@@ -1,0 +1,263 @@
+<!DOCTYPE refentry PUBLIC "-//OASIS//DTD DocBook V4.1//EN" [
+<!ENTITY authors  SYSTEM "authors.sgml">
+<!ENTITY bugzilla SYSTEM "bugzilla.sgml">
+<!ENTITY license  SYSTEM "license.sgml">
+<!ENTITY links    SYSTEM "links.sgml">
+]>
+
+<refentry id='edgvoms8'>
+<refmeta>
+<refentrytitle>edg-voms</refentrytitle>
+<manvolnum>8</manvolnum>
+<refmiscinfo class='source'>VOMS Server</refmiscinfo>
+</refmeta>
+
+<refnamediv id='name'>
+<refname>edg-voms</refname>
+<refpurpose>VOMS server</refpurpose>
+</refnamediv>
+
+<refsynopsisdiv id='synopsis'>
+<cmdsynopsis>
+<command>edg-voms</command>
+<arg choice='opt'><arg choice='plain'>-foreground </arg></arg>
+<arg choice='opt'><arg choice='plain'>-port <replaceable>port</replaceable></arg></arg>
+<arg choice='opt'><arg choice='plain'>-backlog <replaceable>pnum</replaceable></arg></arg>
+<arg choice='opt'><arg choice='plain'>-logfile <replaceable>file</replaceable></arg></arg>
+<arg choice='opt'><arg choice='plain'>-globusid <replaceable>id</replaceable></arg></arg>
+<arg choice='opt'><arg choice='plain'>-globuspwd <replaceable>file</replaceable></arg></arg>
+<arg choice='opt'><arg choice='plain'>-passfile <replaceable>file</replaceable></arg></arg>
+<arg choice='opt'><arg choice='plain'>-x509_cert_dir <replaceable>path</replaceable></arg></arg>
+<arg choice='opt'><arg choice='plain'>-x509_cert_file <replaceable>file</replaceable></arg></arg>
+<arg choice='opt'><arg choice='plain'>-x509_user_cert <replaceable>file</replaceable></arg></arg>
+<arg choice='opt'><arg choice='plain'>-x509_user_key <replaceable>file</replaceable></arg></arg>
+<arg choice='opt'><arg choice='plain'>-x509_user_proxy <replaceable>file</replaceable></arg></arg>
+<arg choice='opt'><arg choice='plain'>-dbname <replaceable>name</replaceable></arg></arg>
+<arg choice='opt'><arg choice='plain'>-username <replaceable>name</replaceable></arg></arg>
+<arg choice='opt'><arg choice='plain'>-vo <replaceable> name</replaceable></arg></arg>
+<arg choice='opt'><arg choice='plain'>-timeout <replaceable> limit</replaceable></arg></arg>
+<arg choice='opt'><arg choice='plain'>-test </arg></arg>
+<arg choice='opt'><arg choice='plain'>-conf <replaceable> file</replaceable></arg></arg>
+<arg choice='opt'><arg choice='plain'>-uri <replaceable> uri</replaceable></arg></arg>
+<arg choice='opt'><arg choice='plain'>-version</arg></arg>
+<arg choice='opt'><arg choice='plain'>-code <replaceable>c</replaceable></arg></arg>
+<arg choice='opt'><arg choice='plain'>-loglevel <replaceable>lev</replaceable></arg></arg>
+<arg choice='opt'><arg choice='plain'>-logtype <replaceable>type</replaceable></arg></arg>
+<arg choice='opt'><arg choice='plain'>-logformat <replaceable>str</replaceable></arg></arg>
+<arg choice='opt'><arg choice='plain'>-logdateformat <replaceable>str</replaceable></arg></arg>
+<arg choice='opt'><arg choice='plain'>-debug</arg></arg>
+<arg choice='opt'><arg choice='plain'>--sqlloc <replaceable>path</replaceable></arg></arg>
+<arg choice='opt'><arg choice='plain'>--compat</arg></arg>
+<arg choice='opt'><arg choice='plain'>--socktimeout <replaceable>num</replaceable></arg></arg>
+<arg choice='opt'><arg choice='plain'>--maxlog <replaceable>num</replaceable></arg></arg>
+<arg choice='opt'><arg choice='plain'>--newformat</arg></arg>
+
+
+
+</cmdsynopsis>
+</refsynopsisdiv>
+
+<refsect1 id='description'><title>Description</title>
+
+<para>VOMS - Virtual Organization Membership Service.</para>
+
+<para>For the initial setup of the server, run the voms_install_db script as root.</para>
+
+</refsect1>
+
+<refsect1 id='options'><title>Options</title>
+
+<para>Options may be specified indifferently with either a "-" or "--" prefix. Their
+meaning is the following.</para>
+
+<para><option>-foreground</option></para>
+<para>Runs part of the server in foreground. Easier debugging.</para>
+
+<para><option>-port</option> <replaceable>port</replaceable></para>
+<para>Listens on port <emphasis remap='I'>port</emphasis>. The default is 754.</para>
+
+<para><option>-backlog</option> <replaceable>num</replaceable></para>
+<para>Sets the maximum backlof for the connections. The default is 50.</para>
+
+<para><option>-logfile</option> <replaceable>file</replaceable></para>
+<para>Selects the file for logging. The default is /ver/log/voms.</para>
+
+<para><option>-globusid</option> <replaceable>id</replaceable></para>
+<para>Sets the server's id. The default is the cert's subject.</para>
+
+<para><option>-globuspwd</option> <replaceable>file</replaceable></para>
+<para>Sets the globuspwd variable.</para>
+
+<para><option>-passfile</option> <replaceable>file</replaceable></para>
+<para>Reads the password to access the DB from <emphasis remap='I'>file</emphasis>. The default is to
+read it from the console during server's startup.</para>
+
+<para><option>-x509_cert_dir</option> <replaceable>path</replaceable></para>
+<para><option>-x509_cert_file</option> <replaceable>file</replaceable></para>
+<para><option>-x509_user_cert</option> <replaceable>file</replaceable></para>
+<para><option>-x509_user_key</option> <replaceable>file</replaceable></para>
+<para><option>-x509_user_proxy</option> <replaceable>file</replaceable></para>
+<para>These options set the respective variables.</para>
+
+<para><option>-dbname</option> <replaceable>name</replaceable></para>
+<para>Sets the name of the DB. Default <emphasis remap='I'>voms</emphasis>.</para>
+
+<para><option>-username</option> <replaceable>name</replaceable></para>
+<para>Sets the name of the user for the DB login. The default is <emphasis remap='I'>voms</emphasis>.</para>
+
+<para><option>-vo</option> <replaceable>name</replaceable></para>
+<para>Sets the name of the VO that owns this server. The default is <emphasis remap='I'>unspecified</emphasis>.</para>
+
+<para><option>-timeout</option> <replaceable>limit</replaceable></para>
+<para>Sets the length of time that the information is valid, measured in secods.
+The default is 86400 seconds (24 hours).</para>
+
+<para><option>-test</option></para>
+<para>Prints information about the server startup and then exits.</para>
+
+<para><option>-conf</option> <replaceable>file</replaceable></para>
+<para>Reads option from the file <emphasis remap='I'>file</emphasis>. The options must be present
+one per line in the format <option>-option[=value]</option> where the value
+part must obviously be present only if it is required.</para>
+
+<para><option>-uri</option> <replaceable>uri</replaceable></para>
+<para>Defines the uri of the server that will be included in the generated
+pseudo certificate. The default value is hostname:port</para>
+
+<para><option>-version</option></para>
+<para>Prints information about the server and then exits.</para>
+
+<para><option>-code</option> <replaceable>c</replaceable></para>
+<para>Defines a subset of AC serial numbers to be used in case multiple servers share the
+same host certificate.  If not specified, this is the same as the port number</para>
+
+<para><option>-logtype</option> <replaceable>type</replaceable></para>
+<para>Sets the type of messages that will be loggged.  Acceptable values are:</para>
+<itemizedlist>
+<listitem>
+<para>1 - STARTUP, print startup messages.</para>
+</listitem>
+<listitem>
+<para>2 - REQUEST, print messages during the request interpretation phase.</para>
+</listitem>
+<listitem>
+<para>4 - RESULT, print messages during the result sending phase.</para>
+</listitem>
+</itemizedlist>
+<para>This values can be ORed together to indicate that all the corresponding types
+of messages are required. The default values is 255.</para>
+
+<para><option>-loglevel</option> <replaceable>lev</replaceable></para>
+<para>Sets the level of verbosity of log messages.  Acceptable values are:</para>
+<itemizedlist>
+<listitem>
+<para>1 - LEV_NONE, do not log anything.</para>
+</listitem>
+<listitem>
+<para>2 - LEV_ERROR, the default, logs only error conditions.</para>
+</listitem>
+<listitem>
+<para>3 - LEV_WARNINGS, logs also warning messages.</para>
+</listitem>
+<listitem>
+<para>4 - LEV_INFO, logs also general informational messages.</para>
+</listitem>
+<listitem>
+<para>5 - LEV_DEBUG, logs also a lot of debug messages.  Setting this level of verbosity
+overwrites the value of the <option>-logtype</option> option to 255.</para>
+</listitem>
+</itemizedlist>
+<para>Higher values include all messages printed by lower ones, and values 
+not documented here are translated as the highest level possible, LEV_DEBUG</para>
+
+<para><option>-logformat</option> <replaceable>str</replaceable></para>
+<para>Sets the format used by the loggin system according toa printf-like
+format string with the following directives format: <emphasis remap='I'>\%[size][char]</emphasis> where size, 
+if present, sets the maximum length of the field and <emphasis remap='i'>char</emphasis> selects the type
+of substitution done. Possible values are the following:</para>
+<itemizedlist>
+<listitem>
+<para>% - Substitutes a plain '%'.</para>
+</listitem>
+<listitem>
+<para>d - Substitutes the date.  The date format is specified by the <option>-logdateformat</option> option.</para>
+</listitem>
+<listitem>
+<para>f - Substitutes the name of the source file that logs the message.</para>
+</listitem>
+<listitem>
+<para>F - Substitutes the name of the function that logs the message.</para>
+</listitem>
+<listitem>
+<para>h - Substitutes the hostname of the machine hosting the service.</para>
+</listitem>
+<listitem>
+<para>l - Substitutes the line number that logs the message.</para>
+</listitem>
+<listitem>
+<para>m - Substitutes the message proper.</para>
+</listitem>
+<listitem>
+<para>p - Substitutes the process' pid.</para>
+</listitem>
+<listitem>
+<para>s - Substitutes the service name ("vomsd").</para>
+</listitem>
+<listitem>
+<para>t - Substitutes the number of the message type. (see the <option>-logtype</option> option)</para>
+</listitem>
+<listitem>
+<para>T - Substitutes the name of the message type. (see the <option>-logtype</option> option)</para>
+</listitem>
+<listitem>
+<para>v - Substitutes the number of the message level. (see the <option>-loglevel</option> option)</para>
+</listitem>
+<listitem>
+<para>V - Substitutes the name of the message level. (see the <option>-loglevel</option> option)</para>
+</listitem>
+</itemizedlist>
+<para>The default value for this options is: "%d:%h:%s(%p):%V:%T:%F (%f:%l):%m"</para>
+
+<para><option>-logdateformat</option> <replaceable>str</replaceable></para>
+<para>This option sets the format used to print the date.  The format is the same used
+by the strftime(3) function, and its default value is: "%c".</para>
+
+<para><option>-debug</option></para>
+<para>This option puts the server into debug mode.  This mode automatically implies
+<option>-loglevel 5</option>.  Also, this option hurts scalability and is not suggested in a production
+environment</para>
+
+<para><option>-sqlloc</option> <replaceable>/path/file</replaceable></para>
+<para>This option specifies the full path for the DB access library.  Please note that there is no
+default for this option!</para>
+
+<para><option>-socktimeout</option> <replaceable>num</replaceable></para>
+<para>This option sets the amount of time, in seconds, after which the server will drop 
+an inactive connection.  The default is 60 seconds.</para>
+
+<para><option>-maxlog</option> <replaceable>num</replaceable></para>
+<para>This options sets the maximum size of a log file.  Please note that this size is
+approximate, and may be exceeded by a few thousand bytes.  In any case, when the specified
+amount is surpassed, logfiles are rotated. The default is 10Mb</para>
+
+<para><option>-newformat</option></para>
+<para>This forces the server to generate ACs in the new (correct) format.  This is meant
+as a compatibility feature to ease migration while the servers upgrade to the new version.</para>
+
+</refsect1>
+
+&bugzilla;
+
+<refsect1 id='seealso'><title>See also</title>
+
+<para>edg-voms-proxy-init(1)</para>
+
+&links;
+
+</refsect1>
+
+&authors;
+
+&license;
+
+</refentry>

@@ -1,0 +1,129 @@
+
+#!/bin/sh
+#set -x
+
+function usage()
+{
+    echo
+    echo "usage : mysql2oracle [OPTIONS]"
+    echo
+    echo -ne "\t--mysql-home <mysql-home>     location of mysql (\$MYSQL_HOME)\n"
+    echo -ne "\t--oracle-home <oracle-home>   location of oracle (\$ORACLE_HOME)\n"
+    echo -ne "\t--db <db>                     name of vosm MySQL db\n"
+    echo -ne "\t--mysql-admin <mysql-admin>   MySQL admin account\n"
+    echo -ne "\t--mysql-pwd <mysql-pwd>       password of MySQL account\n"
+    echo -ne "\t--oracle-admin <oracle-admin> Oracle account\n"
+    echo -ne "\t--oracle-pwd <oracle-pwd>     password of Oracle account\n"
+    echo -ne "\t--oracle-db <db>              name of Oracle db\n"
+    echo -ne "\t--out <filename>              output file where to put the dump (prevent from querying the oracle db)\n"
+
+    echo
+    
+    exit 0
+}
+
+# install prefix
+MYSQL_HOME=${MYSQL_HOME:-/usr}
+ORACLE_HOME=${ORACLE_HOME:-/usr}
+
+# VOMS database
+voms_database=""
+
+# MySQL admin user
+mysql_username_admin=""
+mysql_password_admin=""
+
+# Oracle admin user
+oracle_username_admin=""
+oracle_password_admin=""
+
+dump_output_file=""
+
+TEMP=`getopt -o h --long help,mysql-home:,oracle-home:,db:,mysql-admin:,mysql-pwd:,oracle-admin:,oracle-pwd:,oracle-db:,out: -n 'mysql2oracle' -- "$@"`
+
+if [ $? != 0 ] ; then 
+  echo "Terminating..." >&2 ; exit 1 ;
+fi
+
+eval set -- "$TEMP"
+
+while true ; do
+
+    case "$1" in
+
+	--mysql-home)             MYSQL_HOME=$2              ; shift 2 ;;
+	--oracle-home)            ORACLE_HOME=$2             ; shift 2 ;;
+
+	--db)                     voms_database=$2           ; shift 2 ;;
+
+	--mysql-admin)            mysql_username_admin=$2    ; shift 2 ;;
+	--mysql-pwd)              mysql_password_admin=$2    ; shift 2 ;;
+
+	--oracle-admin)           oracle_username_admin=$2   ; shift 2 ;;
+	--oracle-pwd)             oracle_password_admin=$2   ; shift 2 ;;
+
+	--oracle-db)              oracle_database=$2         ; shift 2 ;;
+
+	--out)                    dump_output_file=$2        ; shift 2 ;;
+
+	--)                       shift                      ; break   ;;
+  --help)                   usage                      ; break   ;;
+  \?)                       usage                      ; break   ;;
+
+    esac
+done
+
+if [ "${voms_database}" = "" ]; then
+    echo -e "\nERROR : database not selected. Use --db option.\n"
+    exit 1
+fi
+
+if [ "${mysql_username_admin}" = "" ]; then
+    echo -e "\nERROR : MySQL admin not selected. Use --mysql-admin option.\n"
+    exit 1
+fi
+
+# Default prefix
+@LOCATION_ENV@=${@LOCATION_ENV@:-@LOCATION_DIR@}
+if [ "${@LOCATION_ENV@}" = "" ]; then
+    echo -e "\nERROR : \$@LOCATION_ENV@ not set, supposing @LOCATION_DIR@. \n"
+fi
+
+# check TNS_ADMIN is set
+TNS_ADMIN=${TNS_ADMIN}
+if [ "${TNS_ADMIN}" = "" ]; then
+    echo -e "\nERROR : \$TNS_ADMIN not set. \n"
+fi
+
+# MySQL client
+if test -z $mysql_password_admin ; then
+   MYSQLDUMP="$MYSQL_HOME/bin/mysqldump -u $mysql_username_admin --no-create-info --extended-insert=false --quote-names=false"
+else
+   MYSQLDUMP="$MYSQL_HOME/bin/mysqldump -u $mysql_username_admin -p$mysql_password_admin --no-create-info --extended-insert=false --quote-names=false"
+fi
+
+# Oracle client
+   CLIENT="$ORACLE_HOME/bin/sqlplus -S $oracle_username_admin/$oracle_password_admin@$oracle_database"
+
+DUMPFILE=`mktemp temp.XXXXXX`
+
+# clean oracle database
+if [ "$dump_output_file" = "" ] ; then
+  echo "Cleaning oracle database ... "
+  if test -f $EDG_LOCATION/etc/voms/voms-oracle.data ; then
+      $CLIENT < $EDG_LOCATION/etc/voms/voms-oracle.data
+  else
+      echo $EDG_LOCATION/etc/voms/voms-oracle.data not installed!
+      exit 1
+  fi
+fi
+
+# dump mysql database, translate and fill oracle database
+echo "Dumping data ..."
+$MYSQLDUMP $voms_database | sed '/--/d' | sed '/\/\*/d' | sed -e s/"IF EXISTS "/""/g | sed '/LOCK TABLES/d' | sed '/UNLOCK TABLES/d' | tr -s '\n' &> $DUMPFILE
+if [ "$dump_output_file" = "" ] ; then
+  cat $DUMPFILE | $CLIENT
+  rm $DUMPFILE
+else
+  mv $DUMPFILE $dump_output_file
+fi

@@ -1,0 +1,46 @@
+#!/bin/sh
+
+# MySQL install prefix
+MYSQL_HOME=/usr
+
+# VOMS database
+voms_database="voms"
+
+# MySQL admin user
+mysql_username_admin="root"
+mysql_password_admin=""
+
+TEMP=`getopt -o h --long mysql-home:,db:,mysql-admin:,mysql-pwd: -n 'upgrade1to2' -- "$@"`
+
+if [ $? != 0 ] ; then echo "Terminating..." >&2 ; exit 1 ; fi
+
+eval set -- "$TEMP"
+
+while true ; do
+    case "$1" in
+	--mysql-home)             MYSQL_HOME=$2              ; shift 2 ;;
+	--db)                     voms_database=$2           ; shift 2 ;;
+	--mysql-admin)            mysql_username_admin=$2    ; shift 2 ;;
+	--mysql-pwd)              mysql_password_admin=$2    ; shift 2 ;;
+	--)                       shift                      ; break   ;;
+	*)                        echo "Internal Error!" >&2 ; exit 1  ;;
+    esac
+done
+
+# MySQL client
+if test -z $mysql_password_admin ; then
+   MYSQLADMIN="$MYSQL_HOME/bin/mysqladmin -u $mysql_username_admin"
+   MYSQL="$MYSQL_HOME/bin/mysql -u $mysql_username_admin"
+else
+   MYSQLADMIN="$MYSQL_HOME/bin/mysqladmin -u $mysql_username_admin -p$mysql_password_admin"
+   MYSQL="$MYSQL_HOME/bin/mysql -u $mysql_username_admin -p$mysql_password_admin"
+fi
+
+# Update Database
+$MYSQL -e "
+  USE $voms_database;
+  ALTER TABLE m CHANGE uid userid bigint(20);
+  ALTER TABLE usr CHANGE uid userid bigint(20);
+  ALTER TABLE usrd CHANGE uid userid bigint(20);
+  UPDATE version SET version=2;"
+

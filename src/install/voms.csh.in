@@ -1,0 +1,5 @@
+setenv VOMS_OPTIONS "--vo unspecified --port 15000 --username voms --dbname voms --passfile @prefix@/etc/voms/voms.pass --logfile @prefix@/var/log/voms"
+
+if ( $?EDG_LOCATION ) then
+  setenv EDG_LOCATION $EDG_LOCATION
+endif

@@ -1,0 +1,132 @@
+<!DOCTYPE refentry PUBLIC "-//OASIS//DTD DocBook V4.1//EN" [
+<!ENTITY authors  SYSTEM "authors.sgml">
+<!ENTITY bugzilla SYSTEM "bugzilla.sgml">
+<!ENTITY license  SYSTEM "license.sgml">
+<!ENTITY links    SYSTEM "links.sgml">
+]>
+
+<refentry id='edgvomsproxylist1'>
+<refmeta>
+<refentrytitle>edg-voms-proxy-list</refentrytitle>
+<manvolnum>1</manvolnum>
+<refmiscinfo class='source'>VOMS Client</refmiscinfo>
+</refmeta>
+
+<refnamediv id='name'>
+<refname>edg-voms-proxy-list</refname>
+<refpurpose>Shows a list of all availabel attributes from a specified server</refpurpose>
+</refnamediv>
+
+<refsynopsisdiv id='synopsis'>
+<cmdsynopsis>
+<command>edg-voms-proxy-list</command>
+<arg choice='opt'><arg choice='plain'>options</arg></arg>
+</cmdsynopsis>
+</refsynopsisdiv>
+
+<refsect1 id='description'><title>Description</title>
+
+<para>The edg-voms-proxy-list prints on screen a list of all available attributes from a specified proxy server.
+</para>
+
+</refsect1>
+
+<refsect1 id='options'><title>Options</title>
+
+<para>Options may be specified indifferently with either a "-" or "--" prefix. The 
+options from -help to -out are present for compatibility with
+grid-proxy-init, and have the exact same meaning. The meaning of the other
+ones is the following.</para>
+
+<para><option>-help</option>
+Displays usage</para>
+
+<para><option>-version</option>
+Displays version</para>
+
+<para><option>-debug</option>
+Enables extra debug output</para>
+
+<para><option>-q</option>
+Quiet mode, minimal output</para>
+
+<para><option>-verify</option>
+Verifies certificate to make proxy for</para>
+
+<para><option>-pwstdin</option>
+Allows passphrase from stdin</para>
+
+<para><option>-cert</option> <replaceable>certfile</replaceable>
+Non-standard location of user certificate</para>
+
+<para><option>-key</option> <replaceable>keyfile</replaceable>
+Non-standard location of user key</para>
+
+<para><option>-certdir</option> <replaceable>certdir</replaceable>
+Non standard location where the trusted CAs certificates are kept.</para>
+
+<para><option>-out</option> <replaceable>proxyfile</replaceable>
+Location of new proxy cert</para>
+
+<para><option>-voms</option> <replaceable>voms</replaceable>
+Specifies the VOMS server to contact using the nickname <emphasis
+remap='I'>voms</emphasis>.</para>
+<para>
+Example : voms-proxy-list --voms myVO</para>
+
+<para><option>-conf</option> <replaceable>file</replaceable>
+Read options from <emphasis remap='I'>file</emphasis>.</para>
+
+<para><option>-confile</option> <replaceable>file</replaceable></para>
+<para><option>-userconf</option> <replaceable>file</replaceable></para>
+<para><option>-vomses</option> <replaceable>file</replaceable>
+Specifies the name of a configuration
+file from which a list of nicknames is read.
+The format of the file is the following:
+<emphasis remap='I'>nick</emphasis> <emphasis remap='I'>host</emphasis> <emphasis remap='I'>port</emphasis> <emphasis remap='I'>subject</emphasis> <emphasis remap='I'>vo</emphasis>
+Where nick is the nickname, host and port are the hostname and
+port of the server to contact, subject is the
+subject of the server's certificate, while vo is the
+name of the VO that owns the server. The default
+filenames are $PREFIX/etc/vomses and $HOME/.edg/vomses.</para>
+
+<para>Moreover, permissions must be 644 if a file is specified,
+and 755 if a directory is specified</para>
+
+<para>The three options are synonyms. -confile and -userconf are deprecated. -vomses
+should be used instead.</para>
+
+<para><option>-globus</option> <replaceable>version</replaceable>
+Underlying Globus version.</para>
+
+<para><option>-noregen</option>
+Avoid regenerating the initial proxy.</para>
+
+<para><option>-ignorewarn</option>
+Ignore all warnings. They are not shown to the user.</para>
+
+<para><option>-failonwarn</option>
+Warnings become failures. The program will translates all warnings into errors
+and will react accordingly, by returning a failure itself.</para>
+
+<para><option>-list</option>
+Instead of producing an attribute certificate, this optin will print
+on screen a list of all attributes available to the user. This is a no-op</para>
+
+</refsect1>
+
+&bugzilla;
+
+<refsect1 id='seealso'><title>See also</title>
+
+<para>edg-voms-proxy-list(1)</para>
+
+&links;
+
+</refsect1>
+
+&authors;
+
+&license;
+
+</refentry>

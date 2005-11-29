@@ -1,0 +1,288 @@
+#! /bin/bash
+#set -x
+
+source /etc/sysconfig/edg
+
+tests=0
+success=0
+
+function newtest() {
+    tests=$(($tests+1))
+}
+
+function result() {
+    if test $1 -eq 0; then
+	success=$(($success+1))
+	echo .... ok!
+    else
+	echo .... failure!
+    fi
+}
+
+function starttest() {
+    local res
+    newtest
+    $@
+    res=$?
+    result $res $2
+    return $res
+}
+
+function printname() {
+    echo -n $@
+}
+
+function report() {
+    if test $tests -eq 0 ; then
+	echo "NO TESTS RUN!"
+	return 1;
+    fi
+    echo "Tests executed:   ($tests)"
+    echo "Successful tests: ($success)"
+    echo "Failed tests:     ($(($tests-$success)))"
+    echo "Percentage:       ($(($success*100/$tests))%)"
+    if test $tests -eq $success ; then
+	return 0
+    else
+	return 1
+    fi
+}
+
+function family() {
+    echo; echo " "
+}
+
+
+
+
+
+
+function mysql.proc() {
+    printname MYSQL is running
+    ps -aux --cols=1000|grep -v grep|grep mysqld >/dev/null 2>/dev/null
+    return $?
+}
+
+function mysql.port() {
+    printname MYSQL is listening
+    netstat -ln| grep 3306 >/dev/null 2>/dev/null
+    return $?
+}
+
+function mysql() {
+    starttest mysql.proc
+    starttest mysql.port
+
+    printname MYSQL tests
+    family
+    return $?
+}
+
+
+
+
+function voms.proc() {
+    printname A VOMS is running
+    if test -z $pid ; then
+	return 1 
+    else
+	ps -aux --cols=1000|grep -v grep|grep $1| grep edg-voms >/dev/null 2>/dev/null
+    fi
+
+    return $?
+}
+
+function voms.port() {
+    printname A VOMS is listening
+    netstat -ln | grep $1 >/dev/null 2>/dev/null
+    return $?
+}
+
+function voms.conf() {
+    printname Testing VOMS configuration... file existance...
+    ls $@LOCATION_ENV@/etc/voms/$1/voms.conf >/dev/null 2>/dev/null
+    return $?
+}
+
+function voms.pass() {
+    printname Can read password file... $1...
+    cat $1 >/dev/null 2>/dev/null
+    return $?
+}
+
+function voms.dbaccess() {
+    printname Testing VOMS configuration... User access
+    echo quit|mysql -u$1 -p$2 >/dev/null 2>/dev/null
+    return $?
+}
+
+function voms.dbase() {
+    printname Testing VOMS DB Existance... User DB Access $3
+    echo quit|mysql -u$1 -p$2 -D$3 >/dev/null 2>/dev/null
+    return $?
+}
+
+function voms.dbase.table() {
+    printname Testing the existance of the table $4 ...
+    echo 'select * from $4;'|mysql -u$1 -p$2 -D$3 >/dev/null 2>/dev/null
+    return $?
+}
+
+function voms.configured() {
+    printname VOMS $1 configured... 
+    if test "x$2" = "x" ; then
+	return 1
+    else
+	return 0
+    fi
+}
+
+
+function voms() {
+    local confs=0
+    vos=`ls $@LOCATION_ENV@/etc/voms`
+
+    for vo in $vos ; do
+	if test  -d $@LOCATION_ENV@/etc/voms/$vo ; then
+	    echo -e "\n\n"
+	    echo "Testing vo: ($vo)"
+	    starttest voms.conf $vo
+
+	    port=`cat $@LOCATION_ENV@/etc/voms/$vo/voms.conf|grep -- --port|cut -f2 -d=` >/dev/null 2>/dev/null
+	    pid=`ps --cols 1000 -x -f|grep "/etc/voms/$vo/voms.conf"|grep edg-voms|grep -v grep|awk '{ print $1; }'` >/dev/null 2>/dev/null
+
+	    dbname=`cat $@LOCATION_ENV@/etc/voms/$vo/voms.conf|grep -- --dbname|cut -f2 -d=` >/dev/null 2>/dev/null
+	    passfile=`cat $@LOCATION_ENV@/etc/voms/$vo/voms.conf|grep -- --passfile|cut -f2 -d=` >/dev/null 2>/dev/null
+	    user=`cat $@LOCATION_ENV@/etc/voms/$vo/voms.conf|grep -- --username|cut -f2 -d=` >/dev/null 2>/dev/null
+	    confs=0
+	    starttest voms.configured port $port
+	    confs=$(($confs+$?))
+	    starttest voms.configured dbname $dbname
+	    confs=$(($confs+$?))
+	    starttest voms.configured passfile $passfile
+	    confs=$(($confs+$?))
+	    starttest voms.configured user $user
+	    confs=$(($confs+$?))
+	    if test $confs -gt 0 ; then
+		continue
+	    fi
+	    starttest voms.port $port
+	    starttest voms.proc $pid
+	    starttest voms.pass $passfile
+	    if test $? -eq 0 ; then
+		pass=`cat $passfile`
+
+		starttest voms.dbaccess $user $pass
+		if test $? -eq 0 ; then
+		    starttest voms.dbase $user $pass $dbname 
+		    if test $? -eq 0 ; then
+			starttest voms.dbase.table $user $pass $dbname usr
+			starttest voms.dbase.table $user $pass $dbname groups
+			starttest voms.dbase.table $user $pass $dbname acl
+			starttest voms.dbase.table $user $pass $dbname acld
+			starttest voms.dbase.table $user $pass $dbname admins
+			starttest voms.dbase.table $user $pass $dbname ca
+			starttest voms.dbase.table $user $pass $dbname capabilities
+			starttest voms.dbase.table $user $pass $dbname capabilitiesd
+			starttest voms.dbase.table $user $pass $dbname groups
+			starttest voms.dbase.table $user $pass $dbname m
+			starttest voms.dbase.table $user $pass $dbname md
+			starttest voms.dbase.table $user $pass $dbname periodicity
+			starttest voms.dbase.table $user $pass $dbname queries
+			starttest voms.dbase.table $user $pass $dbname realtime
+			starttest voms.dbase.table $user $pass $dbname roles
+			starttest voms.dbase.table $user $pass $dbname rolesd
+			starttest voms.dbase.table $user $pass $dbname sequences
+			starttest voms.dbase.table $user $pass $dbname usrd
+			starttest voms.dbase.table $user $pass $dbname validity
+		    fi
+		fi
+	    fi
+	else 
+	    continue
+	fi
+    done
+
+    printname VOMS tests
+    family
+    return $?
+}
+
+function visit() {
+    local temp
+    local name
+    if test -f $1; then
+	list="$1 $list"
+    elif test -d $1; then
+	temp=`ls $1`
+	for name in $temp; do
+	    visit $1/$name
+	done
+    fi
+}
+
+function voms-initial() {
+    printname Trying to create initial proxy... 
+    $@LOCATION_ENV@/bin/edg-voms-proxy-init >/dev/null 2>/dev/null
+    return $?
+}
+
+function voms-contact() {
+    printname Trying to contact server... $1
+    $@LOCATION_ENV@/bin/edg-voms-proxy-init -noregen -voms $1 >/dev/null 2>/dev/null
+    return $?;
+}
+
+function voms-proxy-init() {
+    starttest voms-initial
+
+    if test $? -eq 0 ; then
+	list=""
+	vomses=""
+	visit $@LOCATION_ENV@/etc/vomses
+	visit ~/.edg/vomses
+	for file in $list ; do
+	    new=`cat $file|cut -d\" -f2`
+	    vomses="$vomses $new"
+	done
+
+	for name in $vomses ; do
+	    starttest voms-contact $name
+	done
+    else
+	echo "Failed to create initial proxy!"
+    fi
+}
+
+
+if test -z "$1" ; then
+    mysql
+    voms
+    voms-proxy-init
+    report
+    RETVAL=$?
+else case "$1" in
+    mysql)
+        mysql
+	report
+	RETVAL=$?
+	;;
+    voms)
+        voms
+	report
+	RETVAL=$?
+	;;
+    voms-proxy-init)
+        voms-proxy-init
+	report
+	RETVAL=$?
+	;;
+    *)
+        echo "Usage: $0 [mysql|voms|voms-proxy-init]"
+	RETVAL=1
+	;;
+    esac
+fi
+
+exit $RETVAL
+

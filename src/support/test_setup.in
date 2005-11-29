@@ -1,0 +1,619 @@
+#! /bin/bash
+#set -x
+
+function usage()
+{
+    echo
+    echo "usage : test_setup [-s NUMBER OF VOS] -m MYSQL USER -p MYSQL PWD [-d DIRECTORY]"
+    echo
+
+    exit 0
+}
+
+function is_installed()
+{
+
+    if test ! -x $1; then
+	echo -e "\nERROR : $1\n"
+	exit 1;
+    fi	
+
+}
+
+# parse option
+
+while getopts ":d:s:m:p:h" opt; do
+    case $opt in
+	d  ) directory=$OPTARG;;
+	s  ) let sn=$OPTARG;;
+ 	m  ) mysql_user=$OPTARG;;
+	p  ) mysql_pwd=$OPTARG;;
+	h  ) usage;;
+	\? ) usage
+    esac
+done
+
+# check options
+
+if test -z $sn; then
+    let sn=1;
+fi
+
+if [ $sn -le 0 ]; then
+    echo -e "\nERROR: number fo VOs to install must be positive.\n"
+    exit 1
+fi
+
+if test -z $mysql_user; then
+    echo -e "\nERROR : mysql user not provided.\n"
+    exit 1
+fi
+
+if test -z $mysql_pwd; then
+    echo -e "\nERROR : password of mysql user not provided.\n"
+    exit 1
+fi
+
+# check GLITE_LOCATION is set
+
+GLITE_LOCATION=${GLITE_LOCATION}
+if [ "${GLITE_LOCATION}" = "" ]; then
+    echo "\$GLITE_LOCATION is empty, default to /opt/glite."
+    GLITE_LOCATION=/opt/glite
+else echo "\$GLITE_LOCATION is $GLITE_LOCATION."
+fi
+if ! test -d $GLITE_LOCATION; then
+    echo -e "\nERROR : \$GLITE_LOCATION doesn't exists. \n" 
+    exit 1;
+fi
+if ! test -w $GLITE_LOCATION; then
+    echo -e "\nERROR : \$GLITE_LOCATION is not writable. \n"    
+    exit 1;
+fi
+
+if [ "$directory" == "/etc" ] ; then
+    echo -e "\nERROR : Won't use /etc to install the new CA stuff.\n"
+    exit 1
+fi
+
+directory=${directory:-$GLITE_LOCATION/etc}
+
+# check directory options
+
+if ! test -d $direcory ; then
+    echo -e "\nERROR : $directory doesn't exists.\n" 
+    exit 1;
+fi
+if ! test -w $direcory ; then
+    echo -e "\nERROR : $directory is not writable.\n" 
+    exit 1;
+fi
+
+echo -e "The CA stuff will be installed to $directory.\n Remember it, you should pass it to test_start"
+
+echo -ne "Checking VOMS Core Services are installed  ...  "
+
+# chech voms-proxy-{init, info, destroy} are installed, else exit
+
+is_installed $GLITE_LOCATION/bin/voms-proxy-init
+is_installed $GLITE_LOCATION/bin/voms-proxy-info
+is_installed $GLITE_LOCATION/bin/voms-proxy-destroy
+
+echo "Ok"
+
+# create a test CA with host and users cert
+
+echo -ne "Setting up a test CA and creating certificates  ...  "
+
+# creating the directorys that will store the CA stuff
+
+cd $directory
+mkdir grid-security
+cd grid-security
+mkdir certificates
+mkdir vomsdir
+mkdir usercerts
+
+# need an openssl.cnf, not globus one
+
+cat >> openssl.cnf <<EOF
+#
+# OpenSSL example configuration file.
+# This is mostly being used for generation of certificate requests.
+#
+
+# This definition stops the following lines choking if HOME isn't
+# defined.
+HOME			= .
+RANDFILE		= \$ENV::HOME/.rnd
+
+# Extra OBJECT IDENTIFIER info:
+#oid_file		= \$ENV::HOME/.oid
+oid_section		= new_oids
+
+# To use this configuration file with the "-extfile" option of the
+# "openssl x509" utility, name here the section containing the
+# X.509v3 extensions to use:
+# extensions		= 
+# (Alternatively, use a configuration file that has only
+# X.509v3 extensions in its main [= default] section.)
+
+[ new_oids ]
+
+# We can add new OIDs in here for use by 'ca' and 'req'.
+# Add a simple OID like this:
+# testoid1=1.2.3.4
+# Or use config file substitution like this:
+# testoid2=\${testoid1}.5.6
+
+####################################################################
+[ ca ]
+default_ca	= CA_default		# The default ca section
+
+####################################################################
+[ CA_default ]
+
+dir		= ./     		  # Where everything is kept
+certs		= \$dir		          # Where the issued certs are kept
+crl_dir		= \$dir		          # Where the issued crl are kept
+database	= \$dir/index.txt	  # database index file.
+new_certs_dir	= \$dir          	  # default place for new certs.
+
+certificate	= \$dir/cacert.pem 	  # The CA certificate
+serial		= \$dir/serial 		  # The current serial number
+crl		= \$dir/crl.pem 		  # The current CRL
+private_key	= \$dir/cacert.pem         # The private key
+RANDFILE	= \$dir/private/.rand	  # private random number file
+
+x509_extensions	= usr_cert		  # The extentions to add to the cert
+
+# Comment out the following two lines for the "traditional"
+# (and highly broken) format.
+name_opt 	= ca_default		  # Subject Name options
+cert_opt 	= ca_default		  # Certificate field options
+
+# Extension copying option: use with caution.
+# copy_extensions = copy
+
+# Extensions to add to a CRL. Note: Netscape communicator chokes on V2 CRLs
+# so this is commented out by default to leave a V1 CRL.
+# crl_extensions	= crl_ext
+
+default_days	= 365			# how long to certify for
+default_crl_days= 30			# how long before next CRL
+default_md	= md5			# which md to use.
+preserve	= no			# keep passed DN ordering
+
+# A few difference way of specifying how similar the request should look
+# For type CA, the listed attributes must be the same, and the optional
+# and supplied fields are just that :-)
+policy		= policy_match
+
+# For the CA policy
+[ policy_match ]
+countryName		= match
+stateOrProvinceName	= match
+organizationName	= match
+organizationalUnitName	= optional
+commonName		= supplied
+emailAddress		= optional
+
+# For the 'anything' policy
+# At this point in time, you must list all acceptable 'object'
+# types.
+[ policy_anything ]
+countryName		= optional
+stateOrProvinceName	= optional
+localityName		= optional
+organizationName	= optional
+organizationalUnitName	= optional
+commonName		= supplied
+emailAddress		= optional
+
+####################################################################
+[ req ]
+default_bits		= 1024
+default_keyfile 	= privkey.pem
+distinguished_name	= req_distinguished_name
+attributes		= req_attributes
+x509_extensions	= v3_ca	# The extentions to add to the self signed cert
+
+# Passwords for private keys if not present they will be prompted for
+# input_password = secret
+# output_password = secret
+
+# This sets a mask for permitted string types. There are several options. 
+# default: PrintableString, T61String, BMPString.
+# pkix	 : PrintableString, BMPString.
+# utf8only: only UTF8Strings.
+# nombstr : PrintableString, T61String (no BMPStrings or UTF8Strings).
+# MASK:XXXX a literal mask value.
+# WARNING: current versions of Netscape crash on BMPStrings or UTF8Strings
+# so use this option with caution!
+string_mask = nombstr
+
+# req_extensions = v3_req # The extensions to add to a certificate request
+
+[ req_distinguished_name ]
+countryName			= Country Name (2 letter code)
+countryName_default		= GB
+countryName_min			= 2
+countryName_max			= 2
+
+stateOrProvinceName		= State or Province Name (full name)
+stateOrProvinceName_default	= Berkshire
+
+localityName			= Locality Name (eg, city)
+localityName_default		= Newbury
+
+0.organizationName		= Organization Name (eg, company)
+0.organizationName_default	= My Company Ltd
+
+# we can do this but it is not needed normally :-)
+#1.organizationName		= Second Organization Name (eg, company)
+#1.organizationName_default	= World Wide Web Pty Ltd
+
+organizationalUnitName		= Organizational Unit Name (eg, section)
+#organizationalUnitName_default	=
+
+commonName			= Common Name (eg, your name or your server\'s hostname)
+commonName_max			= 64
+
+emailAddress			= Email Address
+emailAddress_max		= 64
+
+# SET-ex3			= SET extension number 3
+
+[ req_attributes ]
+challengePassword		= A challenge password
+challengePassword_min		= 4
+challengePassword_max		= 20
+
+unstructuredName		= An optional company name
+
+[ usr_cert ]
+
+# These extensions are added when 'ca' signs a request.
+
+# This goes against PKIX guidelines but some CAs do it and some software
+# requires this to avoid interpreting an end user certificate as a CA.
+
+basicConstraints=CA:FALSE
+
+# Here are some examples of the usage of nsCertType. If it is omitted
+# the certificate can be used for anything *except* object signing.
+
+# This is OK for an SSL server.
+# nsCertType			= server
+
+# For an object signing certificate this would be used.
+# nsCertType = objsign
+
+# For normal client use this is typical
+# nsCertType = client, email
+
+# and for everything including object signing:
+# nsCertType = client, email, objsign
+
+# This is typical in keyUsage for a client certificate.
+# keyUsage = nonRepudiation, digitalSignature, keyEncipherment
+
+# This will be displayed in Netscape's comment listbox.
+nsComment			= "OpenSSL Generated Certificate"
+
+# PKIX recommendations harmless if included in all certificates.
+subjectKeyIdentifier=hash
+authorityKeyIdentifier=keyid,issuer:always
+
+# This stuff is for subjectAltName and issuerAltname.
+# Import the email address.
+# subjectAltName=email:copy
+# An alternative to produce certificates that aren't
+# deprecated according to PKIX.
+# subjectAltName=email:move
+
+# Copy subject details
+# issuerAltName=issuer:copy
+
+#nsCaRevocationUrl		= http://www.domain.dom/ca-crl.pem
+#nsBaseUrl
+#nsRevocationUrl
+#nsRenewalUrl
+#nsCaPolicyUrl
+#nsSslServerName
+
+[ v3_req ]
+
+# Extensions to add to a certificate request
+
+basicConstraints = CA:FALSE
+keyUsage = nonRepudiation, digitalSignature, keyEncipherment
+
+[ v3_ca ]
+
+
+# Extensions for a typical CA
+
+
+# PKIX recommendation.
+
+subjectKeyIdentifier=hash
+
+authorityKeyIdentifier=keyid:always,issuer:always
+
+# This is what PKIX recommends but some broken software chokes on critical
+# extensions.
+#basicConstraints = critical,CA:true
+# So we do this instead.
+basicConstraints = CA:true
+
+# Key usage: this is typical for a CA certificate. However since it will
+# prevent it being used as an test self-signed certificate it is best
+# left out by default.
+# keyUsage = cRLSign, keyCertSign
+
+# Some might want this also
+# nsCertType = sslCA, emailCA
+
+# Include email address in subject alt name: another PKIX recommendation
+# subjectAltName=email:copy
+# Copy issuer details
+# issuerAltName=issuer:copy
+
+# DER hex encoding of an extension: beware experts only!
+# obj=DER:02:03
+# Where 'obj' is a standard or added object
+# You can even override a supported extension:
+# basicConstraints= critical, DER:30:03:01:01:FF
+
+[ crl_ext ]
+
+# CRL extensions.
+# Only issuerAltName and authorityKeyIdentifier make any sense in a CRL.
+
+# issuerAltName=issuer:copy
+authorityKeyIdentifier=keyid:always,issuer:always
+EOF
+
+
+
+# CA certificate
+
+cp /dev/null index.txt
+echo "01" > serial
+openssl req -new -x509 -nodes -subj "/C=IT/CN=test CA" -days 2 -batch -keyout cacert.pem -out cacert.pem 2> /dev/null
+
+
+# host certficate 
+
+openssl req -new -nodes -subj "/C=IT/CN=test host" -batch -keyout req.pem -out req.pem 2> /dev/null
+openssl ca -config openssl.cnf -policy policy_anything -days 1 -batch -out hostcert.pem -in req.pem 2> /dev/null
+chmod 600 req.pem
+mv req.pem hostkey.pem
+
+# user certificate
+
+openssl req -new -nodes -subj "/C=IT/CN=test user" -batch -keyout req.pem -out req.pem 2> /dev/null
+openssl ca -config openssl.cnf -policy policy_anything -days 1 -batch -out usercert.pem -in req.pem 2> /dev/null 
+chmod 600 req.pem
+mv req.pem userkey.pem
+
+mv cacert.pem c722f89e.0
+cat >> c722f89e.signing_policy <<EOF 
+access_id_CA            X509    '/C=IT/CN=test CA'
+pos_rights globus       CA:sign
+cond_subjects           globus  '"*"'
+EOF
+
+rm -f 0*.pem
+rm -f index.txt*
+rm -f serial*
+rm -f openssl.cnf
+
+cp hostcert.pem vomsdir 
+mv usercert.pem userkey.pem usercerts
+mv c722f89e.0 c722f89e.signing_policy certificates
+
+echo "Ok"
+    
+# check voms is installed, install a test VO, populate the db and start the server
+
+cat >> dump.sql <<EOF
+--
+-- insert the fake CA
+--
+
+INSERT INTO ca VALUES ('','/C=IT/CN=test CA','CA created for test purpose');
+
+--
+-- Creating groups
+--
+
+INSERT INTO groups VALUES ('','/group1',0,1,2,1,0,NULL);
+INSERT INTO groups VALUES ('','/group2',0,1,2,1,0,NULL);
+INSERT INTO groups VALUES ('','/group3',0,1,2,1,0,NULL);
+INSERT INTO groups VALUES ('','/group1/subgroup1',1,1,2,1,0,NULL);
+INSERT INTO groups VALUES ('','/group1/subgroup2',1,1,2,1,0,NULL);
+INSERT INTO groups VALUES ('','/group1/subgroup3',1,1,2,1,0,NULL);
+INSERT INTO groups VALUES ('','/group2/subgroup1',2,1,2,1,0,NULL);
+INSERT INTO groups VALUES ('','/group2/subgroup2',2,1,2,1,0,NULL);
+INSERT INTO groups VALUES ('','/group2/subgroup3',2,1,2,1,0,NULL);
+INSERT INTO groups VALUES ('','/group3/subgroup1',3,1,2,1,0,NULL);
+INSERT INTO groups VALUES ('','/group3/subgroup2',3,1,2,1,0,NULL);
+INSERT INTO groups VALUES ('','/group3/subgroup3',3,1,2,1,0,NULL);
+
+--
+-- populating the m table
+--
+
+INSERT INTO m VALUES (1,1,NULL,NULL,NULL,NULL,0,0);
+INSERT INTO m VALUES (1,2,NULL,NULL,NULL,NULL,0,0);
+INSERT INTO m VALUES (1,3,NULL,NULL,NULL,NULL,0,0);
+INSERT INTO m VALUES (1,4,NULL,NULL,NULL,NULL,0,0);
+INSERT INTO m VALUES (1,11,NULL,NULL,NULL,NULL,0,0);
+INSERT INTO m VALUES (1,12,NULL,NULL,NULL,NULL,0,0);
+INSERT INTO m VALUES (1,13,NULL,NULL,NULL,NULL,0,0);
+INSERT INTO m VALUES (1,20,NULL,NULL,NULL,NULL,0,0);
+INSERT INTO m VALUES (1,21,NULL,NULL,NULL,NULL,0,0);
+INSERT INTO m VALUES (1,22,NULL,NULL,NULL,NULL,0,0);
+INSERT INTO m VALUES (1,31,NULL,NULL,NULL,NULL,0,0);
+INSERT INTO m VALUES (1,32,NULL,NULL,NULL,NULL,0,0);
+INSERT INTO m VALUES (1,33,NULL,NULL,NULL,NULL,0,0);
+INSERT INTO m VALUES (2,1,NULL,NULL,NULL,NULL,0,0);
+INSERT INTO m VALUES (2,2,NULL,NULL,NULL,NULL,0,0);
+INSERT INTO m VALUES (2,3,NULL,NULL,NULL,NULL,0,0);
+INSERT INTO m VALUES (2,4,NULL,NULL,NULL,NULL,0,0);
+INSERT INTO m VALUES (2,11,NULL,NULL,NULL,NULL,0,0);
+INSERT INTO m VALUES (2,12,NULL,NULL,NULL,NULL,0,0);
+INSERT INTO m VALUES (2,13,NULL,NULL,NULL,NULL,0,0);
+INSERT INTO m VALUES (2,20,NULL,NULL,NULL,NULL,0,0);
+INSERT INTO m VALUES (2,21,NULL,NULL,NULL,NULL,0,0);
+INSERT INTO m VALUES (2,22,NULL,NULL,NULL,NULL,0,0);
+INSERT INTO m VALUES (2,31,NULL,NULL,NULL,NULL,0,0);
+INSERT INTO m VALUES (2,32,NULL,NULL,NULL,NULL,0,0);
+INSERT INTO m VALUES (2,33,NULL,NULL,NULL,NULL,0,0);
+INSERT INTO m VALUES (1,1,2,NULL,NULL,NULL,0,0);
+INSERT INTO m VALUES (1,2,2,NULL,NULL,NULL,0,0);
+INSERT INTO m VALUES (1,3,2,NULL,NULL,NULL,0,0);
+INSERT INTO m VALUES (1,4,2,NULL,NULL,NULL,0,0);
+INSERT INTO m VALUES (1,11,2,NULL,NULL,NULL,0,0);
+INSERT INTO m VALUES (1,12,2,NULL,NULL,NULL,0,0);
+INSERT INTO m VALUES (1,13,2,NULL,NULL,NULL,0,0);
+INSERT INTO m VALUES (1,20,2,NULL,NULL,NULL,0,0);
+INSERT INTO m VALUES (1,21,2,NULL,NULL,NULL,0,0);
+INSERT INTO m VALUES (1,22,2,NULL,NULL,NULL,0,0);
+INSERT INTO m VALUES (1,31,2,NULL,NULL,NULL,0,0);
+INSERT INTO m VALUES (1,32,2,NULL,NULL,NULL,0,0);
+INSERT INTO m VALUES (1,33,2,NULL,NULL,NULL,0,0);
+INSERT INTO m VALUES (1,1,3,NULL,NULL,NULL,0,0);
+INSERT INTO m VALUES (1,2,3,NULL,NULL,NULL,0,0);
+INSERT INTO m VALUES (1,3,3,NULL,NULL,NULL,0,0);
+INSERT INTO m VALUES (1,4,3,NULL,NULL,NULL,0,0);
+INSERT INTO m VALUES (1,11,3,NULL,NULL,NULL,0,0);
+INSERT INTO m VALUES (1,12,3,NULL,NULL,NULL,0,0);
+INSERT INTO m VALUES (1,13,3,NULL,NULL,NULL,0,0);
+INSERT INTO m VALUES (1,20,3,NULL,NULL,NULL,0,0);
+INSERT INTO m VALUES (1,21,3,NULL,NULL,NULL,0,0);
+INSERT INTO m VALUES (1,22,3,NULL,NULL,NULL,0,0);
+INSERT INTO m VALUES (1,31,3,NULL,NULL,NULL,0,0);
+INSERT INTO m VALUES (1,32,3,NULL,NULL,NULL,0,0);
+INSERT INTO m VALUES (1,33,3,NULL,NULL,NULL,0,0);
+INSERT INTO m VALUES (1,1,10,NULL,NULL,NULL,0,0);
+INSERT INTO m VALUES (1,2,10,NULL,NULL,NULL,0,0);
+INSERT INTO m VALUES (1,3,10,NULL,NULL,NULL,0,0);
+INSERT INTO m VALUES (1,4,10,NULL,NULL,NULL,0,0);
+INSERT INTO m VALUES (1,11,10,NULL,NULL,NULL,0,0);
+INSERT INTO m VALUES (1,12,10,NULL,NULL,NULL,0,0);
+INSERT INTO m VALUES (1,13,10,NULL,NULL,NULL,0,0);
+INSERT INTO m VALUES (1,20,10,NULL,NULL,NULL,0,0);
+INSERT INTO m VALUES (1,21,10,NULL,NULL,NULL,0,0);
+INSERT INTO m VALUES (1,22,10,NULL,NULL,NULL,0,0);
+INSERT INTO m VALUES (1,31,10,NULL,NULL,NULL,0,0);
+INSERT INTO m VALUES (1,32,10,NULL,NULL,NULL,0,0);
+INSERT INTO m VALUES (1,33,10,NULL,NULL,NULL,0,0);
+INSERT INTO m VALUES (2,1,2,NULL,NULL,NULL,0,0);
+INSERT INTO m VALUES (2,2,2,NULL,NULL,NULL,0,0);
+INSERT INTO m VALUES (2,3,2,NULL,NULL,NULL,0,0);
+INSERT INTO m VALUES (2,4,2,NULL,NULL,NULL,0,0);
+INSERT INTO m VALUES (2,11,2,NULL,NULL,NULL,0,0);
+INSERT INTO m VALUES (2,12,2,NULL,NULL,NULL,0,0);
+INSERT INTO m VALUES (2,13,2,NULL,NULL,NULL,0,0);
+INSERT INTO m VALUES (2,20,2,NULL,NULL,NULL,0,0);
+INSERT INTO m VALUES (2,21,2,NULL,NULL,NULL,0,0);
+INSERT INTO m VALUES (2,22,2,NULL,NULL,NULL,0,0);
+INSERT INTO m VALUES (2,31,2,NULL,NULL,NULL,0,0);
+INSERT INTO m VALUES (2,32,2,NULL,NULL,NULL,0,0);
+INSERT INTO m VALUES (2,33,2,NULL,NULL,NULL,0,0);
+INSERT INTO m VALUES (2,1,3,NULL,NULL,NULL,0,0);
+INSERT INTO m VALUES (2,2,3,NULL,NULL,NULL,0,0);
+INSERT INTO m VALUES (2,3,3,NULL,NULL,NULL,0,0);
+INSERT INTO m VALUES (2,4,3,NULL,NULL,NULL,0,0);
+INSERT INTO m VALUES (2,11,3,NULL,NULL,NULL,0,0);
+INSERT INTO m VALUES (2,12,3,NULL,NULL,NULL,0,0);
+INSERT INTO m VALUES (2,13,3,NULL,NULL,NULL,0,0);
+INSERT INTO m VALUES (2,20,3,NULL,NULL,NULL,0,0);
+INSERT INTO m VALUES (2,21,3,NULL,NULL,NULL,0,0);
+INSERT INTO m VALUES (2,22,3,NULL,NULL,NULL,0,0);
+INSERT INTO m VALUES (2,31,3,NULL,NULL,NULL,0,0);
+INSERT INTO m VALUES (2,32,3,NULL,NULL,NULL,0,0);
+INSERT INTO m VALUES (2,33,3,NULL,NULL,NULL,0,0);
+INSERT INTO m VALUES (2,1,10,NULL,NULL,NULL,0,0);
+INSERT INTO m VALUES (2,2,10,NULL,NULL,NULL,0,0);
+INSERT INTO m VALUES (2,3,10,NULL,NULL,NULL,0,0);
+INSERT INTO m VALUES (2,4,10,NULL,NULL,NULL,0,0);
+INSERT INTO m VALUES (2,11,10,NULL,NULL,NULL,0,0);
+INSERT INTO m VALUES (2,12,10,NULL,NULL,NULL,0,0);
+INSERT INTO m VALUES (2,13,10,NULL,NULL,NULL,0,0);
+INSERT INTO m VALUES (2,20,10,NULL,NULL,NULL,0,0);
+INSERT INTO m VALUES (2,21,10,NULL,NULL,NULL,0,0);
+INSERT INTO m VALUES (2,22,10,NULL,NULL,NULL,0,0);
+INSERT INTO m VALUES (2,31,10,NULL,NULL,NULL,0,0);
+INSERT INTO m VALUES (2,32,10,NULL,NULL,NULL,0,0);
+INSERT INTO m VALUES (2,33,10,NULL,NULL,NULL,0,0);
+
+--
+-- Creating roles
+--
+
+INSERT INTO roles VALUES ('','role1',3,1,0);
+INSERT INTO roles VALUES ('','role2',3,1,0);
+INSERT INTO roles VALUES ('','role3',3,1,0);
+
+--
+-- Creating users
+--
+
+INSERT INTO usr VALUES ('','/C=IT/CN=test user',27,'Test User One','',NULL,0,0);
+INSERT INTO usr VALUES ('','CN=Test User Two',27,'Test User Two','',NULL,0,0);
+EOF
+
+let i=$((sn))
+while [ $((i)) -gt 0 ]; do 
+
+    echo -ne "Installing test VO $i and starting services  ...  "
+
+    if test ! -x $GLITE_LOCATION/sbin/voms; then
+	echo -e "\nERROR : voms not installed\n"
+	exit 1;
+    fi	
+
+    if ! $GLITE_LOCATION/libexec/voms/voms_install_db --vo "test"$i --port $((50000+i)) \
+	--mysql-admin=$mysql_user --mysql-pwd=$mysql_pwd \
+	--voms-name test_user --voms-pwd pwd --db "test_db"$i \
+	--code $i; then
+	echo -e "\nERROR : error installing test VO.\n"
+	exit 1;
+    fi
+
+    if ! mysql -u $mysql_user -p$mysql_pwd "test_db"$i < dump.sql; then
+	echo -e "ERROR : error populating the database." 
+	exit 1;
+    fi
+
+    echo \""test"$i\" \"$(hostname)\" \"$((50000+i))\" \"/C=IT/CN=test host\" \""test"$i\" \"22\" >> vomses
+
+    cat >> $GLITE_LOCATION/etc/voms/"test"$i/voms.conf <<EOF
+--x509_user_cert=$directory/grid-security/hostcert.pem
+--x509_user_key=$directory/grid-security/hostkey.pem
+--x509_cert_dir=$directory/grid-security/certificates
+--backlog=100
+EOF
+
+    if ! $GLITE_LOCATION/etc/init.d/voms start "test"$i > /dev/null; then
+	echo -e "\nERROR : error starting the server.\n"
+	exit 1;
+    fi
+    
+    let i=$i-1
+
+    echo "Ok"
+
+done
+
+rm dump.sql
+
+cd ..
+if ! tar -czf tarball.tar.gz grid-security; then
+    echo -e "\nERROR : error tarballing grid-security.\n"
+else echo "A tarball containing certs and files to test the installed vo was created in $directory."
+fi

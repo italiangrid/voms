@@ -1,0 +1,317 @@
+\documentclass[a4]{article}
+\title{A VOMS Attribute Certificate\\ Profile for Authorization}
+\author{Vincenzo Ciaschini}
+\begin{document}
+\maketitle
+\tableofcontents
+\newpage
+\section{Introduction}
+X.509 Attribute Certificates (ACs) \cite{rfc3281} are used to bind a
+set of attributes, like group membership, role, security clearance,
+etc\ldots\ with an AC holder.  Their well-defined, standardized format
+and easy extensibility make them a premium way to distribute those
+informations in large system, and in particular in environments where
+authentication is done via X.509 Certificates \cite{rfc3280}.  This is
+the reason why ACs are the format chosen by the VOMS server
+\cite{voms} to encode authorization data.
+
+However, the reference documantation about ACs leaves a huge amount of
+freedom regarding exactly how ACs should be encoded. The scope of this
+paper is to document the particular vernacular of ACs used by VOMS,
+and how the data they contain is supposed to be encoded.  This format
+is in any case fully compatible with what described in \cite{rfc3281},
+and should any incompatibility be found between what is described here
+and what is described in \cite{rfc3281}, the latter is the
+authoritative source.
+
+The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT",
+"SHOULD", "SHOULD NOT", "RECOMMENDED", "MAY", and "OPTIONAL" in this
+document are to be interpreted as described in \cite{rfc2119}.
+
+\section{FQAN}
+The FQAN (short form for Fully Qualified Attribute Name) is what VOMS
+ACs use in place of the Group/Role attributes. It is better described
+in \cite{fqan}, although a brief summary will be given in the
+following paragraphs.  It has been developed because of two perceived
+problems with the standard-defined\cite{rfc3281} Group and Role
+attributes:
+
+\begin{enumerate}
+\item The Group and Role attributes are completely independent of each
+other; in particular, Roles are meant to be global, associated
+directly to the AC holder, regarless of group membership. On the other
+hand, besides this behaviour VOMS also allows groups and roles to be
+bound together, using one as a qualifier of the other.  While it is
+indeed possible to encode groups and roles inside the standard
+attributes in a format that could represent this information, there is
+no way to have the same format also be readable by other AC users
+without risking misunderstandings.
+\item Also, practical use of group/role attributes in defining ACLs
+has showed that having them separate is inconvenient, and it is much
+simpler to have them all expressed together.
+\end{enumerate}
+
+For these reasons, a new format has been devised, as documented in
+\cite{fqan}.  However, here follows a copy of the relevant informations.
+
+Group membership, Role holding and Capabilities may be expressed in a
+format that bounds them together in the following way:
+
+\begin{center}
+$<$group name$>$/Role=[$<$role name$>$][/Capability=$<$capability name$>$]
+\end{center}
+
+where the elements between [] are optional.
+
+This format specifies that the AC holder is a member of group $<$group
+name$>$, and in this group he holds the role $<$role name$>$ while
+having the capability $<$capability name$>$.
+
+$<$group name$>$, $<$role name$>$ and $<$capability name$>$ are
+described by the following grammar:
+
+\begin{verbatim}
+group name      ::= entity
+                 |  groupname ``/'' entity
+role name       ::= entity
+capability name ::= entity
+
+entity          ::= [a-zA-Z0-9 _]*
+\end{verbatim}
+
+It can be noted that while role and capability names have a flat
+structure, group name can be expressed as a series of identifiers
+separated by the ``/'' character.  This happens because groups are a
+structured entities, where a group can have subgroups, that can have
+subgroups, ad libitum.  They are represented in the same format as
+Unix path names, where the first directory name corresponds to the VO
+name, the second one to a group, the third one to a subgroup of the
+preceding group, etc\ldots
+
+\section{VOMS Attribute Certificate Profile}
+
+This is the general format of an AC as defined by \cite{rfc3281}.
+Customizations used by VOMS will be discussed in individual
+subsections.  Everything not specifically mentioned here is intended
+to be in accordance with \cite{rfc3281}.
+
+\begin{verbatim}
+AttributeCertificate ::= SEQUENCE {
+  acinfo              AttributeCertificateInfo,
+  signatureAlgorithm  AlgorithmIdentifier,
+  signatureValue      BIT STRING
+}
+
+AttributeCertificateInfo ::= SEQUENCE {
+  verson                 AttCertVersion,
+  holder                 Holder,
+  issuer                 AttCertIssuer,
+  signature              AlgorithmIdentifier,
+  serialNumber           CertificateSerialNumber,
+  attrCertValidityPeriod AttCertValidityPeriod,
+  attributes             SEQUENCE OF Attribute,
+  issuerUniqueID         UniqueIdentifier OPTIONAL,
+  extensions             Extensions OPTIONAL
+}
+
+AttCertVersion ::= INTEGER { v2(1) }
+
+Holder ::= SEQUENCE {
+  baseCertificateID         [0] IssuerSerial OPTIONAL,
+}
+
+AttCertIssuer ::= CHOICE {
+  v2Form   [0] V2Form
+}
+
+V2Form ::= SEQUENCE {
+  issuerName            GeneralNames  OPTIONAL,
+  baseCertificateID     [0] IssuerSerial  OPTIONAL,
+  objectDigestInfo      [1] ObjectDigestInfo  OPTIONAL
+}
+
+IssuerSerial  ::=  SEQUENCE {
+  issuer         GeneralNames,
+  serial         CertificateSerialNumber,
+  issuerUID      UniqueIdentifier OPTIONAL
+}
+
+AttCertValidityPeriod  ::= SEQUENCE {
+  notBeforeTime  GeneralizedTime,
+  notAfterTime   GeneralizedTime
+}
+
+Attribute ::= SEQUENCE {
+  type      AttributeType,
+  values    SET OF AttributeValue
+  -- at least one value is required
+}
+
+AttributeType ::= OBJECT IDENTIFIER
+
+AttributeValue ::= ANY DEFINED BY AttributeType
+\end{verbatim}
+
+\subsection{Holder}
+The holder of a VOMS AC MUST always be an X.509 PKC.  As a consequence
+of this, in VOMS ACs the only admissible choice for the field is the
+baseCertificateID, hence the absence in the above decription, of the
+other two choices from this SEQUENCE. The issuerUID field in this case
+MUST be present if and only if it is also present in the holder's PKC,
+and in this case they MUST have the same value. Note that
+\cite{rfc3280}\ says that conforming implementations of PKCs SHOULD
+NOT use this field, but that implementations SHOULD be capable to
+handle it.
+
+\subsection{AttCertIssuer} 
+The AttCertIssuer field MUST always be encoded using the V2Form data
+format.
+
+\subsection{V2Form}
+Conforming ACs MUST NOT use either the baseCertificateID or the
+objectDigestInfo fields. They MUST use the issuerName field, which
+MUST contain one and only one distinguished name belonging to the
+certificate that the AC issuer will use to sign the AC. This in
+particular means that this subject MUST NOT be empty.
+
+\section{Attributes}
+The attributes field contains informations about the AC holder.  At
+least one attribute MUST always be present. 
+
+Attributes types use the format defined in \cite{rfc3281}, repeated here
+for convenience:
+
+\begin{verbatim}
+IetfAttrSyntax ::= SEQUENCE {
+  policyAuthority [0] GeneralNames    OPTIONAL,
+  values          SEQUENCE OF CHOICE {
+    octets    OCTET STRING,
+    oid       OBJECT IDENTIFIER,
+    string    UTF8String
+  }
+}
+\end{verbatim}
+
+The attributes Group and Role, defined in \cite{rfc3281} are not used by
+VOMS AC, and SHOULD NOT be present in conforming ACs.  Instead, it
+defines a new attribute, FQAN, which holds informations about both,
+and in fact also binds them together.
+
+\begin{verbatim}
+name         : voms-attribute
+OID          : { voms 4 }
+syntax       : IetfAttrSyntax
+values       : Multiple allowed
+\end{verbatim}
+
+where ``voms'' is the OID 1.3.6.1.5.3004.100.100 and has been
+registered for VOMS.
+
+The policyAuthority field of the IetfAttrSyntax MUST contain an
+encoding of both the VO to which the AC issuer belongs and the server
+which generated this particular attribute, in the following format:
+
+\begin{center}
+$<$vo name$>$://$<$fqhn$>$:$<$port$>$
+\end{center}
+
+all of this component should be omitted, and the IA5STRING
+choice of the GeneralName type should be used.
+
+On the same way, the octets choice of the values field shoud be used
+to encode the FQANs.
+
+\subsection{Extensions}
+
+In the current version, only a specific subset of the extensions
+specified in \cite{rfc3281} is used and they are decribed here, along with
+any specifics points that were originally only loosely defined.  A
+VOMS-compliant AC is allowed to use extensions other than those
+indicated here, on the condition that they should not be critical.
+
+\subsubsection{AC Target}
+
+This extension MAY be present. If it is present, then then targetName
+option MUST be used, with the FQDNs of the hosts which the AC is
+targeted to.  Compliant implementation MUST honor this extension.
+Also, they MUST be capable of understnading at least the targetName
+option.
+
+\subsubsection{No Revocation Available}
+
+This extension MUST be used in the current version of VOMS ACs.
+
+\subsection{Attributes}
+
+While in principle any attribute may be used here, this section will
+specify what attributes are included in the current version of ACs and
+which are expected to be recognized by conforming implementations.
+
+\subsubsection{Fully Qualified Attribute Name (FQAN)}
+
+This attribute is used to express user membership in groups and
+ownership of roles in an integrated way that makes easier to express
+relations between the two elements.  It is fully documented in [FQAN],
+and MUST be included in any and all VOMS ACs.
+
+\subsubsection{Group and Role}
+
+This two attributes are not used in current version, but they MAY be
+present.  However, in this case their content should be consistent
+with the content of the FQAN attribute. The suggested way to ensure
+this is the following:
+\begin{enumerate}
+\item Role and Group have the same number of elements as FQAN.
+\item If the n-th element of FQAN denote membership in group G and
+  ownership of role R, then those are the values of the n-th Group and
+  the n-th Role. If no role R is specified in an element of the FQAN
+  attribute, then the corresponding element in the Role attribute is
+  the empty string.
+\end{enumerate}
+Conforming implementations MAY recognize this two attributes, but if
+they do they SHOULD the verify correspondence between their values and
+the content of the FQAN attributes.  Should there be a miscrepancy,
+the normative data should be that included in the FQAN element.  It is
+up to the implementation whether to consider a discrepancy enough
+cause for an error or to settle for a warning.
+
+\section{Attribute Certificate Validation}
+All mechanisms described by \cite{rfc3281} are kept as they are with only
+the following change:
+\begin{quote}
+It is not required at any time during signature verification that:
+\begin{itemize}
+\item The AC issuer certificate has the signing bit set, or that
+\item any proxy certificate or user certificate as the signing bit
+  set.
+\end{itemize}
+It is although preferred for AC issuer certificate that the signing
+bit is set.
+\end{quote}
+
+\begin{thebibliography}{rfc3280}
+\bibitem{rfc3281} 
+S.~Farrell, R.~Housley, RFC 3281: An Internet Attribute Certificate
+  Profile for Authorization.
+
+\bibitem{rfc3280} 
+R.~Housley, W.~Polk, W.~Ford, D.~Solo, RFC 3280: Internet X.509 Public
+  Key Infrastructure Certificate and Certificate Revocation List (CRL)
+  Profile.
+
+\bibitem{rfc2119} 
+S.~Bradner, RFC 2119: Key words for use in RFCs to Indicate
+  Requirement Levels.
+
+\bibitem{fqan}
+V.~Ciaschini, A.~Frohner, Voms Credential Format,
+http://edg-wp2.web.cern.ch/edg-wp2/security/voms/edg-voms-credential.pdf
+
+\bibitem{voms} 
+R.~Alfieri, R.~Cecchini, V.~Ciaschini, L.~Dell'Agnello, A.~Frohner,
+  A.~Gianoli, L.~Karoly, F.~Spataro, An Authorization System for
+  Virtual Organizations, Forthcoming in Proceedings of the 1st
+  European Across Grids Conference.
+\end{thebibliography}
+\end{document}
+

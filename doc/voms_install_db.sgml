@@ -1,0 +1,192 @@
+<!DOCTYPE refentry PUBLIC "-//OASIS//DTD DocBook V4.1//EN" [
+<!ENTITY authors  SYSTEM "authors.sgml">
+<!ENTITY bugzilla SYSTEM "bugzilla.sgml">
+<!ENTITY license  SYSTEM "license.sgml">
+<!ENTITY links    SYSTEM "links.sgml">
+]>
+
+<refentry id='voms-install-db1'>
+<refmeta>
+<refentrytitle>voms_install_db</refentrytitle>
+<manvolnum>1</manvolnum>
+<refmiscinfo class='source'>VOMS Server setup</refmiscinfo>
+</refmeta>
+
+<refnamediv id='name'>
+<refname>voms_install_db</refname>
+<refpurpose>Setup the edg-voms server for initial use</refpurpose>
+</refnamediv>
+
+<refsynopsisdiv id='synopsis'>
+<cmdsynopsis>
+<command>voms_install_db</command>
+<arg choice='opt'><replaceable>options</replaceable></arg>
+</cmdsynopsis>
+</refsynopsisdiv>
+
+<refsect1 id='description'><title>Description</title>
+
+<para>The voms_install_db script initializes a VOMS server. This script MUST be run
+as root.</para>
+
+</refsect1>
+
+<refsect1 id='options'><title>Options</title>
+
+<para><option>--mysql-home</option> <replaceable>path</replaceable>
+Default home of MySQL. The default is '/usr'.</para>
+
+<para><option>--db</option> <replaceable>name</replaceable>
+Name of the db to create. The default is 'voms'.</para>
+
+<para><option>--port</option> <replaceable>port</replaceable>
+Listens on port <emphasis remap='I'>port</emphasis>. The default is 15000.</para>
+
+<para><option>--voms-vo</option> <replaceable>name</replaceable>
+Sets the vo name. The default is 'unspecified'.</para>
+
+<para><option>--mysql-admin</option> <replaceable>name</replaceable>
+The name of the MySQL admin user. The default is 'root'.</para>
+
+<para><option>--mysql-pwd</option> <replaceable>value</replaceable>
+The password of the MySQL admin user, The default is to not use a password.</para>
+
+<para><option>--voms-name</option> <replaceable>name</replaceable>
+The name of the voms user. The default is 'voms'.</para>
+
+<para><option>--voms-pwd</option> <replaceable>value</replaceable>
+The password of the voms user. The default is 'password'.</para>
+
+<para><option>--code</option> <replaceable>c</replaceable>
+Defines a set of AC serial numbers to be used in case several serers share the
+same host certificate.  If not specified, it is the same as the port number</para>
+
+<para><option>-logtype</option> <replaceable>type</replaceable></para>
+<para>Sets the type of messages that will be loggged.  Acceptable values are:</para>
+<itemizedlist>
+<listitem>
+<para>1 - STARTUP, print startup messages.</para>
+</listitem>
+<listitem>
+<para>2 - REQUEST, print messages during the request interpretation phase.</para>
+</listitem>
+<listitem>
+<para>4 - RESULT, print messages during the result sending phase.</para>
+</listitem>
+</itemizedlist>
+<para>This values can be ORed together to indicate that all the corresponding types
+of messages are required. The default values is 255.</para>
+
+<para><option>-loglevel</option> <replaceable>lev</replaceable></para>
+<para>Sets the level of verbosity of log messages.  Acceptable values are:</para>
+<itemizedlist>
+<listitem>
+<para>1 - LEV_NONE, do not log anything.</para>
+</listitem>
+<listitem>
+<para>2 - LEV_ERROR, the default, logs only error conditions.</para>
+</listitem>
+<listitem>
+<para>3 - LEV_WARNINGS, logs also warning messages.</para>
+</listitem>
+<listitem>
+<para>4 - LEV_INFO, logs also general informational messages.</para>
+</listitem>
+<listitem>
+<para>5 - LEV_DEBUG, logs also a lot of debug messages.  Setting this level of verbosity
+overwrites the value of the <option>-logtype</option> option to 255.</para>
+</listitem>
+</itemizedlist>
+<para>Higher values include all messages printed by lower ones, and values 
+not documented here are translated as the highest level possible, LEV_DEBUG</para>
+
+<para><option>-logformat</option> <replaceable>str</replaceable></para>
+<para>Sets the format used by the loggin system according toa printf-like
+format string with the following directives format: <emphasis remap='I'>\%[size][char]</emphasis> where size, 
+if present, sets the maximum length of the field and <emphasis remap='i'>char</emphasis> selects the type
+of substitution done. Possible values are the following:</para>
+<itemizedlist>
+<listitem>
+<para>% - Substitutes a plain '%'.</para>
+</listitem>
+<listitem>
+<para>d - Substitutes the date.  The date format is specified by the <option>-logdateformat</option> option.</para>
+</listitem>
+<listitem>
+<para>f - Substitutes the name of the source file that logs the message.</para>
+</listitem>
+<listitem>
+<para>F - Substitutes the name of the function that logs the message.</para>
+</listitem>
+<listitem>
+<para>h - Substitutes the hostname of the machine hosting the service.</para>
+</listitem>
+<listitem>
+<para>l - Substitutes the line number that logs the message.</para>
+</listitem>
+<listitem>
+<para>m - Substitutes the message proper.</para>
+</listitem>
+<listitem>
+<para>p - Substitutes the process' pid.</para>
+</listitem>
+<listitem>
+<para>s - Substitutes the service name ("vomsd").</para>
+</listitem>
+<listitem>
+<para>t - Substitutes the number of the message type. (see the <option>-logtype</option> option)</para>
+</listitem>
+<listitem>
+<para>T - Substitutes the name of the message type. (see the <option>-logtype</option> option)</para>
+</listitem>
+<listitem>
+<para>v - Substitutes the number of the message level. (see the <option>-loglevel</option> option)</para>
+</listitem>
+<listitem>
+<para>V - Substitutes the name of the message level. (see the <option>-loglevel</option> option)</para>
+</listitem>
+</itemizedlist>
+<para>The default value for this options is: "%d:%h:%s(%p):%V:%T:%F (%f:%l):%m"</para>
+
+<para><option>-logdateformat</option> <replaceable>str</replaceable></para>
+<para>This option sets the format used to print the date.  The format is the same used
+by the strftime(3) function, and its default value is: "%c".</para>
+
+<para><option>-debug</option></para>
+<para>This option puts the server into debug mode.  This mode automatically implies
+<option>-loglevel 5</option>.  Also, this option hurts scalability and is not suggested in a production
+environment</para>
+
+<para><option>-db-type</option> <replaceable>type</replaceable></para>
+<para>Specifies the type of the underlying DB.  Possible values are either mysql or 
+oracle.  This option MUST be present.</para>
+
+<para><option>-sqlloc</option> <replaceable>/path/file</replaceable></para>
+<para>This option specifies the full path for the DB access library.  Please note that there is no
+default for this option!</para>
+
+<para><option>-socktimeout</option> <replaceable>num</replaceable></para>
+<para>This option sets the amount of time, in seconds, after which the server will drop 
+an inactive connection.  The default is 60 seconds.</para>
+
+<para><option>-newformat</option></para>
+<para>This forces the server to generate ACs in the new (correct) format.  This is meant
+as a compatibility feature to ease migration while the servers upgrade to the new version.</para>
+
+</refsect1>
+
+&bugzilla;
+
+<refsect1 id='seealso'><title>See also</title>
+
+<para>edg-voms(8)</para>
+
+&links;
+
+</refsect1>
+
+&authors;
+
+&license;
+
+</refentry>

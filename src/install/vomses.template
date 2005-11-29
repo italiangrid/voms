@@ -1,0 +1,2 @@
+# "nickname" "host" "port" "hostcert's dn" "vo" "globus version (of the server to contact)"
+"wpsix" "gppvom06.gridpp.rl.ac.uk" "50001" "gppvom06.gridpp.rl.ac.uk" "wpsix" "22"

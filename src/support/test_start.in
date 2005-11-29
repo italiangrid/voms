@@ -1,0 +1,386 @@
+#! /bin/bash
+#set -x
+
+function usage()
+{
+
+    echo
+    echo "usage : test_start ( -d <directory> | -a <vo> -f <confile> [-c <certdir>] [-v <vomsdir>] -u <usercert> ) [-t <threads>] [-r <repetitions>] -l <logfile>"
+    echo
+    echo -ne "\t-d <directory>   dir where test_setup installed the CA stuff (to use after test_setup only)\n"
+    echo -ne "\t-a <vo>          already installed and running vo to test against\n"
+    echo -ne "\t-f <confile>     location of vomses confile\n"
+    echo -ne "\t-c <certdit>     location of trusted CA cert dir\n"
+    echo -ne "\t-v <vomsdir>     location of trusted VOMS host cert dir\n"
+    echo -ne "\t-u <usercert>    location of a proxy certificate\n"
+    echo -ne "\t-t <threads>     number of threads\n"
+    echo -ne "\t-r <repetitions> number of repetiotions per thread\n"
+    echo -ne "\t-l <logfile>     location of logfile\n"
+    echo
+
+    exit 0
+}
+
+function show_result()
+{
+
+    echo "$(($(wc -l < /tmp/done))) voms-proxy-init executed, $(wc -l < /tmp/init_failure) failed."
+    echo "$(($(wc -l < /tmp/done))) voms-proxy-info executed, $(wc -l < /tmp/info_failure) failed."
+    echo "$(($(wc -l < /tmp/done))) voms-proxy-destroy executed, $(wc -l < /tmp/destroy_failure) failed."
+    echo "$(($(wc -l < /tmp/done))) voms-proxy-init executed, $(wc -l < /tmp/init_failure) failed." >> $logfile
+    echo "$(($(wc -l < /tmp/done))) voms-proxy-info executed, $(wc -l < /tmp/info_failure) failed." >> $logfile
+    echo "$(($(wc -l < /tmp/done))) voms-proxy-destroy executed, $(wc -l < /tmp/destroy_failure) failed." >> $logfile
+    echo >> $logfile
+
+}
+
+function is_installed()
+{
+
+    if test ! -x $1; then
+	echo -e "\nERROR : $1\n"
+	exit 1;
+    fi	
+}
+
+# parse option
+
+while getopts ":d:c:v:u:t:r:a:f:l:h" opt; do
+    case $opt in
+	d  ) directory=$OPTARG;;
+	c  ) certdir=$OPTARG;;
+	v  ) vomsdir=$OPTARG;;
+	u  ) usercert=$OPTARG;;
+	t  ) let threads=$OPTARG;;
+	r  ) let repeat=$OPTARG;;
+	a  ) vo=$OPTARG;;
+	f  ) confile=$OPTARG;;
+	l  ) logfile=$OPTARG;;
+	h  ) usage;;
+	\? ) usage
+    esac
+done
+
+# check options
+
+if test -z $directory; then
+    if test -z $vo; then
+	echo -e "\nERROR : vo not given.\n"
+	exit 1
+    fi
+    if test -z $confile; then
+	echo -e "\nERROR : confile not given.\n"
+	exit 1
+    fi
+    certdir=${certdir:-/etc/grid-security/certificates}
+    vomsdir=${vomsdir:-/etc/grid-security/vomsdir}
+    if test -z $usercert; then
+	echo -e "\nERROR : usercert not given.\n"
+	exit 1
+    fi
+    userkey=$usercert
+else
+    if test -z vo; then
+	echo -e "\nERROR : else -a or -d.\n"
+	exit 1
+    fi
+    certdir=$directory/grid-security/certificates
+    vomsdir=$directory/grid-security/vomsdir
+    usercert=$directory/grid-security/usercerts/usercert.pem
+    userkey=$directory/grid-security/usercerts/userkey.pem
+    confile=$directory/grid-security/vomses
+fi
+
+if test -z $threads; then
+    let threads=1;
+fi
+
+if [ $threads -le 0 ]; then
+    echo -e "\nERROR: number of threads must be positive.\n"
+    exit 1
+fi
+
+if test -z $repeat; then
+    let repeat=1;
+fi
+
+if [ $repeat -le 0 ]; then
+    echo -e "\nERROR: number of repetition must be positive.\n"
+    exit 1
+fi
+
+if test -z $logfile; then
+    echo -e "\nERROR : no logfile provided.\n"
+    exit 1
+fi
+if test -e $logfile; then
+    echo -e "\nERROR : $logfile already exists. Would be removed.\n"
+    exit 1
+fi
+touch $logfile
+
+# check you have write access to /tmp
+
+if ! test -w /tmp; then
+    echo "\nERROR : you don't have write access to /tmp.\n"
+    exit 2
+fi
+
+# check GLITE_LOCATION is set
+
+GLITE_LOCATION=${GLITE_LOCATION}
+if [ "${GLITE_LOCATION}" = "" ]; then
+    GLITE_LOCATION=/opt/glite
+fi
+if ! test -d $GLITE_LOCATION; then
+    echo -e "\nERROR : \$GLITE_LOCATION not set. \n" 
+    exit 1;
+fi
+
+# chech voms-proxy-{init, info, destroy} are installed
+
+is_installed $GLITE_LOCATION/bin/voms-proxy-init
+is_installed $GLITE_LOCATION/bin/voms-proxy-info
+is_installed $GLITE_LOCATION/bin/voms-proxy-destroy
+
+# environment
+
+export X509_USER_CERT=$usercert
+export X509_USER_KEY=$userkey
+export X509_CERT_DIR=$certdir
+export X509_VOMS_DIR=$vomsdir
+
+# prepare tmp files
+
+touch /tmp/done
+touch /tmp/init_failure
+touch /tmp/info_failure
+touch /tmp/destroy_failure
+
+# grid-proxy-init-like voms-proxy-init test
+
+echo -e "TEST NAME : grid-proxy-like voms-proxy-{init, info, destroy}"
+echo -e "TEST NAME : grid-proxy-like voms-proxy-{init, info, destroy}\n" >> $logfile
+
+let i=0
+while [ $i -lt $repeat ] ; do
+    if ! voms-proxy-init -out /tmp/$i &> /tmp/tmp_init_log$i; then
+	echo "" >> /tmp/init_failure
+	echo "Command : voms-proxy-init -out $i" >> $logfile
+	cat /tmp/tmp_init_log$i >> $logfile 
+	echo >> $logfile
+    else
+	if ! grid-proxy-info -file /tmp/$i &> /tmp/tmp_info_log$i; then
+	    echo "" >> /tmp/info_failure
+	    echo "Command : grid-proxy-info -file $i" >> $logfile
+	    cat /tmp/tmp_info_log$i >> $logfile
+	    echo >> $logfile
+	fi
+	if ! voms-proxy-destroy -file /tmp/$i &> /tmp/tmp_destroy_log$i; then
+	    echo "\$1\$2" >> /tmp/destroy_failure
+	    echo "Command : voms-proxy-destroy -file $i" >> $logfile
+	    cat /tmp/tmp_destroy_log$i >> $logfile
+	    echo >> $logfile
+	fi
+    fi
+    if ! grid-proxy-init -out /tmp/$i &> /tmp/tmp_init_log$i; then
+	echo "" >> /tmp/init_failure
+	echo "Command : grid-proxy-init -out $i" >> $logfile
+	cat /tmp/tmp_init_log$i >> $logfile 
+	echo >> $logfile
+    else
+	if ! voms-proxy-info -file /tmp/$i &> /tmp/tmp_info_log$i; then
+	    echo "" >> /tmp/info_failure
+	    echo "Command : voms-proxy-info -file $i" >> $logfile
+	    cat /tmp/tmp_info_log$i >> $logfile 
+	    echo >> $logfile
+	fi
+	if ! voms-proxy-destroy -file /tmp/$i &> /tmp/tmp_destroy_log$i; then
+	echo "\$1\$2" >> /tmp/destroy_failure
+	echo "Command : voms-proxy-destroy -file $i" >> $logfile
+	cat /tmp/tmp_destroy_log$i >> $logfile
+	echo >> $logfile
+	fi
+    fi
+    echo "" >> /tmp/done
+    rm /tmp/tmp_init_log$i
+    rm /tmp/tmp_info_log$i
+    rm /tmp/tmp_destroy_log$i
+    let i=i+1
+done
+
+show_result
+
+cp /dev/null /tmp/done
+cp /dev/null /tmp/init_failure
+cp /dev/null /tmp/info_failure
+cp /dev/null /tmp/destroy_failure
+
+# get number of vo
+
+if test -z $vo; then
+    let n=$(($(wc -l < $confile)))
+else let n=1
+fi
+
+# VOMS-enabled voms-proxy-init with lot of attributes and reordering
+
+if test -z $vo; then
+
+    echo -e "TEST NAME : VOMS enabled voms-proxy-init with reordering of attributes"
+    echo -e "TEST NAME : VOMS enabled voms-proxy-init with reordering of attributes\n" >> $logfile
+
+    voname=${vo:-"test1"}
+    fqan=:all
+    fqan1=/group1
+    fqan2=/group1/subgroup1
+    fqan3=/group1/subgroup1/Role=role1
+
+    if ! voms-proxy-init --userconf $confile --voms test1:all --order $fqan1 --order $fqan2 --order $fqan3 --order $fqan4 --order $fqan5 --out /tmp/0 &> /tmp/tmp_init_log0; then
+	echo >> /tmp/init_failure
+	echo "Command : " >> $logfile
+	cat /tmp/tmp_init_log0 >> $logfile 
+	echo >> $logfile
+    else
+	if ! voms-proxy-info -fqan -file 0 &> /tmp/tmp_info_log0; then
+	    echo >> /tmp/info_failure
+	    echo "Command : voms-proxy-info -file 0" >> $logfile
+	    cat /tmp/tmp_info_log0 >> $logfile
+	    echo >> $logfile
+	else
+	    cat >> /tmp/shouldbe <<EOF
+/group1/Role=NULL/Capability=NULL
+/group1/Role=role1/Capability=NULL
+/group2/Role=NULL/Capability=NULL
+/group1/Role=role2/Capability=NULL
+/group2/Role=role1/Capability=NULL
+/group2/Role=role2/Capability=NULL
+/group3/Role=NULL/Capability=NULL
+/group3/Role=role1/Capability=NULL
+/group3/Role=role2/Capability=NULL
+/group3/subgroup1/Role=NULL/Capability=NULL
+/group3/subgroup1/Role=role1/Capability=NULL
+/group3/subgroup1/Role=role2/Capability=NULL
+/group3/subgroup2/Role=NULL/Capability=NULL
+/group3/subgroup2/Role=role1/Capability=NULL
+/group3/subgroup2/Role=role2/Capability=NULL
+/group3/subgroup3/Role=NULL/Capability=NULL
+/group3/subgroup3/Role=role1/Capability=NULL
+/group3/subgroup3/Role=role2/Capability=NULL
+/test1/Role=NULL/Capability=NULL
+/test1/Role=role1/Capability=NULL
+/test1/Role=role2/Capability=NULL
+EOF
+	    if [ "$(voms-proxy-info -fqan -file 0)" != "$(cat /tmp/shouldbe)" ]; then
+		echo "Check of order of attributes failed." >> $logfile
+		echo >> $logfile	    
+	    fi
+	fi
+	if ! voms-proxy-destroy -file 0 &> /tmp/tmp_destroy_log0; then
+	    echo >> /tmp/destroy_failure
+	    echo "Command : voms-proxy-destroy -file $i" >> $logfile
+	    cat /tmp/tmp_destroy_log0 >> $logfile
+	    echo >> $logfile
+	fi
+    fi
+    echo >> /tmp/done
+    rm /tmp/tmp_init_log0
+    rm -f /tmp/tmp_info_log0
+    rm -f /tmp/tmp_destroy_log0
+    rm -f /tmp/shouldbe
+    
+    show_result
+
+    cp /dev/null /tmp/done
+    cp /dev/null /tmp/init_failure
+    cp /dev/null /tmp/info_failure
+    cp /dev/null /tmp/destroy_failure
+
+fi
+
+# Mass test
+
+echo -e "TEST NAME : mass voms-proxy-{init, info, destroy}"
+echo -e "test VOs : $n"
+echo -e "parallel threads : $threads"
+echo -e "repetition per threads : $repeat"
+echo -e "TEST NAME : mass voms-proxy-{init, info, destroy}\n" >> $logfile
+echo -e "test VOs : $n" >> $logfile
+echo -e "parallel threads : $threads" >> $logfile
+echo -e "repetition per threads : $repeat\n" >> $logfile
+
+cat >> /tmp/script <<EOF
+#! /bin/bash
+voname=${vo:-"test\$2"}
+let i=0
+while [ \$i -lt $repeat ] ; do
+if ! voms-proxy-init --userconf $confile --voms \$voname -out /tmp/\$1\$2 &> /tmp/tmp_init_log\$1\$2; then
+echo >> /tmp/init_failure
+echo -e "Command : voms-proxy-init --userconf $confile --voms \$voname -out /tmp/\$1\$2" >> $logfile
+cat /tmp/tmp_init_log\$1\$2 >> $logfile
+echo >> $logfile
+else
+if ! voms-proxy-info -file /tmp/\$1\$2 &> /tmp/tmp_info_log\$1\$2; then
+echo "" >> /tmp/info_failure
+echo -e "Command : voms-proxy-info -file /tmp/\$1\$2" >> $logfile
+cat /tmp/tmp_info_log\$1\$2 >> $logfile
+echo >> $logfile
+out=\$(voms-proxy-info -fqan -file /tmp/\$1\$2)
+fqan=/\$voname/Role=NULL/Capability=NULL
+elif [ "\$out" != "\$fqan" ]; then
+echo -e "Command : voms-proxy-info -fqan -file /tmp/\$1\$2\n" >> $logfile
+echo -e "Wrong attributes." >> $logfile
+echo >> $logfile
+fi
+if ! voms-proxy-destroy -file /tmp/\$1\$2 &> /tmp/tmp_destroy_log\$1\$2; then
+echo >> /tmp/destroy_failure
+echo -e "Command : voms-proxy-destroy -file /tmp/\$1\$2" >> $logfile
+cat /tmp/tmp_destroy_log\$1\$2 >> $logfile
+echo >> $logfile
+fi
+fi
+echo >> /tmp/done
+let i=i+1
+done
+rm -f /tmp/tmp_init_log\$1\$2
+rm -f /tmp/tmp_info_log\$1\$2
+rm -f /tmp/tmp_destroy_log\$1\$2
+EOF
+chmod 700 /tmp/script
+
+let i=0
+while [ $i -lt $((threads)) ] ; do
+    let j=$((n))
+    while [ $j -gt 0 ] ; do
+	/tmp/script $i $j &
+	let j=$j-1
+    done
+    let i=$i+1
+done
+
+while [ $(wc -l < /tmp/done) != $((threads*repeat*n)) ]; do
+    tput cub 10
+    echo -ne $(wc -l < /tmp/done)
+    sleep 1
+done
+
+rm /tmp/script
+
+tput el1
+tput cub 10
+show_result
+
+echo -e "\nSee $logfile for details."
+
+# clean tmp
+
+rm /tmp/done
+rm -f /tmp/init_failure
+rm -f /tmp/info_failure
+rm -f /tmp/destroy_failure
+
+let i=0
+while [ $i -lt $((repeat)) ] ; do
+    rm -rf /tmp/$i
+    let i=$i+1
+done

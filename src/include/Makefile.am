@@ -1,0 +1,13 @@
+
+include_HEADERS = \
+	newformat.h \
+	acstack.h
+
+EXTRA_DIST = Client.h config.h.in data.h \
+globus_oldgaa.h globus_oldgaa_utils.h gssapi_compat.h \
+newca.h options.h pass.h Server.h sign.h streamers.h \
+tokens.h config.h.in xml.h vomsxml.h errors.h log.h \
+listfunc.h errortype.h credentials.h newformat.h proxycertinfo.h \
+acstack.h validate.h ccac.h init.h ccwrite.h getopts.h replace.h dbwrap.h
+
+MAINTAINERCLEANFILES = Makefile.in

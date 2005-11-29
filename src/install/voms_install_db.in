@@ -1,0 +1,289 @@
+#!/bin/sh
+#set -x
+
+# Default prefix
+@LOCATION_ENV@=${@LOCATION_ENV@:-@PPREFIX@}
+if test -z $@VAR_LOCATION_ENV@ ; then
+    @VAR_LOCATION_ENV@=$@LOCATION_ENV@/var
+fi
+
+# CERTDIR
+CERTDIR=${CERTDIR:-/etc/grid-security/certificates}
+
+# openssl
+SSLPROG="openssl"
+
+# MySQL install prefix
+MYSQL_HOME=${MYSQL_HOME:-/usr}
+
+# MySQL install prefix
+ORACLE_HOME=""
+
+# VOMS database
+voms_database=""
+
+# VOMS VO
+voms_vo=""
+
+# MySQL admin user
+db_username_admin="root"
+db_password_admin=""
+
+# VOMS query user
+voms_username_query=""
+voms_password_query=""
+
+# Default path
+basepath=$@LOCATION_ENV@
+datapath=$@LOCATION_ENV@
+
+# Default Suffix
+code=0
+compat_mode=""
+timeout=30
+loglevel=2
+logtype=7
+logdateformat=""
+logformat=""
+sqlloc=""
+help=""
+oldformat="no"
+
+TEMP=`getopt -o h --long mysql-home:,loglevel:,logtype:,logformat:,logdateformat:,oracle-home:,db:,port:,code:,voms-vo:,socktimeout:,db-type:,sqlloc:,db-admin:,db-pwd:,voms-name:,voms-pwd:,newformat:,compat -n 'voms_install_db' -- "$@"`
+
+if [ $? != 0 ] ; then echo "Terminating..." >&2 ; exit 1 ; fi
+
+eval set -- "$TEMP"
+
+while true ; do
+    case "$1" in
+  --mysql-home)             MYSQL_HOME=$2              ; shift 2 ;;
+  --oracle-home)            ORACLE_HOME=$2             ; shift 2 ;;
+  --db)                     voms_database=$2           ; shift 2 ;;
+  --port)                   port=$2                    ; shift 2 ;;
+  --code)                   code=0                     ; shift 2 ;;
+  --voms-vo)                voms_vo=$2                 ; shift 2 ;;
+  --db-type)                db_type=$2                 ; shift 2 ;;
+  --sqlloc)                 sqlloc=$2                  ; shift 2 ;;
+  --db-admin)               db_username_admin=$2       ; shift 2 ;;
+  --db-pwd)                 db_password_admin=$2       ; shift 2 ;;
+  --voms-name)              voms_username_query=$2     ; shift 2 ;;
+  --voms-pwd)               voms_password_query=$2     ; shift 2 ;;
+  --compat)                 compat_mode="-compat"      ; shift 1 ;;
+  --socktimeout)            timeout=$2                 ; shift 2 ;;
+  --loglevel)               loglevel=$2                ; shift 2 ;;
+  --logtype)                logtype=$2                 ; shift 2 ;;
+  --logformat)              logformat=$2               ; shift 2 ;;
+  --logdateformat)          logdateformat=$2           ; shift 2 ;;
+  --newformat)              oldformat="yes"            ; shift 1 ;;
+  -h)                       help="yes"                 ; shift 1 ;;
+	--)                       shift                      ; break   ;;
+	*)                        echo "Internal Error!" >&2 ; exit 1  ;;
+    esac
+done
+
+if test "x$help" = "xyes"; then
+    echo "USAGE: voms_install_db  [--option value] ... [--option value]"
+    echo
+    echo "Where --option may be:"
+    echo "    --mysql-home path       Where the MySQL installation is based."
+    echo "                            Defaults to the value of \$MYSQL_HOME"
+    echo "                            if specified, and /usr otherwise. Only"
+    echo "                            needed if MySQL support is desired."
+    echo "    --oracle-home path      Where the Oracle installation is based."
+    echo "                            Only needed if Oracle support is desired."
+    echo "                            No defaults."
+    echo "    --port port             The port on which the server will listen."
+    echo "                            The default value is 15000."
+    echo "    --code num              Only present for compatibility with older"
+    echo "                            versions of this script.  It is ignored."
+    echo "    --voms-vo name          The name of the VO. No defaults."
+    echo "    --db-type type          The type of the underlying DB.  Only"
+    echo "                           'mysql' and 'oracle' are accepted now."
+    echo "                            There are no defaults.  This must always be."
+    echo "                            specified."
+    echo "    --sqlloc path           The name of the db access library to use."
+    echo "                            The library path must be in \$LD_LIRARY_PATH"
+    echo "                            or in ld.so.conf, or the option must specify"
+    echo "                            the full path. Defaults to libvoms<db>.so."
+    echo "    --db-admin name         The name of the DB administrator account."
+    echo "                            Defaults to 'root'."
+    echo "    --db-pwd password       The password associated to the db-admin account."
+    echo "                            No defaults."
+    echo "    --voms-name name        The name of the DB account that will be created to"
+    echo "                            let VOMS access the DB.  Defaults to voms_<vo name>."
+    echo "    --voms-pwd              The password of the previous account.  The default"
+    echo "                            is randomly generated."
+    echo "    --compat                If specified, allows the server to work with an"
+    echo "                            existing DB coming from VOMS 1.4.x or before."
+    echo "    --socktimeout sec       Specifies the length of time after which connections"
+    echo "                            to the server will be dropped, in seconds.  The"
+    echo "                            default is 60 seconds."
+    echo "    --loglevel lev          Sets the amount of leveling.  Higher values imply more"
+    echo "                            logging. The default is 2. (LOG_ERROR)"
+    echo "    --logtype type          Specifies what to log. See the vomsd(8) man page for details."
+    echo "    --logformat format      See the vomsd(8) man page for details."
+    echo "    --logdateformat format  See the vomsd(8) man page for details."
+    echo "    --newformat             Creates AC according to the old format."
+    echo "    --help                  This output."
+    exit 0;
+fi
+    
+if test "x$voms_vo" = "x"; then
+  echo "The VO name MUST be specified!"
+  exit 1;
+fi
+
+if test "x$voms_username_query" = "x"; then
+  voms_username_query="voms_"$voms_vo
+fi
+
+if test "x$voms_database" = "x"; then
+  voms_database="voms_"$voms_vo
+fi
+
+if test "x$voms_password_query" = "x"; then
+    voms_password_query="`$SSLPROG rand -base64 6`";
+fi
+
+if test "$db_type" != "mysql"; then
+    if test "$db_type" != "oracle"; then
+        echo "Only 'mysql' or 'oracle' are accepted values for --db-type."
+        return 1
+    fi
+fi
+
+if test "x$compat_mode" = "x-compat" ; then
+  if test "x$db_type" != "xmysql"; then
+      echo "compatibility mode only works with MySQL!";
+      return 1;
+  fi
+fi
+
+if test "x$sqlloc" = "x"; then
+    sqlloc="libvoms$db_type.so"
+fi
+
+# choose client
+if test $db_type = "mysql" ; then
+    if test -z $db_password_admin ; then
+        MYSQLADMIN="$MYSQL_HOME/bin/mysqladmin -u $db_username_admin"
+        CLIENT="$MYSQL_HOME/bin/mysql -u $db_username_admin"
+    else
+        MYSQLADMIN="$MYSQL_HOME/bin/mysqladmin -u $db_username_admin -p$db_password_admin"
+        CLIENT="$MYSQL_HOME/bin/mysql -u $db_username_admin -p$db_password_admin"	
+    fi
+elif test $db_type = "oracle" ; then
+    CLIENT="$ORACLE_HOME/bin/sqlplus -S $db_username_admin/$db_password_admin@$voms_database"
+else 
+    echo "Please select one beetween --db-type oracle and --db-type mysql."
+fi
+
+# Create Database
+if test $db_type = "mysql" ; then
+    $CLIENT -e "DROP DATABASE IF EXISTS $voms_database;
+                CREATE DATABASE $voms_database;"
+    CLIENT="$CLIENT -D$voms_database" 
+fi
+
+# Create Tables
+$CLIENT < "${datapath}/etc/voms/voms-"$db_type$compat_mode".data"
+
+# Create users
+if test $db_type = "mysql" ; then
+$CLIENT -e "
+  GRANT SELECT         ON $voms_database.*         TO   $voms_username_query              IDENTIFIED BY '$voms_password_query';
+  GRANT LOCK TABLES    ON $voms_database.*         TO   $voms_username_query              IDENTIFIED BY '$voms_password_query';
+
+  GRANT SELECT         ON $voms_database.*         TO   $voms_username_query@localhost    IDENTIFIED BY '$voms_password_query';
+  GRANT LOCK TABLES    ON $voms_database.*         TO   $voms_username_query@localhost    IDENTIFIED BY '$voms_password_query';
+
+  GRANT UPDATE ON $voms_database.seqnumber TO $voms_username_query IDENTIFIED BY '$voms_password_query';
+  GRANT UPDATE ON $voms_database.seqnumber TO $voms_username_query@localhost IDENTIFIED BY '$voms_password_query';
+
+  FLUSH PRIVILEGES;"
+fi
+
+# Populate database
+$CLIENT <<EOF
+-- The transaction counter.  The first real transaction will get CreatedSerial=1.
+INSERT INTO sequences VALUES ('transaction', 0);
+-- The dummy CA for local administrators bypassing the security infrastructure.
+INSERT INTO ca VALUES (1, '/O=VOMS/O=System/CN=Dummy Certificate Authority', 'A dummy CA for local database maintenance.');
+INSERT INTO ca VALUES (2, '/O=VOMS/O=System/CN=Authorization Manager Attributes', 'A virtual CA corresponding to authz manager attributes');
+INSERT INTO ca VALUES (3, '/O=VOMS/O=System/CN=VOMS Group', 'A virtual CA corresponding to a VO group');
+INSERT INTO ca VALUES (4, '/O=VOMS/O=System/CN=VOMS Role', 'A virtual CA corresponding to a VO role');
+INSERT INTO ca VALUES (5, '/O=VOMS/O=System/CN=VOMS Capability', 'A the virtual CA corresponding to a VO capability');
+-- The database administrator responsible for these bootstrap records. 
+INSERT INTO admins VALUES (1, '/O=VOMS/O=System/CN=Local Database Administrator', 1, 1, 0);
+-- The VO-Admin role to allow remote administration
+INSERT INTO admins VALUES (2, '/$voms_vo/Role=VO-Admin', 4, 1, 0);
+-- The ACL of the VO Group.  The DBA can do everything.  
+-- (Just a placeholder, since the DBA doesn't really need ACLs.)
+INSERT INTO acl VALUES (1, 1, 1, 1, 1, 0);
+INSERT INTO acl VALUES (1, 2, 1, 1, 1, 0);
+-- The Default ACL of the VO Group.
+INSERT INTO acl VALUES (2, 1, 1, 1, 1, 0);
+INSERT INTO acl VALUES (2, 2, 1, 1, 1, 0);
+-- The VO Group.
+INSERT INTO groups VALUES (1, '/$voms_vo', 0, 1, 2, 1, 0, NULL);
+-- The ACL of the VO-Admin role.
+INSERT INTO acl VALUES (3, 1, 1, 1, 1, 0);
+INSERT INTO acl VALUES (3, 2, 1, 1, 1, 0);
+-- The VO Administrators role
+INSERT INTO roles VALUES (1, 'VO-Admin', 3, 1, 0);
+-- The first timestamp record.
+-- INSERT INTO realtime VALUES (0, current_timestamp);
+INSERT INTO seqnumber VALUES ('00');
+INSERT INTO version (version) VALUES (2);
+EOF
+
+# Populate ca table
+insert_ca=""
+i=5
+
+for cert in $CERTDIR/*.0
+do
+   let i+=1
+   subject=`$SSLPROG x509 -noout -subject -in $cert|sed 's/^subject=[ ]*//'`
+   cn=`echo $subject|sed -n '/.*\/CN=\([^\/]*\).*/s//\1/p'`
+   $CLIENT <<EOF 
+INSERT INTO ca VALUES ($i, '$subject', '$cn');
+EOF
+done
+
+# Creating voms group
+groupadd voms 2>/dev/null
+
+# Creating voms user
+useradd -g voms voms 2>/dev/null
+
+# Setting ownership and permission for voms_password_query file
+mkdir -p $datapath/etc/voms/$voms_vo
+mkdir -p $@LOCATION_ENV@_VAR/log
+#$datapath/log
+echo $voms_password_query > $datapath/etc/voms/$voms_vo/voms.pass
+chown root.voms $datapath/etc/voms/$voms_vo/voms.pass
+chmod 640 $datapath/etc/voms/$voms_vo/voms.pass
+
+if test -z $voms_vo ; then
+    logname=voms
+else
+    logname=voms.$voms_vo
+fi
+ 
+echo -en "--vo=$voms_vo\n--dbname=$voms_database\n--port=$port\n--username=$voms_username_query\n--passfile=$datapath/etc/voms/$voms_vo/voms.pass\n--sqlloc=$sqlloc\n--logfile=$@LOCATION_ENV@_VAR/log/$logname\n" > $datapath/etc/voms/$voms_vo/voms.conf
+echo -en "--socktimeout=$timeout\n--loglevel=$loglevel\n--logtype=$logtype\n" >>$datapath/etc/voms/$voms_vo/voms.conf
+
+if test "x$compat_mode" = "x-compat"; then
+    echo -en "--compat\n" >> $datapath/etc/voms/$voms_vo/voms.conf
+fi
+if test "x$logformat" != "x"; then
+    echo -en "--logformat=\"$logformat\"\n" >> $datapath/etc/voms/$voms_vo/voms.conf
+fi
+if test "x$logdateformat" != "x"; then
+    echo -en "--logdateformat=\"$logdateformat\"\n" >> $datapath/etc/voms/$voms_vo/voms.conf
+fi
+if test "x$newformat" = "xyes"; then
+    echo -en "--newformat\n" >> $datapath/etc/voms/$voms_vo/voms.conf
+fi

@@ -1,0 +1,330 @@
+#!/bin/bash
+#set -x
+
+########################################################################
+#
+# Authors: Vincenzo Ciaschini - Vincenzo.Ciaschini@cnaf.infn.it 
+#
+# Copyright (c) 2002, 2003 INFN-CNAF on behalf of the EU DataGrid.
+# For license conditions see LICENSE file or
+# http://www.edg.org/license.html
+#
+# Parts of this code may be based upon or even include verbatim pieces,
+# originally written by other people, in which case the original header
+# follows.
+#
+########################################################################
+#
+# voms	This shell script takes care of starting and stopping
+#	voms servers.
+#
+# chkconfig: 2345 95 05
+# description: VOMS stands for Virtual Organization Membership System.
+# processname: voms
+# pidfile: /var/run/voms.pid
+
+# Source networking configuration and check that networking is up.
+if [ -r /etc/sysconfig/network ] ; then
+    . /etc/sysconfig/network
+    [ ${NETWORKING} = "no" ] && exit 0
+fi
+
+# Default prefix
+@LOCATION_ENV@=${@LOCATION_ENV@:-@LOCATION_DIR@}
+@VAR_LOCATION_ENV@=${@VAR_LOCATION_ENV@:-$@LOCATION_ENV@/var}
+
+# check whether $@VAR_LOCATION_ENV@/var/lock/subsys exists
+if ! test -d $@VAR_LOCATION_ENV@/lock/subsys ; then
+    mkdir -p $@VAR_LOCATION_ENV@/lock/subsys
+fi
+
+# Default path
+basepath=$@LOCATION_ENV@
+binpath=${basepath}/sbin
+etcpath=${basepath}/etc
+
+# Source an auxiliary profile file if we have one, and pick up VOMS_OPTIONS and VOMS_USER
+if [ -r ${etcpath}/profile.d/voms.sh ] ; then
+    . ${etcpath}/profile.d/voms.sh
+fi
+
+# add lib directory to LD_LIBRARY_PATH
+export LD_LIBRARY_PATH="$@LOCATION_ENV@/lib:$LD_LIBRARY_PATH"
+
+voms=${binpath}/edg-voms
+if !(test -x ${voms}) ; then
+    echo "Cannot find edg-voms." 
+    exit 0
+fi
+
+RETVAL=0
+
+function start() {
+    RETGLOB=0
+    # Start daemons.
+    prog=`basename ${voms}`
+    if test -z $1; then
+        vos=`ls $@LOCATION_ENV@/etc/voms`
+    else
+        vos=$1
+    fi
+
+    for vo in $vos ; do
+
+        if test -f $@LOCATION_ENV@/etc/voms/$vo/voms.conf ; then
+            echo -n "Starting $prog($vo): "
+	    
+            if [ -f $@VAR_LOCATION_ENV@/lock/subsys/voms.$vo ]; then
+                read pid < $@VAR_LOCATION_ENV@/lock/subsys/voms.$vo
+                if test "x$pid" != "x"; then
+                    if checkpid $pid; then
+                        echo "VOMS ($pid) is already running" && failure
+                        return 1
+                    fi
+                fi
+            fi
+
+            if [ -n "$VOMS_USER" ]; then
+                su -c "${voms} --conf $@LOCATION_ENV@/etc/voms/$vo/voms.conf" -s /bin/bash $VOMS_USER
+            else
+                ${voms} --conf $@LOCATION_ENV@/etc/voms/$vo/voms.conf
+            fi
+
+	    # get process id
+            pid=$(ps axo pid,args | grep "${voms} --conf $@LOCATION_ENV@/etc/voms/$vo/voms.conf" | grep -v grep | cut -f 1 -d '/')
+            pids=`ps -efww | grep "$@LOCATION_ENV@/sbin/edg-voms --conf $@LOCATION_ENV@/etc/voms/$vo/voms.conf" | grep -v grep | awk '{ print $2; }'`
+            RETVAL=$?
+            echo
+            [ $RETVAL -eq 0 ] && echo $pid > $@VAR_LOCATION_ENV@/lock/subsys/voms.$vo
+            RETGLOB=$((RETVAL+RETGLOB))
+            [ "$RETGLOB" -eq 0 ] && success || failure 
+            
+        fi
+    done
+    
+    return $RETGLOB
+}
+
+success()
+{
+    echo $1
+    
+    RES_COL=60
+    echo -en "\\033[${RES_COL}G"
+    echo -n "[  "
+    echo -en "\\033[1;32m"
+    echo -n OK
+    echo -en "\\033[0;39m"
+    echo -n "  ]"
+    echo -ne "\r"
+    echo
+    
+    return 0
+}
+
+failure()
+{
+    rc=$?
+    echo $1
+
+    RES_COL=60
+    echo -en "\\033[${RES_COL}G"
+    echo -n "["
+    echo -en "\\033[1;31m"
+    echo -n FAILED
+    echo -en "\\033[0;39m"
+    echo -n "]"
+    echo -ne "\r"
+    echo
+
+    return $rc
+}
+
+checkpid() 
+{
+    ps --pid $1 >> /dev/null
+    if [ $? == 0 ]; then
+        return 0
+    else
+        return 1
+    fi
+}
+
+# A function to stop a program.
+killprocs() {
+    RC=0
+	# Test syntax.
+    if [ "$#" -eq 0 ]; then
+        echo $"Usage: killproc {pids} [signal]"
+        return 1
+    fi
+    
+    notset=0
+	# check for second arg to be kill level
+    if [ "$2" != "" ] ; then
+        killlevel=$2
+    else
+        notset=1
+        killlevel="-9"
+    fi
+
+        # Find pid.
+    pid=$1
+
+        # Kill it.
+    if [ -n "${pid:-}" ] ; then
+        [ "$BOOTUP" = "verbose" -a -z "$LSB" ] && echo -n "$base "
+        if [ "$notset" -eq "1" ] ; then
+            if checkpid $pid 2>&1; then
+			   # TERM first, then KILL if not dead
+                kill -TERM $pid
+                usleep 100000
+                if checkpid $pid && sleep 1 &&
+                    checkpid $pid && sleep 3 &&
+                    checkpid $pid ; then
+                    kill -KILL $pid
+                    usleep 100000
+                fi
+		        fi
+            checkpid $pid
+            RC=$?
+            [ "$RC" -eq 0 ] && failure $"$base shutdown" || success $"$base shutdown"
+            RC=$((! $RC))
+		# use specified level only
+		else
+		        if checkpid $pid >/dev/null 2>&1; then
+                kill $killlevel $pid
+                RC=$?
+                [ "$RC" -eq 0 ] && success $"$base $killlevel" || failure $"$base $killlevel"
+            fi
+        fi
+    else
+        failure $"$base shutdown"
+        RC=1
+    fi
+    
+        # Remove pid file if any.
+    if [ "$notset" = "1" ]; then
+        rm -f /var/run/$base.pid
+    fi
+    return $RC
+}
+
+function stop() {
+    RETGLOB=0
+    # Stop daemons.
+    prog=`basename ${voms}`
+    if test -z $1; then
+        vos=`ls $@LOCATION_ENV@/etc/voms`
+    else
+        vos=$1
+    fi
+
+    for vo in $vos ; do
+        if test -f $@LOCATION_ENV@/etc/voms/$vo/voms.conf ; then
+            echo -n "Stopping $prog($vo): "
+#	    pids=$(ps axo pid,args | grep "${voms} --conf $@LOCATION_ENV@/etc/voms/$vo/voms.conf" | grep -v grep | cut -f 1 -d '/')
+            pids=`ps -efww | grep "$@LOCATION_ENV@/sbin/edg-voms --conf $@LOCATION_ENV@/etc/voms/$vo/voms.conf" | grep -v grep|awk '{ print $2; }'`
+            if test -z "$pids"; then
+                failure; echo
+                RETVAL=1
+                continue
+            fi
+            killprocs ${pids}
+            RETVAL=$?
+            echo
+            [ $RETVAL -eq 0 ] && rm -f /var/lock/subsys/voms.$vo
+            RETGLOB=$((RETGLOB + RETVAL))
+        fi
+    done
+    
+    return $RETGLOB
+}
+
+function condrestart() {
+    # Stop daemons.
+    prog=`basename ${voms}`
+    if test -z $1; then
+        vos=`ls $@LOCATION_ENV@/etc/voms`
+    else
+        vos=$1
+    fi
+    
+    for vo in $vos ; do
+        if test -f $@LOCATION_ENV@/etc/voms/$vo/voms.conf ; then
+            echo -n "Condrestart $prog($vo): "
+#	    pids=$(ps axo pid,args | grep "${voms} --conf $@LOCATION_ENV@/etc/voms/$vo/voms.conf" | grep -v grep | cut -f 1 -d '/')
+            pids=`ps -efww | grep "$@LOCATION_ENV@/sbin/edg-voms --conf $@LOCATION_ENV@/etc/voms/$vo/voms.conf" | grep -v grep | awk '{ print $2; }'`
+            if test -z "$pids"; then
+                echo; start $vo
+            else
+                failure; echo
+                RETVAL=1
+            fi
+        fi
+    done
+
+    return $RETGLOB
+
+}
+
+function getstatus() {
+    # Stop daemons.
+    prog=`basename ${voms}`
+    if test -z $1; then
+        vos=`ls $@LOCATION_ENV@/etc/voms`
+    else
+        vos=$1
+    fi
+
+    value=0
+
+    for vo in $vos ; do
+        if test -f $@LOCATION_ENV@/etc/voms/$vo/voms.conf ; then
+            echo -n "Status $prog($vo): "
+#	    pids=$(ps axo pid,args | grep "${voms} --conf $@LOCATION_ENV@/etc/voms/$vo/voms.conf" | grep -v grep | cut -f 1 -d '/')
+            pids=`ps -efww | grep "$@LOCATION_ENV@/sbin/edg-voms --conf $@LOCATION_ENV@/etc/voms/$vo/voms.conf" | grep -v grep | awk '{ print $2; }'`
+            if test -z "$pids"; then
+                if [ -f /var/lock/subsys/voms.$vo ]; then
+                    echo "dead but subsys locked"
+                    value=$[$value < 2 ? 2 : $value]
+                    continue
+                fi
+                echo "stopped"
+                value=$[$value < 3 ? 3 : $value]
+                continue
+            else
+                echo "(pid $pids) is running..."
+                value=$[$value < 0 ? 0 : $value]
+                continue
+            fi
+        fi
+    done
+
+    return $RETGLOB
+}
+
+# See how we were called.
+case "$1" in
+    start)
+        start $2
+        ;;
+    stop)
+        stop $2
+        ;;
+    status)
+        getstatus $2
+        ;;
+    restart)
+        stop $2
+        start $2
+        ;;
+    condrestart)
+        condrestart $2
+        ;;
+    *)
+        echo $"Usage: $0 {start|stop|restart|status|condrestart}"
+        RETVAL=1
+esac
+
+exit $RETVAL

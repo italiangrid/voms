@@ -1,0 +1,67 @@
+This document describes the structure of the extensions added by the
+voms system to the user proxy.
+
+Extension 1:
+
+Name: Voms
+Reason: Return Voms information
+OID:  1.3.6.1.4.1.8005.100.100.1
+Structure:
+SIGLEN: n    -- length of the voms signature in bytes.
+SIGNATURE: s -- voms signature
+USER: s      -- DN of the user's certificate
+UCA:  s      -- DN of the CA who issued the user's certificate
+SERVER: s    -- DN of the server's certificate
+SCA: s       -- DN of the CA who issued the server's certificate
+VO: s        -- The name of the VO to which the server belongs
+TIME1: t     -- The start of the validity of this information
+TIME1: t     -- The end of the validity of this information
+DATALEN: n   -- The length of the data returned
+DATA	     -- The returned data
+
+A few notes.
+
+1. n means a string representation of a number, s stands for a string,
+   and finally t stands for a ASN1 representation of time.
+
+2. All the values are terminated by a newline character, with the
+   exception of the SIGNATURE: field.
+
+3. The DATA, TIME1 and TIME2  fields do not have the contain only the
+   data, without the name of the field.
+
+Now for the data returned:
+
+If one of the standard queries is made (e.g. not the 'S' ones)
+the the data returned is a set of triples with the following syntax:
+
+GROUP: s
+ROLE:  s
+CAP:   s
+
+Otherwise, if a 'S' query is made, the data returned is composed by a
+set of lines with the following structure:
+
+<name of field>: <value of field>
+
+In case more than a single Voms server is contacted, there may be
+multiple copies of the whole structure, starting from the SIGLEN
+header right to the end of the returned data.
+
+
+
+Extension 2:
+
+Name: IncFile
+Reason: Let the user include a specific file into his proxy
+	certificate
+OID: 1.3.6.1.4.1.8005.100.100.2
+Structure:
+	A sequence of bytes.
+
+Note that the contents of this field are not the result of a voms
+request, but do instead contain data specified by the user. The reason
+for the introduction of this extension was to let a user include
+important data into its proxy certifiate like, for example, a kerberos
+ticket.
+

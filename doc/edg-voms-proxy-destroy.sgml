@@ -1,0 +1,80 @@
+<!DOCTYPE refentry PUBLIC "-//OASIS//DTD DocBook V4.1//EN" [
+<!ENTITY authors  SYSTEM "authors.sgml">
+<!ENTITY bugzilla SYSTEM "bugzilla.sgml">
+<!ENTITY license  SYSTEM "license.sgml">
+<!ENTITY links    SYSTEM "links.sgml">
+]>
+
+<refentry id='edgvomsproxydestroy1'>
+<refmeta>
+<refentrytitle>edg-voms-proxy-destroy</refentrytitle>
+<manvolnum>1</manvolnum>
+<refmiscinfo class='source'>VOMS Proxy Destroyer</refmiscinfo>
+</refmeta>
+
+<refnamediv id='name'>
+<refname>edg-voms-proxy-destroy</refname>
+<refpurpose>destroys a VOMS proxy</refpurpose>
+</refnamediv>
+
+<refsynopsisdiv id='synopsis'>
+<cmdsynopsis>
+<command>edg-voms-proxy-destroy</command>
+<arg choice='opt'><arg choice='plain'>options</arg></arg>
+</cmdsynopsis>
+</refsynopsisdiv>
+
+<refsect1 id='description'><title>Description</title>
+
+<para>The edg-voms-proxy-destroy is intended to be used after a proxy is no
+longer useful, to destroy it</para>
+
+</refsect1>
+
+<refsect1 id='options'><title>Options</title>
+
+<para>Options may be specified indifferently with either a "-" or "--" prefix. The 
+options from -help to -out are present for compatibility with
+grid-proxy-init, and have the exact same meaning. The meaning of the other
+ones is the following.</para>
+
+<para><option>-help</option>
+Displays usage</para>
+
+<para><option>-version</option>
+Displays version</para>
+
+<para><option>-debug</option>
+Enables extra debug output</para>
+
+<para><option>-q</option>
+Quiet mode, minimal output</para>
+
+<para><option>-file</option> <replaceable>proxyfile</replaceable>
+The name of the file containing the proxy, in case it is in a 
+non-standard place.</para>
+
+
+<para><option>-dry</option>
+Doesn't actually destroy the proxy.</para>
+
+<para><option>-conf</option> <replaceable>file</replaceable>
+Read options from <emphasis remap='I'>file</emphasis>.</para>
+
+</refsect1>
+
+&bugzilla;
+
+<refsect1 id='seealso'><title>See also</title>
+
+<para>edg-voms-proxy-init(1), edg-voms-proxy-info(1)</para>
+
+&links;
+
+</refsect1>
+
+&authors;
+
+&license;
+
+</refentry>

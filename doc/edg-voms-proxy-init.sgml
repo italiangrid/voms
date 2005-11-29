@@ -1,0 +1,180 @@
+<!DOCTYPE refentry PUBLIC "-//OASIS//DTD DocBook V4.1//EN" [
+<!ENTITY authors  SYSTEM "authors.sgml">
+<!ENTITY bugzilla SYSTEM "bugzilla.sgml">
+<!ENTITY license  SYSTEM "license.sgml">
+<!ENTITY links    SYSTEM "links.sgml">
+]>
+
+<refentry id='edgvomsproxyinit1'>
+<refmeta>
+<refentrytitle>edg-voms-proxy-init</refentrytitle>
+<manvolnum>1</manvolnum>
+<refmiscinfo class='source'>VOMS Client</refmiscinfo>
+</refmeta>
+
+<refnamediv id='name'>
+<refname>edg-voms-proxy-init</refname>
+<refpurpose>create a proxy with VOMS extensions</refpurpose>
+</refnamediv>
+
+<refsynopsisdiv id='synopsis'>
+<cmdsynopsis>
+<command>edg-voms-proxy-init</command>
+<arg choice='opt'><arg choice='plain'>options</arg></arg>
+</cmdsynopsis>
+</refsynopsisdiv>
+
+<refsect1 id='description'><title>Description</title>
+
+<para>The edg-voms-proxy-init generates a proxy with the VOMS information 
+included in a non critical extension.</para>
+
+</refsect1>
+
+<refsect1 id='options'><title>Options</title>
+
+<para>Options may be specified indifferently with either a "-" or "--" prefix. The 
+options from -help to -out are present for compatibility with
+grid-proxy-init, and have the exact same meaning. The meaning of the other
+ones is the following.</para>
+
+<para><option>-help</option>
+Displays usage</para>
+
+<para><option>-version</option>
+Displays version</para>
+
+<para><option>-debug</option>
+Enables extra debug output</para>
+
+<para><option>-q</option>
+Quiet mode, minimal output</para>
+
+<para><option>-verify</option>
+Verifies certificate to make proxy for</para>
+
+<para><option>-pwstdin</option>
+Allows passphrase from stdin</para>
+
+<para><option>-limited</option>
+Creates a limited proxy</para>
+
+<para><option>-hours</option> <replaceable>H</replaceable>
+Proxy is valid for <emphasis remap='I'>H</emphasis> hours (default:12)</para>
+
+<para><option>-vomslife</option> <replaceable>H</replaceable>
+Tries to get a pseudo cert with information valid for <emphasis remap='I'>H</emphasis> hours. The
+default is "as long as the proxy certificate". The special value <literal>0</literal> means
+as long as the server will allow.</para>
+
+<para><option>-bits</option> <replaceable>B</replaceable>
+Number of bits in key {512|1024|2048|4096}</para>
+
+<para><option>-cert</option> <replaceable>certfile</replaceable>
+Non-standard location of user certificate</para>
+
+<para><option>-key</option> <replaceable>keyfile</replaceable>
+Non-standard location of user key</para>
+
+<para><option>-certdir</option> <replaceable>certdir</replaceable>
+Non standard location where the trusted CAs certificates are kept.</para>
+
+<para><option>-out</option> <replaceable>proxyfile</replaceable>
+Location of new proxy cert</para>
+
+<para><option>-voms</option> <replaceable>voms[:command]</replaceable>
+Specifies the VOMS server to contact using the nickname <emphasis
+remap='I'>voms</emphasis>.  It also allows to send a specific command
+to the server.  The default command is <emphasis
+remap='B'>:all</emphasis>, and it gets all group membership information.
+
+Other commands are <emphasis remap='B'>:/Role=rolename</emphasis>
+which grants the <emphasis remap='B'>rolename</emphasis> VO-wide role
+if the server allows it, and <emphasis
+remap='B'>:/group/Role=rolename</emphasis> which grants the role
+<emphasis remap='B'>rolename</emphasis> only in the group <emphasis
+remap='B'>/group</emphasis>, again only if the server allows
+it.</para>
+<para>
+Example : voms-proxy-init --voms myVO:/myVO/Role=VO-Admin</para>
+
+<para><option>-order</option> <replaceable>group[:role]</replaceable>
+Specifies the order in which the attributes returned by the server
+should be ordered. The default ordering is unspecified.</para>
+
+<para><option>-include</option> <replaceable>file</replaceable>
+Includes <emphasis remap='I'>file</emphasis> in the certificate (in a non
+critical extension)</para>
+
+<para><option>-conf</option> <replaceable>file</replaceable>
+Read options from <emphasis remap='I'>file</emphasis>.</para>
+
+<para><option>-confile</option> <replaceable>file</replaceable></para>
+<para><option>-userconf</option> <replaceable>file</replaceable></para>
+<para><option>-vomses</option> <replaceable>file</replaceable>
+Specifies the name of a configuration
+file from which a list of nicknames is read.
+The format of the file is the following:
+<emphasis remap='I'>nick</emphasis> <emphasis remap='I'>host</emphasis> <emphasis remap='I'>port</emphasis> <emphasis remap='I'>subject</emphasis> <emphasis remap='I'>vo</emphasis>
+Where nick is the nickname, host and port are the hostname and
+port of the server to contact, subject is the
+subject of the server's certificate, while vo is the
+name of the VO that owns the server. The default
+filenames are $PREFIX/etc/vomses and $HOME/.edg/vomses.</para>
+
+<para>Moreover, permissions must be 644 if a file is specified,
+and 755 if a directory is specified</para>
+
+<para>The three options are synonyms. -confile and -userconf are deprecated. -vomses
+should be used instead.</para>
+
+<para><option>-policy</option>
+The file containing the policy expression.</para>
+
+<para><option>-policy-language</option><replaceable> pl</replaceable>
+The language in which the policy is expressed. Default is IMPERSONATION_PROXY.</para>
+
+<para><option>-path-length</option>
+Maximum depth of proxy certfificate that can be signed from this.</para>
+
+<para><option>-globus</option> <replaceable>version</replaceable>
+Underlying Globus version.</para>
+
+<para><option>-proxyver</option>
+Version of the proxy certificate to create. May be 2 or 3.
+Default value is decided upon underlying globus version.</para>
+
+<para><option>-noregen</option>
+Avoid regenerating the initial proxy.</para>
+
+<para><option>-separate</option> <replaceable>file</replaceable>
+Saves the voms credential on file <emphasis remap='I'>file</emphasis>.</para>
+
+<para><option>-ignorewarn</option>
+Ignore all warnings. They are not shown to the user.</para>
+
+<para><option>-failonwarn</option>
+Warnings become failures. The program will translates all warnings into errors
+and will react accordingly, by returning a failure itself.</para>
+
+<para><option>-list</option>
+Instead of producing an attribute certificate, this optin will print
+on screen a list of all attributes available to the user.</para>
+
+</refsect1>
+
+&bugzilla;
+
+<refsect1 id='seealso'><title>See also</title>
+
+<para>edg-voms-proxy-init(1)</para>
+
+&links;
+
+</refsect1>
+
+&authors;
+
+&license;
+
+</refentry>

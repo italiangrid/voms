@@ -1,0 +1,1052 @@
+\documentclass[a4paper]{book}
+\usepackage{color}
+\usepackage{listings}
+\newenvironment{compatibility}{\begin{quote}\color{red}Compatibility\begin{quote}}{\end{quote}\color{black}\end{quote}}
+\newcommand{\also}[1]{\noindent \textbf{SEE ALSO}\newline\ \ \ \ \ #1}
+\newcommand{\errors}{\noindent \textbf{ERRORS}\newline}
+\newcommand{\results}{\noindent \textbf{RESULTS}\newline}
+\newcommand{\result}{\noindent \textbf{RESULTS}\newline}
+\newcommand{\return}{\noindent \textbf{RETURNS}\newline}
+\newcommand{\parameter}[1]{\newline\textbf{#1}\ \ }
+\begin{document}
+\lstset{language=C}
+\begin{titlepage}
+\title{The VOMS C API\\ A Developer's Guide}
+\author{Vincenzo Ciaschini}
+\end{titlepage}
+\maketitle
+\tableofcontents
+\newpage
+\chapter{Introduction}
+The VOMS API already come with their own documentation in doxygen
+format.  However, that documentation is little more than a simple
+enumeration of functions, with a very terse description.
+
+The aim of this document is different.  Here the intention is not only
+to describe the different functions that comprise the API, but also to
+show how they are supposed to work together, what particular care the
+user needs to take when calling them, what should be done to mantain
+compatibility between the different versions, etc\ldots
+
+Throughout this whole document, you will find sections marked thus:
+\begin{compatibility}
+Some information
+\end{compatibility}
+These section contain informations regarding both back and forward
+compatibility between different versions of the API.
+
+\begin{compatibility}
+Finally, please note that everything not explicitly defined in this
+argument should be considered a private detail and subject to change
+without notice.
+\end{compatibility}
+
+\chapter{The API.}
+There are three basic data structures: \verb|data, voms|
+and \verb|vomsdata|.
+
+\section{The data structure}
+The first one, \verb|data| contains the data regarding a single
+attribute, giving its specification in terms of Groups, Roles and
+Capabilities. It is defined as follows:
+
+{\begin{lstlisting}{}
+struct data {
+  char *group; 
+  char *role;  
+  char *cap;   
+};
+\end{lstlisting}}
+
+All the values of these strings must be composed from regular
+expression: \texttt{a-ZA-Z0-9\_/]*}.
+
+\subsection{group}
+This field contains the name of a group into which the user belongs.
+The format of entries in this group is reminiscent of the structure of
+pathnames, and is the following:
+\begin{quote}
+\begin{emph}
+/group/group/.../group
+\end{emph}
+\end{quote}
+where the name of the first group is by convention the name of the
+Virtual Organization (VO), while each other \emph{/group} component is
+a subgroup of the group immediately preceding it on the left. The
+character '/' is not acceptable as part of a group name.
+
+This field MUST always be filled.
+
+\subsection{role}
+This field contains the name of the role to which the user owns in the
+group specified by \verb|group|.  If the user does not own any
+particular role in that group, than this field contains the value
+``NULL''.
+
+\subsection{cap}
+This field details a capability that the user has as a member of the
+group specified by \verb|group| while owning the role specified by
+\verb|role|.  If there is no specific capability, than this value is
+``NULL''. 
+
+No specific format is associated to a capability.  They are basically
+free-form strings, whose value should be agreed between the AA and the
+Attribute verifier.
+
+\section{The voms structure}
+The second one, \verb|voms| is used to group together all the
+informations that can be gleaned from a single AC, and is defined as
+follows:
+
+{\begin{lstlisting}{}
+#define  TYPE_NODATA 0  /*!< no data */
+#define  TYPE_STD    1  /*!< group, role, capability triplet */
+#define  TYPE_CUSTOM 2  /*!< result of an S command */
+
+
+struct voms {
+  int siglen;       
+  char *signature;  
+  char *user;       
+  char *userca;     
+  char *server;     
+  char *serverca;   
+  char *voname;     
+  char *uri;        
+  char *date1;      
+  char *date2;      
+  int   type;       
+  struct data **std;
+  char *custom;     
+  int datalen;
+  int version;
+  char **fqan;
+  char *serial;     
+  /* Fields below this line are reserved. */
+};
+\end{lstlisting}}
+
+The purpose of this structure is to present, in a readable format, the
+data that has been included in a single Attribute Certificate
+(AC).  While the various public fields may be freely modified to
+simplify internal coding, such changes have no effect on the
+underlying AC.  Let's examine the various fields in detail, starting
+with the constructors.
+
+\subsection{version}
+This field specifies the version of this structure that is currently
+being used.  A value of 0 indicates that it comes from an old format
+extension, while a value of 1 indicates that this structure comes from
+an AC.
+
+\begin{compatibility}
+Support for version 0 is going to be phased out of the code base in
+roughly 6 months (late june - start of july).  When that happens,
+version 0 structures will not be readable anymore. Until then, support
+for it is being kept as a transition measure.
+\end{compatibility}
+
+Please do note that modifying the fields of a version 0 structure
+associated with a \verb|versiondata| struct invalidates the result of
+the \verb|VOMS_Export()| funciton on that object.
+
+\subsection{siglen}
+The length of the data signature.
+
+\subsection{user}
+This field contains the subject of the holder's certificate in
+slash-separated format.
+
+\subsection{userca}
+This field contains the subject of the CA that issued the holder's
+certificate, in slash-separated format.
+
+\subsection{server}
+This field contains the subject of the certificate that the AA used to
+issue the AC, in slash-separated format.
+
+\subsection{serverca}
+This field contains, in slash-separated format, the subject of the CA that
+issued the certificate that the AA used to issue the AC.
+
+\subsection{voname}
+This field contains the name of the Virtual Organization (VO) to which
+the rest of the data contained in this structure applies.
+
+\subsection{uri}
+This is the URI at which the AA that issued this particular AC can be
+contacted. Its format is:
+\begin{quote}
+\emph{fqdn}:\emph{port}
+\end{quote}
+where \emph{fqdn} is the Fully Qualified Domain Name of the server
+which hosts the AA, while \emph{port} is the port at which the AA can
+be contacted on that server.
+
+\subsection{date1, date2}
+These are the dates of start and end of validity of the rest of the
+informations.  They are in a string representation readable to humans,
+but they may be easily converted back to their original format, with a
+little twist: dates coming from an AC are in GeneralizedTime format,
+while dates coming from the old version data are in UtcTime format.
+
+Here follows a code example doing that conversion:\bigskip\bigskip
+{\begin{lstlisting}{}
+ASN1_TIME *
+convtime(char *data)
+{
+  char *data2 = strdup(data);
+
+  if (data2) {
+    ASN1_TIME *t= ASN1_TIME_new();
+
+    t->data   = (unsigned char *)data2;
+    t->length = strlen(data);
+    switch(t->length) {
+      case 10:
+      t->type = V_ASN1_UTCTIME;
+      break;
+      case 15:
+      t->type = V_ASN1_GENERALIZEDTIME;
+      break;
+      default:
+      ASN1_TIME_free(t);
+      return NULL;
+    }
+    return t;
+  }
+  return NULL;
+}
+\end{lstlisting}}
+
+\subsection{type}
+This datum specifies the type of data that follows.  It can assume the
+following values:
+\begin{description}
+\item [TYPE\_NODATA] There actually was no data returned.
+\begin{compatibility}
+This is actually only true for version 0 structures. The following
+versions will simply not generate a \verb|voms| structure in this
+case.
+\end{compatibility}
+\item [TYPE\_CUSTOM] The data will contain the output of an ``S''
+  command sent to the server.
+\begin{compatibility}
+Again, this type of datum will only be present in version 0
+structures.  Due to lack of use, support for it has been disabled in
+new versions of the server.
+\end{compatibility}
+\item [TYPE\_STD] The data will contain (group, role, capabilities)
+  triples.
+\end{description}
+
+\subsection{std}
+This vector contains all the attributes found in an AC, in the exact
+same order in which they were found, in the format specified by the
+\verb|data| structure.  It is only filled if the value of the
+\verb|type| field is \verb|TYPE_STD|.
+\begin{compatibility}
+This structure is filled in both version 1 and version 0 structures,
+although this is scheduled to be left empty after the transition
+period has passed.
+\end{compatibility}
+
+\subsection{custom}
+This field contains the data returned bu the ``S'' server command, and
+it is only filled if the \verb|type| value id \verb|TYPE_CUSTOM|.
+
+\subsection{fqan}
+This field contains the same data as the \verb|std| field, but
+specified in the Fully Qualified Attribute Name (FQAN) format.
+
+\section{vomsdata}
+The purpose of this object is to collect in a single place all
+informations present in a VOMS extension.  All the fields should be
+considered read-only.  Changing them has indefinite results.
+
+{\begin{lstlisting}{}
+struct vomsdata {
+  char *cdir;
+  char *vdir;
+  struct voms **data;
+  char *workvo;
+  char *extra_data;
+  int volen;
+  int extralen;
+  /* Fields below this line are reserved. */
+};
+\end{lstlisting}}
+
+Let us see the fields in detail.
+
+\subsection{data}
+This field contains a vector of \verb|voms| structures, in the exact
+same order as the corresponding ACs appeared in the proxy certificate,
+and containing the informations present in that AC.
+
+\subsection{workvo, volen}
+\begin{compatibility}
+This fields is obsolete in the current version.  Expect \verb|workvo|
+to be set to \verb|NULL| and \verb|volen| to be set to 0.
+\end{compatibility}
+
+\subsection{extra\_data, extralen}
+This field contains additional data that has been added by the user
+via to the proxy via the \verb|-include| command option.  Extralen
+represents the length of that data.
+
+\subsection{cdir, vdir}
+This fields contain the paths, respectively, of the CA certificates
+and of the VOMS servers certificates.
+
+
+\section{Functions}
+\subsection{Generalities}
+Most of these functions share two parameters,
+\verb|struct vomsdata *vd|, and \verb|int *error|.  To avoid
+repetition, these two parameters are described here.
+\parameter{error}{This field contains the error code returned by one of the methods.
+Please note that the value of this field is only significant if the
+\emph{last} method called returns an error value.  Also, the value of
+this field is subject to change without notice during method
+executions, regardless of whether an error effectively occurred.
+
+The possible values returned are:
+VERR\_NONE, VERR\_NOSOCKET, VERR\_NOIDENT, VERR\_COMM, VERR\_PARAM, 
+VERR\_NOEXT, VERR\_NOINIT, VERR\_TIME, VERR\_IDCHECK, VERR\_EXTRAINFO,
+VERR\_FORMAT, VERR\_NODATA, VERR\_PARSE, VERR\_DIR, VERR\_SIGN, 
+VERR\_SERVER, VERR\_MEM, VERR\_VERIFY, VERR\_TYPE, VERR\_ORDER, 
+VERR\_SERVERCODE
+
+In general, a first idea of what each code means can be gleaned from
+the code name, but in any case every method description will document
+which errors its execution may generate and on which conditions.}
+\parameter{vd}{This parameter is a pointer to the vomsdata structure
+  that should be used by the function for both configuration and data
+  retrieval and also for data storage.}
+
+
+
+\subsection{struct contactdata **VOMS\_FindByAlias(struct vomsdata *vd, char *alias, char *system, char *user, int *error)}
+
+\begin{lstlisting}{}
+struct contactdata { /*!< You must never allocate directly this structure. Its sizeof() is
+		       subject to change without notice. The only supported way to obtain it
+		       is via the VOMS_FindBy* functions. */
+  char *nick;     /*!< The alias of the server */
+  char *host;     /*!< The hostname of the server */
+  char *contact;  /*!< The subject of the server's certificate */
+  char *vo;       /*!< The VO served by this server */
+  int   port;     /*!< The port on which the server is listening */                            
+  char *reserved; /*!< HANDS OFF! */
+  int   version;  /*!< The version of Globus on which this server runs. */
+};
+\end{lstlisting}
+
+This function looks in the vomses files installed in both the
+system-wide and user-specific directories for servers that have been
+registered with a particular alias.
+\parameter{alias}{The alias that will be searched for.  The search will be case
+sensitive.}
+\parameter{system}{The directory where the system-wide files are located.  
+  If empty then its default is \verb|/opt/edg/etc/vomses|.}
+\parameter{user}{The directory where the user-specific files are
+  stored.  If empty its defaul is \verb|$VOMS_USERCONF|.  If this is
+  also empty, then the default becomse \verb|$HOME/.edg/vomses|.}
+
+\return
+The return value is a NULL-terminated vector containing the data (in
+\verb|contactdata| format) of all the servers known by the system
+  that go by the specified alias.  This may be NULL if there was an
+  error or no server was found registered with the specified alias.
+
+The errors that you may find are:
+
+\bigskip\begin{tabular}{lp{3in}}
+VERR\_MEM  & Not enough memory.\\
+VERR\_DIR  & There were some problems while traversing the directory.\\
+VERR\_NONE & No error occurred. Simply, no servers were found.\\
+
+
+\end{tabular}
+\subsection{struct contactdata **VOMS\_FindByVO(struct vomsdata *vd,
+  char *vo, char *system, char *user, int *error)}
+
+This function looks in the vomses files installed in both the
+system-wide and user-specific directories for servers that have been
+registered as serving a particular alias.
+\parameter{vo}{The alias that will be searched for.  The search will
+be case sensitive.}
+\parameter{system}{The directory where the system-wide files are
+  located.  If this field is NULL then the default of
+  \verb|/opt/edg/etc/cvomses| is used.}
+\parameter{user}{The directory where the user-specific files are
+  stored.  If this field is NULL, then the default of
+  \verb|\$VOMS_USERCONF| is used.  If this is also empty, then the
+  default becomse \verb|\$HOME/.edg/vomses|.}
+
+\return
+The return value is a NULL-terminated vector containing the data (in
+\verb|contactdata| format) of all the servers known by the system
+  that go by the specified VO.  This may be NULL if there was an
+  error or no server was found registered with the specified VO.
+
+The errors that you may find are:
+
+\bigskip\begin{tabular}{lp{3in}}
+VERR\_MEM  & Not enough memory.\\
+VERR\_DIR  & There were some problems while traversing the directory.\\
+VERR\_NONE & No error occurred. Simply, no servers were found.\\
+\end{tabular}
+
+\subsection{void VOMS\_DeleteContacts(struct contactdata **list)}
+
+This function deletes a vector of server data returned by either the
+\verb|VOMS_FindByAlias{}| or the \verb|VOMS_FindByVO()| functions.
+This is the only supported way to deallocate the vector.  Any other
+attempt will result in undefined behaviour.
+
+It is although possible to deallocate only part of a vector.  See the
+following code for an example.
+
+\begin{lstlisting}{}
+/*
+ * Supposing that v is a vector returned by one of the VOMS_FindBy*()
+ * functions.  Also suppose that n is the vector's size (including the
+ * NULL ending element).
+ *
+ * The following snippet will delete just the first member.
+ */
+ struct contactdata *dummy[2];
+
+ dummy[1] = NULL;
+ dummy[0] = v[0];
+ v[0]     = v[n-1];
+ v[n-1]   = NULL;
+ VOMS_DeleteContacts(dummy);
+\end{lstlisting}
+
+\ \parameter{list}{The data to be deleted.}
+
+\return
+None.
+
+\subsection{struct vomsdata *VOMS\_Init(char *voms, char *cert)}
+
+This function allocates and initializes a \verb|vomsdata| structure.
+This is the only way to do so.  Trying to allocate a \verb|vomsdata|
+structure by any other way will trigger undefined behaviour, since the
+structure that is published is only a small part of the real one.
+\parameter{voms}{The directory that contains the certificates of the
+  VOMS servers.  If this value is NULL, then \verb|\$X509_VOMS_DIR| is
+  considered.  If this is also empty than its default is
+  \verb|/etc/grid-security/vomsdir|.}
+\parameter{cert}{The directory that contains the certificates of the
+  CAs recognized by the server.  If this value is NULL, then
+  \verb|\$X509_CERT_DIR| is considered.  If this is also empty than its
+  default is \verb|/etc/grid-security/certificates|.}
+
+
+\return
+A pointer to a properly initialized \verb|vomsdata| structure, or NULL
+if something went wrong.  This is the only case in which an error code
+would no be associated to the function.
+
+The default values are strongly suggested.  If you want to hardcode
+specific ones, think very hard about the less of configurability that
+it would entail.
+
+\subsection{struct voms *VOMS\_Copy(struct voms *, int *error)}
+
+This function duplicates an existing \verb|voms| structure.  It is the
+only way to do so.
+\parameter{voms}{The voms structure that you wish to be duplicated.}
+
+\result
+A pointer to a voms structure that duplicates the content of the one
+you passed, or NULL if something went wrong.
+
+\errors
+\bigskip\begin{tabular}{lp{3in}}
+VERR\_MEM & Not enough memory.\\
+\end{tabular}
+
+\subsection{struct vomsdata *VOMS\_CopyAll(struct vomsdata *vd, int
+  *error)}
+
+This function duplicates an existing \verb|vomsdata| structure.  It is
+the ONLY supported way to do so.
+
+\result
+A pointer to a voms structure that duplicates the content of the one
+you passed, or NULL if something went wrong.
+
+\errors
+\bigskip\begin{tabular}{lp{3in}}
+VERR\_MEM & Not enough memory.\\
+\end{tabular}
+
+\subsection{void VOMS\_Delete(strcut voms *v)}
+
+This functions deletes an existing \verb|voms| structure.  It is the
+ONLY supported way to do so.
+\parameter{v}{A pointer to the \verb|voms| structure to delete. It is
+  safe to call this structure with a NULL pointer.}
+
+\result
+None.
+
+\subsection{int VOMS\_AddTarget(struct vomsdaa *vd, char *target, int
+  *error)}
+
+This function adds a target to the target list for the AC that will be
+generated by a server when it will be contacted by the \verb|VOMS_Contact*()|
+function. 
+\parameter{target}{The target to add.  It should be a Fully Qualified
+  Domain Name.}
+
+\result
+\begin{description}
+\item[0] If something went wrong.
+\item[$<>$0] Otherwise.
+\end{description}
+
+\errors
+\bigskip\begin{tabular}{lp{3in}}
+VERR\_NOINIT & The \verb|vomsdata| structure was not properly
+initialized.\\
+VERR\_PARAM  & The \verb|target| parameter was NULL.\\
+VERR\_MEM    & There was not enough memory.\\
+\end{tabular}
+
+\subsection{void VOMS\_FreeTargets(struct vomsdata *vd , int *error)}
+
+This function resets the list of targets. It always succeeds.  It is
+also safe to call this function when targets have been set.
+
+\subsection{char *VOMS\_ListTargets(struct vomsdata *vd, int *error)}
+
+This function returns a comma separated string containing all the
+targets that have been set by the \verb|VOMS_AddTarget()| function.
+The caller is the owner of the returned string, and is responsible for
+calling \verb|free()| over it when he no longer needs it.
+
+\result
+A string with the result, or NULL.
+
+\bigskip\begin{tabular}{lp{3in}}
+VERR\_NOINIT & The \verb|vomsdata| structure was not properly
+initialized.\\
+VERR\_MEM    & There was not enough memory.\\
+\end{tabular}
+
+\subsection{int VOMS\_SetVerificationType(int type, struct vomsdata
+  *vd, int *error)}
+
+This function sets the type of AC verification done by the
+\verb|VOMS_Retrieve()| and \verb|Contact()| functions.  The choices
+are detailed in the \verb|verify\_type| type.
+
+\begin{lstlisting}{}
+#define VERIFY_FULL      0xffffffff
+#define VERIFY_NONE      0x00000000
+#define VERIFY_DATE      0x00000001
+#define VERIFY_NOTARGET  0x00000002
+#define VERIFY_KEY       0x00000004
+#define VERIFY_SIGN      0x00000008
+#define VERIFY_ORDER     0x00000010
+#define VERIFY_ID        0x00000020
+\end{lstlisting}
+
+The meaning of these types is the following:
+\begin{description}
+\item[VERIFY\_DATE] This flag verifies that the current date is
+  within the limits specified by the AC itself.
+\item[VERIFY\_TARGET] This flag verifies that the AC is being
+  evaluated in a machine that is included in the target extension of
+  the AC itself.
+\item[VERIFY\_KEY] This flag is for a future extension and is unused at the
+  moment. 
+\item[VERIFY\_SIGN] This flag verifies that the signature of the AC
+  is correct.
+\item[VERIFY\_ORDER] This flag verifies that the attributes present
+  in the AC are in the exact order that was requested.  Please note
+  that this can ONLY be done when examining an AC right after
+  generation with the Contact() function.  This flag is meaningless
+  in all other cases.
+\item[VERIFY\_ID] This flag verifies that the holder information
+  present in the AC is consistent with:
+\begin{enumerate}
+\item The enveloping user proxy in case the AC was contained in one.
+\item The user's own certificate in case the AC was received without
+  an enclosing proxy.
+\end{enumerate}
+\item[VERIFY\_FULL] This flag implies all other verifications.
+\item[VERIFY\_NONE] This flag disables all verifications.
+\end{description}
+
+These flags can be combined by OR-ing them together.  However, if
+VERIFY\_NONE is OR-ed to any other flag, it can be dismissed, while if
+VERIFY\_FULL is OR-ed to any other flag, all other flags ca be
+dismissed.
+
+If this function is not explicitly called by the user, a VERIFY\_FULL
+flag is considered to be in effect.
+
+\result
+\begin{description}
+\item[0] If there is an error.
+\item[$<>$ 0] otherwise.
+\end{description}
+
+\bigskip\begin{tabular}{lp{3in}}
+VERR\_NOINIT & The \verb|vomsdata| structure was not properly
+initialized.\\
+\end{tabular}
+
+\subsection{int VOMS\_SetLifetime(int length, struct vomsdata *vd, int *error)}
+
+This funxtion sets the requested lifetime for ACs that would be
+generated as the result of a \verb|VOMS_Contact()| or
+\verb|VOMS_ContactRaw()}|
+  request.  Note however that this is only an hint sent to the server,
+  since it can lower it at will if the requested length is against
+  server policy.
+\parameter{length}{The lifetime requested, measured in seconds.}
+
+\result
+\begin{description}
+\item[0] If there is an error.
+\item[$<>$ 0] otherwise.
+\end{description}
+
+\bigskip\begin{tabular}{lp{3in}}
+VERR\_NOINIT & The \verb|vomsdata| structure was not properly
+initialized.\\
+\end{tabular}
+
+\subsection{void VOMS\_Destroy(struct vomsdata *vd)}
+
+This function destroys an allocated \verb|vomsdata| structure. It is
+the ONLY supported way to do so.  It is also safe to pass a NULL
+pointer to it.
+
+\result
+None.
+
+\subsection{int VOMS\_Ordering(char *order, struct vomsdata *vd, int *error)}
+
+This function is used to request a specific ordering of the attributes
+present in an AC returned by the \verb|VOMS_Contact()| or by the
+\verb|VOMS_ContactRaw()| functions. 
+
+This function can be called several times, each time specifying a new
+attribute.  The attributes in th AC created by the server will be in
+the same order as the calls to this function, ignoring attributes
+specified by this function that the server does not wish to grant.
+Attributes not explicitly specified in this list will be inserted, in
+an unspecified order, after all the others.
+
+Never calling this function means that the corresponding list will be
+empty, and as a consequence all the attributes will be in an
+unspecified ordering.
+\parameter{order}{The name of an attribute, in the
+  $<$group$>$[:$<$role$>$:} format.
+
+\begin{compatibility}
+This is the only point where the FQAN format is not yet fully
+supported.  Expect this to change in future revisions.
+\end{compatibility}
+
+\result
+\begin{description}
+\item[0] If there is an error.
+\item[$<>$ 0] otherwise.
+\end{description}
+
+\errors
+\bigskip\begin{tabular}{lp{3in}}
+VERR\_NOINIT & The \verb|vomsdata| structure was not properly
+initialized.\\
+VERR\_PARAM  & The \verb|order| parameter is NULL.\\
+VERR\_MEM    & There is not enough memory.\\
+\end{tabular}
+
+
+\subsection{int VOMS\_ResetOrder(struct vomsdata *cd, int *error)}
+
+This function resets the attribute ordering set by the
+\verb|VOMS_Ordering| function.
+
+\result
+\begin{description}
+\item[0] If there is an error.
+\item[$<>$ 0] otherwise.
+\end{description}
+
+\bigskip\begin{tabular}{lp{3in}}
+VERR\_NOINIT & The \verb|vomsdata| structure was not properly
+initialized.\\
+\end{tabular}
+
+
+\subsection{int VOMS\_Contact(char *hostname, int port, char
+  *servsubject, char *command, struct vomsdata *vd, int *error)}
+
+This function is used to contact a VOMS server to receive an AC
+containing the calling user's authorization informations.  A
+prerequisite to calling this function is the existance of a valid
+proxy for the user himself.  This function does not create such a
+proxy, which then must already exist.  Also, the parameters needed to
+call this function should have been obtained by calling one of
+\verb|FindByAlias()| or \verb|FindByVO()|.
+\parameter{hostname}{This is the hostname of the machine hosting the
+  server.}
+\parameter{port}{This is the port number on which the server is
+  listening.}
+\parameter{servsubject}{This is the subject of the VOMS server'
+  certificate.  This is needed for the mutual authentication.}
+\parameter{command}{This is the command to be sent to the server.  For
+  more info about it, consult the \verb|voms-proxy-init()| manual.}
+
+\result
+\begin{description}
+\item[0] If there is an error.
+\item[$<>$0] otherwise.  Furthermore, the data returned by the server
+  has been parsed and added to the \verb|vomsdata| structure.
+\end{description}
+
+\errors
+\bigskip\begin{tabular}{lp{3in}}
+VERR\_NOINIT   & If the vomsdata structure was not properly
+initialized.\\
+VERR\_NOSOCKET & If it was impossible to contact the server.\\
+VERR\_MEM      & If there was not enough memory.\\
+VERR\_IDCHECK  & If a proxy certificate was not found or the data
+returned by the server did not contain identifying information.\\
+VERR\_FORMAT   & If there was an error in the format of the data
+received.\\
+VERR\_NODATA   & If no data was receied at all. (Usually as a
+consequence of either a server error or not being recognized by the
+server as a valid user.)\\
+VERR\_ORDER    & If the attribute that the client requested, via the
+\verb|VOMS_Ordering()| function, to be first in the list of attributes
+received is not first in the attributes returned by the server. This
+particular code means that the data has been correctly interpreted and
+is available in the vomsdata structure if you want to use it.\\
+VERR\_SERVERCODE & Some strange error occured in the server.\\
+\end{tabular}
+
+
+\subsection{int VOMS\_ContactRaw(char *hostname, int port, char *servsubject, char *command, void **data, int *datalen, int *version, struct vomsdata *vd, int *error)}
+
+This function, like \verb|VOMS_Contact()| can be used to contact a
+server and receive Authorization info from it.  The difference between
+the two functions is that this version does not interpret the raw
+data, but on the contrary returns it to the caller.  This function has
+all the same prerequisites as \verb|VOMS_Contact()|.
+\parameter{hostname}{This is the hostname of the machine hosting the
+  server.}
+\parameter{port}{This is the port number on which the server is
+  listening.}
+\parameter{servsubject}{This is the subject of the VOMS server'
+  certificate.  This is needed for the mutual authentication.}
+\parameter{command}{This is the command to be sent to the server.  For
+  more info about it, consult the \verb|voms-proxy-init()| manual.}
+\parameter{data}{A pointer to a pointer to an area of memory where the
+  data returned from the server is stored.  It is the caller's
+  responsibility to \verb|free()| this memory when it is no longer
+  useful.}
+\parameter{datalen}{The length of the data returned.}
+\parameter{version}{The version of the AC returned.  Note that this is
+  a \emph{minimum} version, it only guarantees that the data is \emph{at
+  least} in that version of the format.}
+
+\result
+\begin{description}
+\item[0] If there is an error.
+\item[$<>$0] otherwise.  Furthermore, the data returned by the server
+  has been parsed and added to the \verb|vomsdata| structure.
+\end{description}
+
+\errors
+\bigskip\begin{tabular}{lp{3in}}
+VERR\_NOINIT   & If the vomsdata structure was not properly
+initialized.\\
+VERR\_NOSOCKET & If it was impossible to contact the server.\\
+VERR\_MEM      & If there was not enough memory.\\
+VERR\_IDCHECK  & If a proxy certificate was not found or the data
+returned by the server did not contain identifying information.\\
+VERR\_FORMAT   & If there was an error in the format of the data
+received.\\
+VERR\_NODATA   & If no data was receied at all. (Usually as a
+consequence of either a server error or not being recognized by the
+server as a valid user.)\\
+VERR\_ORDER    & If the attribute that the client requested, via the
+\verb|VOMS_Ordering()| function, to be first in the list of attributes
+received is not first in the attributes returned by the server. This
+particular code means that the data has been correctly interpreted and
+is available in the vomsdata structure if you want to use it.\\
+VERR\_SERVERCODE & Some strange error occured in the server.\\
+\end{tabular}
+
+
+\subsection{int VOMS\_Retrieve(X509 *cert, STACK\_OF(X509) *chain, int how, struct vomsdata *vd, int *error)}
+
+This function is used to extract from a proxy certificate the
+VOMS-specific extension, to parse them and to insert the results into
+the \verb|vomsdata| structure.
+\parameter{cert}{This is the certificate that contains the VOMS
+  information.  No checks are done on the validity of this certifiate,
+  that is supposed to have already been verified by some other means.}
+\parameter{chain}{This is the chain of certificates that signed the
+  \verb|cert| certificate.  This pointer may be null, but see the next
+  parameter.}
+\parameter{how}{This parameter indicates how the search for the VOMS
+  info will be performed.  If \verb|RECURSE_CHAIN| then the
+  information is searched first into the \verb|cert| and then, if it
+  was not found, in the walking the \verb|chain|, from the
+  certificates to the CA.  If \verb|RECURSE_NONE| is specified, then
+  the information is only searched in the \verb|cert|.
+
+  In case the first value is specified, then the searches stop as soon
+  as the info is found, ignoring further extension that may be found
+  down the chain.}
+
+\result
+\begin{description}
+\item[0] If there is an error.
+\item[$<>$0] otherwise.  Furthermore, the data returned by the server
+  has been parsed and added to the \verb|vomsdata| structure.
+\end{description}
+
+\errors
+\bigskip\begin{tabular}{lp{3in}}
+VERR\_NOINIT   & If the vomsdata structure was not properly
+initialized.\\
+VERR\_PARAM    & If there is something wrong with one of the parameters.\\
+VERR\_MEM      & If there was not enough memory.\\
+VERR\_IDCHECK  & If a proxy certificate was not found or the data
+returned by the server did not contain identifying information.\\
+VERR\_FORMAT   & If there was an error in the format of the data
+received.\\
+VERR\_NOEXT    & If the extension was not found.\\
+\end{tabular}
+
+
+\subsection{int VOMS\_Import(char *buffer, int buflen, struct vomsdata *vd, int *error)}
+
+This function is used to add a string created with
+\verb|VOMS_Export()| back into the vomsdata structure.
+\parameter{buffer}{A pointer to the string.}
+\parameter{buflen}{The length of the string.}
+
+\result
+\begin{description}
+\item[0] If there is an error.
+\item[$<>$0] otherwise.  Furthermore, the data returned by the server
+  has been parsed and added to the \verb|vomsdata| structure.
+\end{description}
+
+\errors
+\bigskip\begin{tabular}{lp{3in}}
+VERR\_NOINIT   & If the vomsdata structure was not properly
+initialized.\\
+VERR\_FORMAT   & If there was an error in the format of the data
+received.\\
+VERR\_PARAM    & If there is something wrong with one of the parameters.\\
+VERR\_MEM      & If there was not enough memory.\\
+VERR\_IDCHECK  & If a proxy certificate was not found or the data
+returned by the server did not contain identifying information.\\
+VERR\_SERVER   & The VOMS server was unidentifiable.\\
+VERR\_PARSE    & There has been some problem in parsing the AC or
+blob.\\
+VERR\_SIGN     & It was not possible to verify the signature.\\
+VERR\_SERVER   & It was not possible to properly identify the Attribute
+Issuer.\\
+VERR\_TIME     & The check on the validity dates failed.\\
+\end{tabular}
+
+
+
+\subsection{int VOMS\_Export(char **buffer, int *buflen, struct
+  vomsdata *vd, int *error)}
+
+This function will take the current \verb|vomsdata| structure and
+encode it in a string that can then be exported.
+\parameter{buffer}{A pointer to an area of memory that will be
+  allocated and filled by the function.  It is the caller's
+  responsibility to \verb|free()| this memory.  It is possible that
+  this pointer will be set to NULL, in case the \verb|vomsdata|
+  structure is empty.}
+\parameter{buflen}{The size of the data pointed by \verb|buffer|.}
+
+\result
+\begin{description}
+\item[0] If there is an error.
+\item[$<>$0] otherwise.  Furthermore, the data returned by the server
+  has been parsed and added to the \verb|vomsdata| structure.
+\end{description}
+
+\errors
+\bigskip\begin{tabular}{lp{3in}}
+VERR\_PARAM    & If there is something wrong with one of the parameters.\\
+VERR\_MEM      & If there was not enough memory.\\
+\end{tabular}
+
+
+
+\subsection{struct voms *VOMS\_DefaultData(struct vomsdata *vd, int
+  *error)}
+
+This function returns the default attributes from a vomsdata class.
+
+\result
+\begin{description}
+\item[NULL] There has been an error or the \verb|vomsdata| structure
+  was empty.
+\item[$<>$NULL] There is some data.
+\end{description}
+
+\errors
+\bigskip\begin{tabular}{lp{3in}}
+VERR\_NOINIT & The \verb|vomsdata| structure was not properly
+initialized.\\
+VERR\_NONE   & The \verb|vomsdata| structure was empty.\\
+\end{tabular}
+
+\subsection{char *VOMS\_ErrorMessage(struct vomsdata *vd, int error, 
+  char *buffer, int len)}
+
+This function gives a textual description of the \emph{last}
+encountered error.
+\parameter{error}{The error returned by the previous function.}
+\parameter{buffer}{A pointer to a buffer that will hold the error
+  message.  If this is NULL, then it will be allocated by the function
+  (and must be released by the caller).}
+\parameter{len}{The length of the buffer pointed to by the previous
+  parameter.}
+
+\result
+\begin{description}
+\item[NULL] The buffer passed was not long enough, or there is not
+  enough memory to allocate a buffer or the vomsdata structure was
+  improperly initialized. 
+\item[$<>$NULL] A pointer to a buffer containig the error message.  If
+  \emph{buffer} was not null, then this is \emph{buffer}, else it is a
+  newly allocated chunk of memory that should be free()ed by the
+  caller.
+\end{description}
+
+\errors
+\bigskip\begin{tabular}{lp{3in}}
+VERR\_NOPARAM & The \verb|vomsdata| structure was not properly
+initialized.\\
+\end{tabular}
+
+\subsection{int VOMS\_RetrieveEXT(X509\_EXTENSION *ext, struct vomsdata
+  *vd, int *error)}
+
+This function retrieves VOMS information from the given extension.
+Due to the lack of a holder certificate, all checks regarding holder
+information will be skipped.
+\parameter{ext}{The extension to parse.}
+
+\result
+\begin{description}
+\item[0] If there is an error.
+\item[$<>$0] otherwise.  Furthermore, the data returned by the server
+  has been parsed and added to the \verb|vomsdata| structure.
+\end{description}
+
+\errors
+Check the description of the the VOMS\_Retrieve() function for a
+description of the errors.
+
+
+\subsection{int VOMS\_RetrieveFromCtx(gss\_ctx\_id\_t ctx, int how, struct vomsdata
+  *vd, int *error)}
+
+This function retrieves VOMS information from the given Globus
+context.
+\parameter{ctx}{The context from which to retrieve the certificate
+  to parse.}
+\parameter{how}{This parameter indicates how the search for the VOMS
+  info will be performed.  If \verb|RECURSE_CHAIN| then the
+  information is searched first into the \verb|cert| and then, if it
+  was not found, in the walking the \verb|chain|, from the
+  certificates to the CA.  If \verb|RECURSE_NONE| is specified, then
+  the information is only searched in the \verb|cert|.
+
+  In case the first value is specified, then the searches stop as soon
+  as the info is found, ignoring further extension that may be found
+  down the chain.}
+
+\result
+\begin{description}
+\item[0] If there is an error.
+\item[$<>$0] otherwise.  Furthermore, the data returned by the server
+  has been parsed and added to the \verb|vomsdata| structure.
+\end{description}
+
+\errors
+Check the description of the the VOMS\_Retrieve() function for a
+description of the errors.
+
+\subsection{int VOMS\_RetrieveFromCred(gss\_cred\_id\_t cred, int how, struct vomsdata
+  *vd, int *error)}
+
+This function retrieves VOMS information from the given Globus
+credential.
+\parameter{cred}{The credential from which to retrieve the certificate
+  to parse.}
+\parameter{how}{This parameter indicates how the search for the VOMS
+  info will be performed.  If \verb|RECURSE_CHAIN| then the
+  information is searched first into the \verb|cert| and then, if it
+  was not found, in the walking the \verb|chain|, from the
+  certificates to the CA.  If \verb|RECURSE_NONE| is specified, then
+  the information is only searched in the \verb|cert|.
+
+  In case the first value is specified, then the searches stop as soon
+  as the info is found, ignoring further extension that may be found
+  down the chain.}
+
+\result
+\begin{description}
+\item[0] If there is an error.
+\item[$<>$0] otherwise.  Furthermore, the data returned by the server
+  has been parsed and added to the \verb|vomsdata| structure.
+\end{description}
+
+\errors
+Check the description of the the VOMS\_Retrieve() function for a
+description of the errors.
+
+\subsection{int VOMS\_RetrieveFromProxy(int how, struct vomsdata *vd, int *error)}
+
+This function retrieves VOMS information from an existing Globus proxy
+certificate.
+\parameter{how}{This parameter indicates how the search for the VOMS
+  info will be performed.  If \verb|RECURSE_CHAIN| then the
+  information is searched first into the \verb|cert| and then, if it
+  was not found, in the walking the \verb|chain|, from the
+  certificates to the CA.  If \verb|RECURSE_NONE| is specified, then
+  the information is only searched in the \verb|cert|.
+
+  In case the first value is specified, then the searches stop as soon
+  as the info is found, ignoring further extension that may be found
+  down the chain.}
+
+\result
+\begin{description}
+\item[0] If there is an error.
+\item[$<>$0] otherwise.  Furthermore, the data returned by the server
+  has been parsed and added to the \verb|vomsdata| structure.
+\end{description}
+
+\errors
+Check the description of the the VOMS\_Retrieve() function for a
+description of the errors.
+
+
+\end{document}

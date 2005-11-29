@@ -1,0 +1,420 @@
+########################################################################
+#
+# Authors: Vincenzo Ciaschini - Vincenzo.Ciaschini@cnaf.infn.it 
+#	   Akos Frohner       - Akos.Frohner@cern.ch
+#          Karoly Lorentey    - Karoly.Lorentey@cern.ch
+#
+# Copyright (c) 2002, 2003 INFN-CNAF on behalf of the EU DataGrid.
+# For license conditions see LICENSE file or
+# http://www.edg.org/license.html
+#
+# Parts of this code may be based upon or even include verbatim pieces,
+# originally written by other people, in which case the original header
+# follows.
+#
+########################################################################
+
+# MySQL dump 8.16
+#
+# Host: localhost    Database: voms
+#--------------------------------------------------------
+# Server version	3.23.42
+#
+
+#
+# Current Database: voms
+#
+
+#
+# Access Control List for containers (group/role/capability)
+#
+
+CREATE TABLE acl (
+  -- ACL identifier (common id for all entries in one list)
+  aid bigint unsigned NOT NULL,
+  -- Administrator's identifier
+  adminid bigint NOT NULL,
+  -- Operation on the container
+  operation smallint NOT NULL,
+  -- Allow/deny flag (default deny).
+  allow tinyint NOT NULL,
+  -- Changelog
+  createdBy bigint unsigned NOT NULL,
+  createdSerial bigint unsigned NOT NULL,
+  -- Keys and indices.
+  INDEX (aid),  -- not primary key!
+  INDEX (aid, adminid, operation)
+) TYPE=InnoDB;
+
+CREATE TABLE acld (
+  aid bigint unsigned NOT NULL,
+  adminid bigint NOT NULL,
+  operation bigint NOT NULL,
+  allow tinyint NOT NULL,
+  createdBy bigint unsigned NOT NULL,
+  createdSerial bigint unsigned NOT NULL,
+  deletedBy bigint unsigned NOT NULL,
+  deletedSerial bigint unsigned NOT NULL,
+  -- Keys and indices.
+  INDEX (aid),
+  INDEX (aid, adminid, operation)
+) TYPE=InnoDB;
+
+#
+# List of the administrator users (to be referenced in acls)
+#
+
+CREATE TABLE admins (
+  -- Administrator's identifier
+  adminid bigint NOT NULL,
+  -- the DN of the administrator
+  dn varchar(250) NOT NULL,
+  -- Issuer certificate authority
+  ca smallint unsigned NOT NULL,
+  createdBy bigint unsigned NOT NULL,
+  createdSerial bigint unsigned NOT NULL,
+  -- Keys and indices.
+  PRIMARY KEY (adminid),
+  UNIQUE KEY admin (dn,ca)
+) TYPE=InnoDB;
+
+#
+# Known Certificate Authorities
+# (generated from /etc/grid-security/certificates).
+#
+
+CREATE TABLE ca (
+  -- Internal id.
+  cid smallint unsigned NOT NULL auto_increment,
+  -- Distinguished name (UTF-8).
+  ca varchar(250) NOT NULL,
+  -- free-form description of the CA
+  cadescr varchar(250),
+  PRIMARY KEY  (cid),
+  UNIQUE KEY ca (ca)
+  -- No createdBy/createdSerial, the rows in this table, because 
+  -- they should be never changed by the administrative interface.
+) TYPE=InnoDB;
+
+#
+# Holds all groups in a VO
+#
+
+CREATE TABLE groups (
+  -- Internal entity identifier.
+  gid bigint unsigned NOT NULL auto_increment,
+  -- Fully Qualified Group Name
+  dn varchar(255) NOT NULL,
+  -- Parent group.
+  parent bigint unsigned NOT NULL,
+  -- Applied ACL (entries are in 'or' relation).
+  aclid bigint unsigned NOT NULL,
+  -- Default ACL for a group/role created under this group.
+  defaultAclid bigint unsigned NOT NULL,
+  -- Changelog.
+  createdBy bigint unsigned NOT NULL,
+  createdSerial bigint unsigned NOT NULL,
+  must tinyint default null,
+  -- Keys and indices.
+  PRIMARY KEY  (gid),
+  KEY parentg (parent),
+  KEY groupname (dn)
+) TYPE=InnoDB;
+
+-- archive table for groups
+CREATE TABLE groupsd (
+  gid bigint unsigned NOT NULL,
+  dn varchar(255) NOT NULL,
+  parent bigint unsigned NOT NULL,
+  aclid bigint unsigned NOT NULL,
+  must tinyint,
+  defaultAclid bigint unsigned NOT NULL,
+  createdBy bigint unsigned NOT NULL,
+  createdSerial bigint unsigned NOT NULL,
+  deletedBy bigint unsigned NOT NULL,
+  deletedSerial bigint unsigned NOT NULL,
+  PRIMARY KEY  (gid),
+  KEY parentg (parent),
+  KEY groupname (dn)
+) TYPE=InnoDB;
+
+#
+# Link table between usr and (roles/groups/capabilities)
+#
+
+CREATE TABLE m (
+  -- user's identifier
+  uid bigint unsigned NOT NULL REFERENCES usr(uid),
+  -- group 
+  gid bigint unsigned NOT NULL REFERENCES groups(gid),
+  -- role
+  rid bigint unsigned REFERENCES roles(rid),
+  -- capability
+  cid bigint unsigned REFERENCES capabilities(cid),
+  vid bigint unsigned REFERENCES validity(vid),
+  pid bigint unsigned REFERENCES periodicity(pid),
+  -- Changelog 
+  createdBy bigint unsigned NOT NULL,
+  createdSerial bigint unsigned NOT NULL,
+  -- Keys and indices
+  UNIQUE m (uid,gid,rid,cid),
+  KEY uid (uid),
+  KEY rid (rid),
+  KEY cid (cid),
+  KEY container (gid,rid,cid)
+) TYPE=InnoDB;
+
+-- archives for membership
+CREATE TABLE md (
+  uid bigint unsigned NOT NULL,
+  gid bigint unsigned NOT NULL,
+  rid bigint unsigned,
+  cid bigint unsigned,
+  vid bigint unsigned, 
+  pid bigint unsigned, 
+  createdBy bigint unsigned NOT NULL,
+  createdSerial bigint unsigned NOT NULL,
+  deletedBy bigint unsigned NOT NULL,
+  deletedSerial bigint unsigned NOT NULL,
+  UNIQUE m (uid,gid,rid,cid),
+  KEY uid (uid),
+  KEY rid (rid),
+  KEY cid (cid),
+  KEY container (gid,rid,cid)
+) TYPE=InnoDB;
+
+#
+# Table structure for table 'validity'
+#
+
+CREATE TABLE validity (
+  vid bigint unsigned NOT NULL,
+  begin TIMESTAMP NOT NULL,
+  end TIMESTAMP NOT NULL,
+  PRIMARY KEY(vid)
+) TYPE=InnoDB;
+ 
+#
+# Table structure for table 'periodicity'
+#
+
+CREATE TABLE periodicity (
+  pid bigint unsigned NOT NULL,
+  hour TINYINT NOT NULL,
+  day TINYINT NOT NULL,
+  wday TINYINT NOT NULL, 
+  month TINYINT NOT NULL, 
+  year TINYINT NOT NULL, 
+  hduration INTEGER NOT NULL,
+  PRIMARY KEY(pid)
+) TYPE=InnoDB;
+
+#
+# Support for special queries
+#
+
+CREATE TABLE queries (
+  qid bigint unsigned NOT NULL auto_increment,
+  query varchar(255) NOT NULL,
+  PRIMARY KEY  (qid)
+) TYPE=InnoDB;
+
+#
+# Holds all roles in a VO
+#
+
+CREATE TABLE roles (
+  -- Internal entity identifier.
+  rid bigint unsigned NOT NULL auto_increment,
+  -- the role name (relative to a group)
+  role varchar(255) NOT NULL,
+  -- Applied ACL (entries are in 'or' relation).
+  aclid bigint NOT NULL,
+  -- Changelog.
+  createdBy bigint unsigned NOT NULL,
+  createdSerial bigint unsigned NOT NULL,
+  PRIMARY KEY  (rid),
+  KEY role (role)
+) TYPE=InnoDB;
+
+-- archive table for roles
+CREATE TABLE rolesd (
+  rid bigint unsigned NOT NULL,
+  role varchar(255) NOT NULL,
+  aclid bigint NOT NULL,
+  createdBy bigint unsigned NOT NULL,
+  createdSerial bigint unsigned NOT NULL,
+  deletedBy bigint unsigned NOT NULL,
+  deletedSerial bigint unsigned NOT NULL,
+  PRIMARY KEY  (rid),
+  KEY role (role)
+) TYPE=InnoDB;
+
+#
+# Holds all capabilities in the VO.
+#
+
+CREATE TABLE capabilities (
+  -- Internal entity identifier.
+  cid bigint unsigned NOT NULL auto_increment,
+  -- Name of the capability (for administration)
+  capability varchar(255) NOT NULL,
+  -- Applied ACL (entries are in 'or' relation).
+  aclid bigint NOT NULL,
+  -- Changelog
+  createdBy bigint unsigned NOT NULL,
+  createdSerial bigint unsigned NOT NULL,
+  -- Keys and indices.
+  PRIMARY KEY  (cid),
+  KEY capability (capability)
+) TYPE=InnoDB;
+
+-- archive table for capabilities
+CREATE TABLE capabilitiesd (
+  cid bigint unsigned NOT NULL,
+  capability varchar(255) NOT NULL,
+  aclid bigint NOT NULL,
+  createdBy bigint unsigned NOT NULL,
+  createdSerial bigint unsigned NOT NULL,
+  deletedBy bigint unsigned NOT NULL,
+  deletedSerial bigint unsigned NOT NULL,
+  PRIMARY KEY  (cid),
+  KEY capability (capability)
+) TYPE=InnoDB;
+
+#
+# Lists all users administered by the VOMS.
+#
+
+CREATE TABLE usr (
+  -- Internal entity identifier.
+  uid bigint unsigned NOT NULL auto_increment,
+  -- Distinguished name (UTF-8).
+  dn varchar(250) NOT NULL,
+  -- Issuer certificate authority.
+  ca smallint unsigned NOT NULL,
+  -- Common Name (UTF-8)
+  cn varchar(250) NOT NULL,
+  -- User's mail address (optional)
+  mail varchar(250) default NULL,
+  -- pointer to the user's certificate (optional)
+  cauri varchar(250) default NULL,
+  -- Changelog.
+  createdBy bigint unsigned NOT NULL,
+  createdSerial bigint unsigned NOT NULL,
+  -- Keys and indices.
+  KEY  (uid),
+  UNIQUE KEY dnca (dn,ca),
+  KEY dn (dn)
+) TYPE=InnoDB;
+
+-- The archive records for usr.
+CREATE TABLE usrd (
+  uid bigint unsigned NOT NULL,
+  dn varchar(250) NOT NULL,
+  ca smallint unsigned NOT NULL,
+  cn varchar(250) NOT NULL,
+  mail varchar(250),
+  cauri varchar(250),
+  createdBy bigint unsigned NOT NULL,
+  createdSerial bigint unsigned NOT NULL,
+  deletedBy bigint unsigned NOT NULL,
+  deletedSerial bigint unsigned NOT NULL,
+  KEY (uid),			-- This is not unique!
+  KEY dnca (dn,ca),		-- This is not unique!
+  KEY dn (dn)
+) TYPE=InnoDB;
+
+#
+# Changelog tables.
+#
+
+CREATE TABLE realtime (
+  transaction bigint unsigned NOT NULL,
+  time timestamp NOT NULL,
+  PRIMARY KEY(transaction),
+  INDEX (time)
+) TYPE=InnoDB;
+
+CREATE TABLE sequences (
+  name varchar(32) NOT NULL,
+  value	bigint,
+  INDEX (name)
+) TYPE=InnoDB;
+
+CREATE TABLE createuser_queue (
+  -- Request id.
+  reqid         BIGINT NOT NULL,
+  -- DN of user to be created.
+  dn            VARCHAR(255) NOT NULL,
+  -- CA id of user to be created.
+  cid           SMALLINT NOT NULL,  
+  -- CN of user to be created.
+  cn            VARCHAR(255),
+  -- CAURI of user to be created.
+  cauri         VARCHAR(255),
+  -- Email address of user to be created.
+  mail          VARCHAR(255),
+  -- Email address to notify when request is closed.
+  clientemail   VARCHAR(255), 
+  -- Client notification address.
+  clientcomment VARCHAR(255), 
+  -- Comment given by the client.
+  admincomment  VARCHAR(255), 
+  -- Comment given by the admin.
+  status        BIGINT NOT NULL,
+  PRIMARY KEY (reqid),
+  INDEX (dn, cid)
+) TYPE=InnoDB;
+
+-- Database version number.
+--
+-- Version 0 is, where the version table doesn't exists.
+-- Later versions can be tested by 
+--
+--      select max(version) from version;
+--
+CREATE TABLE version (
+   version INT
+) TYPE = InnoDB;
+
+
+-- Sequence number of the issued attribute certificates in bigint format.
+CREATE TABLE seqnumber (
+   seq VARCHAR(50) NOT NULL
+) TYPE = InnoDB;
+
+-- Persistent storage of serialized Java request objects.  It would be
+-- a nightmare to define and maintain a detailed database mapping for
+-- request type hierarchies, state hierarchies, the chronicle, etc.,
+-- so we cheat by storing the domain objects themselves in the
+-- database.  We speed up database access by duplicating some of the
+-- request data in indexed columns.
+CREATE TABLE requests (
+  -- Request id.
+  reqid         BIGINT NOT NULL,
+  -- True if the request has been fully processed.
+  complete      BOOL,
+  -- The type of the request. (A fully qualified Java class name.)
+  type          VARCHAR(128),
+  -- The requested action. (A fully qualified Java class name.)
+  action        VARCHAR(128),
+  -- The fqdn of the container that this request wants to change.
+  container     VARCHAR(128),
+  -- The short name of the state of the request.
+  state         VARCHAR(32),
+  -- Id of the client sending the request.  (Points to ADMINS table.)
+  requester     BIGINT,
+  -- The time of the last state change.
+  lastchange    TIMESTAMP,
+  -- The serialized Java Request object.
+  request       BLOB NOT NULL,
+  PRIMARY KEY(reqid),
+  INDEX (reqid),
+  INDEX (state),
+  INDEX (type),
+  INDEX (action),
+  INDEX (container),
+  INDEX (requester),
+  INDEX (lastchange)
+) TYPE=InnoDB;

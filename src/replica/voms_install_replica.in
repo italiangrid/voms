@@ -1,0 +1,123 @@
+#!/bin/sh
+#
+# Default prefix
+@LOCATION_ENV@=${@LOCATION_ENV@:-@LOCATION_DIR@}
+
+if test -z $@VAR_LOCATION_ENV@ ; then
+    @VAR_LOCATION_ENV@=$@LOCATION_ENV@/var
+fi
+
+CERTDIR=${CERTDIR:-/etc/grid-security/certificates} #CERTDIR
+SSLPROG="openssl"                                   #openssl
+MYSQL_HOME=/usr                                     # MySQL install prefi
+voms_database="voms"                                # VOMS database
+master_host=""                                      # Master
+master_mysql_user="replica"                         # Master MySQL admin user
+master_mysql_pwd=""                                 # Master MySQL admin pass 
+master_log_file=""                                  # Master LOG file
+master_log_pos=""                                   # Master LOG file
+mysql_username_admin="root"                         # MySQL admin username
+mysql_password_admin=""                             # MySQL admin pass
+basepath=$@LOCATION_ENV@                            # Default path
+datapath=$@LOCATION_ENV@
+verbose=""
+
+TEMP=`getopt -o hv --long mysql-home:,db:,mysql-admin:,mysql-pwd:,master-host:,master-mysql-user:,master-mysql-pwd:,master-log-file:,master-db:,master-log-pos:  -n 'voms_install_replica' -- "$@"`
+
+if [ $? != 0 ] ; then echo "Terminating..." >&2 ; exit 1 ; fi
+
+eval set -- "$TEMP"
+
+while true ; do
+    case "$1" in
+	--mysql-home)             MYSQL_HOME=$2              ; shift 2 ;;
+	--db)                     voms_database=$2           ; shift 2 ;;
+	--mysql-admin)            mysql_username_admin=$2    ; shift 2 ;;
+	--mysql-pwd)              mysql_password_admin=$2    ; shift 2 ;;
+	--master-host)            master_host=$2             ; shift 2 ;;
+	--master-mysql-user)      master_mysql_user=$2       ; shift 2 ;;
+	--master-mysql-pwd)       master_mysql_pwd=$2        ; shift 2 ;;
+	--master-db)              master_db=$2               ; shift 2 ;;
+        --master-log-file)        master_log_file=$2         ; shift 2 ;;
+        --master-log-pos)         master_log_pos=$2          ; shift 2 ;;
+	-v)                       verbose="1"                ; shift   ;;
+        -h)                       echo "This is the help"    ; exit 1  ;;
+	--)                       shift                      ; break   ;;
+	*)                        echo "Internal Error!" >&2 ; exit 1  ;;
+    esac
+done
+
+###############################################################################
+#STOP ACTIVITY 
+if ! test -z $verbose ; then  echo "VOMS_INSTALL_REPLICA: LOCK MASTER TABLES.."; fi
+$MYSQL -h $master_host -u $master_mysql_user -p$master_mysql_pwd -e "FLUSH TABLES WITH READ LOCK" #  STOP MASTER 
+
+if ! test -z $verbose ; then echo "VOMS_INSTALL_REPLICA: STOP SLAVE.." ; fi
+#$MYSQL                -e "RESET SLAVE"                  # May help..
+$MYSQL                 -e "STOP SLAVE"                   # STOP SLAVE
+
+#DUPLICATE DATABASE
+if ! test -z $verbose ; then echo "VOMS_INSTALL_REPLICA: DUPLICATE DB (MYSQLDUMP).." ; fi
+$MYSQL -e "DROP DATABASE IF EXISTS $voms_database; CREATE DATABASE $voms_database;"
+mysqldump --host $master_host -u $master_mysql_user -p$master_mysql_pwd --opt $master_db | $MYSQL -C $voms_database;
+$MYSQL -D $voms_database -e "update seqnumber set seq=00"
+
+#GET MASTER STATUS
+if test -z $master_log_file; then
+if ! test -z $verbose ; then echo "VOMS_INSTALL_REPLICA: GET MASTER LOG FILE AND POS.." ; fi
+master_log_file=`mysql -h $master_host -u $master_mysql_user -p$master_mysql_pwd -e "show master status" | awk 'NR==2 {print $1}'`
+master_log_pos=`mysql -h $master_host -u $master_mysql_user -p$master_mysql_pwd -e "show master status" | awk 'NR==2 {print $2}'`
+fi
+
+#WRITE MASTER INFO
+$MYSQL <<EOF 
+CHANGE MASTER TO MASTER_HOST='$master_host',MASTER_USER='$master_mysql_user',MASTER_PASSWORD='$master_mysql_pwd',MASTER_LOG_FILE='$master_log_file',MASTER_LOG_POS=$master_log_pos;
+EOF
+
+cat <<EOF
+CHANGE MASTER TO MASTER_HOST='$master_host',MASTER_USER='$master_mysql_user',MASTER_PASSWORD='$master_mysql_pwd',MASTER_LOG_FILE='$master_log_file',MASTER_LOG_POS=$master_log_pos;
+EOF
+
+cat > /etc/my.cnf <<EOF
+
+[mysqld]
+server-id=2
+master-host=$master_host
+master-user=$master_mysql_user
+master-password=$master_mysql_pwd
+replicate-do-db=$matser_db
+replicate-ignore-table=$master-db.seqnumber
+EOF
+
+if ! test -z $verbose ; then echo "VOMS_INSTALL_REPLICA: MYSQL RESTART.." ; fi
+/etc/init.d/mysql restart
+#service mysql restart
+sleep 1
+
+if ! test -z $verbose ; then echo "VOMS_INSTALL_REPLICA: UNLOCK MASTER TABLES.." ; fi
+$MYSQL -h $master_host -u $master_mysql_user -p$master_mysql_pwd -e "UNLOCK TABLES" 
+
+################################################## OPERATIONS #####################
+############################ Master-side 
+# cat > /etc/my.cnf <<EOF 
+# [mysqld]
+#log-bin
+#server-id=1
+#EOF
+# mysql -p -e "grant super, reload , replication slave, replication client on *.* to replica@'grid-se.pr.infn.it' identified by 'replicapass'" ;
+# mysql -p -e "grant select, lock tables on voms_myvo.* to replica@'grid-se.pr.infn.it'"
+#
+############################## Replica-side
+#./voms_install_replica --db=voms_myvo --master_mysql_user="replica" --master_mysql_pwd="replicapass" --mysql_password_admin="camman33"
+#
+##############################  Client side
+# cat >> @LOCATION_DIR@/etc/vomses <<EOF
+# "myvo"  "grid-voms.pr.infn.it" "15010" "/C=IT/O=INFN/OU=Host/L=Parma/CN=grid-voms.pr.infn.it" "myvo"                
+# "myvo2" "grid-se.pr.infn.it"   "15010" "/C=IT/O=INFN/OU=Host/L=Parma/CN=grid-se.pr.infn.it"   "myvo"            
+# EOF
+#
+#voms-proxy-init -voms myvo -voms myvo2
+#
+################################ Attic
+# mysql -p -e "REVOKE ALL ON *.* FROM root@'192.135.11.36'"
+# mysql -p -e "delete from mysql.user where host='192.135.11.36'";

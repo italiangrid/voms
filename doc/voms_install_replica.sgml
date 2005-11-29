@@ -1,0 +1,93 @@
+<!DOCTYPE refentry PUBLIC "-//OASIS//DTD DocBook V4.1//EN" [
+<!ENTITY authors  SYSTEM "authors.sgml">
+<!ENTITY bugzilla SYSTEM "bugzilla.sgml">
+<!ENTITY license  SYSTEM "license.sgml">
+<!ENTITY links    SYSTEM "links.sgml">
+]>
+
+<refentry id='voms-install-replica1'>
+<refmeta>
+<refentrytitle>voms_install_replica</refentrytitle>
+<manvolnum>1</manvolnum>
+<refmiscinfo class='source'>VOMS Server Slave setup</refmiscinfo>
+</refmeta>
+
+<refnamediv id='name'>
+<refname>voms_install_replica</refname>
+<refpurpose>Setup the edg-voms server as a slave of a master server</refpurpose>
+</refnamediv>
+
+<refsynopsisdiv id='synopsis'>
+<cmdsynopsis>
+<command>voms_install_replica</command>
+<arg choice='opt'><replaceable>options</replaceable></arg>
+</cmdsynopsis>
+</refsynopsisdiv>
+
+<refsect1 id='description'><title>Description</title>
+
+<para>The voms_install_replica script initializes a VOMS server as a
+slave of a master server.  It only works if both servers have MySQL as
+the underlying DB.</para>
+
+</refsect1>
+
+<refsect1 id='options'><title>Options</title>
+
+<para><option>--mysql-home</option> <replaceable>path</replaceable>
+Default home of MySQL. The default is '/usr'.</para>
+
+<para><option>--db</option> <replaceable>name</replaceable>
+Name of the db to create. It must be the same name used in the
+--master-db option.</para>
+
+<para><option>--mysql-admin</option> <replaceable>name</replaceable>
+The name of the MySQL admin user. The default is 'root'.</para>
+
+<para><option>--mysql-pwd</option> <replaceable>value</replaceable>
+The password of the MySQL admin user, The default is to not use a password.</para>
+
+<para><option>--master-host</option> <replaceable>value</replaceable>
+This is the fully qualified hostname of the master server.</para>
+
+<para><option>--master-mysql-user</option>
+<replaceable>value</replaceable>
+This is the username that the master has made available for the slave
+to use.</para>
+
+<para><option>--master-mysql-pwd</option>
+<replaceable>value</replaceable>
+This is the password associated to the --master-mysql-user
+account.</para>
+
+<para><option>--master-db</option> <replaceable>value</replaceable>
+This is the name of the DB on the master.  It must be the same as the
+one specified in the --db option.</para>
+
+<para><option>--master-log-file</option>
+<replaceable>value</replaceable>
+This is the name of the file where a copy of the master log file will
+be placed.</para>
+
+<para><option>--master-log-pos</option>
+<replaceable>value</replaceable>
+This is the location where a copy of the master log file will be
+placed.</para>
+
+</refsect1>
+
+&bugzilla;
+
+<refsect1 id='seealso'><title>See also</title>
+
+<para>edg-voms(8)</para>
+
+&links;
+
+</refsect1>
+
+&authors;
+
+&license;
+
+</refentry>
