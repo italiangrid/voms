@@ -42,10 +42,10 @@ AM_CPPFLAGS = \
 
 install-exec-hook:
 	-ln -s voms-proxy-info $(DESTDIR)$(bindir)/edg-voms-proxy-info
-	-ln -s voms-proxy-destroy $(DESTDIR)$(bindir)/edg-proxy-destroy
-	-ln -s voms-proxy-fake $(DESTDIR)$(bindir)/edg-proxy-fake
+	-ln -s voms-proxy-destroy $(DESTDIR)$(bindir)/edg-voms-proxy-destroy
+	-ln -s voms-proxy-fake $(DESTDIR)$(bindir)/edg-voms-proxy-fake
 if ENABLE_GLITE
 	-ln -s voms-proxy-info $(DESTDIR)$(bindir)/glite-voms-proxy-info
-	-ln -s voms-proxy-destroy $(DESTDIR)$(bindir)/glite-proxy-destroy
-	-ln -s voms-proxy-fake $(DESTDIR)$(bindir)/glite-proxy-fake
+	-ln -s voms-proxy-destroy $(DESTDIR)$(bindir)/glite-voms-proxy-destroy
+	-ln -s voms-proxy-fake $(DESTDIR)$(bindir)/glite-voms-proxy-fake
 endif
