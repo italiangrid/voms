@@ -12,9 +12,6 @@
  *
  *********************************************************************/
 
-/* $Revision$ */
-/* $Date$ */
-
 #ifndef VOMS_CINTERFACE_H
 #define VOMS_CINTERFACE_H
 
