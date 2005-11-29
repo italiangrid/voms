@@ -27,6 +27,9 @@ AM_CPPFLAGS = -I$(top_srcdir)/src/api/ccapi \
 
 install-exec-hook:
 	-ln -s voms-proxy-init $(DESTDIR)$(bindir)/edg-voms-proxy-init
+	-ln -s voms-proxy-init $(DESTDIR)$(bindir)/voms-proxy-list
+	-ln -s voms-proxy-init $(DESTDIR)$(bindir)/edg-voms-proxy-list
 if ENABLE_GLITE
 	-ln -s voms-proxy-init $(DESTDIR)$(bindir)/glite-voms-proxy-init
+	-ln -s voms-proxy-init $(DESTDIR)$(bindir)/glite-voms-proxy-list
 endif
