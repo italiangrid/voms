@@ -40,6 +40,12 @@
 /* Define to 1 if you have the `dup2' function. */
 #undef HAVE_DUP2
 
+/* Define to 1 if you have EVP_MD_CTX_cleanup */
+#undef HAVE_EVP_MD_CTX_CLEANUP
+
+/* Define to 1 if you have EVP_MD_CTX_init */
+#undef HAVE_EVP_MD_CTX_INIT
+
 /* Define to 1 if you have the <fcntl.h> header file. */
 #undef HAVE_FCNTL_H
 
@@ -58,8 +64,14 @@
 /* Define to 1 if you have the `getopt_long' function. */
 #undef HAVE_GETOPT_LONG
 
+/* Define to 1 if you have the `getopt_long_only' function. */
+#undef HAVE_GETOPT_LONG_ONLY
+
 /* Define to 1 if you have the `getpagesize' function. */
 #undef HAVE_GETPAGESIZE
+
+/* Define to 1 if you have the `globus_module_activate' function. */
+#undef HAVE_GLOBUS_MODULE_ACTIVATE
 
 /* Define to 1 if you have GLOBUS_OFF_T */
 #undef HAVE_GLOBUS_OFF_T
@@ -80,6 +92,12 @@
    to 0 otherwise. */
 #undef HAVE_MALLOC
 
+/* Define to 1 if you have the <malloc.h> header file. */
+#undef HAVE_MALLOC_H
+
+/* Define to 1 if you have the `memmove' function. */
+#undef HAVE_MEMMOVE
+
 /* Define to 1 if you have the <memory.h> header file. */
 #undef HAVE_MEMORY_H
 
@@ -88,6 +106,9 @@
 
 /* Define to 1 if you have the `mkfifo' function. */
 #undef HAVE_MKFIFO
+
+/* Define to 1 if you have the `mktime' function. */
+#undef HAVE_MKTIME
 
 /* Define to 1 if you have a working `mmap' system call. */
 #undef HAVE_MMAP
@@ -104,6 +125,12 @@
 /* Define to 1 if you have the <netinet/in.h> header file. */
 #undef HAVE_NETINET_IN_H
 
+/* Define to 1 if you have the <openssl/e_os2.h> header file. */
+#undef HAVE_OPENSSL_E_OS2_H
+
+/* Define to 1 if you have the <openssl/e_os.h> header file. */
+#undef HAVE_OPENSSL_E_OS_H
+
 /* Define to 1 if you have the `putenv' function. */
 #undef HAVE_PUTENV
 
@@ -111,8 +138,14 @@
    and to 0 otherwise. */
 #undef HAVE_REALLOC
 
+/* Define to 1 if you have the `select' function. */
+#undef HAVE_SELECT
+
 /* Define to 1 if you have the `setenv' function. */
 #undef HAVE_SETENV
+
+/* Define to 1 if you have the `sigaction' function. */
+#undef HAVE_SIGACTION
 
 /* Define to 1 if you have the `socket' function. */
 #undef HAVE_SOCKET
@@ -151,7 +184,7 @@
 /* Define to 1 if you have the <string.h> header file. */
 #undef HAVE_STRING_H
 
-/* Define to 1 if you have the `strndup' function. */
+/* Define to 1 if you have time_t _timezone type in time.h */
 #undef HAVE_STRNDUP
 
 /* Define to 1 if you have the `strrchr' function. */
@@ -162,6 +195,15 @@
 
 /* Define to 1 if you have the `strstr' function. */
 #undef HAVE_STRSTR
+
+/* Define to 1 if you have the <strstream> header file. */
+#undef HAVE_STRSTREAM
+
+/* Define to 1 if you have the <strstream.h> header file. */
+#undef HAVE_STRSTREAM_H
+
+/* Define to 1 if you have the `strtod' function. */
+#undef HAVE_STRTOD
 
 /* Define to 1 if you have the `strtol' function. */
 #undef HAVE_STRTOL
@@ -206,6 +248,12 @@
 
 /* Define to 1 if you have the <termios.h> header file. */
 #undef HAVE_TERMIOS_H
+
+/* Define to 1 if you have time_t timezone type in time.h */
+#undef HAVE_TIME_T_TIMEZONE
+
+/* Define to 1 if you have time_t _timezone type in time.h */
+#undef HAVE_TIME_T__TIMEZONE
 
 /* Define to 1 if you have the `tzset' function. */
 #undef HAVE_TZSET
@@ -307,11 +355,17 @@
 /* Version number of package */
 #undef VERSION
 
+/* Define if using the dmalloc debugging malloc package */
+#undef WITH_DMALLOC
+
 /* needed to get ansi functions definitions */
 #undef _BSD_SOURCE
 
 /* needed to get ansi functions definitions */
 #undef _POSIX_SOURCE
+
+/* Get SVID extensions */
+#undef _SVID_SOURCE
 
 /* Define like PROTOTYPES; this can be used by system headers. */
 #undef __PROTOTYPES
@@ -333,6 +387,9 @@
 
 /* Define to rpl_malloc if the replacement function should be used. */
 #undef malloc
+
+/* Define to `long' if <sys/types.h> does not define. */
+#undef off_t
 
 /* Define to `int' if <sys/types.h> does not define. */
 #undef pid_t

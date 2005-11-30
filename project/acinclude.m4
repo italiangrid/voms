@@ -38,6 +38,8 @@ AC_DEFUN([AC_GLOBUS],
 
     WANTED_API_LIBS="$WANTED_CCAPI_LIBS $WANTED_CAPI_LIBS"
 
+    AC_MSG_RESULT([will create $WANTED_API_LIBS])
+
     ac_globus_ldlib="-L$with_globus_prefix/lib"
 
     for flavor in $GLOBUS_FLAVORS ; do
@@ -106,6 +108,25 @@ AC_DEFUN([AC_COMPILER],
     fi
 ])
 
+# AC_ENABLE_DOCS add switch to enable debug and warning
+# options for gcc
+# -------------------------------------------------------
+AC_DEFUN([AC_ENABLE_DOCS],
+[
+    AC_ARG_ENABLE(docs,
+	    [ --enable-docs Enable doc generation],
+	    [
+	      case "$enableval" in
+	      yes) build_docs="yes" ;;
+	      no) ;;
+	      *) AC_MSG_ERROR(bad value $(enableval) for --enable-docs) ;;
+	      esac
+	    ],
+	    [build_docs="yes"])
+
+    AM_CONDITIONAL(BUILD_DOCS, test x$build_docs = xyes)
+])
+
 # AC_ENABLE_GLITE switch for glite
 # -------------------------------------------------------
 AC_DEFUN([AC_ENABLE_GLITE],
@@ -160,6 +181,76 @@ AC_DEFUN([EDG_SET_RPM_TOPDIR],
     AC_SUBST(RPM_TOPDIR)
 ])
 
+# AC_VOMS_TIME_T_TIMEZONE test whether time_t timezone is present
+# int time.h
+# ------------------------------------------------------------
+AC_DEFUN([AC_VOMS_TIME_T_TIMEZONE],
+[
+    AC_MSG_CHECKING(for time_t timezone in <time.h>)
+    AC_LANG_PUSH(C)
+    AC_TRY_COMPILE(
+        [
+        #include <time.h>
+        ],
+        [
+        struct tm y;
+        time_t offset = 3;
+        time_t x = mktime(&y) + offset*60*60 - timezone;
+        ],
+        [ac_have_time_t_timezone="yes"],
+        [ac_have_time_t_timezone="no"]
+    )
+
+    if test "X$ac_have_time_t_timezone" = "Xyes" ; then
+      AC_MSG_RESULT(yes)
+      AC_DEFINE(HAVE_TIME_T_TIMEZONE, 1, [Define to 1 if you have time_t timezone type in time.h])
+    else
+      dnl
+      dnl only place this should occur is on CYGWIN B20, which has an
+      dnl integer _timezone defined instead
+      dnl
+      AC_MSG_RESULT(no)
+      AC_MSG_CHECKING(checking for time_t _timezone in <time.h>)
+      AC_TRY_COMPILE(
+        [
+        #include <time.h>
+        ],
+        [
+        struct tm y;
+        time_t offset = 3;
+        time_t x = mktime(&y) + offset*60*60 - _timezone;
+        ],
+        [answer=yes]
+        [answer=no]
+      )
+   
+      if test "X$answer" = "Xyes" ; then   
+        AC_MSG_RESULT(yes)
+        AC_DEFINE(HAVE_TIME_T__TIMEZONE, 1, [Define to 1 if you have time_t _timezone type in time.h])
+      else
+        AC_MSG_RESULT(no)
+      fi
+      AC_LANG_POP(C)
+    fi
+])
+
+# AC_VOMS_STRNDUP 
+# ------------------------------------------------------------
+AC_DEFUN([AC_VOMS_STRNDUP],
+[
+    AC_MSG_CHECKING([for strndup])
+    AC_TRY_LINK([
+                #include <string.h>
+                ], 
+                [
+                char *s = strndup("prova",5);
+                ],
+                [AC_DEFINE(HAVE_STRNDUP, 1, [Define to 1 if you have time_t _timezone type in time.h])
+                 AC_MSG_RESULT(yes)],
+                [AC_LIBOBJ(strndup)
+                AC_MSG_RESULT(no)])
+])
+
 # AC_SOCKLEN_T test whether socklen_t type is present
 # ------------------------------------------------------------
 AC_DEFUN([AC_VOMS_SOCKLEN_T],
@@ -187,7 +278,7 @@ AC_DEFUN([AC_VOMS_SOCKLEN_T],
     AC_MSG_RESULT([$ac_have_socklen_t])
 ])
 
-# OPENSSL_EXT_METHOD check whether X509V3_EXT_METHOD has a 
+# AC_OPENSSL_EXT_METHOD check whether X509V3_EXT_METHOD has a 
 # member called it (only in recent openssl version)
 # ------------------------------------------------------------
 AC_DEFUN([AC_OPENSSL_EXT_METHOD],
@@ -216,6 +307,47 @@ AC_DEFUN([AC_OPENSSL_EXT_METHOD],
     AC_MSG_RESULT([$ac_have_x509v3_member_it])
 
     CFLAGS="$CFLAGS_SAVE"
+])
+
+# AC_VOMS_OPENSSL_EVP_MD_CTX
+# ------------------------------------------------------------
+AC_DEFUN([AC_VOMS_OPENSSL_EVP_MD_CTX],
+[
+    AC_MSG_CHECKING([for EVP_MD_CTX_init])
+    CFLAGS_SAVE="$CFLAGS"
+    CFLAGS="$CFLAGS $GLOBUS_CFLAGS"
+    AC_TRY_LINK(
+      [
+        #include <openssl/evp.h>
+      ],
+      [
+        EVP_MD_CTX mp; 
+        (void)EVP_MD_CTX_init(&mp)
+      ],
+      [AC_DEFINE(HAVE_EVP_MD_CTX_INIT, 1, [Define to 1 if you have EVP_MD_CTX_init])
+       AC_MSG_RESULT(yes)],
+      [AC_MSG_RESULT(no)]
+    )
+      CFLAGS="$CFLAGS_SAVE"
+
+    AC_MSG_CHECKING([for EVP_MD_CTX_cleanup])
+    CFLAGS_SAVE="$CFLAGS"
+    CFLAGS="$CFLAGS -I$GLOBUS_LOCATION/include/$GLOBUS_FLAVOR_NAME"
+    AC_TRY_LINK(
+      [
+        #include <openssl/evp.h>
+      ],
+      [
+        EVP_MD_CTX mp; 
+        (void)EVP_MD_CTX_cleanup(&mp)
+      ],
+      [AC_DEFINE(HAVE_EVP_MD_CTX_CLEANUP, 1, [Define to 1 if you have EVP_MD_CTX_cleanup])
+       AC_MSG_RESULT(yes)],
+      [AC_MSG_RESULT(no)]
+      )
+
+    CFLAGS_SAVE="$CFLAGS"
+    CFLAGS="$CFLAGS $GLOBUS_CFLAGS"
 ])
 
 # AC_VOMS_LONG_LONG check whether long long type is present
