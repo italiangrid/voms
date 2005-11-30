@@ -25744,9 +25744,6 @@ echo "${ECHO_T}found $GLOBUS_FLAVORS ($with_globus_flavor selected)" >&6
 
     WANTED_API_LIBS="$WANTED_CCAPI_LIBS $WANTED_CAPI_LIBS"
 
-    echo "$as_me:$LINENO: result: will create $WANTED_API_LIBS" >&5
-echo "${ECHO_T}will create $WANTED_API_LIBS" >&6
-
     ac_globus_ldlib="-L$with_globus_prefix/lib"
 
     for flavor in $GLOBUS_FLAVORS ; do

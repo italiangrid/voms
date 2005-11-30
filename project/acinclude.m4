@@ -38,8 +38,6 @@ AC_DEFUN([AC_GLOBUS],
 
     WANTED_API_LIBS="$WANTED_CCAPI_LIBS $WANTED_CAPI_LIBS"
 
-    AC_MSG_RESULT([will create $WANTED_API_LIBS])
-
     ac_globus_ldlib="-L$with_globus_prefix/lib"
 
     for flavor in $GLOBUS_FLAVORS ; do
