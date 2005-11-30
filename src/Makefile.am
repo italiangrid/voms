@@ -18,6 +18,9 @@ SUBDIRS = \
 APIDOC_DIR = $(top_builddir)/doc/apidoc
 USERDOC_DIR = $(top_builddir)/doc/userdoc
 
+APIDOC_FILES = $(top_srcdir)/AUTHORS $(top_srcdir)/INSTALL $(top_srcdir)/LICENSE $(top_srcdir)/README
+USERDOC_FILES = $(APIDOC_FILES)
+
 all-local: apidoc-local userdoc-local
 
 apidoc-local: $(APIDOC_FILES)
