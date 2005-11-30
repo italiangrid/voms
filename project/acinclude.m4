@@ -519,7 +519,7 @@ int main(int argc, char *argv[]) {
 HERE
 
     if ( ($CXX -c -o conftest.o conftest.cpp > /dev/null 2>&1) ); then
-      if ( (nm -C conftest.o | grep cerr) ); then
+      if ( (nm -C conftest.o | grep cerr > /dev/null 2>&1) ); then
         AH_BOTTOM([#ifdef __cplusplus
 #include <new>
 #endif])
