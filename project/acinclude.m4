@@ -314,7 +314,7 @@ AC_DEFUN([AC_VOMS_OPENSSL_EVP_MD_CTX],
     AC_MSG_CHECKING([for EVP_MD_CTX_init])
     CFLAGS_SAVE="$CFLAGS"
     CFLAGS="$CFLAGS $GLOBUS_CFLAGS"
-    AC_TRY_LINK(
+    AC_TRY_COMPILE(
       [
         #include <openssl/evp.h>
       ],
@@ -331,7 +331,7 @@ AC_DEFUN([AC_VOMS_OPENSSL_EVP_MD_CTX],
     AC_MSG_CHECKING([for EVP_MD_CTX_cleanup])
     CFLAGS_SAVE="$CFLAGS"
     CFLAGS="$CFLAGS -I$GLOBUS_LOCATION/include/$GLOBUS_FLAVOR_NAME"
-    AC_TRY_LINK(
+    AC_TRY_COMPILE(
       [
         #include <openssl/evp.h>
       ],
