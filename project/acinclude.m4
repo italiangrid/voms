@@ -326,11 +326,11 @@ AC_DEFUN([AC_VOMS_OPENSSL_EVP_MD_CTX],
        AC_MSG_RESULT(yes)],
       [AC_MSG_RESULT(no)]
     )
-      CFLAGS="$CFLAGS_SAVE"
+    CFLAGS="$CFLAGS_SAVE"
 
     AC_MSG_CHECKING([for EVP_MD_CTX_cleanup])
     CFLAGS_SAVE="$CFLAGS"
-    CFLAGS="$CFLAGS -I$GLOBUS_LOCATION/include/$GLOBUS_FLAVOR_NAME"
+    CFLAGS="$CFLAGS $GLOBUS_CFLAGS"
     AC_TRY_COMPILE(
       [
         #include <openssl/evp.h>
@@ -343,9 +343,7 @@ AC_DEFUN([AC_VOMS_OPENSSL_EVP_MD_CTX],
        AC_MSG_RESULT(yes)],
       [AC_MSG_RESULT(no)]
       )
-
-    CFLAGS_SAVE="$CFLAGS"
-    CFLAGS="$CFLAGS $GLOBUS_CFLAGS"
+    CFLAGS="$CFLAGS_SAVE"
 ])
 
 # AC_VOMS_LONG_LONG check whether long long type is present

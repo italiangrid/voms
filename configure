@@ -26830,12 +26830,12 @@ echo "${ECHO_T}no" >&6
 
 fi
 rm -f conftest.err conftest.$ac_objext conftest.$ac_ext
-      CFLAGS="$CFLAGS_SAVE"
+    CFLAGS="$CFLAGS_SAVE"
 
     echo "$as_me:$LINENO: checking for EVP_MD_CTX_cleanup" >&5
 echo $ECHO_N "checking for EVP_MD_CTX_cleanup... $ECHO_C" >&6
     CFLAGS_SAVE="$CFLAGS"
-    CFLAGS="$CFLAGS -I$GLOBUS_LOCATION/include/$GLOBUS_FLAVOR_NAME"
+    CFLAGS="$CFLAGS $GLOBUS_CFLAGS"
     cat >conftest.$ac_ext <<_ACEOF
 /* confdefs.h.  */
 _ACEOF
@@ -26894,9 +26894,7 @@ echo "${ECHO_T}no" >&6
 
 fi
 rm -f conftest.err conftest.$ac_objext conftest.$ac_ext
-
-    CFLAGS_SAVE="$CFLAGS"
-    CFLAGS="$CFLAGS $GLOBUS_CFLAGS"
+    CFLAGS="$CFLAGS_SAVE"
 
 
     echo "$as_me:$LINENO: checking for strndup" >&5
