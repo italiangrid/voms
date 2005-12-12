@@ -83,6 +83,10 @@ int GSISocketServer::GetTimeout()
   return sockalarmed;
 }
 
+gss_ctx_id_t GSISocketServer::GetContext()
+{
+  return context;
+}
 
 bool
 GSISocketServer::ReOpen(int p, int v, int b, bool m)

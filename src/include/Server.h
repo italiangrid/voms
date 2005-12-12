@@ -100,6 +100,8 @@ class GSISocketServer
   bool ReOpen(int, int, int=5, bool=true);
   void SetTimeout(int);
   int  GetTimeout();
+  gss_ctx_id_t GetContext();
+
  private:
   /**
    * Accept the GSI Authentication.
