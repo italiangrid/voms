@@ -568,15 +568,11 @@ bool Client::Run() {
   
   char * oldenv = getenv("X509_USER_PROXY");
 
-  if (Test() == 2)
-    exit(1);
-
   if(!noregen) {
     std::stringstream tmpproxyname;
     tmpproxyname << "/tmp/tmp_x509up_u" << getuid() << "_" << getpid();
     proxyfile = tmpproxyname.str();
     setenv("X509_USER_PROXY", proxyfile.c_str(), 1);
-
   }
   
   /* vomsdata */
@@ -639,15 +635,14 @@ bool Client::Run() {
       /* contact server */
       
       if(!quiet) std::cout << "Contacting " << " " << beg->host << ":" << beg->port
-			   << " [" << beg->contact << "] \"" << beg->vo << "\"\n"
-			   << std::flush;
+                           << " [" << beg->contact << "] \"" << beg->vo << "\"" << std::flush;
       
       if (listing)
         command = "N";
 
       int status = v.ContactRaw(beg->host, beg->port, beg->contact, command, buffer, version);
       
-      /* check for warnings */
+      /* check for errors from the server */
       
       std::string error = v.ServerErrors();
 
@@ -655,22 +650,17 @@ bool Client::Run() {
         Error();
       
       if (!status && !error.empty()) {
-        std::cerr << "Error: " << error << "\n" << std::flush;
+        std::cerr << std::endl << "Error: " << error << std::endl;
         exit(1);
       }
 
-      error = v.ErrorMessage();
-      
-      if (!status && !error.empty()) {
-        std::cerr << "Error: " << error << "\n" << std::flush;
-        exit(1);
-      }
-
+      /* check for warnings from the server */
 
       if(!ignorewarn && !error.empty()) {
-        if(!quiet) 
-          std::cerr << std::endl << "Warning: " << error;
 
+        if(!quiet) 
+          std::cerr << std::endl << "Warning: " << error << std::endl << std::endl;
+        
         if(failonwarn) {
           if (!quiet)
             std::cerr << std::endl << "Error in getting data from VOMS server:" << beg->contact
@@ -679,10 +669,20 @@ bool Client::Run() {
         }
       }
       
+      /* check for errors */
+      
+      error = v.ErrorMessage();
+
+      if (!status && !error.empty()) {
+        std::cerr << std::endl << "Error: " << error << std::endl;
+        exit(1);
+      }
+
       if (isAC(buffer)) {
+        
         if (status) {
-          if (!quiet) 
-            std::cout << " Done" << std::endl;
+          
+          std::cout << " Done" << std::endl;
           
           /* retrieve AC and add to list */
         
@@ -692,11 +692,11 @@ bool Client::Run() {
             exit(3);
           }
         
-        // if contact succeded jumps to other vos */
-        break;
-      }
-      else if(!quiet) 
-        std::cout << " Failed.";
+          // if contact succeded jumps to other vos */
+          break;
+        }
+        else if(!quiet) 
+          std::cout << " Failed";
       }
       else {
         data += buffer;
@@ -1268,34 +1268,35 @@ bool Client::Test() {
   time_t time_now = ASN1_UTCTIME_mktime(asn1_time);
   time_t time_after = ASN1_UTCTIME_mktime(X509_get_notAfter(pcd->ucert));
   time_t time_diff = time_after - time_now ;
-  int status = 0;
 
   if (time_diff < 0) {
+    if (!quiet) 
+      std::cout << std::endl << "ERROR: Your certificate expired "
+                << asctime(localtime(&time_after)) << std::endl;
     
-    if (!quiet) std::cout << std::endl << "Error: your certificate expired "
-			  << asctime(localtime(&time_after)) << std::endl;
-  
-    status = 2;
+    return 2;
   } 
-  else if (hours && time_diff < hours*60*60 + minutes*60) 
-  {
+  
+  if (hours && time_diff < hours*60*60 + minutes*60) {
     if (!quiet) std::cout << std::endl << "Warning: your certificate and proxy will expire "
-			  << asctime(localtime(&time_after))
-			  << "which is within the requested lifetime of the proxy"
-			  << std::endl;
-    status = 1;
+                          << asctime(localtime(&time_after))
+                          << "which is within the requested lifetime of the proxy"
+                          << std::endl;
+    return 1;
   }
   
-  if (!quiet && status==0) 
+  if (!quiet)
   {
     time_t time_after_proxy;
     time_after_proxy = time_now + hours*60*60 + minutes*60;
     
     if (!quiet) std::cout << "Your proxy is valid until "
-			  << asctime(localtime(&time_after_proxy)) << std::endl;
+                          << asctime(localtime(&time_after_proxy)) << std::flush;
+    
+    return 0;
   }
 
-  return status;
+  return 0;
 }
 
 bool Client::Retrieve(std::string buffer) {
