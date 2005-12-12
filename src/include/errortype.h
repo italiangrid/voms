@@ -25,8 +25,10 @@ struct error {
 
 #define WARN_NO_FIRST_SELECT (WARN_OFFSET + 1)
 #define WARN_SHORT_VALIDITY  (WARN_OFFSET + 2)
+#define WARN_ATTR_SUBSET     (WARN_OFFSET + 3)
 
 #define ERR_NOT_MEMBER      (ERROR_OFFSET + 1)
+#define ERR_ATTR_EMPTY      (ERROR_OFFSET + 2)
 
 extern void free_error(struct error *);
 extern struct error *alloc_error(int, const char *);

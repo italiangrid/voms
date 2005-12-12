@@ -53,12 +53,15 @@ void *logh = NULL;
 #include "access_db_sql.h"
 
 #include <map>
+#include <set>
 #include <string>
 #include <algorithm>
 #include <iostream>
 
 #include "attribute.h"
 #include "dbwrap.h"
+
+#include "voms_api.h"
 
 #ifdef HAVE_GLOBUS_MODULE_ACTIVATE
 #include <globus_module.h>
@@ -183,7 +186,7 @@ static void parse_order(const std::string &message, ordermap &ordering)
     }
     temp.cap = "";
     LOGM(VARP, logh, LEV_DEBUG, T_PRE, "Order: %s:%s",temp.group.c_str(),temp.role.c_str());
-    ordering.insert(std::make_pair<attrib,int>(temp,order));
+    ordering.insert(std::make_pair<attrib, int>(temp,order));
     order++;
     position = end_token;
   }
@@ -212,6 +215,11 @@ static void parse_targets(const std::string &message,
     target.push_back(attribute);
     position = end_token;
   }
+}
+
+bool not_in(std::string fqan, std::vector<std::string> fqans)
+{
+  return (find(fqans.begin(), fqans.end(), fqan) == fqans.end());
 }
 
 VOMSServer::VOMSServer(int argc, char *argv[]) : sock(0,0,NULL,50,false),
@@ -546,7 +554,7 @@ void VOMSServer::Run()
             LOGM(VARP, logh, LEV_INFO, T_PRE, " serial: %s", sock.peer_serial.c_str());
 
             LOG(logh, LEV_DEBUG, T_PRE, "Starting Execution.");
-            value = Execute(user, userca, sock.own_key, sock.own_cert, sock.peer_cert);
+            value = Execute(user, userca, sock.own_key, sock.own_cert, sock.peer_cert, sock.GetContext());
           }
           else {
             LOGM(VARP, logh, LEV_INFO, T_PRE, "Failed to authenticate peer");	
@@ -586,7 +594,7 @@ static std::string translate(const std::string& name)
 
 bool
 VOMSServer::Execute(const std::string &client_name, const std::string &ca_name,
-                    EVP_PKEY *key, X509 *issuer, X509 *holder)
+                    EVP_PKEY *key, X509 *issuer, X509 *holder, gss_ctx_id_t context)
 {
   std::string message;
   std::string client = client_name;
@@ -627,14 +635,14 @@ VOMSServer::Execute(const std::string &client_name, const std::string &ca_name,
 
   /* Interpret user requests */
 
-  if (requested != 0)
-    validity = (validity < requested ? validity : requested);
-
-  if (validity < requested) {
-    err.num = WARN_SHORT_VALIDITY;
-    err.message = "SERVER: " + uri + "\nValidity shortened to " +
-      stringify(validity, tmp) + " seconds!\n";
-    errs.push_back(err);
+  if (requested != 0) {
+    if (validity < requested) {
+      err.num = WARN_SHORT_VALIDITY;
+      err.message = uri + ": validity shortened to " +
+        stringify(validity, tmp) + " seconds!";
+      errs.push_back(err);
+      requested = validity;
+    }
   }
 
   LOGM(VARP, logh, LEV_INFO, T_PRE, "New command: %s", r.command.c_str());
@@ -729,19 +737,61 @@ VOMSServer::Execute(const std::string &client_name, const std::string &ca_name,
   }
 
   std::vector<std::string> compact;
-  //    std::string tmp;
   int j = 0;
 
-  for (std::vector<attrib>::iterator i = res.begin(); i != res.end(); i++) {
-    tmp = i->group;
-    if (!i->role.empty())
-      tmp += "/Role=" + i->role;
-    if (!i->cap.empty())
-      tmp += "/Capability=" + i->cap;
-    compact.push_back(tmp);
+  for (std::vector<attrib>::iterator i = res.begin(); i != res.end(); i++) 
+  {
+    compact.push_back(i->str());
     j++;
   }
+  
+  /* check the user is allowed to requests those attributes */
 
+  vomsdata v("", "");
+  v.SetVerificationType((verify_type)(VERIFY_SIGN));
+  v.RetrieveFromCtx(context, RECURSE_DEEP);
+  
+  /* find the attributes corresponding to the vo */
+
+  std::vector<std::string> fqans;
+  for(std::vector<voms>::iterator index = (v.data).begin(); index != (v.data).end(); ++index)
+  {
+    if(index->voname == voname)
+      fqans.insert(fqans.end(), 
+                   index->fqan.begin(), 
+                   index->fqan.end());
+  }
+
+  /* if attributes were found, only release an intersection beetween the requested and the owned */
+
+  std::vector<std::string>::iterator end = compact.end();
+  bool subset = false;
+  if(!fqans.empty())
+    if((compact.erase(remove_if(compact.begin(),
+                                compact.end(), 
+                                bind2nd(std::ptr_fun(not_in), fqans)), 
+                      compact.end()) != end))
+      subset = true;
+  
+  if (compact.empty()) {
+    LOG(logh, LEV_ERROR, T_PRE, "Error in executing request!");
+    err.num = ERR_ATTR_EMPTY;
+    err.message = voname + " : your certificate already contains attributes, only a subset of them can be issued.";
+    errs.push_back(err);
+    std::string ret = XML_Ans_Encode("A", errs);
+    LOGM(VARP, logh, LEV_DEBUG, T_PRE, "Sending: %s", ret.c_str());
+    sock.Send(ret);
+    return false;
+  }
+
+  if(subset)
+  {
+    LOG(logh, LEV_ERROR, T_PRE, "Error in executing request!");
+    err.num = WARN_ATTR_SUBSET;
+    err.message = voname + " : your certificate already contains attributes, only a subset of them can be issued.";
+    errs.push_back(err);
+  }
+  
   if (j) {
     if (!firstgroup.empty()) {
       std::vector<attrib>::iterator i = res.begin();
@@ -755,7 +805,7 @@ VOMSServer::Execute(const std::string &client_name, const std::string &ca_name,
       }
     }
 
-    BIGNUM *serial=get_serial(code, dbname, username, contactstring, mysql_port, mysql_socket, passwd());
+    BIGNUM * serial = get_serial(code, dbname, username, contactstring, mysql_port, mysql_socket, passwd());
 
     int res = 1;
     std::string codedac;
@@ -763,14 +813,14 @@ VOMSServer::Execute(const std::string &client_name, const std::string &ca_name,
     if (*comm != 'N') {
       if (!serial)
         LOG(logh, LEV_ERROR, T_PRE, "Can't get Serial Number!");
-
+      
       if (serial) {
         AC *a = AC_new();
 
         LOGM(VARP, logh, LEV_DEBUG, T_PRE, "length = %d", i2d_AC(a, NULL));
         if (a)
           res = createac(issuer, holder, key, serial, compact, targs, &a,
-                         voname, uri, validity, !newformat);
+                         voname, uri, requested, !newformat);
 
         LOGM(VARP, logh, LEV_DEBUG, T_PRE, "length = %d", i2d_AC(a, NULL));
         BN_free(serial);
