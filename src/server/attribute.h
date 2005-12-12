@@ -18,12 +18,20 @@
 #include <string>
 
 class attrib {
+
  public:
+  
+  std::string str() const;
+
+ public:
+
   std::string group;
   std::string role;
   std::string cap;
+  
 };
 
-extern bool operator<(const attrib &lhs, const attrib &rhs);
+extern bool operator<(const attrib& lhs, 
+                      const attrib& rhs);
 
 #endif /* __ATTRIBUTE_H */

@@ -11,11 +11,24 @@
  * follows.
  *
  *********************************************************************/
+
 #include "config.h"
 
 #include <attribute.h>
 
-bool operator<(const attrib &lhs, const attrib &rhs)
+std::string attrib::str() const {
+
+  std::string tmp = group;
+  if(!role.empty())
+    tmp += "/Role=" + role;
+  if(!cap.empty())
+    tmp += "/Capability=" + cap;
+  
+  return tmp;
+}
+
+bool operator<(const attrib &lhs, 
+               const attrib &rhs)
 {
   if (lhs.group < rhs.group)
     return true;
