@@ -92,7 +92,8 @@ private:
 
 enum recurse_type { 
   RECURSE_CHAIN, 
-  RECURSE_NONE 
+  RECURSE_NONE,
+  RECURSE_DEEP
 };
 
 enum verify_type {

@@ -167,17 +167,18 @@ vomsdata::retrieve(X509 *cert, STACK_OF(X509) *chain, recurse_type how,
     }
   }
 
-  if (found)
+  if (found && how != RECURSE_DEEP)
     return true;
-
+  
   /*
    * May need to travel up the chain.
    */
-  if (how == RECURSE_CHAIN) {
+  if (how != RECURSE_NONE) {
     
     chain_length = sk_X509_num(chain);
     
     while (position < chain_length) {
+      
       cert = sk_X509_value(chain,position);
       
       index = X509_get_ext_by_NID(cert, nida, -1);
@@ -188,7 +189,7 @@ vomsdata::retrieve(X509 *cert, STACK_OF(X509) *chain, recurse_type how,
           found = true;
         }
       }
-	
+      
       index = X509_get_ext_by_NID(cert, nidf, -1);
       if (index >= 0) {
         ext = X509_get_ext(cert,index);
@@ -197,7 +198,7 @@ vomsdata::retrieve(X509 *cert, STACK_OF(X509) *chain, recurse_type how,
           found = true;
         }
       }
-	
+      
       index = X509_get_ext_by_NID(cert, nidv, -1);
       if (index >= 0) {
         ext = X509_get_ext(cert,index);
@@ -207,7 +208,7 @@ vomsdata::retrieve(X509 *cert, STACK_OF(X509) *chain, recurse_type how,
         }
       }
 
-      if (found)
+      if (found && how != RECURSE_DEEP)
         return true;
       
       position++;
@@ -215,7 +216,7 @@ vomsdata::retrieve(X509 *cert, STACK_OF(X509) *chain, recurse_type how,
   }
   
   seterror(VERR_NOEXT, "VOMS extension not found!");
-  return false;
+  return found;
 }
 
 bool 
