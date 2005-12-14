@@ -2,7 +2,7 @@
 #set -x
 
 # Default prefix
-@LOCATION_ENV@=${@LOCATION_ENV@:-@PPREFIX@}
+@LOCATION_ENV@=${@LOCATION_ENV@:-@LOCATION_DIR@}
 if test -z $@VAR_LOCATION_ENV@ ; then
     @VAR_LOCATION_ENV@=$@LOCATION_ENV@/var
 fi
