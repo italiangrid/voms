@@ -18,9 +18,6 @@ libexec_SCRIPTS = \
 
 initdir = $(prefix)/etc/init.d
 
-init_SCRIPTS = \
-	voms.start
-
 EXTRA_DIST = \
 	vomses.template \
 	voms.data \
@@ -30,3 +27,7 @@ EXTRA_DIST = \
 	voms.start
 
 MAINTAINERCLEANFILES = Makefile.in
+
+install-exec-hook: voms.start
+	$(mkinstalldirs) $(DESTDIR)$(initdir)
+	$(INSTALL) $(top_builddir)/src/install/voms.start $(DESTDIR)$(initdir)/voms

@@ -1,4 +1,6 @@
 
+includedir = $(prefix)/include/glite/security/voms
+
 lib_LTLIBRARIES = \
 	libvomsapi.la \
 	libvomsc.la \
