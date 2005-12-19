@@ -345,11 +345,12 @@ bool vomsdata::Retrieve(X509 *cert, STACK_OF(X509) *chain, recurse_type how)
 
   if (retrieve(cert, chain, how, &acs, subject, ca, &holder)) {
     ok = evaluate(acs, subject, ca, holder);
-    if (acs)
-      AC_SEQ_free(acs);
-    if (holder)
-      X509_free(holder);
   }
+
+  if (acs)
+    AC_SEQ_free(acs);
+  if (holder)
+    X509_free(holder);
 
   return ok;
 }

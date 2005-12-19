@@ -284,6 +284,8 @@ void VOMS_Delete(struct vomsr *v)
     AC_free(v->ac);
     X509_free(v->holder);
   }
+
+  free(v);
 }
 
 struct vomsdatar *VOMS_CopyALL(struct vomsdatar *vd, int *error)
