@@ -330,20 +330,22 @@ getopts_real(int argc, char * const argv[], struct option *longopts, struct opti
           int optindsave, opterrsave, optoptsave;
 	  
           while (f >> line) {
-            std::vector<const char *> v;
-            v.push_back(argv[0]);
-            v.push_back(line.c_str());
-            optargsave = optarg;
-            optindsave = optind;
-            opterrsave = opterr;
-            optoptsave = optopt;
-            optind = 0;
-            res &= getopts_real(2, const_cast<char * const *>(&v[0]),
-                                longopts, opts);
-            optarg = optargsave;
-            optind = optindsave;
-            opterr = opterrsave;
-            optopt = optoptsave;
+            if (line.c_str()[0] != '#') {
+              std::vector<const char *> v;
+              v.push_back(argv[0]);
+              v.push_back(line.c_str());
+              optargsave = optarg;
+              optindsave = optind;
+              opterrsave = opterr;
+              optoptsave = optopt;
+              optind = 0;
+              res &= getopts_real(2, const_cast<char * const *>(&v[0]),
+                                  longopts, opts);
+              optarg = optargsave;
+              optind = optindsave;
+              opterr = opterrsave;
+              optopt = optoptsave;
+            }
           }
           if (!res)
             c = '?';

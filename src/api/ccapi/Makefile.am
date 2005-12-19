@@ -49,7 +49,7 @@ CLIBADD =
 	$(top_builddir)/src/log/liblog.la
 
 libvomsc_la_LIBADD = \
-	$(CLIBADD) \
+	$(CCLIBADD) \
 	$(top_builddir)/src/socklib/libsock.la
 
 EXTRA_LTLIBRARIES = \
@@ -126,7 +126,7 @@ libvomsc_gcc32_la_CPPFLAGS = \
 	$(GLOBUS_CFLAGS)
 
 libvomsc_gcc32_la_LIBADD = \
-	$(CLIBADD) \
+	$(CCLIBADD) \
 	$(top_builddir)/src/socklib/libsock_gcc32.la
 
 libvomsc_gcc32_la_LDFLAGS = \
@@ -140,7 +140,7 @@ libvomsc_gcc32dbg_la_CPPFLAGS = \
 	$(GLOBUS_CFLAGS)
 
 libvomsc_gcc32dbg_la_LIBADD = \
-	$(CLIBADD) \
+	$(CCLIBADD) \
 	$(top_builddir)/src/socklib/libsock_gcc32dbg.la
 
 libvomsc_gcc32dbg_la_LDFLAGS = \
@@ -154,7 +154,7 @@ libvomsc_gcc32pthr_la_CPPFLAGS = \
 	$(GLOBUS_CFLAGS)
 
 libvomsc_gcc32pthr_la_LIBADD = \
-	$(CLIBADD) \
+	$(CCLIBADD) \
 	$(top_builddir)/src/socklib/libsock_gcc32pthr.la
 
 libvomsc_gcc32pthr_la_LDFLAGS = \
@@ -168,7 +168,7 @@ libvomsc_gcc32dbgpthr_la_CPPFLAGS = \
 	$(GLOBUS_CFLAGS)
 
 libvomsc_gcc32dbgpthr_la_LIBADD = \
-	$(CLIBADD) \
+	$(CCLIBADD) \
 	$(top_builddir)/src/socklib/libsock_gcc32dbgpthr.la
 
 libvomsc_gcc32dbgpthr_la_LDFLAGS = \

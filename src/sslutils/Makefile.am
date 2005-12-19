@@ -5,15 +5,9 @@ noinst_LTLIBRARIES = \
 	libssl_utils.la \
 	$(WANTED_SSL_UTILS_LIBS) # may add the libraries defined in EXTRA_LTLIBRARIES
 
-SOURCES= \
-	scutils.c \
-	scutils.h \
-	sslutils.c \
-	sslutils.h \
-	proxycertinfo.c
+SOURCES= scutils.c scutils.h sslutils.c sslutils.h proxycertinfo.c
 
-libssl_utils_la_SOURCES= \
-	$(SOURCES)
+libssl_utils_la_SOURCES= $(SOURCES)
 
 libssl_utils_la_CFLAGS = \
 	-I $(top_srcdir)/src/sslutils/oldgaa \
