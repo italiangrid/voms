@@ -468,7 +468,7 @@ ac_includes_default="\
 #endif"
 
 ac_default_prefix="/opt/glite"
-ac_subst_vars='SHELL PATH_SEPARATOR PACKAGE_NAME PACKAGE_TARNAME PACKAGE_VERSION PACKAGE_STRING PACKAGE_BUGREPORT exec_prefix prefix program_transform_name bindir sbindir libexecdir datadir sysconfdir sharedstatedir localstatedir libdir includedir oldincludedir infodir mandir build_alias host_alias target_alias DEFS ECHO_C ECHO_N ECHO_T LIBS INSTALL_PROGRAM INSTALL_SCRIPT INSTALL_DATA CYGPATH_W PACKAGE VERSION ACLOCAL AUTOCONF AUTOMAKE AUTOHEADER MAKEINFO install_sh STRIP ac_ct_STRIP INSTALL_STRIP_PROGRAM mkdir_p AWK SET_MAKE am__leading_dot AMTAR am__tar am__untar MAINTAINER_MODE_TRUE MAINTAINER_MODE_FALSE MAINT WORKDIR WANT_UNIT_TEST_TRUE WANT_UNIT_TEST_FALSE CXX CXXFLAGS LDFLAGS CPPFLAGS ac_ct_CXX EXEEXT OBJEXT DEPDIR am__include am__quote AMDEP_TRUE AMDEP_FALSE AMDEPBACKSLASH CXXDEPMODE am__fastdepCXX_TRUE am__fastdepCXX_FALSE CC CFLAGS ac_ct_CC CCDEPMODE am__fastdepCC_TRUE am__fastdepCC_FALSE CPP LN_S build build_cpu build_vendor build_os host host_cpu host_vendor host_os EGREP ECHO AR ac_ct_AR RANLIB ac_ct_RANLIB CXXCPP F77 FFLAGS ac_ct_F77 LIBTOOL ALLOCA LIBOBJS POW_LIB ENABLE_GLITE_TRUE ENABLE_GLITE_FALSE DISTTAR LOCATION_ENV LOCATION_DIR VAR_LOCATION_ENV GLITE_LOCATION GLITE_CFLAGS EXPAT_INSTALL_PATH EXPAT_CFLAGS EXPAT_LIBS EXPAT_STATIC_LIBS CPPUNIT_CFLAGS CPPUNIT_LIBS WANTED_OLDGAA_LIBS WANTED_SSL_UTILS_LIBS WANTED_SOCK_LIBS WANTED_API_LIBS GLOBUS_CFLAGS GLOBUS_GCC32_CFLAGS GLOBUS_GCC32DBG_CFLAGS GLOBUS_GCC32DBGPTHR_CFLAGS GLOBUS_GCC32PTHR_CFLAGS GLOBUS_GSS_LIBS GLOBUS_GCC32_GSS_LIBS GLOBUS_GCC32DBG_GSS_LIBS GLOBUS_GCC32DBGPTHR_GSS_LIBS GLOBUS_GCC32PTHR_GSS_LIBS BUILD_DOCS_TRUE BUILD_DOCS_FALSE LTLIBOBJS'
+ac_subst_vars='SHELL PATH_SEPARATOR PACKAGE_NAME PACKAGE_TARNAME PACKAGE_VERSION PACKAGE_STRING PACKAGE_BUGREPORT exec_prefix prefix program_transform_name bindir sbindir libexecdir datadir sysconfdir sharedstatedir localstatedir libdir includedir oldincludedir infodir mandir build_alias host_alias target_alias DEFS ECHO_C ECHO_N ECHO_T LIBS INSTALL_PROGRAM INSTALL_SCRIPT INSTALL_DATA CYGPATH_W PACKAGE VERSION ACLOCAL AUTOCONF AUTOMAKE AUTOHEADER MAKEINFO install_sh STRIP ac_ct_STRIP INSTALL_STRIP_PROGRAM mkdir_p AWK SET_MAKE am__leading_dot AMTAR am__tar am__untar MAINTAINER_MODE_TRUE MAINTAINER_MODE_FALSE MAINT WORKDIR WANT_UNIT_TEST_TRUE WANT_UNIT_TEST_FALSE CXX CXXFLAGS LDFLAGS CPPFLAGS ac_ct_CXX EXEEXT OBJEXT DEPDIR am__include am__quote AMDEP_TRUE AMDEP_FALSE AMDEPBACKSLASH CXXDEPMODE am__fastdepCXX_TRUE am__fastdepCXX_FALSE CC CFLAGS ac_ct_CC CCDEPMODE am__fastdepCC_TRUE am__fastdepCC_FALSE CPP LN_S build build_cpu build_vendor build_os host host_cpu host_vendor host_os EGREP ECHO AR ac_ct_AR RANLIB ac_ct_RANLIB CXXCPP F77 FFLAGS ac_ct_F77 LIBTOOL ALLOCA LIBOBJS POW_LIB ENABLE_GLITE_TRUE ENABLE_GLITE_FALSE DISTTAR LOCATION_ENV LOCATION_DIR VAR_LOCATION_ENV GLITE_LOCATION GLITE_CFLAGS EXPAT_INSTALL_PATH EXPAT_CFLAGS EXPAT_LIBS EXPAT_STATIC_LIBS CPPUNIT_CFLAGS CPPUNIT_LIBS WANTED_OLDGAA_LIBS WANTED_SSL_UTILS_LIBS WANTED_SOCK_LIBS WANTED_API_LIBS GLOBUS_CFLAGS GLOBUS_GCC32_CFLAGS GLOBUS_GCC32DBG_CFLAGS GLOBUS_GCC32DBGPTHR_CFLAGS GLOBUS_GCC32PTHR_CFLAGS GLOBUS_GCC64_CFLAGS GLOBUS_GCC64DBG_CFLAGS GLOBUS_GCC64DBGPTHR_CFLAGS GLOBUS_GCC64PTHR_CFLAGS GLOBUS_GSS_LIBS GLOBUS_GCC32_GSS_LIBS GLOBUS_GCC32DBG_GSS_LIBS GLOBUS_GCC32DBGPTHR_GSS_LIBS GLOBUS_GCC32PTHR_GSS_LIBS GLOBUS_GCC64_GSS_LIBS GLOBUS_GCC64DBG_GSS_LIBS GLOBUS_GCC64DBGPTHR_GSS_LIBS GLOBUS_GCC64PTHR_GSS_LIBS BUILD_DOCS_TRUE BUILD_DOCS_FALSE LTLIBOBJS'
 ac_subst_files=''
 
 # Initialize some variables set by options.
@@ -1057,7 +1057,7 @@ Optional Packages:
   --with-expat-prefix=PFX      prefix where 'expat' is installed.
   --with-cppunit-prefix=PFX prefix where 'cppunit' is installed.
   --with-globus-prefix=PFX     prefix where GLOBUS is installed. (/opt/globus)
-  --with-globus-flavor=flavor default=gcc32dbg
+  --with-globus-flavor=flavor default=$default_flavor
   --with-debug Compiles without optimizations and with debug activated
   --with-warnings Compiles with maximum warnings
   --with-dmalloc          use dmalloc, as in
@@ -25703,13 +25703,21 @@ echo $ECHO_N "checking for GLOBUS flavors... $ECHO_C" >&6
       GLOBUS_FLAVORS="$GLOBUS_FLAVORS $i"
     done
 
+    if test -e $with_globus_prefix/include/gcc32dbg ; then
+      default_flavor=gcc32dbg
+    elif test -e $with_globus_prefix/include/gcc64dbg ; then
+      default_flavor=gcc64dbg
+    else
+      default_flavor=""
+    fi
+
 
 # Check whether --with-globus_flavor or --without-globus_flavor was given.
 if test "${with_globus_flavor+set}" = set; then
   withval="$with_globus_flavor"
 
 else
-  with_globus_flavor=${GLOBUS_FLAVOR:-gcc32dbg}
+  with_globus_flavor=${GLOBUS_FLAVOR:-${default_flavor}}
 fi;
 
     echo "$as_me:$LINENO: result: found $GLOBUS_FLAVORS ($with_globus_flavor selected)" >&5
@@ -25729,11 +25737,11 @@ echo "${ECHO_T}found $GLOBUS_FLAVORS ($with_globus_flavor selected)" >&6
 
     for flavor in $GLOBUS_FLAVORS ; do
       if test "x$flavor" = "x$with_globus_flavor" ; then
-	GLOBUS_CFLAGS="-I$with_globus_prefix/include/$flavor"
+      	GLOBUS_CFLAGS="-I$with_globus_prefix/include/$flavor"
         GLOBUS_GSS_LIBS="$ac_globus_ldlib -lglobus_gssapi_gsi_$flavor -lglobus_gss_assist_$flavor"
       fi
       if test "x$flavor" = "xgcc32" ; then
-	GLOBUS_GCC32_CFLAGS="-I$with_globus_prefix/include/$flavor"
+	      GLOBUS_GCC32_CFLAGS="-I$with_globus_prefix/include/$flavor"
         GLOBUS_GCC32_GSS_LIBS="$ac_globus_ldlib -lglobus_gssapi_gsi_$flavor -lglobus_gss_assist_$flavor"
       fi
       if test "$flavor" = "gcc32dbg" ; then
@@ -25748,7 +25756,35 @@ echo "${ECHO_T}found $GLOBUS_FLAVORS ($with_globus_flavor selected)" >&6
         GLOBUS_GCC32PTHR_CFLAGS="-I$with_globus_prefix/include/$flavor"
         GLOBUS_GCC32PTHR_GSS_LIBS="$ac_globus_ldlib -lglobus_gssapi_gsi_$flavor -lglobus_gss_assist_$flavor"
       fi
+
+      if test "x$flavor" = "xgcc64" ; then
+	      GLOBUS_GCC64_CFLAGS="-I$with_globus_prefix/include/$flavor"
+        GLOBUS_GCC64_GSS_LIBS="$ac_globus_ldlib -lglobus_gssapi_gsi_$flavor -lglobus_gss_assist_$flavor"
+      fi
+      if test "$flavor" = "gcc64dbg" ; then
+        GLOBUS_GCC64DBG_CFLAGS="-I$with_globus_prefix/include/$flavor"
+        GLOBUS_GCC64DBG_GSS_LIBS="$ac_globus_ldlib -lglobus_gssapi_gsi_$flavor -lglobus_gss_assist_$flavor"
+      fi
+      if test "$flavor" = "gcc64dbgpthr" ; then
+        GLOBUS_GCC64DBGPTHR_CFLAGS="-I$with_globus_prefix/include/$flavor"
+        GLOBUS_GCC64DBGPTHR_GSS_LIBS="$ac_globus_ldlib -lglobus_gssapi_gsi_$flavor -lglobus_gss_assist_$flavor"
+      fi
+      if test "$flavor" = "gcc64pthr" ; then
+        GLOBUS_GCC64PTHR_CFLAGS="-I$with_globus_prefix/include/$flavor"
+        GLOBUS_GCC64PTHR_GSS_LIBS="$ac_globus_ldlib -lglobus_gssapi_gsi_$flavor -lglobus_gss_assist_$flavor"
+      fi
     done
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -27765,11 +27801,19 @@ s,@GLOBUS_GCC32_CFLAGS@,$GLOBUS_GCC32_CFLAGS,;t t
 s,@GLOBUS_GCC32DBG_CFLAGS@,$GLOBUS_GCC32DBG_CFLAGS,;t t
 s,@GLOBUS_GCC32DBGPTHR_CFLAGS@,$GLOBUS_GCC32DBGPTHR_CFLAGS,;t t
 s,@GLOBUS_GCC32PTHR_CFLAGS@,$GLOBUS_GCC32PTHR_CFLAGS,;t t
+s,@GLOBUS_GCC64_CFLAGS@,$GLOBUS_GCC64_CFLAGS,;t t
+s,@GLOBUS_GCC64DBG_CFLAGS@,$GLOBUS_GCC64DBG_CFLAGS,;t t
+s,@GLOBUS_GCC64DBGPTHR_CFLAGS@,$GLOBUS_GCC64DBGPTHR_CFLAGS,;t t
+s,@GLOBUS_GCC64PTHR_CFLAGS@,$GLOBUS_GCC64PTHR_CFLAGS,;t t
 s,@GLOBUS_GSS_LIBS@,$GLOBUS_GSS_LIBS,;t t
 s,@GLOBUS_GCC32_GSS_LIBS@,$GLOBUS_GCC32_GSS_LIBS,;t t
 s,@GLOBUS_GCC32DBG_GSS_LIBS@,$GLOBUS_GCC32DBG_GSS_LIBS,;t t
 s,@GLOBUS_GCC32DBGPTHR_GSS_LIBS@,$GLOBUS_GCC32DBGPTHR_GSS_LIBS,;t t
 s,@GLOBUS_GCC32PTHR_GSS_LIBS@,$GLOBUS_GCC32PTHR_GSS_LIBS,;t t
+s,@GLOBUS_GCC64_GSS_LIBS@,$GLOBUS_GCC64_GSS_LIBS,;t t
+s,@GLOBUS_GCC64DBG_GSS_LIBS@,$GLOBUS_GCC64DBG_GSS_LIBS,;t t
+s,@GLOBUS_GCC64DBGPTHR_GSS_LIBS@,$GLOBUS_GCC64DBGPTHR_GSS_LIBS,;t t
+s,@GLOBUS_GCC64PTHR_GSS_LIBS@,$GLOBUS_GCC64PTHR_GSS_LIBS,;t t
 s,@BUILD_DOCS_TRUE@,$BUILD_DOCS_TRUE,;t t
 s,@BUILD_DOCS_FALSE@,$BUILD_DOCS_FALSE,;t t
 s,@LTLIBOBJS@,$LTLIBOBJS,;t t

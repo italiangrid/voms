@@ -35,6 +35,16 @@ CSOURCES = \
 	ccval.cc \
 	cinterface.cc
 
+CLEANFILES = \
+	libvomsapi_gcc32.la \
+	libvomsapi_gcc32dbg.la \
+	libvomsapi_gcc32pthr.la \
+	libvomsapi_gcc32dbgpthr.la \
+	libvomsc_gcc32.la \
+	libvomsc_gcc32dbg.la \
+	libvomsc_gcc32pthr.la \
+	libvomsc_gcc32dbgpthr.la
+
 libvomsc_la_SOURCES = \
 	$(CSOURCES)
 
@@ -57,10 +67,18 @@ EXTRA_LTLIBRARIES = \
 	libvomsapi_gcc32dbg.la \
 	libvomsapi_gcc32pthr.la \
 	libvomsapi_gcc32dbgpthr.la \
+	libvomsapi_gcc64.la \
+	libvomsapi_gcc64dbg.la \
+	libvomsapi_gcc64pthr.la \
+	libvomsapi_gcc64dbgpthr.la \
 	libvomsc_gcc32.la \
 	libvomsc_gcc32dbg.la \
 	libvomsc_gcc32pthr.la \
-	libvomsc_gcc32dbgpthr.la
+	libvomsc_gcc32dbgpthr.la \
+	libvomsc_gcc64.la \
+	libvomsc_gcc64dbg.la \
+	libvomsc_gcc64pthr.la \
+	libvomsc_gcc64dbgpthr.la
 
 libvomsapi_gcc32_la_SOURCES = \
 	$(CCSOURCES)
@@ -174,6 +192,123 @@ libvomsc_gcc32dbgpthr_la_LIBADD = \
 libvomsc_gcc32dbgpthr_la_LDFLAGS = \
 	-rpath $(libdir)
 
+
+
+
+libvomsapi_gcc64_la_SOURCES = \
+	$(CCSOURCES)
+
+libvomsapi_gcc64_la_CPPFLAGS = \
+	-I$(top_srcdir)/src/include \
+	$(GLOBUS_GCC64_CFLAGS)
+
+libvomsapi_gcc64_la_LIBADD = \
+	$(CCLIBADD) \
+	$(top_builddir)/src/socklib/libsock_gcc64.la
+
+libvomsapi_gcc64_la_LDFLAGS = \
+	-rpath $(libdir)
+
+libvomsapi_gcc64dbg_la_SOURCES = \
+	$(CCSOURCES)
+
+libvomsapi_gcc64dbg_la_CPPFLAGS = \
+	-I$(top_srcdir)/src/include \
+	$(GLOBUS_GCC64DBG_CFLAGS)
+
+libvomsapi_gcc64dbg_la_LIBADD = \
+	$(CCLIBADD) \
+	$(top_builddir)/src/socklib/libsock_gcc64dbg.la
+
+libvomsapi_gcc64dbg_la_LDFLAGS = \
+	-rpath $(libdir)
+
+libvomsapi_gcc64pthr_la_SOURCES = \
+	$(CCSOURCES)
+
+libvomsapi_gcc64pthr_la_CPPFLAGS = \
+	-I$(top_srcdir)/src/include \
+	$(GLOBUS_GCC64PTHR_CFLAGS)
+
+libvomsapi_gcc64pthr_la_LIBADD = \
+	$(CCLIBADD) \
+	$(top_builddir)/src/socklib/libsock_gcc64pthr.la
+
+libvomsapi_gcc64pthr_la_LDFLAGS = \
+	-rpath $(libdir)
+
+libvomsapi_gcc64dbgpthr_la_SOURCES = \
+	$(CCSOURCES)
+
+libvomsapi_gcc64dbgpthr_la_CPPFLAGS = \
+	-I$(top_srcdir)/src/include \
+	$(GLOBUS_GCC64DBGPTHR_CFLAGS)
+
+libvomsapi_gcc64dbgpthr_la_LIBADD = \
+	$(CCLIBADD) \
+	$(top_builddir)/src/socklib/libsock_gcc64dbgpthr.la
+
+libvomsapi_gcc64dbgpthr_la_LDFLAGS = \
+	-rpath $(libdir)
+
+libvomsc_gcc64_la_SOURCES = \
+	$(CSOURCES)
+
+libvomsc_gcc64_la_CPPFLAGS = \
+	-I$(top_srcdir)/src/include \
+	$(GLOBUS_CFLAGS)
+
+libvomsc_gcc64_la_LIBADD = \
+	$(CCLIBADD) \
+	$(top_builddir)/src/socklib/libsock_gcc64.la
+
+libvomsc_gcc64_la_LDFLAGS = \
+	-rpath $(libdir)
+
+libvomsc_gcc64dbg_la_SOURCES = \
+	$(CSOURCES)
+
+libvomsc_gcc64dbg_la_CPPFLAGS = \
+	-I$(top_srcdir)/src/include \
+	$(GLOBUS_CFLAGS)
+
+libvomsc_gcc64dbg_la_LIBADD = \
+	$(CCLIBADD) \
+	$(top_builddir)/src/socklib/libsock_gcc64dbg.la
+
+libvomsc_gcc64dbg_la_LDFLAGS = \
+	-rpath $(libdir)
+
+libvomsc_gcc64pthr_la_SOURCES = \
+	$(CSOURCES)
+
+libvomsc_gcc64pthr_la_CPPFLAGS = \
+	-I$(top_srcdir)/src/include \
+	$(GLOBUS_CFLAGS)
+
+libvomsc_gcc64pthr_la_LIBADD = \
+	$(CCLIBADD) \
+	$(top_builddir)/src/socklib/libsock_gcc64pthr.la
+
+libvomsc_gcc64pthr_la_LDFLAGS = \
+	-rpath $(libdir)
+
+libvomsc_gcc64dbgpthr_la_SOURCES = \
+	$(CSOURCES)
+
+libvomsc_gcc64dbgpthr_la_CPPFLAGS = \
+	-I$(top_srcdir)/src/include \
+	$(GLOBUS_CFLAGS)
+
+libvomsc_gcc64dbgpthr_la_LIBADD = \
+	$(CCLIBADD) \
+	$(top_builddir)/src/socklib/libsock_gcc64dbgpthr.la
+
+libvomsc_gcc64dbgpthr_la_LDFLAGS = \
+	-rpath $(libdir)
+
+
+
 include_HEADERS = \
 	voms_api.h \
 	voms_apic.h
@@ -185,15 +320,6 @@ EXTRA_DIST = \
 	voms_apic.h \
 	cinterface.h
 
-CLEANFILES = \
-	libvomsapi_gcc32.la \
-	libvomsapi_gcc32dbg.la \
-	libvomsapi_gcc32pthr.la \
-	libvomsapi_gcc32dbgpthr.la \
-	libvomsc_gcc32.la \
-	libvomsc_gcc32dbg.la \
-	libvomsc_gcc32pthr.la \
-	libvomsc_gcc32dbgpthr.la
 
 ###
 

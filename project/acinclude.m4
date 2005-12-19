@@ -21,10 +21,18 @@ AC_DEFUN([AC_GLOBUS],
       GLOBUS_FLAVORS="$GLOBUS_FLAVORS $i"
     done
 
+    if test -e $with_globus_prefix/include/gcc32dbg ; then
+      default_flavor=gcc32dbg
+    else if test -e $with_globus_prefix/include/gcc64dbg ; then
+      default_flavor=gcc64dbg
+    else
+      default_flavor=""
+    fi
+
     AC_ARG_WITH(globus_flavor,
-	[  --with-globus-flavor=flavor [default=gcc32dbg]],
-	[],
-        with_globus_flavor=${GLOBUS_FLAVOR:-gcc32dbg})
+              	[  --with-globus-flavor=flavor [default=$default_flavor]],
+              	[],
+                with_globus_flavor=${GLOBUS_FLAVOR:-${default_flavor}})
 
     AC_MSG_RESULT([found $GLOBUS_FLAVORS ($with_globus_flavor selected)])
 
@@ -42,11 +50,11 @@ AC_DEFUN([AC_GLOBUS],
 
     for flavor in $GLOBUS_FLAVORS ; do
       if test "x$flavor" = "x$with_globus_flavor" ; then
-	GLOBUS_CFLAGS="-I$with_globus_prefix/include/$flavor"
+      	GLOBUS_CFLAGS="-I$with_globus_prefix/include/$flavor"
         GLOBUS_GSS_LIBS="$ac_globus_ldlib -lglobus_gssapi_gsi_$flavor -lglobus_gss_assist_$flavor"
       fi
       if test "x$flavor" = "xgcc32" ; then
-	GLOBUS_GCC32_CFLAGS="-I$with_globus_prefix/include/$flavor"
+	      GLOBUS_GCC32_CFLAGS="-I$with_globus_prefix/include/$flavor"
         GLOBUS_GCC32_GSS_LIBS="$ac_globus_ldlib -lglobus_gssapi_gsi_$flavor -lglobus_gss_assist_$flavor"
       fi
       if test "$flavor" = "gcc32dbg" ; then
@@ -61,6 +69,23 @@ AC_DEFUN([AC_GLOBUS],
         GLOBUS_GCC32PTHR_CFLAGS="-I$with_globus_prefix/include/$flavor"
         GLOBUS_GCC32PTHR_GSS_LIBS="$ac_globus_ldlib -lglobus_gssapi_gsi_$flavor -lglobus_gss_assist_$flavor"
       fi
+
+      if test "x$flavor" = "xgcc64" ; then
+	      GLOBUS_GCC64_CFLAGS="-I$with_globus_prefix/include/$flavor"
+        GLOBUS_GCC64_GSS_LIBS="$ac_globus_ldlib -lglobus_gssapi_gsi_$flavor -lglobus_gss_assist_$flavor"
+      fi
+      if test "$flavor" = "gcc64dbg" ; then
+        GLOBUS_GCC64DBG_CFLAGS="-I$with_globus_prefix/include/$flavor"
+        GLOBUS_GCC64DBG_GSS_LIBS="$ac_globus_ldlib -lglobus_gssapi_gsi_$flavor -lglobus_gss_assist_$flavor"
+      fi
+      if test "$flavor" = "gcc64dbgpthr" ; then
+        GLOBUS_GCC64DBGPTHR_CFLAGS="-I$with_globus_prefix/include/$flavor"
+        GLOBUS_GCC64DBGPTHR_GSS_LIBS="$ac_globus_ldlib -lglobus_gssapi_gsi_$flavor -lglobus_gss_assist_$flavor"
+      fi
+      if test "$flavor" = "gcc64pthr" ; then
+        GLOBUS_GCC64PTHR_CFLAGS="-I$with_globus_prefix/include/$flavor"
+        GLOBUS_GCC64PTHR_GSS_LIBS="$ac_globus_ldlib -lglobus_gssapi_gsi_$flavor -lglobus_gss_assist_$flavor"
+      fi
     done
 
     AC_SUBST(WANTED_OLDGAA_LIBS)
@@ -73,11 +98,22 @@ AC_DEFUN([AC_GLOBUS],
     AC_SUBST(GLOBUS_GCC32DBG_CFLAGS)
     AC_SUBST(GLOBUS_GCC32DBGPTHR_CFLAGS)
     AC_SUBST(GLOBUS_GCC32PTHR_CFLAGS)
+
+    AC_SUBST(GLOBUS_GCC64_CFLAGS)
+    AC_SUBST(GLOBUS_GCC64DBG_CFLAGS)
+    AC_SUBST(GLOBUS_GCC64DBGPTHR_CFLAGS)
+    AC_SUBST(GLOBUS_GCC64PTHR_CFLAGS)
+
     AC_SUBST(GLOBUS_GSS_LIBS)
     AC_SUBST(GLOBUS_GCC32_GSS_LIBS)
     AC_SUBST(GLOBUS_GCC32DBG_GSS_LIBS)
     AC_SUBST(GLOBUS_GCC32DBGPTHR_GSS_LIBS)
     AC_SUBST(GLOBUS_GCC32PTHR_GSS_LIBS)
+
+    AC_SUBST(GLOBUS_GCC64_GSS_LIBS)
+    AC_SUBST(GLOBUS_GCC64DBG_GSS_LIBS)
+    AC_SUBST(GLOBUS_GCC64DBGPTHR_GSS_LIBS)
+    AC_SUBST(GLOBUS_GCC64PTHR_GSS_LIBS)
 ])
 
 # AC_COMPILER add switch to enable debug and warning
