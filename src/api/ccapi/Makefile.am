@@ -20,6 +20,8 @@ libvomsapi_la_CPPFLAGS = \
 	$(GLOBUS_CFLAGS)
 
 CCLIBADD = \
+	$(EXPAT_LIBS) \
+  $(GLOBUS_LIBS) \
 	$(top_builddir)/src/ac/libccattcert.la \
 	$(top_builddir)/src/replib/librep.la \
 	$(top_builddir)/src/common/libutilities.la \
@@ -29,6 +31,12 @@ libvomsapi_la_LIBADD = \
 	$(CCLIBADD) \
 	$(top_builddir)/src/socklib/libsock.la
 
+
+noinst_PROGRAMS = test
+test_SOURCES = test.cc
+test_LDADD = libvomsapi.la
+test_CPPFLAGS = -I$(top_srcdir)/src/include $(GLOBUS_CFLAGS)
+
 CSOURCES = \
 	api_util.cc \
 	voms_api.cc \
@@ -36,6 +44,14 @@ CSOURCES = \
 	cinterface.cc
 
 CLEANFILES = \
+	libvomsapi_gcc32.la \
+	libvomsapi_gcc32dbg.la \
+	libvomsapi_gcc32pthr.la \
+	libvomsapi_gcc32dbgpthr.la \
+	libvomsapi_gcc64.la \
+	libvomsapi_gcc64dbg.la \
+	libvomsapi_gcc64pthr.la \
+	libvomsapi_gcc64dbgpthr.la \
 	libvomsapi_gcc32.la \
 	libvomsapi_gcc32dbg.la \
 	libvomsapi_gcc32pthr.la \

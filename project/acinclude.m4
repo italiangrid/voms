@@ -23,7 +23,7 @@ AC_DEFUN([AC_GLOBUS],
 
     if test -e $with_globus_prefix/include/gcc32dbg ; then
       default_flavor=gcc32dbg
-    else if test -e $with_globus_prefix/include/gcc64dbg ; then
+    elif test -e $with_globus_prefix/include/gcc64dbg ; then
       default_flavor=gcc64dbg
     else
       default_flavor=""
@@ -351,9 +351,9 @@ AC_DEFUN([AC_VOMS_OPENSSL_EVP_MD_CTX],
     CPPFLAGS_SAVE="$CPPFLAGS"
     CPPFLAGS="$CPPFLAGS $GLOBUS_CFLAGS $GLOBUS_GSS_LIBS"
     AC_LANG_PUSH(C++)
-    AC_TRY_COMPILE(
+    AC_TRY_LINK(
       [
-        #include <openssl/evp.h>
+        #include <$GLOBUS_LOCATION/include/$GLOBUS_FLAVOR/openssl/evp.h>
       ],
       [
         EVP_MD_CTX mp; 
@@ -363,14 +363,14 @@ AC_DEFUN([AC_VOMS_OPENSSL_EVP_MD_CTX],
        AC_MSG_RESULT(yes)],
       [AC_MSG_RESULT(no)]
     )
-    CPPFLAGS="$CFLAGS_SAVE"
+    CPPFLAGS="$CPPFLAGS_SAVE"
 
     AC_MSG_CHECKING([for EVP_MD_CTX_cleanup])
-    CPPFLAGS_SAVE="$CFLAGS"
+    CPPFLAGS_SAVE="$CPPFLAGS"
     CPPFLAGS="$CPPFLAGS $GLOBUS_CFLAGS $GLOBUS_GSS_LIBS"
-    AC_TRY_COMPILE(
+    AC_TRY_LINK(
       [
-        #include <openssl/evp.h>
+        #include <$GLOBUS_LOCATION/include/$GLOBUS_FLAVOR/openssl/evp.h>
       ],
       [
         EVP_MD_CTX mp; 

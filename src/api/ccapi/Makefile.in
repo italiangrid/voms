@@ -15,7 +15,8 @@
 @SET_MAKE@
 
 
-SOURCES = $(libvomsapi_la_SOURCES) $(libvomsapi_gcc32_la_SOURCES) $(libvomsapi_gcc32dbg_la_SOURCES) $(libvomsapi_gcc32dbgpthr_la_SOURCES) $(libvomsapi_gcc32pthr_la_SOURCES) $(libvomsapi_gcc64_la_SOURCES) $(libvomsapi_gcc64dbg_la_SOURCES) $(libvomsapi_gcc64dbgpthr_la_SOURCES) $(libvomsapi_gcc64pthr_la_SOURCES) $(libvomsc_la_SOURCES) $(libvomsc_gcc32_la_SOURCES) $(libvomsc_gcc32dbg_la_SOURCES) $(libvomsc_gcc32dbgpthr_la_SOURCES) $(libvomsc_gcc32pthr_la_SOURCES) $(libvomsc_gcc64_la_SOURCES) $(libvomsc_gcc64dbg_la_SOURCES) $(libvomsc_gcc64dbgpthr_la_SOURCES) $(libvomsc_gcc64pthr_la_SOURCES)
+
+SOURCES = $(libvomsapi_la_SOURCES) $(libvomsapi_gcc32_la_SOURCES) $(libvomsapi_gcc32dbg_la_SOURCES) $(libvomsapi_gcc32dbgpthr_la_SOURCES) $(libvomsapi_gcc32pthr_la_SOURCES) $(libvomsapi_gcc64_la_SOURCES) $(libvomsapi_gcc64dbg_la_SOURCES) $(libvomsapi_gcc64dbgpthr_la_SOURCES) $(libvomsapi_gcc64pthr_la_SOURCES) $(libvomsc_la_SOURCES) $(libvomsc_gcc32_la_SOURCES) $(libvomsc_gcc32dbg_la_SOURCES) $(libvomsc_gcc32dbgpthr_la_SOURCES) $(libvomsc_gcc32pthr_la_SOURCES) $(libvomsc_gcc64_la_SOURCES) $(libvomsc_gcc64dbg_la_SOURCES) $(libvomsc_gcc64dbgpthr_la_SOURCES) $(libvomsc_gcc64pthr_la_SOURCES) $(test_SOURCES)
 
 srcdir = @srcdir@
 top_srcdir = @top_srcdir@
@@ -39,6 +40,7 @@ PRE_UNINSTALL = :
 POST_UNINSTALL = :
 build_triplet = @build@
 host_triplet = @host@
+noinst_PROGRAMS = test$(EXEEXT)
 subdir = src/api/ccapi
 DIST_COMMON = $(include_HEADERS) $(srcdir)/Makefile.am \
 	$(srcdir)/Makefile.in
@@ -61,24 +63,26 @@ am__strip_dir = `echo $$p | sed -e 's|^.*/||'`;
 am__installdirs = "$(DESTDIR)$(libdir)" "$(DESTDIR)$(includedir)"
 libLTLIBRARIES_INSTALL = $(INSTALL)
 LTLIBRARIES = $(lib_LTLIBRARIES)
-am__DEPENDENCIES_1 = $(top_builddir)/src/ac/libccattcert.la \
+am__DEPENDENCIES_1 =
+am__DEPENDENCIES_2 = $(am__DEPENDENCIES_1) \
+	$(top_builddir)/src/ac/libccattcert.la \
 	$(top_builddir)/src/replib/librep.la \
 	$(top_builddir)/src/common/libutilities.la \
 	$(top_builddir)/src/log/liblog.la
-libvomsapi_la_DEPENDENCIES = $(am__DEPENDENCIES_1) \
+libvomsapi_la_DEPENDENCIES = $(am__DEPENDENCIES_2) \
 	$(top_builddir)/src/socklib/libsock.la
 am__objects_1 = libvomsapi_la-api_util.lo libvomsapi_la-voms_api.lo \
 	libvomsapi_la-ccval.lo libvomsapi_la-cinterface.lo
 am_libvomsapi_la_OBJECTS = $(am__objects_1)
 libvomsapi_la_OBJECTS = $(am_libvomsapi_la_OBJECTS)
-libvomsapi_gcc32_la_DEPENDENCIES = $(am__DEPENDENCIES_1) \
+libvomsapi_gcc32_la_DEPENDENCIES = $(am__DEPENDENCIES_2) \
 	$(top_builddir)/src/socklib/libsock_gcc32.la
 am__objects_2 = libvomsapi_gcc32_la-api_util.lo \
 	libvomsapi_gcc32_la-voms_api.lo libvomsapi_gcc32_la-ccval.lo \
 	libvomsapi_gcc32_la-cinterface.lo
 am_libvomsapi_gcc32_la_OBJECTS = $(am__objects_2)
 libvomsapi_gcc32_la_OBJECTS = $(am_libvomsapi_gcc32_la_OBJECTS)
-libvomsapi_gcc32dbg_la_DEPENDENCIES = $(am__DEPENDENCIES_1) \
+libvomsapi_gcc32dbg_la_DEPENDENCIES = $(am__DEPENDENCIES_2) \
 	$(top_builddir)/src/socklib/libsock_gcc32dbg.la
 am__objects_3 = libvomsapi_gcc32dbg_la-api_util.lo \
 	libvomsapi_gcc32dbg_la-voms_api.lo \
@@ -86,7 +90,7 @@ am__objects_3 = libvomsapi_gcc32dbg_la-api_util.lo \
 	libvomsapi_gcc32dbg_la-cinterface.lo
 am_libvomsapi_gcc32dbg_la_OBJECTS = $(am__objects_3)
 libvomsapi_gcc32dbg_la_OBJECTS = $(am_libvomsapi_gcc32dbg_la_OBJECTS)
-libvomsapi_gcc32dbgpthr_la_DEPENDENCIES = $(am__DEPENDENCIES_1) \
+libvomsapi_gcc32dbgpthr_la_DEPENDENCIES = $(am__DEPENDENCIES_2) \
 	$(top_builddir)/src/socklib/libsock_gcc32dbgpthr.la
 am__objects_4 = libvomsapi_gcc32dbgpthr_la-api_util.lo \
 	libvomsapi_gcc32dbgpthr_la-voms_api.lo \
@@ -95,7 +99,7 @@ am__objects_4 = libvomsapi_gcc32dbgpthr_la-api_util.lo \
 am_libvomsapi_gcc32dbgpthr_la_OBJECTS = $(am__objects_4)
 libvomsapi_gcc32dbgpthr_la_OBJECTS =  \
 	$(am_libvomsapi_gcc32dbgpthr_la_OBJECTS)
-libvomsapi_gcc32pthr_la_DEPENDENCIES = $(am__DEPENDENCIES_1) \
+libvomsapi_gcc32pthr_la_DEPENDENCIES = $(am__DEPENDENCIES_2) \
 	$(top_builddir)/src/socklib/libsock_gcc32pthr.la
 am__objects_5 = libvomsapi_gcc32pthr_la-api_util.lo \
 	libvomsapi_gcc32pthr_la-voms_api.lo \
@@ -104,14 +108,14 @@ am__objects_5 = libvomsapi_gcc32pthr_la-api_util.lo \
 am_libvomsapi_gcc32pthr_la_OBJECTS = $(am__objects_5)
 libvomsapi_gcc32pthr_la_OBJECTS =  \
 	$(am_libvomsapi_gcc32pthr_la_OBJECTS)
-libvomsapi_gcc64_la_DEPENDENCIES = $(am__DEPENDENCIES_1) \
+libvomsapi_gcc64_la_DEPENDENCIES = $(am__DEPENDENCIES_2) \
 	$(top_builddir)/src/socklib/libsock_gcc64.la
 am__objects_6 = libvomsapi_gcc64_la-api_util.lo \
 	libvomsapi_gcc64_la-voms_api.lo libvomsapi_gcc64_la-ccval.lo \
 	libvomsapi_gcc64_la-cinterface.lo
 am_libvomsapi_gcc64_la_OBJECTS = $(am__objects_6)
 libvomsapi_gcc64_la_OBJECTS = $(am_libvomsapi_gcc64_la_OBJECTS)
-libvomsapi_gcc64dbg_la_DEPENDENCIES = $(am__DEPENDENCIES_1) \
+libvomsapi_gcc64dbg_la_DEPENDENCIES = $(am__DEPENDENCIES_2) \
 	$(top_builddir)/src/socklib/libsock_gcc64dbg.la
 am__objects_7 = libvomsapi_gcc64dbg_la-api_util.lo \
 	libvomsapi_gcc64dbg_la-voms_api.lo \
@@ -119,7 +123,7 @@ am__objects_7 = libvomsapi_gcc64dbg_la-api_util.lo \
 	libvomsapi_gcc64dbg_la-cinterface.lo
 am_libvomsapi_gcc64dbg_la_OBJECTS = $(am__objects_7)
 libvomsapi_gcc64dbg_la_OBJECTS = $(am_libvomsapi_gcc64dbg_la_OBJECTS)
-libvomsapi_gcc64dbgpthr_la_DEPENDENCIES = $(am__DEPENDENCIES_1) \
+libvomsapi_gcc64dbgpthr_la_DEPENDENCIES = $(am__DEPENDENCIES_2) \
 	$(top_builddir)/src/socklib/libsock_gcc64dbgpthr.la
 am__objects_8 = libvomsapi_gcc64dbgpthr_la-api_util.lo \
 	libvomsapi_gcc64dbgpthr_la-voms_api.lo \
@@ -128,7 +132,7 @@ am__objects_8 = libvomsapi_gcc64dbgpthr_la-api_util.lo \
 am_libvomsapi_gcc64dbgpthr_la_OBJECTS = $(am__objects_8)
 libvomsapi_gcc64dbgpthr_la_OBJECTS =  \
 	$(am_libvomsapi_gcc64dbgpthr_la_OBJECTS)
-libvomsapi_gcc64pthr_la_DEPENDENCIES = $(am__DEPENDENCIES_1) \
+libvomsapi_gcc64pthr_la_DEPENDENCIES = $(am__DEPENDENCIES_2) \
 	$(top_builddir)/src/socklib/libsock_gcc64pthr.la
 am__objects_9 = libvomsapi_gcc64pthr_la-api_util.lo \
 	libvomsapi_gcc64pthr_la-voms_api.lo \
@@ -137,27 +141,27 @@ am__objects_9 = libvomsapi_gcc64pthr_la-api_util.lo \
 am_libvomsapi_gcc64pthr_la_OBJECTS = $(am__objects_9)
 libvomsapi_gcc64pthr_la_OBJECTS =  \
 	$(am_libvomsapi_gcc64pthr_la_OBJECTS)
-libvomsc_la_DEPENDENCIES = $(am__DEPENDENCIES_1) \
+libvomsc_la_DEPENDENCIES = $(am__DEPENDENCIES_2) \
 	$(top_builddir)/src/socklib/libsock.la
 am__objects_10 = libvomsc_la-api_util.lo libvomsc_la-voms_api.lo \
 	libvomsc_la-ccval.lo libvomsc_la-cinterface.lo
 am_libvomsc_la_OBJECTS = $(am__objects_10)
 libvomsc_la_OBJECTS = $(am_libvomsc_la_OBJECTS)
-libvomsc_gcc32_la_DEPENDENCIES = $(am__DEPENDENCIES_1) \
+libvomsc_gcc32_la_DEPENDENCIES = $(am__DEPENDENCIES_2) \
 	$(top_builddir)/src/socklib/libsock_gcc32.la
 am__objects_11 = libvomsc_gcc32_la-api_util.lo \
 	libvomsc_gcc32_la-voms_api.lo libvomsc_gcc32_la-ccval.lo \
 	libvomsc_gcc32_la-cinterface.lo
 am_libvomsc_gcc32_la_OBJECTS = $(am__objects_11)
 libvomsc_gcc32_la_OBJECTS = $(am_libvomsc_gcc32_la_OBJECTS)
-libvomsc_gcc32dbg_la_DEPENDENCIES = $(am__DEPENDENCIES_1) \
+libvomsc_gcc32dbg_la_DEPENDENCIES = $(am__DEPENDENCIES_2) \
 	$(top_builddir)/src/socklib/libsock_gcc32dbg.la
 am__objects_12 = libvomsc_gcc32dbg_la-api_util.lo \
 	libvomsc_gcc32dbg_la-voms_api.lo libvomsc_gcc32dbg_la-ccval.lo \
 	libvomsc_gcc32dbg_la-cinterface.lo
 am_libvomsc_gcc32dbg_la_OBJECTS = $(am__objects_12)
 libvomsc_gcc32dbg_la_OBJECTS = $(am_libvomsc_gcc32dbg_la_OBJECTS)
-libvomsc_gcc32dbgpthr_la_DEPENDENCIES = $(am__DEPENDENCIES_1) \
+libvomsc_gcc32dbgpthr_la_DEPENDENCIES = $(am__DEPENDENCIES_2) \
 	$(top_builddir)/src/socklib/libsock_gcc32dbgpthr.la
 am__objects_13 = libvomsc_gcc32dbgpthr_la-api_util.lo \
 	libvomsc_gcc32dbgpthr_la-voms_api.lo \
@@ -166,7 +170,7 @@ am__objects_13 = libvomsc_gcc32dbgpthr_la-api_util.lo \
 am_libvomsc_gcc32dbgpthr_la_OBJECTS = $(am__objects_13)
 libvomsc_gcc32dbgpthr_la_OBJECTS =  \
 	$(am_libvomsc_gcc32dbgpthr_la_OBJECTS)
-libvomsc_gcc32pthr_la_DEPENDENCIES = $(am__DEPENDENCIES_1) \
+libvomsc_gcc32pthr_la_DEPENDENCIES = $(am__DEPENDENCIES_2) \
 	$(top_builddir)/src/socklib/libsock_gcc32pthr.la
 am__objects_14 = libvomsc_gcc32pthr_la-api_util.lo \
 	libvomsc_gcc32pthr_la-voms_api.lo \
@@ -174,21 +178,21 @@ am__objects_14 = libvomsc_gcc32pthr_la-api_util.lo \
 	libvomsc_gcc32pthr_la-cinterface.lo
 am_libvomsc_gcc32pthr_la_OBJECTS = $(am__objects_14)
 libvomsc_gcc32pthr_la_OBJECTS = $(am_libvomsc_gcc32pthr_la_OBJECTS)
-libvomsc_gcc64_la_DEPENDENCIES = $(am__DEPENDENCIES_1) \
+libvomsc_gcc64_la_DEPENDENCIES = $(am__DEPENDENCIES_2) \
 	$(top_builddir)/src/socklib/libsock_gcc64.la
 am__objects_15 = libvomsc_gcc64_la-api_util.lo \
 	libvomsc_gcc64_la-voms_api.lo libvomsc_gcc64_la-ccval.lo \
 	libvomsc_gcc64_la-cinterface.lo
 am_libvomsc_gcc64_la_OBJECTS = $(am__objects_15)
 libvomsc_gcc64_la_OBJECTS = $(am_libvomsc_gcc64_la_OBJECTS)
-libvomsc_gcc64dbg_la_DEPENDENCIES = $(am__DEPENDENCIES_1) \
+libvomsc_gcc64dbg_la_DEPENDENCIES = $(am__DEPENDENCIES_2) \
 	$(top_builddir)/src/socklib/libsock_gcc64dbg.la
 am__objects_16 = libvomsc_gcc64dbg_la-api_util.lo \
 	libvomsc_gcc64dbg_la-voms_api.lo libvomsc_gcc64dbg_la-ccval.lo \
 	libvomsc_gcc64dbg_la-cinterface.lo
 am_libvomsc_gcc64dbg_la_OBJECTS = $(am__objects_16)
 libvomsc_gcc64dbg_la_OBJECTS = $(am_libvomsc_gcc64dbg_la_OBJECTS)
-libvomsc_gcc64dbgpthr_la_DEPENDENCIES = $(am__DEPENDENCIES_1) \
+libvomsc_gcc64dbgpthr_la_DEPENDENCIES = $(am__DEPENDENCIES_2) \
 	$(top_builddir)/src/socklib/libsock_gcc64dbgpthr.la
 am__objects_17 = libvomsc_gcc64dbgpthr_la-api_util.lo \
 	libvomsc_gcc64dbgpthr_la-voms_api.lo \
@@ -197,7 +201,7 @@ am__objects_17 = libvomsc_gcc64dbgpthr_la-api_util.lo \
 am_libvomsc_gcc64dbgpthr_la_OBJECTS = $(am__objects_17)
 libvomsc_gcc64dbgpthr_la_OBJECTS =  \
 	$(am_libvomsc_gcc64dbgpthr_la_OBJECTS)
-libvomsc_gcc64pthr_la_DEPENDENCIES = $(am__DEPENDENCIES_1) \
+libvomsc_gcc64pthr_la_DEPENDENCIES = $(am__DEPENDENCIES_2) \
 	$(top_builddir)/src/socklib/libsock_gcc64pthr.la
 am__objects_18 = libvomsc_gcc64pthr_la-api_util.lo \
 	libvomsc_gcc64pthr_la-voms_api.lo \
@@ -205,6 +209,10 @@ am__objects_18 = libvomsc_gcc64pthr_la-api_util.lo \
 	libvomsc_gcc64pthr_la-cinterface.lo
 am_libvomsc_gcc64pthr_la_OBJECTS = $(am__objects_18)
 libvomsc_gcc64pthr_la_OBJECTS = $(am_libvomsc_gcc64pthr_la_OBJECTS)
+PROGRAMS = $(noinst_PROGRAMS)
+am_test_OBJECTS = test-test.$(OBJEXT)
+test_OBJECTS = $(am_test_OBJECTS)
+test_DEPENDENCIES = libvomsapi.la
 DEFAULT_INCLUDES = -I. -I$(srcdir) -I$(top_builddir)/src/autogen
 depcomp = $(SHELL) $(top_srcdir)/./project/depcomp
 am__depfiles_maybe = depfiles
@@ -229,7 +237,7 @@ SOURCES = $(libvomsapi_la_SOURCES) $(libvomsapi_gcc32_la_SOURCES) \
 	$(libvomsc_gcc32pthr_la_SOURCES) $(libvomsc_gcc64_la_SOURCES) \
 	$(libvomsc_gcc64dbg_la_SOURCES) \
 	$(libvomsc_gcc64dbgpthr_la_SOURCES) \
-	$(libvomsc_gcc64pthr_la_SOURCES)
+	$(libvomsc_gcc64pthr_la_SOURCES) $(test_SOURCES)
 DIST_SOURCES = $(libvomsapi_la_SOURCES) $(libvomsapi_gcc32_la_SOURCES) \
 	$(libvomsapi_gcc32dbg_la_SOURCES) \
 	$(libvomsapi_gcc32dbgpthr_la_SOURCES) \
@@ -243,7 +251,7 @@ DIST_SOURCES = $(libvomsapi_la_SOURCES) $(libvomsapi_gcc32_la_SOURCES) \
 	$(libvomsc_gcc32pthr_la_SOURCES) $(libvomsc_gcc64_la_SOURCES) \
 	$(libvomsc_gcc64dbg_la_SOURCES) \
 	$(libvomsc_gcc64dbgpthr_la_SOURCES) \
-	$(libvomsc_gcc64pthr_la_SOURCES)
+	$(libvomsc_gcc64pthr_la_SOURCES) $(test_SOURCES)
 includeHEADERS_INSTALL = $(INSTALL_HEADER)
 HEADERS = $(include_HEADERS)
 ETAGS = etags
@@ -412,6 +420,8 @@ libvomsapi_la_CPPFLAGS = \
 	$(GLOBUS_CFLAGS)
 
 CCLIBADD = \
+	$(EXPAT_LIBS) \
+  $(GLOBUS_LIBS) \
 	$(top_builddir)/src/ac/libccattcert.la \
 	$(top_builddir)/src/replib/librep.la \
 	$(top_builddir)/src/common/libutilities.la \
@@ -421,6 +431,9 @@ libvomsapi_la_LIBADD = \
 	$(CCLIBADD) \
 	$(top_builddir)/src/socklib/libsock.la
 
+test_SOURCES = test.cc
+test_LDADD = libvomsapi.la
+test_CPPFLAGS = -I$(top_srcdir)/src/include $(GLOBUS_CFLAGS)
 CSOURCES = \
 	api_util.cc \
 	voms_api.cc \
@@ -428,6 +441,14 @@ CSOURCES = \
 	cinterface.cc
 
 CLEANFILES = \
+	libvomsapi_gcc32.la \
+	libvomsapi_gcc32dbg.la \
+	libvomsapi_gcc32pthr.la \
+	libvomsapi_gcc32dbgpthr.la \
+	libvomsapi_gcc64.la \
+	libvomsapi_gcc64dbg.la \
+	libvomsapi_gcc64pthr.la \
+	libvomsapi_gcc64dbgpthr.la \
 	libvomsapi_gcc32.la \
 	libvomsapi_gcc32dbg.la \
 	libvomsapi_gcc32pthr.la \
@@ -824,6 +845,16 @@ libvomsc_gcc64dbgpthr.la: $(libvomsc_gcc64dbgpthr_la_OBJECTS) $(libvomsc_gcc64db
 libvomsc_gcc64pthr.la: $(libvomsc_gcc64pthr_la_OBJECTS) $(libvomsc_gcc64pthr_la_DEPENDENCIES) 
 	$(CXXLINK)  $(libvomsc_gcc64pthr_la_LDFLAGS) $(libvomsc_gcc64pthr_la_OBJECTS) $(libvomsc_gcc64pthr_la_LIBADD) $(LIBS)
 
+clean-noinstPROGRAMS:
+	@list='$(noinst_PROGRAMS)'; for p in $$list; do \
+	  f=`echo $$p|sed 's/$(EXEEXT)$$//'`; \
+	  echo " rm -f $$p $$f"; \
+	  rm -f $$p $$f ; \
+	done
+test$(EXEEXT): $(test_OBJECTS) $(test_DEPENDENCIES) 
+	@rm -f test$(EXEEXT)
+	$(CXXLINK) $(test_LDFLAGS) $(test_OBJECTS) $(test_LDADD) $(LIBS)
+
 mostlyclean-compile:
 	-rm -f *.$(OBJEXT)
 
@@ -902,6 +933,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libvomsc_la-ccval.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libvomsc_la-cinterface.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libvomsc_la-voms_api.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/test-test.Po@am__quote@
 
 .cc.o:
 @am__fastdepCXX_TRUE@	if $(CXXCOMPILE) -MT $@ -MD -MP -MF "$(DEPDIR)/$*.Tpo" -c -o $@ $<; \
@@ -1428,6 +1460,20 @@ libvomsc_gcc64pthr_la-cinterface.lo: cinterface.cc
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(LIBTOOL) --tag=CXX --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libvomsc_gcc64pthr_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o libvomsc_gcc64pthr_la-cinterface.lo `test -f 'cinterface.cc' || echo '$(srcdir)/'`cinterface.cc
 
+test-test.o: test.cc
+@am__fastdepCXX_TRUE@	if $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(test_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT test-test.o -MD -MP -MF "$(DEPDIR)/test-test.Tpo" -c -o test-test.o `test -f 'test.cc' || echo '$(srcdir)/'`test.cc; \
+@am__fastdepCXX_TRUE@	then mv -f "$(DEPDIR)/test-test.Tpo" "$(DEPDIR)/test-test.Po"; else rm -f "$(DEPDIR)/test-test.Tpo"; exit 1; fi
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='test.cc' object='test-test.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(test_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o test-test.o `test -f 'test.cc' || echo '$(srcdir)/'`test.cc
+
+test-test.obj: test.cc
+@am__fastdepCXX_TRUE@	if $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(test_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT test-test.obj -MD -MP -MF "$(DEPDIR)/test-test.Tpo" -c -o test-test.obj `if test -f 'test.cc'; then $(CYGPATH_W) 'test.cc'; else $(CYGPATH_W) '$(srcdir)/test.cc'; fi`; \
+@am__fastdepCXX_TRUE@	then mv -f "$(DEPDIR)/test-test.Tpo" "$(DEPDIR)/test-test.Po"; else rm -f "$(DEPDIR)/test-test.Tpo"; exit 1; fi
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='test.cc' object='test-test.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(test_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o test-test.obj `if test -f 'test.cc'; then $(CYGPATH_W) 'test.cc'; else $(CYGPATH_W) '$(srcdir)/test.cc'; fi`
+
 mostlyclean-libtool:
 	-rm -f *.lo
 
@@ -1532,7 +1578,7 @@ distdir: $(DISTFILES)
 	done
 check-am: all-am
 check: check-am
-all-am: Makefile $(LTLIBRARIES) $(HEADERS) all-local
+all-am: Makefile $(LTLIBRARIES) $(PROGRAMS) $(HEADERS) all-local
 installdirs:
 	for dir in "$(DESTDIR)$(libdir)" "$(DESTDIR)$(includedir)"; do \
 	  test -z "$$dir" || $(mkdir_p) "$$dir"; \
@@ -1565,7 +1611,7 @@ maintainer-clean-generic:
 @BUILD_DOCS_FALSE@install-data-local:
 @BUILD_DOCS_FALSE@install-data-hook:
 clean-am: clean-generic clean-libLTLIBRARIES clean-libtool \
-	mostlyclean-am
+	clean-noinstPROGRAMS mostlyclean-am
 
 distclean: distclean-am
 	-rm -rf ./$(DEPDIR)
@@ -1618,19 +1664,20 @@ uninstall-am: uninstall-includeHEADERS uninstall-info-am \
 	uninstall-libLTLIBRARIES
 
 .PHONY: CTAGS GTAGS all all-am all-local check check-am clean \
-	clean-generic clean-libLTLIBRARIES clean-libtool ctags \
-	distclean distclean-compile distclean-generic \
-	distclean-libtool distclean-tags distdir dvi dvi-am html \
-	html-am info info-am install install-am install-data \
-	install-data-am install-data-hook install-data-local \
-	install-exec install-exec-am install-includeHEADERS \
-	install-info install-info-am install-libLTLIBRARIES \
-	install-man install-strip installcheck installcheck-am \
-	installdirs maintainer-clean maintainer-clean-generic \
-	maintainer-clean-local mostlyclean mostlyclean-compile \
-	mostlyclean-generic mostlyclean-libtool pdf pdf-am ps ps-am \
-	tags uninstall uninstall-am uninstall-includeHEADERS \
-	uninstall-info-am uninstall-libLTLIBRARIES
+	clean-generic clean-libLTLIBRARIES clean-libtool \
+	clean-noinstPROGRAMS ctags distclean distclean-compile \
+	distclean-generic distclean-libtool distclean-tags distdir dvi \
+	dvi-am html html-am info info-am install install-am \
+	install-data install-data-am install-data-hook \
+	install-data-local install-exec install-exec-am \
+	install-includeHEADERS install-info install-info-am \
+	install-libLTLIBRARIES install-man install-strip installcheck \
+	installcheck-am installdirs maintainer-clean \
+	maintainer-clean-generic maintainer-clean-local mostlyclean \
+	mostlyclean-compile mostlyclean-generic mostlyclean-libtool \
+	pdf pdf-am ps ps-am tags uninstall uninstall-am \
+	uninstall-includeHEADERS uninstall-info-am \
+	uninstall-libLTLIBRARIES
 
 	$(top_builddir)/src/common/libutilities.la \
 	$(top_builddir)/src/ac/libccattcert.la \
