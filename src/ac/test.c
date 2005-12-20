@@ -52,6 +52,7 @@ int main(int argc, char *argv[])
   char *c[3]= {"cap1", "cap2", NULL};
   struct col v;
 
+  OpenSSL_add_all_algorithms();
   declareOIDs();
   (void)initEx();
 

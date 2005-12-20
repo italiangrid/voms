@@ -165,7 +165,6 @@ int validate(X509 *cert, X509 *issuer, AC *ac, struct col *voms, int valids)
 
   if (valids & VER_SIGN) {
     CHECK(issuer);
-    OpenSSL_add_all_algorithms();
     key=X509_extract_key(issuer);
     if (!ASN1_verify((int (*)())i2d_AC_INFO,ac->sig_alg, ac->signature,
 		     (char *)ac->acinfo, key))

@@ -24,6 +24,7 @@ extern "C" {
 #include <dirent.h>
 #include "newformat.h"
 #include <openssl/bn.h>
+#include <openssl/err.h>
 #include "credentials.h"
 
 #ifdef HAVE_GLOBUS_MODULE_ACTIVATE
@@ -62,6 +63,8 @@ vomsdata::Initializer::Initializer()
   (void)globus_module_activate(GLOBUS_OPENSSL_MODULE);
 #endif
   SSLeay_add_all_algorithms();
+  ERR_load_crypto_strings();
+
   (void)AC_Init();
 }
 
