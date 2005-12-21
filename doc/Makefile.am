@@ -170,6 +170,51 @@ else
 userdoc-local:
 endif
 
+if BUILD_DOCS
+$(MAN3) $(HTML) $(LATEX): $(DOXY)
+	doxygen $(CCDOCPLC_DIR)/Doxyfile
+	doxygen $(CDOCPLC_DIR)/Doxyfile
+
+
+#$(OUTPUT_DIR)/man/man3/%.3: $(DOXY)
+#	doxygen
+
+$(PDF): $(LATEX)
+	cd $(CCDOCPLC_DIR)/latex; \
+	pdflatex refman.tex; \
+	pdflatex refman.tex; \
+	pdflatex refman.tex; \
+	pdflatex refman.tex;
+	cd $(CDOCPLC_DIR)/latex; \
+	pdflatex refman.tex; \
+	pdflatex refman.tex; \
+	pdflatex refman.tex; \
+	pdflatex refman.tex;
+
+#	cd ../..; \
+#	$(mkinstalldirs) $(OUTPUT_DIR)/pdf; \
+#	$(INSTALL_DATA) $(OUTPUT_DIR)/latex/refman.pdf $(PDF);
+
+$(PS): $(LATEX)
+	cd $(CCDOCPLC_DIR)/latex; \
+	latex refman.tex; \
+	latex refman.tex; \
+	latex refman.tex; \
+	latex refman.tex; \
+	dvips -f <refman.dvi >refman.ps; 
+	cd $(CDOCPLC_DIR)/latex; \
+	latex refman.tex; \
+	latex refman.tex; \
+	latex refman.tex; \
+	latex refman.tex; \
+	dvips -f <refman.dvi >refman.ps; 
+#	cd ../..; \
+#	$(mkinstalldirs) $(OUTPUT_DIR)/ps; \
+#	$(INSTALL_DATA) $(OUTPUT_DIR)/latex/refman.ps $(PS);
+
+endif
+
+
 $(APIPDOCS):
 	cd apidoc/api/VOMS_C_API/latex ; $(MAKE) -f Makefile pdf ps
 	cd apidoc/api/VOMS_CC_API/latex ; $(MAKE) -f Makefile pdf ps

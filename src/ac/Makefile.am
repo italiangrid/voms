@@ -32,4 +32,5 @@ EXTRA_DIST = \
 	acerrors.h \
 	write.h \
 	init.h \
-	extensions.h
+	extensions.h \
+	test.c

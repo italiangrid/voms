@@ -334,7 +334,8 @@ EXTRA_DIST = \
 	ccval.h \
 	voms_api.h \
 	voms_apic.h \
-	cinterface.h
+	cinterface.h \
+  ctest.c
 
 
 ###

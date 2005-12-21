@@ -13,7 +13,6 @@
 # PARTICULAR PURPOSE.
 
 @SET_MAKE@
-
 srcdir = @srcdir@
 top_srcdir = @top_srcdir@
 VPATH = @srcdir@
@@ -36,9 +35,8 @@ PRE_UNINSTALL = :
 POST_UNINSTALL = :
 build_triplet = @build@
 host_triplet = @host@
-subdir = src/replica
-DIST_COMMON = $(srcdir)/Makefile.am $(srcdir)/Makefile.in \
-	$(srcdir)/voms_install_replica.in
+subdir = test/tests
+DIST_COMMON = $(srcdir)/Makefile.am $(srcdir)/Makefile.in
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 am__aclocal_m4_deps = $(top_srcdir)/project/acinclude.m4 \
 	$(top_srcdir)/project/cppunit.m4 \
@@ -48,10 +46,7 @@ am__configure_deps = $(am__aclocal_m4_deps) $(CONFIGURE_DEPENDENCIES) \
 	$(ACLOCAL_M4)
 mkinstalldirs = $(SHELL) $(top_srcdir)/./project/mkinstalldirs
 CONFIG_HEADER = $(top_builddir)/src/autogen/config.h
-CONFIG_CLEAN_FILES = voms_install_replica
-am__installdirs = "$(DESTDIR)$(libexecdir)"
-libexecSCRIPT_INSTALL = $(INSTALL_SCRIPT)
-SCRIPTS = $(libexec_SCRIPTS)
+CONFIG_CLEAN_FILES =
 SOURCES =
 DIST_SOURCES =
 DISTFILES = $(DIST_COMMON) $(DIST_SOURCES) $(TEXINFOS) $(EXTRA_DIST)
@@ -185,7 +180,7 @@ includedir = @includedir@
 infodir = @infodir@
 install_sh = @install_sh@
 libdir = @libdir@
-libexecdir = $(prefix)/libexec/voms
+libexecdir = @libexecdir@
 localstatedir = @localstatedir@
 mandir = @mandir@
 mkdir_p = @mkdir_p@
@@ -196,9 +191,9 @@ sbindir = @sbindir@
 sharedstatedir = @sharedstatedir@
 sysconfdir = @sysconfdir@
 target_alias = @target_alias@
-libexec_SCRIPTS = voms_install_replica
-EXTRA_DIST = voms_install_replica
-MAINTAINERCLEANFILES = Makefile.in
+EXTRA_DIST = masstest.sh servicecert.sh simpleac.sh spurious.sh \
+voms_install_db_test1.sh voms_install_db_test2.sh
+
 all: all-am
 
 .SUFFIXES:
@@ -211,9 +206,9 @@ $(srcdir)/Makefile.in: @MAINTAINER_MODE_TRUE@ $(srcdir)/Makefile.am  $(am__confi
 	      exit 1;; \
 	  esac; \
 	done; \
-	echo ' cd $(top_srcdir) && $(AUTOMAKE) --foreign  src/replica/Makefile'; \
+	echo ' cd $(top_srcdir) && $(AUTOMAKE) --foreign  test/tests/Makefile'; \
 	cd $(top_srcdir) && \
-	  $(AUTOMAKE) --foreign  src/replica/Makefile
+	  $(AUTOMAKE) --foreign  test/tests/Makefile
 .PRECIOUS: Makefile
 Makefile: $(srcdir)/Makefile.in $(top_builddir)/config.status
 	@case '$?' in \
@@ -231,27 +226,6 @@ $(top_srcdir)/configure: @MAINTAINER_MODE_TRUE@ $(am__configure_deps)
 	cd $(top_builddir) && $(MAKE) $(AM_MAKEFLAGS) am--refresh
 $(ACLOCAL_M4): @MAINTAINER_MODE_TRUE@ $(am__aclocal_m4_deps)
 	cd $(top_builddir) && $(MAKE) $(AM_MAKEFLAGS) am--refresh
-voms_install_replica: $(top_builddir)/config.status $(srcdir)/voms_install_replica.in
-	cd $(top_builddir) && $(SHELL) ./config.status $(subdir)/$@
-install-libexecSCRIPTS: $(libexec_SCRIPTS)
-	@$(NORMAL_INSTALL)
-	test -z "$(libexecdir)" || $(mkdir_p) "$(DESTDIR)$(libexecdir)"
-	@list='$(libexec_SCRIPTS)'; for p in $$list; do \
-	  if test -f "$$p"; then d=; else d="$(srcdir)/"; fi; \
-	  if test -f $$d$$p; then \
-	    f=`echo "$$p" | sed 's|^.*/||;$(transform)'`; \
-	    echo " $(libexecSCRIPT_INSTALL) '$$d$$p' '$(DESTDIR)$(libexecdir)/$$f'"; \
-	    $(libexecSCRIPT_INSTALL) "$$d$$p" "$(DESTDIR)$(libexecdir)/$$f"; \
-	  else :; fi; \
-	done
-
-uninstall-libexecSCRIPTS:
-	@$(NORMAL_UNINSTALL)
-	@list='$(libexec_SCRIPTS)'; for p in $$list; do \
-	  f=`echo "$$p" | sed 's|^.*/||;$(transform)'`; \
-	  echo " rm -f '$(DESTDIR)$(libexecdir)/$$f'"; \
-	  rm -f "$(DESTDIR)$(libexecdir)/$$f"; \
-	done
 
 mostlyclean-libtool:
 	-rm -f *.lo
@@ -298,11 +272,8 @@ distdir: $(DISTFILES)
 	done
 check-am: all-am
 check: check-am
-all-am: Makefile $(SCRIPTS)
+all-am: Makefile
 installdirs:
-	for dir in "$(DESTDIR)$(libexecdir)"; do \
-	  test -z "$$dir" || $(mkdir_p) "$$dir"; \
-	done
 install: install-am
 install-exec: install-exec-am
 install-data: install-data-am
@@ -327,7 +298,6 @@ distclean-generic:
 maintainer-clean-generic:
 	@echo "This command is intended for maintainers to use"
 	@echo "it deletes files that may require special tools to rebuild."
-	-test -z "$(MAINTAINERCLEANFILES)" || rm -f $(MAINTAINERCLEANFILES)
 clean: clean-am
 
 clean-am: clean-generic clean-libtool mostlyclean-am
@@ -348,7 +318,7 @@ info-am:
 
 install-data-am:
 
-install-exec-am: install-libexecSCRIPTS
+install-exec-am:
 
 install-info: install-info-am
 
@@ -372,18 +342,17 @@ ps: ps-am
 
 ps-am:
 
-uninstall-am: uninstall-info-am uninstall-libexecSCRIPTS
+uninstall-am: uninstall-info-am
 
 .PHONY: all all-am check check-am clean clean-generic clean-libtool \
 	distclean distclean-generic distclean-libtool distdir dvi \
 	dvi-am html html-am info info-am install install-am \
 	install-data install-data-am install-exec install-exec-am \
-	install-info install-info-am install-libexecSCRIPTS \
-	install-man install-strip installcheck installcheck-am \
-	installdirs maintainer-clean maintainer-clean-generic \
-	mostlyclean mostlyclean-generic mostlyclean-libtool pdf pdf-am \
-	ps ps-am uninstall uninstall-am uninstall-info-am \
-	uninstall-libexecSCRIPTS
+	install-info install-info-am install-man install-strip \
+	installcheck installcheck-am installdirs maintainer-clean \
+	maintainer-clean-generic mostlyclean mostlyclean-generic \
+	mostlyclean-libtool pdf pdf-am ps ps-am uninstall uninstall-am \
+	uninstall-info-am
 
 # Tell versions [3.59,3.63) of GNU make to not export all variables.
 # Otherwise a system limit (for SysV at least) may be exceeded.

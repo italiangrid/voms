@@ -24,7 +24,8 @@ EXTRA_DIST = \
 	mysql2oracle \
 	voms_install_db \
 	upgrade1to2 \
-	voms.start
+	voms.start \
+	voms.sh.in
 
 MAINTAINERCLEANFILES = Makefile.in
 

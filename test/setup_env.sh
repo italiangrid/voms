@@ -52,10 +52,10 @@ function compile()
         cd ttt &&
         tar xzf ../$1-[0-9]*.tar.gz &&
         cd *
-    elif test -f org.glite.security.$1-*.tar.gz; then
+    elif test -f glite-security-$1-*.tar.gz; then
         mkdir ttt &&
         cd ttt &&
-        tar xzf org.glite.security.$1-*.tar.gz &&
+        tar xzf ../glite-security-$1-*.tar.gz &&
         cd *
     else
         apopd
@@ -392,7 +392,7 @@ function do_tests()
 {
     apushd .
     cd tests
-    for i in `ls -B` ; do
+    for i in `ls -B *.sh` ; do
         if test -f $i; then
             apushd .
             COMMENT=""

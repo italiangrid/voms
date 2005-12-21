@@ -54,21 +54,22 @@ AC_STRUCT_TM
 # Checks for library functions.
 AC_FUNC_ALLOCA
 AC_FUNC_CLOSEDIR_VOID
-AC_FUNC_ERROR_AT_LINE
+#AC_FUNC_ERROR_AT_LINE
 AC_FUNC_FORK
-AC_HEADER_MAJOR
-AC_FUNC_MALLOC
+#AC_HEADER_MAJOR
+#AC_FUNC_MALLOC
 AC_FUNC_MEMCMP
-AC_FUNC_MKTIME
+#AC_FUNC_MKTIME
 AC_FUNC_MMAP
-AC_FUNC_REALLOC
+#AC_FUNC_REALLOC
 AC_FUNC_SETVBUF_REVERSED
-AC_TYPE_SIGNAL
-AC_FUNC_STAT
+#AC_TYPE_SIGNAL
+#AC_FUNC_STAT
 AC_FUNC_STRFTIME
-AC_FUNC_STRTOD
+#AC_FUNC_STRTOD
 AC_CHECK_FUNCS([alarm atexit dup2 gethostbyaddr gethostname gethostbyname gethostname memmove memset mkfifo mktime munmap putenv select setenv sigaction socket strchr strdup strerror strndup strrchr strspn strstr strtod strtol strtoul strtoull tzset uname])
-AC_CHECK_FUNCS(globus_module_activate)
+#AC_CHECK_FUNCS([mktime lstat error strtod realloc malloc stat])
+
 AC_REPLACE_FUNCS(getopt_long getopt_long_only daemon setenv)
 
 # check for dependencies based on project/*m4
@@ -79,6 +80,7 @@ AC_EXPAT([], have_expat=yes, have_expat=no)        # taken from org.glite
 AC_CPPUNIT([], have_cppunit=yes, have_cppunit=no)  # taken from org.glite
 AC_GLOBUS([], have_globus=yes, have_globus=no)
 
+#AC_CHECK_FUNCS(globus_module_activate)
 # check in acinclude.m4
 
 AC_COMPILER
@@ -124,6 +126,7 @@ AC_CONFIG_FILES([Makefile
                  src/utils/Makefile
                  doc/Makefile
                  test/Makefile
+                 test/tests/Makefile
                  test/utest/Makefile])
 AC_CONFIG_FILES([src/install/voms_install_db
                  src/install/voms.start

@@ -1,7 +1,7 @@
-
 noinst_LTLIBRARIES = librep.la
 
 librep_la_SOURCES =
+librep_la_LIBADD	= @LTLIBOBJS@
 
 librep_la_CFLAGS = \
 	-I$(top_srcdir)/include \

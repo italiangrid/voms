@@ -153,7 +153,6 @@ PACKAGE_STRING = @PACKAGE_STRING@
 PACKAGE_TARNAME = @PACKAGE_TARNAME@
 PACKAGE_VERSION = @PACKAGE_VERSION@
 PATH_SEPARATOR = @PATH_SEPARATOR@
-POW_LIB = @POW_LIB@
 RANLIB = @RANLIB@
 SET_MAKE = @SET_MAKE@
 SHELL = @SHELL@
@@ -229,7 +228,8 @@ EXTRA_DIST = \
 	mysql2oracle \
 	voms_install_db \
 	upgrade1to2 \
-	voms.start
+	voms.start \
+	voms.sh.in
 
 MAINTAINERCLEANFILES = Makefile.in
 all: all-am

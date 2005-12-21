@@ -140,7 +140,6 @@ PACKAGE_STRING = @PACKAGE_STRING@
 PACKAGE_TARNAME = @PACKAGE_TARNAME@
 PACKAGE_VERSION = @PACKAGE_VERSION@
 PATH_SEPARATOR = @PATH_SEPARATOR@
-POW_LIB = @POW_LIB@
 RANLIB = @RANLIB@
 SET_MAKE = @SET_MAKE@
 SHELL = @SHELL@
@@ -612,6 +611,46 @@ all-local: userdoc-local
 
 @BUILD_DOCS_TRUE@userdoc-local: $(SERVER) $(CLIENT) $(UTILS) $(DOCS) $(APIPDOCS)
 @BUILD_DOCS_FALSE@userdoc-local:
+
+@BUILD_DOCS_TRUE@$(MAN3) $(HTML) $(LATEX): $(DOXY)
+@BUILD_DOCS_TRUE@	doxygen $(CCDOCPLC_DIR)/Doxyfile
+@BUILD_DOCS_TRUE@	doxygen $(CDOCPLC_DIR)/Doxyfile
+
+#$(OUTPUT_DIR)/man/man3/%.3: $(DOXY)
+#	doxygen
+
+@BUILD_DOCS_TRUE@$(PDF): $(LATEX)
+@BUILD_DOCS_TRUE@	cd $(CCDOCPLC_DIR)/latex; \
+@BUILD_DOCS_TRUE@	pdflatex refman.tex; \
+@BUILD_DOCS_TRUE@	pdflatex refman.tex; \
+@BUILD_DOCS_TRUE@	pdflatex refman.tex; \
+@BUILD_DOCS_TRUE@	pdflatex refman.tex;
+@BUILD_DOCS_TRUE@	cd $(CDOCPLC_DIR)/latex; \
+@BUILD_DOCS_TRUE@	pdflatex refman.tex; \
+@BUILD_DOCS_TRUE@	pdflatex refman.tex; \
+@BUILD_DOCS_TRUE@	pdflatex refman.tex; \
+@BUILD_DOCS_TRUE@	pdflatex refman.tex;
+
+#	cd ../..; \
+#	$(mkinstalldirs) $(OUTPUT_DIR)/pdf; \
+#	$(INSTALL_DATA) $(OUTPUT_DIR)/latex/refman.pdf $(PDF);
+
+@BUILD_DOCS_TRUE@$(PS): $(LATEX)
+@BUILD_DOCS_TRUE@	cd $(CCDOCPLC_DIR)/latex; \
+@BUILD_DOCS_TRUE@	latex refman.tex; \
+@BUILD_DOCS_TRUE@	latex refman.tex; \
+@BUILD_DOCS_TRUE@	latex refman.tex; \
+@BUILD_DOCS_TRUE@	latex refman.tex; \
+@BUILD_DOCS_TRUE@	dvips -f <refman.dvi >refman.ps; 
+@BUILD_DOCS_TRUE@	cd $(CDOCPLC_DIR)/latex; \
+@BUILD_DOCS_TRUE@	latex refman.tex; \
+@BUILD_DOCS_TRUE@	latex refman.tex; \
+@BUILD_DOCS_TRUE@	latex refman.tex; \
+@BUILD_DOCS_TRUE@	latex refman.tex; \
+@BUILD_DOCS_TRUE@	dvips -f <refman.dvi >refman.ps; 
+#	cd ../..; \
+#	$(mkinstalldirs) $(OUTPUT_DIR)/ps; \
+#	$(INSTALL_DATA) $(OUTPUT_DIR)/latex/refman.ps $(PS);
 
 $(APIPDOCS):
 	cd apidoc/api/VOMS_C_API/latex ; $(MAKE) -f Makefile pdf ps

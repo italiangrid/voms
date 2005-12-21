@@ -70,7 +70,7 @@
 /* Define to 1 if you have the `getpagesize' function. */
 #undef HAVE_GETPAGESIZE
 
-/* Define to 1 if you have the `globus_module_activate' function. */
+/* Define to 1 if you have globus_module_activate */
 #undef HAVE_GLOBUS_MODULE_ACTIVATE
 
 /* Define to 1 if you have GLOBUS_OFF_T */
@@ -87,10 +87,6 @@
 
 /* Define to 1 if you have long long */
 #undef HAVE_LONG_LONG_T
-
-/* Define to 1 if your system has a GNU libc compatible `malloc' function, and
-   to 0 otherwise. */
-#undef HAVE_MALLOC
 
 /* Define to 1 if you have the <malloc.h> header file. */
 #undef HAVE_MALLOC_H
@@ -134,10 +130,6 @@
 /* Define to 1 if you have the `putenv' function. */
 #undef HAVE_PUTENV
 
-/* Define to 1 if your system has a GNU libc compatible `realloc' function,
-   and to 0 otherwise. */
-#undef HAVE_REALLOC
-
 /* Define to 1 if you have the `select' function. */
 #undef HAVE_SELECT
 
@@ -152,10 +144,6 @@
 
 /* Define to 1 if you have the socklen_t type */
 #undef HAVE_SOCKLEN_T
-
-/* Define to 1 if `stat' has the bug that it succeeds when given the
-   zero-length file name argument. */
-#undef HAVE_STAT_EMPTY_STRING_BUG
 
 /* Define to 1 if stdbool.h conforms to C99. */
 #undef HAVE_STDBOOL_H
@@ -291,18 +279,6 @@
 /* Environment variable name */
 #undef LOCATION_ENV
 
-/* Define to 1 if `lstat' dereferences a symlink specified with a trailing
-   slash. */
-#undef LSTAT_FOLLOWS_SLASHED_SYMLINK
-
-/* Define to 1 if `major', `minor', and `makedev' are declared in <mkdev.h>.
-   */
-#undef MAJOR_IN_MKDEV
-
-/* Define to 1 if `major', `minor', and `makedev' are declared in
-   <sysmacros.h>. */
-#undef MAJOR_IN_SYSMACROS
-
 /* Name of package */
 #undef PACKAGE
 
@@ -323,9 +299,6 @@
 
 /* Define to 1 if the C compiler supports function prototypes. */
 #undef PROTOTYPES
-
-/* Define as the return type of signal handlers (`int' or `void'). */
-#undef RETSIGTYPE
 
 /* Define to 1 if the `setvbuf' function takes the buffering type as its
    second argument and the buffer pointer as the third, as on System V before
@@ -385,17 +358,11 @@
 #undef inline
 #endif
 
-/* Define to rpl_malloc if the replacement function should be used. */
-#undef malloc
-
 /* Define to `long' if <sys/types.h> does not define. */
 #undef off_t
 
 /* Define to `int' if <sys/types.h> does not define. */
 #undef pid_t
-
-/* Define to rpl_realloc if the replacement function should be used. */
-#undef realloc
 
 /* Define to `unsigned' if <sys/types.h> does not define. */
 #undef size_t

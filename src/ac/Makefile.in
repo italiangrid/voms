@@ -169,7 +169,6 @@ PACKAGE_STRING = @PACKAGE_STRING@
 PACKAGE_TARNAME = @PACKAGE_TARNAME@
 PACKAGE_VERSION = @PACKAGE_VERSION@
 PATH_SEPARATOR = @PATH_SEPARATOR@
-POW_LIB = @POW_LIB@
 RANLIB = @RANLIB@
 SET_MAKE = @SET_MAKE@
 SHELL = @SHELL@
@@ -259,7 +258,8 @@ EXTRA_DIST = \
 	acerrors.h \
 	write.h \
 	init.h \
-	extensions.h
+	extensions.h \
+	test.c
 
 all: all-am
 

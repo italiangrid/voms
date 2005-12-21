@@ -1,4 +1,6 @@
 
+DIST_SUBDIRS = tests utest
+
 SUBDIRS = $(OPT_DIRS)
 
 if WANT_UNIT_TEST

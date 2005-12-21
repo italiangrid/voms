@@ -15,6 +15,7 @@ AC_DEFUN([AC_GLOBUS],
     # to be added
     AC_MSG_RESULT([yes])
 
+    LD_LIBRARY_PATH="$LD_LIBRARY_PATH:$with_globus_prefix/lib"
     AC_MSG_CHECKING([for GLOBUS flavors])
 
     for i in `ls $with_globus_prefix/include`; do
@@ -51,43 +52,54 @@ AC_DEFUN([AC_GLOBUS],
     for flavor in $GLOBUS_FLAVORS ; do
       if test "x$flavor" = "x$with_globus_flavor" ; then
       	GLOBUS_CFLAGS="-I$with_globus_prefix/include/$flavor"
-        GLOBUS_GSS_LIBS="$ac_globus_ldlib -lglobus_gssapi_gsi_$flavor -lglobus_gss_assist_$flavor"
+        GLOBUS_GSS_LIBS="$ac_globus_ldlib -lglobus_gssapi_gsi_$flavor -lglobus_gss_assist_$flavor -lcrypto_$flavor"
       fi
       if test "x$flavor" = "xgcc32" ; then
 	      GLOBUS_GCC32_CFLAGS="-I$with_globus_prefix/include/$flavor"
-        GLOBUS_GCC32_GSS_LIBS="$ac_globus_ldlib -lglobus_gssapi_gsi_$flavor -lglobus_gss_assist_$flavor"
+        GLOBUS_GCC32_GSS_LIBS="$ac_globus_ldlib -lglobus_gssapi_gsi_$flavor -lglobus_gss_assist_$flavor -lcrypto_$flavor"
       fi
       if test "$flavor" = "gcc32dbg" ; then
         GLOBUS_GCC32DBG_CFLAGS="-I$with_globus_prefix/include/$flavor"
-        GLOBUS_GCC32DBG_GSS_LIBS="$ac_globus_ldlib -lglobus_gssapi_gsi_$flavor -lglobus_gss_assist_$flavor"
+        GLOBUS_GCC32DBG_GSS_LIBS="$ac_globus_ldlib -lglobus_gssapi_gsi_$flavor -lglobus_gss_assist_$flavor -lcrypto_$flavor"
       fi
       if test "$flavor" = "gcc32dbgpthr" ; then
         GLOBUS_GCC32DBGPTHR_CFLAGS="-I$with_globus_prefix/include/$flavor"
-        GLOBUS_GCC32DBGPTHR_GSS_LIBS="$ac_globus_ldlib -lglobus_gssapi_gsi_$flavor -lglobus_gss_assist_$flavor"
+        GLOBUS_GCC32DBGPTHR_GSS_LIBS="$ac_globus_ldlib -lglobus_gssapi_gsi_$flavor -lglobus_gss_assist_$flavor -lcrypto_$flavor"
       fi
       if test "$flavor" = "gcc32pthr" ; then
         GLOBUS_GCC32PTHR_CFLAGS="-I$with_globus_prefix/include/$flavor"
-        GLOBUS_GCC32PTHR_GSS_LIBS="$ac_globus_ldlib -lglobus_gssapi_gsi_$flavor -lglobus_gss_assist_$flavor"
+        GLOBUS_GCC32PTHR_GSS_LIBS="$ac_globus_ldlib -lglobus_gssapi_gsi_$flavor -lglobus_gss_assist_$flavor -lcrypto_$flavor"
       fi
 
       if test "x$flavor" = "xgcc64" ; then
 	      GLOBUS_GCC64_CFLAGS="-I$with_globus_prefix/include/$flavor"
-        GLOBUS_GCC64_GSS_LIBS="$ac_globus_ldlib -lglobus_gssapi_gsi_$flavor -lglobus_gss_assist_$flavor"
+        GLOBUS_GCC64_GSS_LIBS="$ac_globus_ldlib -lglobus_gssapi_gsi_$flavor -lglobus_gss_assist_$flavor -lcrypto_$flavor"
       fi
       if test "$flavor" = "gcc64dbg" ; then
         GLOBUS_GCC64DBG_CFLAGS="-I$with_globus_prefix/include/$flavor"
-        GLOBUS_GCC64DBG_GSS_LIBS="$ac_globus_ldlib -lglobus_gssapi_gsi_$flavor -lglobus_gss_assist_$flavor"
+        GLOBUS_GCC64DBG_GSS_LIBS="$ac_globus_ldlib -lglobus_gssapi_gsi_$flavor -lglobus_gss_assist_$flavor -lcrypto_$flavor"
       fi
       if test "$flavor" = "gcc64dbgpthr" ; then
         GLOBUS_GCC64DBGPTHR_CFLAGS="-I$with_globus_prefix/include/$flavor"
-        GLOBUS_GCC64DBGPTHR_GSS_LIBS="$ac_globus_ldlib -lglobus_gssapi_gsi_$flavor -lglobus_gss_assist_$flavor"
+        GLOBUS_GCC64DBGPTHR_GSS_LIBS="$ac_globus_ldlib -lglobus_gssapi_gsi_$flavor -lglobus_gss_assist_$flavor -lcrypto_$flavor"
       fi
       if test "$flavor" = "gcc64pthr" ; then
         GLOBUS_GCC64PTHR_CFLAGS="-I$with_globus_prefix/include/$flavor"
-        GLOBUS_GCC64PTHR_GSS_LIBS="$ac_globus_ldlib -lglobus_gssapi_gsi_$flavor -lglobus_gss_assist_$flavor"
+        GLOBUS_GCC64PTHR_GSS_LIBS="$ac_globus_ldlib -lglobus_gssapi_gsi_$flavor -lglobus_gss_assist_$flavor -lcrypto_$flavor"
       fi
     done
 
+
+    AC_LANG_PUSH(C)
+    LDFLAGS_SAVE="$LDFLAGS"
+    LDFLAGS="$LDFLAGS $GLOBUS_GSS_LIBS"
+    AC_MSG_CHECKING([for globus_module_activate])
+    AC_TRY_LINK([], [(void)globus_module_activate();],
+                [ AC_DEFINE(HAVE_GLOBUS_MODULE_ACTIVATE, 1, [Define to 1 if you have globus_module_activate])
+                  AC_MSG_RESULT(yes)],
+                [AC_MSG_RESULT(no)])
+    LDFLAGS="$LDFLAGS_SAVE"
+    AC_LANG_POP(C)
     AC_SUBST(WANTED_OLDGAA_LIBS)
     AC_SUBST(WANTED_SSL_UTILS_LIBS)
     AC_SUBST(WANTED_SOCK_LIBS)
@@ -173,24 +185,24 @@ AC_DEFUN([AC_ENABLE_GLITE],
     AM_CONDITIONAL(ENABLE_GLITE, test x$ac_enable_glite = xyes)
 
     if test "x$ac_enable_glite" = "xno"; then
-	DISTTAR=$WORKDIR
-	AC_SUBST(DISTTAR)
+    	DISTTAR=$WORKDIR
+    	AC_SUBST(DISTTAR)
 #	EDG_SET_RPM_TOPDIR
-	AC_SUBST(LOCATION_ENV, "VOMS_LOCATION")
-	AC_SUBST(LOCATION_DIR, "/opt/edg")
-	AC_SUBST(VAR_LOCATION_ENV, "VOMS_LOCATION_VAR")
-	AC_DEFINE(LOCATION_ENV, "VOMS_LOCATION", [Environment variable name])
-	AC_DEFINE(LOCATION_DIR, "/opt/edg", [Location of system directory])
-	AC_DEFINE(USER_DIR, ".edg", [Location of user directory])
+    	AC_SUBST(LOCATION_ENV, "VOMS_LOCATION")
+    	AC_SUBST(LOCATION_DIR, "$prefix")
+    	AC_SUBST(VAR_LOCATION_ENV, "VOMS_LOCATION_VAR")
+    	AC_DEFINE(LOCATION_ENV, "VOMS_LOCATION", [Environment variable name])
+    	AC_DEFINE(LOCATION_DIR, "$prefix", [Location of system directory])
+    	AC_DEFINE(USER_DIR, ".edg", [Location of user directory])
     else
-	AC_MSG_RESULT([Preparing for gLite environment])
-	AC_GLITE
-	AC_SUBST(LOCATION_ENV, "GLITE_LOCATION")
-	AC_SUBST(LOCATION_DIR, "/opt/glite")
-	AC_SUBST(VAR_LOCATION_ENV, "GLITE_LOCATION_VAR")
-	AC_DEFINE(LOCATION_ENV, "GLITE_LOCATION", [Environment variable name])
-	AC_DEFINE(LOCATION_DIR, "/opt/glite", [Location of system directory])
-	AC_DEFINE(USER_DIR, ".glite", [Location of user directory])
+    	AC_MSG_RESULT([Preparing for gLite environment])
+    	AC_GLITE
+    	AC_SUBST(LOCATION_ENV, "GLITE_LOCATION")
+    	AC_SUBST(LOCATION_DIR, "/opt/glite")
+    	AC_SUBST(VAR_LOCATION_ENV, "GLITE_LOCATION_VAR")
+    	AC_DEFINE(LOCATION_ENV, "GLITE_LOCATION", [Environment variable name])
+    	AC_DEFINE(LOCATION_DIR, "/opt/glite", [Location of system directory])
+    	AC_DEFINE(USER_DIR, ".glite", [Location of user directory])
     fi
 ])
 
