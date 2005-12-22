@@ -336,7 +336,7 @@ AC_DEFUN([AC_OPENSSL_EXT_METHOD],
 
     AC_TRY_COMPILE(
       [
-        #include <openssl/x509v3.h>
+        #include <$with_globus_prefix/include/$with_globus_flavor/openssl/x509v3.h>
       ],
       [
         X509V3_EXT_METHOD it;
@@ -365,7 +365,7 @@ AC_DEFUN([AC_VOMS_OPENSSL_EVP_MD_CTX],
     AC_LANG_PUSH(C++)
     AC_TRY_LINK(
       [
-        #include <$with_globus_location/include/$with_globus_flavor/openssl/evp.h>
+        #include <$with_globus_prefix/include/$with_globus_flavor/openssl/evp.h>
       ],
       [
         EVP_MD_CTX mp; 
@@ -382,7 +382,7 @@ AC_DEFUN([AC_VOMS_OPENSSL_EVP_MD_CTX],
     CPPFLAGS="$CPPFLAGS $GLOBUS_CFLAGS $GLOBUS_GSS_LIBS"
     AC_TRY_LINK(
       [
-        #include <$with_globus_location/include/$with_globus_flavor/openssl/evp.h>
+        #include <$with_globus_prefix/include/$with_globus_flavor/openssl/evp.h>
       ],
       [
         EVP_MD_CTX mp; 

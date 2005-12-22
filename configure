@@ -24399,7 +24399,7 @@ cat confdefs.h >>conftest.$ac_ext
 cat >>conftest.$ac_ext <<_ACEOF
 /* end confdefs.h.  */
 
-        #include <openssl/x509v3.h>
+        #include <$with_globus_prefix/include/$with_globus_flavor/openssl/x509v3.h>
 
 int
 main ()
@@ -24979,7 +24979,7 @@ cat confdefs.h >>conftest.$ac_ext
 cat >>conftest.$ac_ext <<_ACEOF
 /* end confdefs.h.  */
 
-        #include <$with_globus_location/include/$with_globus_flavor/openssl/evp.h>
+        #include <$with_globus_prefix/include/$with_globus_flavor/openssl/evp.h>
 
 int
 main ()
@@ -25044,7 +25044,7 @@ cat confdefs.h >>conftest.$ac_ext
 cat >>conftest.$ac_ext <<_ACEOF
 /* end confdefs.h.  */
 
-        #include <$with_globus_location/include/$with_globus_flavor/openssl/evp.h>
+        #include <$with_globus_prefix/include/$with_globus_flavor/openssl/evp.h>
 
 int
 main ()
