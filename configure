@@ -24979,7 +24979,7 @@ cat confdefs.h >>conftest.$ac_ext
 cat >>conftest.$ac_ext <<_ACEOF
 /* end confdefs.h.  */
 
-        #include <$GLOBUS_LOCATION/include/$GLOBUS_FLAVOR/openssl/evp.h>
+        #include <$with_globus_location/include/$with_globus_flavor/openssl/evp.h>
 
 int
 main ()
@@ -25044,7 +25044,7 @@ cat confdefs.h >>conftest.$ac_ext
 cat >>conftest.$ac_ext <<_ACEOF
 /* end confdefs.h.  */
 
-        #include <$GLOBUS_LOCATION/include/$GLOBUS_FLAVOR/openssl/evp.h>
+        #include <$with_globus_location/include/$with_globus_flavor/openssl/evp.h>
 
 int
 main ()

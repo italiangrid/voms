@@ -365,7 +365,7 @@ AC_DEFUN([AC_VOMS_OPENSSL_EVP_MD_CTX],
     AC_LANG_PUSH(C++)
     AC_TRY_LINK(
       [
-        #include <$GLOBUS_LOCATION/include/$GLOBUS_FLAVOR/openssl/evp.h>
+        #include <$with_globus_location/include/$with_globus_flavor/openssl/evp.h>
       ],
       [
         EVP_MD_CTX mp; 
@@ -382,7 +382,7 @@ AC_DEFUN([AC_VOMS_OPENSSL_EVP_MD_CTX],
     CPPFLAGS="$CPPFLAGS $GLOBUS_CFLAGS $GLOBUS_GSS_LIBS"
     AC_TRY_LINK(
       [
-        #include <$GLOBUS_LOCATION/include/$GLOBUS_FLAVOR/openssl/evp.h>
+        #include <$with_globus_location/include/$with_globus_flavor/openssl/evp.h>
       ],
       [
         EVP_MD_CTX mp; 
