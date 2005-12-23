@@ -146,17 +146,17 @@ if test "x$voms_password_query" = "x"; then
     voms_password_query="`$SSLPROG rand -base64 6`";
 fi
 
-if test "$db_type" != "mysql"; then
-    if test "$db_type" != "oracle"; then
+if test "x$db_type" != "xmysql"; then
+    if test "x$db_type" != "xoracle"; then
         echo "Only 'mysql' or 'oracle' are accepted values for --db-type."
-        return 1
+        exit 1
     fi
 fi
 
 if test "x$compat_mode" = "x-compat" ; then
   if test "x$db_type" != "xmysql"; then
       echo "compatibility mode only works with MySQL!";
-      return 1;
+      exit 1;
   fi
 fi
 
@@ -165,7 +165,7 @@ if test "x$sqlloc" = "x"; then
 fi
 
 # choose client
-if test $db_type = "mysql" ; then
+if test "x$db_type" = "xmysql" ; then
     if test -z $db_password_admin ; then
         MYSQLADMIN="$MYSQL_HOME/bin/mysqladmin -u $db_username_admin"
         CLIENT="$MYSQL_HOME/bin/mysql -u $db_username_admin"
@@ -173,14 +173,15 @@ if test $db_type = "mysql" ; then
         MYSQLADMIN="$MYSQL_HOME/bin/mysqladmin -u $db_username_admin -p$db_password_admin"
         CLIENT="$MYSQL_HOME/bin/mysql -u $db_username_admin -p$db_password_admin"	
     fi
-elif test $db_type = "oracle" ; then
+elif test "x$db_type" = "xoracle" ; then
     CLIENT="$ORACLE_HOME/bin/sqlplus -S $db_username_admin/$db_password_admin@$voms_database"
 else 
     echo "Please select one beetween --db-type oracle and --db-type mysql."
+    exit 1;
 fi
 
 # Create Database
-if test $db_type = "mysql" ; then
+if test "x$db_type" = "xmysql" ; then
     $CLIENT -e "DROP DATABASE IF EXISTS $voms_database;
                 CREATE DATABASE $voms_database;"
     CLIENT="$CLIENT -D$voms_database" 
@@ -190,7 +191,7 @@ fi
 $CLIENT < "${datapath}/etc/voms/voms-"$db_type$compat_mode".data"
 
 # Create users
-if test $db_type = "mysql" ; then
+if test "x$db_type" = "xmysql" ; then
 $CLIENT -e "
   GRANT SELECT         ON $voms_database.*         TO   $voms_username_query              IDENTIFIED BY '$voms_password_query';
   GRANT LOCK TABLES    ON $voms_database.*         TO   $voms_username_query              IDENTIFIED BY '$voms_password_query';
