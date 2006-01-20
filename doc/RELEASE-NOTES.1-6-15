@@ -1,0 +1,15 @@
+Changes since 1.6.10
+
+Fixed vulnerability #12685: Escalation of right possible.
+Fixed the first part of bug #13899, meaning that the crashes with
+                                    threads do not happen any more, and
+                                    the memory leak is much reduced.  We
+                                    are at work to tackle the remaining
+                                    few bytes.
+Fixed bug #11227: Now VOMS builds on RH 7.2
+Fixed bug #10702: Now the duplicated connection are not there anymore.
+Fixed bug #10761: Junk in command line is now detected.
+Fixde bug #13356: Syntax of ps usage fixed.
+
+
+Valerio is updating bug 12613. 
