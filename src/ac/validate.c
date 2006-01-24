@@ -164,9 +164,10 @@ int validate(X509 *cert, X509 *issuer, AC *ac, struct col *voms, int valids)
   }
 
   if (valids & VER_SIGN) {
+    int ok;
     CHECK(issuer);
     key=X509_extract_key(issuer);
-    int ok = ASN1_verify((int (*)())i2d_AC_INFO,ac->sig_alg, ac->signature,
+    ok = ASN1_verify((int (*)())i2d_AC_INFO,ac->sig_alg, ac->signature,
                          (char *)ac->acinfo, key);
     EVP_PKEY_free(key);
     if (!ok)
