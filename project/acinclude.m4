@@ -139,8 +139,8 @@ AC_DEFUN([AC_COMPILER],
       [ac_with_debug="no"])
     
     if test "x$ac_with_debug" = "xyes" ; then
-      CFLAGS="-g -O0 $CFLAGS"
-      CXXFLAGS="-g -O0 $CXXFLAGS"
+      CFLAGS="-g -O0"
+      CXXFLAGS="-g -O0"
     fi
 
     AC_ARG_WITH(warnings,
@@ -533,11 +533,11 @@ AC_DEFUN([AC_VOMS_GLOBUS_CONFIG_H],
         *) proc="" ;;
       esac
       arch=`echo $arch | tr a-z A-Z`
-      echo "#define BUILD_LITE 1" > include/globus_config.h
-      echo "#define BUILD_DEBUG 1" >> include/globus_config.h
-      echo "#define TARGET_ARCH_$arch 1" >> include/globus_config.h
+      echo "#define BUILD_LITE 1" > src/include/globus_config.h
+      echo "#define BUILD_DEBUG 1" >> src/include/globus_config.h
+      echo "#define TARGET_ARCH_$arch 1" >> src/include/globus_config.h
       if ! test "x$proc" = "x"; then
-        echo "#define TARGET_ARCH_$proc 1" >> include/globus_config.h
+        echo "#define TARGET_ARCH_$proc 1" >> src/include/globus_config.h
       fi
     fi
 

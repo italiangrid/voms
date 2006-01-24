@@ -292,7 +292,9 @@ GSISocketClient::Close()
     close(sck);
   if (peer_key) 
     EVP_PKEY_free(peer_key);
-  peer_key = NULL;
+  peer_key = own_key = NULL;
+  peer_cert = own_cert = NULL;
+
   opened=false;
 }
 

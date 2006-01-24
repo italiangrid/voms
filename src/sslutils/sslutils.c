@@ -892,6 +892,9 @@ proxy_genreq(
     return 0;
 
 err:
+    if (upkey)
+      EVP_PKEY_free(upkey);
+
     if(rsa)
     {
         RSA_free(rsa);
@@ -977,8 +980,9 @@ proxy_sign(
     if(proxyver==3) {
 
       user_public_key = X509_get_pubkey(user_cert);
-
       ASN1_digest(i2d_PUBKEY, EVP_sha1(), (char *) user_public_key, md, &len);
+      EVP_PKEY_free(user_public_key);
+
       sub_hash = md[0] + (md[1] + (md[2] + (md[3] >> 1) * 256) * 256) * 256;
  
       newcn = malloc(sizeof(long)*4 + 1);
@@ -1108,6 +1112,8 @@ proxy_sign_ext(
     }
 
     i = X509_REQ_verify(req,new_public_key);
+    EVP_PKEY_free(new_public_key);
+    new_public_key = NULL;
 
     if (i < 0)
     {
@@ -1184,6 +1190,7 @@ proxy_sign_ext(
     asn1_time = ASN1_UTCTIME_new();
     X509_gmtime_adj(asn1_time, 0);
     time_now = ASN1_UTCTIME_mktime(asn1_time);
+    ASN1_UTCTIME_free(asn1_time);
     time_after = ASN1_UTCTIME_mktime(X509_get_notAfter(user_cert));
     time_diff = time_after - time_now;
 
@@ -1281,6 +1288,8 @@ proxy_sign_ext(
     }
 #endif
 
+    EVP_PKEY_free(tmp_public_key);
+
     if (!X509_sign(*new_cert,user_private_key,method))
     {
         PRXYerr(PRXYERR_F_PROXY_SIGN_EXT,PRXYERR_R_PROCESS_SIGNC);
@@ -1296,6 +1305,9 @@ err:
     {
         X509_free(*new_cert);
     }
+
+    if (new_public_key)
+      EVP_PKEY_free(new_public_key);
 
     return 1;
 }
@@ -1916,6 +1928,7 @@ proxy_verify_callback(
     time_t                              goodtill;
     char *                              ca_policy_file_path = NULL;
     char *                              cert_dir            = NULL;
+    EVP_PKEY *key = NULL;
 
     /*
      * If we are being called recursivly to check delegate
@@ -2086,8 +2099,8 @@ proxy_verify_callback(
             crl_info = crl->crl;
             /* verify the signature on this CRL */
 
-            if (X509_CRL_verify(crl,
-                                X509_get_pubkey(ctx->current_cert)) <= 0)
+            key = X509_get_pubkey(ctx->current_cert);
+            if (X509_CRL_verify(crl, key) <= 0)
             {
                 PRXYerr(PRXYERR_F_VERIFY_CB,PRXYERR_R_CRL_SIGNATURE_FAILURE);
                 ERR_set_continue_needed();
@@ -2420,10 +2433,14 @@ proxy_verify_callback(
         }
     }
 
+    EVP_PKEY_free(key);
 
     return(ok);
 
 fail_verify:
+
+    if (key)
+      EVP_PKEY_free(key);
 
     if (ctx->current_cert)
     {
@@ -3606,6 +3623,7 @@ proxy_load_user_key(
             mismatch=1;
         }
         
+        EVP_PKEY_free(ucertpkey);
         if (mismatch)
         {
             PRXYerr(PRXYERR_F_INIT_CRED,PRXYERR_R_KEY_CERT_MISMATCH);

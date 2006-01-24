@@ -178,7 +178,9 @@ GSISocketServer::Close()
   opened = false;
   if (peer_key)
     EVP_PKEY_free(peer_key);
-  peer_key = NULL;
+  own_key = peer_key = NULL;
+  own_cert = peer_cert = NULL;
+
   opened=false;
 }
 

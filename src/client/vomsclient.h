@@ -92,7 +92,8 @@ class Client {
   void *                   class_add_buf = NULL;
   size_t                   class_add_buf_len = 0;
 #endif
-  
+
+  BIGNUM *                 dataorder;
   proxy_cred_desc *        pcd;
   proxy_verify_desc        pvd;
   proxy_verify_ctx_desc    pvxd;
@@ -100,7 +101,6 @@ class Client {
   // store data retrieved from server
   AC **                    aclist;
   std::string              data;
-  BIGNUM *                 dataorder;
   
   // vo
   std::string voID;
@@ -114,7 +114,7 @@ class Client {
 
  private:
   
-  bool CreateProxy(std::string data, std::string filedata, AC ** aclist, BIGNUM * dataorder, int version);
+  bool CreateProxy(std::string data, std::string filedata, AC ** aclist, int version);
   X509_EXTENSION * CreateProxyExtension(std::string name, std::string data, bool crit = false);
 
   bool Retrieve(std::string buffer);

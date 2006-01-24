@@ -17,7 +17,7 @@ SSLPROG="openssl"
 MYSQL_HOME=${MYSQL_HOME:-/usr}
 
 # MySQL install prefix
-ORACLE_HOME=""
+ORACLE_HOME=${ORACLE_HOME:-/usr/}
 
 # VOMS database
 voms_database=""

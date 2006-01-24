@@ -28,6 +28,8 @@ AC_PROG_LN_S
 AC_PROG_MAKE_SET
 AC_PROG_LIBTOOL
 
+AC_COMPILER
+
 # Checks for libraries.
 
 # Checks for header files.
@@ -83,7 +85,6 @@ AC_GLOBUS([], have_globus=yes, have_globus=no)
 #AC_CHECK_FUNCS(globus_module_activate)
 # check in acinclude.m4
 
-AC_COMPILER
 AC_ENABLE_DOCS
 
 TEST_USE_BSD

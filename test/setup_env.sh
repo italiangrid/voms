@@ -1,5 +1,14 @@
 #!/bin/sh
 
+function do_configure()
+{
+    if test "x$1" = "xvoms-oracle"; then
+        ./configure --prefix=$2 --with-debug --with-oracle-libdir=$ORACLE_LIB --with-oracle-incdir=$ORACLE_INC
+    else
+        ./configure --prefix=$2 --with-debug
+    fi
+}
+
 function command()
 {
     $@ >/dev/null 2>&1
@@ -20,12 +29,12 @@ function find_component()
     apushd .
     if test -d ../../$1; then
         cd ../../$1 &&
-        ./configure && 
+        do_configure $1 /tmp/tt && 
         make dist && 
         cp *.tar.gz $2
     elif test -d ../../org.glite.security.$1; then
         cd ../../org.glite.security.$1 &&
-        ./configure &&
+        do_configure $1 /tmp/tt &&
         make dist &&
         cp *.tar.gz $2
     else
@@ -34,7 +43,7 @@ function find_component()
         cvs -d :pserver:anonymous@infnforge.cnaf.infn.it:/cvsroot co $1 &&
         COMMENT="Had to get component from the development CVS" &&
         cd $2/tmp/$1 && 
-        ./configure && 
+        do_configure $1 /tmp/tt && 
         make dist && 
         cp *.tar.gz ../.. &&
         rm -rf $2/tmp
@@ -57,13 +66,19 @@ function compile()
         cd ttt &&
         tar xzf ../glite-security-$1-*.tar.gz &&
         cd *
+    elif test -f $1-plugin*.tar.gz; then
+        mkdir ttt &&
+        cd ttt &&
+        tar xzf ../$1-plugin*.tar.gz &&
+        cd  *
     else
         apopd
         COMMENT="Unable to find tarball."
         return 1;
     fi
 
-    ./configure --prefix=$2 --with-debug && make install && cd ../.. && rm -rf ttt
+    do_configure $1 $2 && make install && cd ../.. && rm -rf ttt
+
     res=$?
     apopd
     return $res

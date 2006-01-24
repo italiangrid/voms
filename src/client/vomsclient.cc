@@ -133,9 +133,9 @@ Client::Client(int argc, char ** argv) :
                                            classs_add_buf(NULL),
                                            class_add_buf_len(0),
 #endif 
+                                           dataorder(NULL),
                                            pcd(NULL),
                                            aclist(NULL),
-                                           dataorder(NULL),
                                            voID(""),
                                            listing(false)
 {
@@ -515,6 +515,12 @@ Client::Client(int argc, char ** argv) :
   this->certfile = (certfile.empty() ? NULL : const_cast<char *>(certfile.c_str()));
   this->keyfile = (keyfile.empty() ? NULL : const_cast<char *>(keyfile.c_str()));
 
+  /* prepare dataorder */
+   
+  dataorder = BN_new();
+  if (!dataorder) 
+    exit(1);
+  BN_one(dataorder);
 
   /* prepare proxy_cred_desc */
 
@@ -526,14 +532,6 @@ Client::Client(int argc, char ** argv) :
   if(verify)
     if(!Verify())
       exit(3);
-
-  /* prepare dataorder */
-  
-  dataorder = BN_new();
-  if (!dataorder) 
-    exit(1);
-  BN_one(dataorder);
-
 }
 
 Client::~Client() {
@@ -549,12 +547,11 @@ Client::~Client() {
   if(outfile)  
     free(outfile);
 
-  if (dataorder)
-    BN_free(dataorder);
-  
   if(pcd)
     proxy_cred_desc_free(pcd);
-  
+  if (dataorder)
+    BN_free(dataorder);
+
   OBJ_cleanup();
 
 }
@@ -621,7 +618,7 @@ bool Client::Run() {
 	
         if(!quiet) std::cout << "Creating temporary proxy " << std::flush;
         if(debug) std::cout << "to " << proxyfile << " " << std::flush;
-        if(CreateProxy("", "", NULL, NULL, (beg->version == -1 ? proxyver : beg->version)))
+        if(CreateProxy("", "", NULL, (beg->version == -1 ? proxyver : beg->version)))
           goto err;
       }
       
@@ -691,6 +688,8 @@ bool Client::Run() {
             std::cerr << "Error: " << v.ErrorMessage() << std::endl;
             exit(3);
           }
+
+
         
           // if contact succeded jumps to other vos */
           break;
@@ -767,7 +766,7 @@ bool Client::Run() {
   
   if(!quiet) std::cout << "Creating proxy " << std::flush; 
   if(debug) std::cout << "to " << proxyfile << " " << std::flush;
-  if(CreateProxy(data, filedata, vomses.empty() ? NULL : aclist, vomses.empty() ? NULL : dataorder, proxyver)) {
+  if(CreateProxy(data, filedata, vomses.empty() ? NULL : aclist, proxyver)) {
     listfree((char **)aclist, (freefn)AC_free);
     goto err;
   }
@@ -798,7 +797,7 @@ bool Client::Run() {
 
 }
 
-bool Client::CreateProxy(std::string data, std::string filedata, AC ** aclist, BIGNUM * dataorder, int version) {
+bool Client::CreateProxy(std::string data, std::string filedata, AC ** aclist, int version) {
 
   bool status = true;
   char *confstr = NULL;
@@ -809,7 +808,7 @@ bool Client::CreateProxy(std::string data, std::string filedata, AC ** aclist, B
   BIO * bp = NULL;
   STACK_OF(X509_EXTENSION) * extensions = NULL;
   X509_EXTENSION *ex1 = NULL, *ex2 = NULL, *ex3 = NULL, *ex4 = NULL, *ex5 = NULL, *ex6 = NULL, *ex7 = NULL, *ex8 = NULL;
-  bool voms, classadd, file, vo, acs, order, info, kusg;
+  bool voms, classadd, file, vo, acs, info, kusg, order;
   order = acs = vo = voms = classadd = file = kusg = false;
   
   FILE *fpout = fopen(proxyfile.c_str(), "w");
@@ -920,24 +919,6 @@ bool Client::CreateProxy(std::string data, std::string filedata, AC ** aclist, B
     vo = true;
   }
   
-  /* order extension */
-
-  if (dataorder) {
-    
-    std::string tmp = std::string(BN_bn2hex(dataorder));
-    
-    if ((ex6 = CreateProxyExtension("order", tmp)) == NULL) {
-      PRXYerr(PRXYERR_F_PROXY_SIGN,PRXYERR_R_CLASS_ADD_EXT);
-      goto err;
-    }
-    
-    if (!sk_X509_EXTENSION_push(extensions, ex6)) {
-      PRXYerr(PRXYERR_F_PROXY_SIGN,PRXYERR_R_CLASS_ADD_EXT);
-      goto err;
-    }
-    
-    order = true;
-  }
 
   /* class_add extension */
 
@@ -958,6 +939,26 @@ bool Client::CreateProxy(std::string data, std::string filedata, AC ** aclist, B
   }
 
 #endif
+  /* order extension */
+ 
+  if (aclist && dataorder) {
+
+    char *buffer = BN_bn2hex(dataorder);
+    std::string tmp = std::string(buffer);
+    OPENSSL_free(buffer);
+
+    if ((ex6 = CreateProxyExtension("order", tmp)) == NULL) {
+      PRXYerr(PRXYERR_F_PROXY_SIGN,PRXYERR_R_CLASS_ADD_EXT);
+      goto err;
+    }
+     
+    if (!sk_X509_EXTENSION_push(extensions, ex6)) {
+      PRXYerr(PRXYERR_F_PROXY_SIGN,PRXYERR_R_CLASS_ADD_EXT);
+      goto err;
+    }
+     
+    order = true;
+  }
   
   /* PCI extension */
   
@@ -1087,7 +1088,7 @@ bool Client::CreateProxy(std::string data, std::string filedata, AC ** aclist, B
     fclose(fpout);
   if (extensions) {
     sk_X509_EXTENSION_pop_free(extensions, X509_EXTENSION_free);
-    kusg = voms = classadd = file = vo = acs = order = info = false;
+    order = kusg = voms = classadd = file = vo = acs = info = false;
   }
   if(req) {
     X509_REQ_free(req);
@@ -1096,10 +1097,10 @@ bool Client::CreateProxy(std::string data, std::string filedata, AC ** aclist, B
     X509_EXTENSION_free(ex8);
   if(npkey)
     EVP_PKEY_free(npkey);
-  if (info)
-    X509_EXTENSION_free(ex7);
   if (order)
     X509_EXTENSION_free(ex6);
+  if (info)
+    X509_EXTENSION_free(ex7);
   if (acs)
     X509_EXTENSION_free(ex5);
   if (voms)
@@ -1139,6 +1140,8 @@ X509_EXTENSION * Client::CreateProxyExtension(std::string name, std::string data
     goto err;
   }
 	
+  //  ASN1_OCTET_STRING_free(ex_oct);
+  //  ASN1_OBJECT_free(ex_obj);
   ex_oct = NULL;
 	
   return ex;
@@ -1180,25 +1183,8 @@ bool Client::WriteSeparate() {
   if(!data.empty()) {
     
     if(aclist) {
-      
       if(!quiet)
-        std:: cout << "Wrote ACs to " << separate+".ac" << std::endl;
-      
-      std::string tmp = std::string(BN_bn2hex(dataorder));      
-      std::ofstream fs;
-      fs.open((separate+".order").c_str());
-      if (!fs) {
-        std::cerr << "cannot open file" << std::endl;
-        return false;
-      }
-      else {
-        for(std::string::iterator pos = tmp.begin(); pos != tmp.end(); pos++)
-          fs << *pos;
-        fs.close();
-      }
-      
-      if(!quiet)
-        std::cout << "Wrote order to " << separate+".order" << std::endl;
+        std:: cout << "Wrote ACs to " << separate+".ac" << std::endl;      
     }
     
     std::ofstream fs;
@@ -1266,6 +1252,7 @@ bool Client::Test() {
   ASN1_UTCTIME * asn1_time = ASN1_UTCTIME_new();
   X509_gmtime_adj(asn1_time, 0);
   time_t time_now = ASN1_UTCTIME_mktime(asn1_time);
+  ASN1_UTCTIME_free(asn1_time);
   time_t time_after = ASN1_UTCTIME_mktime(X509_get_notAfter(pcd->ucert));
   time_t time_diff = time_after - time_now ;
 
@@ -1322,20 +1309,15 @@ bool Client::Retrieve(std::string buffer) {
     actmplist = (AC **)listadd((char **)aclist, (char *)ac, sizeof(AC *));
     if (actmplist) {
       aclist = actmplist;
+      (void)BN_lshift1(dataorder, dataorder);
+      (void)BN_set_bit(dataorder, 0);
       status = true;
     }
     else {
       listfree((char **)aclist, (freefn)AC_free);
       goto err;
     }
-    //    (void)BN_lshift1(dataorder, dataorder);
-    //    (void)BN_set_bit(dataorder, 0);
   }
-//   else {
-//     (void)BN_lshift1(dataorder, dataorder);
-//     data += buffer;
-//     status = true;
-//   }
   
  err:
 
@@ -1430,6 +1412,8 @@ bool Client::pcdInit() {
   
  err:
 
+  if (bio_err)
+    BIO_free(bio_err);
   Error();
   return status;
   

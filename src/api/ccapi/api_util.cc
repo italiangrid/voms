@@ -541,6 +541,7 @@ vomsdata::my_conn(const std::string &hostname, int port, const std::string &cont
 
   if (!sock.Open()) {
     seterror(VERR_COMM, sock.GetError());
+    sock.Close();
     return false;
   }
   
@@ -550,8 +551,8 @@ vomsdata::my_conn(const std::string &hostname, int port, const std::string &cont
   //s  = sock.peer_subject;
 
   if (u.empty()) {
-    sock.Close();
     seterror(VERR_NOIDENT, sock.GetError());
+    sock.Close();
     return false;
   }
 
