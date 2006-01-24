@@ -18,7 +18,11 @@ EXTRA_LTLIBRARIES = \
 	liboldgaa_gcc32.la \
 	liboldgaa_gcc32dbg.la \
 	liboldgaa_gcc32pthr.la \
-	liboldgaa_gcc32dbgpthr.la
+	liboldgaa_gcc32dbgpthr.la \
+	liboldgaa_gcc64.la \
+	liboldgaa_gcc64dbg.la \
+	liboldgaa_gcc64pthr.la \
+	liboldgaa_gcc64dbgpthr.la
 
 liboldgaa_gcc32_la_SOURCES = \
 	$(SOURCES)
@@ -56,7 +60,47 @@ liboldgaa_gcc32dbgpthr_la_CFLAGS = \
 liboldgaa_gcc32dbgpthr_la_LIBADD = \
 	$(GLOBUS_GCC32DBGPTHRGSS_LIBS)
 
+liboldgaa_gcc64_la_SOURCES = \
+	$(SOURCES)
+
+liboldgaa_gcc64_la_CFLAGS = \
+	$(GLOBUS_GCC64_CFLAGS)
+
+liboldgaa_gcc64_la_LIBADD = \
+	$(GLOBUS_GCC64_GSS_LIBS)
+
+liboldgaa_gcc64dbg_la_SOURCES = \
+	$(SOURCES)
+
+liboldgaa_gcc64dbg_la_CFLAGS = \
+	$(GLOBUS_GCC64DBG_CFLAGS)
+
+liboldgaa_gcc64dbg_la_LIBADD = \
+	$(GLOBUS_GCC64DBG_GSS_LIBS)
+
+liboldgaa_gcc64pthr_la_SOURCES = \
+	$(SOURCES)
+
+liboldgaa_gcc64pthr_la_CFLAGS = \
+	$(GLOBUS_GCC64PTHR_CFLAGS)
+
+liboldgaa_gcc64pthr_la_LIBADD = \
+	$(GLOBUS_GCC64PTHR_GSS_LIBS)
+
+liboldgaa_gcc64dbgpthr_la_SOURCES = \
+	$(SOURCES)
+
+liboldgaa_gcc64dbgpthr_la_CFLAGS = \
+	$(GLOBUS_GCC64DBGPTHR_CFLAGS)
+
+liboldgaa_gcc64dbgpthr_la_LIBADD = \
+	$(GLOBUS_GCC64DBGPTHRGSS_LIBS)
+
 CLEANFILES = \
+	liboldgaa_gcc64.la \
+	liboldgaa_gcc64dbg.la \
+	liboldgaa_gcc64pthr.la \
+	liboldgaa_gcc64dbgpthr.la \
 	liboldgaa_gcc32.la \
 	liboldgaa_gcc32dbg.la \
 	liboldgaa_gcc32pthr.la \

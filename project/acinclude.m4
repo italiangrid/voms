@@ -58,15 +58,15 @@ AC_DEFUN([AC_GLOBUS],
 	      GLOBUS_GCC32_CFLAGS="-I$with_globus_prefix/include/$flavor"
         GLOBUS_GCC32_GSS_LIBS="$ac_globus_ldlib -lglobus_gssapi_gsi_$flavor -lglobus_gss_assist_$flavor -lcrypto_$flavor"
       fi
-      if test "$flavor" = "gcc32dbg" ; then
+      if test "x$flavor" = "xgcc32dbg" ; then
         GLOBUS_GCC32DBG_CFLAGS="-I$with_globus_prefix/include/$flavor"
         GLOBUS_GCC32DBG_GSS_LIBS="$ac_globus_ldlib -lglobus_gssapi_gsi_$flavor -lglobus_gss_assist_$flavor -lcrypto_$flavor"
       fi
-      if test "$flavor" = "gcc32dbgpthr" ; then
+      if test "x$flavor" = "xgcc32dbgpthr" ; then
         GLOBUS_GCC32DBGPTHR_CFLAGS="-I$with_globus_prefix/include/$flavor"
         GLOBUS_GCC32DBGPTHR_GSS_LIBS="$ac_globus_ldlib -lglobus_gssapi_gsi_$flavor -lglobus_gss_assist_$flavor -lcrypto_$flavor"
       fi
-      if test "$flavor" = "gcc32pthr" ; then
+      if test "x$flavor" = "xgcc32pthr" ; then
         GLOBUS_GCC32PTHR_CFLAGS="-I$with_globus_prefix/include/$flavor"
         GLOBUS_GCC32PTHR_GSS_LIBS="$ac_globus_ldlib -lglobus_gssapi_gsi_$flavor -lglobus_gss_assist_$flavor -lcrypto_$flavor"
       fi
@@ -75,15 +75,15 @@ AC_DEFUN([AC_GLOBUS],
 	      GLOBUS_GCC64_CFLAGS="-I$with_globus_prefix/include/$flavor"
         GLOBUS_GCC64_GSS_LIBS="$ac_globus_ldlib -lglobus_gssapi_gsi_$flavor -lglobus_gss_assist_$flavor -lcrypto_$flavor"
       fi
-      if test "$flavor" = "gcc64dbg" ; then
+      if test "x$flavor" = "xgcc64dbg" ; then
         GLOBUS_GCC64DBG_CFLAGS="-I$with_globus_prefix/include/$flavor"
         GLOBUS_GCC64DBG_GSS_LIBS="$ac_globus_ldlib -lglobus_gssapi_gsi_$flavor -lglobus_gss_assist_$flavor -lcrypto_$flavor"
       fi
-      if test "$flavor" = "gcc64dbgpthr" ; then
+      if test "x$flavor" = "xgcc64dbgpthr" ; then
         GLOBUS_GCC64DBGPTHR_CFLAGS="-I$with_globus_prefix/include/$flavor"
         GLOBUS_GCC64DBGPTHR_GSS_LIBS="$ac_globus_ldlib -lglobus_gssapi_gsi_$flavor -lglobus_gss_assist_$flavor -lcrypto_$flavor"
       fi
-      if test "$flavor" = "gcc64pthr" ; then
+      if test "x$flavor" = "xgcc64pthr" ; then
         GLOBUS_GCC64PTHR_CFLAGS="-I$with_globus_prefix/include/$flavor"
         GLOBUS_GCC64PTHR_GSS_LIBS="$ac_globus_ldlib -lglobus_gssapi_gsi_$flavor -lglobus_gss_assist_$flavor -lcrypto_$flavor"
       fi

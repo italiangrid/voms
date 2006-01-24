@@ -106,6 +106,51 @@ am__objects_5 = liboldgaa_gcc32pthr_la-oldgaa_alloc.lo \
 	liboldgaa_gcc32pthr_la-rfc1779.lo
 am_liboldgaa_gcc32pthr_la_OBJECTS = $(am__objects_5)
 liboldgaa_gcc32pthr_la_OBJECTS = $(am_liboldgaa_gcc32pthr_la_OBJECTS)
+liboldgaa_gcc64_la_DEPENDENCIES = $(am__DEPENDENCIES_1)
+am__objects_6 = liboldgaa_gcc64_la-oldgaa_alloc.lo \
+	liboldgaa_gcc64_la-oldgaa_api.lo \
+	liboldgaa_gcc64_la-oldgaa_gl_internal_err.lo \
+	liboldgaa_gcc64_la-oldgaa_policy_evaluator.lo \
+	liboldgaa_gcc64_la-oldgaa_release.lo \
+	liboldgaa_gcc64_la-oldgaa_utils.lo \
+	liboldgaa_gcc64_la-globus_oldgaa_utils.lo \
+	liboldgaa_gcc64_la-rfc1779.lo
+am_liboldgaa_gcc64_la_OBJECTS = $(am__objects_6)
+liboldgaa_gcc64_la_OBJECTS = $(am_liboldgaa_gcc64_la_OBJECTS)
+liboldgaa_gcc64dbg_la_DEPENDENCIES = $(am__DEPENDENCIES_1)
+am__objects_7 = liboldgaa_gcc64dbg_la-oldgaa_alloc.lo \
+	liboldgaa_gcc64dbg_la-oldgaa_api.lo \
+	liboldgaa_gcc64dbg_la-oldgaa_gl_internal_err.lo \
+	liboldgaa_gcc64dbg_la-oldgaa_policy_evaluator.lo \
+	liboldgaa_gcc64dbg_la-oldgaa_release.lo \
+	liboldgaa_gcc64dbg_la-oldgaa_utils.lo \
+	liboldgaa_gcc64dbg_la-globus_oldgaa_utils.lo \
+	liboldgaa_gcc64dbg_la-rfc1779.lo
+am_liboldgaa_gcc64dbg_la_OBJECTS = $(am__objects_7)
+liboldgaa_gcc64dbg_la_OBJECTS = $(am_liboldgaa_gcc64dbg_la_OBJECTS)
+liboldgaa_gcc64dbgpthr_la_DEPENDENCIES =
+am__objects_8 = liboldgaa_gcc64dbgpthr_la-oldgaa_alloc.lo \
+	liboldgaa_gcc64dbgpthr_la-oldgaa_api.lo \
+	liboldgaa_gcc64dbgpthr_la-oldgaa_gl_internal_err.lo \
+	liboldgaa_gcc64dbgpthr_la-oldgaa_policy_evaluator.lo \
+	liboldgaa_gcc64dbgpthr_la-oldgaa_release.lo \
+	liboldgaa_gcc64dbgpthr_la-oldgaa_utils.lo \
+	liboldgaa_gcc64dbgpthr_la-globus_oldgaa_utils.lo \
+	liboldgaa_gcc64dbgpthr_la-rfc1779.lo
+am_liboldgaa_gcc64dbgpthr_la_OBJECTS = $(am__objects_8)
+liboldgaa_gcc64dbgpthr_la_OBJECTS =  \
+	$(am_liboldgaa_gcc64dbgpthr_la_OBJECTS)
+liboldgaa_gcc64pthr_la_DEPENDENCIES = $(am__DEPENDENCIES_1)
+am__objects_9 = liboldgaa_gcc64pthr_la-oldgaa_alloc.lo \
+	liboldgaa_gcc64pthr_la-oldgaa_api.lo \
+	liboldgaa_gcc64pthr_la-oldgaa_gl_internal_err.lo \
+	liboldgaa_gcc64pthr_la-oldgaa_policy_evaluator.lo \
+	liboldgaa_gcc64pthr_la-oldgaa_release.lo \
+	liboldgaa_gcc64pthr_la-oldgaa_utils.lo \
+	liboldgaa_gcc64pthr_la-globus_oldgaa_utils.lo \
+	liboldgaa_gcc64pthr_la-rfc1779.lo
+am_liboldgaa_gcc64pthr_la_OBJECTS = $(am__objects_9)
+liboldgaa_gcc64pthr_la_OBJECTS = $(am_liboldgaa_gcc64pthr_la_OBJECTS)
 DEFAULT_INCLUDES = -I. -I$(srcdir) -I$(top_builddir)/src/autogen
 depcomp = $(SHELL) $(top_srcdir)/./project/depcomp
 am__depfiles_maybe = depfiles
@@ -120,7 +165,10 @@ LINK = $(LIBTOOL) --tag=CC --mode=link $(CCLD) $(AM_CFLAGS) $(CFLAGS) \
 DIST_SOURCES = $(liboldgaa_la_SOURCES) $(liboldgaa_gcc32_la_SOURCES) \
 	$(liboldgaa_gcc32dbg_la_SOURCES) \
 	$(liboldgaa_gcc32dbgpthr_la_SOURCES) \
-	$(liboldgaa_gcc32pthr_la_SOURCES)
+	$(liboldgaa_gcc32pthr_la_SOURCES) \
+	$(liboldgaa_gcc64_la_SOURCES) $(liboldgaa_gcc64dbg_la_SOURCES) \
+	$(liboldgaa_gcc64dbgpthr_la_SOURCES) \
+	$(liboldgaa_gcc64pthr_la_SOURCES)
 ETAGS = etags
 CTAGS = ctags
 DISTFILES = $(DIST_COMMON) $(DIST_SOURCES) $(TEXINFOS) $(EXTRA_DIST)
@@ -282,7 +330,11 @@ EXTRA_LTLIBRARIES = \
 	liboldgaa_gcc32.la \
 	liboldgaa_gcc32dbg.la \
 	liboldgaa_gcc32pthr.la \
-	liboldgaa_gcc32dbgpthr.la
+	liboldgaa_gcc32dbgpthr.la \
+	liboldgaa_gcc64.la \
+	liboldgaa_gcc64dbg.la \
+	liboldgaa_gcc64pthr.la \
+	liboldgaa_gcc64dbgpthr.la
 
 liboldgaa_gcc32_la_SOURCES = \
 	$(SOURCES)
@@ -320,7 +372,47 @@ liboldgaa_gcc32dbgpthr_la_CFLAGS = \
 liboldgaa_gcc32dbgpthr_la_LIBADD = \
 	$(GLOBUS_GCC32DBGPTHRGSS_LIBS)
 
+liboldgaa_gcc64_la_SOURCES = \
+	$(SOURCES)
+
+liboldgaa_gcc64_la_CFLAGS = \
+	$(GLOBUS_GCC64_CFLAGS)
+
+liboldgaa_gcc64_la_LIBADD = \
+	$(GLOBUS_GCC64_GSS_LIBS)
+
+liboldgaa_gcc64dbg_la_SOURCES = \
+	$(SOURCES)
+
+liboldgaa_gcc64dbg_la_CFLAGS = \
+	$(GLOBUS_GCC64DBG_CFLAGS)
+
+liboldgaa_gcc64dbg_la_LIBADD = \
+	$(GLOBUS_GCC64DBG_GSS_LIBS)
+
+liboldgaa_gcc64pthr_la_SOURCES = \
+	$(SOURCES)
+
+liboldgaa_gcc64pthr_la_CFLAGS = \
+	$(GLOBUS_GCC64PTHR_CFLAGS)
+
+liboldgaa_gcc64pthr_la_LIBADD = \
+	$(GLOBUS_GCC64PTHR_GSS_LIBS)
+
+liboldgaa_gcc64dbgpthr_la_SOURCES = \
+	$(SOURCES)
+
+liboldgaa_gcc64dbgpthr_la_CFLAGS = \
+	$(GLOBUS_GCC64DBGPTHR_CFLAGS)
+
+liboldgaa_gcc64dbgpthr_la_LIBADD = \
+	$(GLOBUS_GCC64DBGPTHRGSS_LIBS)
+
 CLEANFILES = \
+	liboldgaa_gcc64.la \
+	liboldgaa_gcc64dbg.la \
+	liboldgaa_gcc64pthr.la \
+	liboldgaa_gcc64dbgpthr.la \
 	liboldgaa_gcc32.la \
 	liboldgaa_gcc32dbg.la \
 	liboldgaa_gcc32pthr.la \
@@ -378,6 +470,14 @@ liboldgaa_gcc32dbgpthr.la: $(liboldgaa_gcc32dbgpthr_la_OBJECTS) $(liboldgaa_gcc3
 	$(LINK)  $(liboldgaa_gcc32dbgpthr_la_LDFLAGS) $(liboldgaa_gcc32dbgpthr_la_OBJECTS) $(liboldgaa_gcc32dbgpthr_la_LIBADD) $(LIBS)
 liboldgaa_gcc32pthr.la: $(liboldgaa_gcc32pthr_la_OBJECTS) $(liboldgaa_gcc32pthr_la_DEPENDENCIES) 
 	$(LINK)  $(liboldgaa_gcc32pthr_la_LDFLAGS) $(liboldgaa_gcc32pthr_la_OBJECTS) $(liboldgaa_gcc32pthr_la_LIBADD) $(LIBS)
+liboldgaa_gcc64.la: $(liboldgaa_gcc64_la_OBJECTS) $(liboldgaa_gcc64_la_DEPENDENCIES) 
+	$(LINK)  $(liboldgaa_gcc64_la_LDFLAGS) $(liboldgaa_gcc64_la_OBJECTS) $(liboldgaa_gcc64_la_LIBADD) $(LIBS)
+liboldgaa_gcc64dbg.la: $(liboldgaa_gcc64dbg_la_OBJECTS) $(liboldgaa_gcc64dbg_la_DEPENDENCIES) 
+	$(LINK)  $(liboldgaa_gcc64dbg_la_LDFLAGS) $(liboldgaa_gcc64dbg_la_OBJECTS) $(liboldgaa_gcc64dbg_la_LIBADD) $(LIBS)
+liboldgaa_gcc64dbgpthr.la: $(liboldgaa_gcc64dbgpthr_la_OBJECTS) $(liboldgaa_gcc64dbgpthr_la_DEPENDENCIES) 
+	$(LINK)  $(liboldgaa_gcc64dbgpthr_la_LDFLAGS) $(liboldgaa_gcc64dbgpthr_la_OBJECTS) $(liboldgaa_gcc64dbgpthr_la_LIBADD) $(LIBS)
+liboldgaa_gcc64pthr.la: $(liboldgaa_gcc64pthr_la_OBJECTS) $(liboldgaa_gcc64pthr_la_DEPENDENCIES) 
+	$(LINK)  $(liboldgaa_gcc64pthr_la_LDFLAGS) $(liboldgaa_gcc64pthr_la_OBJECTS) $(liboldgaa_gcc64pthr_la_LIBADD) $(LIBS)
 
 mostlyclean-compile:
 	-rm -f *.$(OBJEXT)
@@ -417,6 +517,38 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/liboldgaa_gcc32pthr_la-oldgaa_release.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/liboldgaa_gcc32pthr_la-oldgaa_utils.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/liboldgaa_gcc32pthr_la-rfc1779.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/liboldgaa_gcc64_la-globus_oldgaa_utils.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/liboldgaa_gcc64_la-oldgaa_alloc.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/liboldgaa_gcc64_la-oldgaa_api.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/liboldgaa_gcc64_la-oldgaa_gl_internal_err.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/liboldgaa_gcc64_la-oldgaa_policy_evaluator.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/liboldgaa_gcc64_la-oldgaa_release.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/liboldgaa_gcc64_la-oldgaa_utils.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/liboldgaa_gcc64_la-rfc1779.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/liboldgaa_gcc64dbg_la-globus_oldgaa_utils.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/liboldgaa_gcc64dbg_la-oldgaa_alloc.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/liboldgaa_gcc64dbg_la-oldgaa_api.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/liboldgaa_gcc64dbg_la-oldgaa_gl_internal_err.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/liboldgaa_gcc64dbg_la-oldgaa_policy_evaluator.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/liboldgaa_gcc64dbg_la-oldgaa_release.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/liboldgaa_gcc64dbg_la-oldgaa_utils.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/liboldgaa_gcc64dbg_la-rfc1779.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/liboldgaa_gcc64dbgpthr_la-globus_oldgaa_utils.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/liboldgaa_gcc64dbgpthr_la-oldgaa_alloc.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/liboldgaa_gcc64dbgpthr_la-oldgaa_api.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/liboldgaa_gcc64dbgpthr_la-oldgaa_gl_internal_err.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/liboldgaa_gcc64dbgpthr_la-oldgaa_policy_evaluator.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/liboldgaa_gcc64dbgpthr_la-oldgaa_release.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/liboldgaa_gcc64dbgpthr_la-oldgaa_utils.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/liboldgaa_gcc64dbgpthr_la-rfc1779.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/liboldgaa_gcc64pthr_la-globus_oldgaa_utils.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/liboldgaa_gcc64pthr_la-oldgaa_alloc.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/liboldgaa_gcc64pthr_la-oldgaa_api.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/liboldgaa_gcc64pthr_la-oldgaa_gl_internal_err.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/liboldgaa_gcc64pthr_la-oldgaa_policy_evaluator.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/liboldgaa_gcc64pthr_la-oldgaa_release.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/liboldgaa_gcc64pthr_la-oldgaa_utils.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/liboldgaa_gcc64pthr_la-rfc1779.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/liboldgaa_la-globus_oldgaa_utils.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/liboldgaa_la-oldgaa_alloc.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/liboldgaa_la-oldgaa_api.Plo@am__quote@
@@ -726,6 +858,230 @@ liboldgaa_gcc32pthr_la-rfc1779.lo: rfc1779.c
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	source='rfc1779.c' object='liboldgaa_gcc32pthr_la-rfc1779.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(LIBTOOL) --tag=CC --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(liboldgaa_gcc32pthr_la_CFLAGS) $(CFLAGS) -c -o liboldgaa_gcc32pthr_la-rfc1779.lo `test -f 'rfc1779.c' || echo '$(srcdir)/'`rfc1779.c
+
+liboldgaa_gcc64_la-oldgaa_alloc.lo: oldgaa_alloc.c
+@am__fastdepCC_TRUE@	if $(LIBTOOL) --tag=CC --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(liboldgaa_gcc64_la_CFLAGS) $(CFLAGS) -MT liboldgaa_gcc64_la-oldgaa_alloc.lo -MD -MP -MF "$(DEPDIR)/liboldgaa_gcc64_la-oldgaa_alloc.Tpo" -c -o liboldgaa_gcc64_la-oldgaa_alloc.lo `test -f 'oldgaa_alloc.c' || echo '$(srcdir)/'`oldgaa_alloc.c; \
+@am__fastdepCC_TRUE@	then mv -f "$(DEPDIR)/liboldgaa_gcc64_la-oldgaa_alloc.Tpo" "$(DEPDIR)/liboldgaa_gcc64_la-oldgaa_alloc.Plo"; else rm -f "$(DEPDIR)/liboldgaa_gcc64_la-oldgaa_alloc.Tpo"; exit 1; fi
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='oldgaa_alloc.c' object='liboldgaa_gcc64_la-oldgaa_alloc.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(LIBTOOL) --tag=CC --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(liboldgaa_gcc64_la_CFLAGS) $(CFLAGS) -c -o liboldgaa_gcc64_la-oldgaa_alloc.lo `test -f 'oldgaa_alloc.c' || echo '$(srcdir)/'`oldgaa_alloc.c
+
+liboldgaa_gcc64_la-oldgaa_api.lo: oldgaa_api.c
+@am__fastdepCC_TRUE@	if $(LIBTOOL) --tag=CC --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(liboldgaa_gcc64_la_CFLAGS) $(CFLAGS) -MT liboldgaa_gcc64_la-oldgaa_api.lo -MD -MP -MF "$(DEPDIR)/liboldgaa_gcc64_la-oldgaa_api.Tpo" -c -o liboldgaa_gcc64_la-oldgaa_api.lo `test -f 'oldgaa_api.c' || echo '$(srcdir)/'`oldgaa_api.c; \
+@am__fastdepCC_TRUE@	then mv -f "$(DEPDIR)/liboldgaa_gcc64_la-oldgaa_api.Tpo" "$(DEPDIR)/liboldgaa_gcc64_la-oldgaa_api.Plo"; else rm -f "$(DEPDIR)/liboldgaa_gcc64_la-oldgaa_api.Tpo"; exit 1; fi
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='oldgaa_api.c' object='liboldgaa_gcc64_la-oldgaa_api.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(LIBTOOL) --tag=CC --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(liboldgaa_gcc64_la_CFLAGS) $(CFLAGS) -c -o liboldgaa_gcc64_la-oldgaa_api.lo `test -f 'oldgaa_api.c' || echo '$(srcdir)/'`oldgaa_api.c
+
+liboldgaa_gcc64_la-oldgaa_gl_internal_err.lo: oldgaa_gl_internal_err.c
+@am__fastdepCC_TRUE@	if $(LIBTOOL) --tag=CC --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(liboldgaa_gcc64_la_CFLAGS) $(CFLAGS) -MT liboldgaa_gcc64_la-oldgaa_gl_internal_err.lo -MD -MP -MF "$(DEPDIR)/liboldgaa_gcc64_la-oldgaa_gl_internal_err.Tpo" -c -o liboldgaa_gcc64_la-oldgaa_gl_internal_err.lo `test -f 'oldgaa_gl_internal_err.c' || echo '$(srcdir)/'`oldgaa_gl_internal_err.c; \
+@am__fastdepCC_TRUE@	then mv -f "$(DEPDIR)/liboldgaa_gcc64_la-oldgaa_gl_internal_err.Tpo" "$(DEPDIR)/liboldgaa_gcc64_la-oldgaa_gl_internal_err.Plo"; else rm -f "$(DEPDIR)/liboldgaa_gcc64_la-oldgaa_gl_internal_err.Tpo"; exit 1; fi
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='oldgaa_gl_internal_err.c' object='liboldgaa_gcc64_la-oldgaa_gl_internal_err.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(LIBTOOL) --tag=CC --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(liboldgaa_gcc64_la_CFLAGS) $(CFLAGS) -c -o liboldgaa_gcc64_la-oldgaa_gl_internal_err.lo `test -f 'oldgaa_gl_internal_err.c' || echo '$(srcdir)/'`oldgaa_gl_internal_err.c
+
+liboldgaa_gcc64_la-oldgaa_policy_evaluator.lo: oldgaa_policy_evaluator.c
+@am__fastdepCC_TRUE@	if $(LIBTOOL) --tag=CC --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(liboldgaa_gcc64_la_CFLAGS) $(CFLAGS) -MT liboldgaa_gcc64_la-oldgaa_policy_evaluator.lo -MD -MP -MF "$(DEPDIR)/liboldgaa_gcc64_la-oldgaa_policy_evaluator.Tpo" -c -o liboldgaa_gcc64_la-oldgaa_policy_evaluator.lo `test -f 'oldgaa_policy_evaluator.c' || echo '$(srcdir)/'`oldgaa_policy_evaluator.c; \
+@am__fastdepCC_TRUE@	then mv -f "$(DEPDIR)/liboldgaa_gcc64_la-oldgaa_policy_evaluator.Tpo" "$(DEPDIR)/liboldgaa_gcc64_la-oldgaa_policy_evaluator.Plo"; else rm -f "$(DEPDIR)/liboldgaa_gcc64_la-oldgaa_policy_evaluator.Tpo"; exit 1; fi
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='oldgaa_policy_evaluator.c' object='liboldgaa_gcc64_la-oldgaa_policy_evaluator.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(LIBTOOL) --tag=CC --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(liboldgaa_gcc64_la_CFLAGS) $(CFLAGS) -c -o liboldgaa_gcc64_la-oldgaa_policy_evaluator.lo `test -f 'oldgaa_policy_evaluator.c' || echo '$(srcdir)/'`oldgaa_policy_evaluator.c
+
+liboldgaa_gcc64_la-oldgaa_release.lo: oldgaa_release.c
+@am__fastdepCC_TRUE@	if $(LIBTOOL) --tag=CC --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(liboldgaa_gcc64_la_CFLAGS) $(CFLAGS) -MT liboldgaa_gcc64_la-oldgaa_release.lo -MD -MP -MF "$(DEPDIR)/liboldgaa_gcc64_la-oldgaa_release.Tpo" -c -o liboldgaa_gcc64_la-oldgaa_release.lo `test -f 'oldgaa_release.c' || echo '$(srcdir)/'`oldgaa_release.c; \
+@am__fastdepCC_TRUE@	then mv -f "$(DEPDIR)/liboldgaa_gcc64_la-oldgaa_release.Tpo" "$(DEPDIR)/liboldgaa_gcc64_la-oldgaa_release.Plo"; else rm -f "$(DEPDIR)/liboldgaa_gcc64_la-oldgaa_release.Tpo"; exit 1; fi
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='oldgaa_release.c' object='liboldgaa_gcc64_la-oldgaa_release.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(LIBTOOL) --tag=CC --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(liboldgaa_gcc64_la_CFLAGS) $(CFLAGS) -c -o liboldgaa_gcc64_la-oldgaa_release.lo `test -f 'oldgaa_release.c' || echo '$(srcdir)/'`oldgaa_release.c
+
+liboldgaa_gcc64_la-oldgaa_utils.lo: oldgaa_utils.c
+@am__fastdepCC_TRUE@	if $(LIBTOOL) --tag=CC --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(liboldgaa_gcc64_la_CFLAGS) $(CFLAGS) -MT liboldgaa_gcc64_la-oldgaa_utils.lo -MD -MP -MF "$(DEPDIR)/liboldgaa_gcc64_la-oldgaa_utils.Tpo" -c -o liboldgaa_gcc64_la-oldgaa_utils.lo `test -f 'oldgaa_utils.c' || echo '$(srcdir)/'`oldgaa_utils.c; \
+@am__fastdepCC_TRUE@	then mv -f "$(DEPDIR)/liboldgaa_gcc64_la-oldgaa_utils.Tpo" "$(DEPDIR)/liboldgaa_gcc64_la-oldgaa_utils.Plo"; else rm -f "$(DEPDIR)/liboldgaa_gcc64_la-oldgaa_utils.Tpo"; exit 1; fi
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='oldgaa_utils.c' object='liboldgaa_gcc64_la-oldgaa_utils.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(LIBTOOL) --tag=CC --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(liboldgaa_gcc64_la_CFLAGS) $(CFLAGS) -c -o liboldgaa_gcc64_la-oldgaa_utils.lo `test -f 'oldgaa_utils.c' || echo '$(srcdir)/'`oldgaa_utils.c
+
+liboldgaa_gcc64_la-globus_oldgaa_utils.lo: globus_oldgaa_utils.c
+@am__fastdepCC_TRUE@	if $(LIBTOOL) --tag=CC --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(liboldgaa_gcc64_la_CFLAGS) $(CFLAGS) -MT liboldgaa_gcc64_la-globus_oldgaa_utils.lo -MD -MP -MF "$(DEPDIR)/liboldgaa_gcc64_la-globus_oldgaa_utils.Tpo" -c -o liboldgaa_gcc64_la-globus_oldgaa_utils.lo `test -f 'globus_oldgaa_utils.c' || echo '$(srcdir)/'`globus_oldgaa_utils.c; \
+@am__fastdepCC_TRUE@	then mv -f "$(DEPDIR)/liboldgaa_gcc64_la-globus_oldgaa_utils.Tpo" "$(DEPDIR)/liboldgaa_gcc64_la-globus_oldgaa_utils.Plo"; else rm -f "$(DEPDIR)/liboldgaa_gcc64_la-globus_oldgaa_utils.Tpo"; exit 1; fi
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='globus_oldgaa_utils.c' object='liboldgaa_gcc64_la-globus_oldgaa_utils.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(LIBTOOL) --tag=CC --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(liboldgaa_gcc64_la_CFLAGS) $(CFLAGS) -c -o liboldgaa_gcc64_la-globus_oldgaa_utils.lo `test -f 'globus_oldgaa_utils.c' || echo '$(srcdir)/'`globus_oldgaa_utils.c
+
+liboldgaa_gcc64_la-rfc1779.lo: rfc1779.c
+@am__fastdepCC_TRUE@	if $(LIBTOOL) --tag=CC --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(liboldgaa_gcc64_la_CFLAGS) $(CFLAGS) -MT liboldgaa_gcc64_la-rfc1779.lo -MD -MP -MF "$(DEPDIR)/liboldgaa_gcc64_la-rfc1779.Tpo" -c -o liboldgaa_gcc64_la-rfc1779.lo `test -f 'rfc1779.c' || echo '$(srcdir)/'`rfc1779.c; \
+@am__fastdepCC_TRUE@	then mv -f "$(DEPDIR)/liboldgaa_gcc64_la-rfc1779.Tpo" "$(DEPDIR)/liboldgaa_gcc64_la-rfc1779.Plo"; else rm -f "$(DEPDIR)/liboldgaa_gcc64_la-rfc1779.Tpo"; exit 1; fi
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='rfc1779.c' object='liboldgaa_gcc64_la-rfc1779.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(LIBTOOL) --tag=CC --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(liboldgaa_gcc64_la_CFLAGS) $(CFLAGS) -c -o liboldgaa_gcc64_la-rfc1779.lo `test -f 'rfc1779.c' || echo '$(srcdir)/'`rfc1779.c
+
+liboldgaa_gcc64dbg_la-oldgaa_alloc.lo: oldgaa_alloc.c
+@am__fastdepCC_TRUE@	if $(LIBTOOL) --tag=CC --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(liboldgaa_gcc64dbg_la_CFLAGS) $(CFLAGS) -MT liboldgaa_gcc64dbg_la-oldgaa_alloc.lo -MD -MP -MF "$(DEPDIR)/liboldgaa_gcc64dbg_la-oldgaa_alloc.Tpo" -c -o liboldgaa_gcc64dbg_la-oldgaa_alloc.lo `test -f 'oldgaa_alloc.c' || echo '$(srcdir)/'`oldgaa_alloc.c; \
+@am__fastdepCC_TRUE@	then mv -f "$(DEPDIR)/liboldgaa_gcc64dbg_la-oldgaa_alloc.Tpo" "$(DEPDIR)/liboldgaa_gcc64dbg_la-oldgaa_alloc.Plo"; else rm -f "$(DEPDIR)/liboldgaa_gcc64dbg_la-oldgaa_alloc.Tpo"; exit 1; fi
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='oldgaa_alloc.c' object='liboldgaa_gcc64dbg_la-oldgaa_alloc.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(LIBTOOL) --tag=CC --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(liboldgaa_gcc64dbg_la_CFLAGS) $(CFLAGS) -c -o liboldgaa_gcc64dbg_la-oldgaa_alloc.lo `test -f 'oldgaa_alloc.c' || echo '$(srcdir)/'`oldgaa_alloc.c
+
+liboldgaa_gcc64dbg_la-oldgaa_api.lo: oldgaa_api.c
+@am__fastdepCC_TRUE@	if $(LIBTOOL) --tag=CC --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(liboldgaa_gcc64dbg_la_CFLAGS) $(CFLAGS) -MT liboldgaa_gcc64dbg_la-oldgaa_api.lo -MD -MP -MF "$(DEPDIR)/liboldgaa_gcc64dbg_la-oldgaa_api.Tpo" -c -o liboldgaa_gcc64dbg_la-oldgaa_api.lo `test -f 'oldgaa_api.c' || echo '$(srcdir)/'`oldgaa_api.c; \
+@am__fastdepCC_TRUE@	then mv -f "$(DEPDIR)/liboldgaa_gcc64dbg_la-oldgaa_api.Tpo" "$(DEPDIR)/liboldgaa_gcc64dbg_la-oldgaa_api.Plo"; else rm -f "$(DEPDIR)/liboldgaa_gcc64dbg_la-oldgaa_api.Tpo"; exit 1; fi
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='oldgaa_api.c' object='liboldgaa_gcc64dbg_la-oldgaa_api.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(LIBTOOL) --tag=CC --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(liboldgaa_gcc64dbg_la_CFLAGS) $(CFLAGS) -c -o liboldgaa_gcc64dbg_la-oldgaa_api.lo `test -f 'oldgaa_api.c' || echo '$(srcdir)/'`oldgaa_api.c
+
+liboldgaa_gcc64dbg_la-oldgaa_gl_internal_err.lo: oldgaa_gl_internal_err.c
+@am__fastdepCC_TRUE@	if $(LIBTOOL) --tag=CC --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(liboldgaa_gcc64dbg_la_CFLAGS) $(CFLAGS) -MT liboldgaa_gcc64dbg_la-oldgaa_gl_internal_err.lo -MD -MP -MF "$(DEPDIR)/liboldgaa_gcc64dbg_la-oldgaa_gl_internal_err.Tpo" -c -o liboldgaa_gcc64dbg_la-oldgaa_gl_internal_err.lo `test -f 'oldgaa_gl_internal_err.c' || echo '$(srcdir)/'`oldgaa_gl_internal_err.c; \
+@am__fastdepCC_TRUE@	then mv -f "$(DEPDIR)/liboldgaa_gcc64dbg_la-oldgaa_gl_internal_err.Tpo" "$(DEPDIR)/liboldgaa_gcc64dbg_la-oldgaa_gl_internal_err.Plo"; else rm -f "$(DEPDIR)/liboldgaa_gcc64dbg_la-oldgaa_gl_internal_err.Tpo"; exit 1; fi
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='oldgaa_gl_internal_err.c' object='liboldgaa_gcc64dbg_la-oldgaa_gl_internal_err.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(LIBTOOL) --tag=CC --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(liboldgaa_gcc64dbg_la_CFLAGS) $(CFLAGS) -c -o liboldgaa_gcc64dbg_la-oldgaa_gl_internal_err.lo `test -f 'oldgaa_gl_internal_err.c' || echo '$(srcdir)/'`oldgaa_gl_internal_err.c
+
+liboldgaa_gcc64dbg_la-oldgaa_policy_evaluator.lo: oldgaa_policy_evaluator.c
+@am__fastdepCC_TRUE@	if $(LIBTOOL) --tag=CC --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(liboldgaa_gcc64dbg_la_CFLAGS) $(CFLAGS) -MT liboldgaa_gcc64dbg_la-oldgaa_policy_evaluator.lo -MD -MP -MF "$(DEPDIR)/liboldgaa_gcc64dbg_la-oldgaa_policy_evaluator.Tpo" -c -o liboldgaa_gcc64dbg_la-oldgaa_policy_evaluator.lo `test -f 'oldgaa_policy_evaluator.c' || echo '$(srcdir)/'`oldgaa_policy_evaluator.c; \
+@am__fastdepCC_TRUE@	then mv -f "$(DEPDIR)/liboldgaa_gcc64dbg_la-oldgaa_policy_evaluator.Tpo" "$(DEPDIR)/liboldgaa_gcc64dbg_la-oldgaa_policy_evaluator.Plo"; else rm -f "$(DEPDIR)/liboldgaa_gcc64dbg_la-oldgaa_policy_evaluator.Tpo"; exit 1; fi
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='oldgaa_policy_evaluator.c' object='liboldgaa_gcc64dbg_la-oldgaa_policy_evaluator.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(LIBTOOL) --tag=CC --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(liboldgaa_gcc64dbg_la_CFLAGS) $(CFLAGS) -c -o liboldgaa_gcc64dbg_la-oldgaa_policy_evaluator.lo `test -f 'oldgaa_policy_evaluator.c' || echo '$(srcdir)/'`oldgaa_policy_evaluator.c
+
+liboldgaa_gcc64dbg_la-oldgaa_release.lo: oldgaa_release.c
+@am__fastdepCC_TRUE@	if $(LIBTOOL) --tag=CC --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(liboldgaa_gcc64dbg_la_CFLAGS) $(CFLAGS) -MT liboldgaa_gcc64dbg_la-oldgaa_release.lo -MD -MP -MF "$(DEPDIR)/liboldgaa_gcc64dbg_la-oldgaa_release.Tpo" -c -o liboldgaa_gcc64dbg_la-oldgaa_release.lo `test -f 'oldgaa_release.c' || echo '$(srcdir)/'`oldgaa_release.c; \
+@am__fastdepCC_TRUE@	then mv -f "$(DEPDIR)/liboldgaa_gcc64dbg_la-oldgaa_release.Tpo" "$(DEPDIR)/liboldgaa_gcc64dbg_la-oldgaa_release.Plo"; else rm -f "$(DEPDIR)/liboldgaa_gcc64dbg_la-oldgaa_release.Tpo"; exit 1; fi
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='oldgaa_release.c' object='liboldgaa_gcc64dbg_la-oldgaa_release.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(LIBTOOL) --tag=CC --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(liboldgaa_gcc64dbg_la_CFLAGS) $(CFLAGS) -c -o liboldgaa_gcc64dbg_la-oldgaa_release.lo `test -f 'oldgaa_release.c' || echo '$(srcdir)/'`oldgaa_release.c
+
+liboldgaa_gcc64dbg_la-oldgaa_utils.lo: oldgaa_utils.c
+@am__fastdepCC_TRUE@	if $(LIBTOOL) --tag=CC --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(liboldgaa_gcc64dbg_la_CFLAGS) $(CFLAGS) -MT liboldgaa_gcc64dbg_la-oldgaa_utils.lo -MD -MP -MF "$(DEPDIR)/liboldgaa_gcc64dbg_la-oldgaa_utils.Tpo" -c -o liboldgaa_gcc64dbg_la-oldgaa_utils.lo `test -f 'oldgaa_utils.c' || echo '$(srcdir)/'`oldgaa_utils.c; \
+@am__fastdepCC_TRUE@	then mv -f "$(DEPDIR)/liboldgaa_gcc64dbg_la-oldgaa_utils.Tpo" "$(DEPDIR)/liboldgaa_gcc64dbg_la-oldgaa_utils.Plo"; else rm -f "$(DEPDIR)/liboldgaa_gcc64dbg_la-oldgaa_utils.Tpo"; exit 1; fi
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='oldgaa_utils.c' object='liboldgaa_gcc64dbg_la-oldgaa_utils.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(LIBTOOL) --tag=CC --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(liboldgaa_gcc64dbg_la_CFLAGS) $(CFLAGS) -c -o liboldgaa_gcc64dbg_la-oldgaa_utils.lo `test -f 'oldgaa_utils.c' || echo '$(srcdir)/'`oldgaa_utils.c
+
+liboldgaa_gcc64dbg_la-globus_oldgaa_utils.lo: globus_oldgaa_utils.c
+@am__fastdepCC_TRUE@	if $(LIBTOOL) --tag=CC --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(liboldgaa_gcc64dbg_la_CFLAGS) $(CFLAGS) -MT liboldgaa_gcc64dbg_la-globus_oldgaa_utils.lo -MD -MP -MF "$(DEPDIR)/liboldgaa_gcc64dbg_la-globus_oldgaa_utils.Tpo" -c -o liboldgaa_gcc64dbg_la-globus_oldgaa_utils.lo `test -f 'globus_oldgaa_utils.c' || echo '$(srcdir)/'`globus_oldgaa_utils.c; \
+@am__fastdepCC_TRUE@	then mv -f "$(DEPDIR)/liboldgaa_gcc64dbg_la-globus_oldgaa_utils.Tpo" "$(DEPDIR)/liboldgaa_gcc64dbg_la-globus_oldgaa_utils.Plo"; else rm -f "$(DEPDIR)/liboldgaa_gcc64dbg_la-globus_oldgaa_utils.Tpo"; exit 1; fi
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='globus_oldgaa_utils.c' object='liboldgaa_gcc64dbg_la-globus_oldgaa_utils.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(LIBTOOL) --tag=CC --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(liboldgaa_gcc64dbg_la_CFLAGS) $(CFLAGS) -c -o liboldgaa_gcc64dbg_la-globus_oldgaa_utils.lo `test -f 'globus_oldgaa_utils.c' || echo '$(srcdir)/'`globus_oldgaa_utils.c
+
+liboldgaa_gcc64dbg_la-rfc1779.lo: rfc1779.c
+@am__fastdepCC_TRUE@	if $(LIBTOOL) --tag=CC --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(liboldgaa_gcc64dbg_la_CFLAGS) $(CFLAGS) -MT liboldgaa_gcc64dbg_la-rfc1779.lo -MD -MP -MF "$(DEPDIR)/liboldgaa_gcc64dbg_la-rfc1779.Tpo" -c -o liboldgaa_gcc64dbg_la-rfc1779.lo `test -f 'rfc1779.c' || echo '$(srcdir)/'`rfc1779.c; \
+@am__fastdepCC_TRUE@	then mv -f "$(DEPDIR)/liboldgaa_gcc64dbg_la-rfc1779.Tpo" "$(DEPDIR)/liboldgaa_gcc64dbg_la-rfc1779.Plo"; else rm -f "$(DEPDIR)/liboldgaa_gcc64dbg_la-rfc1779.Tpo"; exit 1; fi
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='rfc1779.c' object='liboldgaa_gcc64dbg_la-rfc1779.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(LIBTOOL) --tag=CC --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(liboldgaa_gcc64dbg_la_CFLAGS) $(CFLAGS) -c -o liboldgaa_gcc64dbg_la-rfc1779.lo `test -f 'rfc1779.c' || echo '$(srcdir)/'`rfc1779.c
+
+liboldgaa_gcc64dbgpthr_la-oldgaa_alloc.lo: oldgaa_alloc.c
+@am__fastdepCC_TRUE@	if $(LIBTOOL) --tag=CC --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(liboldgaa_gcc64dbgpthr_la_CFLAGS) $(CFLAGS) -MT liboldgaa_gcc64dbgpthr_la-oldgaa_alloc.lo -MD -MP -MF "$(DEPDIR)/liboldgaa_gcc64dbgpthr_la-oldgaa_alloc.Tpo" -c -o liboldgaa_gcc64dbgpthr_la-oldgaa_alloc.lo `test -f 'oldgaa_alloc.c' || echo '$(srcdir)/'`oldgaa_alloc.c; \
+@am__fastdepCC_TRUE@	then mv -f "$(DEPDIR)/liboldgaa_gcc64dbgpthr_la-oldgaa_alloc.Tpo" "$(DEPDIR)/liboldgaa_gcc64dbgpthr_la-oldgaa_alloc.Plo"; else rm -f "$(DEPDIR)/liboldgaa_gcc64dbgpthr_la-oldgaa_alloc.Tpo"; exit 1; fi
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='oldgaa_alloc.c' object='liboldgaa_gcc64dbgpthr_la-oldgaa_alloc.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(LIBTOOL) --tag=CC --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(liboldgaa_gcc64dbgpthr_la_CFLAGS) $(CFLAGS) -c -o liboldgaa_gcc64dbgpthr_la-oldgaa_alloc.lo `test -f 'oldgaa_alloc.c' || echo '$(srcdir)/'`oldgaa_alloc.c
+
+liboldgaa_gcc64dbgpthr_la-oldgaa_api.lo: oldgaa_api.c
+@am__fastdepCC_TRUE@	if $(LIBTOOL) --tag=CC --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(liboldgaa_gcc64dbgpthr_la_CFLAGS) $(CFLAGS) -MT liboldgaa_gcc64dbgpthr_la-oldgaa_api.lo -MD -MP -MF "$(DEPDIR)/liboldgaa_gcc64dbgpthr_la-oldgaa_api.Tpo" -c -o liboldgaa_gcc64dbgpthr_la-oldgaa_api.lo `test -f 'oldgaa_api.c' || echo '$(srcdir)/'`oldgaa_api.c; \
+@am__fastdepCC_TRUE@	then mv -f "$(DEPDIR)/liboldgaa_gcc64dbgpthr_la-oldgaa_api.Tpo" "$(DEPDIR)/liboldgaa_gcc64dbgpthr_la-oldgaa_api.Plo"; else rm -f "$(DEPDIR)/liboldgaa_gcc64dbgpthr_la-oldgaa_api.Tpo"; exit 1; fi
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='oldgaa_api.c' object='liboldgaa_gcc64dbgpthr_la-oldgaa_api.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(LIBTOOL) --tag=CC --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(liboldgaa_gcc64dbgpthr_la_CFLAGS) $(CFLAGS) -c -o liboldgaa_gcc64dbgpthr_la-oldgaa_api.lo `test -f 'oldgaa_api.c' || echo '$(srcdir)/'`oldgaa_api.c
+
+liboldgaa_gcc64dbgpthr_la-oldgaa_gl_internal_err.lo: oldgaa_gl_internal_err.c
+@am__fastdepCC_TRUE@	if $(LIBTOOL) --tag=CC --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(liboldgaa_gcc64dbgpthr_la_CFLAGS) $(CFLAGS) -MT liboldgaa_gcc64dbgpthr_la-oldgaa_gl_internal_err.lo -MD -MP -MF "$(DEPDIR)/liboldgaa_gcc64dbgpthr_la-oldgaa_gl_internal_err.Tpo" -c -o liboldgaa_gcc64dbgpthr_la-oldgaa_gl_internal_err.lo `test -f 'oldgaa_gl_internal_err.c' || echo '$(srcdir)/'`oldgaa_gl_internal_err.c; \
+@am__fastdepCC_TRUE@	then mv -f "$(DEPDIR)/liboldgaa_gcc64dbgpthr_la-oldgaa_gl_internal_err.Tpo" "$(DEPDIR)/liboldgaa_gcc64dbgpthr_la-oldgaa_gl_internal_err.Plo"; else rm -f "$(DEPDIR)/liboldgaa_gcc64dbgpthr_la-oldgaa_gl_internal_err.Tpo"; exit 1; fi
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='oldgaa_gl_internal_err.c' object='liboldgaa_gcc64dbgpthr_la-oldgaa_gl_internal_err.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(LIBTOOL) --tag=CC --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(liboldgaa_gcc64dbgpthr_la_CFLAGS) $(CFLAGS) -c -o liboldgaa_gcc64dbgpthr_la-oldgaa_gl_internal_err.lo `test -f 'oldgaa_gl_internal_err.c' || echo '$(srcdir)/'`oldgaa_gl_internal_err.c
+
+liboldgaa_gcc64dbgpthr_la-oldgaa_policy_evaluator.lo: oldgaa_policy_evaluator.c
+@am__fastdepCC_TRUE@	if $(LIBTOOL) --tag=CC --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(liboldgaa_gcc64dbgpthr_la_CFLAGS) $(CFLAGS) -MT liboldgaa_gcc64dbgpthr_la-oldgaa_policy_evaluator.lo -MD -MP -MF "$(DEPDIR)/liboldgaa_gcc64dbgpthr_la-oldgaa_policy_evaluator.Tpo" -c -o liboldgaa_gcc64dbgpthr_la-oldgaa_policy_evaluator.lo `test -f 'oldgaa_policy_evaluator.c' || echo '$(srcdir)/'`oldgaa_policy_evaluator.c; \
+@am__fastdepCC_TRUE@	then mv -f "$(DEPDIR)/liboldgaa_gcc64dbgpthr_la-oldgaa_policy_evaluator.Tpo" "$(DEPDIR)/liboldgaa_gcc64dbgpthr_la-oldgaa_policy_evaluator.Plo"; else rm -f "$(DEPDIR)/liboldgaa_gcc64dbgpthr_la-oldgaa_policy_evaluator.Tpo"; exit 1; fi
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='oldgaa_policy_evaluator.c' object='liboldgaa_gcc64dbgpthr_la-oldgaa_policy_evaluator.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(LIBTOOL) --tag=CC --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(liboldgaa_gcc64dbgpthr_la_CFLAGS) $(CFLAGS) -c -o liboldgaa_gcc64dbgpthr_la-oldgaa_policy_evaluator.lo `test -f 'oldgaa_policy_evaluator.c' || echo '$(srcdir)/'`oldgaa_policy_evaluator.c
+
+liboldgaa_gcc64dbgpthr_la-oldgaa_release.lo: oldgaa_release.c
+@am__fastdepCC_TRUE@	if $(LIBTOOL) --tag=CC --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(liboldgaa_gcc64dbgpthr_la_CFLAGS) $(CFLAGS) -MT liboldgaa_gcc64dbgpthr_la-oldgaa_release.lo -MD -MP -MF "$(DEPDIR)/liboldgaa_gcc64dbgpthr_la-oldgaa_release.Tpo" -c -o liboldgaa_gcc64dbgpthr_la-oldgaa_release.lo `test -f 'oldgaa_release.c' || echo '$(srcdir)/'`oldgaa_release.c; \
+@am__fastdepCC_TRUE@	then mv -f "$(DEPDIR)/liboldgaa_gcc64dbgpthr_la-oldgaa_release.Tpo" "$(DEPDIR)/liboldgaa_gcc64dbgpthr_la-oldgaa_release.Plo"; else rm -f "$(DEPDIR)/liboldgaa_gcc64dbgpthr_la-oldgaa_release.Tpo"; exit 1; fi
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='oldgaa_release.c' object='liboldgaa_gcc64dbgpthr_la-oldgaa_release.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(LIBTOOL) --tag=CC --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(liboldgaa_gcc64dbgpthr_la_CFLAGS) $(CFLAGS) -c -o liboldgaa_gcc64dbgpthr_la-oldgaa_release.lo `test -f 'oldgaa_release.c' || echo '$(srcdir)/'`oldgaa_release.c
+
+liboldgaa_gcc64dbgpthr_la-oldgaa_utils.lo: oldgaa_utils.c
+@am__fastdepCC_TRUE@	if $(LIBTOOL) --tag=CC --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(liboldgaa_gcc64dbgpthr_la_CFLAGS) $(CFLAGS) -MT liboldgaa_gcc64dbgpthr_la-oldgaa_utils.lo -MD -MP -MF "$(DEPDIR)/liboldgaa_gcc64dbgpthr_la-oldgaa_utils.Tpo" -c -o liboldgaa_gcc64dbgpthr_la-oldgaa_utils.lo `test -f 'oldgaa_utils.c' || echo '$(srcdir)/'`oldgaa_utils.c; \
+@am__fastdepCC_TRUE@	then mv -f "$(DEPDIR)/liboldgaa_gcc64dbgpthr_la-oldgaa_utils.Tpo" "$(DEPDIR)/liboldgaa_gcc64dbgpthr_la-oldgaa_utils.Plo"; else rm -f "$(DEPDIR)/liboldgaa_gcc64dbgpthr_la-oldgaa_utils.Tpo"; exit 1; fi
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='oldgaa_utils.c' object='liboldgaa_gcc64dbgpthr_la-oldgaa_utils.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(LIBTOOL) --tag=CC --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(liboldgaa_gcc64dbgpthr_la_CFLAGS) $(CFLAGS) -c -o liboldgaa_gcc64dbgpthr_la-oldgaa_utils.lo `test -f 'oldgaa_utils.c' || echo '$(srcdir)/'`oldgaa_utils.c
+
+liboldgaa_gcc64dbgpthr_la-globus_oldgaa_utils.lo: globus_oldgaa_utils.c
+@am__fastdepCC_TRUE@	if $(LIBTOOL) --tag=CC --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(liboldgaa_gcc64dbgpthr_la_CFLAGS) $(CFLAGS) -MT liboldgaa_gcc64dbgpthr_la-globus_oldgaa_utils.lo -MD -MP -MF "$(DEPDIR)/liboldgaa_gcc64dbgpthr_la-globus_oldgaa_utils.Tpo" -c -o liboldgaa_gcc64dbgpthr_la-globus_oldgaa_utils.lo `test -f 'globus_oldgaa_utils.c' || echo '$(srcdir)/'`globus_oldgaa_utils.c; \
+@am__fastdepCC_TRUE@	then mv -f "$(DEPDIR)/liboldgaa_gcc64dbgpthr_la-globus_oldgaa_utils.Tpo" "$(DEPDIR)/liboldgaa_gcc64dbgpthr_la-globus_oldgaa_utils.Plo"; else rm -f "$(DEPDIR)/liboldgaa_gcc64dbgpthr_la-globus_oldgaa_utils.Tpo"; exit 1; fi
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='globus_oldgaa_utils.c' object='liboldgaa_gcc64dbgpthr_la-globus_oldgaa_utils.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(LIBTOOL) --tag=CC --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(liboldgaa_gcc64dbgpthr_la_CFLAGS) $(CFLAGS) -c -o liboldgaa_gcc64dbgpthr_la-globus_oldgaa_utils.lo `test -f 'globus_oldgaa_utils.c' || echo '$(srcdir)/'`globus_oldgaa_utils.c
+
+liboldgaa_gcc64dbgpthr_la-rfc1779.lo: rfc1779.c
+@am__fastdepCC_TRUE@	if $(LIBTOOL) --tag=CC --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(liboldgaa_gcc64dbgpthr_la_CFLAGS) $(CFLAGS) -MT liboldgaa_gcc64dbgpthr_la-rfc1779.lo -MD -MP -MF "$(DEPDIR)/liboldgaa_gcc64dbgpthr_la-rfc1779.Tpo" -c -o liboldgaa_gcc64dbgpthr_la-rfc1779.lo `test -f 'rfc1779.c' || echo '$(srcdir)/'`rfc1779.c; \
+@am__fastdepCC_TRUE@	then mv -f "$(DEPDIR)/liboldgaa_gcc64dbgpthr_la-rfc1779.Tpo" "$(DEPDIR)/liboldgaa_gcc64dbgpthr_la-rfc1779.Plo"; else rm -f "$(DEPDIR)/liboldgaa_gcc64dbgpthr_la-rfc1779.Tpo"; exit 1; fi
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='rfc1779.c' object='liboldgaa_gcc64dbgpthr_la-rfc1779.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(LIBTOOL) --tag=CC --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(liboldgaa_gcc64dbgpthr_la_CFLAGS) $(CFLAGS) -c -o liboldgaa_gcc64dbgpthr_la-rfc1779.lo `test -f 'rfc1779.c' || echo '$(srcdir)/'`rfc1779.c
+
+liboldgaa_gcc64pthr_la-oldgaa_alloc.lo: oldgaa_alloc.c
+@am__fastdepCC_TRUE@	if $(LIBTOOL) --tag=CC --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(liboldgaa_gcc64pthr_la_CFLAGS) $(CFLAGS) -MT liboldgaa_gcc64pthr_la-oldgaa_alloc.lo -MD -MP -MF "$(DEPDIR)/liboldgaa_gcc64pthr_la-oldgaa_alloc.Tpo" -c -o liboldgaa_gcc64pthr_la-oldgaa_alloc.lo `test -f 'oldgaa_alloc.c' || echo '$(srcdir)/'`oldgaa_alloc.c; \
+@am__fastdepCC_TRUE@	then mv -f "$(DEPDIR)/liboldgaa_gcc64pthr_la-oldgaa_alloc.Tpo" "$(DEPDIR)/liboldgaa_gcc64pthr_la-oldgaa_alloc.Plo"; else rm -f "$(DEPDIR)/liboldgaa_gcc64pthr_la-oldgaa_alloc.Tpo"; exit 1; fi
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='oldgaa_alloc.c' object='liboldgaa_gcc64pthr_la-oldgaa_alloc.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(LIBTOOL) --tag=CC --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(liboldgaa_gcc64pthr_la_CFLAGS) $(CFLAGS) -c -o liboldgaa_gcc64pthr_la-oldgaa_alloc.lo `test -f 'oldgaa_alloc.c' || echo '$(srcdir)/'`oldgaa_alloc.c
+
+liboldgaa_gcc64pthr_la-oldgaa_api.lo: oldgaa_api.c
+@am__fastdepCC_TRUE@	if $(LIBTOOL) --tag=CC --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(liboldgaa_gcc64pthr_la_CFLAGS) $(CFLAGS) -MT liboldgaa_gcc64pthr_la-oldgaa_api.lo -MD -MP -MF "$(DEPDIR)/liboldgaa_gcc64pthr_la-oldgaa_api.Tpo" -c -o liboldgaa_gcc64pthr_la-oldgaa_api.lo `test -f 'oldgaa_api.c' || echo '$(srcdir)/'`oldgaa_api.c; \
+@am__fastdepCC_TRUE@	then mv -f "$(DEPDIR)/liboldgaa_gcc64pthr_la-oldgaa_api.Tpo" "$(DEPDIR)/liboldgaa_gcc64pthr_la-oldgaa_api.Plo"; else rm -f "$(DEPDIR)/liboldgaa_gcc64pthr_la-oldgaa_api.Tpo"; exit 1; fi
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='oldgaa_api.c' object='liboldgaa_gcc64pthr_la-oldgaa_api.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(LIBTOOL) --tag=CC --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(liboldgaa_gcc64pthr_la_CFLAGS) $(CFLAGS) -c -o liboldgaa_gcc64pthr_la-oldgaa_api.lo `test -f 'oldgaa_api.c' || echo '$(srcdir)/'`oldgaa_api.c
+
+liboldgaa_gcc64pthr_la-oldgaa_gl_internal_err.lo: oldgaa_gl_internal_err.c
+@am__fastdepCC_TRUE@	if $(LIBTOOL) --tag=CC --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(liboldgaa_gcc64pthr_la_CFLAGS) $(CFLAGS) -MT liboldgaa_gcc64pthr_la-oldgaa_gl_internal_err.lo -MD -MP -MF "$(DEPDIR)/liboldgaa_gcc64pthr_la-oldgaa_gl_internal_err.Tpo" -c -o liboldgaa_gcc64pthr_la-oldgaa_gl_internal_err.lo `test -f 'oldgaa_gl_internal_err.c' || echo '$(srcdir)/'`oldgaa_gl_internal_err.c; \
+@am__fastdepCC_TRUE@	then mv -f "$(DEPDIR)/liboldgaa_gcc64pthr_la-oldgaa_gl_internal_err.Tpo" "$(DEPDIR)/liboldgaa_gcc64pthr_la-oldgaa_gl_internal_err.Plo"; else rm -f "$(DEPDIR)/liboldgaa_gcc64pthr_la-oldgaa_gl_internal_err.Tpo"; exit 1; fi
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='oldgaa_gl_internal_err.c' object='liboldgaa_gcc64pthr_la-oldgaa_gl_internal_err.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(LIBTOOL) --tag=CC --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(liboldgaa_gcc64pthr_la_CFLAGS) $(CFLAGS) -c -o liboldgaa_gcc64pthr_la-oldgaa_gl_internal_err.lo `test -f 'oldgaa_gl_internal_err.c' || echo '$(srcdir)/'`oldgaa_gl_internal_err.c
+
+liboldgaa_gcc64pthr_la-oldgaa_policy_evaluator.lo: oldgaa_policy_evaluator.c
+@am__fastdepCC_TRUE@	if $(LIBTOOL) --tag=CC --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(liboldgaa_gcc64pthr_la_CFLAGS) $(CFLAGS) -MT liboldgaa_gcc64pthr_la-oldgaa_policy_evaluator.lo -MD -MP -MF "$(DEPDIR)/liboldgaa_gcc64pthr_la-oldgaa_policy_evaluator.Tpo" -c -o liboldgaa_gcc64pthr_la-oldgaa_policy_evaluator.lo `test -f 'oldgaa_policy_evaluator.c' || echo '$(srcdir)/'`oldgaa_policy_evaluator.c; \
+@am__fastdepCC_TRUE@	then mv -f "$(DEPDIR)/liboldgaa_gcc64pthr_la-oldgaa_policy_evaluator.Tpo" "$(DEPDIR)/liboldgaa_gcc64pthr_la-oldgaa_policy_evaluator.Plo"; else rm -f "$(DEPDIR)/liboldgaa_gcc64pthr_la-oldgaa_policy_evaluator.Tpo"; exit 1; fi
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='oldgaa_policy_evaluator.c' object='liboldgaa_gcc64pthr_la-oldgaa_policy_evaluator.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(LIBTOOL) --tag=CC --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(liboldgaa_gcc64pthr_la_CFLAGS) $(CFLAGS) -c -o liboldgaa_gcc64pthr_la-oldgaa_policy_evaluator.lo `test -f 'oldgaa_policy_evaluator.c' || echo '$(srcdir)/'`oldgaa_policy_evaluator.c
+
+liboldgaa_gcc64pthr_la-oldgaa_release.lo: oldgaa_release.c
+@am__fastdepCC_TRUE@	if $(LIBTOOL) --tag=CC --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(liboldgaa_gcc64pthr_la_CFLAGS) $(CFLAGS) -MT liboldgaa_gcc64pthr_la-oldgaa_release.lo -MD -MP -MF "$(DEPDIR)/liboldgaa_gcc64pthr_la-oldgaa_release.Tpo" -c -o liboldgaa_gcc64pthr_la-oldgaa_release.lo `test -f 'oldgaa_release.c' || echo '$(srcdir)/'`oldgaa_release.c; \
+@am__fastdepCC_TRUE@	then mv -f "$(DEPDIR)/liboldgaa_gcc64pthr_la-oldgaa_release.Tpo" "$(DEPDIR)/liboldgaa_gcc64pthr_la-oldgaa_release.Plo"; else rm -f "$(DEPDIR)/liboldgaa_gcc64pthr_la-oldgaa_release.Tpo"; exit 1; fi
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='oldgaa_release.c' object='liboldgaa_gcc64pthr_la-oldgaa_release.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(LIBTOOL) --tag=CC --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(liboldgaa_gcc64pthr_la_CFLAGS) $(CFLAGS) -c -o liboldgaa_gcc64pthr_la-oldgaa_release.lo `test -f 'oldgaa_release.c' || echo '$(srcdir)/'`oldgaa_release.c
+
+liboldgaa_gcc64pthr_la-oldgaa_utils.lo: oldgaa_utils.c
+@am__fastdepCC_TRUE@	if $(LIBTOOL) --tag=CC --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(liboldgaa_gcc64pthr_la_CFLAGS) $(CFLAGS) -MT liboldgaa_gcc64pthr_la-oldgaa_utils.lo -MD -MP -MF "$(DEPDIR)/liboldgaa_gcc64pthr_la-oldgaa_utils.Tpo" -c -o liboldgaa_gcc64pthr_la-oldgaa_utils.lo `test -f 'oldgaa_utils.c' || echo '$(srcdir)/'`oldgaa_utils.c; \
+@am__fastdepCC_TRUE@	then mv -f "$(DEPDIR)/liboldgaa_gcc64pthr_la-oldgaa_utils.Tpo" "$(DEPDIR)/liboldgaa_gcc64pthr_la-oldgaa_utils.Plo"; else rm -f "$(DEPDIR)/liboldgaa_gcc64pthr_la-oldgaa_utils.Tpo"; exit 1; fi
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='oldgaa_utils.c' object='liboldgaa_gcc64pthr_la-oldgaa_utils.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(LIBTOOL) --tag=CC --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(liboldgaa_gcc64pthr_la_CFLAGS) $(CFLAGS) -c -o liboldgaa_gcc64pthr_la-oldgaa_utils.lo `test -f 'oldgaa_utils.c' || echo '$(srcdir)/'`oldgaa_utils.c
+
+liboldgaa_gcc64pthr_la-globus_oldgaa_utils.lo: globus_oldgaa_utils.c
+@am__fastdepCC_TRUE@	if $(LIBTOOL) --tag=CC --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(liboldgaa_gcc64pthr_la_CFLAGS) $(CFLAGS) -MT liboldgaa_gcc64pthr_la-globus_oldgaa_utils.lo -MD -MP -MF "$(DEPDIR)/liboldgaa_gcc64pthr_la-globus_oldgaa_utils.Tpo" -c -o liboldgaa_gcc64pthr_la-globus_oldgaa_utils.lo `test -f 'globus_oldgaa_utils.c' || echo '$(srcdir)/'`globus_oldgaa_utils.c; \
+@am__fastdepCC_TRUE@	then mv -f "$(DEPDIR)/liboldgaa_gcc64pthr_la-globus_oldgaa_utils.Tpo" "$(DEPDIR)/liboldgaa_gcc64pthr_la-globus_oldgaa_utils.Plo"; else rm -f "$(DEPDIR)/liboldgaa_gcc64pthr_la-globus_oldgaa_utils.Tpo"; exit 1; fi
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='globus_oldgaa_utils.c' object='liboldgaa_gcc64pthr_la-globus_oldgaa_utils.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(LIBTOOL) --tag=CC --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(liboldgaa_gcc64pthr_la_CFLAGS) $(CFLAGS) -c -o liboldgaa_gcc64pthr_la-globus_oldgaa_utils.lo `test -f 'globus_oldgaa_utils.c' || echo '$(srcdir)/'`globus_oldgaa_utils.c
+
+liboldgaa_gcc64pthr_la-rfc1779.lo: rfc1779.c
+@am__fastdepCC_TRUE@	if $(LIBTOOL) --tag=CC --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(liboldgaa_gcc64pthr_la_CFLAGS) $(CFLAGS) -MT liboldgaa_gcc64pthr_la-rfc1779.lo -MD -MP -MF "$(DEPDIR)/liboldgaa_gcc64pthr_la-rfc1779.Tpo" -c -o liboldgaa_gcc64pthr_la-rfc1779.lo `test -f 'rfc1779.c' || echo '$(srcdir)/'`rfc1779.c; \
+@am__fastdepCC_TRUE@	then mv -f "$(DEPDIR)/liboldgaa_gcc64pthr_la-rfc1779.Tpo" "$(DEPDIR)/liboldgaa_gcc64pthr_la-rfc1779.Plo"; else rm -f "$(DEPDIR)/liboldgaa_gcc64pthr_la-rfc1779.Tpo"; exit 1; fi
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='rfc1779.c' object='liboldgaa_gcc64pthr_la-rfc1779.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(LIBTOOL) --tag=CC --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(liboldgaa_gcc64pthr_la_CFLAGS) $(CFLAGS) -c -o liboldgaa_gcc64pthr_la-rfc1779.lo `test -f 'rfc1779.c' || echo '$(srcdir)/'`rfc1779.c
 
 mostlyclean-libtool:
 	-rm -f *.lo

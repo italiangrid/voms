@@ -24,7 +24,11 @@ EXTRA_LTLIBRARIES = \
 	libssl_utils_gcc32.la \
 	libssl_utils_gcc32dbg.la \
 	libssl_utils_gcc32pthr.la \
-	libssl_utils_gcc32dbgpthr.la
+	libssl_utils_gcc32dbgpthr.la \
+	libssl_utils_gcc64.la \
+	libssl_utils_gcc64dbg.la \
+	libssl_utils_gcc64pthr.la \
+	libssl_utils_gcc64dbgpthr.la
 
 libssl_utils_gcc32_la_SOURCES= \
 	$(SOURCES)
@@ -74,7 +78,59 @@ libssl_utils_gcc32dbgpthr_la_LIBADD = \
 	./oldgaa/liboldgaa_gcc32dbgpthr.la \
 	$(GLOBUS_GCC32DBGPTHR_GSS_LIBS)
 
+libssl_utils_gcc64_la_SOURCES= \
+	$(SOURCES)
+
+libssl_utils_gcc64_la_CFLAGS = \
+	-I $(top_srcdir)/src/sslutils/oldgaa \
+	-I $(top_srcdir)/src/include \
+	$(GLOBUS_GCC64_CFLAGS)
+
+libssl_utils_gcc64_la_LIBADD = \
+	./oldgaa/liboldgaa_gcc64.la \
+	$(GLOBUS_GCC64_GSS_LIBS)
+
+libssl_utils_gcc64dbg_la_SOURCES= \
+	$(SOURCES)
+
+libssl_utils_gcc64dbg_la_CFLAGS = \
+	-I $(top_srcdir)/src/sslutils/oldgaa \
+	-I $(top_srcdir)/src/include \
+	$(GLOBUS_GCC64DBG_CFLAGS)
+
+libssl_utils_gcc64dbg_la_LIBADD = \
+	./oldgaa/liboldgaa_gcc64dbg.la \
+	$(GLOBUS_GCC64DBG_GSS_LIBS)
+
+libssl_utils_gcc64pthr_la_SOURCES= \
+	$(SOURCES)
+
+libssl_utils_gcc64pthr_la_CFLAGS = \
+	-I $(top_srcdir)/src/sslutils/oldgaa \
+	-I $(top_srcdir)/src/include \
+	$(GLOBUS_GCC64PTHR_CFLAGS)
+
+libssl_utils_gcc64pthr_la_LIBADD = \
+	./oldgaa/liboldgaa_gcc64pthr.la \
+	$(GLOBUS_GCC64PTHR_GSS_LIBS)
+
+libssl_utils_gcc64dbgpthr_la_SOURCES= \
+	$(SOURCES)
+
+libssl_utils_gcc64dbgpthr_la_CFLAGS = \
+	-I $(top_srcdir)/src/sslutils/oldgaa \
+	-I $(top_srcdir)/src/include \
+	$(GLOBUS_GCC64DBGPTHR_CFLAGS)
+
+libssl_utils_gcc64dbgpthr_la_LIBADD = \
+	./oldgaa/liboldgaa_gcc64dbgpthr.la \
+	$(GLOBUS_GCC64DBGPTHR_GSS_LIBS)
+
 CLEANFILES = \
+	libssl_utils_gcc64.la \
+	libssl_utils_gcc64dbg.la \
+	libssl_utils_gcc64pthr.la \
+	libssl_utils_gcc64dbgpthr.la \
 	libssl_utils_gcc32.la \
 	libssl_utils_gcc32dbg.la \
 	libssl_utils_gcc32pthr.la \
