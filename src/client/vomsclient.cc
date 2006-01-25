@@ -122,8 +122,9 @@ Client::Client(int argc, char ** argv) :
                                            bits(512),
                                            hours(12),
                                            minutes(0),
+                                           ac_hours(12),
+                                           ac_minutes(0),
                                            limit_proxy(false),
-                                           vomslife(-1),
                                            proxyver(0),
                                            pathlength(1),
                                            verify(false),
@@ -139,9 +140,9 @@ Client::Client(int argc, char ** argv) :
                                            voID(""),
                                            listing(false)
 {
-
   bool progversion = false;
   std::string valid;
+  std::string vomslife;
   std::string certdir;
   std::string certfile;
   std::string keyfile;
@@ -175,7 +176,7 @@ Client::Client(int argc, char ** argv) :
       "    -verify                        Verifies certificate to make proxy for\n" \
       "    -pwstdin                       Allows passphrase from stdin\n" \
       "    -limited                       Creates a limited proxy\n" \
-      "    -valid <h:m>                   Proxy is valid for h hours and m minutes (default:12:00)\n" \
+      "    -valid <h:m>                   Proxy is valid for h hours and m minutes (default to 12:00)\n" \
       "    -hours H                       Proxy is valid for H hours (default:12)\n" \
       "    -bits                          Number of bits in key {512|1024|2048|4096}\n" \
       "    -cert     <certfile>           Non-standard location of user certificate\n" \
@@ -185,7 +186,7 @@ Client::Client(int argc, char ** argv) :
       "    -voms <voms<:command>>         Specify voms server. :command is optional.\n" \
       "    -order <group<:role>>          Specify ordering of attributes.\n" \
       "    -target <hostname>             Targets the AC against a specific hostname.\n" \
-      "    -vomslife <H>                  Try to get a VOMS pseudocert valid for H hours.\n" \
+      "    -vomslife <h:m>                Try to get a VOMS pseudocert valid for h hours and m minutes (default to value of -valid).\n" \
       "    -include <file>                Include the contents of the specified file.\n" \
       "    -conf <file>                   Read options from <file>.\n" \
       "    -confile <file>                Non-standard location of voms server addresses.\n" \
@@ -219,7 +220,7 @@ Client::Client(int argc, char ** argv) :
       {"include",         1, (int *)&incfile,     OPT_STRING},
       {"hours",           1,        &hours,       OPT_NUM},
       {"valid",           1, (int *)&valid,       OPT_STRING},
-      {"vomslife",        1,        &vomslife,    OPT_NUM},
+      {"vomslife",        1, (int *)&vomslife,    OPT_STRING},
       {"bits",            1,        &bits,        OPT_NUM},
       {"debug",           0, (int *)&debug,       OPT_BOOL},
       {"limited",         0, (int *)&limit_proxy, OPT_BOOL},
@@ -406,14 +407,19 @@ Client::Client(int argc, char ** argv) :
     std::string::size_type pos = valid.find(':');
     if (pos != std::string::npos && pos > 0) 
     {
-      hours   = atoi(valid.substr(0, pos).c_str());
-      minutes = atoi(valid.substr(pos+1).c_str());
+      hours  = ac_hours = atoi(valid.substr(0, pos).c_str());
+      minutes = ac_minutes = atoi(valid.substr(pos+1).c_str());
     }
     else 
     {
-      std::cerr << "-valid argument must be in the format: H:M" << std::endl;
+      std::cerr << "-valid argument must be in the format: h:m" << std::endl;
       exit(1);
     }
+    if(hours < 0)
+    {
+      std::cerr << "-valid argument must be in the format: h:m" << std::endl;
+      exit(1);
+    }    
     if(minutes < 0 || minutes >59)
     {
       std::cerr << "specified minutes must be in the range 0-59" << std::endl;
@@ -421,18 +427,31 @@ Client::Client(int argc, char ** argv) :
     }
   }
 
-  /* certficate duration option */
-  
-  if(hours<0 || (hours == 0 && minutes==0)) 
+  /* parse vomslife options */
+
+  if (!vomslife.empty())
   {
-    std::cerr << "Error: duration must be positive." << std::endl;
-    exit(1);
-  }
-  
-  if(!(vomslife>0) && vomslife!=-1) 
-  {
-    std::cerr << "Error: duration of AC must be positive." << std::endl;
-    exit(1);
+    std::string::size_type pos = vomslife.find(':');
+    if (pos != std::string::npos && pos > 0) 
+    {
+      ac_hours   = atoi(vomslife.substr(0, pos).c_str());
+      ac_minutes = atoi(vomslife.substr(pos+1).c_str());
+    }
+    else 
+    {
+      std::cerr << "-vomslife argument must be in the format: h:m" << std::endl;
+      exit(1);
+    }
+    if(ac_hours < 0)
+    {
+      std::cerr << "-valid argument must be in the format: h:m" << std::endl;
+      exit(1);
+    }    
+    if(ac_minutes < 0 || ac_minutes >59)
+    {
+      std::cerr << "specified minutes must be in the range 0-59" << std::endl;
+      exit(1);
+    }
   }
 
   /* allow password from stdin */
@@ -577,7 +596,7 @@ bool Client::Run() {
   vomsdata v;
   v.LoadSystemContacts(confile);
   v.LoadUserContacts(userconf);
-  v.SetLifetime((vomslife != -1) ? vomslife*60*60 : hours*3600 + minutes*60);
+  v.SetLifetime(ac_hours * 3600 + ac_minutes * 60);
   v.Order(ordering);
   v.AddTarget(targetlist);
   
@@ -618,8 +637,11 @@ bool Client::Run() {
 	
         if(!quiet) std::cout << "Creating temporary proxy " << std::flush;
         if(debug) std::cout << "to " << proxyfile << " " << std::flush;
-        if(CreateProxy("", "", NULL, (beg->version == -1 ? proxyver : beg->version)))
+        int tmp = hours;
+        hours = 1;
+        if(CreateProxy("", "", NULL, NULL, (beg->version == -1 ? proxyver : beg->version)))
           goto err;
+        hours = tmp;
       }
       
       /* parse fqan */
@@ -1058,13 +1080,13 @@ bool Client::CreateProxy(std::string data, std::string filedata, AC ** aclist, i
   }
   
   if (proxy_sign(pcd->ucert,
-		 pcd->upkey,
-		 req,
-		 &ncert,
-		 hours*60*60 + minutes*60,
-		 extensions,
-		 limit_proxy,
-		 version)) {
+                 pcd->upkey,
+                 req,
+                 &ncert,
+                 hours*60*60 + minutes*60,
+                 extensions,
+                 limit_proxy,
+                 version)) {
     goto err;
   }
   

@@ -68,8 +68,9 @@ class Client {
   int                bits;
   int                hours;
   int                minutes;
+  int                ac_hours;
+  int                ac_minutes;
   bool               limit_proxy;
-  int                vomslife;
   int                proxyver;
   std::string        policyfile;
   std::string        policylang;
