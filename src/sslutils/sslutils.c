@@ -1194,7 +1194,7 @@ proxy_sign_ext(
     time_after = ASN1_UTCTIME_mktime(X509_get_notAfter(user_cert));
     time_diff = time_after - time_now;
 
-    if(seconds && time_diff > seconds)
+    if(time_diff > seconds)
     {
       X509_gmtime_adj(X509_get_notAfter(*new_cert),(long) seconds);
     }
