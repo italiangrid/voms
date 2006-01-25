@@ -639,7 +639,7 @@ bool Client::Run() {
         if(debug) std::cout << "to " << proxyfile << " " << std::flush;
         int tmp = hours;
         hours = 1;
-        if(CreateProxy("", "", NULL, NULL, (beg->version == -1 ? proxyver : beg->version)))
+        if(CreateProxy("", "", NULL, (beg->version == -1 ? proxyver : beg->version)))
           goto err;
         hours = tmp;
       }
