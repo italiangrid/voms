@@ -65,25 +65,27 @@ libLTLIBRARIES_INSTALL = $(INSTALL)
 LTLIBRARIES = $(lib_LTLIBRARIES)
 am__DEPENDENCIES_1 =
 am__DEPENDENCIES_2 = $(am__DEPENDENCIES_1) \
-	$(top_builddir)/src/ac/libccattcert.la \
 	$(top_builddir)/src/replib/librep.la \
 	$(top_builddir)/src/common/libutilities.la \
 	$(top_builddir)/src/log/liblog.la
 libvomsapi_la_DEPENDENCIES = $(am__DEPENDENCIES_2) \
-	$(top_builddir)/src/socklib/libsock.la
+	$(top_builddir)/src/socklib/libsock.la \
+	$(top_builddir)/src/ac/libccattcert.la
 am__objects_1 = libvomsapi_la-api_util.lo libvomsapi_la-voms_api.lo \
 	libvomsapi_la-ccval.lo libvomsapi_la-cinterface.lo
 am_libvomsapi_la_OBJECTS = $(am__objects_1)
 libvomsapi_la_OBJECTS = $(am_libvomsapi_la_OBJECTS)
 libvomsapi_gcc32_la_DEPENDENCIES = $(am__DEPENDENCIES_2) \
-	$(top_builddir)/src/socklib/libsock_gcc32.la
+	$(top_builddir)/src/socklib/libsock_gcc32.la \
+	$(top_builddir)/src/ac/libccattcert_gcc32.la
 am__objects_2 = libvomsapi_gcc32_la-api_util.lo \
 	libvomsapi_gcc32_la-voms_api.lo libvomsapi_gcc32_la-ccval.lo \
 	libvomsapi_gcc32_la-cinterface.lo
 am_libvomsapi_gcc32_la_OBJECTS = $(am__objects_2)
 libvomsapi_gcc32_la_OBJECTS = $(am_libvomsapi_gcc32_la_OBJECTS)
 libvomsapi_gcc32dbg_la_DEPENDENCIES = $(am__DEPENDENCIES_2) \
-	$(top_builddir)/src/socklib/libsock_gcc32dbg.la
+	$(top_builddir)/src/socklib/libsock_gcc32dbg.la \
+	$(top_builddir)/src/ac/libccattcert_gcc32dbg.la
 am__objects_3 = libvomsapi_gcc32dbg_la-api_util.lo \
 	libvomsapi_gcc32dbg_la-voms_api.lo \
 	libvomsapi_gcc32dbg_la-ccval.lo \
@@ -91,7 +93,8 @@ am__objects_3 = libvomsapi_gcc32dbg_la-api_util.lo \
 am_libvomsapi_gcc32dbg_la_OBJECTS = $(am__objects_3)
 libvomsapi_gcc32dbg_la_OBJECTS = $(am_libvomsapi_gcc32dbg_la_OBJECTS)
 libvomsapi_gcc32dbgpthr_la_DEPENDENCIES = $(am__DEPENDENCIES_2) \
-	$(top_builddir)/src/socklib/libsock_gcc32dbgpthr.la
+	$(top_builddir)/src/socklib/libsock_gcc32dbgpthr.la \
+	$(top_builddir)/src/ac/libccattcert_gcc32dbgpthr.la
 am__objects_4 = libvomsapi_gcc32dbgpthr_la-api_util.lo \
 	libvomsapi_gcc32dbgpthr_la-voms_api.lo \
 	libvomsapi_gcc32dbgpthr_la-ccval.lo \
@@ -100,7 +103,8 @@ am_libvomsapi_gcc32dbgpthr_la_OBJECTS = $(am__objects_4)
 libvomsapi_gcc32dbgpthr_la_OBJECTS =  \
 	$(am_libvomsapi_gcc32dbgpthr_la_OBJECTS)
 libvomsapi_gcc32pthr_la_DEPENDENCIES = $(am__DEPENDENCIES_2) \
-	$(top_builddir)/src/socklib/libsock_gcc32pthr.la
+	$(top_builddir)/src/socklib/libsock_gcc32pthr.la \
+	$(top_builddir)/src/ac/libccattcert_gcc32pthr.la
 am__objects_5 = libvomsapi_gcc32pthr_la-api_util.lo \
 	libvomsapi_gcc32pthr_la-voms_api.lo \
 	libvomsapi_gcc32pthr_la-ccval.lo \
@@ -109,14 +113,16 @@ am_libvomsapi_gcc32pthr_la_OBJECTS = $(am__objects_5)
 libvomsapi_gcc32pthr_la_OBJECTS =  \
 	$(am_libvomsapi_gcc32pthr_la_OBJECTS)
 libvomsapi_gcc64_la_DEPENDENCIES = $(am__DEPENDENCIES_2) \
-	$(top_builddir)/src/socklib/libsock_gcc64.la
+	$(top_builddir)/src/socklib/libsock_gcc64.la \
+	$(top_builddir)/src/ac/libccattcert_gcc64.la
 am__objects_6 = libvomsapi_gcc64_la-api_util.lo \
 	libvomsapi_gcc64_la-voms_api.lo libvomsapi_gcc64_la-ccval.lo \
 	libvomsapi_gcc64_la-cinterface.lo
 am_libvomsapi_gcc64_la_OBJECTS = $(am__objects_6)
 libvomsapi_gcc64_la_OBJECTS = $(am_libvomsapi_gcc64_la_OBJECTS)
 libvomsapi_gcc64dbg_la_DEPENDENCIES = $(am__DEPENDENCIES_2) \
-	$(top_builddir)/src/socklib/libsock_gcc64dbg.la
+	$(top_builddir)/src/socklib/libsock_gcc64dbg.la \
+	$(top_builddir)/src/ac/libccattcert_gcc64dbg.la
 am__objects_7 = libvomsapi_gcc64dbg_la-api_util.lo \
 	libvomsapi_gcc64dbg_la-voms_api.lo \
 	libvomsapi_gcc64dbg_la-ccval.lo \
@@ -124,7 +130,8 @@ am__objects_7 = libvomsapi_gcc64dbg_la-api_util.lo \
 am_libvomsapi_gcc64dbg_la_OBJECTS = $(am__objects_7)
 libvomsapi_gcc64dbg_la_OBJECTS = $(am_libvomsapi_gcc64dbg_la_OBJECTS)
 libvomsapi_gcc64dbgpthr_la_DEPENDENCIES = $(am__DEPENDENCIES_2) \
-	$(top_builddir)/src/socklib/libsock_gcc64dbgpthr.la
+	$(top_builddir)/src/socklib/libsock_gcc64dbgpthr.la \
+	$(top_builddir)/src/ac/libccattcert_gcc64dbgpthr.la
 am__objects_8 = libvomsapi_gcc64dbgpthr_la-api_util.lo \
 	libvomsapi_gcc64dbgpthr_la-voms_api.lo \
 	libvomsapi_gcc64dbgpthr_la-ccval.lo \
@@ -133,7 +140,8 @@ am_libvomsapi_gcc64dbgpthr_la_OBJECTS = $(am__objects_8)
 libvomsapi_gcc64dbgpthr_la_OBJECTS =  \
 	$(am_libvomsapi_gcc64dbgpthr_la_OBJECTS)
 libvomsapi_gcc64pthr_la_DEPENDENCIES = $(am__DEPENDENCIES_2) \
-	$(top_builddir)/src/socklib/libsock_gcc64pthr.la
+	$(top_builddir)/src/socklib/libsock_gcc64pthr.la \
+	$(top_builddir)/src/ac/libccattcert_gcc64pthr.la
 am__objects_9 = libvomsapi_gcc64pthr_la-api_util.lo \
 	libvomsapi_gcc64pthr_la-voms_api.lo \
 	libvomsapi_gcc64pthr_la-ccval.lo \
@@ -142,27 +150,31 @@ am_libvomsapi_gcc64pthr_la_OBJECTS = $(am__objects_9)
 libvomsapi_gcc64pthr_la_OBJECTS =  \
 	$(am_libvomsapi_gcc64pthr_la_OBJECTS)
 libvomsc_la_DEPENDENCIES = $(am__DEPENDENCIES_2) \
-	$(top_builddir)/src/socklib/libsock.la
+	$(top_builddir)/src/socklib/libsock.la \
+	$(top_builddir)/src/ac/libattcert.la
 am__objects_10 = libvomsc_la-api_util.lo libvomsc_la-voms_api.lo \
 	libvomsc_la-ccval.lo libvomsc_la-cinterface.lo
 am_libvomsc_la_OBJECTS = $(am__objects_10)
 libvomsc_la_OBJECTS = $(am_libvomsc_la_OBJECTS)
 libvomsc_gcc32_la_DEPENDENCIES = $(am__DEPENDENCIES_2) \
-	$(top_builddir)/src/socklib/libsock_gcc32.la
+	$(top_builddir)/src/socklib/libsock_gcc32.la \
+	$(top_builddir)/src/ac/libattcert_gcc64.la
 am__objects_11 = libvomsc_gcc32_la-api_util.lo \
 	libvomsc_gcc32_la-voms_api.lo libvomsc_gcc32_la-ccval.lo \
 	libvomsc_gcc32_la-cinterface.lo
 am_libvomsc_gcc32_la_OBJECTS = $(am__objects_11)
 libvomsc_gcc32_la_OBJECTS = $(am_libvomsc_gcc32_la_OBJECTS)
 libvomsc_gcc32dbg_la_DEPENDENCIES = $(am__DEPENDENCIES_2) \
-	$(top_builddir)/src/socklib/libsock_gcc32dbg.la
+	$(top_builddir)/src/socklib/libsock_gcc32dbg.la \
+	$(top_builddir)/src/ac/libattcert_gcc32dbg.la
 am__objects_12 = libvomsc_gcc32dbg_la-api_util.lo \
 	libvomsc_gcc32dbg_la-voms_api.lo libvomsc_gcc32dbg_la-ccval.lo \
 	libvomsc_gcc32dbg_la-cinterface.lo
 am_libvomsc_gcc32dbg_la_OBJECTS = $(am__objects_12)
 libvomsc_gcc32dbg_la_OBJECTS = $(am_libvomsc_gcc32dbg_la_OBJECTS)
 libvomsc_gcc32dbgpthr_la_DEPENDENCIES = $(am__DEPENDENCIES_2) \
-	$(top_builddir)/src/socklib/libsock_gcc32dbgpthr.la
+	$(top_builddir)/src/socklib/libsock_gcc32dbgpthr.la \
+	$(top_builddir)/src/ac/libattcert_gcc32dbgpthr.la
 am__objects_13 = libvomsc_gcc32dbgpthr_la-api_util.lo \
 	libvomsc_gcc32dbgpthr_la-voms_api.lo \
 	libvomsc_gcc32dbgpthr_la-ccval.lo \
@@ -171,7 +183,8 @@ am_libvomsc_gcc32dbgpthr_la_OBJECTS = $(am__objects_13)
 libvomsc_gcc32dbgpthr_la_OBJECTS =  \
 	$(am_libvomsc_gcc32dbgpthr_la_OBJECTS)
 libvomsc_gcc32pthr_la_DEPENDENCIES = $(am__DEPENDENCIES_2) \
-	$(top_builddir)/src/socklib/libsock_gcc32pthr.la
+	$(top_builddir)/src/socklib/libsock_gcc32pthr.la \
+	$(top_builddir)/src/ac/libattcert_gcc32pthr.la
 am__objects_14 = libvomsc_gcc32pthr_la-api_util.lo \
 	libvomsc_gcc32pthr_la-voms_api.lo \
 	libvomsc_gcc32pthr_la-ccval.lo \
@@ -179,21 +192,24 @@ am__objects_14 = libvomsc_gcc32pthr_la-api_util.lo \
 am_libvomsc_gcc32pthr_la_OBJECTS = $(am__objects_14)
 libvomsc_gcc32pthr_la_OBJECTS = $(am_libvomsc_gcc32pthr_la_OBJECTS)
 libvomsc_gcc64_la_DEPENDENCIES = $(am__DEPENDENCIES_2) \
-	$(top_builddir)/src/socklib/libsock_gcc64.la
+	$(top_builddir)/src/socklib/libsock_gcc64.la \
+	$(top_builddir)/src/ac/libattcert_gcc64.la
 am__objects_15 = libvomsc_gcc64_la-api_util.lo \
 	libvomsc_gcc64_la-voms_api.lo libvomsc_gcc64_la-ccval.lo \
 	libvomsc_gcc64_la-cinterface.lo
 am_libvomsc_gcc64_la_OBJECTS = $(am__objects_15)
 libvomsc_gcc64_la_OBJECTS = $(am_libvomsc_gcc64_la_OBJECTS)
 libvomsc_gcc64dbg_la_DEPENDENCIES = $(am__DEPENDENCIES_2) \
-	$(top_builddir)/src/socklib/libsock_gcc64dbg.la
+	$(top_builddir)/src/socklib/libsock_gcc64dbg.la \
+	$(top_builddir)/src/ac/libattcert_gcc64dbg.la
 am__objects_16 = libvomsc_gcc64dbg_la-api_util.lo \
 	libvomsc_gcc64dbg_la-voms_api.lo libvomsc_gcc64dbg_la-ccval.lo \
 	libvomsc_gcc64dbg_la-cinterface.lo
 am_libvomsc_gcc64dbg_la_OBJECTS = $(am__objects_16)
 libvomsc_gcc64dbg_la_OBJECTS = $(am_libvomsc_gcc64dbg_la_OBJECTS)
 libvomsc_gcc64dbgpthr_la_DEPENDENCIES = $(am__DEPENDENCIES_2) \
-	$(top_builddir)/src/socklib/libsock_gcc64dbgpthr.la
+	$(top_builddir)/src/socklib/libsock_gcc64dbgpthr.la \
+	$(top_builddir)/src/ac/libattcert_gcc64dbgpthr.la
 am__objects_17 = libvomsc_gcc64dbgpthr_la-api_util.lo \
 	libvomsc_gcc64dbgpthr_la-voms_api.lo \
 	libvomsc_gcc64dbgpthr_la-ccval.lo \
@@ -202,7 +218,8 @@ am_libvomsc_gcc64dbgpthr_la_OBJECTS = $(am__objects_17)
 libvomsc_gcc64dbgpthr_la_OBJECTS =  \
 	$(am_libvomsc_gcc64dbgpthr_la_OBJECTS)
 libvomsc_gcc64pthr_la_DEPENDENCIES = $(am__DEPENDENCIES_2) \
-	$(top_builddir)/src/socklib/libsock_gcc64pthr.la
+	$(top_builddir)/src/socklib/libsock_gcc64pthr.la \
+	$(top_builddir)/src/ac/libattcert_gcc64pthr.la
 am__objects_18 = libvomsc_gcc64pthr_la-api_util.lo \
 	libvomsc_gcc64pthr_la-voms_api.lo \
 	libvomsc_gcc64pthr_la-ccval.lo \
@@ -349,6 +366,7 @@ STRIP = @STRIP@
 VAR_LOCATION_ENV = @VAR_LOCATION_ENV@
 VERSION = @VERSION@
 WANTED_API_LIBS = @WANTED_API_LIBS@
+WANTED_ATTCERT_LIBS = @WANTED_ATTCERT_LIBS@
 WANTED_OLDGAA_LIBS = @WANTED_OLDGAA_LIBS@
 WANTED_SOCK_LIBS = @WANTED_SOCK_LIBS@
 WANTED_SSL_UTILS_LIBS = @WANTED_SSL_UTILS_LIBS@
@@ -421,14 +439,14 @@ libvomsapi_la_CPPFLAGS = \
 CCLIBADD = \
 	$(EXPAT_LIBS) \
   $(GLOBUS_LIBS) \
-	$(top_builddir)/src/ac/libccattcert.la \
 	$(top_builddir)/src/replib/librep.la \
 	$(top_builddir)/src/common/libutilities.la \
 	$(top_builddir)/src/log/liblog.la
 
 libvomsapi_la_LIBADD = \
 	$(CCLIBADD) \
-	$(top_builddir)/src/socklib/libsock.la
+	$(top_builddir)/src/socklib/libsock.la \
+	$(top_builddir)/src/ac/libccattcert.la
 
 test_SOURCES = test.cc
 test_LDADD = libvomsapi.la
@@ -467,7 +485,8 @@ libvomsc_la_CPPFLAGS = \
 CLIBADD = 
 libvomsc_la_LIBADD = \
 	$(CCLIBADD) \
-	$(top_builddir)/src/socklib/libsock.la
+	$(top_builddir)/src/socklib/libsock.la \
+	$(top_builddir)/src/ac/libattcert.la
 
 EXTRA_LTLIBRARIES = \
 	libvomsapi_gcc32.la \
@@ -496,7 +515,8 @@ libvomsapi_gcc32_la_CPPFLAGS = \
 
 libvomsapi_gcc32_la_LIBADD = \
 	$(CCLIBADD) \
-	$(top_builddir)/src/socklib/libsock_gcc32.la
+	$(top_builddir)/src/socklib/libsock_gcc32.la \
+	$(top_builddir)/src/ac/libccattcert_gcc32.la
 
 libvomsapi_gcc32_la_LDFLAGS = \
 	-rpath $(libdir)
@@ -510,7 +530,8 @@ libvomsapi_gcc32dbg_la_CPPFLAGS = \
 
 libvomsapi_gcc32dbg_la_LIBADD = \
 	$(CCLIBADD) \
-	$(top_builddir)/src/socklib/libsock_gcc32dbg.la
+	$(top_builddir)/src/socklib/libsock_gcc32dbg.la \
+	$(top_builddir)/src/ac/libccattcert_gcc32dbg.la
 
 libvomsapi_gcc32dbg_la_LDFLAGS = \
 	-rpath $(libdir)
@@ -524,7 +545,8 @@ libvomsapi_gcc32pthr_la_CPPFLAGS = \
 
 libvomsapi_gcc32pthr_la_LIBADD = \
 	$(CCLIBADD) \
-	$(top_builddir)/src/socklib/libsock_gcc32pthr.la
+	$(top_builddir)/src/socklib/libsock_gcc32pthr.la \
+	$(top_builddir)/src/ac/libccattcert_gcc32pthr.la
 
 libvomsapi_gcc32pthr_la_LDFLAGS = \
 	-rpath $(libdir)
@@ -538,7 +560,8 @@ libvomsapi_gcc32dbgpthr_la_CPPFLAGS = \
 
 libvomsapi_gcc32dbgpthr_la_LIBADD = \
 	$(CCLIBADD) \
-	$(top_builddir)/src/socklib/libsock_gcc32dbgpthr.la
+	$(top_builddir)/src/socklib/libsock_gcc32dbgpthr.la \
+	$(top_builddir)/src/ac/libccattcert_gcc32dbgpthr.la
 
 libvomsapi_gcc32dbgpthr_la_LDFLAGS = \
 	-rpath $(libdir)
@@ -552,7 +575,8 @@ libvomsc_gcc32_la_CPPFLAGS = \
 
 libvomsc_gcc32_la_LIBADD = \
 	$(CCLIBADD) \
-	$(top_builddir)/src/socklib/libsock_gcc32.la
+	$(top_builddir)/src/socklib/libsock_gcc32.la \
+	$(top_builddir)/src/ac/libattcert_gcc64.la
 
 libvomsc_gcc32_la_LDFLAGS = \
 	-rpath $(libdir)
@@ -566,7 +590,8 @@ libvomsc_gcc32dbg_la_CPPFLAGS = \
 
 libvomsc_gcc32dbg_la_LIBADD = \
 	$(CCLIBADD) \
-	$(top_builddir)/src/socklib/libsock_gcc32dbg.la
+	$(top_builddir)/src/socklib/libsock_gcc32dbg.la \
+	$(top_builddir)/src/ac/libattcert_gcc32dbg.la
 
 libvomsc_gcc32dbg_la_LDFLAGS = \
 	-rpath $(libdir)
@@ -580,7 +605,8 @@ libvomsc_gcc32pthr_la_CPPFLAGS = \
 
 libvomsc_gcc32pthr_la_LIBADD = \
 	$(CCLIBADD) \
-	$(top_builddir)/src/socklib/libsock_gcc32pthr.la
+	$(top_builddir)/src/socklib/libsock_gcc32pthr.la \
+	$(top_builddir)/src/ac/libattcert_gcc32pthr.la
 
 libvomsc_gcc32pthr_la_LDFLAGS = \
 	-rpath $(libdir)
@@ -594,7 +620,8 @@ libvomsc_gcc32dbgpthr_la_CPPFLAGS = \
 
 libvomsc_gcc32dbgpthr_la_LIBADD = \
 	$(CCLIBADD) \
-	$(top_builddir)/src/socklib/libsock_gcc32dbgpthr.la
+	$(top_builddir)/src/socklib/libsock_gcc32dbgpthr.la \
+	$(top_builddir)/src/ac/libattcert_gcc32dbgpthr.la
 
 libvomsc_gcc32dbgpthr_la_LDFLAGS = \
 	-rpath $(libdir)
@@ -608,7 +635,8 @@ libvomsapi_gcc64_la_CPPFLAGS = \
 
 libvomsapi_gcc64_la_LIBADD = \
 	$(CCLIBADD) \
-	$(top_builddir)/src/socklib/libsock_gcc64.la
+	$(top_builddir)/src/socklib/libsock_gcc64.la \
+	$(top_builddir)/src/ac/libccattcert_gcc64.la
 
 libvomsapi_gcc64_la_LDFLAGS = \
 	-rpath $(libdir)
@@ -622,7 +650,8 @@ libvomsapi_gcc64dbg_la_CPPFLAGS = \
 
 libvomsapi_gcc64dbg_la_LIBADD = \
 	$(CCLIBADD) \
-	$(top_builddir)/src/socklib/libsock_gcc64dbg.la
+	$(top_builddir)/src/socklib/libsock_gcc64dbg.la \
+	$(top_builddir)/src/ac/libccattcert_gcc64dbg.la
 
 libvomsapi_gcc64dbg_la_LDFLAGS = \
 	-rpath $(libdir)
@@ -636,7 +665,8 @@ libvomsapi_gcc64pthr_la_CPPFLAGS = \
 
 libvomsapi_gcc64pthr_la_LIBADD = \
 	$(CCLIBADD) \
-	$(top_builddir)/src/socklib/libsock_gcc64pthr.la
+	$(top_builddir)/src/socklib/libsock_gcc64pthr.la \
+	$(top_builddir)/src/ac/libccattcert_gcc64pthr.la
 
 libvomsapi_gcc64pthr_la_LDFLAGS = \
 	-rpath $(libdir)
@@ -650,7 +680,8 @@ libvomsapi_gcc64dbgpthr_la_CPPFLAGS = \
 
 libvomsapi_gcc64dbgpthr_la_LIBADD = \
 	$(CCLIBADD) \
-	$(top_builddir)/src/socklib/libsock_gcc64dbgpthr.la
+	$(top_builddir)/src/socklib/libsock_gcc64dbgpthr.la \
+	$(top_builddir)/src/ac/libccattcert_gcc64dbgpthr.la
 
 libvomsapi_gcc64dbgpthr_la_LDFLAGS = \
 	-rpath $(libdir)
@@ -664,7 +695,8 @@ libvomsc_gcc64_la_CPPFLAGS = \
 
 libvomsc_gcc64_la_LIBADD = \
 	$(CCLIBADD) \
-	$(top_builddir)/src/socklib/libsock_gcc64.la
+	$(top_builddir)/src/socklib/libsock_gcc64.la \
+	$(top_builddir)/src/ac/libattcert_gcc64.la
 
 libvomsc_gcc64_la_LDFLAGS = \
 	-rpath $(libdir)
@@ -678,7 +710,8 @@ libvomsc_gcc64dbg_la_CPPFLAGS = \
 
 libvomsc_gcc64dbg_la_LIBADD = \
 	$(CCLIBADD) \
-	$(top_builddir)/src/socklib/libsock_gcc64dbg.la
+	$(top_builddir)/src/socklib/libsock_gcc64dbg.la \
+	$(top_builddir)/src/ac/libattcert_gcc64dbg.la
 
 libvomsc_gcc64dbg_la_LDFLAGS = \
 	-rpath $(libdir)
@@ -692,7 +725,8 @@ libvomsc_gcc64pthr_la_CPPFLAGS = \
 
 libvomsc_gcc64pthr_la_LIBADD = \
 	$(CCLIBADD) \
-	$(top_builddir)/src/socklib/libsock_gcc64pthr.la
+	$(top_builddir)/src/socklib/libsock_gcc64pthr.la \
+	$(top_builddir)/src/ac/libattcert_gcc64pthr.la
 
 libvomsc_gcc64pthr_la_LDFLAGS = \
 	-rpath $(libdir)
@@ -706,7 +740,8 @@ libvomsc_gcc64dbgpthr_la_CPPFLAGS = \
 
 libvomsc_gcc64dbgpthr_la_LIBADD = \
 	$(CCLIBADD) \
-	$(top_builddir)/src/socklib/libsock_gcc64dbgpthr.la
+	$(top_builddir)/src/socklib/libsock_gcc64dbgpthr.la \
+	$(top_builddir)/src/ac/libattcert_gcc64dbgpthr.la
 
 libvomsc_gcc64dbgpthr_la_LDFLAGS = \
 	-rpath $(libdir)
@@ -1680,7 +1715,6 @@ uninstall-am: uninstall-includeHEADERS uninstall-info-am \
 	uninstall-libLTLIBRARIES
 
 	$(top_builddir)/src/common/libutilities.la \
-	$(top_builddir)/src/ac/libccattcert.la \
 	$(top_builddir)/src/replib/librep.la \
 	$(top_builddir)/src/log/liblog.la
 				$(CDOCPLC_DIR)/html/index.html
