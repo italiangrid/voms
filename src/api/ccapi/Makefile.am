@@ -165,7 +165,7 @@ libvomsc_gcc32_la_CPPFLAGS = \
 libvomsc_gcc32_la_LIBADD = \
 	$(CCLIBADD) \
 	$(top_builddir)/src/socklib/libsock_gcc32.la \
-	$(top_builddir)/src/ac/libattcert_gcc64.la
+	$(top_builddir)/src/ac/libattcert_gcc32.la
 
 libvomsc_gcc32_la_LDFLAGS = \
 	-rpath $(libdir)

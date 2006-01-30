@@ -158,7 +158,7 @@ am_libvomsc_la_OBJECTS = $(am__objects_10)
 libvomsc_la_OBJECTS = $(am_libvomsc_la_OBJECTS)
 libvomsc_gcc32_la_DEPENDENCIES = $(am__DEPENDENCIES_2) \
 	$(top_builddir)/src/socklib/libsock_gcc32.la \
-	$(top_builddir)/src/ac/libattcert_gcc64.la
+	$(top_builddir)/src/ac/libattcert_gcc32.la
 am__objects_11 = libvomsc_gcc32_la-api_util.lo \
 	libvomsc_gcc32_la-voms_api.lo libvomsc_gcc32_la-ccval.lo \
 	libvomsc_gcc32_la-cinterface.lo
@@ -576,7 +576,7 @@ libvomsc_gcc32_la_CPPFLAGS = \
 libvomsc_gcc32_la_LIBADD = \
 	$(CCLIBADD) \
 	$(top_builddir)/src/socklib/libsock_gcc32.la \
-	$(top_builddir)/src/ac/libattcert_gcc64.la
+	$(top_builddir)/src/ac/libattcert_gcc32.la
 
 libvomsc_gcc32_la_LDFLAGS = \
 	-rpath $(libdir)
