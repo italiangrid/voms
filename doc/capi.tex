@@ -349,7 +349,7 @@ registered with a particular alias.
 \parameter{alias}{The alias that will be searched for.  The search will be case
 sensitive.}
 \parameter{system}{The directory where the system-wide files are located.  
-  If empty then its default is \verb|/opt/edg/etc/vomses|.}
+  If empty then its default is \verb|\$PREFIX/etc/vomses|.}
 \parameter{user}{The directory where the user-specific files are
   stored.  If empty its defaul is \verb|$VOMS_USERCONF|.  If this is
   also empty, then the default becomse \verb|$HOME/.edg/vomses|.}
@@ -379,11 +379,11 @@ registered as serving a particular alias.
 be case sensitive.}
 \parameter{system}{The directory where the system-wide files are
   located.  If this field is NULL then the default of
-  \verb|/opt/edg/etc/cvomses| is used.}
+  \verb|\$PREFIX/etc/vomses| is used.}
 \parameter{user}{The directory where the user-specific files are
   stored.  If this field is NULL, then the default of
   \verb|\$VOMS_USERCONF| is used.  If this is also empty, then the
-  default becomse \verb|\$HOME/.edg/vomses|.}
+  default becomse \verb|$HOME/.edg/vomses|.}
 
 \return
 The return value is a NULL-terminated vector containing the data (in

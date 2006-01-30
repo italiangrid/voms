@@ -56,10 +56,10 @@ With version 1.6.0 and onwards, compatibility with VOMS version 1.1.x
 and previous version is now dropped.  This means that servers that are
 not capable of generating ACs are now unsupported.
 
-\chapter{edg-voms}
+\chapter{voms}
 \section{Configuration}
-To complete configuration of \verb|edg-voms|, you are supposed to
-execute the \newline\verb|/opt/edg/libexec/voms_install_db| command.  It takes
+To complete configuration of \verb|voms|, you are supposed to
+execute the \newline\verb|voms_install_db| command.  It takes
 the following options:
 
 \begin{longtable}{lp{3in}}
@@ -147,7 +147,7 @@ will so describe the totality of the options.
                              ``unspecified''.\\ 
 \textbf{--logfile}         & The location of the log file.  The
                              default location is
-                             ``/opt/edg/var/log/$<$voname$>$''\\
+                             ``\$PREFIX/var/log/voms.$<$voname$>$''\\
 \textbf{--globusid}        & The value of the GLOBUSID environment
                              variable.  There is no default value.\\ 
 \textbf{--globuspwd}       & The value of the GLOBUSPWD environment
@@ -296,7 +296,7 @@ according to the following table:
 \textbf{V}  & Substitutes the name of the message level. (see \emph{-logtype})\\
 \end{longtable}
 
-\chapter{edg-voms-proxy-init}
+\chapter{voms-proxy-init}
 \section{Introduction}
 This command is used to contact the VOMS server and retrieve an AC
 containing user attributes that will be included in the proxy
@@ -308,7 +308,7 @@ First of all, in ``/etc/grid-security/vomsdir'' you should include a
 copy of the host certificates of all the VOMS servers that could be
 contacted by the users.
 
-Second, in ``/opt/edg/etc/vomses'' You should put a copy of the
+Second, in ``\$PREFIX/etc/vomses'' You should put a copy of the
 \emph{vomses} file distributed by all the VOMS servers you wish to
 contact.  This subtree will be recursed into to examine all pertinent
 files.
@@ -321,7 +321,7 @@ command.
 
 \section{Invocation}
 
-The edg-voms-proxy-init command can be invoked with the following
+The voms-proxy-init command can be invoked with the following
 options: 
 
 \begin{longtable}{lp{3in}}
@@ -449,7 +449,7 @@ options:
 		      host. Use 20 for Globus 2.0 or Globus 2.1, and
 		      22 for Globus 2.2 and Globus 2.4.  The default
 		      value is 22.\\  
-\textbf{--noregen}  & For its normal workings, edg-voms-proxy-init
+\textbf{--noregen}  & For its normal workings, voms-proxy-init
 		      first creates a proxy with which to contact the
 		      VOMS servers, and then creates a new proxy to
 		      hold all of the returned ACs.  This option skips
@@ -472,12 +472,6 @@ options:
                     where --confile was reserved for root-owned files, and --userconf was reserved for
                     user-owned files. This modification is backwards compatible and should solve all
                     the confusion problems. --userconf and --confile are now deprecated\\
-%\textbf{--confile}    & Specifies a non-standard location of the
-%		      system-wide vomses files.  The default value for
-%		      this option is ``/opt/edg/atc/vomses''.\\
-%\textbf{--userconf}   & Specifies a non-standard location of the
-%		      user-specific config files.  The default value
-%		      for this option is ``\$HOME/.edg/vomses''.\\
 \textbf{--conf}     & Lets you specify a file from which options will
 		      be loaded.  This file should have exactly one
 		      option per line, and option that do have values
@@ -487,7 +481,7 @@ options:
 		      informations on stdout.  The additional output
 		      returned by this option should \emph{always} be
 		      included into bug reports for the
-		      edg-voms-proxy-init command.  User should not,
+		      voms-proxy-init command.  User should not,
 		      however, ever rely on informations printed by
 		      this options.  Both content and format are
 		      guaranteed to change between software
@@ -496,13 +490,13 @@ options:
           a list of all attributes available to the user.\\
 \end{longtable}
 
-\chapter{edg-voms-proxy-info}
+\chapter{voms-proxy-info}
 \section{Introduction}
 This command is used to print to the screen the informations included
 in an already generated VOMS proxy.
 
 \section{Configuration}
-The same as edg-voms-proxy-init.
+The same as voms-proxy-init.
 
 \section{Invocation}
 \begin{longtable}{lp{3in}}
@@ -510,7 +504,7 @@ The same as edg-voms-proxy-init.
 		      informations on stdout.  The additional output
 		      returned by this option should \emph{always} be
 		      included into bug reports for the
-		      edg-voms-proxy-info command.  User should not,
+		      voms-proxy-info command.  User should not,
 		      however, ever rely on informations printed by
 		      this options.  Both content and format are
 		      guaranteed to change between software
@@ -555,7 +549,7 @@ The same as edg-voms-proxy-init.
 \end{longtable}
 
 
-\chapter{edg-voms-proxy-destroy}
+\chapter{voms-proxy-destroy}
 \section{Introduction}
 This command destroys an already existing VOMS proxy.
 
@@ -570,7 +564,7 @@ The following options may be used:
 		      informations on stdout.  The additional output
 		      returned by this option should \emph{always} be
 		      included into bug reports for the
-		      edg-voms-proxy-info command.  User should not,
+		      voms-proxy-info command.  User should not,
 		      however, ever rely on informations printed by
 		      this options.  Both content and format are
 		      guaranteed to change between software
@@ -593,7 +587,7 @@ The following options may be used:
 		      actions.\\
 \end{longtable}
 
-\chapter{edg-voms-proxy-fake}
+\chapter{voms-proxy-fake}
 \section{Introduction}
 This command creates proxy certificates with fake ACs.  This is useful for test
 purposes.

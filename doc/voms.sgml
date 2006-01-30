@@ -5,21 +5,21 @@
 <!ENTITY links    SYSTEM "links.sgml">
 ]>
 
-<refentry id='edgvoms8'>
+<refentry id='voms8'>
 <refmeta>
-<refentrytitle>edg-voms</refentrytitle>
+<refentrytitle>voms</refentrytitle>
 <manvolnum>8</manvolnum>
 <refmiscinfo class='source'>VOMS Server</refmiscinfo>
 </refmeta>
 
 <refnamediv id='name'>
-<refname>edg-voms</refname>
+<refname>voms</refname>
 <refpurpose>VOMS server</refpurpose>
 </refnamediv>
 
 <refsynopsisdiv id='synopsis'>
 <cmdsynopsis>
-<command>edg-voms</command>
+<command>voms</command>
 <arg choice='opt'><arg choice='plain'>-foreground </arg></arg>
 <arg choice='opt'><arg choice='plain'>-port <replaceable>port</replaceable></arg></arg>
 <arg choice='opt'><arg choice='plain'>-backlog <replaceable>pnum</replaceable></arg></arg>
@@ -250,7 +250,7 @@ as a compatibility feature to ease migration while the servers upgrade to the ne
 
 <refsect1 id='seealso'><title>See also</title>
 
-<para>edg-voms-proxy-init(1)</para>
+<para>voms-proxy-init(1), voms-proxy-info(1), voms-proxy-destroy(1)</para>
 
 &links;
 

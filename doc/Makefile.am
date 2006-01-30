@@ -3,54 +3,54 @@ USERDOC_DIR = $(top_builddir)/doc/userdoc
 
 SGML_INCLUDES = authors.sgml bugzilla.sgml license.sgml links.sgml
 
-SGML = $(srcdir)/edg-voms-proxy-init.sgml \
-			 $(srcdir)/edg-voms-proxy-list.sgml \
-			 $(srcdir)/edg-voms.sgml \
-	     $(srcdir)/testvoms.sgml 
-			 $(srcdir)/voms_install_db.sgml \
-       $(srcdir)/edg-voms-proxy-info.sgml \
-       $(srcdir)/edg-voms-proxy-destroy.sgml \
-	     $(srcdir)/voms_install_replica.sgml \
-	     $(srcdir)/edg-voms-proxy-fake.sgml
+SGML = $(srcdir)/voms-proxy-init.sgml \
+       $(srcdir)/voms-proxy-list.sgml \
+       $(srcdir)/voms.sgml \
+       $(srcdir)/testvoms.sgml \
+       $(srcdir)/voms_install_db.sgml \
+       $(srcdir)/voms-proxy-info.sgml \
+       $(srcdir)/voms-proxy-destroy.sgml \
+       $(srcdir)/voms_install_replica.sgml \
+       $(srcdir)/voms-proxy-fake.sgml
 
-SGML_DIST = edg-voms-proxy-init.sgml edg-voms.sgml testvoms.sgml \
-            voms_install_db.sgml edg-voms-proxy-info.sgml \
-	          edg-voms-proxy-destroy.sgml voms_install_replica.sgml \
-	          edg-voms-proxy-fake.sgml edg-voms-proxy-list.sgml
+SGML_DIST = voms-proxy-init.sgml voms.sgml testvoms.sgml \
+            voms_install_db.sgml voms-proxy-info.sgml \
+            voms-proxy-destroy.sgml voms_install_replica.sgml \
+            voms-proxy-fake.sgml voms-proxy-list.sgml
 
 LATEX  = $(srcdir)/software.tex $(srcdir)/capi.tex $(srcdir)/c++api.tex $(srcdir)/AC-RFC.tex
 
 LATEX_DIST  = software.tex capi.tex c++api.tex AC-RFC.tex
 
-SERVER_HTML = $(USERDOC_DIR)/server/html/edg-voms.html \
+SERVER_HTML = $(USERDOC_DIR)/server/html/voms.html \
               $(USERDOC_DIR)/server/html/voms_install_db.html \
               $(USERDOC_DIR)/server/html/voms_install_replica.html
 
-SERVER_PDF  = $(USERDOC_DIR)/server/pdf/edg-voms.pdf \
+SERVER_PDF  = $(USERDOC_DIR)/server/pdf/voms.pdf \
               $(USERDOC_DIR)/server/pdf/voms_install_db.pdf \
               $(USERDOC_DIR)/server/pdf/voms_install_replica.pdf
 
-SERVER_PS   = $(USERDOC_DIR)/server/ps/edg-voms.ps \
+SERVER_PS   = $(USERDOC_DIR)/server/ps/voms.ps \
               $(USERDOC_DIR)/server/ps/voms_install_db.ps \
               $(USERDOC_DIR)/server/ps/voms_install_replica.ps
 
-CLIENT_HTML = $(USERDOC_DIR)/client/html/edg-voms-proxy-init.html \
-	      $(USERDOC_DIR)/client/html/edg-voms-proxy-list.html \
-	      $(USERDOC_DIR)/client/html/edg-voms-proxy-info.html \
-	      $(USERDOC_DIR)/client/html/edg-voms-proxy-destroy.html \
-	      $(USERDOC_DIR)/client/html/edg-voms-proxy-fake.html
+CLIENT_HTML = $(USERDOC_DIR)/client/html/voms-proxy-init.html \
+	      $(USERDOC_DIR)/client/html/voms-proxy-list.html \
+	      $(USERDOC_DIR)/client/html/voms-proxy-info.html \
+	      $(USERDOC_DIR)/client/html/voms-proxy-destroy.html \
+	      $(USERDOC_DIR)/client/html/voms-proxy-fake.html
 
-CLIENT_PDF  = $(USERDOC_DIR)/client/pdf/edg-voms-proxy-init.pdf \
-	      $(USERDOC_DIR)/client/pdf/edg-voms-proxy-info.pdf \
-	      $(USERDOC_DIR)/client/pdf/edg-voms-proxy-list.pdf \
-	      $(USERDOC_DIR)/client/pdf/edg-voms-proxy-destroy.pdf \
-	      $(USERDOC_DIR)/client/pdf/edg-voms-proxy-fake.pdf
+CLIENT_PDF  = $(USERDOC_DIR)/client/pdf/voms-proxy-init.pdf \
+	      $(USERDOC_DIR)/client/pdf/voms-proxy-info.pdf \
+	      $(USERDOC_DIR)/client/pdf/voms-proxy-list.pdf \
+	      $(USERDOC_DIR)/client/pdf/voms-proxy-destroy.pdf \
+	      $(USERDOC_DIR)/client/pdf/voms-proxy-fake.pdf
 
-CLIENT_PS   = $(USERDOC_DIR)/client/ps/edg-voms-proxy-init.ps \
-	      $(USERDOC_DIR)/client/ps/edg-voms-proxy-info.ps \
-	      $(USERDOC_DIR)/client/ps/edg-voms-proxy-list.ps \
-	      $(USERDOC_DIR)/client/ps/edg-voms-proxy-destroy.ps \
-	      $(USERDOC_DIR)/client/ps/edg-voms-proxy-fake.ps
+CLIENT_PS   = $(USERDOC_DIR)/client/ps/voms-proxy-init.ps \
+	      $(USERDOC_DIR)/client/ps/voms-proxy-info.ps \
+	      $(USERDOC_DIR)/client/ps/voms-proxy-list.ps \
+	      $(USERDOC_DIR)/client/ps/voms-proxy-destroy.ps \
+	      $(USERDOC_DIR)/client/ps/voms-proxy-fake.ps
 
 UTILS_HTML  = $(USERDOC_DIR)/utils/html/testvoms.html
 
@@ -76,15 +76,15 @@ mandir = $(datadir)/man
 
 if BUILD_DOCS
 man_MANS = \
-	edg-voms.8 \
-	edg-voms-proxy-init.1 \
+	voms.8 \
+	voms-proxy-init.1 \
 	testvoms.1 \
 	voms_install_db.1 \
-	edg-voms-proxy-info.1 \
-	edg-voms-proxy-destroy.1 \
+	voms-proxy-info.1 \
+	voms-proxy-destroy.1 \
 	voms_install_replica.1 \
-	edg-voms-proxy-fake.1 \
-	edg-voms-proxy-list.1
+	voms-proxy-fake.1 \
+	voms-proxy-list.1
 else
 man_MANS = 
 endif
@@ -214,7 +214,6 @@ $(PS): $(LATEX)
 
 endif
 
-
 $(APIPDOCS):
 	cd apidoc/api/VOMS_C_API/latex ; $(MAKE) -f Makefile pdf ps
 	cd apidoc/api/VOMS_CC_API/latex ; $(MAKE) -f Makefile pdf ps
@@ -239,12 +238,20 @@ install-data-hook:
 	cp apidoc/api/VOMS_CC_API/latex/refman.ps $(DESTDIR)/$(datadir)/doc/voms$(DOCVER)/VOMS_CC_API.ps
 	cp apidoc/api/VOMS_C_API/latex/refman.pdf $(DESTDIR)/$(datadir)/doc/voms$(DOCVER)/VOMS_C_API.pdf
 	cp apidoc/api/VOMS_C_API/latex/refman.ps $(DESTDIR)/$(datadir)/doc/voms$(DOCVER)/VOMS_C_API.ps
-	-ln -s edg-voms-proxy-init.1.gz    $(DESTDIR)$(mandir)/man1/voms-proxy-init.1.gz
-	-ln -s edg-voms-proxy-list.1.gz    $(DESTDIR)$(mandir)/man1/voms-proxy-list.1.gz
-	-ln -s edg-voms-proxy-info.1.gz    $(DESTDIR)$(mandir)/man1/voms-proxy-info.1.gz
-	-ln -s edg-voms-proxy-destroy.1.gz $(DESTDIR)$(mandir)/man1/voms-proxy-destroy.1.gz
-	-ln -s edg-voms-proxy-fake.1.gz $(DESTDIR)$(mandir)/man1/voms-proxy-fake.1.gz
-	-ln -s edg-voms.8.gz               $(DESTDIR)$(mandir)/man8/voms.8.gz
+	-ln -s voms-proxy-init.1.gz    $(DESTDIR)$(mandir)/man1/edg-voms-proxy-init.1.gz
+	-ln -s voms-proxy-list.1.gz    $(DESTDIR)$(mandir)/man1/edg-voms-proxy-list.1.gz
+	-ln -s voms-proxy-info.1.gz    $(DESTDIR)$(mandir)/man1/edg-voms-proxy-info.1.gz
+	-ln -s voms-proxy-destroy.1.gz $(DESTDIR)$(mandir)/man1/edg-voms-proxy-destroy.1.gz
+	-ln -s voms-proxy-fake.1.gz    $(DESTDIR)$(mandir)/man1/edg-voms-proxy-fake.1.gz
+	-ln -s voms.8.gz               $(DESTDIR)$(mandir)/man8/edg-voms.8.gz
+if ENABLE_GLITE
+	-ln -s voms-proxy-init.1.gz    $(DESTDIR)$(mandir)/man1/glite-voms-proxy-init.1.gz
+	-ln -s voms-proxy-list.1.gz    $(DESTDIR)$(mandir)/man1/glite-voms-proxy-list.1.gz
+	-ln -s voms-proxy-info.1.gz    $(DESTDIR)$(mandir)/man1/glite-voms-proxy-info.1.gz
+	-ln -s voms-proxy-destroy.1.gz $(DESTDIR)$(mandir)/man1/glite-voms-proxy-destroy.1.gz
+	-ln -s voms-proxy-fake.1.gz    $(DESTDIR)$(mandir)/man1/glite-voms-proxy-fake.1.gz
+	-ln -s voms.8.gz               $(DESTDIR)$(mandir)/man8/glite-voms.8.gz
+endif
 else
 install-data-hook:
 endif

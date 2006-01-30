@@ -5,28 +5,28 @@
 <!ENTITY links    SYSTEM "links.sgml">
 ]>
 
-<refentry id='edgvomsproxyfake1'>
+<refentry id='vomsproxyfake1'>
 <refmeta>
-<refentrytitle>edg-voms-proxy-fake</refentrytitle>
+<refentrytitle>voms-proxy-fake</refentrytitle>
 <manvolnum>1</manvolnum>
 <refmiscinfo class='source'>VOMS Client</refmiscinfo>
 </refmeta>
 
 <refnamediv id='name'>
-<refname>edg-voms-proxy-fake</refname>
+<refname>voms-proxy-fake</refname>
 <refpurpose>create a proxy with VOMS extensions</refpurpose>
 </refnamediv>
 
 <refsynopsisdiv id='synopsis'>
 <cmdsynopsis>
-<command>edg-voms-proxy-fake</command>
+<command>voms-proxy-fake</command>
 <arg choice='opt'><arg choice='plain'>options</arg></arg>
 </cmdsynopsis>
 </refsynopsisdiv>
 
 <refsect1 id='description'><title>Description</title>
 
-<para>The edg-voms-proxy-fake generates a proxy containing arbitrary attributes
+<para>The voms-proxy-fake generates a proxy containing arbitrary attributes
 without contacting the VOMS server.</para>
 
 </refsect1>
@@ -129,7 +129,7 @@ as a compatibility feature to ease migration while the servers upgrade to the ne
 
 <refsect1 id='seealso'><title>See also</title>
 
-<para>edg-voms-proxy-fake(1), edg-voms-proxy-init(1), edg-voms-proxy-info(1), edg-voms-proxy-destroy(1)</para>
+<para>voms-proxy-fake(1), voms-proxy-init(1), voms-proxy-info(1), voms-proxy-destroy(1)</para>
 
 &links;
 

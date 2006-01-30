@@ -421,7 +421,7 @@ it would entail.
 \subsection{bool vomsdata::LoadSystemContacts(std::string dir = ``'')}
 This function loads the vomses files that are shared system-wide.
 \parameter{dir}{This is the directory in which the various vomses files are
-kept.  If left as blank, it defaults to \texttt{/opt/edg/etc/vomses}.}
+kept.  If left as blank, it defaults to \texttt{\$PREFIX/etc/vomses}.}
 
 \return
 The return value is true if all went well and false otherwise.  In the
@@ -441,7 +441,7 @@ This function loads the vomses files that are user-specific.
 \parameter{dir}{This is the directory in which the various vomses
 files are kept.  If left as blank, it defaults to
 \texttt{\$VOMS\_USERCONF}.  If this is also empty, then the last
-default is \texttt{$~$/.edg/vomses}.}
+default is \texttt{\$HOME/.edg/vomses}.}
 
 \return
 The return value is true if all went well and false otherwise.  In the

@@ -5,28 +5,28 @@
 <!ENTITY links    SYSTEM "links.sgml">
 ]>
 
-<refentry id='edgvomsproxyinfo1'>
+<refentry id='vomsproxyinfo1'>
 <refmeta>
-<refentrytitle>edg-voms-proxy-info</refentrytitle>
+<refentrytitle>voms-proxy-info</refentrytitle>
 <manvolnum>1</manvolnum>
 <refmiscinfo class='source'>VOMS Client</refmiscinfo>
 </refmeta>
 
 <refnamediv id='name'>
-<refname>edg-voms-proxy-info</refname>
+<refname>voms-proxy-info</refname>
 <refpurpose>prints informations about a proxy with VOMS extensions</refpurpose>
 </refnamediv>
 
 <refsynopsisdiv id='synopsis'>
 <cmdsynopsis>
-<command>edg-voms-proxy-info</command>
+<command>voms-proxy-info</command>
 <arg choice='opt'><arg choice='plain'>options</arg></arg>
 </cmdsynopsis>
 </refsynopsisdiv>
 
 <refsect1 id='description'><title>Description</title>
 
-<para>The edg-voms-proxy-info command pritns information about a proxy, including
+<para>The voms-proxy-info command pritns information about a proxy, including
 information about the VOMS extension.</para>
 
 </refsect1>
@@ -100,7 +100,7 @@ Read options from <emphasis remap='I'>file</emphasis>.</para>
 
 <refsect1 id='seealso'><title>See also</title>
 
-<para>edg-voms-proxy-init(1), edg-voms-proxy-destroy(1)</para>
+    <para>voms-proxy-init(1), voms-proxy-destroy(1)</para>
 
 &links;
 

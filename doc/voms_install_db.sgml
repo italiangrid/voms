@@ -14,7 +14,7 @@
 
 <refnamediv id='name'>
 <refname>voms_install_db</refname>
-<refpurpose>Setup the edg-voms server for initial use</refpurpose>
+<refpurpose>Setup the voms server for initial use</refpurpose>
 </refnamediv>
 
 <refsynopsisdiv id='synopsis'>
@@ -179,7 +179,7 @@ as a compatibility feature to ease migration while the servers upgrade to the ne
 
 <refsect1 id='seealso'><title>See also</title>
 
-<para>edg-voms(8)</para>
+<para>voms(8)</para>
 
 &links;
 

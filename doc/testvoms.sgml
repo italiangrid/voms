@@ -41,9 +41,9 @@ specific group of tests by specifying its name on the command line.</para>
 
 <refsect1 id='seealso'><title>See also</title>
 
-<para>edg-voms(8)</para>
+<para>voms(8)</para>
 
-<para>edg-voms-proxy-init(1)</para>
+<para>voms-proxy-init(1)</para>
 
 &links;
 
