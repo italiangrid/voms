@@ -31,34 +31,11 @@ libvomsapi_la_LIBADD = \
 	$(top_builddir)/src/socklib/libsock.la \
 	$(top_builddir)/src/ac/libccattcert.la
 
-noinst_PROGRAMS = test
-test_SOURCES = test.cc
-test_LDADD = libvomsapi.la
-test_CPPFLAGS = -I$(top_srcdir)/src/include $(GLOBUS_CFLAGS)
-
 CSOURCES = \
 	api_util.cc \
 	voms_api.cc \
 	ccval.cc \
 	cinterface.cc
-
-CLEANFILES = \
-	libvomsapi_gcc32.la \
-	libvomsapi_gcc32dbg.la \
-	libvomsapi_gcc32pthr.la \
-	libvomsapi_gcc32dbgpthr.la \
-	libvomsapi_gcc64.la \
-	libvomsapi_gcc64dbg.la \
-	libvomsapi_gcc64pthr.la \
-	libvomsapi_gcc64dbgpthr.la \
-	libvomsapi_gcc32.la \
-	libvomsapi_gcc32dbg.la \
-	libvomsapi_gcc32pthr.la \
-	libvomsapi_gcc32dbgpthr.la \
-	libvomsc_gcc32.la \
-	libvomsc_gcc32dbg.la \
-	libvomsc_gcc32pthr.la \
-	libvomsc_gcc32dbgpthr.la
 
 libvomsc_la_SOURCES = \
 	$(CSOURCES)
@@ -75,7 +52,17 @@ CLIBADD =
 libvomsc_la_LIBADD = \
 	$(CCLIBADD) \
 	$(top_builddir)/src/socklib/libsock.la \
-	$(top_builddir)/src/ac/libattcert.la
+	$(top_builddir)/src/ac/libccattcert.la
+
+# test programs
+
+noinst_PROGRAMS = test ctest
+test_SOURCES = test.cc
+test_LDADD = libvomsapi.la
+test_CPPFLAGS = -I$(top_srcdir)/src/include $(GLOBUS_CFLAGS)
+ctest_SOURCES = ctest.c
+ctest_LDADD = libvomsc.la
+ctest_CPPFLAGS = -I$(top_srcdir)/src/include $(GLOBUS_CFLAGS)
 
 EXTRA_LTLIBRARIES = \
 	libvomsapi_gcc32.la \
@@ -165,7 +152,7 @@ libvomsc_gcc32_la_CPPFLAGS = \
 libvomsc_gcc32_la_LIBADD = \
 	$(CCLIBADD) \
 	$(top_builddir)/src/socklib/libsock_gcc32.la \
-	$(top_builddir)/src/ac/libattcert_gcc32.la
+	$(top_builddir)/src/ac/libccattcert_gcc32.la
 
 libvomsc_gcc32_la_LDFLAGS = \
 	-rpath $(libdir)
@@ -180,7 +167,7 @@ libvomsc_gcc32dbg_la_CPPFLAGS = \
 libvomsc_gcc32dbg_la_LIBADD = \
 	$(CCLIBADD) \
 	$(top_builddir)/src/socklib/libsock_gcc32dbg.la \
-	$(top_builddir)/src/ac/libattcert_gcc32dbg.la
+	$(top_builddir)/src/ac/libccattcert_gcc32dbg.la
 
 libvomsc_gcc32dbg_la_LDFLAGS = \
 	-rpath $(libdir)
@@ -195,7 +182,7 @@ libvomsc_gcc32pthr_la_CPPFLAGS = \
 libvomsc_gcc32pthr_la_LIBADD = \
 	$(CCLIBADD) \
 	$(top_builddir)/src/socklib/libsock_gcc32pthr.la \
-	$(top_builddir)/src/ac/libattcert_gcc32pthr.la
+	$(top_builddir)/src/ac/libccattcert_gcc32pthr.la
 
 libvomsc_gcc32pthr_la_LDFLAGS = \
 	-rpath $(libdir)
@@ -210,7 +197,7 @@ libvomsc_gcc32dbgpthr_la_CPPFLAGS = \
 libvomsc_gcc32dbgpthr_la_LIBADD = \
 	$(CCLIBADD) \
 	$(top_builddir)/src/socklib/libsock_gcc32dbgpthr.la \
-	$(top_builddir)/src/ac/libattcert_gcc32dbgpthr.la
+	$(top_builddir)/src/ac/libccattcert_gcc32dbgpthr.la
 
 libvomsc_gcc32dbgpthr_la_LDFLAGS = \
 	-rpath $(libdir)
@@ -288,7 +275,7 @@ libvomsc_gcc64_la_CPPFLAGS = \
 libvomsc_gcc64_la_LIBADD = \
 	$(CCLIBADD) \
 	$(top_builddir)/src/socklib/libsock_gcc64.la \
-	$(top_builddir)/src/ac/libattcert_gcc64.la
+	$(top_builddir)/src/ac/libccattcert_gcc64.la
 
 libvomsc_gcc64_la_LDFLAGS = \
 	-rpath $(libdir)
@@ -303,7 +290,7 @@ libvomsc_gcc64dbg_la_CPPFLAGS = \
 libvomsc_gcc64dbg_la_LIBADD = \
 	$(CCLIBADD) \
 	$(top_builddir)/src/socklib/libsock_gcc64dbg.la \
-	$(top_builddir)/src/ac/libattcert_gcc64dbg.la
+	$(top_builddir)/src/ac/libccattcert_gcc64dbg.la
 
 libvomsc_gcc64dbg_la_LDFLAGS = \
 	-rpath $(libdir)
@@ -318,7 +305,7 @@ libvomsc_gcc64pthr_la_CPPFLAGS = \
 libvomsc_gcc64pthr_la_LIBADD = \
 	$(CCLIBADD) \
 	$(top_builddir)/src/socklib/libsock_gcc64pthr.la \
-	$(top_builddir)/src/ac/libattcert_gcc64pthr.la
+	$(top_builddir)/src/ac/libccattcert_gcc64pthr.la
 
 
 libvomsc_gcc64pthr_la_LDFLAGS = \
@@ -334,7 +321,7 @@ libvomsc_gcc64dbgpthr_la_CPPFLAGS = \
 libvomsc_gcc64dbgpthr_la_LIBADD = \
 	$(CCLIBADD) \
 	$(top_builddir)/src/socklib/libsock_gcc64dbgpthr.la \
-	$(top_builddir)/src/ac/libattcert_gcc64dbgpthr.la
+	$(top_builddir)/src/ac/libccattcert_gcc64dbgpthr.la
 
 libvomsc_gcc64dbgpthr_la_LDFLAGS = \
 	-rpath $(libdir)
@@ -350,6 +337,24 @@ EXTRA_DIST = \
 	voms_apic.h \
 	cinterface.h \
   ctest.c
+
+CLEANFILES = \
+	libvomsapi_gcc32.la \
+	libvomsapi_gcc32dbg.la \
+	libvomsapi_gcc32pthr.la \
+	libvomsapi_gcc32dbgpthr.la \
+	libvomsapi_gcc64.la \
+	libvomsapi_gcc64dbg.la \
+	libvomsapi_gcc64pthr.la \
+	libvomsapi_gcc64dbgpthr.la \
+	libvomsapi_gcc32.la \
+	libvomsapi_gcc32dbg.la \
+	libvomsapi_gcc32pthr.la \
+	libvomsapi_gcc32dbgpthr.la \
+	libvomsc_gcc32.la \
+	libvomsc_gcc32dbg.la \
+	libvomsc_gcc32pthr.la \
+	libvomsc_gcc32dbgpthr.la
 
 ###
 
