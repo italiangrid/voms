@@ -144,7 +144,7 @@ Version of the proxy certificate to create. May be 2 or 3.
 Default value is decided upon underlying globus version.</para>
 
 <para><option>-noregen</option>
-Avoid regenerating the initial proxy.</para>
+Use existing proxy to contact the server and to sing the new proxy.</para>
 
 <para><option>-separate</option> <replaceable>file</replaceable>
 Saves the voms credential on file <emphasis remap='I'>file</emphasis>.</para>
