@@ -198,7 +198,7 @@ Client::Client(int argc, char ** argv) :
       "    -path-length <l>               Allow a chain of at most l proxies to be generated from this ones.\n" \
       "    -globus                        Globus version.\n" \
       "    -proxyver                      Version of proxy certificate.\n" \
-      "    -noregen                       Doesn't regenerate a new proxy for the connection.\n" \
+      "    -noregen                       Use existing proxy certificate to connect to server and sign the new proxy.\n" \
       "    -separate <file>               Saves the informations returned by the server on file <file>.\n" \
       "    -ignorewarn                    Ignore warnings.\n" \
       "    -failonwarn                    Treat warnings as errors.\n" \
@@ -275,7 +275,7 @@ Client::Client(int argc, char ** argv) :
       "    -userconf <file>               Non-standard location of user-defined voms server addresses.\n" \
       "    -vomses <file>                 Non-standard loation of configuration files.\n"
       "    -globus                        Globus version.\n" \
-      "    -noregen                       Doesn't regenerate a new proxy for the connection.\n" \
+      "    -noregen                       Use existing proxy certificate to connect to server and sign the new proxy.\n" \
       "    -ignorewarn                    Ignore warnings.\n" \
       "    -failonwarn                    Treat warnings as errors.\n" \
       "    -list                          Show all available attributes.\n" \
@@ -455,7 +455,7 @@ Client::Client(int argc, char ** argv) :
   }
 
   /* allow password from stdin */
-
+  
   if(pwstdin)
     pw_cb = (int (*)())(pwstdin_callback);
 
@@ -579,6 +579,18 @@ bool Client::Run() {
 
   bool ret = true;
   std::string filedata;
+
+  /* check if the certificate expected to sign the proxy is expired */
+  if(!vomses.empty())
+  {
+    time_t not_after = ASN1_UTCTIME_mktime(X509_get_notAfter(pcd->ucert));
+    if ((time(0) - not_after)>0)
+    {
+      std::cerr << std::endl << "ERROR: Your certificate expired "
+                << asctime(localtime(&not_after)) << std::endl;
+      exit(1);
+    }
+  }
 
   /* set output file and environment */
   
@@ -1277,7 +1289,7 @@ bool Client::Test() {
   ASN1_UTCTIME_free(asn1_time);
   time_t time_after = ASN1_UTCTIME_mktime(X509_get_notAfter(pcd->ucert));
   time_t time_diff = time_after - time_now ;
-
+  
   if (time_diff < 0) {
     if (!quiet) 
       std::cout << std::endl << "ERROR: Your certificate expired "
