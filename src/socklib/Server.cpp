@@ -33,6 +33,7 @@ extern "C" {
 #include <time.h>
 #include <stdio.h>
 #include <netdb.h>
+#include <arpa/inet.h>
 
 #include <openssl/evp.h>
 #include <openssl/buffer.h>
@@ -328,12 +329,14 @@ GSISocketServer::Listen()
     struct hostent * he = gethostbyaddr((void *)&peeraddr_in, addrlen, AF_INET);
 #endif
 
-    if (he) {
-      if (he->h_name)
-        LOGM(VARP, logh, LEV_INFO, T_PRE, "Received connection from: %s\n", he->h_name);
-      else
-        LOG(logh, LEV_INFO, T_PRE, "Cannot discover connection origin!\n");
+    if (he && he->h_name)
+      LOGM(VARP, logh, LEV_INFO, T_PRE, "Received connection from: %s\n", he->h_name);
+    else
+    {
+      char buffer[16];
+      LOGM(VARP, logh, LEV_INFO, T_PRE, "Received connection from: %s\n", inet_ntop(AF_INET, &peeraddr_in.sin_addr, buffer, 16));
     }
+
     newopened = true;
     return true;
   }

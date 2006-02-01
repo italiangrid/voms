@@ -811,6 +811,7 @@ VOMSServer::Execute(const std::string &client_name, const std::string &ca_name,
     std::string codedac;
 
     if (*comm != 'N') {
+      
       if (!serial)
         LOG(logh, LEV_ERROR, T_PRE, "Can't get Serial Number!");
       
@@ -844,9 +845,14 @@ VOMSServer::Execute(const std::string &client_name, const std::string &ca_name,
           errs.push_back(err);
         }
       }
-
+      
       if (res || codedac.empty()) {
-        sock.Send("");
+        LOG(logh, LEV_ERROR, T_PRE, "Error in executing request!");
+        err.message = voname + ": Unable to satisfy " + r.command + " request due to database error.";
+        errs.push_back(err);
+        std::string ret = XML_Ans_Encode("A", errs);
+        LOGM(VARP, logh, LEV_DEBUG, T_PRE, "Sending: %s", ret.c_str());
+        sock.Send(ret);
         return false;
       }
     }
