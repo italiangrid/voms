@@ -1399,6 +1399,43 @@ bool Client::pcdInit() {
   else if (proxy_get_filenames(pcd, 0, &cacertfile, &certdir, &outfile, &certfile, &keyfile))
     goto err;
   
+  // verify that user's certificate and key have the correct permissions
+
+  struct stat stats;
+  
+  assert(stat("/data/valerio/.globus/usercert.pem", &stats) == 0);
+  if (stats.st_mode & S_IXUSR || 
+      stats.st_mode & S_IWGRP ||  
+      stats.st_mode & S_IXGRP ||
+      stats.st_mode & S_IWOTH ||
+      stats.st_mode & S_IXOTH
+      )  
+  {
+    std::cerr << std::endl << "ERROR: Couldn't find valid credentials to generate a proxy." << std::endl 
+              << "Use --debug for further information." << std::endl;
+    if(debug) {
+      std::cout << "Wrong permissions on file: " << certfile << std::endl;
+    }
+    exit(1);
+  }
+
+  assert(stat(keyfile, &stats) == 0);
+  if (stats.st_mode & S_IXUSR || 
+      stats.st_mode & S_IRGRP ||  
+      stats.st_mode & S_IWGRP ||  
+      stats.st_mode & S_IXGRP ||
+      stats.st_mode & S_IRGRP ||  
+      stats.st_mode & S_IWOTH ||
+      stats.st_mode & S_IXOTH)  
+  {
+    std::cerr << std::endl << "ERROR: Couldn't find valid credentials to generate a proxy." << std::endl 
+              << "Use --debug for further information." << std::endl;
+    if(debug) {
+      std::cout << "Wrong permissions on file: " << keyfile << std::endl;
+    }
+    exit(1);
+  }
+  
   if(debug) std::cout << "Files being used:" << std::endl 
 		      << " CA certificate file: " << (cacertfile ? cacertfile : "none") << std::endl
 		      << " Trusted certificates directory : " << (this->certdir ? this->certdir : "none") << std::endl
