@@ -225,6 +225,7 @@ function stop() {
             echo -n "Stopping $prog($vo): "
 #	    pids=$(ps axo pid,args | grep "${voms} --conf $@LOCATION_ENV@/etc/voms/$vo/voms.conf" | grep -v grep | cut -f 1 -d '/')
             pids=`ps -efww | grep "$@LOCATION_ENV@/sbin/edg-voms --conf $@LOCATION_ENV@/etc/voms/$vo/voms.conf" | grep -v grep|awk '{ print $2; }'`
+            dbname=`grep dbname $@LOCATIONS_ENV@/etc/voms/$vo/voms.conf | awk -F"=" '{ print $2; }'`
             pids2=`ps -efww | grep middleman$vo | grep -v grep|awk '{ print $2; }'`
             if test "x$pids2" != "x"; then
                 kill -TERM $pids2
