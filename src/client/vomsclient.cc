@@ -112,6 +112,23 @@ extern void proxy_verify_ctx_init(proxy_verify_ctx_desc * pvxd);
   
 }
 
+class rand_wrapper 
+{
+
+public:
+  
+  rand_wrapper(unsigned int seed)
+  {
+    srand(seed);
+  }
+
+  ptrdiff_t operator() (ptrdiff_t max)
+  {
+    return static_cast<ptrdiff_t>(rand() % max);
+  }
+
+};
+
 Client::Client(int argc, char ** argv) :
                                            ignorewarn(false),
                                            failonwarn(false),
@@ -580,18 +597,6 @@ bool Client::Run() {
   bool ret = true;
   std::string filedata;
 
-  /* check if the certificate expected to sign the proxy is expired */
-  if(!vomses.empty())
-  {
-    time_t not_after = ASN1_UTCTIME_mktime(X509_get_notAfter(pcd->ucert));
-    if ((time(0) - not_after)>0)
-    {
-      std::cerr << std::endl << "ERROR: Your certificate expired "
-                << asctime(localtime(&not_after)) << std::endl;
-      exit(1);
-    }
-  }
-
   /* set output file and environment */
   
   char * oldenv = getenv("X509_USER_PROXY");
@@ -633,20 +638,24 @@ bool Client::Run() {
     
     std::vector<contactdata> servers;
     servers = v.FindByAlias(nick);
-    if (!servers.empty())
-      random_shuffle(servers.begin(), servers.end());
-    
+    if (!servers.empty()){
+      rand_wrapper rd(time(0));
+      random_shuffle(servers.begin(), 
+                     servers.end(),
+                     rd);
+    }
+
     /* and contact them */
 
     std::string buffer;
     int version;
     
+    /* contact each server until one answers */
     for (std::vector<contactdata>::iterator beg = servers.begin(); beg != servers.end(); beg++) {
-  
-      if(!noregen) {
-	
-        /* create a temporary proxy to contact the server */  
-	
+
+      /* create a temporary proxy to contact the server */    
+      if(!noregen) 
+      {
         if(!quiet) std::cout << "Creating temporary proxy " << std::flush;
         if(debug) std::cout << "to " << proxyfile << " " << std::flush;
         int tmp = hours;
@@ -657,42 +666,51 @@ bool Client::Run() {
       }
       
       /* parse fqan */
-      
       std::string command;
       if(!fqan.empty())
         command = FQANParse(fqan);
       else command = "G/" + beg->vo; 
       
       /* contact server */
-      
       if(!quiet) std::cout << "Contacting " << " " << beg->host << ":" << beg->port
                            << " [" << beg->contact << "] \"" << beg->vo << "\"" << std::flush;
       
+      /* when called voms-proxy-list */
       if (listing)
         command = "N";
 
       int status = v.ContactRaw(beg->host, beg->port, beg->contact, command, buffer, version);
-      
-      /* check for errors from the server */
-      
-      std::string error = v.ServerErrors();
 
+      /* print status */
+      if(!status)
+      {
+        if(!quiet) 
+          std::cout << " Failed" << std::endl;
+      }        
+      else
+      {
+        if(!quiet)
+          std::cout << " Done" << std::endl;
+      }
+      
+      /* check for socket error */
       if (!status && v.error == VERR_NOSOCKET)
         Error();
       
-      if (!status && !error.empty()) {
-        std::cerr << std::endl << "Error: " << error << std::endl;
-        exit(1);
+      /* check for errors from the server */
+      std::string serror = v.ServerErrors();
+      if (!status && !serror.empty()) {
+        std::cerr << std::endl << "Error: " << serror << std::endl;
       }
 
       /* check for warnings from the server */
-
-      if(!ignorewarn && !error.empty()) {
-
+      if((status && !serror.empty()) && !ignorewarn)
+      {
         if(!quiet) 
-          std::cerr << std::endl << "Warning: " << error << std::endl << std::endl;
+          std::cerr << std::endl << "Warning: " << serror << std::endl << std::endl;
         
-        if(failonwarn) {
+        if(failonwarn) 
+        {
           if (!quiet)
             std::cerr << std::endl << "Error in getting data from VOMS server:" << beg->contact
                       << " (or in memorizing)" << std::endl;
@@ -701,58 +719,37 @@ bool Client::Run() {
       }
       
       /* check for errors */
-      
-      error = v.ErrorMessage();
-
-      if (!status && !error.empty()) {
-        std::cerr << std::endl << "Error: " << error << std::endl;
-        exit(1);
+      std::string cerror = v.ErrorMessage();
+      if (!status && serror.empty() && !cerror.empty())
+      {
+        std::cerr << std::endl << "Error: " << cerror << std::endl;
       }
 
-      if (isAC(buffer)) {
-        
-        if (status) {
-          
-          std::cout << " Done" << std::endl;
-          
+      /* digets AC */
+      if(status)
+      {
+        if (isAC(buffer)) 
+        {
           /* retrieve AC and add to list */
-        
           if (!Retrieve(buffer)) {
             std::cerr << "\nError decoding AC." << std::endl;
             std::cerr << "Error: " << v.ErrorMessage() << std::endl;
             exit(3);
           }
-
-
-        
-          // if contact succeded jumps to other vos */
+          
+          /* if contact succeded jumps to other vos */
           break;
         }
-        else if(!quiet) 
-          std::cout << " Failed";
+        else {
+          data += buffer;
+          break;
+        }
       }
-      else {
-        data += buffer;
-        break;
-      }
-
-      /* check for errors */
       
-//       static std::string retmsg[] = { "VERR_NONE", "VERR_NOSOCKET", "VERR_NOIDENT", "VERR_COMM", 
-// 				      "VERR_PARAM", "VERR_NOEXT", "VERR_NOINIT",
-// 				      "VERR_TIME", "VERR_IDCHECK", "VERR_EXTRAINFO",
-// 				      "VERR_FORMAT", "VERR_NODATA", "VERR_PARSE",
-// 				      "VERR_DIR", "VERR_SIGN", "VERR_SERVER", 
-// 				      "VERR_MEM", "VERR_VERIFY", "VERR_TYPE",
-// 				      "VERR_ORDER", "VERR_SERVERCODE"};      
-      
-      if(!quiet) {
-        std::cerr << "\n Error: " << v.ErrorMessage() << std::endl;
-      }
-
       if(beg != servers.end()-1) 
       {
-        if(!quiet) std::cout << std::endl << "Trying next server for " << beg->nick << "." << std::endl;
+        if(!quiet) 
+          std::cout << std::endl << "Trying next server for " << beg->nick << "." << std::endl;
       }
       else 
       {
@@ -1403,7 +1400,8 @@ bool Client::pcdInit() {
 
   struct stat stats;
   
-  assert(stat("/data/valerio/.globus/usercert.pem", &stats) == 0);
+  if(stat(certfile, &stats) == -1)
+    std::cerr << "Unable to find user certificate."<< std::endl;
   if (stats.st_mode & S_IXUSR || 
       stats.st_mode & S_IWGRP ||  
       stats.st_mode & S_IXGRP ||
@@ -1419,7 +1417,8 @@ bool Client::pcdInit() {
     exit(1);
   }
 
-  assert(stat(keyfile, &stats) == 0);
+  if(stat(keyfile, &stats) == 1)
+    std::cerr << "Unable to find user certificate."<< std::endl;
   if (stats.st_mode & S_IXUSR || 
       stats.st_mode & S_IRGRP ||  
       stats.st_mode & S_IWGRP ||  
