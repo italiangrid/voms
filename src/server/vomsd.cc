@@ -820,7 +820,7 @@ VOMSServer::Execute(const std::string &client_name, const std::string &ca_name,
 
         LOGM(VARP, logh, LEV_DEBUG, T_PRE, "length = %d", i2d_AC(a, NULL));
         if (a)
-          res = createac(issuer, holder, key, serial, compact, targs, &a,
+          res = createac(issuer, sock.own_stack, holder, key, serial, compact, targs, &a,
                          voname, uri, requested, !newformat);
 
         LOGM(VARP, logh, LEV_DEBUG, T_PRE, "length = %d", i2d_AC(a, NULL));

@@ -23,6 +23,7 @@ extern "C" {
 #include <netinet/in.h>
 #include <sys/socket.h>
 #include <sys/wait.h>
+
 #include <signal.h>
   /*#include "gssapi_compat.h"*/
 #include "gssapi.h"
@@ -46,6 +47,7 @@ extern "C" {
 
 #include <iostream>
 #include <iomanip>
+#include <fstream>
 
 #include "sign.h"
 #include "api_util.h"
@@ -362,11 +364,151 @@ bool vomsdata::check_sig_ac(X509 *cert, void *data)
 X509 *
 vomsdata::check(check_sig f, void *data)
 {
-  return check(data);
+  // This should not be used anymore.  Only left here for binary compatibility.
+  return NULL;
 }
+
 
 X509 *
 vomsdata::check(void *data)
+{
+  error = VERR_DIR;
+
+  /* extract vo name from AC */
+  
+  AC * ac = (AC *)data;
+  STACK_OF(AC_ATTR) * atts = ac->acinfo->attrib;
+  int nid = OBJ_txt2nid("idatcap");
+  int pos = X509at_get_attr_by_NID(atts, nid, -1);
+
+  int nidc = OBJ_txt2nid("certseq");
+  STACK_OF(X509_EXTENSION) *exts = ac->acinfo->exts;
+  int posc = X509v3_get_ext_by_NID(exts, nidc, -1);
+
+  if (!(pos >=0)) {
+    seterror(VERR_DIR, "Unable to extract vo name from AC.");
+    return NULL;
+  }
+  AC_ATTR * caps = sk_AC_ATTR_value(atts, pos);
+  if(!caps) {
+    seterror(VERR_DIR, "Unable to extract vo name from AC.");
+    return NULL;
+  }
+  AC_IETFATTR * capattr = sk_AC_IETFATTR_value(caps->ietfattr, 0);
+  if(!capattr) {
+    seterror(VERR_DIR, "Unable to extract vo name from AC.");
+    return NULL;
+  }
+  GENERAL_NAME * name = sk_GENERAL_NAME_value(capattr->names, 0);
+  if(!name) {
+    seterror(VERR_DIR, "Unable to extract vo name from AC.");
+    return NULL;
+  }
+  
+  std::string voname((const char *)name->d.ia5->data, 0, name->d.ia5->length);
+  std::string::size_type cpos = voname.find("://");
+  std::string hostname;
+
+  if (cpos != std::string::npos) {
+    std::string::size_type cpos2 = voname.find(":", cpos+1);
+
+    if (cpos2 != std::string::npos) 
+      hostname = voname.substr(cpos+3, (cpos2 - cpos - 3));
+    else {
+      seterror(VERR_DIR, "Unable to determine hostname from AC.");
+      return NULL;
+    }
+      
+    voname = voname.substr(0, cpos);
+  } 
+  else {
+    seterror(VERR_DIR, "Unable to extract vo name from AC.");
+    return NULL;
+  }
+
+
+  /* check if the DN/CA file is installed for a given VO. */
+  if (posc >= 0) {
+    std::string filecerts = voms_cert_dir + "/" + voname + "/" + hostname + ".lsc";
+    std::ifstream file(filecerts.c_str());
+
+    if (file)
+      return check_from_file(ac, file, voname);
+
+  }
+
+  /* check if able to find the signing certificate 
+     among those specific for the vo or else in the vomsdir
+     directory */
+  return check_from_certs(ac, voname);
+}
+
+X509 *vomsdata::check_from_certs(AC *ac, const std::string& voname)
+{
+  bool found  = false;
+
+  DIR * dp = NULL;
+  BIO * in = NULL;
+  X509 * x = NULL;
+
+  for(int i = 0; (i < 2 && !found); ++i) {
+    
+    std::string directory = voms_cert_dir + (i ? "" : "/" + voname);
+    
+    dp = opendir(directory.c_str());
+    if (!dp) {
+      if(!i) {
+        continue;
+      }
+      else {
+        break;
+      }
+    }
+
+    while(struct dirent * de = readdir(dp)) {
+      char * name = de->d_name;
+      if (name) {
+        in = BIO_new(BIO_s_file());
+        if (in) {
+          std::string temp = directory + "/" + name;
+          if (BIO_read_filename(in, temp.c_str()) > 0) {
+            x = PEM_read_bio_X509(in, NULL, 0, NULL);
+            if (x) {
+              if (check_sig_ac(x, ac)) {
+                found = true;
+                break;
+              }
+              else {
+                X509_free(x);
+                x = NULL;
+              }
+            }
+          }
+          BIO_free(in);
+          in = NULL;
+        }
+      }
+    }
+  }
+
+  if (in) 
+    BIO_free(in);
+  (void)closedir(dp);
+  if (found) {
+    if (!check_cert(x)) {
+      X509_free(x);
+      x = NULL;
+    }
+  }
+  else
+    seterror(VERR_SIGN, std::string("Cannot find certificate of AC issuer for vo ") + voname);
+  
+  return x;
+}
+
+#if 0
+X509 *
+vomsdata::check_file(void *data)
 {
   error = VERR_DIR;
 
@@ -397,7 +539,6 @@ vomsdata::check(void *data)
     seterror(VERR_DIR, "Unable to extract vo name from AC.");
     return NULL;
   }
-  
   std::string voname((const char *)name->d.ia5->data, 0, name->d.ia5->length);
   std::string::size_type cpos = voname.find("://");
   if (cpos != std::string::npos) {
@@ -407,68 +548,80 @@ vomsdata::check(void *data)
     seterror(VERR_DIR, "Unable to extract vo name from AC.");
     return NULL;
   }
+  
 
+  return check_from_file(ac, voname);
+}
+#endif
+
+X509 *vomsdata::check_from_file(AC *ac, std::ifstream &file, const std::string &voname)
+{
+  if (!file || !ac) {
+    return NULL;
+  }
+
+  int nid = OBJ_txt2nid("certseq");
+  STACK_OF(X509_EXTENSION) *exts = ac->acinfo->exts;
+  int pos = X509v3_get_ext_by_NID(exts, nid, -1);
+  X509_EXTENSION *ext=sk_X509_EXTENSION_value(exts, pos);
+
+  AC_CERTS *certs = (AC_CERTS *)X509V3_EXT_d2i(ext);
+  STACK_OF(X509) *certstack = certs->stackcert;
+
+  bool success = true;
+
+  for (int i = 0; i < sk_X509_num(certstack); i++) {
+    if (!file) {
+      success = false;
+      break;
+    }
+    char subjcandidate[1000];
+    char issuercandidate[1000];
+
+    X509 *current = sk_X509_value(certstack, i);
+    file.getline(subjcandidate,999);
+    file.getline(issuercandidate, 999);
+    char *realsubj = X509_NAME_oneline(X509_get_subject_name(current), NULL, 0);
+    char *realiss  = X509_NAME_oneline(X509_get_issuer_name(current), NULL, 0);
+    if (strcmp(realsubj, subjcandidate) ||
+        strcmp(realiss, issuercandidate)) {
+      OPENSSL_free(realsubj);
+      OPENSSL_free(realiss);
+      success = false;
+      seterror(VERR_SIGN, "Unable to match certificate chain against file: " + voname + ".lsc");
+      break;
+    }
+  }
+  file.close();
+  if (!success) {
+    AC_CERTS_free(certs);
+    return NULL;
+  }
+                  
   /* check if able to find the signing certificate 
      among those specific for the vo or else in the vomsdir
      directory */
 
-  DIR * dp = NULL;
-  BIO * in = NULL;
-  X509 * x = NULL;
+  X509 *cert = (X509 *)ASN1_dup((int (*)())i2d_X509, (char * (*)())d2i_X509, (char *)sk_X509_value(certstack, 0));
 
-  for(int i = 0; (i < 2 && !found); ++i) {
-    
-    std::string directory = voms_cert_dir + (i ? "" : "/" + voname);
-    
-    dp = opendir(directory.c_str());
-    if (!dp) {
-      if(!i) {
-        continue;
-      }
-      else {
-        break;
-      }
-    }
+  bool found = false;
 
-    while(struct dirent * de = readdir(dp)) {
-      char * name = de->d_name;
-      if (name) {
-        in = BIO_new(BIO_s_file());
-        if (in) {
-          std::string temp = directory + "/" + name;
-          if (BIO_read_filename(in, temp.c_str()) > 0) {
-            x = PEM_read_bio_X509(in, NULL, 0, NULL);
-            if (x) {
-              if (check_sig_ac(x, data)) {
-                found = true;
-                break;
-              }
-              else {
-                X509_free(x);
-                x = NULL;
-              }
-            }
-          }
-          BIO_free(in);
-          in = NULL;
-        }
-      }
-    }
-  }
+  if (check_sig_ac(cert, ac))
+    found = true;
+  else
+    seterror(VERR_SIGN, "Unable to verify signature!");
 
-  if (in) 
-    BIO_free(in);
-  (void)closedir(dp);
   if (found) {
-    if (!check_cert(x)) {
-      X509_free(x);
-      x = NULL;
+    if (!check_cert(certstack)) {
+      cert = NULL;
+      seterror(VERR_SIGN, "Unable to verify certificate chain.");
     }
   }
   else
     seterror(VERR_SIGN, std::string("Cannot find certificate of AC issuer for vo ") + voname);
-  
-  return x;
+
+  AC_CERTS_free(certs);
+  return cert;
 }
 
 bool
@@ -503,6 +656,42 @@ vomsdata::check_cert(X509 *cert)
   if (csc) X509_STORE_CTX_free(csc);
 
   return (i != 0);
+}
+
+bool
+vomsdata::check_cert(STACK_OF(X509) *stack)
+{
+  X509_STORE *ctx = NULL;
+  X509_STORE_CTX *csc = NULL;
+  X509_LOOKUP *lookup = NULL;
+  int index = 0;
+
+  csc = X509_STORE_CTX_new();
+  ctx = X509_STORE_new();
+  error = VERR_MEM;
+  if (ctx && csc) {
+    X509_STORE_set_verify_cb_func(ctx,cb);
+#ifdef SIGPIPE
+    signal(SIGPIPE,SIG_IGN);
+#endif
+    CRYPTO_malloc_init();
+    if ((lookup = X509_STORE_add_lookup(ctx, X509_LOOKUP_file()))) {
+      X509_LOOKUP_load_file(lookup, NULL, X509_FILETYPE_DEFAULT);
+      if ((lookup=X509_STORE_add_lookup(ctx,X509_LOOKUP_hash_dir()))) {
+        X509_LOOKUP_add_dir(lookup, ca_cert_dir.c_str(), X509_FILETYPE_PEM);
+        for (int i = 1; i < sk_X509_num(stack); i++)
+          X509_STORE_add_cert(ctx,sk_X509_value(stack, i));
+        ERR_clear_error();
+        error = VERR_VERIFY;
+        X509_STORE_CTX_init(csc, ctx, sk_X509_value(stack, 0), NULL);
+        index = X509_verify_cert(csc);
+      }
+    }
+  }
+  if (ctx) X509_STORE_free(ctx);
+  if (csc) X509_STORE_CTX_free(csc);
+
+  return (index != 0);
 }
 
 

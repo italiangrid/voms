@@ -33,7 +33,6 @@ extern "C" {
 #include <time.h>
 #include <stdio.h>
 #include <netdb.h>
-#include <arpa/inet.h>
 
 #include <openssl/evp.h>
 #include <openssl/buffer.h>
@@ -276,6 +275,26 @@ GSISocketServer::AcceptGSIAuthentication()
     own_subject = std::string(tmp);
   free(tmp);
 
+  X509 *rcert = NULL;
+  STACK_OF(X509) *stk = NULL;
+
+  rcert = decouple_cred(credential, version, &stk);
+  own_stack = stk;
+
+  LOGM(VARP, logh, LEV_DEBUG, T_PRE, "Certificate DN: %s",
+       X509_NAME_oneline(X509_get_subject_name(rcert), NULL, 0));
+  LOGM(VARP, logh, LEV_DEBUG, T_PRE, "Certificate CA: %s",
+       X509_NAME_oneline(X509_get_issuer_name(rcert), NULL, 0));
+  LOGM(VARP, logh, LEV_DEBUG, T_PRE, "Stack Size: %d", sk_X509_num(stk));
+
+  for (int i = 0; i < sk_X509_num(stk); i++) {
+    X509 *cert = sk_X509_value(stk, i);
+    LOGM(VARP, logh, LEV_DEBUG, T_PRE, "Certificate DN: %s",
+         X509_NAME_oneline(X509_get_subject_name(cert), NULL, 0));
+    LOGM(VARP, logh, LEV_DEBUG, T_PRE, "Certificate CA: %s",
+         X509_NAME_oneline(X509_get_issuer_name(cert), NULL, 0));
+  }
+
   tmp = NULL;
   (void)get_own_data(credential, version, &own_key, &tmp, &own_cert);
   if (tmp)
@@ -329,14 +348,12 @@ GSISocketServer::Listen()
     struct hostent * he = gethostbyaddr((void *)&peeraddr_in, addrlen, AF_INET);
 #endif
 
-    if (he && he->h_name)
+    if (he) {
+      if (he->h_name)
       LOGM(VARP, logh, LEV_INFO, T_PRE, "Received connection from: %s\n", he->h_name);
     else
-    {
-      char buffer[16];
-      LOGM(VARP, logh, LEV_INFO, T_PRE, "Received connection from: %s\n", inet_ntop(AF_INET, &peeraddr_in.sin_addr, buffer, 16));
+        LOG(logh, LEV_INFO, T_PRE, "Cannot discover connection origin!\n");
     }
-
     newopened = true;
     return true;
   }

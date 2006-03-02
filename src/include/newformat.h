@@ -102,6 +102,10 @@ typedef struct ACSEQ {
   STACK_OF(AC) *acs;
 } AC_SEQ;
 
+typedef struct ACCERTS {
+  STACK_OF(X509) *stackcert;
+} AC_CERTS;
+
 DECL_STACK(AC_TARGET)
 DECL_STACK(AC_TARGETS)
 DECL_STACK(AC_IETFATTR)
@@ -115,6 +119,7 @@ DECL_STACK(AC_ACI);
 DECL_STACK(AC_FORM);
 DECL_STACK(AC_IS);
 DECL_STACK(AC_DIGEST);
+DECL_STACK(AC_CERTS);
 
 extern int i2d_AC_ATTR(AC_ATTR *a, unsigned char **pp);
 extern AC_ATTR *d2i_AC_ATTR(AC_ATTR **a, unsigned char **p, long length);
@@ -177,5 +182,10 @@ extern int i2d_AC_SEQ(AC_SEQ *a, unsigned char **pp) ;
 extern AC_SEQ *d2i_AC_SEQ(AC_SEQ **a, unsigned char **pp, long length);
 extern AC_SEQ *AC_SEQ_new(void);
 extern void AC_SEQ_free(AC_SEQ *a);
+
+extern int i2d_AC_CERTS(AC_CERTS *a, unsigned char **pp) ;
+extern AC_CERTS *d2i_AC_CERTS(AC_CERTS **a, unsigned char **pp, long length);
+extern AC_CERTS *AC_CERTS_new(void);
+extern void AC_CERTS_free(AC_CERTS *a);
 
 #endif

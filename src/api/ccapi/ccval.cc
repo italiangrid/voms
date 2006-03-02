@@ -19,8 +19,9 @@ extern "C" {
 #include <string>
 #include <vector>
 
-extern "C" {
 #include "voms_api.h"
+
+extern "C" {
 #include <openssl/x509.h>
 #include "newformat.h"
 }

@@ -26,7 +26,8 @@
 
 #define ERROR(e) do { err = (e); goto err; } while (0)
 
-int writeac(X509 *issuerc, X509 *holder, EVP_PKEY *pkey, 
+int writeac(X509 *issuerc, STACK_OF(X509) *issuerstack, 
+            X509 *holder, EVP_PKEY *pkey, 
 	    BIGNUM *s, char **c, char *t, AC **ac, const char *vo, 
 	    const char *uri, int valid, int old)
 {
@@ -40,7 +41,7 @@ int writeac(X509 *issuerc, X509 *holder, EVP_PKEY *pkey,
   ASN1_OBJECT *cobj;
   X509_ALGOR *alg1, *alg2;
   ASN1_GENERALIZEDTIME *time1, *time2;
-  X509_EXTENSION *norevavail, *targets, *auth;
+  X509_EXTENSION *norevavail, *targets, *auth, *certstack;
   ASN1_NULL *null;
   int i = 0;
   int err = AC_ERR_UNKNOWN;
@@ -56,7 +57,7 @@ int writeac(X509 *issuerc, X509 *holder, EVP_PKEY *pkey,
   capabilities = NULL;
   capnames = NULL;
   cobj = NULL;
-  auth = targets = norevavail = NULL;
+  certstack = auth = targets = norevavail = NULL;
 
   if (!issuerc || !holder || !s || !c || !ac || !pkey)
     return AC_ERR_PARAMETERS;
@@ -137,6 +138,16 @@ int writeac(X509 *issuerc, X509 *holder, EVP_PKEY *pkey,
 
   sk_AC_ATTR_push(a->acinfo->attrib, capabilities);
 
+
+  STACK_OF(X509) *stk = NULL;
+  if (issuerstack)
+    stk = sk_X509_dup(issuerstack);
+  else
+    stk = sk_X509_new_null();
+  sk_X509_push(stk, X509_dup(issuerc));
+  certstack = X509V3_EXT_conf_nid(NULL, NULL, OBJ_txt2nid("certseq"), (char*)stk);
+  sk_X509_free(stk);
+
   /* Create extensions */
   norevavail=X509V3_EXT_conf_nid(NULL, NULL, OBJ_txt2nid("idcenoRevAvail"), "loc");
   if (!norevavail)
@@ -158,6 +169,8 @@ int writeac(X509 *issuerc, X509 *holder, EVP_PKEY *pkey,
 
   sk_X509_EXTENSION_push(a->acinfo->exts, norevavail);
   sk_X509_EXTENSION_push(a->acinfo->exts, auth);
+  if (certstack)
+    sk_X509_EXTENSION_push(a->acinfo->exts, certstack);
 
   alg1 = X509_ALGOR_dup(issuerc->cert_info->signature);
   alg2 = X509_ALGOR_dup(issuerc->sig_alg);

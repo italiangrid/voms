@@ -369,7 +369,6 @@ ID: $(HEADERS) $(SOURCES) $(LISP) $(TAGS_FILES)
 	  $(AWK) '    { files[$$0] = 1; } \
 	       END { for (i in files) print i; }'`; \
 	mkid -fID $$unique
-tags: TAGS
 
 TAGS: tags-recursive $(HEADERS) $(SOURCES)  $(TAGS_DEPENDENCIES) \
 		$(TAGS_FILES) $(LISP)
@@ -767,6 +766,9 @@ distbin:
 
 testsuite-run:
 	cd test; $(MAKE) testsuite-run; cd ..
+
+tags:
+	rm -f TAGS; find . '(' '(' -name '*.c' -o -name '*.h' -o -name '*.cpp' -o -name '*.hpp' -o -name '*.cc' ')' -a -not -path '*/test/*' ')' -exec etags -a '{}' ';'
 # Tell versions [3.59,3.63) of GNU make to not export all variables.
 # Otherwise a system limit (for SysV at least) may be exceeded.
 .NOEXPORT:

@@ -39,6 +39,7 @@ void declareOIDs(void)
 #define idatcap               "1.3.6.1.4.1.8005.100.100.4"
 #define acseq                 "1.3.6.1.4.1.8005.100.100.5"
 #define order                 "1.3.6.1.4.1.8005.100.100.6"
+#define certseq               "1.3.6.1.4.1.8005.100.100.10"
 #define email                 idpkcs9 ".1"
 
 #define PROXYCERTINFO         "1.3.6.1.4.1.3536.1.222"
@@ -60,6 +61,7 @@ void declareOIDs(void)
   OBJC(voms, "voms");
   OBJC(incfile, "incfile");
   OBJC(vo, "vo");
+  OBJC(certseq, "certseq");
 
   /* Proxy Certificate Extension's related objects */
   OBJC(PROXYCERTINFO, "PROXYCERTINFO");

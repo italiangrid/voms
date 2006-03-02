@@ -20,7 +20,7 @@
 #include <openssl/x509.h>
 #include <openssl/x509v3.h>
 
-extern int writeac(const X509 *issuerc, const X509 *holder, 
+extern int writeac(const X509 *issuerc, const STACK_OF(X509) *certstack, const X509 *holder, 
 		   const EVP_PKEY *pkey, BIGNUM *s, char **c, 
 		   const char *t, AC **ac, const char *voname, 
 		   const char *uri, int valid, int old);

@@ -33,7 +33,7 @@ extern char *Decode(const char *, int, int *);
 
 }
 
-int createac(X509 *issuerc, X509 *holder, EVP_PKEY *pkey, BIGNUM *s,
+int createac(X509 *issuerc, STACK_OF(X509) *issuerstack, X509 *holder, EVP_PKEY *pkey, BIGNUM *s,
 	      std::vector<std::string> &c, std::vector<std::string> &t, 
 	      AC **ac, std::string vo, std::string uri, int valid, bool old)
 {
@@ -67,7 +67,7 @@ int createac(X509 *issuerc, X509 *holder, EVP_PKEY *pkey, BIGNUM *s,
       else
         complete += "," + (*i);
 
-    int res = writeac(issuerc, holder, pkey, s, array, 
+    int res = writeac(issuerc, issuerstack, holder, pkey, s, array, 
 		      (complete.empty() ? NULL :
 		       const_cast<char *>(complete.c_str())),
 		      ac, const_cast<char *>(vo.c_str()), 

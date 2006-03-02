@@ -25,7 +25,7 @@ extern "C" {
 #include <vector>
 #include <string>
 
-extern int createac(X509 *, X509 *, EVP_PKEY *, BIGNUM *,
+extern int createac(X509 *, STACK_OF(X509) *, X509 *, EVP_PKEY *, BIGNUM *,
 		     std::vector<std::string> &, std::vector<std::string> &, 
 		     AC **, std::string, std::string, int valid, bool old);
 #endif

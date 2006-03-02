@@ -71,4 +71,6 @@
 #define X509_ERR_HOLDER_NAME        5050
 #define AC_ERR_NO_EXTENSION         5051
 
+#define ASN1_F_D2I_AC_CERTS         5052
+#define AC_F_X509_New               5053
 #endif

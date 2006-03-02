@@ -123,6 +123,7 @@ public:
   EVP_PKEY *peer_key;
   X509 *own_cert;
   X509 *peer_cert;
+  STACK_OF(X509) *own_stack;
 
 private:
   int port;

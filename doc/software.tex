@@ -304,9 +304,44 @@ certificates.
 
 
 \section{Configuration}
-First of all, in ``/etc/grid-security/vomsdir'' you should include a
-copy of the host certificates of all the VOMS servers that could be
-contacted by the users.
+\subsection{The vomsdir directory}
+Since the attribute certificates that come with voms proxies include
+the signature of the issuing hosts, it becomes necessary for both the
+command line utilities and the APIs to have a way to access the
+issuing host's own certificate.  For this reason, a directory, must be
+setup.
+
+Its default name is ``/etc/grid-security/vomsdir'', but this can be
+overridden by setting the X509\_VOMS\_DIR envirinment variable.
+
+For each VO supported on the host, a subdirectory must be created with
+the same name as the VO.  In this subdirectory two kinds of files may
+be present.
+
+\begin{enumerate}
+\item \texttt{\*.lsc} files.  These files contain data regarding the
+signing certificate, in the format:
+
+$<$DN$>$\newline
+$<$CA$>$\newline
+\ .\newline
+\ .\newline
+\ .\newline
+$<$DN$>$\newline
+$<$CA$>$\newline
+
+Where each couple DN,CA is the corresponding couple in the signing
+certificate's cert chain. The name of this file MUST be $<$voms host
+name$>$.lsc where $<$voms host name$>$ is the output of the
+\texttt{hostname} command in the VOMS server.  Such files will be
+tested against the certificate chain included in the VOMS ac.
+
+\item Otherwise you may have files containing the whole certificate
+chain of the host.  There is no special requirement on the name,
+except that it must not end with '\texttt{.lsc}'
+\end{enumerate}
+
+
 
 Second, in ``\$PREFIX/etc/vomses'' You should put a copy of the
 \emph{vomses} file distributed by all the VOMS servers you wish to

@@ -15,8 +15,10 @@
 #ifndef VOMS_API_H
 #define VOMS_API_H
 
+#include <fstream>
 #include <string>
 #include <vector>
+
 
 extern "C" {
 #include <gssapi.h>
@@ -104,7 +106,8 @@ enum verify_type {
   VERIFY_KEY       = 0x00000004,
   VERIFY_SIGN      = 0x00000008,
   VERIFY_ORDER     = 0x00000010,
-  VERIFY_ID        = 0x00000020
+  VERIFY_ID        = 0x00000020,
+  VERIFY_CERTLIST  = 0x00000040
 };
 
 /*! \brief Error codes.
@@ -134,7 +137,7 @@ enum verror_type {
   VERR_SERVERCODE /*!< Error message from the server */
 };
 
-typedef bool (*check_sig)(X509 *, void *, verror_type &);
+typedef bool (*check_sig)(X509 *, void *, verror_type &); /*!<*/
 
 struct vomsdata {
   private:
@@ -301,7 +304,7 @@ private:
   bool loadfile0(std::string, uid_t uid, gid_t gid);
   bool verifydata(std::string &message, std::string subject, std::string ca, 
                   X509 *holder, voms &v);
-  X509 *check(check_sig f, void *data);
+  X509 *check(check_sig f, void *data); /*!< Unused.  Only left here for binary compatibility. */
   bool check_cert(X509 *cert);
   bool retrieve(X509 *cert, STACK_OF(X509) *chain, recurse_type how,
                 AC_SEQ **listnew, std::string &subject, std::string &ca,
@@ -348,6 +351,11 @@ public:
              \param how Recursion type
              \return failure (F) or success (T)*/
   ~vomsdata();
+private:
+  //  X509 *check_file(void *);
+  bool check_cert(STACK_OF(X509) *);
+  X509 *check_from_certs(AC *ac, const std::string& voname);
+  X509 *check_from_file(AC *, std::ifstream&, const std::string &filename);
 };
 
 

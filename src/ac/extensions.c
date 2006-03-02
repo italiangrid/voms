@@ -153,14 +153,55 @@ void AC_TARGET_free(AC_TARGET *a)
   OPENSSL_free(a);
 }
 
+int i2d_AC_CERTS(AC_CERTS *a, unsigned char **pp)
+{
+  int v1=0, v2=0, v3=0;
+
+  M_ASN1_I2D_vars(a);
+  M_ASN1_I2D_len_SEQUENCE(a->stackcert, i2d_X509);
+  M_ASN1_I2D_seq_total();
+  M_ASN1_I2D_put_SEQUENCE(a->stackcert, i2d_X509);
+  M_ASN1_I2D_finish();
+}
+
+AC_CERTS *d2i_AC_CERTS(AC_CERTS **a, unsigned char **pp, long length)
+{
+  M_ASN1_D2I_vars(a, AC_CERTS *, AC_CERTS_new);
+
+  M_ASN1_D2I_Init();
+  M_ASN1_D2I_start_sequence();
+  M_ASN1_D2I_get_seq(ret->stackcert, d2i_X509, X509_free);
+  M_ASN1_D2I_Finish(a, AC_CERTS_free, ASN1_F_D2I_AC_CERTS);
+}
+
+AC_CERTS *AC_CERTS_new()
+{
+  AC_CERTS *ret=NULL;
+  ASN1_CTX c;
+
+  M_ASN1_New_Malloc(ret, AC_CERTS);
+  M_ASN1_New(ret->stackcert, sk_X509_new_null);
+  return ret;
+  M_ASN1_New_Error(AC_F_X509_New);
+}
+
+void AC_CERTS_free(AC_CERTS *a)
+{
+  if (a==NULL) return;
+
+  sk_X509_pop_free(a->stackcert, X509_free);
+  OPENSSL_free(a);
+}
+
+
 
 static char *norep()
 {
-  char *buffer;
+  static char *buffer="";
 
-  buffer=malloc(1);
-  if (buffer)
-    *buffer='\0';
+/*   buffer=malloc(1); */
+/*   if (buffer) */
+/*     *buffer='\0'; */
   return buffer;
 
 }
@@ -171,6 +212,11 @@ char *acseq_i2s(struct v3_ext_method *method, void *ext)
 }
   
 char *targets_i2s(struct v3_ext_method *method, void *ext)
+{
+  return norep();
+}
+
+char *certs_i2s(struct v3_ext_method *method, void *ext)
 {
   return norep();
 }
@@ -233,7 +279,23 @@ void *targets_s2i(struct v3_ext_method *method, struct v3_ext_ctx *ctx, char *da
  err:
   AC_TARGETS_free(a);
   return NULL;    
+
 }
+
+void *certs_s2i(struct v3_ext_method *method, struct v3_ext_ctx *ctx, char *data)
+{
+  STACK_OF(X509) *certs =
+    (STACK_OF(X509) *)data;
+
+  if (data) {
+    AC_CERTS *a = AC_CERTS_new();
+    a->stackcert = sk_X509_dup(certs);
+    return a;
+  }
+
+  return NULL;    
+}
+
 
 void *null_s2i(struct v3_ext_method *method, struct v3_ext_ctx *ctx, char *data)
 {
@@ -275,17 +337,20 @@ int initEx(void)
   X509V3_EXT_METHOD *avail;
   X509V3_EXT_METHOD *auth;
   X509V3_EXT_METHOD *acseq;
+  X509V3_EXT_METHOD *certseq;
 
   avail   = (X509V3_EXT_METHOD *)OPENSSL_malloc(sizeof(X509V3_EXT_METHOD));
   targets = (X509V3_EXT_METHOD *)OPENSSL_malloc(sizeof(X509V3_EXT_METHOD));
   auth    = (X509V3_EXT_METHOD *)OPENSSL_malloc(sizeof(X509V3_EXT_METHOD));
   acseq   = (X509V3_EXT_METHOD *)OPENSSL_malloc(sizeof(X509V3_EXT_METHOD));
+  certseq = (X509V3_EXT_METHOD *)OPENSSL_malloc(sizeof(X509V3_EXT_METHOD));
 
-  if (!avail || !targets || !auth || !acseq) {
+  if (!avail || !targets || !auth || !acseq || !certseq) {
     OPENSSL_free(avail);
     OPENSSL_free(targets);
     OPENSSL_free(auth);
     OPENSSL_free(acseq);
+    OPENSSL_free(certseq);
     return 0;
   }
 
@@ -353,10 +418,27 @@ int initEx(void)
   acseq->r2i      = (X509V3_EXT_R2I) NULL;
   acseq->i2r      = (X509V3_EXT_I2R) NULL;
 
+  certseq->ext_nid  = OBJ_txt2nid("certseq");
+#ifdef HAVE_X509V3_EXT_METHOD_IT
+  certseq->it = NULL;
+#endif
+  certseq->ext_flags = 0;
+  certseq->ext_new  = (X509V3_EXT_NEW) AC_CERTS_new;
+  certseq->ext_free = (X509V3_EXT_FREE)AC_CERTS_free;
+  certseq->d2i      = (X509V3_EXT_D2I) d2i_AC_CERTS;
+  certseq->i2d      = (X509V3_EXT_I2D) i2d_AC_CERTS;
+  certseq->s2i      = (X509V3_EXT_S2I) certs_s2i;
+  certseq->i2s      = (X509V3_EXT_I2S) certs_i2s;
+  certseq->i2v      = (X509V3_EXT_I2V) NULL;
+  certseq->v2i      = (X509V3_EXT_V2I) NULL;
+  certseq->r2i      = (X509V3_EXT_R2I) NULL;
+  certseq->i2r      = (X509V3_EXT_I2R) NULL;
+
   X509V3_EXT_add(avail);
   X509V3_EXT_add(targets);
   X509V3_EXT_add(auth);
   X509V3_EXT_add(acseq);
+  X509V3_EXT_add(certseq);
 
   return 1;
 }
