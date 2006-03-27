@@ -113,7 +113,7 @@ static struct contactdatar **Arrayize(std::vector<contactdata> &cd, int *error)
       cdr[i] = &cda[i];
 
       cda[i].nick    = mystrdup(cur->nick.c_str());
-      cda[i].host    = mystrdup(cur->nick.c_str());
+      cda[i].host    = mystrdup(cur->host.c_str());
       cda[i].contact = mystrdup(cur->contact.c_str());
       cda[i].vo      = mystrdup(cur->vo.c_str());
       cda[i].port    = cur->port;
