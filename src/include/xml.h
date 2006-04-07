@@ -17,7 +17,8 @@
 
 struct req {
   char *order;
-  char *command;
+  char **command;
+  int  n;
   char *targets;
   char *value;
   int   error;

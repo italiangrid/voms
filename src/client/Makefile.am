@@ -5,8 +5,9 @@ voms_proxy_init_SOURCES = \
 	main.cc \
 	vomsclient.cc \
 	vomsclient.h \
-	fqan.cc \
-	fqan.h
+	contact.hpp \
+	fqan.h \
+	fqan.cc
 
 voms_proxy_init_LDADD = \
 	$(top_builddir)/src/common/libutilities.la \

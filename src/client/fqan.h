@@ -16,6 +16,28 @@
 #define VOMS_CLIENT_FQAN_H
 
 #include <string>
+#include <vector>
+
+class Fqan
+{
+  
+public:
+
+  Fqan(const std::string& s);
+  
+  std::string str() const;  
+
+
+private:
+
+  std::string group;
+  std::string role;
+  
+};
+
 
 std::string FQANParse(std::string fqan);
+
+std::string parse_fqan(const std::vector<std::string>& fqans);
+
 #endif

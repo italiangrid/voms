@@ -22,7 +22,7 @@
 struct request {
   std::string order;
   std::string targets;
-  std::string command;
+  std::vector<std::string> command;
   int lifetime;
 };
 

@@ -145,7 +145,7 @@ char *Decode(const char *data, int size, int *n)
 }
 
 char *XMLEncodeReq(const char *command, const char *order, const char *targets,
-		   int lifetime)
+                  int lifetime)
 {
   char *res;
   int size;
@@ -158,9 +158,19 @@ char *XMLEncodeReq(const char *command, const char *order, const char *targets,
     (targets ? strlen(targets) : 0) + 149;
 
   if ((res = (char *)malloc(size))) {
-    strcpy(res, "<?xml version=\"1.0\" encoding = \"US-ASCII\"?><voms><command>");
-    strcat(res, command);
-    strcat(res, "</command>");
+    strcpy(res, "<?xml version=\"1.0\" encoding = \"US-ASCII\"?><voms>");
+
+    char * prev = command, * next;
+    while(next != 0)
+    { 
+      next = strchr(prev, ',');
+
+      strcat(res, "<command>");
+      strncat(res, prev, (next ? next - prev : command + strlen(command) - prev));
+      strcat(res, "</command>");
+
+      prev = next + 1;
+    }
 
     if (order && strlen(order)) {
       strcat(res, "<order>");
@@ -303,7 +313,10 @@ static void  endreq(void *userdata, const char *name)
   else if (strcmp(name, "target") == 0)
     d->targets = d->value;
   else if (strcmp(name, "command") == 0)
-    d->command = d->value;
+  {
+    *(d->command + d->n) = d->value;
+    ++(d->n);
+  }  
   else if (strcmp(name, "lifetime") == 0)
     d->lifetime = atoi(d->value);
   d->value=NULL;
@@ -410,9 +423,10 @@ int XMLDecodeReq(const char *message, struct req *d)
 {
   XML_Parser p = XML_ParserCreate(NULL);
   int res;
-  d->order = d->command = d->targets = d->value = NULL;
-  d->error = d->lifetime = d->depth = 0;
-
+  d->command = (char *)malloc(16);
+  d->order = d->targets = d->value = NULL;
+  d->error = d->lifetime = d->depth = d->n = 0;
+  
   XML_SetUserData(p, d);
   XML_SetElementHandler(p,startreq,endreq);
   XML_SetCharacterDataHandler(p,handlerreq);

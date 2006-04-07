@@ -614,8 +614,9 @@ VOMSServer::Execute(const std::string &client_name, const std::string &ca_name,
     LOGM(VARP, logh, LEV_ERROR, T_PRE, "Unable to interpret command: %s",message.c_str());
     return false;
   }
-
-  const char *comm = r.command.c_str();
+  
+  std::vector<std::string> comm = r.command;
+  
   int requested = r.lifetime;
 
   std::vector<std::string> targs;
@@ -629,7 +630,7 @@ VOMSServer::Execute(const std::string &client_name, const std::string &ca_name,
   std::vector<attrib> res;
   std::string data = "";
   std::string tmp="";
-  bool result = false;
+  bool result = true;
   std::vector<errorp> errs;
   errorp err;
 
@@ -645,90 +646,108 @@ VOMSServer::Execute(const std::string &client_name, const std::string &ca_name,
     }
   }
 
-  LOGM(VARP, logh, LEV_INFO, T_PRE, "New command: %s", r.command.c_str());
+  std::string command;
+  for(std::vector<std::string>::iterator i = comm.begin(); i < comm.end(); ++i)
+  {
+    command = *i;
+    
+    LOGM(VARP, logh, LEV_INFO, T_PRE, "Next command : %s", i->c_str());
+    
+    /* Interpret request by first character */
+    switch (*(i->c_str()))
+    {
+    case 'A':
+      result &=
+        get_all(client, ca_name, dbname, username, contactstring, mysql_port, mysql_socket, passwd(), res);
+      if (!result && (newname != client))
+        result=
+          get_all(newname, ca_name, dbname, username, contactstring, mysql_port, mysql_socket, passwd(), res);
+      break;
 
-  /* Interpret request by first character */
-
-  switch (*comm) {
-  case 'A':
-    result =
-      get_all(client, ca_name, dbname, username, contactstring, mysql_port, mysql_socket, passwd(), res);
-    if (!result && (newname != client))
-      result=
-        get_all(newname, ca_name, dbname, username, contactstring, mysql_port, mysql_socket, passwd(), res);
-    break;
-
-  case 'R':
-    result =
-      get_role(client, ca_name, comm+1, dbname, username, contactstring, mysql_port, mysql_socket, passwd(), res);
-    if (!result && (newname != client))
-      result=
-        get_role(newname, ca_name, comm+1, dbname, username, contactstring, mysql_port, mysql_socket, passwd(), res);
-
-    break;
+    case 'R':
+      result &=
+        get_role(client, ca_name, i->c_str() + 1, dbname, username, contactstring, mysql_port, mysql_socket, passwd(), res);
+      if (!result && (newname != client))
+        result=
+          get_role(newname, ca_name, i->c_str() + 1, dbname, username, contactstring, mysql_port, mysql_socket, passwd(), res);
+      
+      break;
 	
-  case 'G':
-    result=
-      get_group(client, ca_name, comm+1, dbname, username, contactstring, mysql_port, mysql_socket, passwd(), res);
-    if (!result && (newname != client))
-      result=
-        get_group(newname, ca_name, comm+1, dbname, username, contactstring, mysql_port, mysql_socket, passwd(), res);
-    break;
+    case 'G':
+      result &=
+        get_group(client, ca_name, i->c_str() + 1, dbname, username, contactstring, mysql_port, mysql_socket, passwd(), res);
+      if (!result && (newname != client))
+        result=
+          get_group(newname, ca_name, i->c_str() + 1, dbname, username, contactstring, mysql_port, mysql_socket, passwd(), res);
+      break;
 
-  case 'B':
-    result =
-      get_group_and_role(client_name, ca_name, comm+1, dbname, username, contactstring, mysql_port, mysql_socket, passwd(), res);
-    if (!result && (newname != client))
-      result=
-        get_group_and_role(newname, ca_name, comm+1, dbname, username, contactstring, mysql_port, mysql_socket, passwd(), res);
+    case 'B':
+      result &=
+        get_group_and_role(client_name, ca_name, i->c_str() + 1, dbname, username, contactstring, mysql_port, mysql_socket, passwd(), res);
+      if (!result && (newname != client))
+        result=
+          get_group_and_role(newname, ca_name, i->c_str() + 1, dbname, username, contactstring, mysql_port, mysql_socket, passwd(), res);
+      
+      break;
 
-    break;
+    case 'S':
+      result &=
+        special(client_name, ca_name, i->c_str() + 1, dbname, username, contactstring, mysql_port, mysql_socket, passwd(), data);
+      if (!result && (newname != client))
+        result=
+          special(newname, ca_name, i->c_str() + 1, dbname, username, contactstring, mysql_port, mysql_socket, passwd(), data);
+      break;
 
-  case 'S':
-    result =
-      special(client_name, ca_name, comm+1, dbname, username, contactstring, mysql_port, mysql_socket, passwd(), data);
-    if (!result && (newname != client))
-      result=
-        special(newname, ca_name, comm+1, dbname, username, contactstring, mysql_port, mysql_socket, passwd(), data);
-    break;
+    case 'L':
+      result &=
+        listspecial(dbname, username, contactstring, mysql_port, mysql_socket, passwd(), data);
+      break;
 
-  case 'L':
-    result =
-      listspecial(dbname, username, contactstring, mysql_port, mysql_socket, passwd(), data);
-    break;
+    case 'M':
+      result &= getlist(client_name, ca_name, dbname, username, contactstring, mysql_port, mysql_socket, passwd(), data);
+      if (!result && (newname != client))
+        result=
+          getlist(newname, ca_name, dbname, username, contactstring, mysql_port, mysql_socket, passwd(), data);
+      break;
 
-  case 'M':
-    result = getlist(client_name, ca_name, dbname, username, contactstring, mysql_port, mysql_socket, passwd(), data);
-    if (!result && (newname != client))
-      result=
-        getlist(newname, ca_name, dbname, username, contactstring, mysql_port, mysql_socket, passwd(), data);
-    break;
+    case 'N':
+      result &=
+        get_all(client, ca_name, dbname, username, contactstring, mysql_port, mysql_socket, passwd(), res);
+      if (!result && (newname != client))
+        result=
+          get_all(newname, ca_name, dbname, username, contactstring, mysql_port, mysql_socket, passwd(), res);
+      break;
 
-  case 'N':
-    result =
-      get_all(client, ca_name, dbname, username, contactstring, mysql_port, mysql_socket, passwd(), res);
-    if (!result && (newname != client))
-      result=
-        get_all(newname, ca_name, dbname, username, contactstring, mysql_port, mysql_socket, passwd(), res);
-    break;
-
-  default:
-    result = false;
-    LOGM(VARP, logh, LEV_ERROR, T_PRE, "Unknown Command \"%c\"", *comm);
-    break;
+    default:
+      result &= false;
+      LOGM(VARP, logh, LEV_ERROR, T_PRE, "Unknown Command \"%c\"", i->c_str());
+      break;
+    } 
+    
+    if(!result)
+      break;
+  } 
+  
+  // remove duplicates
+  for(std::vector<attrib>::iterator i = res.begin(); i != res.end(); ++i)
+  {
+    res.erase(std::remove(i+1, res.end(), *i),
+              res.end());
   }
 
-  if (result && !res.empty()) {
+  if(result && !res.empty())
+  {
     orderattribs(res);
   }
 
-  if (!result) {
+  if (!result) 
+  {
     LOG(logh, LEV_ERROR, T_PRE, "Error in executing request!");
     err.num = ERR_NOT_MEMBER;
-    if (r.command == (std::string("G/")+ voname))
+    if (command == (std::string("G/")+ voname))
       err.message = voname + ": User unknown to this VO.";
     else
-      err.message = voname + ": Unable to satisfy " + r.command + " Request!";
+      err.message = voname + ": Unable to satisfy " + command + " Request!";
     errs.push_back(err);
     std::string ret = XML_Ans_Encode("A", errs);
     LOGM(VARP, logh, LEV_DEBUG, T_PRE, "Sending: %s", ret.c_str());
@@ -810,8 +829,8 @@ VOMSServer::Execute(const std::string &client_name, const std::string &ca_name,
     int res = 1;
     std::string codedac;
 
-    if (*comm != 'N') {
-      
+    if (comm.at(0) != "N")
+    {
       if (!serial)
         LOG(logh, LEV_ERROR, T_PRE, "Can't get Serial Number!");
       
@@ -848,7 +867,7 @@ VOMSServer::Execute(const std::string &client_name, const std::string &ca_name,
       
       if (res || codedac.empty()) {
         LOG(logh, LEV_ERROR, T_PRE, "Error in executing request!");
-        err.message = voname + ": Unable to satisfy " + r.command + " request due to database error.";
+        err.message = voname + ": Unable to satisfy " + command + " request due to database error.";
         errs.push_back(err);
         std::string ret = XML_Ans_Encode("A", errs);
         LOGM(VARP, logh, LEV_DEBUG, T_PRE, "Sending: %s", ret.c_str());
@@ -859,12 +878,12 @@ VOMSServer::Execute(const std::string &client_name, const std::string &ca_name,
 
     (void)SetCurLogType(logh, T_RESULT);
 
-    if (*comm == 'N')
+    if (comm[0] == "N")
       data = "";
 
     for (std::vector<std::string>::iterator i = compact.begin(); i != compact.end(); i++) {
       LOGM(VARP, logh, LEV_INFO, T_PRE, "Request Result: %s",  (*i).c_str());
-      if (*comm == 'N')
+      if (comm.at(0) == "N")
         data += (*i).c_str() + std::string("\n");
     }
 

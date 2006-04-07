@@ -28,10 +28,13 @@ class attrib {
   std::string group;
   std::string role;
   std::string cap;
-  
+
 };
 
 extern bool operator<(const attrib& lhs, 
                       const attrib& rhs);
+
+bool operator==(const attrib& lhs,
+                const attrib& rhs);
 
 #endif /* __ATTRIBUTE_H */

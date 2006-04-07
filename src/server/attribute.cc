@@ -37,3 +37,9 @@ bool operator<(const attrib &lhs,
       return true;
   return false;
 }
+
+bool operator==(const attrib &lhs, 
+                const attrib &rhs)
+{
+  return ((lhs.group == rhs.group) && (lhs.role == rhs.role) && (lhs.cap == rhs.cap));
+}

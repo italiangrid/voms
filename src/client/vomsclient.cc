@@ -48,6 +48,7 @@ extern "C" {
 
 #include "vomsclient.h"
 #include "fqan.h"
+#include "contact.hpp"
 
 extern "C" 
 {
@@ -513,29 +514,17 @@ Client::Client(int argc, char ** argv) :
       std::cerr << v.ErrorMessage() << std::endl;
   }
 
-  //  v.LoadSystemContacts(confile);
-  //  v.LoadUserContacts(userconf);
-  
   for (unsigned int i = 0; i < vomses.size(); i++) {
   
-    std::string tmp = vomses[i];
-    
-    /* separate nick from fqan */
-    
-    std::string nick;
-    std::string::size_type pos = tmp.find(':');
-    
-    if (pos != std::string::npos && pos > 0)
-      nick = tmp.substr(0, pos);
-    else 
-      nick = tmp;
+    Contact contact(vomses[i]);
     
     /* exit if any server for that vo known */
-
+    
     std::vector<contactdata> servers;
-    servers = v.FindByAlias(nick);
-    if (servers.empty()) {
-      std::cerr << "VOMS Server for " << nick << " not known!" << std::endl;
+    servers = v.FindByAlias(contact.vo());
+    if (servers.empty()) 
+    {
+      std::cerr << "VOMS Server for " << contact.vo() << " not known!" << std::endl;
       exit(1);
     }
     
@@ -619,41 +608,48 @@ bool Client::Run() {
   
   /* contacts servers for each vo */
 
-  for (unsigned int i = 0; i < vomses.size(); i++) {
+  for(std::vector<std::string>::iterator i = vomses.begin(); i != vomses.end(); ++i)
+  {
+    /* will contain all fqans requested for the vo */
+    std::vector<std::string> fqans;
     
-    std::string tmp = vomses[i];
-
-    /* separate nick from fqan */
+    Contact contact(*i);
+    fqans.push_back(contact.fqan());
     
-    std::string fqan;
-    std::string nick;
-    std::string::size_type pos = tmp.find(':');
-    if (pos != std::string::npos && pos > 0) {
-      fqan = tmp.substr(pos+1);
-      nick = tmp.substr(0, pos);
+    /* chech if other requests for the same vo exists */
+    for(std::vector<std::string>::iterator j = i + 1; j < vomses.end(); ++j)
+    {
+      Contact tmp = *j;
+      if(tmp.vo() == contact.vo())
+      {
+        fqans.push_back(tmp.fqan());
+        vomses.erase(j); 
+        --j;
+      }
     }
-    else nick = tmp;
+
+    /* parse fqans vector to build the command to send to the server */
+    std::string command = parse_fqan(fqans);
     
     /* find servers for that vo */
-    
     std::vector<contactdata> servers;
-    servers = v.FindByAlias(nick);
+    servers = v.FindByAlias(contact.vo());
     if (!servers.empty()){
       rand_wrapper rd(time(0));
       random_shuffle(servers.begin(), 
                      servers.end(),
                      rd);
     }
-
+    
     /* and contact them */
 
     std::string buffer;
     int version;
-    
-    /* contact each server until one answers */
-    for (std::vector<contactdata>::iterator beg = servers.begin(); beg != servers.end(); beg++) {
 
-      /* create a temporary proxy to contact the server */    
+    /* contact each server until one answers */
+    for (std::vector<contactdata>::iterator beg = servers.begin(); beg != servers.end(); beg++) 
+    {
+      /* create a temporary proxy to contact the server */  
       if(!noregen) 
       {
         if(!quiet) std::cout << "Creating temporary proxy " << std::flush;
@@ -665,13 +661,8 @@ bool Client::Run() {
         hours = tmp;
       }
       
-      /* parse fqan */
-      std::string command;
-      if(!fqan.empty())
-        command = FQANParse(fqan);
-      else command = "G/" + beg->vo; 
-      
       /* contact server */
+      
       if(!quiet) std::cout << "Contacting " << " " << beg->host << ":" << beg->port
                            << " [" << beg->contact << "] \"" << beg->vo << "\"" << std::flush;
       
@@ -680,7 +671,7 @@ bool Client::Run() {
         command = "N";
 
       int status = v.ContactRaw(beg->host, beg->port, beg->contact, command, buffer, version);
-
+      
       /* print status */
       if(!status)
       {
@@ -702,11 +693,12 @@ bool Client::Run() {
       if (!status && !serror.empty()) {
         std::cerr << std::endl << "Error: " << serror << std::endl;
       }
-
+      
       /* check for warnings from the server */
       if((status && !serror.empty()) && !ignorewarn)
       {
-        if(!quiet) 
+        
+        if(!quiet)
           std::cerr << std::endl << "Warning: " << serror << std::endl << std::endl;
         
         if(failonwarn) 
@@ -726,10 +718,11 @@ bool Client::Run() {
       }
 
       /* digets AC */
-      if(status)
+      if(status) 
       {
         if (isAC(buffer)) 
         {
+          
           /* retrieve AC and add to list */
           if (!Retrieve(buffer)) {
             std::cerr << "\nError decoding AC." << std::endl;
@@ -740,12 +733,13 @@ bool Client::Run() {
           /* if contact succeded jumps to other vos */
           break;
         }
+
         else {
           data += buffer;
           break;
         }
       }
-      
+
       if(beg != servers.end()-1) 
       {
         if(!quiet) 
@@ -759,6 +753,9 @@ bool Client::Run() {
         exit(1);
       }
     }
+    
+    if(i == vomses.end())
+      break;
   }
   
   /* unlink tmp proxy file */
