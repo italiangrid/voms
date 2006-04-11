@@ -19,7 +19,9 @@ AC_DEFUN([AC_GLOBUS],
     AC_MSG_CHECKING([for GLOBUS flavors])
 
     for i in `ls $with_globus_prefix/include`; do
-      GLOBUS_FLAVORS="$GLOBUS_FLAVORS $i"
+      if test "x$i" != "xldap_backend"; then
+        GLOBUS_FLAVORS="$GLOBUS_FLAVORS $i"
+      fi
     done
 
     if test -e $with_globus_prefix/include/gcc32dbg ; then

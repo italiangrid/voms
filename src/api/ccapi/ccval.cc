@@ -102,6 +102,7 @@ bool vomsdata::verifyac(X509 *cert, X509 *issuer, AC *ac, voms &v)
   result = validate(cert, issuer, ac, vv, typ);
 
   if (!result) {
+    v.siglen    = vv->siglen;
     v.signature = std::string(vv->signature, vv->siglen);
     v.user      = vv->user;
     v.userca    = vv->userca;

@@ -73,7 +73,13 @@ function start() {
 
         if test -f $@LOCATION_ENV@/etc/voms/$vo/voms.conf ; then
             echo -n "Starting $prog($vo): "
-	    
+
+            if test -f $@LOCATION_ENV@/etc/voms/$vo/tnsnames.ora ; then
+                tnsvalue=$@LOCATION_ENV@/etc/voms/$vo
+            else
+                tnsvalue="$TNS_ADMIN"
+            fi
+
             if [ -f $@VAR_LOCATION_ENV@/lock/subsys/voms.$vo ]; then
                 read pid < $@VAR_LOCATION_ENV@/lock/subsys/voms.$vo
                 if test "x$pid" != "x"; then
@@ -85,9 +91,9 @@ function start() {
             fi
 
             if [ -n "$VOMS_USER" ]; then
-                su -c "${voms} --conf $@LOCATION_ENV@/etc/voms/$vo/voms.conf" -s /bin/bash $VOMS_USER
+                su -c "TNS_ADMIN=\"$tnsvalue\" ${voms} --conf $@LOCATION_ENV@/etc/voms/$vo/voms.conf" -s /bin/bash $VOMS_USER
             else
-                ${voms} --conf $@LOCATION_ENV@/etc/voms/$vo/voms.conf
+                TNS_ADMIN="$tnsvalue" ${voms} --conf $@LOCATION_ENV@/etc/voms/$vo/voms.conf
             fi
 
 	    # get process id

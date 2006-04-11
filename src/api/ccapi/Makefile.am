@@ -528,6 +528,8 @@ all-local: apidoc-local
 
 if BUILD_DOCS
 apidoc-local: $(HTML) $(MAN3) 
+else
+apidoc-local:
 endif
 
 apidoc-recursive:

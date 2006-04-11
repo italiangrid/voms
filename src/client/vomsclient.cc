@@ -662,7 +662,6 @@ bool Client::Run() {
       }
       
       /* contact server */
-      
       if(!quiet) std::cout << "Contacting " << " " << beg->host << ":" << beg->port
                            << " [" << beg->contact << "] \"" << beg->vo << "\"" << std::flush;
       
@@ -671,6 +670,18 @@ bool Client::Run() {
         command = "N";
 
       int status = v.ContactRaw(beg->host, beg->port, beg->contact, command, buffer, version);
+
+      /* print status */
+      if(!status)
+      {
+        if(!quiet) 
+          std::cout << " Failed" << std::endl;
+      }        
+      else
+      {
+        if(!quiet)
+          std::cout << " Done" << std::endl;
+      }
       
       /* print status */
       if(!status)
@@ -685,6 +696,7 @@ bool Client::Run() {
       }
       
       /* check for socket error */
+
       if (!status && v.error == VERR_NOSOCKET)
         Error();
       
@@ -697,7 +709,6 @@ bool Client::Run() {
       /* check for warnings from the server */
       if((status && !serror.empty()) && !ignorewarn)
       {
-        
         if(!quiet)
           std::cerr << std::endl << "Warning: " << serror << std::endl << std::endl;
         
@@ -722,7 +733,6 @@ bool Client::Run() {
       {
         if (isAC(buffer)) 
         {
-          
           /* retrieve AC and add to list */
           if (!Retrieve(buffer)) {
             std::cerr << "\nError decoding AC." << std::endl;
@@ -739,7 +749,6 @@ bool Client::Run() {
           break;
         }
       }
-
       if(beg != servers.end()-1) 
       {
         if(!quiet) 

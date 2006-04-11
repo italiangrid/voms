@@ -758,59 +758,62 @@ VOMSServer::Execute(const std::string &client_name, const std::string &ca_name,
   std::vector<std::string> compact;
   int j = 0;
 
-  for (std::vector<attrib>::iterator i = res.begin(); i != res.end(); i++) 
+  for (std::vector<attrib>::iterator i = res.begin(); i != res.end(); i++)
   {
     compact.push_back(i->str());
     j++;
   }
   
-  /* check the user is allowed to requests those attributes */
-
-  vomsdata v("", "");
-  v.SetVerificationType((verify_type)(VERIFY_SIGN));
-  v.RetrieveFromCtx(context, RECURSE_DEEP);
-  
-  /* find the attributes corresponding to the vo */
-
-  std::vector<std::string> fqans;
-  for(std::vector<voms>::iterator index = (v.data).begin(); index != (v.data).end(); ++index)
+  if(!res.empty())
   {
-    if(index->voname == voname)
-      fqans.insert(fqans.end(), 
-                   index->fqan.begin(), 
-                   index->fqan.end());
-  }
-
-  /* if attributes were found, only release an intersection beetween the requested and the owned */
-
-  std::vector<std::string>::iterator end = compact.end();
-  bool subset = false;
-  if(!fqans.empty())
-    if((compact.erase(remove_if(compact.begin(),
-                                compact.end(), 
-                                bind2nd(std::ptr_fun(not_in), fqans)), 
-                      compact.end()) != end))
-      subset = true;
+    /* check whether the user is allowed to requests those attributes */
+    vomsdata v("", "");
+    v.SetVerificationType((verify_type)(VERIFY_SIGN));
+    v.RetrieveFromCtx(context, RECURSE_DEEP);
   
-  if (compact.empty()) {
-    LOG(logh, LEV_ERROR, T_PRE, "Error in executing request!");
-    err.num = ERR_ATTR_EMPTY;
-    err.message = voname + " : your certificate already contains attributes, only a subset of them can be issued.";
-    errs.push_back(err);
-    std::string ret = XML_Ans_Encode("A", errs);
-    LOGM(VARP, logh, LEV_DEBUG, T_PRE, "Sending: %s", ret.c_str());
-    sock.Send(ret);
-    return false;
-  }
+    /* find the attributes corresponding to the vo */
+    std::vector<std::string> fqans;
+    for(std::vector<voms>::iterator index = (v.data).begin(); index != (v.data).end(); ++index)
+    {
+      if(index->voname == voname)
+        fqans.insert(fqans.end(), 
+                     index->fqan.begin(), 
+                     index->fqan.end());
+    }
 
-  if(subset)
-  {
-    LOG(logh, LEV_ERROR, T_PRE, "Error in executing request!");
-    err.num = WARN_ATTR_SUBSET;
-    err.message = voname + " : your certificate already contains attributes, only a subset of them can be issued.";
-    errs.push_back(err);
-  }
-  
+    /* if attributes were found, only release an intersection beetween the requested and the owned */
+    std::vector<std::string>::iterator end = compact.end();
+    bool subset = false;
+    if(!fqans.empty())
+      if((compact.erase(remove_if(compact.begin(),
+                                  compact.end(), 
+                                  bind2nd(std::ptr_fun(not_in), fqans)), 
+                        compact.end()) != end))
+        subset = true;
+    
+    // no attributes can be send
+    if(compact.empty())
+    {
+      LOG(logh, LEV_ERROR, T_PRE, "Error in executing request!");
+      err.num = ERR_ATTR_EMPTY;
+      err.message = voname + " : your certificate already contains attributes, only a subset of them can be issued.";
+      errs.push_back(err);
+      std::string ret = XML_Ans_Encode("A", errs);
+      LOGM(VARP, logh, LEV_DEBUG, T_PRE, "Sending: %s", ret.c_str());
+      sock.Send(ret);
+      return false;
+    }
+
+    // some attributes can't be send
+    if(subset)
+    {
+      LOG(logh, LEV_ERROR, T_PRE, "Error in executing request!");
+      err.num = WARN_ATTR_SUBSET;
+      err.message = voname + " : your certificate already contains attributes, only a subset of them can be issued.";
+      errs.push_back(err);
+    }
+  }   
+
   if (j) {
     if (!firstgroup.empty()) {
       std::vector<attrib>::iterator i = res.begin();
@@ -823,7 +826,7 @@ VOMSServer::Execute(const std::string &client_name, const std::string &ca_name,
         }
       }
     }
-
+    
     BIGNUM * serial = get_serial(code, dbname, username, contactstring, mysql_port, mysql_socket, passwd());
 
     int res = 1;
