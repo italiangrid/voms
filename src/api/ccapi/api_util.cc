@@ -56,6 +56,26 @@ extern "C" {
 #include "ccval.h"
 
 static bool check_sig_ac(X509 *, void *, verror_type &);
+static bool dncompare(const std::string &mut, const std::string &fixed);
+
+
+static bool dncompare(const std::string &first, const std::string &second)
+{
+  if (first == second)
+    return true;
+
+  std::string::size_type userid = first.find(std::string("/USERID="));
+  std::string::size_type uid = first.find(std::string("/UID="));
+
+  std::string copy = first;
+  if (userid != std::string::npos)
+    return (copy.substr(0, userid) + "/UID=" + copy.substr(userid+8)) == second;
+  else if (uid != std::string::npos)
+    return (copy.substr(0, uid) + "/USERID=" + copy.substr(uid+5)) == second;
+
+  return false;
+}
+
 
 bool
 vomsdata::evaluate(AC_SEQ *acs, const std::string& subject, 
@@ -433,7 +453,7 @@ vomsdata::check(void *data)
     std::ifstream file(filecerts.c_str());
 
     if (file)
-      return check_from_file(ac, file, voname);
+      return check_from_file(ac, file, voname, filecerts);
 
   }
 
@@ -506,55 +526,78 @@ X509 *vomsdata::check_from_certs(AC *ac, const std::string& voname)
   return x;
 }
 
-#if 0
-X509 *
-vomsdata::check_file(void *data)
+
+static bool readdn(std::ifstream &file, char *buffer, int buflen)
 {
-  error = VERR_DIR;
 
-  bool found  = false;
-  
-  /* extract vo name from AC */
-  
-  AC * ac = (AC *)data;
-  STACK_OF(AC_ATTR) * atts = ac->acinfo->attrib;
-  int nid = OBJ_txt2nid("idatcap");
-  int pos = X509at_get_attr_by_NID(atts, nid, -1);
-  if (!(pos >=0)) {
-    seterror(VERR_DIR, "Unable to extract vo name from AC.");
-    return NULL;
-  }
-  AC_ATTR * caps = sk_AC_ATTR_value(atts, pos);
-  if(!caps) {
-    seterror(VERR_DIR, "Unable to extract vo name from AC.");
-    return NULL;
-  }
-  AC_IETFATTR * capattr = sk_AC_IETFATTR_value(caps->ietfattr, 0);
-  if(!capattr) {
-    seterror(VERR_DIR, "Unable to extract vo name from AC.");
-    return NULL;
-  }
-  GENERAL_NAME * name = sk_GENERAL_NAME_value(capattr->names, 0);
-  if(!name) {
-    seterror(VERR_DIR, "Unable to extract vo name from AC.");
-    return NULL;
-  }
-  std::string voname((const char *)name->d.ia5->data, 0, name->d.ia5->length);
-  std::string::size_type cpos = voname.find("://");
-  if (cpos != std::string::npos) {
-    voname = voname.substr(0, cpos);
-  } 
-  else {
-    seterror(VERR_DIR, "Unable to extract vo name from AC.");
-    return NULL;
-  }
-  
+  int len = 0;
 
-  return check_from_file(ac, voname);
+  do {
+    file.getline(buffer, buflen -1);
+    if (!file)
+      return false;
+
+    len = strlen(buffer);
+    int drop = 0;
+    int start = 0;
+    while (buffer[start] && isspace(buffer[start]))
+      start++;
+
+    if (start == len) {
+      len = 0;
+      continue;
+    }
+
+    bool bounded = false;
+
+    if (buffer[start] == '"') {
+      start ++;
+      bounded = true;
+    }
+
+    memmove(buffer, buffer+start, len - start);
+    len -= start;
+
+    start = 0;
+
+    int mode;
+
+    if (bounded) {
+      mode = 1;
+      do {
+        switch(buffer[start]) {
+          case '\\':
+            mode = 2;
+            start ++;
+            break;
+        case '"':
+          start ++;
+
+          if (mode != 2)
+            bounded = false;
+          break;
+        case 0:
+          break;
+        default:
+          start++;
+          break;
+        }
+      } while (bounded);
+    }
+
+    if (start)
+      buffer[start-1]=' ';
+
+    while (len && isspace(buffer[len-1]))
+      len--;
+    buffer[len]='\0';
+
+  } while (len == 0);
 }
-#endif
 
-X509 *vomsdata::check_from_file(AC *ac, std::ifstream &file, const std::string &voname)
+
+
+X509 *vomsdata::check_from_file(AC *ac, std::ifstream &file, const std::string &voname, const std::string& filename)
 {
   if (!file || !ac) {
     return NULL;
@@ -568,33 +611,49 @@ X509 *vomsdata::check_from_file(AC *ac, std::ifstream &file, const std::string &
   AC_CERTS *certs = (AC_CERTS *)X509V3_EXT_d2i(ext);
   STACK_OF(X509) *certstack = certs->stackcert;
 
-  bool success = true;
+  bool success = false;
+  bool final = false;
 
-  for (int i = 0; i < sk_X509_num(certstack); i++) {
-    if (!file) {
-      success = false;
-      break;
-    }
-    char subjcandidate[1000];
-    char issuercandidate[1000];
+  do {
+    success = true;
 
-    X509 *current = sk_X509_value(certstack, i);
-    file.getline(subjcandidate,999);
-    file.getline(issuercandidate, 999);
-    char *realsubj = X509_NAME_oneline(X509_get_subject_name(current), NULL, 0);
-    char *realiss  = X509_NAME_oneline(X509_get_issuer_name(current), NULL, 0);
-    if (strcmp(realsubj, subjcandidate) ||
-        strcmp(realiss, issuercandidate)) {
+    for (int i = 0; i < sk_X509_num(certstack); i++) {
+      if (!file)
+        break;
+
+      char subjcandidate[1000];
+      char issuercandidate[1000];
+
+      X509 *current = sk_X509_value(certstack, i);
+      if (!readdn(file, subjcandidate, 1000) ||
+          !readdn(file, issuercandidate, 1000)) {
+        success = false;
+        final = true;
+        break;
+      }
+
+      char *realsubj = X509_NAME_oneline(X509_get_subject_name(current), NULL, 0);
+      char *realiss  = X509_NAME_oneline(X509_get_issuer_name(current), NULL, 0);
+      if (!dncompare(realsubj, subjcandidate) ||
+          !dncompare(realiss, issuercandidate)) {
+        do {
+          file.getline(subjcandidate, 999);
+        } while (file && strcmp(subjcandidate, "------ NEXT CHAIN ------"));
+        success = false;
+        break;
+      }
       OPENSSL_free(realsubj);
       OPENSSL_free(realiss);
-      success = false;
-      seterror(VERR_SIGN, "Unable to match certificate chain against file: " + voname + ".lsc");
-      break;
     }
-  }
+    if (success || !file)
+      final = true;
+
+  } while (!final);
+
   file.close();
   if (!success) {
     AC_CERTS_free(certs);
+    seterror(VERR_SIGN, "Unable to match certificate chain against file: " + filename);
     return NULL;
   }
                   

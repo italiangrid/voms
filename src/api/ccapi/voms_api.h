@@ -355,7 +355,7 @@ private:
   //  X509 *check_file(void *);
   bool check_cert(STACK_OF(X509) *);
   X509 *check_from_certs(AC *ac, const std::string& voname);
-  X509 *check_from_file(AC *, std::ifstream&, const std::string &filename);
+  X509 *check_from_file(AC *, std::ifstream&, const std::string &vo, const std::string &filename);
 };
 
 

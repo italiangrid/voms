@@ -336,12 +336,18 @@ name$>$.lsc where $<$voms host name$>$ is the output of the
 \texttt{hostname} command in the VOMS server.  Such files will be
 tested against the certificate chain included in the VOMS ac.
 
+Different certificate chains, for example during a certificate change
+procedure, may be included if they are divided by a line containig
+only ``------ NEXT CHAIN ------''.
+
+Blank lines, lines containing only white space chars, or white space
+at the end of a line are ignored.
+
+
 \item Otherwise you may have files containing the whole certificate
 chain of the host.  There is no special requirement on the name,
 except that it must not end with '\texttt{.lsc}'
 \end{enumerate}
-
-
 
 Second, in ``\$PREFIX/etc/vomses'' You should put a copy of the
 \emph{vomses} file distributed by all the VOMS servers you wish to
