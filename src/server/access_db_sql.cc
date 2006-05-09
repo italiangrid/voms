@@ -1007,7 +1007,7 @@ get_group_and_role_attributes(const std::string &dn, const std::string &ca,
                                   "left join capabilities on capabilities.cid = m.cid "
                                   "INNER JOIN Role_attrs on groups.gid = Role_attrs.g_id "             // added
                                   "INNER JOIN Attributes on Attributes.a_id = Role_attrs.a_id "        // added
-                                  "WHERE Roles_attrs.r_id = roles.rid AND "                            // added  
+                                  "WHERE Role_attrs.r_id = roles.rid AND "                            // added  
                                   "groups.gid = m.gid AND ") +
     (compat_flag ? "usr.uid = m.uid AND " : "usr.userid = m.userid AND ") +
     "roles.role = \'" + role + "\' AND "
@@ -1152,7 +1152,9 @@ get_attributes_real0(sqliface::interface *db, const std::string &dn,
         if(e.what() == "Unknown column GROUPNAME.")
           rec.qualifier.clear();
       }
-
+      catch(...) {
+        LOGM(VARP, logh, LEV_DEBUG, T_REQUEST, "UNKNOWN EXCEPTION: %s", ".");
+      }
       results.push_back(rec);
 
       (void)r->next();
@@ -1162,5 +1164,70 @@ get_attributes_real0(sqliface::interface *db, const std::string &dn,
   }
   CATCH
 
+
+  LOGM(VARP, logh, LEV_DEBUG, T_REQUEST, "RETURNING: %s", "false");        
+
   return false;
+}
+
+bool get_correct_dn(const std::string &dbname, const std::string &username, 
+                    const char *password, const std::string &name)
+{
+  if (dbname.empty() || username.empty() || !password || !acceptable(name.c_str()))
+    return NULL;
+
+  bool res = false;
+
+  try {
+    std::auto_ptr<sqliface::interface> db(NewDB());
+    if(connect_with_port_and_socket)
+      connect_with_port_and_socket(db.get(), dbname.c_str(), contactstring.c_str(), username.c_str(), port, (!socket.empty() ? socket.c_str() : NULL), password);
+    else 
+      db->connect(dbname.c_str(), contactstring.c_str(), username.c_str(), password);
+
+    std::auto_ptr<sqliface::query> q(db->newquery());
+    std::string query = "SELECT dn from usr where dn = \"" + name +"\"";
+    *q << query.c_str();
+
+    std::auto_ptr<sqliface::results> r(q->result());
+
+    while (r->valid()) {
+      (void)r->next();
+      res = true;
+    }
+  }
+  CATCH
+
+    return res;
+}
+
+bool get_correct_ca(const std::string &dbname, const std::string &username, 
+                    const char *password, const std::string &name)
+{
+  if (dbname.empty() || username.empty() || !password || !acceptable(name.c_str()))
+    return NULL;
+
+  bool res = false;
+
+  try {
+    std::auto_ptr<sqliface::interface> db(NewDB());
+    if(connect_with_port_and_socket)
+      connect_with_port_and_socket(db.get(), dbname.c_str(), contactstring.c_str(), username.c_str(), port, (!socket.empty() ? socket.c_str() : NULL), password);
+    else 
+      db->connect(dbname.c_str(), contactstring.c_str(), username.c_str(), password);
+
+    std::auto_ptr<sqliface::query> q(db->newquery());
+    std::string query = "SELECT cid from ca where ca.ca = \"" + name +"\"";
+    *q << query.c_str();
+
+    std::auto_ptr<sqliface::results> r(q->result());
+
+    while (r->valid()) {
+      (void)r->next();
+      res = true;
+    }
+  }
+  CATCH
+
+    return res;
 }

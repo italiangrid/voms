@@ -220,24 +220,26 @@ bool vomsdata::verifyac(X509 *cert, X509 *issuer, AC *ac, voms &v)
   }
 
   int i = 0;
-  while (vv->atts->list[i]) {
-    struct attributelist l;
-    struct att_list *al = vv->atts->list[i];
-    l.grantor = std::string(al->grantor);
-    int j = 0;
-    while (al->attrs[j]) {
-      struct attribute a;
-      struct att *at = al->attrs[j];
+  if (vv->atts && vv->atts->list ){
+    while (vv->atts->list[i]) {
+      struct attributelist l;
+      struct att_list *al = vv->atts->list[i];
+      l.grantor = std::string(al->grantor);
+      int j = 0;
+      while (al->attrs[j]) {
+        struct attribute a;
+        struct att *at = al->attrs[j];
 
-      a.name      = std::string(at->name);
-      a.qualifier = std::string(at->qual);
-      a.value     = std::string(at->val);
-
-      l.attributes.push_back(a);
-      j++;
+        a.name      = std::string(at->name);
+        a.qualifier = std::string(at->qual);
+        a.value     = std::string(at->val);
+        
+        l.attributes.push_back(a);
+        j++;
+      }
+      v.attributes.push_back(l);
+      i++;
     }
-    v.attributes.push_back(l);
-    i++;
   }
 
   free_full_att(vv->atts);

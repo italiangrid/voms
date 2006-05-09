@@ -690,7 +690,8 @@ VOMSServer::Execute(const std::string &client_name, const std::string &ca_name,
         result = get_group_and_role(newname, ca_name, i->c_str() + 1, dbname, username, contactstring, mysql_port, mysql_socket, passwd(), res);
         result = get_group_and_role_attributes(newname, ca_name, i->c_str() + 1, dbname, username, contactstring, mysql_port, mysql_socket, passwd(), attributes);
       }
-
+      break;
+      
     case 'S':
       result &=
         special(client_name, ca_name, i->c_str() + 1, dbname, username, contactstring, mysql_port, mysql_socket, passwd(), data);
