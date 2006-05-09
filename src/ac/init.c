@@ -37,6 +37,8 @@ void declareOIDs(void)
 #define incfile               "1.3.6.1.4.1.8005.100.100.2"
 #define vo                    "1.3.6.1.4.1.8005.100.100.3"
 #define idatcap               "1.3.6.1.4.1.8005.100.100.4"
+  ///// test
+#define attributes            "1.3.6.1.4.1.8005.100.100.11"
 #define acseq                 "1.3.6.1.4.1.8005.100.100.5"
 #define order                 "1.3.6.1.4.1.8005.100.100.6"
 #define certseq               "1.3.6.1.4.1.8005.100.100.10"
@@ -53,6 +55,8 @@ void declareOIDs(void)
   done=1;
   OBJ_create(email, "Email", "Email");
   OBJC(idatcap,"idatcap");
+  //// test
+  OBJC(attributes,"attributes");
   OBJC(idcenoRevAvail, "noRevAvail");
   OBJC(idceauthKeyIdentifier, "authKeyId");
   OBJC(idceTargets, "idceTargets");

@@ -92,12 +92,11 @@ endif
 EXTRA_DIST = $(SGML_INCLUDES) $(SGML_DIST) $(LATEX_DIST)
 
 MAINTAINERCLEANFILES = Makefile.in \
-                       aclocal.m4 \
                        manpage.links \
                        manpage.refs \
                        $(man_MANS)
 
-CLEANFILES = $(man_MANS) $(DOCS) $(SERVER) $(CLIENT) $(UTILS)
+CLEANFILES = $(man_MANS) $(DOCS) $(SERVER) $(CLIENT) $(UTILS) *toc *aux *log
 
 $(USERDOC_DIR)/server/html/%.html: %.sgml $(SGML_INCLUDES)
 	echo $(USERDOC_DIR)/

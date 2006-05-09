@@ -77,8 +77,11 @@ std::string XML_Ans_Encode(const std::string &ac, const std::string &data, const
 
   char *ret = XMLEncodeAns(vect, ac.data(), ac.size(), data.data(), data.size());
   listfree((char **)vect, (freefn)free);
-  if (ret)
-    return std::string(ret);
+  if (ret) {
+    std::string s = std::string(ret);
+    free(ret);
+    return s;
+  }
   else
     return "";
 }

@@ -26,23 +26,32 @@
 #include <openssl/safestack.h>
 #include "newformat.h"
 #include "acerrors.h"
+#include "attributes.h"
 
 int i2d_AC_ATTR(AC_ATTR *a, unsigned char **pp)
 {
-  char text[1000];
-
   M_ASN1_I2D_vars(a);
 
-  if (!i2t_ASN1_OBJECT(text,999,a->type))
-    return 0;
-  else if (!((strcmp(text, "idacagroup") == 0) || (strcmp(text,"idatcap") == 0)))
-    return 0;
-  
   M_ASN1_I2D_len(a->type, i2d_ASN1_OBJECT);
-  M_ASN1_I2D_len_SET_type(AC_IETFATTR, a->ietfattr, i2d_AC_IETFATTR);
+  if (a->get_type == GET_TYPE_FQAN) {
+    M_ASN1_I2D_len_SET_type(AC_IETFATTR, a->ietfattr, i2d_AC_IETFATTR);
+  }
+  else if (a->get_type == GET_TYPE_ATTRIBUTES) {
+    M_ASN1_I2D_len_SET_type(AC_IETFATTR, a->fullattributes, i2d_AC_FULL_ATTRIBUTES);
+  }
   M_ASN1_I2D_seq_total();
+
   M_ASN1_I2D_put(a->type, i2d_ASN1_OBJECT);
-  M_ASN1_I2D_put_SET_type(AC_IETFATTR,a->ietfattr, i2d_AC_IETFATTR);
+  /* encode with object specific call */
+  if (a->get_type == GET_TYPE_FQAN) {
+    M_ASN1_I2D_put_SET_type(AC_IETFATTR,a->ietfattr, i2d_AC_IETFATTR);
+  }
+  else if (a->get_type == GET_TYPE_ATTRIBUTES) {
+    M_ASN1_I2D_put_SET_type(AC_FULL_ATTRIBUTES,a->fullattributes, i2d_AC_FULL_ATTRIBUTES);
+  }
+  /* if neither of the allowed object were passed */
+  else return 0;
+  
   M_ASN1_I2D_finish();
 }
 
@@ -60,8 +69,16 @@ AC_ATTR *d2i_AC_ATTR(AC_ATTR **a, unsigned char **pp, long length)
     goto err;
   }
 
-  if (strcmp(text, "idatcap") == 0)
+  /* decode with object specific call */
+  if (strcmp(text, "idatcap") == 0) {
     M_ASN1_D2I_get_set_type(AC_IETFATTR, ret->ietfattr, d2i_AC_IETFATTR, AC_IETFATTR_free);
+    ret->get_type = GET_TYPE_FQAN;
+  }
+  if (strcmp(text, "attributes") == 0) {
+    M_ASN1_D2I_get_set_type(AC_FULL_ATTRIBUTES, ret->fullattributes, d2i_AC_FULL_ATTRIBUTES, AC_FULL_ATTRIBUTES_free);
+    ret->get_type = GET_TYPE_ATTRIBUTES;
+  }
+
   M_ASN1_D2I_Finish(a, AC_ATTR_free, ASN1_F_D2I_AC_ATTR);
 }
 
@@ -71,7 +88,11 @@ AC_ATTR *AC_ATTR_new()
   ASN1_CTX c;
   M_ASN1_New_Malloc(ret, AC_ATTR);
   M_ASN1_New(ret->type,  ASN1_OBJECT_new);
+
+  /* COME FACCIO A SCEGLIERE LA FUNZIONE GIUSTA??? */
   M_ASN1_New(ret->ietfattr, sk_AC_IETFATTR_new_null);
+  M_ASN1_New(ret->fullattributes, sk_AC_FULL_ATTRIBUTES_new_null);
+  ret->get_type = 0;
   return ret;
   M_ASN1_New_Error(AC_F_ATTR_New);
 }
@@ -82,7 +103,11 @@ void AC_ATTR_free(AC_ATTR *a)
     return;
 
   ASN1_OBJECT_free(a->type);
+
+  /* free with object specific call */
   sk_AC_IETFATTR_pop_free(a->ietfattr, AC_IETFATTR_free);
+  sk_AC_FULL_ATTRIBUTES_pop_free(a->fullattributes, AC_FULL_ATTRIBUTES_free);
+  
   OPENSSL_free(a);
 }
 

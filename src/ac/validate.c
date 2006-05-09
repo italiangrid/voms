@@ -31,6 +31,7 @@
 #include "newformat.h"
 #include "acerrors.h"
 
+#include "attributes.h"
 #include "acstack.h"
 #include "../api/ccapi/voms_apic.h"
 #include "validate.h"
@@ -47,6 +48,32 @@ static int checkAttributes(STACK_OF(AC_ATTR) *, struct col *, int);
 static int checkExtensions(STACK_OF(X509_EXTENSION) *, X509 *, struct col *, 
 			   int);
 
+static void free_att(struct att *a)
+{
+  if (a) {
+    free(a->name);
+    free(a->qual);
+    free(a->val);
+    free(a);
+  }
+}
+
+static void free_att_list(struct att_list *at)
+{
+  if (at) {
+    free(at->grantor);
+    listfree((char **)(at->attrs), (freefn)free_att);
+    free(at);
+  }
+}
+
+static void free_full_att(struct full_att *fa)
+{
+  if (fa) {
+    listfree((char **)(fa->list), (freefn)free_att_list);
+    free(fa);
+  }
+}
 
 char *get_error(int e)
 {
@@ -297,7 +324,10 @@ int validate(X509 *cert, X509 *issuer, AC *ac, struct col *voms, int valids)
 
 static int checkAttributes(STACK_OF(AC_ATTR) *atts, struct col *voms, int valids)
 {
+  int nid;
   int nid3;
+
+  int pos;
   int pos3;
   int i;
 
@@ -306,6 +336,7 @@ static int checkAttributes(STACK_OF(AC_ATTR) *atts, struct col *voms, int valids
   AC_IETFATTR *capattr;
   AC_IETFATTRVAL *capname;
   GENERAL_NAME *data;
+  GENERAL_NAME *gn;
 
   char **list, **tmp;
 
@@ -314,11 +345,20 @@ static int checkAttributes(STACK_OF(AC_ATTR) *atts, struct col *voms, int valids
   char *g, *r, *c;
   char *rolestart, *capstart;
   struct data **dlist, **dtmp;
+  char *name, *value, *qualifier, *grant;
+  struct att_list *al;
+  struct full_att *fa;
+  struct att *a;
 
   str = str2 = NULL;
   list = tmp = NULL;
   d = NULL;
   dlist = dtmp = NULL;
+  name = value = qualifier = grant = NULL;
+  al = NULL;
+  fa = NULL;
+  a = NULL;
+  data = gn = NULL;
 
   if (!atts)
     return 0;
@@ -326,26 +366,103 @@ static int checkAttributes(STACK_OF(AC_ATTR) *atts, struct col *voms, int valids
   if (voms)
     voms->voname = NULL;
 
+  nid  = OBJ_txt2nid("attributes");
+  pos  = X509at_get_attr_by_NID(atts, nid, -1);
+  if (pos >= 0) {
+    /* We have attributes */
+    AC_ATTR *attrs = sk_AC_ATTR_value(atts, pos);
 
+    AC_FULL_ATTRIBUTES *full_attr = sk_AC_FULL_ATTRIBUTES_value(attrs->fullattributes, 0);
+
+    struct full_att *fa = malloc(sizeof(struct full_att));
+    if (!fa)
+      goto err;
+
+    fa->list = NULL;
+
+    STACK_OF(AC_ATT_HOLDER) *providers = full_attr->providers;
+
+    int i;
+    for (i = 0; i < sk_AC_ATT_HOLDER_num(providers); i++) {
+      AC_ATT_HOLDER *holder = sk_AC_ATT_HOLDER_value(providers, i);
+
+      struct att_list *al = malloc(sizeof(struct att_list));
+      al->grantor = NULL;
+      al->attrs   = NULL;
+
+      STACK_OF(AC_ATTRIBUTE) *atts = holder->attributes;
+
+      int j;
+      for (j = 0; j < sk_AC_ATTRIBUTE_num(atts); j++) {
+        AC_ATTRIBUTE *at = sk_AC_ATTRIBUTE_value(atts, j);
+
+        name      = strndup(at->name->data,      at->name->length);
+        value     = strndup(at->value->data,     at->value->length);
+        qualifier = strndup(at->qualifier->data, at->qualifier->length);
+        if (!name || !value || !qualifier)
+          goto err;
+
+        a = malloc(sizeof(struct att*));
+        a->name = name;
+        a->val  = value;
+        a->qual = qualifier;
+        name = value = qualifier = NULL;
+
+        char ** tmp = listadd((char **)(al->attrs), (char *)a, sizeof(a));
+        if (tmp) {
+          al->attrs = (struct att **)tmp;
+          a = NULL;
+        }
+        else {
+          listfree((char **)(al->attrs), (freefn)free_att);
+          goto err;
+        }
+      }
+
+      gn = sk_GENERAL_NAME_value(holder->grantor, 0);
+      grant = strndup(gn->d.ia5->data, gn->d.ia5->length);
+      if (!grant)
+        goto err;
+
+      al->grantor = grant;
+      grant = NULL;
+
+      char **tmp = listadd((char **)(fa->list), (char *)al, sizeof(al));
+      if (tmp) {
+        fa->list = (struct att_list **)tmp;
+        al = NULL;
+      }
+      else {
+        listfree((char **)(fa->list), (freefn)free_att_list);
+        goto err;
+      }
+    }
+    voms->atts = fa;
+    fa = NULL;
+  }
+  else
+    voms->atts = NULL;
+
+  /* find AC_ATTR with IETFATTR type */
   nid3 = OBJ_txt2nid("idatcap");
   pos3 = X509at_get_attr_by_NID(atts, nid3, -1);
-
   if (!(pos3 >=0))
     return AC_ERR_ATTRIBS;
-
-  /* get capabilities */
   caps = sk_AC_ATTR_value(atts, pos3);
-
+  
+  /* check there's exactly one IETFATTR attribute */
   if (sk_AC_IETFATTR_num(caps->ietfattr) != 1)
     return AC_ERR_ATTRIB_URI;
 
+  /* retrieve the only AC_IETFFATTR */
   capattr = sk_AC_IETFATTR_value(caps->ietfattr, 0);
-  
   values = capattr->values;
-
+  
+  /* check it has exactly one policyAuthority */
   if (sk_GENERAL_NAME_num(capattr->names) != 1)
     return AC_ERR_ATTRIB_URI;
 
+  /* put policyAuthority in voms struct */
   data = sk_GENERAL_NAME_value(capattr->names, 0);
   if (data->type == GEN_URI) {
     char *point;
@@ -362,14 +479,16 @@ static int checkAttributes(STACK_OF(AC_ATTR) *atts, struct col *voms, int valids
   else
     return AC_ERR_ATTRIB_URI;
 
-  for (i=0; i<sk_AC_IETFATTRVAL_num(values); i++) {
-
+  /* scan the stack of IETFATTRVAL to put attribute in voms struct */
+  for (i=0; i<sk_AC_IETFATTRVAL_num(values); i++) 
+  {
     capname = sk_AC_IETFATTRVAL_value(values, i);
 
     if (!(capname->type == V_ASN1_OCTET_STRING))
       return AC_ERR_ATTRIB_FQAN;
 
-    if (voms) {
+    if (voms) 
+    {
       str  = strndup(capname->data, capname->length);
       str2 = strdup(str);
       d = (struct data *)malloc(sizeof(struct data));
@@ -408,7 +527,8 @@ static int checkAttributes(STACK_OF(AC_ATTR) *atts, struct col *voms, int valids
       dlist = dtmp;
     }
   }
-  if (voms) {
+  if (voms) 
+  {
     voms->std     = dlist;
     voms->compact = list;
     voms->type    = TYPE_STD;
@@ -431,6 +551,13 @@ static int checkAttributes(STACK_OF(AC_ATTR) *atts, struct col *voms, int valids
     free(dtmp);
     free(str);
     free(str2);
+    free(name);
+    free(value);
+    free(qualifier);
+    free(grant);
+    free_att(a);
+    free_att_list(al);
+    free_full_att(fa);
     if (voms)
       free(voms->voname);
   }

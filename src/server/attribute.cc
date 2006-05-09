@@ -16,8 +16,8 @@
 
 #include <attribute.h>
 
-std::string attrib::str() const {
-
+std::string attrib::str() const 
+{
   std::string tmp = group;
   if(!role.empty())
     tmp += "/Role=" + role;
@@ -43,3 +43,9 @@ bool operator==(const attrib &lhs,
 {
   return ((lhs.group == rhs.group) && (lhs.role == rhs.role) && (lhs.cap == rhs.cap));
 }
+
+std::string gattrib::str() const
+{
+  return (qualifier.empty() ? "" : qualifier) + "::" + name + "=" + value;
+}
+

@@ -12,7 +12,8 @@ libattcert_la_SOURCES = \
 	mystack.c \
 	error.c \
 	newformat.c \
-	init.c
+	init.c \
+	attributes.c
 
 libattributes_nog_la_SOURCES = \
 	validate.c \

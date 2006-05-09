@@ -28,6 +28,7 @@
 
 #include "newformat.h"
 #include "acerrors.h"
+#include "attributes.h"
 #include <string.h>
 
 int i2d_AC_SEQ(AC_SEQ *a, unsigned char **pp)
@@ -241,13 +242,72 @@ void *acseq_s2i(struct v3_ext_method *method, struct v3_ext_ctx *ctx, char *data
   return (void *)a;
 }
 
+void *attributes_s2i(struct v3_ext_method *method, struct v3_ext_ctx *ctx, char *data)
+{
+  AC_FULL_ATTRIBUTES *a = AC_FULL_ATTRIBUTES_new();
+  int pos = 0;
+  char *list = strdup(data);
+
+  while (list[pos])
+    do_interpret_att_holder(list, &pos, a);
+  
+}
+
+int do_interpret_att_holder(char *list,  int *pos, AC_FULL_ATTRIBUTES *a)
+{
+#if 0
+  int do_exit;
+
+  char *ppos = strchr(list[*pos], '(');
+
+  if (ppos) {
+    AC_ATT_HOLDER *aah = AC_ATT_HOLDER_new();
+    int start = *pos;
+    int mode = 0;
+
+    /* get grantor */
+    while (list[start] != ppos) {
+      switch(list[start]) {
+      case '\'':
+        mode = 1 - mode;
+        break;
+      case ' ':
+      case '\t':
+      case ',':
+        if (!mode)
+          do_exit = 1;
+        break;
+      default:
+        break;
+      }
+
+      if (do_exit)
+        break;
+      start++;
+    }
+
+    char * grantor = strndup(list, start);
+
+    start = ppos - list;
+
+    while(1) 
+    {
+      switch(list[*pos]) 
+      {
+        case
+          }
+  }
+  }
+#endif
+}
+
 void *targets_s2i(struct v3_ext_method *method, struct v3_ext_ctx *ctx, char *data)
 {
   char *pos;
   char *list = strdup(data);
   AC_TARGETS *a = AC_TARGETS_new();
 
-
+  int attlist;
   do {
     pos = strchr(list, ',');
     if (pos)
@@ -268,7 +328,7 @@ void *targets_s2i(struct v3_ext_method *method, struct v3_ext_ctx *ctx, char *da
       g->d.ia5 = tmpr;
       targ->name = g;
       sk_AC_TARGET_push(a->targets, targ);
-      list++;
+      attlist++;
     }
     if (pos)
       list = pos++;
@@ -289,6 +349,8 @@ void *certs_s2i(struct v3_ext_method *method, struct v3_ext_ctx *ctx, char *data
 
   if (data) {
     AC_CERTS *a = AC_CERTS_new();
+
+    sk_X509_pop_free(a->stackcert, X509_free);
     a->stackcert = sk_X509_dup(certs);
     return a;
   }

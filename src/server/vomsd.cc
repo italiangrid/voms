@@ -628,6 +628,7 @@ VOMSServer::Execute(const std::string &client_name, const std::string &ca_name,
   parse_targets(r.targets, targs);
 
   std::vector<attrib> res;
+  std::vector<gattrib> attributes;
   std::string data = "";
   std::string tmp="";
   bool result = true;
@@ -674,21 +675,21 @@ VOMSServer::Execute(const std::string &client_name, const std::string &ca_name,
       break;
 	
     case 'G':
-      result &=
-        get_group(client, ca_name, i->c_str() + 1, dbname, username, contactstring, mysql_port, mysql_socket, passwd(), res);
-      if (!result && (newname != client))
-        result=
-          get_group(newname, ca_name, i->c_str() + 1, dbname, username, contactstring, mysql_port, mysql_socket, passwd(), res);
+      result = get_group(client, ca_name, i->c_str() + 1, dbname, username, contactstring, mysql_port, mysql_socket, passwd(), res);
+      result &= get_group_attributes(client, ca_name, i->c_str() + 1, dbname, username, contactstring, mysql_port, mysql_socket, passwd(), attributes);
+      if (!result && (newname != client)) {
+        result = get_group(newname, ca_name, i->c_str() + 1, dbname, username, contactstring, mysql_port, mysql_socket, passwd(), res);
+        result &= get_group_attributes(client, ca_name, i->c_str() + 1, dbname, username, contactstring, mysql_port, mysql_socket, passwd(), attributes);
+      }
       break;
 
     case 'B':
-      result &=
-        get_group_and_role(client_name, ca_name, i->c_str() + 1, dbname, username, contactstring, mysql_port, mysql_socket, passwd(), res);
-      if (!result && (newname != client))
-        result=
-          get_group_and_role(newname, ca_name, i->c_str() + 1, dbname, username, contactstring, mysql_port, mysql_socket, passwd(), res);
-      
-      break;
+      result = get_group_and_role(client_name, ca_name, i->c_str() + 1, dbname, username, contactstring, mysql_port, mysql_socket, passwd(), res);
+      result &= get_group_and_role_attributes(client, ca_name, i->c_str() + 1, dbname, username, contactstring, mysql_port, mysql_socket, passwd(), attributes);
+      if (!result && (newname != client)) {
+        result = get_group_and_role(newname, ca_name, i->c_str() + 1, dbname, username, contactstring, mysql_port, mysql_socket, passwd(), res);
+        result = get_group_and_role_attributes(newname, ca_name, i->c_str() + 1, dbname, username, contactstring, mysql_port, mysql_socket, passwd(), attributes);
+      }
 
     case 'S':
       result &=
@@ -827,6 +828,26 @@ VOMSServer::Execute(const std::string &client_name, const std::string &ca_name,
       }
     }
     
+    ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+    // test logging retrieved attributes
+
+    if(result && !attributes.empty())
+    {
+      for(std::vector<gattrib>::iterator i = attributes.begin(); i != attributes.end(); ++i)
+        LOGM(VARP, logh, LEV_DEBUG, T_PRE,  "User got attributes: %s", i->str().c_str());
+    }
+    else
+      LOGM(VARP, logh, LEV_DEBUG, T_PRE,  "User got no attributes or something went wrong searching for them.");
+
+    // convert to string
+    std::vector<std::string> attributes_compact;
+    for(std::vector<gattrib>::iterator i = attributes.begin(); i != attributes.end(); ++i)
+      attributes_compact.push_back(i->str());
+    
+
+    ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
     BIGNUM * serial = get_serial(code, dbname, username, contactstring, mysql_port, mysql_socket, passwd());
 
     int res = 1;
@@ -842,8 +863,8 @@ VOMSServer::Execute(const std::string &client_name, const std::string &ca_name,
 
         LOGM(VARP, logh, LEV_DEBUG, T_PRE, "length = %d", i2d_AC(a, NULL));
         if (a)
-          res = createac(issuer, sock.own_stack, holder, key, serial, compact, targs, &a,
-                         voname, uri, requested, !newformat);
+          res = createac(issuer, sock.own_stack, holder, key, serial, 
+                         compact, targs, attributes_compact, &a, voname, uri, requested, !newformat);
 
         LOGM(VARP, logh, LEV_DEBUG, T_PRE, "length = %d", i2d_AC(a, NULL));
         BN_free(serial);
@@ -860,12 +881,14 @@ VOMSServer::Execute(const std::string &client_name, const std::string &ca_name,
             i2d_AC(a, &tmp);
             codedac = std::string((char *)ttmp, len);
           }
+          free(ttmp);
         }
         else {
           err.num = ERR_NOT_MEMBER;
           err.message = std::string(get_error(res));
           errs.push_back(err);
         }
+        AC_free(a);
       }
       
       if (res || codedac.empty()) {
@@ -875,6 +898,7 @@ VOMSServer::Execute(const std::string &client_name, const std::string &ca_name,
         std::string ret = XML_Ans_Encode("A", errs);
         LOGM(VARP, logh, LEV_DEBUG, T_PRE, "Sending: %s", ret.c_str());
         sock.Send(ret);
+
         return false;
       }
     }
@@ -907,6 +931,7 @@ VOMSServer::Execute(const std::string &client_name, const std::string &ca_name,
     std::string ret = XML_Ans_Encode("", errs);
     sock.Send(ret);
   }
+
   return true;
 }
 

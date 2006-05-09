@@ -46,6 +46,8 @@ int TranslateVOMS(struct vomsdatar *vd, std::vector<voms> &v, int *error)
     std::vector<voms>::iterator cur = v.begin();
     while (cur != v.end()) {
       arr2[i] = cur->translate();
+      arr2[i]->mydata = i;
+      arr2[i]->my2    = (void *)vd;
       i++;
       cur++;
     }
@@ -95,6 +97,66 @@ struct vomsdatar *VOMS_Init(char *voms, char *cert)
   return vd;
 }
 
+int VOMS_GetAttributeSourcesNumber(struct vomsr *v, struct vomsdatar *vd, int *error)
+{
+  try {
+    return ((struct vomsdatar *)(v->my2))->real->data[v->mydata].attributes.size();
+  }
+  catch(...) {
+    *error = VERR_PARAM;
+    return -1;
+  }
+}
+
+int VOMS_GetAttributeSourceHandle(struct vomsr *v, int num, struct vomsdatar *vd, int *error)
+{
+  try {
+    if (((struct vomsdatar *)(v->my2))->real->data[v->mydata].attributes.size() <= num)
+      return num;
+  }
+  catch(...) {
+  }
+  *error = VERR_PARAM;
+  return -1;
+}
+
+const char *VOMS_GetAttributeGrantor(struct vomsr *v, int handle, struct vomsdatar *vd, int *error)
+{
+  try {
+    return ((struct vomsdatar *)(v->my2))->real->data[v->mydata].attributes[handle].grantor.c_str();
+  }
+  catch(...) {
+    *error = VERR_PARAM;
+    return NULL;
+  }
+}
+
+int VOMS_GetAttributesNumber(struct vomsr *v, int handle, struct vomsdatar *vd, int *error)
+{
+  try {
+    return ((struct vomsdatar *)(v->my2))->real->data[v->mydata].attributes[handle].attributes.size();
+  }
+  catch (...) {
+    *error = VERR_PARAM;
+    return -1;
+  }
+}
+
+int VOMS_GetAttribute(struct vomsr *v, int handle, int num, struct attributer *at, struct vomsdatar *vd, int *error)
+{
+  try {
+    struct attribute a = ((struct vomsdatar *)(v->my2))->real->data[v->mydata].attributes[handle].attributes[num];
+
+    at->name = a.name.c_str();
+    at->qualifier = (a.qualifier.empty() ? NULL : a.qualifier.c_str());
+    at->value = a.value.c_str();
+    return 1;
+  }
+  catch(...) {
+    *error = VERR_PARAM;
+    return 0;
+  }
+}
 
 static struct contactdatar **Arrayize(std::vector<contactdata> &cd, int *error)
 {

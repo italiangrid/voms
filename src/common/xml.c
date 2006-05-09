@@ -432,6 +432,7 @@ int XMLDecodeReq(const char *message, struct req *d)
   XML_SetCharacterDataHandler(p,handlerreq);
   res = XML_Parse(p, message, strlen(message), 1);
   XML_ParserFree(p);
+  free(d->value);
   return res;
 }
 

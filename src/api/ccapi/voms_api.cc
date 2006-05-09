@@ -808,7 +808,9 @@ voms::voms(const voms &orig)
   holder = (X509 *)ASN1_dup((int (*)())i2d_X509,
 			    (char * (*)())d2i_X509,
 			    (char *)orig.holder);
+  attributes = orig.attributes;
 }
+
 
 voms::voms(): version(0), siglen(0), ac(NULL), holder(NULL)
 {}
@@ -836,6 +838,7 @@ voms &voms::operator=(const voms &orig)
   serial    = orig.serial;
   ac = (AC *)ASN1_dup((int (*)())i2d_AC, (char * (*)())d2i_AC, (char *)orig.ac);
   holder = (X509 *)ASN1_dup((int (*)())i2d_X509, (char * (*)())d2i_X509, (char *)orig.holder);
+  attributes = orig.attributes;
   return *this;
 }
 

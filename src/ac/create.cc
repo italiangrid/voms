@@ -1,3 +1,4 @@
+
 /*********************************************************************
  *
  * Authors: Vincenzo Ciaschini - Vincenzo.Ciaschini@cnaf.infn.it 
@@ -33,25 +34,31 @@ extern char *Decode(const char *, int, int *);
 
 }
 
-int createac(X509 *issuerc, STACK_OF(X509) *issuerstack, X509 *holder, EVP_PKEY *pkey, BIGNUM *s,
-	      std::vector<std::string> &c, std::vector<std::string> &t, 
-	      AC **ac, std::string vo, std::string uri, int valid, bool old)
+int createac(X509 *issuerc, STACK_OF(X509) *issuerstack, X509 *holder, EVP_PKEY *pkey, BIGNUM *serial,
+             std::vector<std::string> &fqan, std::vector<std::string> &targets, std::vector<std::string>& attributes,
+             AC **ac, std::string vo, std::string uri, int valid, bool old)
 {
-  int size = c.size();
+  int size = fqan.size();
   char **array = NULL;
   bool error = false;
-  
-  if ((array = (char **)malloc(sizeof(char *)*(size+1)))) {
+  char **array2 = NULL;
+
+  // convert vector of strings to char**
+  if ((array = (char **)malloc(sizeof(char *)*(size+1))) && (array2 = (char **)malloc(sizeof(char *)*(attributes.size() +1))))
+  {
     int j = 0;
-    for (std::vector<std::string>::iterator i = c.begin(); i != c.end(); i++) {
-      array[j]=strdup((*i).c_str());
-      if (!array[j]) {
+    for (std::vector<std::string>::iterator i = fqan.begin(); i != fqan.end(); i++)
+    {
+      array[j] = strdup((*i).c_str());
+      if (!array[j])
+      {
         error = true;
         break;
       }
       j++;
     }
-    if (error) {
+    if (error)
+    {
       for (int i=0; i < j; i++)
         free(array[j]);
       free(array);
@@ -59,24 +66,53 @@ int createac(X509 *issuerc, STACK_OF(X509) *issuerstack, X509 *holder, EVP_PKEY 
     }
     array[j]=NULL;
 
-    std::string complete;
+    j = 0;
+    for (std::vector<std::string>::iterator i = attributes.begin(); i != attributes.end(); i++)
+    {
+      array2[j] = strdup((*i).c_str());
+      if (!array2[j])
+      {
+        error = true;
+        break;
+      }
+      j++;
+    }
+    if (error)
+    {
+      for (int i=0; i < j; i++)
+        free(array2[j]);
+      free(array2);
 
-    for (std::vector<std::string>::iterator i = t.begin(); i != t.end(); i++)
-      if (i == t.begin())
+      int i = 0;
+      while (array[i])
+        free(array[i++]);
+      free(array);
+
+      return false;
+    }
+    array2[j]=NULL;
+
+    std::string complete;
+    for (std::vector<std::string>::iterator i = targets.begin(); i != targets.end(); i++)
+      if (i == targets.begin())
         complete = (*i);
       else
         complete += "," + (*i);
-
-    int res = writeac(issuerc, issuerstack, holder, pkey, s, array, 
-		      (complete.empty() ? NULL :
-		       const_cast<char *>(complete.c_str())),
-		      ac, const_cast<char *>(vo.c_str()), 
-		      const_cast<char *>(uri.c_str()), valid, (old ? 1 : 0));
+    
+    int res = writeac(issuerc, issuerstack, holder, pkey, serial, array,
+                      (complete.empty() ? NULL : const_cast<char *>(complete.c_str())), array2, 
+                      ac, const_cast<char *>(vo.c_str()), const_cast<char *>(uri.c_str()), valid, (old ? 1 : 0));
 
     for (int i = 0; i < size; i++)
       free(array[i]);
     free(array);
+
+    for (int i = 0; i < attributes.size(); i++)
+      free(array2[i]);
+    free(array2);
+    
     return res;
   }
+
   return AC_ERR_MEMORY;
 }

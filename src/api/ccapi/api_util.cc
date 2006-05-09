@@ -121,7 +121,7 @@ vomsdata::evaluate(AC_SEQ *acs, const std::string& subject,
 
 bool 
 vomsdata::retrieve(X509 *cert, STACK_OF(X509) *chain, recurse_type how,
-       AC_SEQ **listnew, std::string &subject, std::string &ca, X509 **holder)
+                   AC_SEQ **listnew, std::string &subject, std::string &ca, X509 **holder)
 {
   bool found = false;
 

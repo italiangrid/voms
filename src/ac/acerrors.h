@@ -73,4 +73,15 @@
 
 #define ASN1_F_D2I_AC_CERTS         5052
 #define AC_F_X509_New               5053
+
+#define AC_F_D2I_AC_ATTRIBUTE       5054
+#define AC_F_ATTRIBUTE_New          5055
+#define ASN1_F_D2I_AC_ATT_HOLDER    5056
+#define AC_F_AC_ATT_HOLDER_New      5057
+#define ASN1_F_D2I_AC_FULL_ATTRIBUTES 5058
+#define AC_F_AC_FULL_ATTRIBUTES_New 5059
+#define ASN1_F_D2I_AC_ATTRIBUTEVAL 5060
+#define ASN1_F_I2D_AC_ATTRIBUTEVAL 5061
+#define AC_F_AC_ATTRIBUTEVAL_New 5062
+
 #endif

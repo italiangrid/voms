@@ -40,6 +40,20 @@ struct data {
   std::string cap;   /*!< user's capability */
 };
 
+/*!< \brief Generic name-value attribute : can be repeated.
+ */
+struct attribute {
+  std::string name;      /*!< attribute's group */
+  std::string qualifier; /*!< attribute's qualifier */
+  std::string value;     /*!< attribute's value */
+};
+
+struct attributelist {
+  std::string grantor;               /*!< Who granted these attributes. */
+  std::vector<attribute> attributes; /*!< The attributes themselves.    */
+};
+
+
 /*! \brief The type of data returned.
  */
 enum data_type { 
@@ -49,9 +63,9 @@ enum data_type {
 };
 
 struct contactdata {   /*!< You must never allocate directly this structure.
-			    Its sizeof() is subject to change without notice.
-			    The only supported way to obtain it is via the
-			    FindBy* functions. */
+                         Its sizeof() is subject to change without notice.
+                         The only supported way to obtain it is via the
+                         FindBy* functions. */
   std::string  nick;    /*!< The alias of the server */
   std::string  host;    /*!< The hostname of the server */
   std::string  contact; /*!< The subject of the server's certificate */
@@ -94,8 +108,12 @@ public:
 private:
   struct vomsr *translate();
   friend int TranslateVOMS(struct vomsdatar *vd, std::vector<voms>&v, int *error);
+
 public:
   AC *GetAC();
+
+public:
+  std::vector<attributelist> attributes;   /*!< Generic attributes */
 };
 
 enum recurse_type { 

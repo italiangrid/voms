@@ -1,6 +1,7 @@
 /*********************************************************************
  *
  * Authors: Vincenzo Ciaschini - Vincenzo.Ciaschini@cnaf.infn.it 
+ *          Valerio Venturi - valerio.venturi@cnaf.infn.it
  *
  * Copyright (c) 2002, 2003 INFN-CNAF on behalf of the EU DataGrid.
  * For license conditions see LICENSE file or
@@ -75,6 +76,17 @@ static bool get_group_and_role_real(const std::string &dn,
                                     const std::string &query, 
                                     std::vector<attrib> &result);
 
+static bool get_attributes_real(const std::string &dn,
+                                const std::string &ca, 
+                                const std::string &dbname, 
+                                const std::string &username,
+                                const std::string &contactstring,
+                                int port,
+                                const std::string& socket,
+                                const char *password, 
+                                const std::string &query, 
+                                std::vector<gattrib> &result);
+
 static bool simple_query(const std::string &dbname, 
                          const std::string &username,
                          const std::string &contactstring,
@@ -91,6 +103,11 @@ static bool get_group_and_role_real0(sqliface::interface *db, const std::string 
                                      const std::string &ca,
                                      const std::string &query,
                                      std::vector<attrib> &results, datahash &map);
+
+static bool get_attributes_real0(sqliface::interface *db, const std::string &dn,
+                                 const std::string &ca,
+                                 const std::string &query,
+                                 std::vector<gattrib> &results, datahash &map);
 
 static bool simple_query0(sqliface::interface *db, const std::string &query, const char *fieldname, std::string &result);
 
@@ -530,8 +547,8 @@ get_group_and_role_real(const std::string &dn, const std::string &ca,
   
   if (dbname.empty() || username.empty() || !password || query.empty())
     return false;
-
-  try 
+  
+  try
   {
     std::auto_ptr<sqliface::interface> db(NewDB());
     if(connect_with_port_and_socket)
@@ -578,7 +595,7 @@ get_group_and_role_real0(sqliface::interface *db, const std::string &dn,
     std::auto_ptr<sqliface::query> q(db->newquery());
 
     LOGM(VARP, logh, LEV_DEBUG, T_REQUEST, "QUERY: %s", query.c_str());
-
+    
     *q << query.c_str();
 
     std::auto_ptr<sqliface::results> r(q->result());
@@ -916,4 +933,234 @@ int get_version(const std::string &dbname, const std::string &username,
   CATCH
 
   return 0;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+bool
+get_group_attributes(const std::string &dn, const std::string &ca,
+                     const char *group,
+                     const std::string &dbname, const std::string &username, const std::string &contactstring,
+                     int port, const std::string& socket, const char *password,
+                     std::vector<gattrib> &result)
+{
+  if (dn.empty() || ca.empty() || !group || dbname.empty() || username.empty() || !password)
+    return false;
+
+  // compose query
+
+  std::string query = std::string("SELECT usr.dn as username, role, groups.dn as groupname, groups.gid "
+                                  "FROM groups, usr, ca, m "
+                                  "left join roles on roles.rid = m.rid "
+                                  //"left join capabilities on capabilities.cid = m.cid "
+                                  "INNER JOIN Group_attrs on groups.gid = Group_attrs.g_id "           // added
+                                  "INNER JOIN Attributes on Attributes.a_id = Group_attrs.a_id "       // added
+                                  "WHERE groups.gid = m.gid AND ") +
+    (compat_flag ? "usr.uid = m.uid AND " : "usr.userid = m.userid AND ") +
+    "groups.dn = \'" + group + ("\' AND "
+                                "usr.ca  = ca.cid AND "
+                                "ca.ca = \'" + ca + "\' AND "
+                                "usr.dn = \'" + dn + "\' AND "
+                                "m.rid is NULL");
+  
+  return get_attributes_real(dn, ca, dbname, username, contactstring, port, socket, password, query, result);
+}
+
+bool
+get_group_and_role_attributes(const std::string &dn, const std::string &ca,
+                              const char *group,
+                              const std::string &dbname, const std::string &username, const std::string &contactstring,
+                              int port, const std::string& socket, const char *password,
+                              std::vector<gattrib> &result)
+{
+  if (dn.empty() || ca.empty() || !group || dbname.empty() || username.empty() || !password)
+    return false;
+  
+  // separate group and role in group:role syntax
+  
+  char *role;
+  char *argument = strdup(group);
+  
+  if (!argument || !(role = strchr(argument, ':')))
+    return false;
+
+  *role++ = '\0';
+
+  if (!acceptable(argument) || !acceptable(role))
+    return false;
+
+  // compose query
+
+  std::string query = std::string("SELECT usr.dn as username, role, groups.dn as groupname, capability, groups.gid, Attributes.a_name, Role_attrs.a_value "
+                                  "FROM groups, usr, ca, m "
+                                  "left join roles on roles.rid = m.rid "
+                                  "left join capabilities on capabilities.cid = m.cid "
+                                  "INNER JOIN Role_attrs on groups.gid = Role_attrs.g_id "             // added
+                                  "INNER JOIN Attributes on Attributes.a_id = Role_attrs.a_id "        // added
+                                  "WHERE Roles_attrs.r_id = roles.rid AND "                            // added  
+                                  "groups.gid = m.gid AND ") +
+    (compat_flag ? "usr.uid = m.uid AND " : "usr.userid = m.userid AND ") +
+    "roles.role = \'" + role + "\' AND "
+    "groups.dn = \'" + argument + "\' AND "
+    "usr.ca  = ca.cid AND "
+    "ca.ca = \'" + ca + "\' AND "
+    "usr.dn = \'" + dn + "\'";
+  
+  free(argument);
+
+  // execute query
+
+  return get_attributes_real(dn, ca, dbname, username, contactstring, port, socket, password, query, result);
+}
+
+bool
+get_user_attributes(const std::string &dn, const std::string &ca, 
+                    const char *group, 
+                    const std::string &dbname, const std::string &username, const std::string &contactstring, 
+                    int port, const std::string& socket, const char *password, 
+                    std::vector<gattrib> &result)
+{
+  if (dn.empty() || ca.empty() || !group || dbname.empty() || username.empty() || !password)
+    return false;
+
+  // compose query
+  
+  std::string query = std::string("SELECT usr.dn, ca.ca, Attributes.a_name, User_attrs.a_value "
+                                  "FROM usr "
+                                  "LEFT JOIN ca on usr.ca = ca.cid "
+                                  "LEFT JOIN User_attrs on usr.userid = User_attrs.u_id "
+                                  "LEFT JOIN Attributes on Attributes.a_id = User_attrs.a_id "
+                                  "WHERE "
+                                  "ca.ca = \'" + ca + "\' AND "
+                                  "usr.dn = \'" + dn + "\'");
+  
+  return get_attributes_real(dn, ca, dbname, username, contactstring, port, socket, password, query, result);
+}
+
+static bool
+get_attributes_real(const std::string &dn, const std::string &ca,
+                    const std::string &dbname, const std::string &username,
+                    const std::string &contactstring, 
+                    int port, const std::string& socket,const char *password,
+                    const std::string &query,	std::vector<gattrib> &results)
+{
+  if (dbname.empty() || username.empty() || !password || query.empty())
+    return false;
+  
+  std::string user_additional = std::string("SELECT usr.dn, ca.ca, Attributes.a_name, User_attrs.a_value "
+                                            "FROM usr "
+                                            "LEFT JOIN ca on usr.ca = ca.cid "
+                                            "LEFT JOIN User_attrs on usr.userid = User_attrs.u_id "
+                                            "LEFT JOIN Attributes on Attributes.a_id = User_attrs.a_id "
+                                            "WHERE "
+                                            "ca.ca = \'" + ca + "\' AND "
+                                            "usr.dn = \'" + dn + "\'");
+
+  std::string additional = std::string("SELECT usr.dn as username, role, groups.dn as groupname, capability, groups.gid, Attributes.a_name, Group_attrs.a_value "
+                                       "FROM groups, usr, ca, m "
+                                       "left join roles on roles.rid = m.rid "
+                                       "left join capabilities on capabilities.cid = m.cid "
+                                       "INNER JOIN Group_attrs on groups.gid = Group_attrs.g_id "             // added
+                                       "INNER JOIN Attributes on Attributes.a_id = Group_attrs.a_id "         // added
+                                       "WHERE groups.gid = m.gid AND ") +
+    (compat_flag ? "usr.uid = m.uid AND " : "usr.userid = m.userid AND ") +
+    "groups.must IS NOT NULL AND "
+    "usr.ca  = ca.cid AND "
+    "ca.ca = \'" + ca + "\' AND "
+    "usr.dn = \'" + dn + "\' AND "
+    "m.rid is NULL";
+  
+  try
+  {
+    std::auto_ptr<sqliface::interface> db(NewDB());
+    if(connect_with_port_and_socket)
+      connect_with_port_and_socket(db.get(), dbname.c_str(), contactstring.c_str(), username.c_str(), port, (!socket.empty() ? socket.c_str() : NULL), password);
+    else 
+      db->connect(dbname.c_str(), contactstring.c_str(), username.c_str(), password);
+
+    std::auto_ptr<sqliface::query> q(db->newquery());
+
+    *q << "SET TRANSACTION ISOLATION LEVEL SERIALIZABLE";
+    q->exec();
+
+    datahash map;
+
+    LOGM(VARP, logh, LEV_DEBUG, T_REQUEST, "ORIGINAL: %s", query.c_str());
+    bool ok = get_attributes_real0(db.get(), dn, ca, query, results, map);
+    
+    LOGM(VARP, logh, LEV_DEBUG, T_REQUEST, "GROUPS: %s", additional.c_str());
+    bool ok2 = get_attributes_real0(db.get(), dn, ca, additional, results, map);
+
+    LOGM(VARP, logh, LEV_DEBUG, T_REQUEST, "USER: %s", additional.c_str());
+    bool ok3 = get_attributes_real0(db.get(), dn, ca, user_additional, results, map);
+    
+    *q << "ROLLBACK";
+    q->exec();
+    
+    return ok && ok2 && ok3;
+  }
+  CATCH
+
+  return false;
+}
+
+static bool
+get_attributes_real0(sqliface::interface *db, const std::string &dn,
+                     const std::string &ca, const std::string &query,
+                     std::vector<gattrib> &results, datahash &map)
+{
+  std::string res;
+
+  if (query.empty())
+    return false;
+
+  try 
+  {
+    std::auto_ptr<sqliface::query> q(db->newquery());
+
+    LOGM(VARP, logh, LEV_DEBUG, T_REQUEST, "QUERY: %s", query.c_str());
+
+    *q << query.c_str();
+
+    std::auto_ptr<sqliface::results> r(q->result());
+    
+    // parse result set
+
+    while (r->valid())
+    {
+      gattrib rec;
+
+      rec.name = r->get("A_NAME");
+      rec.value  = r->get("A_VALUE");
+
+      try
+      {
+        rec.qualifier = r->get("GROUPNAME");
+      }    
+      catch(sqliface::DBEXC& e)
+      {
+        if(e.what() == "Unknown column GROUPNAME.")
+          rec.qualifier.clear();
+      }
+
+      results.push_back(rec);
+
+      (void)r->next();
+    }
+  
+    return true;
+  }
+  CATCH
+
+  return false;
 }

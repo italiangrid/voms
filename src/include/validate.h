@@ -17,6 +17,22 @@
 #include "newformat.h"
 /* #include "voms_apic.h" */
 
+
+struct att {
+  char *name;
+  char *qual;
+  char *val;
+};
+
+struct att_list {
+  char *grantor;
+  struct att **attrs;
+};
+
+struct full_att {
+  struct att_list **list;
+};
+
 struct col {
   int siglen;        /*!< The length of the VOMS server signature */
   char *signature;   /*!< The VOMS server signature */
@@ -35,6 +51,7 @@ struct col {
   int version;
   char **compact;    /*!< User's attributes in compact format */
   char *serial;
+  struct full_att *atts;
   /* Fields below this line are reserved. */
   char *reserved;
   int reserved2;

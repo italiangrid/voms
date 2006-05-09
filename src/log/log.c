@@ -534,6 +534,7 @@ int LogMessage(void *data, loglevels lev, logtypes type, const char *message, co
 {
   struct LogInfo *li=(struct LogInfo *)data;
   signed int len;
+  char *msgcopy = NULL;
 
   if (!data)
     return 1;
@@ -551,7 +552,7 @@ int LogMessage(void *data, loglevels lev, logtypes type, const char *message, co
       const char *dateformat = (li->dateformat ? li->dateformat : "%c");
       char *str = NULL;
 
-      char *msgcopy = strdup(message);
+      msgcopy = strdup(message);
       char *holder = msgcopy;
 
       if (!msgcopy)
@@ -763,7 +764,9 @@ int LogMessage(void *data, loglevels lev, logtypes type, const char *message, co
       free(str);
     }
   }
+  free(msgcopy);
   return 1;
  err:
+  free(msgcopy);
   return 0;
 }

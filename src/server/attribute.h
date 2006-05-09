@@ -37,4 +37,18 @@ extern bool operator<(const attrib& lhs,
 bool operator==(const attrib& lhs,
                 const attrib& rhs);
 
+class gattrib {
+
+ public:
+  
+  std::string str() const;
+
+ public:
+
+  std::string name;
+  std::string qualifier;
+  std::string value;
+  
+};
+
 #endif /* __ATTRIBUTE_H */

@@ -1,3 +1,4 @@
+
 /*********************************************************************
  *
  * Authors: Vincenzo Ciaschini - Vincenzo.Ciaschini@cnaf.infn.it 
@@ -11,6 +12,7 @@
  * follows.
  *
  *********************************************************************/
+
 #include "config.h"
 
 #include <openssl/asn1.h>
@@ -23,25 +25,29 @@
 
 #include "newformat.h"
 #include "acerrors.h"
+#include "attributes.h"
 
 #define ERROR(e) do { err = (e); goto err; } while (0)
 
-int writeac(X509 *issuerc, STACK_OF(X509) *issuerstack, 
-            X509 *holder, EVP_PKEY *pkey, 
-	    BIGNUM *s, char **c, char *t, AC **ac, const char *vo, 
-	    const char *uri, int valid, int old)
+int writeac(X509 *issuerc, STACK_OF(X509) *issuerstack, X509 *holder, EVP_PKEY *pkey, BIGNUM *s,
+            char **fqan, char *t, char **attributes_strings, AC **ac,
+            const char *vo, const char *uri, int valid, int old)
 {
   AC *a;
   X509_NAME *name1, *name2, *subjdup, *issdup;
   GENERAL_NAME *dirn, *dirn2;
   ASN1_INTEGER  *serial, *holdserial, *version;
   ASN1_BIT_STRING *uid;
-  AC_ATTR *capabilities;
+  AC_ATTR *capabilities, *attributes;
   AC_IETFATTR *capnames;
-  ASN1_OBJECT *cobj;
+  AC_FULL_ATTRIBUTES *ac_full_attrs;
+  ASN1_OBJECT *cobj, *aobj;
   X509_ALGOR *alg1, *alg2;
   ASN1_GENERALIZEDTIME *time1, *time2;
   X509_EXTENSION *norevavail, *targets, *auth, *certstack;
+  AC_ATT_HOLDER *ac_att_holder;
+  char *qual, *name, *value, *tmp, *tmp2;
+
   ASN1_NULL *null;
   int i = 0;
   int err = AC_ERR_UNKNOWN;
@@ -54,12 +60,14 @@ int writeac(X509 *issuerc, STACK_OF(X509) *issuerstack,
   version = serial = holdserial = NULL;
   time1 = time2 = NULL;
   uid = NULL;
-  capabilities = NULL;
+  capabilities = attributes = NULL;
   capnames = NULL;
-  cobj = NULL;
+  cobj = aobj = NULL;
   certstack = auth = targets = norevavail = NULL;
+  ac_full_attrs = NULL;
+  qual = name = value = tmp = tmp2 = NULL;
 
-  if (!issuerc || !holder || !s || !c || !ac || !pkey)
+  if (!issuerc || !holder || !s || !fqan || !ac || !pkey)
     return AC_ERR_PARAMETERS;
 
   a = *ac;
@@ -90,23 +98,29 @@ int writeac(X509 *issuerc, STACK_OF(X509) *issuerstack,
   serial              = BN_to_ASN1_INTEGER(s, NULL);
   version             = BN_to_ASN1_INTEGER((BIGNUM *)(BN_value_one()), NULL);
   capabilities        = AC_ATTR_new();
+  attributes          = AC_ATTR_new();
   cobj                = OBJ_txt2obj("idatcap",0);
+  aobj                = OBJ_txt2obj("attributes",0);
   capnames            = AC_IETFATTR_new();
   null                = ASN1_NULL_new();
+  ac_full_attrs       = AC_FULL_ATTRIBUTES_new();
+  ac_att_holder       = AC_ATT_HOLDER_new();
 
   if (!subjdup || !issdup || !dirn || !dirn2 || !holdserial || !serial ||
-      !capabilities || !cobj || !capnames || !time1 || !time2 ||
-      !null)
+      !capabilities || !attributes || !cobj || !capnames || !time1 || !time2 ||
+      !null || !ac_full_attrs || !ac_att_holder)
     ERROR(AC_ERR_MEMORY);
 
-  while(c[i]) {
+  // prepare AC_IETFATTR
+  while(fqan[i]) 
+  {
     ASN1_OCTET_STRING *tmpc = ASN1_OCTET_STRING_new();
-
-    if (!tmpc) {
+    if (!tmpc) 
+    {
       ASN1_OCTET_STRING_free(tmpc);
       ERROR(AC_ERR_MEMORY);
     }
-    ASN1_OCTET_STRING_set(tmpc, c[i], strlen(c[i]));
+    ASN1_OCTET_STRING_set(tmpc, fqan[i], strlen(fqan[i]));
     sk_AC_IETFATTRVAL_push(capnames->values, (AC_IETFATTRVAL *)tmpc);
     i++;
   }
@@ -115,7 +129,8 @@ int writeac(X509 *issuerc, STACK_OF(X509) *issuerstack,
     ASN1_IA5STRING *tmpr = ASN1_IA5STRING_new();
     char *buffer=(char *)malloc(strlen(vo)+strlen(uri)+4);
 
-    if (!tmpr || !g || !buffer) {
+    if (!tmpr || !g || !buffer) 
+    {
       GENERAL_NAME_free(g);
       ASN1_IA5STRING_free(tmpr);
       free(buffer);
@@ -131,13 +146,93 @@ int writeac(X509 *issuerc, STACK_OF(X509) *issuerstack,
     sk_GENERAL_NAME_push(capnames->names, g);
   }
 
-
+  // stuff the created AC_IETFATTR in ietfattr (values) and define its object
   sk_AC_IETFATTR_push(capabilities->ietfattr, capnames);
+  capabilities->get_type = GET_TYPE_FQAN;
   ASN1_OBJECT_free(capabilities->type);
   capabilities->type = cobj;
 
-  sk_AC_ATTR_push(a->acinfo->attrib, capabilities);
 
+  i = 0;
+  // prepare AC_FULL_ATTRIBUTES
+  while(attributes_strings[i]) {
+    AC_ATTRIBUTE *ac_attr      = AC_ATTRIBUTE_new();
+
+    if (!ac_attr) {
+      AC_ATTRIBUTE_free(ac_attr);
+      ERROR(AC_ERR_MEMORY);
+    }
+    
+    char *qual, *name, *value;
+
+    char *tmp =strstr(attributes_strings[i], "::");
+    if (tmp == attributes_strings[i]) {
+      qual = NULL;
+      tmp = attributes_strings[i] + 2;
+    }
+    else {
+      *tmp='\0';
+      qual = attributes_strings[i];
+      tmp += 2;
+    }
+
+    char *tmp2 = strstr(tmp, "=");
+    if (!tmp2) {
+      ERROR(AC_ERR_PARAMETERS);
+    }
+    else {
+      name = tmp;
+      *tmp2 = '\0';
+      value = ++tmp2;
+    }
+
+    if (qual)
+      ASN1_OCTET_STRING_set(ac_attr->qualifier, qual, strlen(qual));
+    else
+      ASN1_OCTET_STRING_set(ac_attr->qualifier, "", strlen(""));
+
+    ASN1_OCTET_STRING_set(ac_attr->name,        name,  strlen(name));
+    ASN1_OCTET_STRING_set(ac_attr->value,       value, strlen(value));
+
+    sk_AC_ATTRIBUTE_push(ac_att_holder->attributes, ac_attr);
+    i++;
+  }
+  if (!i) 
+    AC_ATT_HOLDER_free(ac_att_holder);
+  else {
+    GENERAL_NAME *g = GENERAL_NAME_new();
+    ASN1_IA5STRING *tmpr = ASN1_IA5STRING_new();
+    char *buffer=(char *)malloc(strlen(vo)+strlen(uri)+4);
+
+    if (!tmpr || !g || !buffer) 
+    {
+      GENERAL_NAME_free(g);
+      ASN1_IA5STRING_free(tmpr);
+      free(buffer);
+      ERROR(AC_ERR_MEMORY);
+    }
+    strcpy(buffer, vo);
+    strcat(buffer, "://");
+    strcat(buffer,uri);
+    ASN1_STRING_set(tmpr, buffer, strlen(buffer));
+    free(buffer);
+    g->type  = GEN_URI;
+    g->d.ia5 = tmpr;
+    sk_GENERAL_NAME_push(ac_att_holder->grantor, g);
+
+    sk_AC_ATT_HOLDER_push(ac_full_attrs->providers, ac_att_holder);
+  }  
+
+
+  // stuff the AC_FULL_ATTRIBUTES in values and define its object
+  sk_AC_FULL_ATTRIBUTES_push(attributes->fullattributes, ac_full_attrs);
+  attributes->get_type = GET_TYPE_ATTRIBUTES;
+  ASN1_OBJECT_free(attributes->type);
+  attributes->type = aobj;
+  
+  // push both AC_ATTR into STACK_OF(AC_ATTR)
+  sk_AC_ATTR_push(a->acinfo->attrib, capabilities);
+  sk_AC_ATTR_push(a->acinfo->attrib, attributes);
 
   STACK_OF(X509) *stk = NULL;
   if (issuerstack)
@@ -154,7 +249,7 @@ int writeac(X509 *issuerc, STACK_OF(X509) *issuerstack,
     ERROR(AC_ERR_NO_EXTENSION);
 /*   X509_EXTENSION_set_critical(norevavail, 0); */
 
-  auth=X509V3_EXT_conf_nid(NULL, NULL, OBJ_txt2nid("authKeyId"), (char *)issuerc);
+  auth = X509V3_EXT_conf_nid(NULL, NULL, OBJ_txt2nid("authKeyId"), (char *)issuerc);
   if (!auth)
     ERROR(AC_ERR_NO_EXTENSION);
 
@@ -211,6 +306,7 @@ int writeac(X509 *issuerc, STACK_OF(X509) *issuerstack,
   X509_EXTENSION_free(auth);
   X509_EXTENSION_free(norevavail);
   X509_EXTENSION_free(targets);
+  X509_EXTENSION_free(certstack);
   X509_NAME_free(subjdup);
   X509_NAME_free(issdup);
   GENERAL_NAME_free(dirn);
@@ -222,6 +318,7 @@ int writeac(X509 *issuerc, STACK_OF(X509) *issuerstack,
   AC_IETFATTR_free(capnames);
   ASN1_UTCTIME_free(time1);
   ASN1_UTCTIME_free(time2);
-
+  AC_ATT_HOLDER_free(ac_att_holder);
+  AC_FULL_ATTRIBUTES_free(ac_full_attrs);
   return err;
 }

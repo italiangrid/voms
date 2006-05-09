@@ -860,6 +860,9 @@ bool Fake::Retrieve()
   X509 *hcert = NULL, *holder = NULL;
   EVP_PKEY *hkey = NULL;
 
+  // generic attributes TO BE FILLED
+  std::vector<std::string> attributes;
+
   if (hcrt && hckey && owncert) {
     if ((BIO_read_filename(hcrt, hostcert.c_str()) > 0) &&
         (BIO_read_filename(hckey, hostkey.c_str()) > 0) &&
@@ -872,7 +875,7 @@ bool Fake::Retrieve()
         ac = AC_new();
         if (ac)
           res = createac(holder, NULL, hcert, hkey, (BIGNUM *)(BN_value_one()), fqans, 
-			 targets, &ac, voms, uri, hours*3600, !newformat);
+                         targets, attributes, &ac, voms, uri, hours*3600, !newformat);
       }
     }
   }

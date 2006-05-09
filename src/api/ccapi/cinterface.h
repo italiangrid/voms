@@ -46,6 +46,13 @@ struct contactdatar { /*!< You must never allocate directly this structure. Its 
   int   version;
 };
 
+
+struct attributer {
+  const char *name;
+  const char *value;
+  const char *qualifier;
+};
+
 /*!< \brief The type of data returned.
  */
 
@@ -70,12 +77,14 @@ struct vomsr {
   char *custom;      /*!< The data returned by an S command */
   int datalen;
   int version;
-  char **fqan;    /*!< User's attributes in compact format */
+  char **fqan;    /*!< User's FQANs */
   char *serial;      /*!< Serial number. Only significant if coming from AC. 
-		       Null otherwise */
+                       Null otherwise */
   /* Fields below this line are reserved. */
   AC *ac;
   X509 *holder;
+  int mydata;
+  void *my2;
 };
 
 

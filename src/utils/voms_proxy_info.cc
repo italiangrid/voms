@@ -496,7 +496,11 @@ static bool print(X509 *cert, vomsdata &vd)
       std::cout << "issuer    : " << v->server << "\n";
       for (std::vector<std::string>::iterator s = v->fqan.begin(); s != v->fqan.end(); s++)
         std::cout << "attribute : " << *s << "\n";
-      std::cout << "timeleft  : " << leftac/3600 << ":" << std::setw(2) << std::setfill('0') 
+      for (std::vector<attributelist>::iterator s = v->attributes.begin(); s != v->attributes.end(); s++)
+        for (std::vector<attribute>::iterator t = s->attributes.begin(); t != s->attributes.end(); t++)
+          std::cout << "attribute : " << t->name + " = " + t->value + 
+            (t->qualifier.empty() ? "" : " (" + t->qualifier + ")") << std::endl;
+      std::cout << "timeleft  : " << leftac/3600 << ":" << std::setw(2) << std::setfill('0')
                 << (leftac%3600)/60 << ":" << std::setw(2) << std::setfill('0') << (leftac%3600)%60 << "\n";
     }
   }

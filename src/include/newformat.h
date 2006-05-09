@@ -11,8 +11,10 @@
  * follows.
  *
  *********************************************************************/
+
 #ifndef VOMS_NEW_FORMAT_H
 #define VOMS_NEW_FORMAT_H
+
 #include <openssl/evp.h>
 #include <openssl/asn1.h>
 #include <openssl/asn1_mac.h>
@@ -76,9 +78,13 @@ typedef struct ACTARGETS {
 } AC_TARGETS;
 
 typedef struct ACATTR {
-  ASN1_OBJECT           *type;
+  ASN1_OBJECT * type;
+  int get_type;
   STACK_OF(AC_IETFATTR) *ietfattr;
+  STACK_OF(AC_FULL_ATTRIBUTES) *fullattributes; // attenzione forse c'e' un livello di troppo, AC_FULL_ATTRIBUTES era come AC_ATTR
 } AC_ATTR;
+#define GET_TYPE_FQAN 1
+#define GET_TYPE_ATTRIBUTES 2
 
 typedef struct ACINFO {
   ASN1_INTEGER             *version;

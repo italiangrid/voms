@@ -35,6 +35,11 @@ struct data {
   char *cap;   /*!< user's capability */
 };
 
+struct attribute {
+  const char *name;
+  const char *value;
+  const char *qualifier;
+};
 
 struct contactdata { /*!< You must never allocate directly this structure. Its sizeof() is
                         subject to change without notice. The only supported way to obtain it
@@ -202,14 +207,16 @@ extern struct vomsdata *VOMS_Init(char *voms, char *cert); /*!< Initializes a vo
 						       \return NULL for failure, or a pointer to a properly initialized structure. */
 
 extern struct voms *VOMS_Copy(struct voms *v, int *error); /*!< Copies a voms structure.
-							     N.B: This is the ONLY way to correctly initialize a voms structure.
+							     N.B: This is the ONLY way to correctly initialize a voms structure as a
+                        copy of another voms structure.
 							     \param v The structure to copy.
 							     \param error RETURN PARAMETER: qualifies the error message.
 
 							     \return NULL (error) or the new voms structure. */
 
 extern struct vomsdata *VOMS_CopyAll(struct vomsdata *vd, int *error); /*!< Copies a vomsdata structure.
-									 N.B: This is the ONLY way to correctly initialize a vomsdata structure.
+									 N.B: This is the ONLY way to correctly initialize a vomsdata structure as a
+                        copy of another vomsdata structure.
 									 \param vd The structure to copy.
 									 \param error RETURN PARAMETER: qualifies the error message.
 
@@ -369,6 +376,11 @@ extern int VOMS_RetrieveFromProxy(int how, struct vomsdata *vd, int *error); /*!
              \param error RETURN PARAMETER: Qualifies the error message
              \return failure (0) or success (<>0)*/
 
+extern int VOMS_GetAttributeSourcesNumber(struct voms *v, struct vomsdata *vd, int *error);
+extern int VOMS_GetAttributeSourceHandle(struct voms *v, int num, struct vomsdata *vd, int *error);
+extern const char *VOMS_GetAttributeGrantor(struct voms *v, int handle, struct vomsdata *vd, int *error);
+extern int VOMS_GetAttributesNumber(struct voms *v, int handle, struct vomsdata *vd, int *error);
+extern int VOMS_GetAttribute(struct voms *v, int handle, int num, struct attribute *at, struct vomsdata *vd, int *error);
 
 extern struct vomsdata *VOMS_Duplicate(struct vomsdata *vd);
 extern AC *VOMS_GetAC(struct voms *v);

@@ -41,7 +41,8 @@ static int bwrite(int fd, const char * s)
     memcpy(buffer + sizeof(int), s, strlen(s));
     ret = write(fd, buffer, blen);
   }
-  
+  free(buffer);
+
   return (ret != -1);
 }
 

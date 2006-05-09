@@ -24,6 +24,7 @@ extern "C" {
 extern "C" {
 #include <openssl/x509.h>
 #include "newformat.h"
+#include "listfunc.h"
 }
 
 
@@ -38,6 +39,48 @@ struct d {
   char *role;
   char *cap;
 };
+
+struct att {
+  char *name;
+  char *qual;
+  char *val;
+};
+
+struct att_list {
+  char *grantor;
+  struct att **attrs;
+};
+
+struct full_att {
+  struct att_list **list;
+};
+
+static void free_att(struct att *a)
+{
+  if (a) {
+    free(a->name);
+    free(a->qual);
+    free(a->val);
+    free(a);
+  }
+}
+
+static void free_att_list(struct att_list *at)
+{
+  if (at) {
+    free(at->grantor);
+    listfree((char **)(at->attrs), (freefn)free_att);
+    free(at);
+  }
+}
+
+static void free_full_att(struct full_att *fa)
+{
+  if (fa) {
+    listfree((char **)(fa->list), (freefn)free_att_list);
+    free(fa);
+  }
+}
 
 struct col {
   int siglen;        /*!< The length of the VOMS server signature */
@@ -57,6 +100,7 @@ struct col {
   int version;
   char **fqan;    /*!< User's attributes in compact format */
   char *serial;
+  struct full_att *atts;
   /* Fields below this line are reserved. */
   char *reserved;
   int reserved2;
@@ -174,6 +218,29 @@ bool vomsdata::verifyac(X509 *cert, X509 *issuer, AC *ac, voms &v)
     free(vv->fqan);
     vv->fqan = NULL;
   }
+
+  int i = 0;
+  while (vv->atts->list[i]) {
+    struct attributelist l;
+    struct att_list *al = vv->atts->list[i];
+    l.grantor = std::string(al->grantor);
+    int j = 0;
+    while (al->attrs[j]) {
+      struct attribute a;
+      struct att *at = al->attrs[j];
+
+      a.name      = std::string(at->name);
+      a.qualifier = std::string(at->qual);
+      a.value     = std::string(at->val);
+
+      l.attributes.push_back(a);
+      j++;
+    }
+    v.attributes.push_back(l);
+    i++;
+  }
+
+  free_full_att(vv->atts);
   free(vv->fqan);
   free(vv->user);
   free(vv->userca);
