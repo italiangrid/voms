@@ -21,8 +21,12 @@
 
 
 extern "C" {
+#ifndef NOGLOBUS
 #include <gssapi.h>
-
+#else
+typedef void * gss_cred_id_t;
+typedef void * gss_ctx_id_t;
+#endif
 #include <openssl/x509.h>
 #include <sys/types.h>
 #include "newformat.h"
@@ -90,6 +94,8 @@ public:
 private:
   struct vomsr *translate();
   friend int TranslateVOMS(struct vomsdatar *vd, std::vector<voms>&v, int *error);
+public:
+  AC *GetAC();
 };
 
 enum recurse_type { 
@@ -114,27 +120,28 @@ enum verify_type {
 */
 enum verror_type { 
   VERR_NONE,
-  VERR_NOSOCKET,  /*!< Socket problem*/
-  VERR_NOIDENT,   /*!< Cannot identify itself (certificate problem) */
-  VERR_COMM,      /*!< Server problem */
-  VERR_PARAM,     /*!< Wrong parameters*/
-  VERR_NOEXT,     /*!< VOMS extension missing */
-  VERR_NOINIT,    /*!< Initialization error */
-  VERR_TIME,      /*!< Error in time checking */
-  VERR_IDCHECK,   /*!< User data in extension different from the real ones */
-  VERR_EXTRAINFO, /*!< VO name and URI missing */
-  VERR_FORMAT,    /*!< Wrong data format */
-  VERR_NODATA,    /*!< Empty extension */
-  VERR_PARSE,     /*!< Parse error */
-  VERR_DIR,       /*!< Directory error */
-  VERR_SIGN,      /*!< Signature error */
-  VERR_SERVER,    /*!< Unidentifiable VOMS server */
-  VERR_MEM,       /*!< Memory problems */
-  VERR_VERIFY,    /*!< Generic verification error*/
+  VERR_NOSOCKET,   /*!< Socket problem*/
+  VERR_NOIDENT,    /*!< Cannot identify itself (certificate problem) */
+  VERR_COMM,       /*!< Server problem */
+  VERR_PARAM,      /*!< Wrong parameters*/
+  VERR_NOEXT,      /*!< VOMS extension missing */
+  VERR_NOINIT,     /*!< Initialization error */
+  VERR_TIME,       /*!< Error in time checking */
+  VERR_IDCHECK,    /*!< User data in extension different from the real ones */
+  VERR_EXTRAINFO,  /*!< VO name and URI missing */
+  VERR_FORMAT,     /*!< Wrong data format */
+  VERR_NODATA,     /*!< Empty extension */
+  VERR_PARSE,      /*!< Parse error */
+  VERR_DIR,        /*!< Directory error */
+  VERR_SIGN,       /*!< Signature error */
+  VERR_SERVER,     /*!< Unidentifiable VOMS server */
+  VERR_MEM,        /*!< Memory problems */
+  VERR_VERIFY,     /*!< Generic verification error*/
   //  VERR_IDENT, 
-  VERR_TYPE,      /*!< Returned data of unknown type */
-  VERR_ORDER,     /*!< Ordering different than required */
-  VERR_SERVERCODE /*!< Error message from the server */
+  VERR_TYPE,       /*!< Returned data of unknown type */
+  VERR_ORDER,      /*!< Ordering different than required */
+  VERR_SERVERCODE, /*!< Error message from the server */
+  VERR_NOTAVAIL    /*!< Method not available */
 };
 
 typedef bool (*check_sig)(X509 *, void *, verror_type &); /*!<*/
@@ -356,6 +363,10 @@ private:
   bool check_cert(STACK_OF(X509) *);
   X509 *check_from_certs(AC *ac, const std::string& voname);
   X509 *check_from_file(AC *, std::ifstream&, const std::string &vo, const std::string &filename);
+
+public:
+  vomsdata(const vomsdata &);
+
 };
 
 

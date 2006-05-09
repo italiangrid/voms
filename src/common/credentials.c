@@ -51,6 +51,7 @@ globus(int version)
   return version;
 }
 
+#ifndef NOGLOBUS
 X509 *
 get_own_cert(void)
 {
@@ -123,6 +124,7 @@ decouple_ctx(gss_ctx_id_t context, int version, STACK_OF(X509) **stk)
   else
     return NULL;
 }
+#endif
 
 X509 *
 get_real_cert(X509 *base, STACK_OF(X509) *stk)
@@ -209,6 +211,7 @@ get_private_key(void *credential, int globusver)
   return pkey;
 }
 
+#ifndef NOGLOBUS
 int get_own_data(gss_cred_id_t credential, int globusver, EVP_PKEY **key, char **issuer, X509 **pcert)
 {
   /*  EVP_PKEY *pkey = NULL; */
@@ -285,6 +288,8 @@ get_globusid(gss_cred_id_t handle)
   }
   return globusid_tmp;
 }
+#endif
+
 
 char *
 get_peer_serial(X509 *cert)

@@ -14,7 +14,7 @@
 
 @SET_MAKE@
 
-SOURCES = $(libattcert_la_SOURCES) $(libattcert_gcc32_la_SOURCES) $(libattcert_gcc32dbg_la_SOURCES) $(libattcert_gcc32dbgpthr_la_SOURCES) $(libattcert_gcc32pthr_la_SOURCES) $(libattcert_gcc64_la_SOURCES) $(libattcert_gcc64dbg_la_SOURCES) $(libattcert_gcc64dbgpthr_la_SOURCES) $(libattcert_gcc64pthr_la_SOURCES) $(libccattcert_la_SOURCES) $(libccattcert_gcc32_la_SOURCES) $(libccattcert_gcc32dbg_la_SOURCES) $(libccattcert_gcc32dbgpthr_la_SOURCES) $(libccattcert_gcc32pthr_la_SOURCES) $(libccattcert_gcc64_la_SOURCES) $(libccattcert_gcc64dbg_la_SOURCES) $(libccattcert_gcc64dbgpthr_la_SOURCES) $(libccattcert_gcc64pthr_la_SOURCES)
+SOURCES = $(libattcert_la_SOURCES) $(libattcert_gcc32_la_SOURCES) $(libattcert_gcc32dbg_la_SOURCES) $(libattcert_gcc32dbgpthr_la_SOURCES) $(libattcert_gcc32pthr_la_SOURCES) $(libattcert_gcc64_la_SOURCES) $(libattcert_gcc64dbg_la_SOURCES) $(libattcert_gcc64dbgpthr_la_SOURCES) $(libattcert_gcc64pthr_la_SOURCES) $(libattributes_nog_la_SOURCES) $(libccattcert_la_SOURCES) $(libccattcert_gcc32_la_SOURCES) $(libccattcert_gcc32dbg_la_SOURCES) $(libccattcert_gcc32dbgpthr_la_SOURCES) $(libccattcert_gcc32pthr_la_SOURCES) $(libccattcert_gcc64_la_SOURCES) $(libccattcert_gcc64dbg_la_SOURCES) $(libccattcert_gcc64dbgpthr_la_SOURCES) $(libccattcert_gcc64pthr_la_SOURCES)
 
 srcdir = @srcdir@
 top_srcdir = @top_srcdir@
@@ -51,13 +51,13 @@ mkinstalldirs = $(SHELL) $(top_srcdir)/./project/mkinstalldirs
 CONFIG_HEADER = $(top_builddir)/src/autogen/config.h
 CONFIG_CLEAN_FILES =
 LTLIBRARIES = $(noinst_LTLIBRARIES)
-am__DEPENDENCIES_1 =
-libattcert_la_DEPENDENCIES = $(am__DEPENDENCIES_1)
+libattcert_la_LIBADD =
 am_libattcert_la_OBJECTS = libattcert_la-validate.lo \
 	libattcert_la-write.lo libattcert_la-extensions.lo \
 	libattcert_la-mystack.lo libattcert_la-error.lo \
 	libattcert_la-newformat.lo libattcert_la-init.lo
 libattcert_la_OBJECTS = $(am_libattcert_la_OBJECTS)
+am__DEPENDENCIES_1 =
 libattcert_gcc32_la_DEPENDENCIES = $(am__DEPENDENCIES_1)
 am_libattcert_gcc32_la_OBJECTS = libattcert_gcc32_la-validate.lo \
 	libattcert_gcc32_la-write.lo libattcert_gcc32_la-extensions.lo \
@@ -134,7 +134,15 @@ am_libattcert_gcc64pthr_la_OBJECTS =  \
 	libattcert_gcc64pthr_la-init.lo
 libattcert_gcc64pthr_la_OBJECTS =  \
 	$(am_libattcert_gcc64pthr_la_OBJECTS)
-libccattcert_la_DEPENDENCIES = libattcert.la $(am__DEPENDENCIES_1)
+libattributes_nog_la_DEPENDENCIES = $(am__DEPENDENCIES_1)
+am_libattributes_nog_la_OBJECTS = libattributes_nog_la-validate.lo \
+	libattributes_nog_la-write.lo \
+	libattributes_nog_la-extensions.lo \
+	libattributes_nog_la-mystack.lo libattributes_nog_la-error.lo \
+	libattributes_nog_la-newformat.lo libattributes_nog_la-init.lo \
+	create.lo ccinit.lo
+libattributes_nog_la_OBJECTS = $(am_libattributes_nog_la_OBJECTS)
+libccattcert_la_DEPENDENCIES = libattcert.la
 am_libccattcert_la_OBJECTS = create.lo ccinit.lo
 libccattcert_la_OBJECTS = $(am_libccattcert_la_OBJECTS)
 libccattcert_gcc32_la_DEPENDENCIES = libattcert_gcc32.la \
@@ -201,7 +209,8 @@ SOURCES = $(libattcert_la_SOURCES) $(libattcert_gcc32_la_SOURCES) \
 	$(libattcert_gcc64_la_SOURCES) \
 	$(libattcert_gcc64dbg_la_SOURCES) \
 	$(libattcert_gcc64dbgpthr_la_SOURCES) \
-	$(libattcert_gcc64pthr_la_SOURCES) $(libccattcert_la_SOURCES) \
+	$(libattcert_gcc64pthr_la_SOURCES) \
+	$(libattributes_nog_la_SOURCES) $(libccattcert_la_SOURCES) \
 	$(libccattcert_gcc32_la_SOURCES) \
 	$(libccattcert_gcc32dbg_la_SOURCES) \
 	$(libccattcert_gcc32dbgpthr_la_SOURCES) \
@@ -217,7 +226,8 @@ DIST_SOURCES = $(libattcert_la_SOURCES) $(libattcert_gcc32_la_SOURCES) \
 	$(libattcert_gcc64_la_SOURCES) \
 	$(libattcert_gcc64dbg_la_SOURCES) \
 	$(libattcert_gcc64dbgpthr_la_SOURCES) \
-	$(libattcert_gcc64pthr_la_SOURCES) $(libccattcert_la_SOURCES) \
+	$(libattcert_gcc64pthr_la_SOURCES) \
+	$(libattributes_nog_la_SOURCES) $(libccattcert_la_SOURCES) \
 	$(libccattcert_gcc32_la_SOURCES) \
 	$(libccattcert_gcc32dbg_la_SOURCES) \
 	$(libccattcert_gcc32dbgpthr_la_SOURCES) \
@@ -306,7 +316,9 @@ MAINT = @MAINT@
 MAINTAINER_MODE_FALSE = @MAINTAINER_MODE_FALSE@
 MAINTAINER_MODE_TRUE = @MAINTAINER_MODE_TRUE@
 MAKEINFO = @MAKEINFO@
+NO_GLOBUS_FLAGS = @NO_GLOBUS_FLAGS@
 OBJEXT = @OBJEXT@
+OPENSSL_LIBS = @OPENSSL_LIBS@
 PACKAGE = @PACKAGE@
 PACKAGE_BUGREPORT = @PACKAGE_BUGREPORT@
 PACKAGE_NAME = @PACKAGE_NAME@
@@ -374,6 +386,7 @@ target_alias = @target_alias@
 noinst_LTLIBRARIES = \
 	libattcert.la \
 	libccattcert.la \
+	libattributes_nog.la \
 	$(WANTED_ATTCERT_LIBS) # may add the libraries defined in EXTRA_LTLIBRARIES
 
 libattcert_la_SOURCES = \
@@ -385,22 +398,43 @@ libattcert_la_SOURCES = \
 	newformat.c \
 	init.c
 
+libattributes_nog_la_SOURCES = \
+	validate.c \
+	write.c \
+	extensions.c \
+	mystack.c \
+	error.c \
+	newformat.c \
+	init.c \
+	create.cc \
+	ccinit.cc
+
+libattributes_nog_la_CFLAGS = \
+	$(NO_GLOBUS_FLAGS) \
+	-DNOGLOBUS \
+	-I $(top_srcdir)/src/include \
+	-I $(top_builddir)/src/sslutils
+
+libattributes_nog_la_LIBADD = \
+	$(OPENSSL_LIBS)
+
 libattcert_la_CFLAGS = \
 	-I $(top_srcdir)/src/include \
 	-I $(top_builddir)/src/sslutils \
 	$(GLOBUS_CFLAGS)
 
-libattcert_la_LIBADD = \
-	$(GLOBUS_GSS_LIBS)
 
+#libattcert_la_LIBADD = \
+#	$(GLOBUS_GSS_LIBS)
 libccattcert_la_SOURCES = \
 	create.cc \
 	ccinit.cc
 
 libccattcert_la_LIBADD = \
-	libattcert.la \
-	$(GLOBUS_GSS_LIBS)
+	libattcert.la
 
+# \
+#	$(GLOBUS_GSS_LIBS)
 AM_CPPFLAGS = \
 	-I $(top_srcdir)/src/include \
 	-I $(top_srcdir)/src/sslutils
@@ -692,6 +726,8 @@ libattcert_gcc64dbgpthr.la: $(libattcert_gcc64dbgpthr_la_OBJECTS) $(libattcert_g
 	$(LINK)  $(libattcert_gcc64dbgpthr_la_LDFLAGS) $(libattcert_gcc64dbgpthr_la_OBJECTS) $(libattcert_gcc64dbgpthr_la_LIBADD) $(LIBS)
 libattcert_gcc64pthr.la: $(libattcert_gcc64pthr_la_OBJECTS) $(libattcert_gcc64pthr_la_DEPENDENCIES) 
 	$(LINK)  $(libattcert_gcc64pthr_la_LDFLAGS) $(libattcert_gcc64pthr_la_OBJECTS) $(libattcert_gcc64pthr_la_LIBADD) $(LIBS)
+libattributes_nog.la: $(libattributes_nog_la_OBJECTS) $(libattributes_nog_la_DEPENDENCIES) 
+	$(CXXLINK)  $(libattributes_nog_la_LDFLAGS) $(libattributes_nog_la_OBJECTS) $(libattributes_nog_la_LIBADD) $(LIBS)
 libccattcert.la: $(libccattcert_la_OBJECTS) $(libccattcert_la_DEPENDENCIES) 
 	$(CXXLINK)  $(libccattcert_la_LDFLAGS) $(libccattcert_la_OBJECTS) $(libccattcert_la_LIBADD) $(LIBS)
 libccattcert_gcc32.la: $(libccattcert_gcc32_la_OBJECTS) $(libccattcert_gcc32_la_DEPENDENCIES) 
@@ -782,6 +818,13 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libattcert_la-newformat.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libattcert_la-validate.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libattcert_la-write.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libattributes_nog_la-error.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libattributes_nog_la-extensions.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libattributes_nog_la-init.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libattributes_nog_la-mystack.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libattributes_nog_la-newformat.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libattributes_nog_la-validate.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libattributes_nog_la-write.Plo@am__quote@
 
 .c.o:
 @am__fastdepCC_TRUE@	if $(COMPILE) -MT $@ -MD -MP -MF "$(DEPDIR)/$*.Tpo" -c -o $@ $<; \
@@ -1244,6 +1287,55 @@ libattcert_gcc64pthr_la-init.lo: init.c
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	source='init.c' object='libattcert_gcc64pthr_la-init.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(LIBTOOL) --tag=CC --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libattcert_gcc64pthr_la_CFLAGS) $(CFLAGS) -c -o libattcert_gcc64pthr_la-init.lo `test -f 'init.c' || echo '$(srcdir)/'`init.c
+
+libattributes_nog_la-validate.lo: validate.c
+@am__fastdepCC_TRUE@	if $(LIBTOOL) --tag=CC --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libattributes_nog_la_CFLAGS) $(CFLAGS) -MT libattributes_nog_la-validate.lo -MD -MP -MF "$(DEPDIR)/libattributes_nog_la-validate.Tpo" -c -o libattributes_nog_la-validate.lo `test -f 'validate.c' || echo '$(srcdir)/'`validate.c; \
+@am__fastdepCC_TRUE@	then mv -f "$(DEPDIR)/libattributes_nog_la-validate.Tpo" "$(DEPDIR)/libattributes_nog_la-validate.Plo"; else rm -f "$(DEPDIR)/libattributes_nog_la-validate.Tpo"; exit 1; fi
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='validate.c' object='libattributes_nog_la-validate.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(LIBTOOL) --tag=CC --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libattributes_nog_la_CFLAGS) $(CFLAGS) -c -o libattributes_nog_la-validate.lo `test -f 'validate.c' || echo '$(srcdir)/'`validate.c
+
+libattributes_nog_la-write.lo: write.c
+@am__fastdepCC_TRUE@	if $(LIBTOOL) --tag=CC --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libattributes_nog_la_CFLAGS) $(CFLAGS) -MT libattributes_nog_la-write.lo -MD -MP -MF "$(DEPDIR)/libattributes_nog_la-write.Tpo" -c -o libattributes_nog_la-write.lo `test -f 'write.c' || echo '$(srcdir)/'`write.c; \
+@am__fastdepCC_TRUE@	then mv -f "$(DEPDIR)/libattributes_nog_la-write.Tpo" "$(DEPDIR)/libattributes_nog_la-write.Plo"; else rm -f "$(DEPDIR)/libattributes_nog_la-write.Tpo"; exit 1; fi
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='write.c' object='libattributes_nog_la-write.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(LIBTOOL) --tag=CC --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libattributes_nog_la_CFLAGS) $(CFLAGS) -c -o libattributes_nog_la-write.lo `test -f 'write.c' || echo '$(srcdir)/'`write.c
+
+libattributes_nog_la-extensions.lo: extensions.c
+@am__fastdepCC_TRUE@	if $(LIBTOOL) --tag=CC --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libattributes_nog_la_CFLAGS) $(CFLAGS) -MT libattributes_nog_la-extensions.lo -MD -MP -MF "$(DEPDIR)/libattributes_nog_la-extensions.Tpo" -c -o libattributes_nog_la-extensions.lo `test -f 'extensions.c' || echo '$(srcdir)/'`extensions.c; \
+@am__fastdepCC_TRUE@	then mv -f "$(DEPDIR)/libattributes_nog_la-extensions.Tpo" "$(DEPDIR)/libattributes_nog_la-extensions.Plo"; else rm -f "$(DEPDIR)/libattributes_nog_la-extensions.Tpo"; exit 1; fi
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='extensions.c' object='libattributes_nog_la-extensions.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(LIBTOOL) --tag=CC --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libattributes_nog_la_CFLAGS) $(CFLAGS) -c -o libattributes_nog_la-extensions.lo `test -f 'extensions.c' || echo '$(srcdir)/'`extensions.c
+
+libattributes_nog_la-mystack.lo: mystack.c
+@am__fastdepCC_TRUE@	if $(LIBTOOL) --tag=CC --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libattributes_nog_la_CFLAGS) $(CFLAGS) -MT libattributes_nog_la-mystack.lo -MD -MP -MF "$(DEPDIR)/libattributes_nog_la-mystack.Tpo" -c -o libattributes_nog_la-mystack.lo `test -f 'mystack.c' || echo '$(srcdir)/'`mystack.c; \
+@am__fastdepCC_TRUE@	then mv -f "$(DEPDIR)/libattributes_nog_la-mystack.Tpo" "$(DEPDIR)/libattributes_nog_la-mystack.Plo"; else rm -f "$(DEPDIR)/libattributes_nog_la-mystack.Tpo"; exit 1; fi
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='mystack.c' object='libattributes_nog_la-mystack.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(LIBTOOL) --tag=CC --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libattributes_nog_la_CFLAGS) $(CFLAGS) -c -o libattributes_nog_la-mystack.lo `test -f 'mystack.c' || echo '$(srcdir)/'`mystack.c
+
+libattributes_nog_la-error.lo: error.c
+@am__fastdepCC_TRUE@	if $(LIBTOOL) --tag=CC --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libattributes_nog_la_CFLAGS) $(CFLAGS) -MT libattributes_nog_la-error.lo -MD -MP -MF "$(DEPDIR)/libattributes_nog_la-error.Tpo" -c -o libattributes_nog_la-error.lo `test -f 'error.c' || echo '$(srcdir)/'`error.c; \
+@am__fastdepCC_TRUE@	then mv -f "$(DEPDIR)/libattributes_nog_la-error.Tpo" "$(DEPDIR)/libattributes_nog_la-error.Plo"; else rm -f "$(DEPDIR)/libattributes_nog_la-error.Tpo"; exit 1; fi
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='error.c' object='libattributes_nog_la-error.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(LIBTOOL) --tag=CC --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libattributes_nog_la_CFLAGS) $(CFLAGS) -c -o libattributes_nog_la-error.lo `test -f 'error.c' || echo '$(srcdir)/'`error.c
+
+libattributes_nog_la-newformat.lo: newformat.c
+@am__fastdepCC_TRUE@	if $(LIBTOOL) --tag=CC --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libattributes_nog_la_CFLAGS) $(CFLAGS) -MT libattributes_nog_la-newformat.lo -MD -MP -MF "$(DEPDIR)/libattributes_nog_la-newformat.Tpo" -c -o libattributes_nog_la-newformat.lo `test -f 'newformat.c' || echo '$(srcdir)/'`newformat.c; \
+@am__fastdepCC_TRUE@	then mv -f "$(DEPDIR)/libattributes_nog_la-newformat.Tpo" "$(DEPDIR)/libattributes_nog_la-newformat.Plo"; else rm -f "$(DEPDIR)/libattributes_nog_la-newformat.Tpo"; exit 1; fi
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='newformat.c' object='libattributes_nog_la-newformat.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(LIBTOOL) --tag=CC --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libattributes_nog_la_CFLAGS) $(CFLAGS) -c -o libattributes_nog_la-newformat.lo `test -f 'newformat.c' || echo '$(srcdir)/'`newformat.c
+
+libattributes_nog_la-init.lo: init.c
+@am__fastdepCC_TRUE@	if $(LIBTOOL) --tag=CC --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libattributes_nog_la_CFLAGS) $(CFLAGS) -MT libattributes_nog_la-init.lo -MD -MP -MF "$(DEPDIR)/libattributes_nog_la-init.Tpo" -c -o libattributes_nog_la-init.lo `test -f 'init.c' || echo '$(srcdir)/'`init.c; \
+@am__fastdepCC_TRUE@	then mv -f "$(DEPDIR)/libattributes_nog_la-init.Tpo" "$(DEPDIR)/libattributes_nog_la-init.Plo"; else rm -f "$(DEPDIR)/libattributes_nog_la-init.Tpo"; exit 1; fi
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='init.c' object='libattributes_nog_la-init.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(LIBTOOL) --tag=CC --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libattributes_nog_la_CFLAGS) $(CFLAGS) -c -o libattributes_nog_la-init.lo `test -f 'init.c' || echo '$(srcdir)/'`init.c
 
 .cc.o:
 @am__fastdepCXX_TRUE@	if $(CXXCOMPILE) -MT $@ -MD -MP -MF "$(DEPDIR)/$*.Tpo" -c -o $@ $<; \

@@ -31,6 +31,7 @@ AC_PROG_LIBTOOL
 AC_COMPILER
 
 # Checks for libraries.
+AC_OPENSSL
 
 # Checks for header files.
 AC_HEADER_DIRENT
@@ -112,6 +113,7 @@ AC_CONFIG_FILES([Makefile
                  src/ac/Makefile
                  src/api/Makefile
                  src/api/ccapi/Makefile
+                 src/api/java/Makefile
                  src/client/Makefile
                  src/common/Makefile
                  src/include/Makefile

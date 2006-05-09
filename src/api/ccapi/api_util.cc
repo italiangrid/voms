@@ -16,7 +16,9 @@ extern "C" {
 #include "config.h"
 #include "replace.h"
 
+#ifndef NOGLOBUS
 #include "globus_config.h"
+#endif
 #include <sys/types.h>
 #include <netdb.h>
 #include <dirent.h>
@@ -25,9 +27,12 @@ extern "C" {
 #include <sys/wait.h>
 
 #include <signal.h>
+
+#ifndef NOGLOBUS
   /*#include "gssapi_compat.h"*/
 #include "gssapi.h"
 #include "globus_gss_assist.h"
+#endif
 
 #include <stdio.h>
 #include <openssl/x509.h>
@@ -41,7 +46,9 @@ extern "C" {
 
 #include "data.h"
 
+#ifndef NOGLOBUS
 #include "Client.h"
+#endif
 
 #include "voms_api.h"
 
@@ -781,6 +788,7 @@ vomsdata::my_conn(const std::string &hostname, int port, const std::string &cont
 	int version, const std::string &command, std::string &u, std::string &uc,
 	std::string &buf)
 {
+#ifndef NOGLOBUS
   GSISocketClient sock(hostname, port, version);
 
   sock.RedirectGSIOutput(stderr);
@@ -818,6 +826,9 @@ vomsdata::my_conn(const std::string &hostname, int port, const std::string &cont
 
   sock.Close();
   return true;
+#else
+  return false;
+#endif
 }
 
 bool
@@ -825,6 +836,10 @@ vomsdata::contact(const std::string &hostname, int port, const std::string &cont
 	const std::string &command, std::string &buffer, std::string &username,
 	std::string &ca)
 {
+#ifndef NOGLOBUS
   return my_conn(hostname, port, contact, globus(0), command, username, ca,
 		 buffer);
+#else
+  return false;
+#endif
 }   

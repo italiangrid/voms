@@ -1,2 +1,2 @@
 
-SUBDIRS = ccapi
+SUBDIRS = java ccapi

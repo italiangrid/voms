@@ -3,11 +3,13 @@ SUBDIRS = oldgaa
 
 noinst_LTLIBRARIES = \
 	libssl_utils.la \
+	libssl_utils_nog.la \
 	$(WANTED_SSL_UTILS_LIBS) # may add the libraries defined in EXTRA_LTLIBRARIES
 
 SOURCES= scutils.c scutils.h sslutils.c sslutils.h proxycertinfo.c
 
 libssl_utils_la_SOURCES= $(SOURCES)
+libssl_utils_nog_la_SOURCES= $(SOURCES)
 
 libssl_utils_la_CFLAGS = \
 	-I $(top_srcdir)/src/sslutils/oldgaa \
@@ -15,8 +17,17 @@ libssl_utils_la_CFLAGS = \
 	$(GLOBUS_CFLAGS)
 
 libssl_utils_la_LIBADD = \
-	./oldgaa/liboldgaa.la \
+	./oldgaa/liboldgaa_nog.la \
 	$(GLOBUS_GSS_LIBS)
+
+libssl_utils_nog_la_CFLAGS = \
+	$(NO_GLOBUS_FLAGS) \
+	-I $(top_srcdir)/src/sslutils/oldgaa \
+	-I $(top_srcdir)/src/include \
+	$(GLOBUS_CFLAGS)
+
+libssl_utils_nog_la_LIBADD = \
+	./oldgaa/liboldgaa_nog.la
 
 ###
 

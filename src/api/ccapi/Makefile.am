@@ -2,6 +2,7 @@
 includedir = $(prefix)/include/glite/security/voms
 
 lib_LTLIBRARIES = \
+	libvomsapi_nog.la \
 	libvomsapi.la \
 	libvomsc.la \
 	$(WANTED_API_LIBS) # may add the libraries defined in EXTRA_LTLIBRARIES
@@ -10,13 +11,39 @@ CCSOURCES = \
 	api_util.cc \
 	voms_api.cc \
 	ccval.cc \
-	cinterface.cc
+	cinterface.cc \
+	jni-int.cc
+
+libvomsapi_nog_la_SOURCES = \
+	$(CCSOURCES)
+
+libvomsapi_nog_la_CPPFLAGS = \
+	$(NO_GLOBUS_FLAGS) \
+	-DNOGLOBUS \
+	-I$(top_srcdir)/src/include \
+	-I$(JAVA_HOME)/include \
+	-I$(JAVA_HOME)/include/linux
+
+NOGLIBADD = \
+	$(EXPAT_LIBS) \
+	$(OPENSSL_LIBS) \
+	$(top_builddir)/src/replib/librep.la \
+	$(top_builddir)/src/common/libutilities_nog.la \
+	$(top_builddir)/src/common/libutilc_nog.la \
+	$(top_builddir)/src/sslutils/libssl_utils_nog.la \
+	$(top_builddir)/src/log/liblog.la
+
+libvomsapi_nog_la_LIBADD = \
+	$(NOGLIBADD) \
+	$(top_builddir)/src/ac/libattributes_nog.la
 
 libvomsapi_la_SOURCES = \
 	$(CCSOURCES)
 
 libvomsapi_la_CPPFLAGS = \
 	-I$(top_srcdir)/src/include \
+	-I$(JAVA_HOME)/include \
+	-I$(JAVA_HOME)/include/linux \
 	$(GLOBUS_CFLAGS)
 
 CCLIBADD = \
@@ -35,7 +62,8 @@ CSOURCES = \
 	api_util.cc \
 	voms_api.cc \
 	ccval.cc \
-	cinterface.cc
+	cinterface.cc \
+	jni-int.cc
 
 libvomsc_la_SOURCES = \
 	$(CSOURCES)
@@ -328,7 +356,9 @@ libvomsc_gcc64dbgpthr_la_LDFLAGS = \
 
 include_HEADERS = \
 	voms_api.h \
-	voms_apic.h
+	voms_apic.h \
+	voms_api_nog.h \
+	voms_apic_nog.h
 
 EXTRA_DIST = \
 	api_util.h \
@@ -336,6 +366,7 @@ EXTRA_DIST = \
 	voms_api.h \
 	voms_apic.h \
 	cinterface.h \
+	jni-int.h \
   ctest.c
 
 CLEANFILES = \

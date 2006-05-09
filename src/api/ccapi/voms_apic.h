@@ -14,8 +14,13 @@
 
 #ifndef VOMS_APIC_H
 #define VOMS_APIC_H
-
+#ifndef NOGLOBUS
 #include <gssapi.h>
+#else
+typedef void * gss_cred_id_t;
+typedef void * gss_ctx_id_t;
+#endif
+
 #include <openssl/x509.h>
 
 #include "newformat.h"
@@ -113,6 +118,7 @@ struct voms {
 #define VERR_TYPE       18 /*!< Returned data of unknown type */
 #define VERR_ORDER      19 /*!< Ordering different than required */
 #define VERR_SERVERCODE 20 /*!< Error from the server */
+#define VERR_NOTAVAIL   21 /*!< Method not available */
 
 struct vomsdata {
   char *cdir;
@@ -363,6 +369,9 @@ extern int VOMS_RetrieveFromProxy(int how, struct vomsdata *vd, int *error); /*!
              \param error RETURN PARAMETER: Qualifies the error message
              \return failure (0) or success (<>0)*/
 
+
+extern struct vomsdata *VOMS_Duplicate(struct vomsdata *vd);
+extern AC *VOMS_GetAC(struct voms *v);
 
 int getMajorVersionNumber(void);
 int getMinorVersionNumber(void);

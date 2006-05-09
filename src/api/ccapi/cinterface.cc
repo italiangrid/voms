@@ -14,6 +14,10 @@
 #include "config.h"
 #include "replace.h"
 
+#ifndef NOGLOBUS
+#include <gssapi.h>
+#endif
+
 #include "voms_api.h"
 
 /*Interface routines from C++ API to C API */
@@ -749,4 +753,39 @@ char *VOMS_ErrorMessage(struct vomsdatar *vd, int error, char *buffer, int len)
     return buf;
   }
 }
+vomsdatar *VOMS_Duplicate(vomsdatar *orig)
+{
+  struct vomsdatar *vd = NULL;
+
+  try {
+    vomsdata *v = new vomsdata(*(orig->real));
+
+    if ((vd = (struct vomsdatar *)malloc(sizeof(struct vomsdatar)))) {
+      int error = 0;
+
+      vd->cdir = (orig->cdir ? strdup(orig->cdir) : NULL );
+      vd->vdir = (orig->vdir ? strdup(orig->vdir) : NULL );
+      //      vd->data = NULL;
+      vd->extra_data = (orig->extra_data ? strdup(orig->extra_data) : NULL);
+      vd->workvo = (orig->workvo ? strdup(orig->workvo) : NULL);
+      vd->volen = orig->volen;
+      vd->extralen = orig->extralen;
+      vd->real = v;
+
+      if (!TranslateVOMS(vd, v->data, &error)) {
+        VOMS_Destroy(vd);
+        vd = NULL;
+      }
+    }
+  }
+  catch(...) {}
+  
+  return vd;
+}
+
+AC *VOMS_GetAC(vomsr *v)
+{
+  return (AC *)ASN1_dup((int (*)())i2d_AC, (char * (*)())d2i_AC, (char *)v->ac);
+}
+
 }

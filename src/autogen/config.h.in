@@ -43,8 +43,14 @@
 /* Define to 1 if you have EVP_MD_CTX_cleanup */
 #undef HAVE_EVP_MD_CTX_CLEANUP
 
+/* Define to 1 if you have EVP_MD_CTX_cleanup (OpenSSL system libs) */
+#undef HAVE_EVP_MD_CTX_CLEANUP_OPENSSL
+
 /* Define to 1 if you have EVP_MD_CTX_init */
 #undef HAVE_EVP_MD_CTX_INIT
+
+/* Define to 1 if you have EVP_MD_CTX_init (OpenSSL system libs) */
+#undef HAVE_EVP_MD_CTX_INIT_OPENSSL
 
 /* Define to 1 if you have the <fcntl.h> header file. */
 #undef HAVE_FCNTL_H
@@ -269,6 +275,9 @@
 
 /* Define to 1 if X509V3_EXT has a member it */
 #undef HAVE_X509V3_EXT_METHOD_IT
+
+/* Define to 1 if X509V3_EXT has a member it (OpenSSL system libs) */
+#undef HAVE_X509V3_EXT_METHOD_IT_OPENSSL
 
 /* Define to 1 if the system has the type `_Bool'. */
 #undef HAVE__BOOL

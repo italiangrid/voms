@@ -468,7 +468,7 @@ ac_includes_default="\
 #endif"
 
 ac_default_prefix="/opt/glite"
-ac_subst_vars='SHELL PATH_SEPARATOR PACKAGE_NAME PACKAGE_TARNAME PACKAGE_VERSION PACKAGE_STRING PACKAGE_BUGREPORT exec_prefix prefix program_transform_name bindir sbindir libexecdir datadir sysconfdir sharedstatedir localstatedir libdir includedir oldincludedir infodir mandir build_alias host_alias target_alias DEFS ECHO_C ECHO_N ECHO_T LIBS INSTALL_PROGRAM INSTALL_SCRIPT INSTALL_DATA CYGPATH_W PACKAGE VERSION ACLOCAL AUTOCONF AUTOMAKE AUTOHEADER MAKEINFO install_sh STRIP ac_ct_STRIP INSTALL_STRIP_PROGRAM mkdir_p AWK SET_MAKE am__leading_dot AMTAR am__tar am__untar MAINTAINER_MODE_TRUE MAINTAINER_MODE_FALSE MAINT WORKDIR WANT_UNIT_TEST_TRUE WANT_UNIT_TEST_FALSE CXX CXXFLAGS LDFLAGS CPPFLAGS ac_ct_CXX EXEEXT OBJEXT DEPDIR am__include am__quote AMDEP_TRUE AMDEP_FALSE AMDEPBACKSLASH CXXDEPMODE am__fastdepCXX_TRUE am__fastdepCXX_FALSE CC CFLAGS ac_ct_CC CCDEPMODE am__fastdepCC_TRUE am__fastdepCC_FALSE CPP LN_S build build_cpu build_vendor build_os host host_cpu host_vendor host_os EGREP ECHO AR ac_ct_AR RANLIB ac_ct_RANLIB CXXCPP F77 FFLAGS ac_ct_F77 LIBTOOL ALLOCA LIBOBJS ENABLE_GLITE_TRUE ENABLE_GLITE_FALSE DISTTAR LOCATION_ENV LOCATION_DIR VAR_LOCATION_ENV GLITE_LOCATION GLITE_CFLAGS EXPAT_INSTALL_PATH EXPAT_CFLAGS EXPAT_LIBS EXPAT_STATIC_LIBS CPPUNIT_CFLAGS CPPUNIT_LIBS WANTED_OLDGAA_LIBS WANTED_SSL_UTILS_LIBS WANTED_SOCK_LIBS WANTED_API_LIBS WANTED_ATTCERT_LIBS GLOBUS_CFLAGS GLOBUS_GCC32_CFLAGS GLOBUS_GCC32DBG_CFLAGS GLOBUS_GCC32DBGPTHR_CFLAGS GLOBUS_GCC32PTHR_CFLAGS GLOBUS_GCC64_CFLAGS GLOBUS_GCC64DBG_CFLAGS GLOBUS_GCC64DBGPTHR_CFLAGS GLOBUS_GCC64PTHR_CFLAGS GLOBUS_GSS_LIBS GLOBUS_GCC32_GSS_LIBS GLOBUS_GCC32DBG_GSS_LIBS GLOBUS_GCC32DBGPTHR_GSS_LIBS GLOBUS_GCC32PTHR_GSS_LIBS GLOBUS_GCC64_GSS_LIBS GLOBUS_GCC64DBG_GSS_LIBS GLOBUS_GCC64DBGPTHR_GSS_LIBS GLOBUS_GCC64PTHR_GSS_LIBS BUILD_DOCS_TRUE BUILD_DOCS_FALSE LTLIBOBJS'
+ac_subst_vars='SHELL PATH_SEPARATOR PACKAGE_NAME PACKAGE_TARNAME PACKAGE_VERSION PACKAGE_STRING PACKAGE_BUGREPORT exec_prefix prefix program_transform_name bindir sbindir libexecdir datadir sysconfdir sharedstatedir localstatedir libdir includedir oldincludedir infodir mandir build_alias host_alias target_alias DEFS ECHO_C ECHO_N ECHO_T LIBS INSTALL_PROGRAM INSTALL_SCRIPT INSTALL_DATA CYGPATH_W PACKAGE VERSION ACLOCAL AUTOCONF AUTOMAKE AUTOHEADER MAKEINFO install_sh STRIP ac_ct_STRIP INSTALL_STRIP_PROGRAM mkdir_p AWK SET_MAKE am__leading_dot AMTAR am__tar am__untar MAINTAINER_MODE_TRUE MAINTAINER_MODE_FALSE MAINT WORKDIR WANT_UNIT_TEST_TRUE WANT_UNIT_TEST_FALSE CXX CXXFLAGS LDFLAGS CPPFLAGS ac_ct_CXX EXEEXT OBJEXT DEPDIR am__include am__quote AMDEP_TRUE AMDEP_FALSE AMDEPBACKSLASH CXXDEPMODE am__fastdepCXX_TRUE am__fastdepCXX_FALSE CC CFLAGS ac_ct_CC CCDEPMODE am__fastdepCC_TRUE am__fastdepCC_FALSE CPP LN_S build build_cpu build_vendor build_os host host_cpu host_vendor host_os EGREP ECHO AR ac_ct_AR RANLIB ac_ct_RANLIB CXXCPP F77 FFLAGS ac_ct_F77 LIBTOOL NO_GLOBUS_FLAGS OPENSSL_LIBS ALLOCA LIBOBJS ENABLE_GLITE_TRUE ENABLE_GLITE_FALSE DISTTAR LOCATION_ENV LOCATION_DIR VAR_LOCATION_ENV GLITE_LOCATION GLITE_CFLAGS EXPAT_INSTALL_PATH EXPAT_CFLAGS EXPAT_LIBS EXPAT_STATIC_LIBS CPPUNIT_CFLAGS CPPUNIT_LIBS WANTED_OLDGAA_LIBS WANTED_SSL_UTILS_LIBS WANTED_SOCK_LIBS WANTED_API_LIBS WANTED_ATTCERT_LIBS GLOBUS_CFLAGS GLOBUS_GCC32_CFLAGS GLOBUS_GCC32DBG_CFLAGS GLOBUS_GCC32DBGPTHR_CFLAGS GLOBUS_GCC32PTHR_CFLAGS GLOBUS_GCC64_CFLAGS GLOBUS_GCC64DBG_CFLAGS GLOBUS_GCC64DBGPTHR_CFLAGS GLOBUS_GCC64PTHR_CFLAGS GLOBUS_GSS_LIBS GLOBUS_GCC32_GSS_LIBS GLOBUS_GCC32DBG_GSS_LIBS GLOBUS_GCC32DBGPTHR_GSS_LIBS GLOBUS_GCC32PTHR_GSS_LIBS GLOBUS_GCC64_GSS_LIBS GLOBUS_GCC64DBG_GSS_LIBS GLOBUS_GCC64DBGPTHR_GSS_LIBS GLOBUS_GCC64PTHR_GSS_LIBS BUILD_DOCS_TRUE BUILD_DOCS_FALSE LTLIBOBJS'
 ac_subst_files=''
 
 # Initialize some variables set by options.
@@ -1054,6 +1054,7 @@ Optional Packages:
                           include additional configurations [automatic]
   --with-debug Compiles without optimizations and with debug activated
   --with-warnings Compiles with maximum warnings
+ --with-openssl-prefix=PFX    prefix where OpenSSL (non-globus) is installed. (/usr)
   --with-glite-location=PFX     prefix where GLITE is installed. (/opt/glite)
   --with-dist-location=PFX     prefix where DIST location is. (pwd)
   --with-expat-prefix=PFX      prefix where 'expat' is installed.
@@ -4569,7 +4570,7 @@ ia64-*-hpux*)
   ;;
 *-*-irix6*)
   # Find out which ABI we are using.
-  echo '#line 4572 "configure"' > conftest.$ac_ext
+  echo '#line 4573 "configure"' > conftest.$ac_ext
   if { (eval echo "$as_me:$LINENO: \"$ac_compile\"") >&5
   (eval $ac_compile) 2>&5
   ac_status=$?
@@ -5450,7 +5451,7 @@ fi
 
 
 # Provide some information about the compiler.
-echo "$as_me:5453:" \
+echo "$as_me:5454:" \
      "checking for Fortran 77 compiler version" >&5
 ac_compiler=`set X $ac_compile; echo $2`
 { (eval echo "$as_me:$LINENO: \"$ac_compiler --version </dev/null >&5\"") >&5
@@ -6548,11 +6549,11 @@ else
    -e 's:.*FLAGS}? :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:6551: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:6552: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>conftest.err)
    ac_status=$?
    cat conftest.err >&5
-   echo "$as_me:6555: \$? = $ac_status" >&5
+   echo "$as_me:6556: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s "$ac_outfile"; then
      # The compiler can only warn and ignore the option if not recognized
      # So say no if there are warnings other than the usual output.
@@ -6810,11 +6811,11 @@ else
    -e 's:.*FLAGS}? :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:6813: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:6814: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>conftest.err)
    ac_status=$?
    cat conftest.err >&5
-   echo "$as_me:6817: \$? = $ac_status" >&5
+   echo "$as_me:6818: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s "$ac_outfile"; then
      # The compiler can only warn and ignore the option if not recognized
      # So say no if there are warnings other than the usual output.
@@ -6872,11 +6873,11 @@ else
    -e 's:.*FLAGS}? :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:6875: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:6876: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>out/conftest.err)
    ac_status=$?
    cat out/conftest.err >&5
-   echo "$as_me:6879: \$? = $ac_status" >&5
+   echo "$as_me:6880: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s out/conftest2.$ac_objext
    then
      # The compiler can only warn and ignore the option if not recognized
@@ -7087,12 +7088,11 @@ EOF
 	tmp_addflag=
 	case $cc_basename,$host_cpu in
 	pgcc*)				# Portland Group C compiler
-	  whole_archive_flag_spec='${wl}--whole-archive,`for conv in $convenience\"\"; do test  -n \"$conv\" && new_convenience=\"$new_convenience,$conv\"; done; $echo \"$new_convenience\"` ${wl}--no-whole-archive'
-	  tmp_addflag=' $pic_flag'
+	  whole_archive_flag_spec=
 	  ;;
 	pgf77* | pgf90* )			# Portland Group f77 and f90 compilers
-	  whole_archive_flag_spec='${wl}--whole-archive,`for conv in $convenience\"\"; do test  -n \"$conv\" && new_convenience=\"$new_convenience,$conv\"; done; $echo \"$new_convenience\"` ${wl}--no-whole-archive'
-	  tmp_addflag=' $pic_flag -Mnomain' ;;
+	  whole_archive_flag_spec=
+	  tmp_addflag=' -fpic -Mnomain' ;;
 	ecc*,ia64* | icc*,ia64*)		# Intel C compiler on ia64
 	  tmp_addflag=' -i_dynamic' ;;
 	efc*,ia64* | ifort*,ia64*)	# Intel Fortran compiler on ia64
@@ -8256,7 +8256,7 @@ linux*)
 
   # Append ld.so.conf contents to the search path
   if test -f /etc/ld.so.conf; then
-    lt_ld_extra=`awk '/^include / { system(sprintf("cd /etc; cat %s", \$2)); skip = 1; } { if (!skip) print \$0; skip = 0; }' < /etc/ld.so.conf | $SED -e 's/#.*//;s/[:,	]/ /g;s/=[^=]*$//;s/=[^= ]* / /g;/^$/d' | tr '\n' ' '`
+    lt_ld_extra=`awk '/^include / { system(sprintf("cd /etc; cat %s", \$2)); skip = 1; } { if (!skip) print \$0; skip = 0; }' < /etc/ld.so.conf | $SED -e 's/#.*//;s/[:,\t]/ /g;s/=[^=]*$//;s/=[^= ]* / /g;/^$/d' | tr '\n' ' '`
     sys_lib_dlsearch_path_spec="/lib /usr/lib $lt_ld_extra"
   fi
 
@@ -8319,11 +8319,7 @@ nto-qnx*)
 openbsd*)
   version_type=sunos
   need_lib_prefix=no
-  # Some older versions of OpenBSD (3.3 at least) *do* need versioned libs.
-  case $host_os in
-    openbsd3.3 | openbsd3.3.*) need_version=yes ;;
-    *)                         need_version=no  ;;
-  esac
+  need_version=no
   library_names_spec='${libname}${release}${shared_ext}$versuffix ${libname}${shared_ext}$versuffix'
   finish_cmds='PATH="\$PATH:/sbin" ldconfig -m $libdir'
   shlibpath_var=LD_LIBRARY_PATH
@@ -9112,7 +9108,7 @@ else
   lt_dlunknown=0; lt_dlno_uscore=1; lt_dlneed_uscore=2
   lt_status=$lt_dlunknown
   cat > conftest.$ac_ext <<EOF
-#line 9115 "configure"
+#line 9111 "configure"
 #include "confdefs.h"
 
 #if HAVE_DLFCN_H
@@ -9210,7 +9206,7 @@ else
   lt_dlunknown=0; lt_dlno_uscore=1; lt_dlneed_uscore=2
   lt_status=$lt_dlunknown
   cat > conftest.$ac_ext <<EOF
-#line 9213 "configure"
+#line 9209 "configure"
 #include "confdefs.h"
 
 #if HAVE_DLFCN_H
@@ -10708,12 +10704,12 @@ if test -z "$aix_libpath"; then aix_libpath="/usr/lib:/lib"; fi
 	;;
       pgCC*)
         # Portland Group C++ compiler
-	archive_cmds_CXX='$CC -shared $pic_flag $predep_objects $libobjs $deplibs $postdep_objects $compiler_flags ${wl}-soname ${wl}$soname -o $lib'
-  	archive_expsym_cmds_CXX='$CC -shared $pic_flag $predep_objects $libobjs $deplibs $postdep_objects $compiler_flags ${wl}-soname ${wl}$soname ${wl}-retain-symbols-file ${wl}$export_symbols -o $lib'
+	archive_cmds_CXX='$CC -shared $predep_objects $libobjs $deplibs $postdep_objects $compiler_flags ${wl}-soname ${wl}$soname -o $lib'
+  	archive_expsym_cmds_CXX='$CC -shared $predep_objects $libobjs $deplibs $postdep_objects $compiler_flags ${wl}-soname ${wl}$soname ${wl}-retain-symbols-file ${wl}$export_symbols -o $lib'
 
 	hardcode_libdir_flag_spec_CXX='${wl}--rpath ${wl}$libdir'
 	export_dynamic_flag_spec_CXX='${wl}--export-dynamic'
-	whole_archive_flag_spec_CXX='${wl}--whole-archive,`for conv in $convenience\"\"; do test  -n \"$conv\" && new_convenience=\"$new_convenience,$conv\"; done; $echo \"$new_convenience\"` ${wl}--no-whole-archive'
+	whole_archive_flag_spec_CXX=''
         ;;
       cxx*)
 	# Compaq C++
@@ -11458,11 +11454,11 @@ else
    -e 's:.*FLAGS}? :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:11461: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:11457: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>conftest.err)
    ac_status=$?
    cat conftest.err >&5
-   echo "$as_me:11465: \$? = $ac_status" >&5
+   echo "$as_me:11461: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s "$ac_outfile"; then
      # The compiler can only warn and ignore the option if not recognized
      # So say no if there are warnings other than the usual output.
@@ -11520,11 +11516,11 @@ else
    -e 's:.*FLAGS}? :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:11523: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:11519: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>out/conftest.err)
    ac_status=$?
    cat out/conftest.err >&5
-   echo "$as_me:11527: \$? = $ac_status" >&5
+   echo "$as_me:11523: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s out/conftest2.$ac_objext
    then
      # The compiler can only warn and ignore the option if not recognized
@@ -12033,7 +12029,7 @@ linux*)
 
   # Append ld.so.conf contents to the search path
   if test -f /etc/ld.so.conf; then
-    lt_ld_extra=`awk '/^include / { system(sprintf("cd /etc; cat %s", \$2)); skip = 1; } { if (!skip) print \$0; skip = 0; }' < /etc/ld.so.conf | $SED -e 's/#.*//;s/[:,	]/ /g;s/=[^=]*$//;s/=[^= ]* / /g;/^$/d' | tr '\n' ' '`
+    lt_ld_extra=`awk '/^include / { system(sprintf("cd /etc; cat %s", \$2)); skip = 1; } { if (!skip) print \$0; skip = 0; }' < /etc/ld.so.conf | $SED -e 's/#.*//;s/[:,\t]/ /g;s/=[^=]*$//;s/=[^= ]* / /g;/^$/d' | tr '\n' ' '`
     sys_lib_dlsearch_path_spec="/lib /usr/lib $lt_ld_extra"
   fi
 
@@ -12096,11 +12092,7 @@ nto-qnx*)
 openbsd*)
   version_type=sunos
   need_lib_prefix=no
-  # Some older versions of OpenBSD (3.3 at least) *do* need versioned libs.
-  case $host_os in
-    openbsd3.3 | openbsd3.3.*) need_version=yes ;;
-    *)                         need_version=no  ;;
-  esac
+  need_version=no
   library_names_spec='${libname}${release}${shared_ext}$versuffix ${libname}${shared_ext}$versuffix'
   finish_cmds='PATH="\$PATH:/sbin" ldconfig -m $libdir'
   shlibpath_var=LD_LIBRARY_PATH
@@ -12889,7 +12881,7 @@ else
   lt_dlunknown=0; lt_dlno_uscore=1; lt_dlneed_uscore=2
   lt_status=$lt_dlunknown
   cat > conftest.$ac_ext <<EOF
-#line 12892 "configure"
+#line 12884 "configure"
 #include "confdefs.h"
 
 #if HAVE_DLFCN_H
@@ -12987,7 +12979,7 @@ else
   lt_dlunknown=0; lt_dlno_uscore=1; lt_dlneed_uscore=2
   lt_status=$lt_dlunknown
   cat > conftest.$ac_ext <<EOF
-#line 12990 "configure"
+#line 12982 "configure"
 #include "confdefs.h"
 
 #if HAVE_DLFCN_H
@@ -13872,11 +13864,11 @@ else
    -e 's:.*FLAGS}? :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:13875: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:13867: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>conftest.err)
    ac_status=$?
    cat conftest.err >&5
-   echo "$as_me:13879: \$? = $ac_status" >&5
+   echo "$as_me:13871: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s "$ac_outfile"; then
      # The compiler can only warn and ignore the option if not recognized
      # So say no if there are warnings other than the usual output.
@@ -13934,11 +13926,11 @@ else
    -e 's:.*FLAGS}? :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:13937: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:13929: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>out/conftest.err)
    ac_status=$?
    cat out/conftest.err >&5
-   echo "$as_me:13941: \$? = $ac_status" >&5
+   echo "$as_me:13933: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s out/conftest2.$ac_objext
    then
      # The compiler can only warn and ignore the option if not recognized
@@ -14149,12 +14141,11 @@ EOF
 	tmp_addflag=
 	case $cc_basename,$host_cpu in
 	pgcc*)				# Portland Group C compiler
-	  whole_archive_flag_spec_F77='${wl}--whole-archive,`for conv in $convenience\"\"; do test  -n \"$conv\" && new_convenience=\"$new_convenience,$conv\"; done; $echo \"$new_convenience\"` ${wl}--no-whole-archive'
-	  tmp_addflag=' $pic_flag'
+	  whole_archive_flag_spec_F77=
 	  ;;
 	pgf77* | pgf90* )			# Portland Group f77 and f90 compilers
-	  whole_archive_flag_spec_F77='${wl}--whole-archive,`for conv in $convenience\"\"; do test  -n \"$conv\" && new_convenience=\"$new_convenience,$conv\"; done; $echo \"$new_convenience\"` ${wl}--no-whole-archive'
-	  tmp_addflag=' $pic_flag -Mnomain' ;;
+	  whole_archive_flag_spec_F77=
+	  tmp_addflag=' -fpic -Mnomain' ;;
 	ecc*,ia64* | icc*,ia64*)		# Intel C compiler on ia64
 	  tmp_addflag=' -i_dynamic' ;;
 	efc*,ia64* | ifort*,ia64*)	# Intel Fortran compiler on ia64
@@ -15298,7 +15289,7 @@ linux*)
 
   # Append ld.so.conf contents to the search path
   if test -f /etc/ld.so.conf; then
-    lt_ld_extra=`awk '/^include / { system(sprintf("cd /etc; cat %s", \$2)); skip = 1; } { if (!skip) print \$0; skip = 0; }' < /etc/ld.so.conf | $SED -e 's/#.*//;s/[:,	]/ /g;s/=[^=]*$//;s/=[^= ]* / /g;/^$/d' | tr '\n' ' '`
+    lt_ld_extra=`awk '/^include / { system(sprintf("cd /etc; cat %s", \$2)); skip = 1; } { if (!skip) print \$0; skip = 0; }' < /etc/ld.so.conf | $SED -e 's/#.*//;s/[:,\t]/ /g;s/=[^=]*$//;s/=[^= ]* / /g;/^$/d' | tr '\n' ' '`
     sys_lib_dlsearch_path_spec="/lib /usr/lib $lt_ld_extra"
   fi
 
@@ -15361,11 +15352,7 @@ nto-qnx*)
 openbsd*)
   version_type=sunos
   need_lib_prefix=no
-  # Some older versions of OpenBSD (3.3 at least) *do* need versioned libs.
-  case $host_os in
-    openbsd3.3 | openbsd3.3.*) need_version=yes ;;
-    *)                         need_version=no  ;;
-  esac
+  need_version=no
   library_names_spec='${libname}${release}${shared_ext}$versuffix ${libname}${shared_ext}$versuffix'
   finish_cmds='PATH="\$PATH:/sbin" ldconfig -m $libdir'
   shlibpath_var=LD_LIBRARY_PATH
@@ -16056,11 +16043,11 @@ else
    -e 's:.*FLAGS}? :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:16059: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:16046: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>conftest.err)
    ac_status=$?
    cat conftest.err >&5
-   echo "$as_me:16063: \$? = $ac_status" >&5
+   echo "$as_me:16050: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s "$ac_outfile"; then
      # The compiler can only warn and ignore the option if not recognized
      # So say no if there are warnings other than the usual output.
@@ -16318,11 +16305,11 @@ else
    -e 's:.*FLAGS}? :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:16321: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:16308: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>conftest.err)
    ac_status=$?
    cat conftest.err >&5
-   echo "$as_me:16325: \$? = $ac_status" >&5
+   echo "$as_me:16312: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s "$ac_outfile"; then
      # The compiler can only warn and ignore the option if not recognized
      # So say no if there are warnings other than the usual output.
@@ -16380,11 +16367,11 @@ else
    -e 's:.*FLAGS}? :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:16383: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:16370: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>out/conftest.err)
    ac_status=$?
    cat out/conftest.err >&5
-   echo "$as_me:16387: \$? = $ac_status" >&5
+   echo "$as_me:16374: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s out/conftest2.$ac_objext
    then
      # The compiler can only warn and ignore the option if not recognized
@@ -16595,12 +16582,11 @@ EOF
 	tmp_addflag=
 	case $cc_basename,$host_cpu in
 	pgcc*)				# Portland Group C compiler
-	  whole_archive_flag_spec_GCJ='${wl}--whole-archive,`for conv in $convenience\"\"; do test  -n \"$conv\" && new_convenience=\"$new_convenience,$conv\"; done; $echo \"$new_convenience\"` ${wl}--no-whole-archive'
-	  tmp_addflag=' $pic_flag'
+	  whole_archive_flag_spec_GCJ=
 	  ;;
 	pgf77* | pgf90* )			# Portland Group f77 and f90 compilers
-	  whole_archive_flag_spec_GCJ='${wl}--whole-archive,`for conv in $convenience\"\"; do test  -n \"$conv\" && new_convenience=\"$new_convenience,$conv\"; done; $echo \"$new_convenience\"` ${wl}--no-whole-archive'
-	  tmp_addflag=' $pic_flag -Mnomain' ;;
+	  whole_archive_flag_spec_GCJ=
+	  tmp_addflag=' -fpic -Mnomain' ;;
 	ecc*,ia64* | icc*,ia64*)		# Intel C compiler on ia64
 	  tmp_addflag=' -i_dynamic' ;;
 	efc*,ia64* | ifort*,ia64*)	# Intel Fortran compiler on ia64
@@ -17764,7 +17750,7 @@ linux*)
 
   # Append ld.so.conf contents to the search path
   if test -f /etc/ld.so.conf; then
-    lt_ld_extra=`awk '/^include / { system(sprintf("cd /etc; cat %s", \$2)); skip = 1; } { if (!skip) print \$0; skip = 0; }' < /etc/ld.so.conf | $SED -e 's/#.*//;s/[:,	]/ /g;s/=[^=]*$//;s/=[^= ]* / /g;/^$/d' | tr '\n' ' '`
+    lt_ld_extra=`awk '/^include / { system(sprintf("cd /etc; cat %s", \$2)); skip = 1; } { if (!skip) print \$0; skip = 0; }' < /etc/ld.so.conf | $SED -e 's/#.*//;s/[:,\t]/ /g;s/=[^=]*$//;s/=[^= ]* / /g;/^$/d' | tr '\n' ' '`
     sys_lib_dlsearch_path_spec="/lib /usr/lib $lt_ld_extra"
   fi
 
@@ -17827,11 +17813,7 @@ nto-qnx*)
 openbsd*)
   version_type=sunos
   need_lib_prefix=no
-  # Some older versions of OpenBSD (3.3 at least) *do* need versioned libs.
-  case $host_os in
-    openbsd3.3 | openbsd3.3.*) need_version=yes ;;
-    *)                         need_version=no  ;;
-  esac
+  need_version=no
   library_names_spec='${libname}${release}${shared_ext}$versuffix ${libname}${shared_ext}$versuffix'
   finish_cmds='PATH="\$PATH:/sbin" ldconfig -m $libdir'
   shlibpath_var=LD_LIBRARY_PATH
@@ -18620,7 +18602,7 @@ else
   lt_dlunknown=0; lt_dlno_uscore=1; lt_dlneed_uscore=2
   lt_status=$lt_dlunknown
   cat > conftest.$ac_ext <<EOF
-#line 18623 "configure"
+#line 18605 "configure"
 #include "confdefs.h"
 
 #if HAVE_DLFCN_H
@@ -18718,7 +18700,7 @@ else
   lt_dlunknown=0; lt_dlno_uscore=1; lt_dlneed_uscore=2
   lt_status=$lt_dlunknown
   cat > conftest.$ac_ext <<EOF
-#line 18721 "configure"
+#line 18703 "configure"
 #include "confdefs.h"
 
 #if HAVE_DLFCN_H
@@ -19800,6 +19782,120 @@ fi;
 
 
 # Checks for libraries.
+
+
+# Check whether --with-openssl_prefix or --without-openssl_prefix was given.
+if test "${with_openssl_prefix+set}" = set; then
+  withval="$with_openssl_prefix"
+
+else
+  with_openssl_prefix=/usr
+fi;
+
+  SAVE_LD_LIBRARY_PATH=$LD_LIBRARY_PATH
+  LD_LIBRARY_PATH="$with_openssl_prefix/lib"
+
+  ac_ext=c
+ac_cpp='$CPP $CPPFLAGS'
+ac_compile='$CC -c $CFLAGS $CPPFLAGS conftest.$ac_ext >&5'
+ac_link='$CC -o conftest$ac_exeext $CFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
+ac_compiler_gnu=$ac_cv_c_compiler_gnu
+
+  echo "$as_me:$LINENO: checking for CRYPTO_num_locks in -lcrypto" >&5
+echo $ECHO_N "checking for CRYPTO_num_locks in -lcrypto... $ECHO_C" >&6
+if test "${ac_cv_lib_crypto_CRYPTO_num_locks+set}" = set; then
+  echo $ECHO_N "(cached) $ECHO_C" >&6
+else
+  ac_check_lib_save_LIBS=$LIBS
+LIBS="-lcrypto  $LIBS"
+cat >conftest.$ac_ext <<_ACEOF
+/* confdefs.h.  */
+_ACEOF
+cat confdefs.h >>conftest.$ac_ext
+cat >>conftest.$ac_ext <<_ACEOF
+/* end confdefs.h.  */
+
+/* Override any gcc2 internal prototype to avoid an error.  */
+#ifdef __cplusplus
+extern "C"
+#endif
+/* We use char because int might match the return type of a gcc2
+   builtin and then its argument prototype would still apply.  */
+char CRYPTO_num_locks ();
+int
+main ()
+{
+CRYPTO_num_locks ();
+  ;
+  return 0;
+}
+_ACEOF
+rm -f conftest.$ac_objext conftest$ac_exeext
+if { (eval echo "$as_me:$LINENO: \"$ac_link\"") >&5
+  (eval $ac_link) 2>conftest.er1
+  ac_status=$?
+  grep -v '^ *+' conftest.er1 >conftest.err
+  rm -f conftest.er1
+  cat conftest.err >&5
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); } &&
+	 { ac_try='test -z "$ac_c_werror_flag"
+			 || test ! -s conftest.err'
+  { (eval echo "$as_me:$LINENO: \"$ac_try\"") >&5
+  (eval $ac_try) 2>&5
+  ac_status=$?
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); }; } &&
+	 { ac_try='test -s conftest$ac_exeext'
+  { (eval echo "$as_me:$LINENO: \"$ac_try\"") >&5
+  (eval $ac_try) 2>&5
+  ac_status=$?
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); }; }; then
+  ac_cv_lib_crypto_CRYPTO_num_locks=yes
+else
+  echo "$as_me: failed program was:" >&5
+sed 's/^/| /' conftest.$ac_ext >&5
+
+ac_cv_lib_crypto_CRYPTO_num_locks=no
+fi
+rm -f conftest.err conftest.$ac_objext \
+      conftest$ac_exeext conftest.$ac_ext
+LIBS=$ac_check_lib_save_LIBS
+fi
+echo "$as_me:$LINENO: result: $ac_cv_lib_crypto_CRYPTO_num_locks" >&5
+echo "${ECHO_T}$ac_cv_lib_crypto_CRYPTO_num_locks" >&6
+if test $ac_cv_lib_crypto_CRYPTO_num_locks = yes; then
+  found=yes
+else
+  found=no
+fi
+
+  ac_ext=c
+ac_cpp='$CPP $CPPFLAGS'
+ac_compile='$CC -c $CFLAGS $CPPFLAGS conftest.$ac_ext >&5'
+ac_link='$CC -o conftest$ac_exeext $CFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
+ac_compiler_gnu=$ac_cv_c_compiler_gnu
+
+
+  if test "x$found" = "xyes"; then
+    NO_GLOBUS_FLAGS="-I$with_openssl_prefix/include"
+    OPENSSL_LIBS="-L$with_openssl_prefix/lib -lcrypto -lssl"
+
+
+    echo "$as_me:$LINENO: checking for system OpenSSL version" >&5
+echo $ECHO_N "checking for system OpenSSL version... $ECHO_C" >&6
+    cat >conftest.h <<HERE
+#include <openssl/opensslv.h>
+OPENSSL_VERSION_TEXT
+HERE
+    openssl_version=`$CPP -I$NO_GLOBUS_FLAGS -o - -P conftest.h`
+    echo "$as_me:$LINENO: result: $openssl_version" >&5
+echo "${ECHO_T}$openssl_version" >&6
+    rm -f conftest.h
+  fi
+  LD_LIBRARY_PATH="$SAVE_LD_LIBRARY_PATH"
+
 
 # Checks for header files.
 
@@ -24408,8 +24504,8 @@ echo "${ECHO_T}no" >&6
 fi;
 
 
-    echo "$as_me:$LINENO: checking for it member in X509V3_EXT_METHOD" >&5
-echo $ECHO_N "checking for it member in X509V3_EXT_METHOD... $ECHO_C" >&6
+    echo "$as_me:$LINENO: checking for it member in X509V3_EXT_METHOD (globus libs)" >&5
+echo $ECHO_N "checking for it member in X509V3_EXT_METHOD (globus libs)... $ECHO_C" >&6
 
     CFLAGS_SAVE="$CFLAGS"
     CFLAGS="$CFLAGS $GLOBUS_CFLAGS"
@@ -24470,6 +24566,77 @@ rm -f conftest.err conftest.$ac_objext conftest.$ac_ext
 
 cat >>confdefs.h <<\_ACEOF
 #define HAVE_X509V3_EXT_METHOD_IT 1
+_ACEOF
+
+    fi
+
+    echo "$as_me:$LINENO: result: $ac_have_x509v3_member_it" >&5
+echo "${ECHO_T}$ac_have_x509v3_member_it" >&6
+
+    CFLAGS="$CFLAGS_SAVE"
+
+    echo "$as_me:$LINENO: checking for it member in X509V3_EXT_METHOD (system libs)" >&5
+echo $ECHO_N "checking for it member in X509V3_EXT_METHOD (system libs)... $ECHO_C" >&6
+
+    CFLAGS_SAVE="$CFLAGS"
+    CFLAGS="$CFLAGS $NO_GLOBUS_FLAGS"
+
+    cat >conftest.$ac_ext <<_ACEOF
+/* confdefs.h.  */
+_ACEOF
+cat confdefs.h >>conftest.$ac_ext
+cat >>conftest.$ac_ext <<_ACEOF
+/* end confdefs.h.  */
+
+        #include <openssl/x509v3.h>
+
+int
+main ()
+{
+
+        X509V3_EXT_METHOD it;
+        it.it = NULL;
+
+  ;
+  return 0;
+}
+_ACEOF
+rm -f conftest.$ac_objext
+if { (eval echo "$as_me:$LINENO: \"$ac_compile\"") >&5
+  (eval $ac_compile) 2>conftest.er1
+  ac_status=$?
+  grep -v '^ *+' conftest.er1 >conftest.err
+  rm -f conftest.er1
+  cat conftest.err >&5
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); } &&
+	 { ac_try='test -z "$ac_c_werror_flag"
+			 || test ! -s conftest.err'
+  { (eval echo "$as_me:$LINENO: \"$ac_try\"") >&5
+  (eval $ac_try) 2>&5
+  ac_status=$?
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); }; } &&
+	 { ac_try='test -s conftest.$ac_objext'
+  { (eval echo "$as_me:$LINENO: \"$ac_try\"") >&5
+  (eval $ac_try) 2>&5
+  ac_status=$?
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); }; }; then
+  ac_have_x509v3_member_it="yes"
+else
+  echo "$as_me: failed program was:" >&5
+sed 's/^/| /' conftest.$ac_ext >&5
+
+ac_have_x509v3_member_it="no"
+
+fi
+rm -f conftest.err conftest.$ac_objext conftest.$ac_ext
+
+    if test "x$ac_have_socklen_t" = "xyes" ; then
+
+cat >>confdefs.h <<\_ACEOF
+#define HAVE_X509V3_EXT_METHOD_IT_OPENSSL 1
 _ACEOF
 
     fi
@@ -25055,6 +25222,77 @@ rm -f conftest.err conftest.$ac_objext \
       conftest$ac_exeext conftest.$ac_ext
     CPPFLAGS="$CPPFLAGS_SAVE"
 
+    echo "$as_me:$LINENO: checking for EVP_MD_CTX_init (system libs)" >&5
+echo $ECHO_N "checking for EVP_MD_CTX_init (system libs)... $ECHO_C" >&6
+    CPPFLAGS_SAVE="$CPPFLAGS"
+    CPPFLAGS="$CPPFLAGS $NO_GLOBUS_FLAGS $OPENSSL_LIBS"
+    ac_ext=cc
+ac_cpp='$CXXCPP $CPPFLAGS'
+ac_compile='$CXX -c $CXXFLAGS $CPPFLAGS conftest.$ac_ext >&5'
+ac_link='$CXX -o conftest$ac_exeext $CXXFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
+ac_compiler_gnu=$ac_cv_cxx_compiler_gnu
+
+    cat >conftest.$ac_ext <<_ACEOF
+/* confdefs.h.  */
+_ACEOF
+cat confdefs.h >>conftest.$ac_ext
+cat >>conftest.$ac_ext <<_ACEOF
+/* end confdefs.h.  */
+
+        #include <openssl/evp.h>
+
+int
+main ()
+{
+
+        EVP_MD_CTX mp;
+        (void)EVP_MD_CTX_init(&mp)
+
+  ;
+  return 0;
+}
+_ACEOF
+rm -f conftest.$ac_objext conftest$ac_exeext
+if { (eval echo "$as_me:$LINENO: \"$ac_link\"") >&5
+  (eval $ac_link) 2>conftest.er1
+  ac_status=$?
+  grep -v '^ *+' conftest.er1 >conftest.err
+  rm -f conftest.er1
+  cat conftest.err >&5
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); } &&
+	 { ac_try='test -z "$ac_cxx_werror_flag"
+			 || test ! -s conftest.err'
+  { (eval echo "$as_me:$LINENO: \"$ac_try\"") >&5
+  (eval $ac_try) 2>&5
+  ac_status=$?
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); }; } &&
+	 { ac_try='test -s conftest$ac_exeext'
+  { (eval echo "$as_me:$LINENO: \"$ac_try\"") >&5
+  (eval $ac_try) 2>&5
+  ac_status=$?
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); }; }; then
+
+cat >>confdefs.h <<\_ACEOF
+#define HAVE_EVP_MD_CTX_INIT_OPENSSL 1
+_ACEOF
+
+       echo "$as_me:$LINENO: result: yes" >&5
+echo "${ECHO_T}yes" >&6
+else
+  echo "$as_me: failed program was:" >&5
+sed 's/^/| /' conftest.$ac_ext >&5
+
+echo "$as_me:$LINENO: result: no" >&5
+echo "${ECHO_T}no" >&6
+
+fi
+rm -f conftest.err conftest.$ac_objext \
+      conftest$ac_exeext conftest.$ac_ext
+    CPPFLAGS="$CPPFLAGS_SAVE"
+
     echo "$as_me:$LINENO: checking for EVP_MD_CTX_cleanup" >&5
 echo $ECHO_N "checking for EVP_MD_CTX_cleanup... $ECHO_C" >&6
     CPPFLAGS_SAVE="$CPPFLAGS"
@@ -25104,6 +25342,77 @@ if { (eval echo "$as_me:$LINENO: \"$ac_link\"") >&5
 
 cat >>confdefs.h <<\_ACEOF
 #define HAVE_EVP_MD_CTX_CLEANUP 1
+_ACEOF
+
+       echo "$as_me:$LINENO: result: yes" >&5
+echo "${ECHO_T}yes" >&6
+else
+  echo "$as_me: failed program was:" >&5
+sed 's/^/| /' conftest.$ac_ext >&5
+
+echo "$as_me:$LINENO: result: no" >&5
+echo "${ECHO_T}no" >&6
+
+fi
+rm -f conftest.err conftest.$ac_objext \
+      conftest$ac_exeext conftest.$ac_ext
+    ac_ext=cc
+ac_cpp='$CXXCPP $CPPFLAGS'
+ac_compile='$CXX -c $CXXFLAGS $CPPFLAGS conftest.$ac_ext >&5'
+ac_link='$CXX -o conftest$ac_exeext $CXXFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
+ac_compiler_gnu=$ac_cv_cxx_compiler_gnu
+
+    CPPFLAGS="$CPPFLAGS_SAVE"
+
+    echo "$as_me:$LINENO: checking for EVP_MD_CTX_cleanup (system libs)" >&5
+echo $ECHO_N "checking for EVP_MD_CTX_cleanup (system libs)... $ECHO_C" >&6
+    CPPFLAGS_SAVE="$CPPFLAGS"
+    CPPFLAGS="$CPPFLAGS $NO_GLOBUS_FLAGS $OPENSSL_LIBS"
+    cat >conftest.$ac_ext <<_ACEOF
+/* confdefs.h.  */
+_ACEOF
+cat confdefs.h >>conftest.$ac_ext
+cat >>conftest.$ac_ext <<_ACEOF
+/* end confdefs.h.  */
+
+        #include <openssl/evp.h>
+
+int
+main ()
+{
+
+        EVP_MD_CTX mp;
+        (void)EVP_MD_CTX_cleanup(&mp)
+
+  ;
+  return 0;
+}
+_ACEOF
+rm -f conftest.$ac_objext conftest$ac_exeext
+if { (eval echo "$as_me:$LINENO: \"$ac_link\"") >&5
+  (eval $ac_link) 2>conftest.er1
+  ac_status=$?
+  grep -v '^ *+' conftest.er1 >conftest.err
+  rm -f conftest.er1
+  cat conftest.err >&5
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); } &&
+	 { ac_try='test -z "$ac_cxx_werror_flag"
+			 || test ! -s conftest.err'
+  { (eval echo "$as_me:$LINENO: \"$ac_try\"") >&5
+  (eval $ac_try) 2>&5
+  ac_status=$?
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); }; } &&
+	 { ac_try='test -s conftest$ac_exeext'
+  { (eval echo "$as_me:$LINENO: \"$ac_try\"") >&5
+  (eval $ac_try) 2>&5
+  ac_status=$?
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); }; }; then
+
+cat >>confdefs.h <<\_ACEOF
+#define HAVE_EVP_MD_CTX_CLEANUP_OPENSSL 1
 _ACEOF
 
        echo "$as_me:$LINENO: result: yes" >&5
@@ -25201,7 +25510,7 @@ rm -f conftest.err conftest.$ac_objext \
           ac_config_headers="$ac_config_headers src/autogen/config.h"
 
 
-                                                                                                                                                                                                                            ac_config_files="$ac_config_files Makefile src/Makefile src/ac/Makefile src/api/Makefile src/api/ccapi/Makefile src/client/Makefile src/common/Makefile src/include/Makefile src/install/Makefile src/log/Makefile src/replib/Makefile src/replica/Makefile src/server/Makefile src/socklib/Makefile src/sslutils/Makefile src/sslutils/oldgaa/Makefile src/support/Makefile src/utils/Makefile doc/Makefile test/Makefile test/tests/Makefile test/utest/Makefile"
+                                                                                                                                                                                                                                      ac_config_files="$ac_config_files Makefile src/Makefile src/ac/Makefile src/api/Makefile src/api/ccapi/Makefile src/api/java/Makefile src/client/Makefile src/common/Makefile src/include/Makefile src/install/Makefile src/log/Makefile src/replib/Makefile src/replica/Makefile src/server/Makefile src/socklib/Makefile src/sslutils/Makefile src/sslutils/oldgaa/Makefile src/support/Makefile src/utils/Makefile doc/Makefile test/Makefile test/tests/Makefile test/utest/Makefile"
 
                                                                                 ac_config_files="$ac_config_files src/install/voms_install_db src/install/voms.start src/replica/voms_install_replica src/install/upgrade1to2 src/install/mysql2oracle src/support/test_setup src/support/test_start src/support/test_clean"
 
@@ -25794,6 +26103,7 @@ do
   "src/ac/Makefile" ) CONFIG_FILES="$CONFIG_FILES src/ac/Makefile" ;;
   "src/api/Makefile" ) CONFIG_FILES="$CONFIG_FILES src/api/Makefile" ;;
   "src/api/ccapi/Makefile" ) CONFIG_FILES="$CONFIG_FILES src/api/ccapi/Makefile" ;;
+  "src/api/java/Makefile" ) CONFIG_FILES="$CONFIG_FILES src/api/java/Makefile" ;;
   "src/client/Makefile" ) CONFIG_FILES="$CONFIG_FILES src/client/Makefile" ;;
   "src/common/Makefile" ) CONFIG_FILES="$CONFIG_FILES src/common/Makefile" ;;
   "src/include/Makefile" ) CONFIG_FILES="$CONFIG_FILES src/include/Makefile" ;;
@@ -25977,6 +26287,8 @@ s,@F77@,$F77,;t t
 s,@FFLAGS@,$FFLAGS,;t t
 s,@ac_ct_F77@,$ac_ct_F77,;t t
 s,@LIBTOOL@,$LIBTOOL,;t t
+s,@NO_GLOBUS_FLAGS@,$NO_GLOBUS_FLAGS,;t t
+s,@OPENSSL_LIBS@,$OPENSSL_LIBS,;t t
 s,@ALLOCA@,$ALLOCA,;t t
 s,@LIBOBJS@,$LIBOBJS,;t t
 s,@ENABLE_GLITE_TRUE@,$ENABLE_GLITE_TRUE,;t t

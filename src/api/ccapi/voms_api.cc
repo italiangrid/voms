@@ -13,6 +13,10 @@
  *********************************************************************/
 
 extern "C" {
+#ifdef NOGLOBUS
+#include <pthread.h>
+#endif
+
 #include "config.h"
 #include "replace.h"
 
@@ -27,9 +31,13 @@ extern "C" {
 #include <openssl/err.h>
 #include "credentials.h"
 
+#ifndef NOGLOBUS
 #ifdef HAVE_GLOBUS_MODULE_ACTIVATE
 #include <globus_module.h>
 #include <globus_openssl.h>
+#endif
+#else
+#include <openssl/crypto.h>
 #endif
 }
 
@@ -39,6 +47,7 @@ extern "C" {
 #include <voms_api.h>
 #include "data.h"
 #include "vomsxml.h"
+
 
 extern bool retrieve(X509 *cert, STACK_OF(X509) *chain, recurse_type how, 
 		     std::string &buffer, std::string &vo, std::string &file, 
@@ -54,13 +63,81 @@ extern char *Decode(const char *, int, int *);
 extern char *Encode(const char *, int, int *);
 }
 
+#ifdef NOGLOBUS
+static pthread_mutex_t *mut_pool = NULL;
+
+static void locking_cb(int mode, int type, const char *file, int line)
+{
+  if (pthread_mutex_lock)
+    if (mode & CRYPTO_LOCK)
+      pthread_mutex_lock(&(mut_pool[type]));
+    else
+      pthread_mutex_unlock(&(mut_pool[type]));
+}
+
+
+/**
+ * OpenSSL thread id callback
+ *
+ */
+static unsigned long thread_id(void)
+{
+  if (pthread_self)
+    return (unsigned long) pthread_self();
+  else
+    return 0;
+}
+
+static void openssl_initialize(void)
+{
+  mut_pool = (pthread_mutex_t *)malloc(CRYPTO_num_locks() * sizeof(pthread_mutex_t));
+
+  fprintf(stderr, "It appears that the value of pthread_mutex_init is %d\n",
+          pthread_mutex_init);
+  if (pthread_mutex_init)
+    for(int i = 0; i < CRYPTO_num_locks(); i++)
+      pthread_mutex_init(&(mut_pool[i]),NULL);
+
+  CRYPTO_set_locking_callback(locking_cb);
+  CRYPTO_set_id_callback(thread_id);
+
+  OBJ_create("0.9.2342.19200300.100.1.1","USERID","userId");
+
+#if 0
+  OBJ_create("1.3.6.1.5.5.7.21.1", "IMPERSONATION_PROXY",
+             "GSI Impersonation Proxy");
+
+  OBJ_create("1.3.6.1.5.5.7.21.2", "INDEPENDENT_PROXY",
+             "GSI Independent Proxy");
+
+  OBJ_create("1.3.6.1.4.1.3536.1.1.1.9", "LIMITED_PROXY",
+             "GSI Limited Proxy");
+    
+  int pci_NID = OBJ_create("1.3.6.1.4.1.3536.1.222", "PROXYCERTINFO",
+                           "Proxy Certificate Info Extension");
+
+  X509V3_EXT_METHOD *pci_x509v3_ext_meth = PROXYCERTINFO_x509v3_ext_meth();
+
+  /* this sets the pci NID in the static X509V3_EXT_METHOD struct */
+  pci_x509v3_ext_meth->ext_nid = pci_NID;
+    
+  X509V3_EXT_add(pci_x509v3_ext_meth);
+#endif
+}
+
+#endif
+
 extern int AC_Init(void);
 vomsdata::Initializer::Initializer(Initializer &) {}
 vomsdata::Initializer::Initializer()
 {
+#ifndef NOGLOBUS
 #ifdef HAVE_GLOBUS_MODULE_ACTIVATE
   (void)globus_module_activate(GLOBUS_GSI_GSS_ASSIST_MODULE);
   (void)globus_module_activate(GLOBUS_OPENSSL_MODULE);
+#endif
+#else
+  openssl_initialize();
 #endif
   SSLeay_add_all_algorithms();
   ERR_load_crypto_strings();
@@ -116,7 +193,8 @@ vomsdata::vomsdata(std::string voms_dir, std::string cert_dir) :  ca_cert_dir(ce
 
   if (!cdir)
     seterror(VERR_DIR, "Unable to find ca certificates");
-    
+
+#ifndef NOGLOBUS    
 #ifdef HAVE_GLOBUS_MODULE_ACTIVATE
   if (globus_module_activate(GLOBUS_GSI_GSS_ASSIST_MODULE) != GLOBUS_SUCCESS) {
     seterror(VERR_NOINIT, "Unable to initialize globus.");
@@ -127,6 +205,7 @@ vomsdata::vomsdata(std::string voms_dir, std::string cert_dir) :  ca_cert_dir(ce
     globus_module_deactivate(GLOBUS_GSI_GSS_ASSIST_MODULE);
     noglobus = true;
   }
+#endif
 #endif
 
   if (cdir)
@@ -139,11 +218,13 @@ vomsdata::vomsdata(std::string voms_dir, std::string cert_dir) :  ca_cert_dir(ce
 
 vomsdata::~vomsdata()
 {
+#ifndef NOGLOBUS
 #ifdef HAVE_GLOBUS_MODULE_ACTIVATE
   if (!noglobus) {
     globus_module_deactivate(GLOBUS_GSI_GSS_ASSIST_MODULE);
     globus_module_deactivate(GLOBUS_OPENSSL_MODULE);
   }
+#endif
 #endif
 }
 
@@ -192,6 +273,7 @@ void vomsdata::Order(std::string att)
 
 bool vomsdata::ContactRaw(std::string hostname, int port, std::string servsubject, std::string command, std::string &raw, int& version)
 {
+#ifndef NOGLOBUS
   std::string buffer;
   std::string subject, ca;
   std::string lifetime;
@@ -244,10 +326,15 @@ bool vomsdata::ContactRaw(std::string hostname, int port, std::string servsubjec
 
   version = 1;
   return true;
+#else
+  seterror(VERR_NOTAVAIL, "Method not available in this library!");
+  return false;
+#endif
 }
 
 bool vomsdata::Contact(std::string hostname, int port, std::string servsubject, std::string command)
 {
+#ifndef NOGLOBUS
   std::string subject, ca;
   char *s = NULL, *c = NULL;
 
@@ -285,30 +372,45 @@ bool vomsdata::Contact(std::string hostname, int port, std::string servsubject, 
   free(s);
 
   return result;
+#else
+  seterror(VERR_NOTAVAIL, "Method not available in this library!");
+  return false;
+#endif
 }
 
 bool vomsdata::RetrieveFromCred(gss_cred_id_t cred, recurse_type how)
 {
+#ifndef NOGLOBUS
   X509 *cert;
   STACK_OF(X509) *chain;
 
   cert = decouple_cred(cred, 0, &chain);
 
   return Retrieve(cert, chain, how);
+#else
+  seterror(VERR_NOTAVAIL, "Method not available in this library!");
+  return false;
+#endif
 }
 
 bool vomsdata::RetrieveFromCtx(gss_ctx_id_t cred, recurse_type how)
 {
+#ifndef NOGLOBUS
   X509 *cert;
   STACK_OF(X509) *chain;
 
   cert = decouple_ctx(cred, 0, &chain);
 
   return Retrieve(cert, chain, how);
+#else
+  seterror(VERR_NOTAVAIL, "Method not available in this library!");
+  return false;
+#endif
 }
 
 bool vomsdata::RetrieveFromProxy(recurse_type how)
 {
+#ifndef NOGLOBUS
   gss_cred_id_t cred = GSS_C_NO_CREDENTIAL;
 
   OM_uint32 major, minor, status;
@@ -323,6 +425,10 @@ bool vomsdata::RetrieveFromProxy(recurse_type how)
   bool b = RetrieveFromCred(cred, how);
   gss_release_cred(&status, &cred);
   return b;
+#else
+  seterror(VERR_NOTAVAIL, "Method not available in this library!");
+  return false;
+#endif
 }
 
 bool vomsdata::Retrieve(X509_EXTENSION *ext)
@@ -739,6 +845,27 @@ voms::~voms()
   X509_free(holder);
 }
 
+AC *voms::GetAC()
+{
+  return (AC *)ASN1_dup((int (*)())i2d_AC, (char * (*)())d2i_AC, (char *)ac);
+}
+
+vomsdata::vomsdata(const vomsdata &orig) : ca_cert_dir(orig.ca_cert_dir),
+                                           voms_cert_dir(orig.voms_cert_dir),
+                                           duration(orig.duration),
+                                           ordering(orig.ordering),
+                                           servers(orig.servers),
+                                           targets(orig.targets),
+                                           error(orig.error),
+                                           workvo(orig.workvo),
+                                           extra_data(orig.extra_data),
+                                           ver_type(orig.ver_type),
+                                           serverrors(orig.serverrors),
+                                           errmessage(orig.errmessage),
+                                           noglobus(orig.noglobus) {}
+
+
+
 int getMajorVersionNumber(void) {return 1;}
-int getMinorVersionNumber(void) {return 5;}
-int getPatchVersionNumber(void) {return 1;}
+int getMinorVersionNumber(void) {return 7;}
+int getPatchVersionNumber(void) {return 0;}

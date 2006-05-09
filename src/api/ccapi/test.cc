@@ -36,7 +36,8 @@ static std::string retmsg[] = { "VERR_NONE", "VERR_NOSOCKET", "VERR_NOIDENT",
                                 "VERR_EXTRAINFO", "VERR_FORMAT", "VERR_NODATA",
                                 "VERR_PARSE", "VERR_DIR", "VERR_SIGN",
                                 "VERR_SERVER", "VERR_MEM", "VERR_VERIFY",
-                                "VERR_IDENT", "VERR_TYPE" };
+                                "VERR_IDENT", "VERR_TYPE", "VERR_ORDER",
+                                "VERR_SERVERCODE", "VERR_NOTAVAIL" };
 
 static STACK_OF(X509) *load_chain(char *certfile);
 

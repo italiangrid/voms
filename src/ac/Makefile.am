@@ -2,6 +2,7 @@
 noinst_LTLIBRARIES = \
 	libattcert.la \
 	libccattcert.la \
+	libattributes_nog.la \
 	$(WANTED_ATTCERT_LIBS) # may add the libraries defined in EXTRA_LTLIBRARIES
 
 libattcert_la_SOURCES = \
@@ -13,21 +14,42 @@ libattcert_la_SOURCES = \
 	newformat.c \
 	init.c
 
+libattributes_nog_la_SOURCES = \
+	validate.c \
+	write.c \
+	extensions.c \
+	mystack.c \
+	error.c \
+	newformat.c \
+	init.c \
+	create.cc \
+	ccinit.cc
+
+libattributes_nog_la_CFLAGS = \
+	$(NO_GLOBUS_FLAGS) \
+	-DNOGLOBUS \
+	-I $(top_srcdir)/src/include \
+	-I $(top_builddir)/src/sslutils
+
+libattributes_nog_la_LIBADD = \
+	$(OPENSSL_LIBS)
+
 libattcert_la_CFLAGS= \
 	-I $(top_srcdir)/src/include \
 	-I $(top_builddir)/src/sslutils \
 	$(GLOBUS_CFLAGS)
 
-libattcert_la_LIBADD = \
-	$(GLOBUS_GSS_LIBS)
+#libattcert_la_LIBADD = \
+#	$(GLOBUS_GSS_LIBS)
 
 libccattcert_la_SOURCES = \
 	create.cc \
 	ccinit.cc
 
 libccattcert_la_LIBADD  = \
-	libattcert.la \
-	$(GLOBUS_GSS_LIBS)
+	libattcert.la
+# \
+#	$(GLOBUS_GSS_LIBS)
 
 AM_CPPFLAGS= \
 	-I $(top_srcdir)/src/include \

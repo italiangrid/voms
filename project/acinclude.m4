@@ -1,3 +1,35 @@
+# AC_OPENSSL checks system openssl availability
+# ---------------------------------------------
+AC_DEFUN([AC_OPENSSL],
+[
+  AC_ARG_WITH(openssl_prefix,
+              [ --with-openssl-prefix=PFX    prefix where OpenSSL (non-globus) is installed. (/usr)],
+              [],
+              [with_openssl_prefix=/usr])
+
+  SAVE_LD_LIBRARY_PATH=$LD_LIBRARY_PATH
+  LD_LIBRARY_PATH="$with_openssl_prefix/lib"
+
+  AC_LANG_PUSH(C)
+  AC_CHECK_LIB(crypto, CRYPTO_num_locks, [found=yes], [found=no])
+  AC_LANG_POP(C) 
+
+  if test "x$found" = "xyes"; then
+    NO_GLOBUS_FLAGS="-I$with_openssl_prefix/include"
+    OPENSSL_LIBS="-L$with_openssl_prefix/lib -lcrypto -lssl"
+    AC_SUBST(NO_GLOBUS_FLAGS)
+    AC_SUBST(OPENSSL_LIBS)
+    AC_MSG_CHECKING([for system OpenSSL version])
+    cat >conftest.h <<HERE
+#include <openssl/opensslv.h>
+OPENSSL_VERSION_TEXT
+HERE
+    openssl_version=`$CPP -I$NO_GLOBUS_FLAGS -o - -P conftest.h`
+    AC_MSG_RESULT($openssl_version)
+    rm -f conftest.h
+  fi
+  LD_LIBRARY_PATH="$SAVE_LD_LIBRARY_PATH"
+])
 
 # AC_GLOBUS checks globus prefix, looks for globus 
 # flavors, selects globus flavor and define wanted lib
@@ -333,7 +365,7 @@ AC_DEFUN([AC_VOMS_SOCKLEN_T],
 # ------------------------------------------------------------
 AC_DEFUN([AC_OPENSSL_EXT_METHOD],
 [
-    AC_MSG_CHECKING([for it member in X509V3_EXT_METHOD])
+    AC_MSG_CHECKING([for it member in X509V3_EXT_METHOD (globus libs)])
 
     CFLAGS_SAVE="$CFLAGS"
     CFLAGS="$CFLAGS $GLOBUS_CFLAGS"
@@ -352,6 +384,31 @@ AC_DEFUN([AC_OPENSSL_EXT_METHOD],
 
     if test "x$ac_have_socklen_t" = "xyes" ; then
       AC_DEFINE(HAVE_X509V3_EXT_METHOD_IT, 1, [Define to 1 if X509V3_EXT has a member it]) 
+    fi
+
+    AC_MSG_RESULT([$ac_have_x509v3_member_it])
+
+    CFLAGS="$CFLAGS_SAVE"
+
+    AC_MSG_CHECKING([for it member in X509V3_EXT_METHOD (system libs)])
+
+    CFLAGS_SAVE="$CFLAGS"
+    CFLAGS="$CFLAGS $NO_GLOBUS_FLAGS"
+
+    AC_TRY_COMPILE(
+      [
+        #include <openssl/x509v3.h>
+      ],
+      [
+        X509V3_EXT_METHOD it;
+        it.it = NULL;
+      ],
+      [ac_have_x509v3_member_it="yes"],
+      [ac_have_x509v3_member_it="no"]
+    )
+
+    if test "x$ac_have_socklen_t" = "xyes" ; then
+      AC_DEFINE(HAVE_X509V3_EXT_METHOD_IT_OPENSSL, 1, [Define to 1 if X509V3_EXT has a member it (OpenSSL system libs)]) 
     fi
 
     AC_MSG_RESULT([$ac_have_x509v3_member_it])
@@ -381,6 +438,24 @@ AC_DEFUN([AC_VOMS_OPENSSL_EVP_MD_CTX],
     )
     CPPFLAGS="$CPPFLAGS_SAVE"
 
+    AC_MSG_CHECKING([for EVP_MD_CTX_init (system libs)])
+    CPPFLAGS_SAVE="$CPPFLAGS"
+    CPPFLAGS="$CPPFLAGS $NO_GLOBUS_FLAGS $OPENSSL_LIBS"
+    AC_LANG_PUSH(C++)
+    AC_TRY_LINK(
+      [
+        #include <openssl/evp.h>
+      ],
+      [
+        EVP_MD_CTX mp; 
+        (void)EVP_MD_CTX_init(&mp)
+      ],
+      [AC_DEFINE(HAVE_EVP_MD_CTX_INIT_OPENSSL, 1, [Define to 1 if you have EVP_MD_CTX_init (OpenSSL system libs)])
+       AC_MSG_RESULT(yes)],
+      [AC_MSG_RESULT(no)]
+    )
+    CPPFLAGS="$CPPFLAGS_SAVE"
+
     AC_MSG_CHECKING([for EVP_MD_CTX_cleanup])
     CPPFLAGS_SAVE="$CPPFLAGS"
     CPPFLAGS="$CPPFLAGS $GLOBUS_CFLAGS $GLOBUS_GSS_LIBS"
@@ -393,6 +468,24 @@ AC_DEFUN([AC_VOMS_OPENSSL_EVP_MD_CTX],
         (void)EVP_MD_CTX_cleanup(&mp)
       ],
       [AC_DEFINE(HAVE_EVP_MD_CTX_CLEANUP, 1, [Define to 1 if you have EVP_MD_CTX_cleanup])
+       AC_MSG_RESULT(yes)],
+      [AC_MSG_RESULT(no)]
+      )
+    AC_LANG_POP(C++)
+    CPPFLAGS="$CPPFLAGS_SAVE"
+
+    AC_MSG_CHECKING([for EVP_MD_CTX_cleanup (system libs)])
+    CPPFLAGS_SAVE="$CPPFLAGS"
+    CPPFLAGS="$CPPFLAGS $NO_GLOBUS_FLAGS $OPENSSL_LIBS"
+    AC_TRY_LINK(
+      [
+        #include <openssl/evp.h>
+      ],
+      [
+        EVP_MD_CTX mp; 
+        (void)EVP_MD_CTX_cleanup(&mp)
+      ],
+      [AC_DEFINE(HAVE_EVP_MD_CTX_CLEANUP_OPENSSL, 1, [Define to 1 if you have EVP_MD_CTX_cleanup (OpenSSL system libs)])
        AC_MSG_RESULT(yes)],
       [AC_MSG_RESULT(no)]
       )

@@ -14,7 +14,7 @@
 
 @SET_MAKE@
 
-SOURCES = $(libutilc_la_SOURCES) $(libutilities_la_SOURCES)
+SOURCES = $(libutilc_la_SOURCES) $(libutilc_nog_la_SOURCES) $(libutilities_la_SOURCES) $(libutilities_nog_la_SOURCES)
 
 srcdir = @srcdir@
 top_srcdir = @top_srcdir@
@@ -54,10 +54,19 @@ LTLIBRARIES = $(noinst_LTLIBRARIES)
 libutilc_la_LIBADD =
 am_libutilc_la_OBJECTS = list.lo xml.lo error.lo credentials.lo
 libutilc_la_OBJECTS = $(am_libutilc_la_OBJECTS)
+libutilc_nog_la_LIBADD =
+am_libutilc_nog_la_OBJECTS = libutilc_nog_la-list.lo \
+	libutilc_nog_la-xml.lo libutilc_nog_la-error.lo \
+	libutilc_nog_la-credentials.lo
+libutilc_nog_la_OBJECTS = $(am_libutilc_nog_la_OBJECTS)
 libutilities_la_LIBADD =
 am_libutilities_la_OBJECTS = data.lo options.lo pass.lo sign.lo \
 	xmlcc.lo
 libutilities_la_OBJECTS = $(am_libutilities_la_OBJECTS)
+libutilities_nog_la_LIBADD =
+am_libutilities_nog_la_OBJECTS = data.lo options.lo pass.lo sign.lo \
+	xmlcc.lo
+libutilities_nog_la_OBJECTS = $(am_libutilities_nog_la_OBJECTS)
 DEFAULT_INCLUDES = -I. -I$(srcdir) -I$(top_builddir)/src/autogen
 depcomp = $(SHELL) $(top_srcdir)/./project/depcomp
 am__depfiles_maybe = depfiles
@@ -77,8 +86,10 @@ LTCXXCOMPILE = $(LIBTOOL) --tag=CXX --mode=compile $(CXX) $(DEFS) \
 CXXLD = $(CXX)
 CXXLINK = $(LIBTOOL) --tag=CXX --mode=link $(CXXLD) $(AM_CXXFLAGS) \
 	$(CXXFLAGS) $(AM_LDFLAGS) $(LDFLAGS) -o $@
-SOURCES = $(libutilc_la_SOURCES) $(libutilities_la_SOURCES)
-DIST_SOURCES = $(libutilc_la_SOURCES) $(libutilities_la_SOURCES)
+SOURCES = $(libutilc_la_SOURCES) $(libutilc_nog_la_SOURCES) \
+	$(libutilities_la_SOURCES) $(libutilities_nog_la_SOURCES)
+DIST_SOURCES = $(libutilc_la_SOURCES) $(libutilc_nog_la_SOURCES) \
+	$(libutilities_la_SOURCES) $(libutilities_nog_la_SOURCES)
 ETAGS = etags
 CTAGS = ctags
 DISTFILES = $(DIST_COMMON) $(DIST_SOURCES) $(TEXINFOS) $(EXTRA_DIST)
@@ -159,7 +170,9 @@ MAINT = @MAINT@
 MAINTAINER_MODE_FALSE = @MAINTAINER_MODE_FALSE@
 MAINTAINER_MODE_TRUE = @MAINTAINER_MODE_TRUE@
 MAKEINFO = @MAKEINFO@
+NO_GLOBUS_FLAGS = @NO_GLOBUS_FLAGS@
 OBJEXT = @OBJEXT@
+OPENSSL_LIBS = @OPENSSL_LIBS@
 PACKAGE = @PACKAGE@
 PACKAGE_BUGREPORT = @PACKAGE_BUGREPORT@
 PACKAGE_NAME = @PACKAGE_NAME@
@@ -226,6 +239,8 @@ sysconfdir = @sysconfdir@
 target_alias = @target_alias@
 noinst_LTLIBRARIES = \
 	libutilities.la \
+	libutilities_nog.la \
+	libutilc_nog.la \
 	libutilc.la
 
 libutilities_la_SOURCES = \
@@ -234,6 +249,18 @@ libutilities_la_SOURCES = \
 	pass.cc \
 	sign.cc \
 	xmlcc.cc
+
+libutilities_nog_la_SOURCES = \
+	data.cc \
+	options.cc \
+	pass.cc \
+	sign.cc \
+	xmlcc.cc
+
+libutilities_nog_la_CFLAGS = \
+	-DNOGLOBUS \
+	$(NO_GLOBUS_FLAGS) \
+	-I $(top_srcdir)/src/include
 
 libutilc_la_SOURCES = \
 	list.c \
@@ -245,6 +272,19 @@ AM_CPPFLAGS = \
 	-I $(top_srcdir)/src/include \
 	-I $(top_srcdir)/src/sslutils \
 	$(GLOBUS_CFLAGS)
+
+libutilc_nog_la_CPPFLAGS = \
+	$(NO_GLOBUS_FLAGS) \
+	-DNOGLOBUS \
+	-I $(top_srcdir)/src/include \
+	-I $(top_srcdir)/src/sslutils \
+	$(GLOBUS_CFLAGS)
+
+libutilc_nog_la_SOURCES = \
+	list.c \
+	xml.c \
+	error.c \
+	credentials.c
 
 all: all-am
 
@@ -290,8 +330,12 @@ clean-noinstLTLIBRARIES:
 	done
 libutilc.la: $(libutilc_la_OBJECTS) $(libutilc_la_DEPENDENCIES) 
 	$(LINK)  $(libutilc_la_LDFLAGS) $(libutilc_la_OBJECTS) $(libutilc_la_LIBADD) $(LIBS)
+libutilc_nog.la: $(libutilc_nog_la_OBJECTS) $(libutilc_nog_la_DEPENDENCIES) 
+	$(LINK)  $(libutilc_nog_la_LDFLAGS) $(libutilc_nog_la_OBJECTS) $(libutilc_nog_la_LIBADD) $(LIBS)
 libutilities.la: $(libutilities_la_OBJECTS) $(libutilities_la_DEPENDENCIES) 
 	$(CXXLINK)  $(libutilities_la_LDFLAGS) $(libutilities_la_OBJECTS) $(libutilities_la_LIBADD) $(LIBS)
+libutilities_nog.la: $(libutilities_nog_la_OBJECTS) $(libutilities_nog_la_DEPENDENCIES) 
+	$(CXXLINK)  $(libutilities_nog_la_LDFLAGS) $(libutilities_nog_la_OBJECTS) $(libutilities_nog_la_LIBADD) $(LIBS)
 
 mostlyclean-compile:
 	-rm -f *.$(OBJEXT)
@@ -302,6 +346,10 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/credentials.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/data.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/error.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libutilc_nog_la-credentials.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libutilc_nog_la-error.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libutilc_nog_la-list.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libutilc_nog_la-xml.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/list.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/options.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/pass.Plo@am__quote@
@@ -329,6 +377,34 @@ distclean-compile:
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	source='$<' object='$@' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(LTCOMPILE) -c -o $@ $<
+
+libutilc_nog_la-list.lo: list.c
+@am__fastdepCC_TRUE@	if $(LIBTOOL) --tag=CC --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libutilc_nog_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT libutilc_nog_la-list.lo -MD -MP -MF "$(DEPDIR)/libutilc_nog_la-list.Tpo" -c -o libutilc_nog_la-list.lo `test -f 'list.c' || echo '$(srcdir)/'`list.c; \
+@am__fastdepCC_TRUE@	then mv -f "$(DEPDIR)/libutilc_nog_la-list.Tpo" "$(DEPDIR)/libutilc_nog_la-list.Plo"; else rm -f "$(DEPDIR)/libutilc_nog_la-list.Tpo"; exit 1; fi
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='list.c' object='libutilc_nog_la-list.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(LIBTOOL) --tag=CC --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libutilc_nog_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o libutilc_nog_la-list.lo `test -f 'list.c' || echo '$(srcdir)/'`list.c
+
+libutilc_nog_la-xml.lo: xml.c
+@am__fastdepCC_TRUE@	if $(LIBTOOL) --tag=CC --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libutilc_nog_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT libutilc_nog_la-xml.lo -MD -MP -MF "$(DEPDIR)/libutilc_nog_la-xml.Tpo" -c -o libutilc_nog_la-xml.lo `test -f 'xml.c' || echo '$(srcdir)/'`xml.c; \
+@am__fastdepCC_TRUE@	then mv -f "$(DEPDIR)/libutilc_nog_la-xml.Tpo" "$(DEPDIR)/libutilc_nog_la-xml.Plo"; else rm -f "$(DEPDIR)/libutilc_nog_la-xml.Tpo"; exit 1; fi
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='xml.c' object='libutilc_nog_la-xml.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(LIBTOOL) --tag=CC --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libutilc_nog_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o libutilc_nog_la-xml.lo `test -f 'xml.c' || echo '$(srcdir)/'`xml.c
+
+libutilc_nog_la-error.lo: error.c
+@am__fastdepCC_TRUE@	if $(LIBTOOL) --tag=CC --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libutilc_nog_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT libutilc_nog_la-error.lo -MD -MP -MF "$(DEPDIR)/libutilc_nog_la-error.Tpo" -c -o libutilc_nog_la-error.lo `test -f 'error.c' || echo '$(srcdir)/'`error.c; \
+@am__fastdepCC_TRUE@	then mv -f "$(DEPDIR)/libutilc_nog_la-error.Tpo" "$(DEPDIR)/libutilc_nog_la-error.Plo"; else rm -f "$(DEPDIR)/libutilc_nog_la-error.Tpo"; exit 1; fi
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='error.c' object='libutilc_nog_la-error.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(LIBTOOL) --tag=CC --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libutilc_nog_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o libutilc_nog_la-error.lo `test -f 'error.c' || echo '$(srcdir)/'`error.c
+
+libutilc_nog_la-credentials.lo: credentials.c
+@am__fastdepCC_TRUE@	if $(LIBTOOL) --tag=CC --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libutilc_nog_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT libutilc_nog_la-credentials.lo -MD -MP -MF "$(DEPDIR)/libutilc_nog_la-credentials.Tpo" -c -o libutilc_nog_la-credentials.lo `test -f 'credentials.c' || echo '$(srcdir)/'`credentials.c; \
+@am__fastdepCC_TRUE@	then mv -f "$(DEPDIR)/libutilc_nog_la-credentials.Tpo" "$(DEPDIR)/libutilc_nog_la-credentials.Plo"; else rm -f "$(DEPDIR)/libutilc_nog_la-credentials.Tpo"; exit 1; fi
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='credentials.c' object='libutilc_nog_la-credentials.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(LIBTOOL) --tag=CC --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libutilc_nog_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o libutilc_nog_la-credentials.lo `test -f 'credentials.c' || echo '$(srcdir)/'`credentials.c
 
 .cc.o:
 @am__fastdepCXX_TRUE@	if $(CXXCOMPILE) -MT $@ -MD -MP -MF "$(DEPDIR)/$*.Tpo" -c -o $@ $<; \

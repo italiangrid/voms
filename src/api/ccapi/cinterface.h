@@ -15,7 +15,10 @@
 #ifndef VOMS_CINTERFACE_H
 #define VOMS_CINTERFACE_H
 
+#ifndef NOGLOBUS
 #include <gssapi.h>
+#endif
+
 #include <openssl/x509.h>
 
 #include "newformat.h"
@@ -113,6 +116,7 @@ struct vomsr {
 #define VERR_TYPE       18 /*!< Returned data of unknown type */
 #define VERR_ORDER      19 /*!< Ordering different than required */
 #define VERR_SERVERCODE 20 /*!< Error from the server */
+#define VERR_NOTAVAIL   21 /*!< Method not available */
 
 struct vomsdatar {
   char *cdir;
@@ -317,6 +321,9 @@ extern int VOMS_RetrieveEXT(X509_EXTENSION *ext, struct vomsdatar *vd, int *erro
 extern int VOMS_RetrieveFromCred(gss_cred_id_t, int, struct vomsdatar *vd, int *error);
 extern int VOMS_RetrieveFromCtx(gss_ctx_id_t, int, struct vomsdatar *vd, int *error);
 extern int VOMS_RetrieveFromProxy(int, struct vomsdatar *vd, int *error);
+
+extern struct vomsdatar *VOMS_Duplicate(struct vomsdatar *vd);
+extern AC *VOMS_GetAC(struct vomsr *v);
 
 #if 0
 int getMajorVersionNumber(void);

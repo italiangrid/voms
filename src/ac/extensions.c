@@ -355,8 +355,14 @@ int initEx(void)
   }
 
   auth->ext_nid  = OBJ_txt2nid("authKeyId");
+#ifndef NOGLOBUS
 #ifdef HAVE_X509V3_EXT_METHOD_IT
   auth->it = NULL;
+#endif
+#else
+#ifdef HAVE_X509V3_EXT_METHOD_IT_OPENSSL
+  auth->it = NULL;
+#endif
 #endif
   auth->ext_flags = 0;
   auth->ext_new  = (X509V3_EXT_NEW) AUTHORITY_KEYID_new;
@@ -371,8 +377,14 @@ int initEx(void)
   auth->i2r      = (X509V3_EXT_I2R) NULL;
 
   avail->ext_nid  = OBJ_txt2nid("idcenoRevAvail");
+#ifndef NOGLOBUS
 #ifdef HAVE_X509V3_EXT_METHOD_IT
-  avail->it = NULL;
+  auth->it = NULL;
+#endif
+#else
+#ifdef HAVE_X509V3_EXT_METHOD_IT_OPENSSL
+  auth->it = NULL;
+#endif
 #endif
   avail->ext_flags = 0;
   avail->ext_new  = (X509V3_EXT_NEW) ASN1_NULL_new;
@@ -387,8 +399,14 @@ int initEx(void)
   avail->i2r      = (X509V3_EXT_I2R) NULL;
 
   targets->ext_nid  = OBJ_txt2nid("idceTargets");
+#ifndef NOGLOBUS
 #ifdef HAVE_X509V3_EXT_METHOD_IT
-  targets->it = NULL;
+  auth->it = NULL;
+#endif
+#else
+#ifdef HAVE_X509V3_EXT_METHOD_IT_OPENSSL
+  auth->it = NULL;
+#endif
 #endif
   targets->ext_flags = 0;
   targets->ext_new  = (X509V3_EXT_NEW) AC_TARGETS_new;
@@ -403,8 +421,14 @@ int initEx(void)
   targets->i2r      = (X509V3_EXT_I2R) NULL;
 
   acseq->ext_nid  = OBJ_txt2nid("acseq");
+#ifndef NOGLOBUS
 #ifdef HAVE_X509V3_EXT_METHOD_IT
-  acseq->it = NULL;
+  auth->it = NULL;
+#endif
+#else
+#ifdef HAVE_X509V3_EXT_METHOD_IT_OPENSSL
+  auth->it = NULL;
+#endif
 #endif
   acseq->ext_flags = 0;
   acseq->ext_new  = (X509V3_EXT_NEW) AC_SEQ_new;
@@ -419,8 +443,14 @@ int initEx(void)
   acseq->i2r      = (X509V3_EXT_I2R) NULL;
 
   certseq->ext_nid  = OBJ_txt2nid("certseq");
+#ifndef NOGLOBUS
 #ifdef HAVE_X509V3_EXT_METHOD_IT
-  certseq->it = NULL;
+  auth->it = NULL;
+#endif
+#else
+#ifdef HAVE_X509V3_EXT_METHOD_IT_OPENSSL
+  auth->it = NULL;
+#endif
 #endif
   certseq->ext_flags = 0;
   certseq->ext_new  = (X509V3_EXT_NEW) AC_CERTS_new;

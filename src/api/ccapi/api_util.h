@@ -40,16 +40,18 @@ extern "C" {
 #include <netinet/in.h>
 #include <sys/types.h>
 #include <sys/socket.h>
+#ifndef NOGLOBUS
 #include "globus_config.h"
 #include "gssapi.h"
 #include "globus_gss_assist.h"
+#endif
 
 #include <stdio.h>
 }
 
-
+#ifndef NOGLOBUS
 #include "Client.h"
-
+#endif
 
 #include "voms_api.h"
 
