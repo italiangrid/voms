@@ -977,6 +977,71 @@ get_group_attributes(const std::string &dn, const std::string &ca,
 }
 
 bool
+get_role_attributes(const std::string &dn, const std::string &ca,
+                              const char *role,
+                              const std::string &dbname, const std::string &username, const std::string &contactstring,
+                              int port, const std::string& socket, const char *password,
+                              std::vector<gattrib> &result)
+{
+  if (dn.empty() || ca.empty() || !role || dbname.empty() || username.empty() || !password)
+    return false;
+  
+  // separate group and role in group:role syntax
+  
+  if (!acceptable(role))
+    return false;
+
+  // compose query
+
+  std::string query = std::string("SELECT usr.dn as username, role, groups.dn as groupname, capability, groups.gid, Attributes.a_name, Role_attrs.a_value "
+                                  "FROM groups, usr, ca, m "
+                                  "left join roles on roles.rid = m.rid "
+                                  "left join capabilities on capabilities.cid = m.cid "
+                                  "INNER JOIN Role_attrs on groups.gid = Role_attrs.g_id "             // added
+                                  "INNER JOIN Attributes on Attributes.a_id = Role_attrs.a_id "        // added
+                                  "WHERE Role_attrs.r_id = roles.rid AND "                            // added  
+                                  "groups.gid = m.gid AND ") +
+    (compat_flag ? "usr.uid = m.uid AND " : "usr.userid = m.userid AND ") +
+    "roles.role = \'" + role + "\' AND "
+    "usr.ca  = ca.cid AND "
+    "ca.ca = \'" + ca + "\' AND "
+    "usr.dn = \'" + dn + "\'";
+
+  // execute query
+
+  return get_attributes_real(dn, ca, dbname, username, contactstring, port, socket, password, query, result);
+}
+
+bool
+get_all_attributes(const std::string &dn, const std::string &ca,
+                              const std::string &dbname, const std::string &username, const std::string &contactstring,
+                              int port, const std::string& socket, const char *password,
+                              std::vector<gattrib> &result)
+{
+  if (dn.empty() || ca.empty() || dbname.empty() || username.empty() || !password)
+    return false;
+  
+  // compose query
+
+  std::string query = std::string("SELECT usr.dn as username, role, groups.dn as groupname, capability, groups.gid, Attributes.a_name, Role_attrs.a_value "
+                                  "FROM groups, usr, ca, m "
+                                  "left join roles on roles.rid = m.rid "
+                                  "left join capabilities on capabilities.cid = m.cid "
+                                  "INNER JOIN Role_attrs on groups.gid = Role_attrs.g_id "             // added
+                                  "INNER JOIN Attributes on Attributes.a_id = Role_attrs.a_id "        // added
+                                  "WHERE Role_attrs.r_id = roles.rid AND "                            // added  
+                                  "groups.gid = m.gid AND ") +
+    (compat_flag ? "usr.uid = m.uid AND " : "usr.userid = m.userid AND ") +
+    "usr.ca  = ca.cid AND "
+    "ca.ca = \'" + ca + "\' AND "
+    "usr.dn = \'" + dn + "\'";
+
+  // execute query
+
+  return get_attributes_real(dn, ca, dbname, username, contactstring, port, socket, password, query, result);
+}
+
+bool
 get_group_and_role_attributes(const std::string &dn, const std::string &ca,
                               const char *group,
                               const std::string &dbname, const std::string &username, const std::string &contactstring,
@@ -1171,10 +1236,11 @@ get_attributes_real0(sqliface::interface *db, const std::string &dn,
 }
 
 bool get_correct_dn(const std::string &dbname, const std::string &username, 
-                    const char *password, const std::string &name)
+                    const char *password, const std::string &contactstring, 
+                    int port, const std::string &socket, const std::string &name)
 {
   if (dbname.empty() || username.empty() || !password || !acceptable(name.c_str()))
-    return NULL;
+    return false;
 
   bool res = false;
 
@@ -1202,10 +1268,11 @@ bool get_correct_dn(const std::string &dbname, const std::string &username,
 }
 
 bool get_correct_ca(const std::string &dbname, const std::string &username, 
-                    const char *password, const std::string &name)
+                    const char *password, const std::string &contactstring,
+                    int port, const std::string& socket, const std::string &name)
 {
   if (dbname.empty() || username.empty() || !password || !acceptable(name.c_str()))
-    return NULL;
+    return false;
 
   bool res = false;
 

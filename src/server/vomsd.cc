@@ -599,6 +599,7 @@ VOMSServer::Execute(const std::string &client_name, const std::string &ca_name,
   std::string message;
   std::string client = client_name;
   std::string newname = translate(client);
+  std::string newca   = translate(ca_name);
 
   if (!sock.Receive(message)) {
     LOG(logh, LEV_ERROR, T_PRE, "Unable to receive request.");
@@ -647,6 +648,19 @@ VOMSServer::Execute(const std::string &client_name, const std::string &ca_name,
     }
   }
 
+  std::string real_ca = (ca_name == newca ? ca_name :
+                         ( get_correct_ca(dbname, username, passwd(), 
+                                          contactstring, mysql_port, 
+                                          mysql_socket, ca_name) ?
+                           ca_name : newca));
+
+  std::string real_user = (client == newname ? client :
+                           ( get_correct_dn(dbname, username, passwd(), 
+                                            contactstring, mysql_port, 
+                                            mysql_socket, client) ?
+                             client : newname));
+
+
   std::string command;
   for(std::vector<std::string>::iterator i = comm.begin(); i < comm.end(); ++i)
   {
@@ -659,45 +673,29 @@ VOMSServer::Execute(const std::string &client_name, const std::string &ca_name,
     {
     case 'A':
       result &=
-        get_all(client, ca_name, dbname, username, contactstring, mysql_port, mysql_socket, passwd(), res);
-      if (!result && (newname != client))
-        result=
-          get_all(newname, ca_name, dbname, username, contactstring, mysql_port, mysql_socket, passwd(), res);
+        get_all(real_user, real_ca, dbname, username, contactstring, mysql_port, mysql_socket, passwd(), res);
+      result &= get_all_attributes(real_user, real_ca, dbname, username, contactstring, mysql_port, mysql_socket, passwd(), attributes);
       break;
 
     case 'R':
       result &=
-        get_role(client, ca_name, i->c_str() + 1, dbname, username, contactstring, mysql_port, mysql_socket, passwd(), res);
-      if (!result && (newname != client))
-        result=
-          get_role(newname, ca_name, i->c_str() + 1, dbname, username, contactstring, mysql_port, mysql_socket, passwd(), res);
-      
+        get_role(real_user, real_ca, i->c_str() + 1, dbname, username, contactstring, mysql_port, mysql_socket, passwd(), res);
+      result &= get_role_attributes(real_user, real_ca, i->c_str() + 1, dbname, username, contactstring, mysql_port, mysql_socket, passwd(), attributes);
       break;
 	
     case 'G':
-      result = get_group(client, ca_name, i->c_str() + 1, dbname, username, contactstring, mysql_port, mysql_socket, passwd(), res);
-      result &= get_group_attributes(client, ca_name, i->c_str() + 1, dbname, username, contactstring, mysql_port, mysql_socket, passwd(), attributes);
-      if (!result && (newname != client)) {
-        result = get_group(newname, ca_name, i->c_str() + 1, dbname, username, contactstring, mysql_port, mysql_socket, passwd(), res);
-        result &= get_group_attributes(client, ca_name, i->c_str() + 1, dbname, username, contactstring, mysql_port, mysql_socket, passwd(), attributes);
-      }
+      result = get_group(real_user, real_ca, i->c_str() + 1, dbname, username, contactstring, mysql_port, mysql_socket, passwd(), res);
+      result &= get_group_attributes(real_user, real_ca, i->c_str() + 1, dbname, username, contactstring, mysql_port, mysql_socket, passwd(), attributes);
       break;
 
     case 'B':
-      result = get_group_and_role(client_name, ca_name, i->c_str() + 1, dbname, username, contactstring, mysql_port, mysql_socket, passwd(), res);
-      result &= get_group_and_role_attributes(client, ca_name, i->c_str() + 1, dbname, username, contactstring, mysql_port, mysql_socket, passwd(), attributes);
-      if (!result && (newname != client)) {
-        result = get_group_and_role(newname, ca_name, i->c_str() + 1, dbname, username, contactstring, mysql_port, mysql_socket, passwd(), res);
-        result = get_group_and_role_attributes(newname, ca_name, i->c_str() + 1, dbname, username, contactstring, mysql_port, mysql_socket, passwd(), attributes);
-      }
+      result = get_group_and_role(real_user, real_ca, i->c_str() + 1, dbname, username, contactstring, mysql_port, mysql_socket, passwd(), res);
+      result &= get_group_and_role_attributes(real_user, real_ca, i->c_str() + 1, dbname, username, contactstring, mysql_port, mysql_socket, passwd(), attributes);
       break;
       
     case 'S':
       result &=
-        special(client_name, ca_name, i->c_str() + 1, dbname, username, contactstring, mysql_port, mysql_socket, passwd(), data);
-      if (!result && (newname != client))
-        result=
-          special(newname, ca_name, i->c_str() + 1, dbname, username, contactstring, mysql_port, mysql_socket, passwd(), data);
+        special(real_user, real_ca, i->c_str() + 1, dbname, username, contactstring, mysql_port, mysql_socket, passwd(), data);
       break;
 
     case 'L':
@@ -706,18 +704,12 @@ VOMSServer::Execute(const std::string &client_name, const std::string &ca_name,
       break;
 
     case 'M':
-      result &= getlist(client_name, ca_name, dbname, username, contactstring, mysql_port, mysql_socket, passwd(), data);
-      if (!result && (newname != client))
-        result=
-          getlist(newname, ca_name, dbname, username, contactstring, mysql_port, mysql_socket, passwd(), data);
+      result &= getlist(real_user, real_ca, dbname, username, contactstring, mysql_port, mysql_socket, passwd(), data);
       break;
 
     case 'N':
       result &=
-        get_all(client, ca_name, dbname, username, contactstring, mysql_port, mysql_socket, passwd(), res);
-      if (!result && (newname != client))
-        result=
-          get_all(newname, ca_name, dbname, username, contactstring, mysql_port, mysql_socket, passwd(), res);
+        get_all(real_user, real_ca, dbname, username, contactstring, mysql_port, mysql_socket, passwd(), res);
       break;
 
     default:

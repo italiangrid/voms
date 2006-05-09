@@ -156,4 +156,23 @@ extern bool get_group_and_role_attributes(const std::string& dn,
                                           const char * password,
                                           std::vector<gattrib>& result);
 
+bool get_correct_ca(const std::string &dbname, const std::string &username, 
+                    const char *password, const std::string &contactstring,
+                    int port, const std::string &socket, const std::string &name);
+bool get_correct_dn(const std::string &dbname, const std::string &username, 
+                    const char *password, const std::string &contactstring,
+                    int port, const std::string &socket, const std::string &name);
+
+bool get_role_attributes(const std::string &dn, const std::string &ca,
+                         const char *role, const std::string &dbname, 
+                         const std::string &username, const std::string &contactstring,
+                         int port, const std::string& socket, const char *password,
+                         std::vector<gattrib> &result);
+
+bool get_all_attributes(const std::string &dn, const std::string &ca,
+                        const std::string &dbname, const std::string &username, 
+                        const std::string &contactstring, int port, 
+                        const std::string& socket, const char *password,
+                        std::vector<gattrib> &result);
+
 #endif

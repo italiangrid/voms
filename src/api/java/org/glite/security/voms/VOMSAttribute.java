@@ -19,6 +19,8 @@ import javax.security.auth.x500.X500Principal;
 import org.glite.security.voms.ac.AttributeCertificate;
 import org.glite.security.voms.ac.IetfAttrSyntax;
 
+import org.glite.security.voms.AttributeList;
+
 import java.util.SimpleTimeZone;
 import java.util.Iterator;
 import java.util.List;
@@ -284,6 +286,14 @@ public class VOMSAttribute {
      */
     public String getHostPort() {
         return myHostPort;
+    }
+
+    public int getAttributeNumber() {
+        return v.attributes.length;
+    }
+
+    public AttributeList getAttributeList(int i) {
+        return new AttributeList(v.attributes[i]);
     }
 
     /**

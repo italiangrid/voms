@@ -254,3 +254,41 @@ JNIEXPORT void JNICALL Java_org_glite_security_voms_peers_DataPeer_initializer
 }
 #endif
 #endif
+/* Header for class org_glite_security_voms_peers_AttributePeer */
+
+#ifndef _Included_org_glite_security_voms_peers_AttributePeer
+#define _Included_org_glite_security_voms_peers_AttributePeer
+#ifdef __cplusplus
+extern "C" {
+#endif
+/*
+ * Class:     org_glite_security_voms_peers_AttributePeer
+ * Method:    initializer
+ * Signature: ()V
+ */
+JNIEXPORT void JNICALL Java_org_glite_security_voms_peers_AttributePeer_initializer
+  (JNIEnv *, jclass);
+
+#ifdef __cplusplus
+}
+#endif
+#endif
+/* Header for class org_glite_security_voms_peers_AttributeListPeer */
+
+#ifndef _Included_org_glite_security_voms_peers_AttributeListPeer
+#define _Included_org_glite_security_voms_peers_AttributeListPeer
+#ifdef __cplusplus
+extern "C" {
+#endif
+/*
+ * Class:     org_glite_security_voms_peers_AttributeListPeer
+ * Method:    initializer
+ * Signature: ()V
+ */
+JNIEXPORT void JNICALL Java_org_glite_security_voms_peers_AttributeListPeer_initializer
+  (JNIEnv *, jclass);
+
+#ifdef __cplusplus
+}
+#endif
+#endif

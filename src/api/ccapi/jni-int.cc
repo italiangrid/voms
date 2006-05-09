@@ -32,12 +32,19 @@ static jfieldID  vp_serial   = 0;
 static jfieldID  vp_holder   = 0;
 static jfieldID  vp_issuer   = 0;
 static jfieldID  vp_uri      = 0;
+static jfieldID  vp_attribs  = 0;
 
 static jclass    cdp_class     = 0;
 static jmethodID cdp_constructor = 0;
 
 static jclass    s_class = 0;
 static jmethodID s_constructor = 0;
+
+static jclass    ap_class = 0;
+static jmethodID ap_constructor = 0;
+
+static jclass    alp_class = 0;
+static jmethodID alp_constructor = 0;
 
 static jboolean returnBool(JNIEnv *env, bool v)
 {
@@ -89,6 +96,53 @@ static jobjectArray returnDataPeer(JNIEnv *env, std::vector<data> &data)
 
   return arr;
 }
+
+static jobjectArray returnAttributeArray(JNIEnv *env, std::vector<attribute> &array)
+{
+  fprintf(stderr, "in returnContactData\n");
+  fprintf(stderr, "dp_class = %d\n", ap_class);
+  fprintf(stderr, "size = %d\n",array.size());
+  jobjectArray arr = (jobjectArray)env->NewObjectArray(array.size(), ap_class, NULL);
+  fprintf(stderr, "Initialized array\n");
+
+  for (int i = 0; i <array.size(); i++) {
+    fprintf(stderr, "data: name %s, value %s, qualifier:%s\n",
+            array[i].name.c_str(), array[i].value.c_str(),
+            array[i].qualifier.c_str());
+    jobject obj = env->NewObject(ap_class, ap_constructor, 
+                                 returnString(env, array[i].name),
+                                 returnString(env, array[i].value),
+                                 returnString(env, array[i].qualifier));
+    fprintf(stderr, "Created object\n");
+    env->SetObjectArrayElement(arr, i, obj);
+    fprintf(stderr, "Added object\n");
+  }
+
+  return arr;
+}
+
+static jobjectArray returnAttributeListArray(JNIEnv *env, std::vector<attributelist> &array)
+{
+  fprintf(stderr, "in returnContactData\n");
+  fprintf(stderr, "dp_class = %d\n", alp_class);
+  fprintf(stderr, "size = %d\n",array.size());
+  jobjectArray arr = (jobjectArray)env->NewObjectArray(array.size(), alp_class, NULL);
+  fprintf(stderr, "Initialized array\n");
+
+  for (int i = 0; i <array.size(); i++) {
+    fprintf(stderr, "data: grantor %s\n",array[i].grantor.c_str());
+
+    jobject obj = env->NewObject(alp_class, alp_constructor, 
+                                 returnString(env, array[i].grantor),
+                                 returnAttributeArray(env, array[i].attributes));
+    fprintf(stderr, "Created object\n");
+    env->SetObjectArrayElement(arr, i, obj);
+    fprintf(stderr, "Added object\n");
+  }
+
+  return arr;
+}
+
 
 static jobjectArray returnContactData(JNIEnv *env, std::vector<contactdata> &array)
 {
@@ -184,6 +238,7 @@ static jobject returnVomsPeer(JNIEnv *env, voms &v)
   env->SetObjectField(obj, vp_holder,   returnByteArray(env, (const char *)holdbuffer, holdlen));
   env->SetObjectField(obj, vp_issuer,   returnByteArray(env, (const char *)fbuffer, flen));
   env->SetObjectField(obj, vp_uri,      returnString(env, v.uri));
+  env->SetObjectField(obj, vp_attribs,  returnAttributeListArray(env, v.attributes));
   free(fbuffer);
   free(holdbuffer);
 
@@ -513,6 +568,14 @@ Java_org_glite_security_voms_peers_VomsdataPeer_initializer(JNIEnv *env, jclass 
   vp_class       = (jclass)env->NewGlobalRef(tmp);
   fprintf(stderr, "got VomsPeer\n");
 
+  tmp            = env->FindClass("Lorg/glite/security/voms/peers/AttributePeer;");
+  ap_class       = (jclass)env->NewGlobalRef(tmp);
+  fprintf(stderr, "got AttributePeer\n");
+
+  tmp            = env->FindClass("Lorg/glite/security/voms/peers/AttributeListPeer;");
+  alp_class       = (jclass)env->NewGlobalRef(tmp);
+  fprintf(stderr, "got AttributeListPeer\n");
+
   s_constructor = env->GetMethodID(cls, "<init>", "()V");
 
   fprintf(stderr, "got constructor (exiting)\n");
@@ -593,6 +656,7 @@ Java_org_glite_security_voms_peers_VomsPeer_initializer(JNIEnv *env, jclass cls)
   vp_holder   = env->GetFieldID(cls, "holder", "[B");
   vp_issuer   = env->GetFieldID(cls, "issuer", "[B");
   vp_uri      = env->GetFieldID(cls, "uri", "Ljava/lang/String;");
+  vp_attribs  = env->GetFieldID(cls, "attributes", "[Lorg/glite/security/voms/peers/AttributeListPeer;");
 }
 
 JNIEXPORT void JNICALL 
@@ -600,5 +664,19 @@ Java_org_glite_security_voms_peers_DataPeer_initializer(JNIEnv *env, jclass cls)
 {
   cdp_class = (jclass)env->NewGlobalRef(cls);
   cdp_constructor = env->GetMethodID(cls, "<init>", "(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)V");
+}
+
+JNIEXPORT void JNICALL 
+Java_org_glite_security_voms_peers_AttributePeer_initializer(JNIEnv *env, jclass cls)
+{
+  ap_class = (jclass)env->NewGlobalRef(cls);
+  ap_constructor = env->GetMethodID(cls, "<init>", "(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)V");
+}
+
+JNIEXPORT void JNICALL 
+Java_org_glite_security_voms_peers_AttributeListPeer_initializer(JNIEnv *env, jclass cls)
+{
+  alp_class = (jclass)env->NewGlobalRef(cls);
+  alp_constructor = env->GetMethodID(cls, "<init>", "(Ljava/lang/String;[Lorg/glite/security/voms/peers/AttributePeer;)V");
 }
 

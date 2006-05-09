@@ -19,6 +19,7 @@ public final class VomsPeer {
     public  byte[] holder;
     public  byte[] issuer;
     public  String uri;
+    public  AttributeListPeer[] attributes;
     private long d;
 
     native static private synchronized void initializer();
