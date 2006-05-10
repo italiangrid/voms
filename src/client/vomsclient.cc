@@ -727,6 +727,8 @@ bool Client::Run() {
           if (!quiet)
             std::cerr << std::endl << "Error in getting data from VOMS server:" << beg->contact
                       << " (or in memorizing)" << std::endl;
+          if(!noregen)
+            unlink(proxyfile.c_str()); 
           exit(1);
         }
       }
@@ -747,6 +749,8 @@ bool Client::Run() {
           if (!Retrieve(buffer)) {
             std::cerr << "\nError decoding AC." << std::endl;
             std::cerr << "Error: " << v.ErrorMessage() << std::endl;
+            if(!noregen)
+              unlink(proxyfile.c_str()); 
             exit(3);
           }
           
