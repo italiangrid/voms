@@ -76,6 +76,9 @@
 /* Define to 1 if you have the `getpagesize' function. */
 #undef HAVE_GETPAGESIZE
 
+/* Define to 1 if you have the `getpwnam' function. */
+#undef HAVE_GETPWNAM
+
 /* Define to 1 if you have globus_module_activate */
 #undef HAVE_GLOBUS_MODULE_ACTIVATE
 

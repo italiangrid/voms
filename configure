@@ -23420,7 +23420,8 @@ done
 
 
 
-for ac_func in alarm atexit dup2 gethostbyaddr gethostname gethostbyname gethostname memmove memset mkfifo mktime munmap putenv select setenv sigaction socket strchr strdup strerror strndup strrchr strspn strstr strtod strtol strtoul strtoull tzset uname
+
+for ac_func in alarm atexit dup2 gethostbyaddr gethostname gethostbyname gethostname memmove memset mkfifo mktime munmap putenv select setenv sigaction socket strchr strdup strerror strndup strrchr strspn strstr strtod strtol strtoul strtoull tzset uname getpwnam
 do
 as_ac_var=`echo "ac_cv_func_$ac_func" | $as_tr_sh`
 echo "$as_me:$LINENO: checking for $ac_func" >&5

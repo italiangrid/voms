@@ -23,7 +23,9 @@ extern "C" {
 #include <unistd.h>
 #include <sys/types.h>
 #include <sys/stat.h>
-#include <unistd.h>
+#ifdef HAVE_GETPWNAM
+#include <pwd.h>
+#endif
 #include <stdlib.h>
 #include <dirent.h>
 #include "newformat.h"
@@ -749,8 +751,19 @@ bool vomsdata::LoadUserContacts(std::string dir)
       char *home = getenv("HOME");
       if (home)
         dir = std::string(home) + "/.glite/vomses";
-      else
-        dir = "~/.glite/vomses";
+      else {
+#ifdef HAVE_GETPWNAM
+        struct passwd *pw = getpwuid(getuid());
+        if (pw) {
+          dir = std::string(pw->pw_dir) + "/.glite/vomses";
+        }
+        else {
+#endif
+          return false;
+#ifdef HAVE_GETPWNAM
+        }
+#endif
+      }
     }
   }
 
