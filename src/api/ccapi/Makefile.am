@@ -7,12 +7,29 @@ lib_LTLIBRARIES = \
 	libvomsc.la \
 	$(WANTED_API_LIBS) # may add the libraries defined in EXTRA_LTLIBRARIES
 
+if BUILD_JAVA
+CCSOURCES = \
+	api_util.cc \
+	jni-int.cc \
+	voms_api.cc \
+	ccval.cc \
+	cinterface.cc
+else
 CCSOURCES = \
 	api_util.cc \
 	voms_api.cc \
 	ccval.cc \
-	cinterface.cc \
-	jni-int.cc
+	cinterface.cc
+endif
+
+if BUILD_JAVA
+API_INCLUDES = \
+	$(JAVA_INCLUDES) \
+	-I$(top_srcdir)/src/include
+else
+API_INCLUDES = \
+	-I$(top_srcdir)/src/include
+endif
 
 libvomsapi_nog_la_SOURCES = \
 	$(CCSOURCES)
@@ -20,9 +37,7 @@ libvomsapi_nog_la_SOURCES = \
 libvomsapi_nog_la_CPPFLAGS = \
 	$(NO_GLOBUS_FLAGS) \
 	-DNOGLOBUS \
-	-I$(top_srcdir)/src/include \
-	-I$(JAVA_HOME)/include \
-	-I$(JAVA_HOME)/include/linux
+	$(API_INCLUDES)
 
 NOGLIBADD = \
 	$(EXPAT_LIBS) \
@@ -42,8 +57,7 @@ libvomsapi_la_SOURCES = \
 
 libvomsapi_la_CPPFLAGS = \
 	-I$(top_srcdir)/src/include \
-	-I$(JAVA_HOME)/include \
-	-I$(JAVA_HOME)/include/linux \
+	$(API_INCLUDES) \
 	$(GLOBUS_CFLAGS)
 
 CCLIBADD = \
@@ -58,18 +72,27 @@ libvomsapi_la_LIBADD = \
 	$(top_builddir)/src/socklib/libsock.la \
 	$(top_builddir)/src/ac/libccattcert.la
 
+if BUILD_JAVA
 CSOURCES = \
 	api_util.cc \
 	voms_api.cc \
 	ccval.cc \
-	cinterface.cc \
-	jni-int.cc
+	jni-int.cc \
+	cinterface.cc
+else
+CSOURCES = \
+	api_util.cc \
+	voms_api.cc \
+	ccval.cc \
+	cinterface.cc
+endif
 
 libvomsc_la_SOURCES = \
 	$(CSOURCES)
 
 libvomsc_la_CPPFLAGS = \
 	-I$(top_srcdir)/src/include \
+	$(API_INCLUDES) \
 	$(GLOBUS_CFLAGS)
 
 CLIBADD = 
@@ -115,7 +138,7 @@ libvomsapi_gcc32_la_SOURCES = \
 
 libvomsapi_gcc32_la_CPPFLAGS = \
 	-I$(top_srcdir)/src/include \
-	$(GLOBUS_GCC32_CFLAGS)
+	$(API_INCLUDS)
 
 libvomsapi_gcc32_la_LIBADD = \
 	$(CCLIBADD) \
@@ -130,7 +153,8 @@ libvomsapi_gcc32dbg_la_SOURCES = \
 
 libvomsapi_gcc32dbg_la_CPPFLAGS = \
 	-I$(top_srcdir)/src/include \
-	$(GLOBUS_GCC32DBG_CFLAGS)
+	$(GLOBUS_GCC32DBG_CFLAGS) \
+	$(API_INCLUDES)
 
 libvomsapi_gcc32dbg_la_LIBADD = \
 	$(CCLIBADD) \
@@ -145,6 +169,7 @@ libvomsapi_gcc32pthr_la_SOURCES = \
 
 libvomsapi_gcc32pthr_la_CPPFLAGS = \
 	-I$(top_srcdir)/src/include \
+	$(API_INCLUDES) \
 	$(GLOBUS_GCC32PTHR_CFLAGS)
 
 libvomsapi_gcc32pthr_la_LIBADD = \
@@ -160,6 +185,7 @@ libvomsapi_gcc32dbgpthr_la_SOURCES = \
 
 libvomsapi_gcc32dbgpthr_la_CPPFLAGS = \
 	-I$(top_srcdir)/src/include \
+	$(API_INCLUDES) \
 	$(GLOBUS_GCC32DBGPTHR_CFLAGS)
 
 libvomsapi_gcc32dbgpthr_la_LIBADD = \
@@ -175,6 +201,7 @@ libvomsc_gcc32_la_SOURCES = \
 
 libvomsc_gcc32_la_CPPFLAGS = \
 	-I$(top_srcdir)/src/include \
+	$(API_INCLUDES) \
 	$(GLOBUS_CFLAGS)
 
 libvomsc_gcc32_la_LIBADD = \
@@ -190,6 +217,7 @@ libvomsc_gcc32dbg_la_SOURCES = \
 
 libvomsc_gcc32dbg_la_CPPFLAGS = \
 	-I$(top_srcdir)/src/include \
+	$(API_INCLUDES) \
 	$(GLOBUS_CFLAGS)
 
 libvomsc_gcc32dbg_la_LIBADD = \
@@ -205,6 +233,7 @@ libvomsc_gcc32pthr_la_SOURCES = \
 
 libvomsc_gcc32pthr_la_CPPFLAGS = \
 	-I$(top_srcdir)/src/include \
+	$(API_INCLUDES) \
 	$(GLOBUS_CFLAGS)
 
 libvomsc_gcc32pthr_la_LIBADD = \
@@ -220,6 +249,7 @@ libvomsc_gcc32dbgpthr_la_SOURCES = \
 
 libvomsc_gcc32dbgpthr_la_CPPFLAGS = \
 	-I$(top_srcdir)/src/include \
+	$(API_INCLUDES) \
 	$(GLOBUS_CFLAGS)
 
 libvomsc_gcc32dbgpthr_la_LIBADD = \
@@ -238,6 +268,7 @@ libvomsapi_gcc64_la_SOURCES = \
 
 libvomsapi_gcc64_la_CPPFLAGS = \
 	-I$(top_srcdir)/src/include \
+	$(API_INCLUDES) \
 	$(GLOBUS_GCC64_CFLAGS)
 
 libvomsapi_gcc64_la_LIBADD = \
@@ -253,6 +284,7 @@ libvomsapi_gcc64dbg_la_SOURCES = \
 
 libvomsapi_gcc64dbg_la_CPPFLAGS = \
 	-I$(top_srcdir)/src/include \
+	$(API_INCLUDES) \
 	$(GLOBUS_GCC64DBG_CFLAGS)
 
 libvomsapi_gcc64dbg_la_LIBADD = \
@@ -268,6 +300,7 @@ libvomsapi_gcc64pthr_la_SOURCES = \
 
 libvomsapi_gcc64pthr_la_CPPFLAGS = \
 	-I$(top_srcdir)/src/include \
+	$(API_INCLUDES) \
 	$(GLOBUS_GCC64PTHR_CFLAGS)
 
 libvomsapi_gcc64pthr_la_LIBADD = \
@@ -283,6 +316,7 @@ libvomsapi_gcc64dbgpthr_la_SOURCES = \
 
 libvomsapi_gcc64dbgpthr_la_CPPFLAGS = \
 	-I$(top_srcdir)/src/include \
+	$(API_INCLUDES) \
 	$(GLOBUS_GCC64DBGPTHR_CFLAGS)
 
 libvomsapi_gcc64dbgpthr_la_LIBADD = \
@@ -313,6 +347,7 @@ libvomsc_gcc64dbg_la_SOURCES = \
 
 libvomsc_gcc64dbg_la_CPPFLAGS = \
 	-I$(top_srcdir)/src/include \
+	$(API_INCLUDES) \
 	$(GLOBUS_CFLAGS)
 
 libvomsc_gcc64dbg_la_LIBADD = \
@@ -328,6 +363,7 @@ libvomsc_gcc64pthr_la_SOURCES = \
 
 libvomsc_gcc64pthr_la_CPPFLAGS = \
 	-I$(top_srcdir)/src/include \
+	$(API_INCLUDES) \
 	$(GLOBUS_CFLAGS)
 
 libvomsc_gcc64pthr_la_LIBADD = \
@@ -344,6 +380,7 @@ libvomsc_gcc64dbgpthr_la_SOURCES = \
 
 libvomsc_gcc64dbgpthr_la_CPPFLAGS = \
 	-I$(top_srcdir)/src/include \
+	$(API_INCLUDES) \
 	$(GLOBUS_CFLAGS)
 
 libvomsc_gcc64dbgpthr_la_LIBADD = \

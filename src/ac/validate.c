@@ -402,7 +402,7 @@ static int checkAttributes(STACK_OF(AC_ATTR) *atts, struct col *voms, int valids
         if (!name || !value || !qualifier)
           goto err;
 
-        a = malloc(sizeof(struct att*));
+        a = malloc(sizeof(struct att));
         a->name = name;
         a->val  = value;
         a->qual = qualifier;

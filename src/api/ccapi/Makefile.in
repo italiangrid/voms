@@ -71,90 +71,152 @@ am__DEPENDENCIES_2 = $(am__DEPENDENCIES_1) \
 libvomsapi_la_DEPENDENCIES = $(am__DEPENDENCIES_2) \
 	$(top_builddir)/src/socklib/libsock.la \
 	$(top_builddir)/src/ac/libccattcert.la
-am__objects_1 = libvomsapi_la-api_util.lo libvomsapi_la-voms_api.lo \
-	libvomsapi_la-ccval.lo libvomsapi_la-cinterface.lo \
-	libvomsapi_la-jni-int.lo
+am__libvomsapi_la_SOURCES_DIST = api_util.cc voms_api.cc ccval.cc \
+	cinterface.cc jni-int.cc
+@BUILD_JAVA_FALSE@am__objects_1 = libvomsapi_la-api_util.lo \
+@BUILD_JAVA_FALSE@	libvomsapi_la-voms_api.lo \
+@BUILD_JAVA_FALSE@	libvomsapi_la-ccval.lo \
+@BUILD_JAVA_FALSE@	libvomsapi_la-cinterface.lo
+@BUILD_JAVA_TRUE@am__objects_1 = libvomsapi_la-api_util.lo \
+@BUILD_JAVA_TRUE@	libvomsapi_la-jni-int.lo \
+@BUILD_JAVA_TRUE@	libvomsapi_la-voms_api.lo \
+@BUILD_JAVA_TRUE@	libvomsapi_la-ccval.lo \
+@BUILD_JAVA_TRUE@	libvomsapi_la-cinterface.lo
 am_libvomsapi_la_OBJECTS = $(am__objects_1)
 libvomsapi_la_OBJECTS = $(am_libvomsapi_la_OBJECTS)
 libvomsapi_gcc32_la_DEPENDENCIES = $(am__DEPENDENCIES_2) \
 	$(top_builddir)/src/socklib/libsock_gcc32.la \
 	$(top_builddir)/src/ac/libccattcert_gcc32.la
-am__objects_2 = libvomsapi_gcc32_la-api_util.lo \
-	libvomsapi_gcc32_la-voms_api.lo libvomsapi_gcc32_la-ccval.lo \
-	libvomsapi_gcc32_la-cinterface.lo \
-	libvomsapi_gcc32_la-jni-int.lo
+am__libvomsapi_gcc32_la_SOURCES_DIST = api_util.cc voms_api.cc \
+	ccval.cc cinterface.cc jni-int.cc
+@BUILD_JAVA_FALSE@am__objects_2 = libvomsapi_gcc32_la-api_util.lo \
+@BUILD_JAVA_FALSE@	libvomsapi_gcc32_la-voms_api.lo \
+@BUILD_JAVA_FALSE@	libvomsapi_gcc32_la-ccval.lo \
+@BUILD_JAVA_FALSE@	libvomsapi_gcc32_la-cinterface.lo
+@BUILD_JAVA_TRUE@am__objects_2 = libvomsapi_gcc32_la-api_util.lo \
+@BUILD_JAVA_TRUE@	libvomsapi_gcc32_la-jni-int.lo \
+@BUILD_JAVA_TRUE@	libvomsapi_gcc32_la-voms_api.lo \
+@BUILD_JAVA_TRUE@	libvomsapi_gcc32_la-ccval.lo \
+@BUILD_JAVA_TRUE@	libvomsapi_gcc32_la-cinterface.lo
 am_libvomsapi_gcc32_la_OBJECTS = $(am__objects_2)
 libvomsapi_gcc32_la_OBJECTS = $(am_libvomsapi_gcc32_la_OBJECTS)
 libvomsapi_gcc32dbg_la_DEPENDENCIES = $(am__DEPENDENCIES_2) \
 	$(top_builddir)/src/socklib/libsock_gcc32dbg.la \
 	$(top_builddir)/src/ac/libccattcert_gcc32dbg.la
-am__objects_3 = libvomsapi_gcc32dbg_la-api_util.lo \
-	libvomsapi_gcc32dbg_la-voms_api.lo \
-	libvomsapi_gcc32dbg_la-ccval.lo \
-	libvomsapi_gcc32dbg_la-cinterface.lo \
-	libvomsapi_gcc32dbg_la-jni-int.lo
+am__libvomsapi_gcc32dbg_la_SOURCES_DIST = api_util.cc voms_api.cc \
+	ccval.cc cinterface.cc jni-int.cc
+@BUILD_JAVA_FALSE@am__objects_3 = libvomsapi_gcc32dbg_la-api_util.lo \
+@BUILD_JAVA_FALSE@	libvomsapi_gcc32dbg_la-voms_api.lo \
+@BUILD_JAVA_FALSE@	libvomsapi_gcc32dbg_la-ccval.lo \
+@BUILD_JAVA_FALSE@	libvomsapi_gcc32dbg_la-cinterface.lo
+@BUILD_JAVA_TRUE@am__objects_3 = libvomsapi_gcc32dbg_la-api_util.lo \
+@BUILD_JAVA_TRUE@	libvomsapi_gcc32dbg_la-jni-int.lo \
+@BUILD_JAVA_TRUE@	libvomsapi_gcc32dbg_la-voms_api.lo \
+@BUILD_JAVA_TRUE@	libvomsapi_gcc32dbg_la-ccval.lo \
+@BUILD_JAVA_TRUE@	libvomsapi_gcc32dbg_la-cinterface.lo
 am_libvomsapi_gcc32dbg_la_OBJECTS = $(am__objects_3)
 libvomsapi_gcc32dbg_la_OBJECTS = $(am_libvomsapi_gcc32dbg_la_OBJECTS)
 libvomsapi_gcc32dbgpthr_la_DEPENDENCIES = $(am__DEPENDENCIES_2) \
 	$(top_builddir)/src/socklib/libsock_gcc32dbgpthr.la \
 	$(top_builddir)/src/ac/libccattcert_gcc32dbgpthr.la
-am__objects_4 = libvomsapi_gcc32dbgpthr_la-api_util.lo \
-	libvomsapi_gcc32dbgpthr_la-voms_api.lo \
-	libvomsapi_gcc32dbgpthr_la-ccval.lo \
-	libvomsapi_gcc32dbgpthr_la-cinterface.lo \
-	libvomsapi_gcc32dbgpthr_la-jni-int.lo
+am__libvomsapi_gcc32dbgpthr_la_SOURCES_DIST = api_util.cc voms_api.cc \
+	ccval.cc cinterface.cc jni-int.cc
+@BUILD_JAVA_FALSE@am__objects_4 =  \
+@BUILD_JAVA_FALSE@	libvomsapi_gcc32dbgpthr_la-api_util.lo \
+@BUILD_JAVA_FALSE@	libvomsapi_gcc32dbgpthr_la-voms_api.lo \
+@BUILD_JAVA_FALSE@	libvomsapi_gcc32dbgpthr_la-ccval.lo \
+@BUILD_JAVA_FALSE@	libvomsapi_gcc32dbgpthr_la-cinterface.lo
+@BUILD_JAVA_TRUE@am__objects_4 =  \
+@BUILD_JAVA_TRUE@	libvomsapi_gcc32dbgpthr_la-api_util.lo \
+@BUILD_JAVA_TRUE@	libvomsapi_gcc32dbgpthr_la-jni-int.lo \
+@BUILD_JAVA_TRUE@	libvomsapi_gcc32dbgpthr_la-voms_api.lo \
+@BUILD_JAVA_TRUE@	libvomsapi_gcc32dbgpthr_la-ccval.lo \
+@BUILD_JAVA_TRUE@	libvomsapi_gcc32dbgpthr_la-cinterface.lo
 am_libvomsapi_gcc32dbgpthr_la_OBJECTS = $(am__objects_4)
 libvomsapi_gcc32dbgpthr_la_OBJECTS =  \
 	$(am_libvomsapi_gcc32dbgpthr_la_OBJECTS)
 libvomsapi_gcc32pthr_la_DEPENDENCIES = $(am__DEPENDENCIES_2) \
 	$(top_builddir)/src/socklib/libsock_gcc32pthr.la \
 	$(top_builddir)/src/ac/libccattcert_gcc32pthr.la
-am__objects_5 = libvomsapi_gcc32pthr_la-api_util.lo \
-	libvomsapi_gcc32pthr_la-voms_api.lo \
-	libvomsapi_gcc32pthr_la-ccval.lo \
-	libvomsapi_gcc32pthr_la-cinterface.lo \
-	libvomsapi_gcc32pthr_la-jni-int.lo
+am__libvomsapi_gcc32pthr_la_SOURCES_DIST = api_util.cc voms_api.cc \
+	ccval.cc cinterface.cc jni-int.cc
+@BUILD_JAVA_FALSE@am__objects_5 = libvomsapi_gcc32pthr_la-api_util.lo \
+@BUILD_JAVA_FALSE@	libvomsapi_gcc32pthr_la-voms_api.lo \
+@BUILD_JAVA_FALSE@	libvomsapi_gcc32pthr_la-ccval.lo \
+@BUILD_JAVA_FALSE@	libvomsapi_gcc32pthr_la-cinterface.lo
+@BUILD_JAVA_TRUE@am__objects_5 = libvomsapi_gcc32pthr_la-api_util.lo \
+@BUILD_JAVA_TRUE@	libvomsapi_gcc32pthr_la-jni-int.lo \
+@BUILD_JAVA_TRUE@	libvomsapi_gcc32pthr_la-voms_api.lo \
+@BUILD_JAVA_TRUE@	libvomsapi_gcc32pthr_la-ccval.lo \
+@BUILD_JAVA_TRUE@	libvomsapi_gcc32pthr_la-cinterface.lo
 am_libvomsapi_gcc32pthr_la_OBJECTS = $(am__objects_5)
 libvomsapi_gcc32pthr_la_OBJECTS =  \
 	$(am_libvomsapi_gcc32pthr_la_OBJECTS)
 libvomsapi_gcc64_la_DEPENDENCIES = $(am__DEPENDENCIES_2) \
 	$(top_builddir)/src/socklib/libsock_gcc64.la \
 	$(top_builddir)/src/ac/libccattcert_gcc64.la
-am__objects_6 = libvomsapi_gcc64_la-api_util.lo \
-	libvomsapi_gcc64_la-voms_api.lo libvomsapi_gcc64_la-ccval.lo \
-	libvomsapi_gcc64_la-cinterface.lo \
-	libvomsapi_gcc64_la-jni-int.lo
+am__libvomsapi_gcc64_la_SOURCES_DIST = api_util.cc voms_api.cc \
+	ccval.cc cinterface.cc jni-int.cc
+@BUILD_JAVA_FALSE@am__objects_6 = libvomsapi_gcc64_la-api_util.lo \
+@BUILD_JAVA_FALSE@	libvomsapi_gcc64_la-voms_api.lo \
+@BUILD_JAVA_FALSE@	libvomsapi_gcc64_la-ccval.lo \
+@BUILD_JAVA_FALSE@	libvomsapi_gcc64_la-cinterface.lo
+@BUILD_JAVA_TRUE@am__objects_6 = libvomsapi_gcc64_la-api_util.lo \
+@BUILD_JAVA_TRUE@	libvomsapi_gcc64_la-jni-int.lo \
+@BUILD_JAVA_TRUE@	libvomsapi_gcc64_la-voms_api.lo \
+@BUILD_JAVA_TRUE@	libvomsapi_gcc64_la-ccval.lo \
+@BUILD_JAVA_TRUE@	libvomsapi_gcc64_la-cinterface.lo
 am_libvomsapi_gcc64_la_OBJECTS = $(am__objects_6)
 libvomsapi_gcc64_la_OBJECTS = $(am_libvomsapi_gcc64_la_OBJECTS)
 libvomsapi_gcc64dbg_la_DEPENDENCIES = $(am__DEPENDENCIES_2) \
 	$(top_builddir)/src/socklib/libsock_gcc64dbg.la \
 	$(top_builddir)/src/ac/libccattcert_gcc64dbg.la
-am__objects_7 = libvomsapi_gcc64dbg_la-api_util.lo \
-	libvomsapi_gcc64dbg_la-voms_api.lo \
-	libvomsapi_gcc64dbg_la-ccval.lo \
-	libvomsapi_gcc64dbg_la-cinterface.lo \
-	libvomsapi_gcc64dbg_la-jni-int.lo
+am__libvomsapi_gcc64dbg_la_SOURCES_DIST = api_util.cc voms_api.cc \
+	ccval.cc cinterface.cc jni-int.cc
+@BUILD_JAVA_FALSE@am__objects_7 = libvomsapi_gcc64dbg_la-api_util.lo \
+@BUILD_JAVA_FALSE@	libvomsapi_gcc64dbg_la-voms_api.lo \
+@BUILD_JAVA_FALSE@	libvomsapi_gcc64dbg_la-ccval.lo \
+@BUILD_JAVA_FALSE@	libvomsapi_gcc64dbg_la-cinterface.lo
+@BUILD_JAVA_TRUE@am__objects_7 = libvomsapi_gcc64dbg_la-api_util.lo \
+@BUILD_JAVA_TRUE@	libvomsapi_gcc64dbg_la-jni-int.lo \
+@BUILD_JAVA_TRUE@	libvomsapi_gcc64dbg_la-voms_api.lo \
+@BUILD_JAVA_TRUE@	libvomsapi_gcc64dbg_la-ccval.lo \
+@BUILD_JAVA_TRUE@	libvomsapi_gcc64dbg_la-cinterface.lo
 am_libvomsapi_gcc64dbg_la_OBJECTS = $(am__objects_7)
 libvomsapi_gcc64dbg_la_OBJECTS = $(am_libvomsapi_gcc64dbg_la_OBJECTS)
 libvomsapi_gcc64dbgpthr_la_DEPENDENCIES = $(am__DEPENDENCIES_2) \
 	$(top_builddir)/src/socklib/libsock_gcc64dbgpthr.la \
 	$(top_builddir)/src/ac/libccattcert_gcc64dbgpthr.la
-am__objects_8 = libvomsapi_gcc64dbgpthr_la-api_util.lo \
-	libvomsapi_gcc64dbgpthr_la-voms_api.lo \
-	libvomsapi_gcc64dbgpthr_la-ccval.lo \
-	libvomsapi_gcc64dbgpthr_la-cinterface.lo \
-	libvomsapi_gcc64dbgpthr_la-jni-int.lo
+am__libvomsapi_gcc64dbgpthr_la_SOURCES_DIST = api_util.cc voms_api.cc \
+	ccval.cc cinterface.cc jni-int.cc
+@BUILD_JAVA_FALSE@am__objects_8 =  \
+@BUILD_JAVA_FALSE@	libvomsapi_gcc64dbgpthr_la-api_util.lo \
+@BUILD_JAVA_FALSE@	libvomsapi_gcc64dbgpthr_la-voms_api.lo \
+@BUILD_JAVA_FALSE@	libvomsapi_gcc64dbgpthr_la-ccval.lo \
+@BUILD_JAVA_FALSE@	libvomsapi_gcc64dbgpthr_la-cinterface.lo
+@BUILD_JAVA_TRUE@am__objects_8 =  \
+@BUILD_JAVA_TRUE@	libvomsapi_gcc64dbgpthr_la-api_util.lo \
+@BUILD_JAVA_TRUE@	libvomsapi_gcc64dbgpthr_la-jni-int.lo \
+@BUILD_JAVA_TRUE@	libvomsapi_gcc64dbgpthr_la-voms_api.lo \
+@BUILD_JAVA_TRUE@	libvomsapi_gcc64dbgpthr_la-ccval.lo \
+@BUILD_JAVA_TRUE@	libvomsapi_gcc64dbgpthr_la-cinterface.lo
 am_libvomsapi_gcc64dbgpthr_la_OBJECTS = $(am__objects_8)
 libvomsapi_gcc64dbgpthr_la_OBJECTS =  \
 	$(am_libvomsapi_gcc64dbgpthr_la_OBJECTS)
 libvomsapi_gcc64pthr_la_DEPENDENCIES = $(am__DEPENDENCIES_2) \
 	$(top_builddir)/src/socklib/libsock_gcc64pthr.la \
 	$(top_builddir)/src/ac/libccattcert_gcc64pthr.la
-am__objects_9 = libvomsapi_gcc64pthr_la-api_util.lo \
-	libvomsapi_gcc64pthr_la-voms_api.lo \
-	libvomsapi_gcc64pthr_la-ccval.lo \
-	libvomsapi_gcc64pthr_la-cinterface.lo \
-	libvomsapi_gcc64pthr_la-jni-int.lo
+am__libvomsapi_gcc64pthr_la_SOURCES_DIST = api_util.cc voms_api.cc \
+	ccval.cc cinterface.cc jni-int.cc
+@BUILD_JAVA_FALSE@am__objects_9 = libvomsapi_gcc64pthr_la-api_util.lo \
+@BUILD_JAVA_FALSE@	libvomsapi_gcc64pthr_la-voms_api.lo \
+@BUILD_JAVA_FALSE@	libvomsapi_gcc64pthr_la-ccval.lo \
+@BUILD_JAVA_FALSE@	libvomsapi_gcc64pthr_la-cinterface.lo
+@BUILD_JAVA_TRUE@am__objects_9 = libvomsapi_gcc64pthr_la-api_util.lo \
+@BUILD_JAVA_TRUE@	libvomsapi_gcc64pthr_la-jni-int.lo \
+@BUILD_JAVA_TRUE@	libvomsapi_gcc64pthr_la-voms_api.lo \
+@BUILD_JAVA_TRUE@	libvomsapi_gcc64pthr_la-ccval.lo \
+@BUILD_JAVA_TRUE@	libvomsapi_gcc64pthr_la-cinterface.lo
 am_libvomsapi_gcc64pthr_la_OBJECTS = $(am__objects_9)
 libvomsapi_gcc64pthr_la_OBJECTS =  \
 	$(am_libvomsapi_gcc64pthr_la_OBJECTS)
@@ -166,93 +228,165 @@ am__DEPENDENCIES_3 = $(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1) \
 	$(top_builddir)/src/log/liblog.la
 libvomsapi_nog_la_DEPENDENCIES = $(am__DEPENDENCIES_3) \
 	$(top_builddir)/src/ac/libattributes_nog.la
-am__objects_10 = libvomsapi_nog_la-api_util.lo \
-	libvomsapi_nog_la-voms_api.lo libvomsapi_nog_la-ccval.lo \
-	libvomsapi_nog_la-cinterface.lo libvomsapi_nog_la-jni-int.lo
+am__libvomsapi_nog_la_SOURCES_DIST = api_util.cc voms_api.cc ccval.cc \
+	cinterface.cc jni-int.cc
+@BUILD_JAVA_FALSE@am__objects_10 = libvomsapi_nog_la-api_util.lo \
+@BUILD_JAVA_FALSE@	libvomsapi_nog_la-voms_api.lo \
+@BUILD_JAVA_FALSE@	libvomsapi_nog_la-ccval.lo \
+@BUILD_JAVA_FALSE@	libvomsapi_nog_la-cinterface.lo
+@BUILD_JAVA_TRUE@am__objects_10 = libvomsapi_nog_la-api_util.lo \
+@BUILD_JAVA_TRUE@	libvomsapi_nog_la-jni-int.lo \
+@BUILD_JAVA_TRUE@	libvomsapi_nog_la-voms_api.lo \
+@BUILD_JAVA_TRUE@	libvomsapi_nog_la-ccval.lo \
+@BUILD_JAVA_TRUE@	libvomsapi_nog_la-cinterface.lo
 am_libvomsapi_nog_la_OBJECTS = $(am__objects_10)
 libvomsapi_nog_la_OBJECTS = $(am_libvomsapi_nog_la_OBJECTS)
 libvomsc_la_DEPENDENCIES = $(am__DEPENDENCIES_2) \
 	$(top_builddir)/src/socklib/libsock.la \
 	$(top_builddir)/src/ac/libccattcert.la
-am__objects_11 = libvomsc_la-api_util.lo libvomsc_la-voms_api.lo \
-	libvomsc_la-ccval.lo libvomsc_la-cinterface.lo \
-	libvomsc_la-jni-int.lo
+am__libvomsc_la_SOURCES_DIST = api_util.cc voms_api.cc ccval.cc \
+	cinterface.cc jni-int.cc
+@BUILD_JAVA_FALSE@am__objects_11 = libvomsc_la-api_util.lo \
+@BUILD_JAVA_FALSE@	libvomsc_la-voms_api.lo libvomsc_la-ccval.lo \
+@BUILD_JAVA_FALSE@	libvomsc_la-cinterface.lo
+@BUILD_JAVA_TRUE@am__objects_11 = libvomsc_la-api_util.lo \
+@BUILD_JAVA_TRUE@	libvomsc_la-voms_api.lo libvomsc_la-ccval.lo \
+@BUILD_JAVA_TRUE@	libvomsc_la-jni-int.lo \
+@BUILD_JAVA_TRUE@	libvomsc_la-cinterface.lo
 am_libvomsc_la_OBJECTS = $(am__objects_11)
 libvomsc_la_OBJECTS = $(am_libvomsc_la_OBJECTS)
 libvomsc_gcc32_la_DEPENDENCIES = $(am__DEPENDENCIES_2) \
 	$(top_builddir)/src/socklib/libsock_gcc32.la \
 	$(top_builddir)/src/ac/libccattcert_gcc32.la
-am__objects_12 = libvomsc_gcc32_la-api_util.lo \
-	libvomsc_gcc32_la-voms_api.lo libvomsc_gcc32_la-ccval.lo \
-	libvomsc_gcc32_la-cinterface.lo libvomsc_gcc32_la-jni-int.lo
+am__libvomsc_gcc32_la_SOURCES_DIST = api_util.cc voms_api.cc ccval.cc \
+	cinterface.cc jni-int.cc
+@BUILD_JAVA_FALSE@am__objects_12 = libvomsc_gcc32_la-api_util.lo \
+@BUILD_JAVA_FALSE@	libvomsc_gcc32_la-voms_api.lo \
+@BUILD_JAVA_FALSE@	libvomsc_gcc32_la-ccval.lo \
+@BUILD_JAVA_FALSE@	libvomsc_gcc32_la-cinterface.lo
+@BUILD_JAVA_TRUE@am__objects_12 = libvomsc_gcc32_la-api_util.lo \
+@BUILD_JAVA_TRUE@	libvomsc_gcc32_la-voms_api.lo \
+@BUILD_JAVA_TRUE@	libvomsc_gcc32_la-ccval.lo \
+@BUILD_JAVA_TRUE@	libvomsc_gcc32_la-jni-int.lo \
+@BUILD_JAVA_TRUE@	libvomsc_gcc32_la-cinterface.lo
 am_libvomsc_gcc32_la_OBJECTS = $(am__objects_12)
 libvomsc_gcc32_la_OBJECTS = $(am_libvomsc_gcc32_la_OBJECTS)
 libvomsc_gcc32dbg_la_DEPENDENCIES = $(am__DEPENDENCIES_2) \
 	$(top_builddir)/src/socklib/libsock_gcc32dbg.la \
 	$(top_builddir)/src/ac/libccattcert_gcc32dbg.la
-am__objects_13 = libvomsc_gcc32dbg_la-api_util.lo \
-	libvomsc_gcc32dbg_la-voms_api.lo libvomsc_gcc32dbg_la-ccval.lo \
-	libvomsc_gcc32dbg_la-cinterface.lo \
-	libvomsc_gcc32dbg_la-jni-int.lo
+am__libvomsc_gcc32dbg_la_SOURCES_DIST = api_util.cc voms_api.cc \
+	ccval.cc cinterface.cc jni-int.cc
+@BUILD_JAVA_FALSE@am__objects_13 = libvomsc_gcc32dbg_la-api_util.lo \
+@BUILD_JAVA_FALSE@	libvomsc_gcc32dbg_la-voms_api.lo \
+@BUILD_JAVA_FALSE@	libvomsc_gcc32dbg_la-ccval.lo \
+@BUILD_JAVA_FALSE@	libvomsc_gcc32dbg_la-cinterface.lo
+@BUILD_JAVA_TRUE@am__objects_13 = libvomsc_gcc32dbg_la-api_util.lo \
+@BUILD_JAVA_TRUE@	libvomsc_gcc32dbg_la-voms_api.lo \
+@BUILD_JAVA_TRUE@	libvomsc_gcc32dbg_la-ccval.lo \
+@BUILD_JAVA_TRUE@	libvomsc_gcc32dbg_la-jni-int.lo \
+@BUILD_JAVA_TRUE@	libvomsc_gcc32dbg_la-cinterface.lo
 am_libvomsc_gcc32dbg_la_OBJECTS = $(am__objects_13)
 libvomsc_gcc32dbg_la_OBJECTS = $(am_libvomsc_gcc32dbg_la_OBJECTS)
 libvomsc_gcc32dbgpthr_la_DEPENDENCIES = $(am__DEPENDENCIES_2) \
 	$(top_builddir)/src/socklib/libsock_gcc32dbgpthr.la \
 	$(top_builddir)/src/ac/libccattcert_gcc32dbgpthr.la
-am__objects_14 = libvomsc_gcc32dbgpthr_la-api_util.lo \
-	libvomsc_gcc32dbgpthr_la-voms_api.lo \
-	libvomsc_gcc32dbgpthr_la-ccval.lo \
-	libvomsc_gcc32dbgpthr_la-cinterface.lo \
-	libvomsc_gcc32dbgpthr_la-jni-int.lo
+am__libvomsc_gcc32dbgpthr_la_SOURCES_DIST = api_util.cc voms_api.cc \
+	ccval.cc cinterface.cc jni-int.cc
+@BUILD_JAVA_FALSE@am__objects_14 =  \
+@BUILD_JAVA_FALSE@	libvomsc_gcc32dbgpthr_la-api_util.lo \
+@BUILD_JAVA_FALSE@	libvomsc_gcc32dbgpthr_la-voms_api.lo \
+@BUILD_JAVA_FALSE@	libvomsc_gcc32dbgpthr_la-ccval.lo \
+@BUILD_JAVA_FALSE@	libvomsc_gcc32dbgpthr_la-cinterface.lo
+@BUILD_JAVA_TRUE@am__objects_14 =  \
+@BUILD_JAVA_TRUE@	libvomsc_gcc32dbgpthr_la-api_util.lo \
+@BUILD_JAVA_TRUE@	libvomsc_gcc32dbgpthr_la-voms_api.lo \
+@BUILD_JAVA_TRUE@	libvomsc_gcc32dbgpthr_la-ccval.lo \
+@BUILD_JAVA_TRUE@	libvomsc_gcc32dbgpthr_la-jni-int.lo \
+@BUILD_JAVA_TRUE@	libvomsc_gcc32dbgpthr_la-cinterface.lo
 am_libvomsc_gcc32dbgpthr_la_OBJECTS = $(am__objects_14)
 libvomsc_gcc32dbgpthr_la_OBJECTS =  \
 	$(am_libvomsc_gcc32dbgpthr_la_OBJECTS)
 libvomsc_gcc32pthr_la_DEPENDENCIES = $(am__DEPENDENCIES_2) \
 	$(top_builddir)/src/socklib/libsock_gcc32pthr.la \
 	$(top_builddir)/src/ac/libccattcert_gcc32pthr.la
-am__objects_15 = libvomsc_gcc32pthr_la-api_util.lo \
-	libvomsc_gcc32pthr_la-voms_api.lo \
-	libvomsc_gcc32pthr_la-ccval.lo \
-	libvomsc_gcc32pthr_la-cinterface.lo \
-	libvomsc_gcc32pthr_la-jni-int.lo
+am__libvomsc_gcc32pthr_la_SOURCES_DIST = api_util.cc voms_api.cc \
+	ccval.cc cinterface.cc jni-int.cc
+@BUILD_JAVA_FALSE@am__objects_15 = libvomsc_gcc32pthr_la-api_util.lo \
+@BUILD_JAVA_FALSE@	libvomsc_gcc32pthr_la-voms_api.lo \
+@BUILD_JAVA_FALSE@	libvomsc_gcc32pthr_la-ccval.lo \
+@BUILD_JAVA_FALSE@	libvomsc_gcc32pthr_la-cinterface.lo
+@BUILD_JAVA_TRUE@am__objects_15 = libvomsc_gcc32pthr_la-api_util.lo \
+@BUILD_JAVA_TRUE@	libvomsc_gcc32pthr_la-voms_api.lo \
+@BUILD_JAVA_TRUE@	libvomsc_gcc32pthr_la-ccval.lo \
+@BUILD_JAVA_TRUE@	libvomsc_gcc32pthr_la-jni-int.lo \
+@BUILD_JAVA_TRUE@	libvomsc_gcc32pthr_la-cinterface.lo
 am_libvomsc_gcc32pthr_la_OBJECTS = $(am__objects_15)
 libvomsc_gcc32pthr_la_OBJECTS = $(am_libvomsc_gcc32pthr_la_OBJECTS)
 libvomsc_gcc64_la_DEPENDENCIES = $(am__DEPENDENCIES_2) \
 	$(top_builddir)/src/socklib/libsock_gcc64.la \
 	$(top_builddir)/src/ac/libccattcert_gcc64.la
-am__objects_16 = libvomsc_gcc64_la-api_util.lo \
-	libvomsc_gcc64_la-voms_api.lo libvomsc_gcc64_la-ccval.lo \
-	libvomsc_gcc64_la-cinterface.lo libvomsc_gcc64_la-jni-int.lo
+am__libvomsc_gcc64_la_SOURCES_DIST = api_util.cc voms_api.cc ccval.cc \
+	cinterface.cc jni-int.cc
+@BUILD_JAVA_FALSE@am__objects_16 = libvomsc_gcc64_la-api_util.lo \
+@BUILD_JAVA_FALSE@	libvomsc_gcc64_la-voms_api.lo \
+@BUILD_JAVA_FALSE@	libvomsc_gcc64_la-ccval.lo \
+@BUILD_JAVA_FALSE@	libvomsc_gcc64_la-cinterface.lo
+@BUILD_JAVA_TRUE@am__objects_16 = libvomsc_gcc64_la-api_util.lo \
+@BUILD_JAVA_TRUE@	libvomsc_gcc64_la-voms_api.lo \
+@BUILD_JAVA_TRUE@	libvomsc_gcc64_la-ccval.lo \
+@BUILD_JAVA_TRUE@	libvomsc_gcc64_la-jni-int.lo \
+@BUILD_JAVA_TRUE@	libvomsc_gcc64_la-cinterface.lo
 am_libvomsc_gcc64_la_OBJECTS = $(am__objects_16)
 libvomsc_gcc64_la_OBJECTS = $(am_libvomsc_gcc64_la_OBJECTS)
 libvomsc_gcc64dbg_la_DEPENDENCIES = $(am__DEPENDENCIES_2) \
 	$(top_builddir)/src/socklib/libsock_gcc64dbg.la \
 	$(top_builddir)/src/ac/libccattcert_gcc64dbg.la
-am__objects_17 = libvomsc_gcc64dbg_la-api_util.lo \
-	libvomsc_gcc64dbg_la-voms_api.lo libvomsc_gcc64dbg_la-ccval.lo \
-	libvomsc_gcc64dbg_la-cinterface.lo \
-	libvomsc_gcc64dbg_la-jni-int.lo
+am__libvomsc_gcc64dbg_la_SOURCES_DIST = api_util.cc voms_api.cc \
+	ccval.cc cinterface.cc jni-int.cc
+@BUILD_JAVA_FALSE@am__objects_17 = libvomsc_gcc64dbg_la-api_util.lo \
+@BUILD_JAVA_FALSE@	libvomsc_gcc64dbg_la-voms_api.lo \
+@BUILD_JAVA_FALSE@	libvomsc_gcc64dbg_la-ccval.lo \
+@BUILD_JAVA_FALSE@	libvomsc_gcc64dbg_la-cinterface.lo
+@BUILD_JAVA_TRUE@am__objects_17 = libvomsc_gcc64dbg_la-api_util.lo \
+@BUILD_JAVA_TRUE@	libvomsc_gcc64dbg_la-voms_api.lo \
+@BUILD_JAVA_TRUE@	libvomsc_gcc64dbg_la-ccval.lo \
+@BUILD_JAVA_TRUE@	libvomsc_gcc64dbg_la-jni-int.lo \
+@BUILD_JAVA_TRUE@	libvomsc_gcc64dbg_la-cinterface.lo
 am_libvomsc_gcc64dbg_la_OBJECTS = $(am__objects_17)
 libvomsc_gcc64dbg_la_OBJECTS = $(am_libvomsc_gcc64dbg_la_OBJECTS)
 libvomsc_gcc64dbgpthr_la_DEPENDENCIES = $(am__DEPENDENCIES_2) \
 	$(top_builddir)/src/socklib/libsock_gcc64dbgpthr.la \
 	$(top_builddir)/src/ac/libccattcert_gcc64dbgpthr.la
-am__objects_18 = libvomsc_gcc64dbgpthr_la-api_util.lo \
-	libvomsc_gcc64dbgpthr_la-voms_api.lo \
-	libvomsc_gcc64dbgpthr_la-ccval.lo \
-	libvomsc_gcc64dbgpthr_la-cinterface.lo \
-	libvomsc_gcc64dbgpthr_la-jni-int.lo
+am__libvomsc_gcc64dbgpthr_la_SOURCES_DIST = api_util.cc voms_api.cc \
+	ccval.cc cinterface.cc jni-int.cc
+@BUILD_JAVA_FALSE@am__objects_18 =  \
+@BUILD_JAVA_FALSE@	libvomsc_gcc64dbgpthr_la-api_util.lo \
+@BUILD_JAVA_FALSE@	libvomsc_gcc64dbgpthr_la-voms_api.lo \
+@BUILD_JAVA_FALSE@	libvomsc_gcc64dbgpthr_la-ccval.lo \
+@BUILD_JAVA_FALSE@	libvomsc_gcc64dbgpthr_la-cinterface.lo
+@BUILD_JAVA_TRUE@am__objects_18 =  \
+@BUILD_JAVA_TRUE@	libvomsc_gcc64dbgpthr_la-api_util.lo \
+@BUILD_JAVA_TRUE@	libvomsc_gcc64dbgpthr_la-voms_api.lo \
+@BUILD_JAVA_TRUE@	libvomsc_gcc64dbgpthr_la-ccval.lo \
+@BUILD_JAVA_TRUE@	libvomsc_gcc64dbgpthr_la-jni-int.lo \
+@BUILD_JAVA_TRUE@	libvomsc_gcc64dbgpthr_la-cinterface.lo
 am_libvomsc_gcc64dbgpthr_la_OBJECTS = $(am__objects_18)
 libvomsc_gcc64dbgpthr_la_OBJECTS =  \
 	$(am_libvomsc_gcc64dbgpthr_la_OBJECTS)
 libvomsc_gcc64pthr_la_DEPENDENCIES = $(am__DEPENDENCIES_2) \
 	$(top_builddir)/src/socklib/libsock_gcc64pthr.la \
 	$(top_builddir)/src/ac/libccattcert_gcc64pthr.la
-am__objects_19 = libvomsc_gcc64pthr_la-api_util.lo \
-	libvomsc_gcc64pthr_la-voms_api.lo \
-	libvomsc_gcc64pthr_la-ccval.lo \
-	libvomsc_gcc64pthr_la-cinterface.lo \
-	libvomsc_gcc64pthr_la-jni-int.lo
+am__libvomsc_gcc64pthr_la_SOURCES_DIST = api_util.cc voms_api.cc \
+	ccval.cc cinterface.cc jni-int.cc
+@BUILD_JAVA_FALSE@am__objects_19 = libvomsc_gcc64pthr_la-api_util.lo \
+@BUILD_JAVA_FALSE@	libvomsc_gcc64pthr_la-voms_api.lo \
+@BUILD_JAVA_FALSE@	libvomsc_gcc64pthr_la-ccval.lo \
+@BUILD_JAVA_FALSE@	libvomsc_gcc64pthr_la-cinterface.lo
+@BUILD_JAVA_TRUE@am__objects_19 = libvomsc_gcc64pthr_la-api_util.lo \
+@BUILD_JAVA_TRUE@	libvomsc_gcc64pthr_la-voms_api.lo \
+@BUILD_JAVA_TRUE@	libvomsc_gcc64pthr_la-ccval.lo \
+@BUILD_JAVA_TRUE@	libvomsc_gcc64pthr_la-jni-int.lo \
+@BUILD_JAVA_TRUE@	libvomsc_gcc64pthr_la-cinterface.lo
 am_libvomsc_gcc64pthr_la_OBJECTS = $(am__objects_19)
 libvomsc_gcc64pthr_la_OBJECTS = $(am_libvomsc_gcc64pthr_la_OBJECTS)
 PROGRAMS = $(noinst_PROGRAMS)
@@ -297,21 +431,25 @@ SOURCES = $(libvomsapi_la_SOURCES) $(libvomsapi_gcc32_la_SOURCES) \
 	$(libvomsc_gcc64dbgpthr_la_SOURCES) \
 	$(libvomsc_gcc64pthr_la_SOURCES) $(ctest_SOURCES) \
 	$(test_SOURCES)
-DIST_SOURCES = $(libvomsapi_la_SOURCES) $(libvomsapi_gcc32_la_SOURCES) \
-	$(libvomsapi_gcc32dbg_la_SOURCES) \
-	$(libvomsapi_gcc32dbgpthr_la_SOURCES) \
-	$(libvomsapi_gcc32pthr_la_SOURCES) \
-	$(libvomsapi_gcc64_la_SOURCES) \
-	$(libvomsapi_gcc64dbg_la_SOURCES) \
-	$(libvomsapi_gcc64dbgpthr_la_SOURCES) \
-	$(libvomsapi_gcc64pthr_la_SOURCES) \
-	$(libvomsapi_nog_la_SOURCES) $(libvomsc_la_SOURCES) \
-	$(libvomsc_gcc32_la_SOURCES) $(libvomsc_gcc32dbg_la_SOURCES) \
-	$(libvomsc_gcc32dbgpthr_la_SOURCES) \
-	$(libvomsc_gcc32pthr_la_SOURCES) $(libvomsc_gcc64_la_SOURCES) \
-	$(libvomsc_gcc64dbg_la_SOURCES) \
-	$(libvomsc_gcc64dbgpthr_la_SOURCES) \
-	$(libvomsc_gcc64pthr_la_SOURCES) $(ctest_SOURCES) \
+DIST_SOURCES = $(am__libvomsapi_la_SOURCES_DIST) \
+	$(am__libvomsapi_gcc32_la_SOURCES_DIST) \
+	$(am__libvomsapi_gcc32dbg_la_SOURCES_DIST) \
+	$(am__libvomsapi_gcc32dbgpthr_la_SOURCES_DIST) \
+	$(am__libvomsapi_gcc32pthr_la_SOURCES_DIST) \
+	$(am__libvomsapi_gcc64_la_SOURCES_DIST) \
+	$(am__libvomsapi_gcc64dbg_la_SOURCES_DIST) \
+	$(am__libvomsapi_gcc64dbgpthr_la_SOURCES_DIST) \
+	$(am__libvomsapi_gcc64pthr_la_SOURCES_DIST) \
+	$(am__libvomsapi_nog_la_SOURCES_DIST) \
+	$(am__libvomsc_la_SOURCES_DIST) \
+	$(am__libvomsc_gcc32_la_SOURCES_DIST) \
+	$(am__libvomsc_gcc32dbg_la_SOURCES_DIST) \
+	$(am__libvomsc_gcc32dbgpthr_la_SOURCES_DIST) \
+	$(am__libvomsc_gcc32pthr_la_SOURCES_DIST) \
+	$(am__libvomsc_gcc64_la_SOURCES_DIST) \
+	$(am__libvomsc_gcc64dbg_la_SOURCES_DIST) \
+	$(am__libvomsc_gcc64dbgpthr_la_SOURCES_DIST) \
+	$(am__libvomsc_gcc64pthr_la_SOURCES_DIST) $(ctest_SOURCES) \
 	$(test_SOURCES)
 includeHEADERS_INSTALL = $(INSTALL_HEADER)
 HEADERS = $(include_HEADERS)
@@ -330,6 +468,8 @@ AUTOMAKE = @AUTOMAKE@
 AWK = @AWK@
 BUILD_DOCS_FALSE = @BUILD_DOCS_FALSE@
 BUILD_DOCS_TRUE = @BUILD_DOCS_TRUE@
+BUILD_JAVA_FALSE = @BUILD_JAVA_FALSE@
+BUILD_JAVA_TRUE = @BUILD_JAVA_TRUE@
 CC = @CC@
 CCDEPMODE = @CCDEPMODE@
 CFLAGS = @CFLAGS@
@@ -383,6 +523,7 @@ INSTALL_DATA = @INSTALL_DATA@
 INSTALL_PROGRAM = @INSTALL_PROGRAM@
 INSTALL_SCRIPT = @INSTALL_SCRIPT@
 INSTALL_STRIP_PROGRAM = @INSTALL_STRIP_PROGRAM@
+JAVA_INCLUDES = @JAVA_INCLUDES@
 LDFLAGS = @LDFLAGS@
 LIBOBJS = @LIBOBJS@
 LIBS = @LIBS@
@@ -470,12 +611,25 @@ lib_LTLIBRARIES = \
 	libvomsc.la \
 	$(WANTED_API_LIBS) # may add the libraries defined in EXTRA_LTLIBRARIES
 
-CCSOURCES = \
-	api_util.cc \
-	voms_api.cc \
-	ccval.cc \
-	cinterface.cc \
-	jni-int.cc
+@BUILD_JAVA_FALSE@CCSOURCES = \
+@BUILD_JAVA_FALSE@	api_util.cc \
+@BUILD_JAVA_FALSE@	voms_api.cc \
+@BUILD_JAVA_FALSE@	ccval.cc \
+@BUILD_JAVA_FALSE@	cinterface.cc
+
+@BUILD_JAVA_TRUE@CCSOURCES = \
+@BUILD_JAVA_TRUE@	api_util.cc \
+@BUILD_JAVA_TRUE@	jni-int.cc \
+@BUILD_JAVA_TRUE@	voms_api.cc \
+@BUILD_JAVA_TRUE@	ccval.cc \
+@BUILD_JAVA_TRUE@	cinterface.cc
+
+@BUILD_JAVA_FALSE@API_INCLUDES = \
+@BUILD_JAVA_FALSE@	-I$(top_srcdir)/src/include
+
+@BUILD_JAVA_TRUE@API_INCLUDES = \
+@BUILD_JAVA_TRUE@	$(JAVA_INCLUDES) \
+@BUILD_JAVA_TRUE@	-I$(top_srcdir)/src/include
 
 libvomsapi_nog_la_SOURCES = \
 	$(CCSOURCES)
@@ -483,9 +637,7 @@ libvomsapi_nog_la_SOURCES = \
 libvomsapi_nog_la_CPPFLAGS = \
 	$(NO_GLOBUS_FLAGS) \
 	-DNOGLOBUS \
-	-I$(top_srcdir)/src/include \
-	-I$(JAVA_HOME)/include \
-	-I$(JAVA_HOME)/include/linux
+	$(API_INCLUDES)
 
 NOGLIBADD = \
 	$(EXPAT_LIBS) \
@@ -505,8 +657,7 @@ libvomsapi_la_SOURCES = \
 
 libvomsapi_la_CPPFLAGS = \
 	-I$(top_srcdir)/src/include \
-	-I$(JAVA_HOME)/include \
-	-I$(JAVA_HOME)/include/linux \
+	$(API_INCLUDES) \
 	$(GLOBUS_CFLAGS)
 
 CCLIBADD = \
@@ -521,18 +672,25 @@ libvomsapi_la_LIBADD = \
 	$(top_builddir)/src/socklib/libsock.la \
 	$(top_builddir)/src/ac/libccattcert.la
 
-CSOURCES = \
-	api_util.cc \
-	voms_api.cc \
-	ccval.cc \
-	cinterface.cc \
-	jni-int.cc
+@BUILD_JAVA_FALSE@CSOURCES = \
+@BUILD_JAVA_FALSE@	api_util.cc \
+@BUILD_JAVA_FALSE@	voms_api.cc \
+@BUILD_JAVA_FALSE@	ccval.cc \
+@BUILD_JAVA_FALSE@	cinterface.cc
+
+@BUILD_JAVA_TRUE@CSOURCES = \
+@BUILD_JAVA_TRUE@	api_util.cc \
+@BUILD_JAVA_TRUE@	voms_api.cc \
+@BUILD_JAVA_TRUE@	ccval.cc \
+@BUILD_JAVA_TRUE@	jni-int.cc \
+@BUILD_JAVA_TRUE@	cinterface.cc
 
 libvomsc_la_SOURCES = \
 	$(CSOURCES)
 
 libvomsc_la_CPPFLAGS = \
 	-I$(top_srcdir)/src/include \
+	$(API_INCLUDES) \
 	$(GLOBUS_CFLAGS)
 
 CLIBADD = 
@@ -570,7 +728,7 @@ libvomsapi_gcc32_la_SOURCES = \
 
 libvomsapi_gcc32_la_CPPFLAGS = \
 	-I$(top_srcdir)/src/include \
-	$(GLOBUS_GCC32_CFLAGS)
+	$(API_INCLUDS)
 
 libvomsapi_gcc32_la_LIBADD = \
 	$(CCLIBADD) \
@@ -585,7 +743,8 @@ libvomsapi_gcc32dbg_la_SOURCES = \
 
 libvomsapi_gcc32dbg_la_CPPFLAGS = \
 	-I$(top_srcdir)/src/include \
-	$(GLOBUS_GCC32DBG_CFLAGS)
+	$(GLOBUS_GCC32DBG_CFLAGS) \
+	$(API_INCLUDES)
 
 libvomsapi_gcc32dbg_la_LIBADD = \
 	$(CCLIBADD) \
@@ -600,6 +759,7 @@ libvomsapi_gcc32pthr_la_SOURCES = \
 
 libvomsapi_gcc32pthr_la_CPPFLAGS = \
 	-I$(top_srcdir)/src/include \
+	$(API_INCLUDES) \
 	$(GLOBUS_GCC32PTHR_CFLAGS)
 
 libvomsapi_gcc32pthr_la_LIBADD = \
@@ -615,6 +775,7 @@ libvomsapi_gcc32dbgpthr_la_SOURCES = \
 
 libvomsapi_gcc32dbgpthr_la_CPPFLAGS = \
 	-I$(top_srcdir)/src/include \
+	$(API_INCLUDES) \
 	$(GLOBUS_GCC32DBGPTHR_CFLAGS)
 
 libvomsapi_gcc32dbgpthr_la_LIBADD = \
@@ -630,6 +791,7 @@ libvomsc_gcc32_la_SOURCES = \
 
 libvomsc_gcc32_la_CPPFLAGS = \
 	-I$(top_srcdir)/src/include \
+	$(API_INCLUDES) \
 	$(GLOBUS_CFLAGS)
 
 libvomsc_gcc32_la_LIBADD = \
@@ -645,6 +807,7 @@ libvomsc_gcc32dbg_la_SOURCES = \
 
 libvomsc_gcc32dbg_la_CPPFLAGS = \
 	-I$(top_srcdir)/src/include \
+	$(API_INCLUDES) \
 	$(GLOBUS_CFLAGS)
 
 libvomsc_gcc32dbg_la_LIBADD = \
@@ -660,6 +823,7 @@ libvomsc_gcc32pthr_la_SOURCES = \
 
 libvomsc_gcc32pthr_la_CPPFLAGS = \
 	-I$(top_srcdir)/src/include \
+	$(API_INCLUDES) \
 	$(GLOBUS_CFLAGS)
 
 libvomsc_gcc32pthr_la_LIBADD = \
@@ -675,6 +839,7 @@ libvomsc_gcc32dbgpthr_la_SOURCES = \
 
 libvomsc_gcc32dbgpthr_la_CPPFLAGS = \
 	-I$(top_srcdir)/src/include \
+	$(API_INCLUDES) \
 	$(GLOBUS_CFLAGS)
 
 libvomsc_gcc32dbgpthr_la_LIBADD = \
@@ -690,6 +855,7 @@ libvomsapi_gcc64_la_SOURCES = \
 
 libvomsapi_gcc64_la_CPPFLAGS = \
 	-I$(top_srcdir)/src/include \
+	$(API_INCLUDES) \
 	$(GLOBUS_GCC64_CFLAGS)
 
 libvomsapi_gcc64_la_LIBADD = \
@@ -705,6 +871,7 @@ libvomsapi_gcc64dbg_la_SOURCES = \
 
 libvomsapi_gcc64dbg_la_CPPFLAGS = \
 	-I$(top_srcdir)/src/include \
+	$(API_INCLUDES) \
 	$(GLOBUS_GCC64DBG_CFLAGS)
 
 libvomsapi_gcc64dbg_la_LIBADD = \
@@ -720,6 +887,7 @@ libvomsapi_gcc64pthr_la_SOURCES = \
 
 libvomsapi_gcc64pthr_la_CPPFLAGS = \
 	-I$(top_srcdir)/src/include \
+	$(API_INCLUDES) \
 	$(GLOBUS_GCC64PTHR_CFLAGS)
 
 libvomsapi_gcc64pthr_la_LIBADD = \
@@ -735,6 +903,7 @@ libvomsapi_gcc64dbgpthr_la_SOURCES = \
 
 libvomsapi_gcc64dbgpthr_la_CPPFLAGS = \
 	-I$(top_srcdir)/src/include \
+	$(API_INCLUDES) \
 	$(GLOBUS_GCC64DBGPTHR_CFLAGS)
 
 libvomsapi_gcc64dbgpthr_la_LIBADD = \
@@ -765,6 +934,7 @@ libvomsc_gcc64dbg_la_SOURCES = \
 
 libvomsc_gcc64dbg_la_CPPFLAGS = \
 	-I$(top_srcdir)/src/include \
+	$(API_INCLUDES) \
 	$(GLOBUS_CFLAGS)
 
 libvomsc_gcc64dbg_la_LIBADD = \
@@ -780,6 +950,7 @@ libvomsc_gcc64pthr_la_SOURCES = \
 
 libvomsc_gcc64pthr_la_CPPFLAGS = \
 	-I$(top_srcdir)/src/include \
+	$(API_INCLUDES) \
 	$(GLOBUS_CFLAGS)
 
 libvomsc_gcc64pthr_la_LIBADD = \
@@ -795,6 +966,7 @@ libvomsc_gcc64dbgpthr_la_SOURCES = \
 
 libvomsc_gcc64dbgpthr_la_CPPFLAGS = \
 	-I$(top_srcdir)/src/include \
+	$(API_INCLUDES) \
 	$(GLOBUS_CFLAGS)
 
 libvomsc_gcc64dbgpthr_la_LIBADD = \

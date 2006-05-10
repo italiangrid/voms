@@ -4,7 +4,7 @@ AC_DEFUN([AC_OPENSSL],
 [
   AC_ARG_WITH(openssl_prefix,
               [ --with-openssl-prefix=PFX    prefix where OpenSSL (non-globus) is installed. (/usr)],
-              [],
+              [with_openssl_prefix="$withval"],
               [with_openssl_prefix=/usr])
 
   SAVE_LD_LIBRARY_PATH=$LD_LIBRARY_PATH
@@ -40,7 +40,7 @@ AC_DEFUN([AC_GLOBUS],
 [
     AC_ARG_WITH(globus_prefix,
 	[  --with-globus-prefix=PFX     prefix where GLOBUS is installed. (/opt/globus)],
-	[],
+	[with_globus_prefix="$withval"],
         [with_globus_prefix=${GLOBUS_LOCATION:-/opt/globus}])
 
     AC_MSG_CHECKING([for GLOBUS installation at $with_globus_prefix])
@@ -66,7 +66,7 @@ AC_DEFUN([AC_GLOBUS],
 
     AC_ARG_WITH(globus_flavor,
               	[  --with-globus-flavor=flavor [default=$default_flavor]],
-              	[],
+              	[with_globus_flavor="$withval"],
                 with_globus_flavor=${GLOBUS_FLAVOR:-${default_flavor}})
 
     AC_MSG_RESULT([found $GLOBUS_FLAVORS ($with_globus_flavor selected)])
@@ -189,6 +189,39 @@ AC_DEFUN([AC_COMPILER],
       CXXFLAGS="-O -Wall -w $CXXFLAGS"
     fi
 ])
+
+
+
+AC_DEFUN([AC_JAVA],
+[
+  AC_ARG_ENABLE(java, 
+    [  --enable-java   Enable compilation of the Java libraries],
+    [
+      case "$enableval" in
+      yes) build_java="yes" ;;
+      no)  build_java="no" ;;
+      *) AC_MSG_ERROR([bad value $(enableval) for --enable-java]) ;;
+      esac
+    ],
+    [ have_java="yes" ])
+
+  AM_CONDITIONAL(BUILD_JAVA, test x$have_java = xyes)
+
+  if test "x$have_java" = "xyes"; then
+    AC_MSG_CHECKING([for JAVA])
+    AC_ARG_WITH(java-home,
+      [ --with-java-home=<dir>    Specifies where to find the java installation, default=$JAVA_HOME],
+      [ javahome="$withval"],
+      [ javahome="$JAVA_HOME"])
+# Find include dirs
+    javainc="`find $javahome/include -type d -exec echo -n '-I{} ' ';'`"
+    JAVA_INCLUDES="$javainc"
+    AC_MSG_RESULT($javahome)
+    AC_SUBST(JAVA_INCLUDES)
+  fi 
+])
+
+
 
 # AC_ENABLE_DOCS add switch to enable debug and warning
 # options for gcc

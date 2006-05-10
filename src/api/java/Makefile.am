@@ -45,4 +45,8 @@ install-exec-hook:
 	$(mkinstalldirs) $(DESTDIR)/$(datadir)/java
 	$(INSTALL) $(top_builddir)/src/api/java/vomsjapi.jar $(DESTDIR)/$(datadir)/java
 
+clean:
+	rm -f $(top_builddir)/src/api/java/vomsapi.jar
+	find $(top_builddir)/src/api/java -name '*.class' -exec rm -f '{}' ';'
+
 #java_JAVA =  privateinternal.java

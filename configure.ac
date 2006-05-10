@@ -88,6 +88,8 @@ AC_GLOBUS([], have_globus=yes, have_globus=no)
 
 AC_ENABLE_DOCS
 
+AC_JAVA
+
 TEST_USE_BSD
 TEST_USE_POSIX
 NEW_ISSUES
