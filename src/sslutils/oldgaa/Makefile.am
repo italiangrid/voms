@@ -64,7 +64,7 @@ liboldgaa_gcc32dbgpthr_la_CFLAGS = \
 	$(GLOBUS_GCC32DBGPTHR_CFLAGS)
 
 liboldgaa_gcc32dbgpthr_la_LIBADD = \
-	$(GLOBUS_GCC32DBGPTHRGSS_LIBS)
+	$(GLOBUS_GCC32DBGPTHR_GSS_LIBS)
 
 liboldgaa_gcc64_la_SOURCES = \
 	$(SOURCES)
@@ -100,7 +100,7 @@ liboldgaa_gcc64dbgpthr_la_CFLAGS = \
 	$(GLOBUS_GCC64DBGPTHR_CFLAGS)
 
 liboldgaa_gcc64dbgpthr_la_LIBADD = \
-	$(GLOBUS_GCC64DBGPTHRGSS_LIBS)
+	$(GLOBUS_GCC64DBGPTHR_GSS_LIBS)
 
 CLEANFILES = \
 	liboldgaa_gcc64.la \

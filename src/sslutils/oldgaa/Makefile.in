@@ -83,7 +83,7 @@ am__objects_3 = liboldgaa_gcc32dbg_la-oldgaa_alloc.lo \
 	liboldgaa_gcc32dbg_la-rfc1779.lo
 am_liboldgaa_gcc32dbg_la_OBJECTS = $(am__objects_3)
 liboldgaa_gcc32dbg_la_OBJECTS = $(am_liboldgaa_gcc32dbg_la_OBJECTS)
-liboldgaa_gcc32dbgpthr_la_DEPENDENCIES =
+liboldgaa_gcc32dbgpthr_la_DEPENDENCIES = $(am__DEPENDENCIES_1)
 am__objects_4 = liboldgaa_gcc32dbgpthr_la-oldgaa_alloc.lo \
 	liboldgaa_gcc32dbgpthr_la-oldgaa_api.lo \
 	liboldgaa_gcc32dbgpthr_la-oldgaa_gl_internal_err.lo \
@@ -128,7 +128,7 @@ am__objects_7 = liboldgaa_gcc64dbg_la-oldgaa_alloc.lo \
 	liboldgaa_gcc64dbg_la-rfc1779.lo
 am_liboldgaa_gcc64dbg_la_OBJECTS = $(am__objects_7)
 liboldgaa_gcc64dbg_la_OBJECTS = $(am_liboldgaa_gcc64dbg_la_OBJECTS)
-liboldgaa_gcc64dbgpthr_la_DEPENDENCIES =
+liboldgaa_gcc64dbgpthr_la_DEPENDENCIES = $(am__DEPENDENCIES_1)
 am__objects_8 = liboldgaa_gcc64dbgpthr_la-oldgaa_alloc.lo \
 	liboldgaa_gcc64dbgpthr_la-oldgaa_api.lo \
 	liboldgaa_gcc64dbgpthr_la-oldgaa_gl_internal_err.lo \
@@ -390,7 +390,7 @@ liboldgaa_gcc32dbgpthr_la_CFLAGS = \
 	$(GLOBUS_GCC32DBGPTHR_CFLAGS)
 
 liboldgaa_gcc32dbgpthr_la_LIBADD = \
-	$(GLOBUS_GCC32DBGPTHRGSS_LIBS)
+	$(GLOBUS_GCC32DBGPTHR_GSS_LIBS)
 
 liboldgaa_gcc64_la_SOURCES = \
 	$(SOURCES)
@@ -426,7 +426,7 @@ liboldgaa_gcc64dbgpthr_la_CFLAGS = \
 	$(GLOBUS_GCC64DBGPTHR_CFLAGS)
 
 liboldgaa_gcc64dbgpthr_la_LIBADD = \
-	$(GLOBUS_GCC64DBGPTHRGSS_LIBS)
+	$(GLOBUS_GCC64DBGPTHR_GSS_LIBS)
 
 CLEANFILES = \
 	liboldgaa_gcc64.la \
