@@ -67,6 +67,8 @@ const std::string location = (getenv(LOCATION_ENV) ? getenv(LOCATION_ENV) : LOCA
 const std::string CONFILENAME     = (location + "/etc/vomses");
 const std::string USERCONFILENAME = std::string(USER_DIR) + std::string("/vomses");
 
+std::vector<std::string> confiles;
+
 /* global variable for output control */
 
 bool debug = false;
@@ -167,7 +169,7 @@ Client::Client(int argc, char ** argv) :
   std::string outfile;
   std::vector<std::string> order;
   std::vector<std::string> targets;
-  std::vector<std::string> confiles;
+
 
   bool pwstdin = false;
 
@@ -600,8 +602,16 @@ bool Client::Run() {
   /* vomsdata */
   
   vomsdata v;
-  v.LoadSystemContacts(confile);
-  v.LoadUserContacts(userconf);
+
+  for (std::vector<std::string>::iterator i = confiles.begin(); i != confiles.end(); i++) {
+    if(debug)
+      std::cout << "Using configuration file "<< *i << std::endl;
+    if (!v.LoadSystemContacts(*i))
+      std::cerr << v.ErrorMessage() << std::endl;
+  }
+
+  //  v.LoadSystemContacts(confile);
+  //  v.LoadUserContacts(userconf);
   v.SetLifetime(ac_hours * 3600 + ac_minutes * 60);
   v.Order(ordering);
   v.AddTarget(targetlist);
