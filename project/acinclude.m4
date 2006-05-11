@@ -210,15 +210,59 @@ AC_DEFUN([AC_JAVA],
   if test "x$have_java" = "xyes"; then
     AC_MSG_CHECKING([for JAVA])
     AC_ARG_WITH(java-home,
-      [ --with-java-home=<dir>    Specifies where to find the java installation, default=$JAVA_HOME],
+      [  --with-java-home=DIR    Specifies where to find the java installation, default=$JAVA_HOME],
       [ javahome="$withval"],
       [ javahome="$JAVA_HOME"])
 # Find include dirs
     javainc="`find $javahome/include -type d -exec echo -n '-I{} ' ';'`"
     JAVA_INCLUDES="$javainc"
+    JHOME="$javahome"
     AC_MSG_RESULT($javahome)
     AC_SUBST(JAVA_INCLUDES)
-  fi 
+    AC_SUBST(JHOME)
+  fi
+
+  if test "x$have_java" = "xyes"; then
+    AC_MSG_CHECKING([for bouncycastle])
+  fi
+  AC_ARG_WITH(bc,
+    [  --with-bc=FILE          Specifies the location of the bouncycastle jar, default=$CLASSPATH],
+    [ wbc="$withval"],
+    [ wbc=""])
+
+  if test "x$wbc" = "x"; then
+    if test "x$have_java" = "xyes"; then
+      AC_MSG_RESULT([hope it is in $CLASSPATH])
+    fi
+  else
+    if test -e "$wbc"; then
+      AC_MSG_RESULT([found: $(wbc)])
+    else
+      AC_MSG_ERROR([bouncycastle not found])
+    fi
+  fi
+
+  if test "x$have_java" = "xyes"; then
+    AC_MSG_CHECKING([for log4j])
+  fi
+  AC_ARG_WITH(log4j,
+    [  --with-log4j=FILE        Specifies the location of the log4j jar, default=$CLASSPATH],
+    [ wlog4j="$withval"],
+    [ wlog4j=""])
+  if test "x$wlog4j" = "x"; then
+    if test "x$have_java" = "xyes"; then
+      AC_MSG_RESULT([hope it is in $CLASSPATH])
+    fi
+  else
+    if test -e "$wlog4j" ; then
+      AC_MSG_RESULT([found: $(wlog4j)])
+    else
+      AC_MSG_ERROR([log4j not found])
+    fi
+  fi
+  JAVA_CLASSPATH=".:$wbc:$wlog4j"
+  AC_SUBST(JAVA_CLASSPATH)    
+  
 ])
 
 

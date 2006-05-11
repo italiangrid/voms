@@ -1,6 +1,6 @@
-JAVAC=javac
-JAR=jar
-JAVAH=javah
+JAVAC=$(JHOME)/bin/javac
+JAR=$(JHOME)/bin/jar
+JAVAH=$(JHOME)/bin/javah
 
 JAVA_CLASSES = org/glite/security/voms/peers/VomsdataPeer.class \
 							 org/glite/security/voms/peers/ContactDataPeer.class \
@@ -28,14 +28,14 @@ JAVA_CLASSES = org/glite/security/voms/peers/VomsdataPeer.class \
 all-local: $(top_builddir)/src/api/java/vomsjapi.jar
 
 %.class : %.java
-	$(JAVAC) -sourcepath . -d $(top_builddir)/src/api/java $<
-
-#VomsdataPeer.class ContactDataPeer.class VomsPeer.class DataPeer.class: privateinternal.java
-#	$(JAVAC) privateinternal.java
+	$(JAVAC) -sourcepath . -classpath $(JAVA_CLASSPATH):$(CLASSPATH) -d $(top_builddir)/src/api/java $<
 
 $(top_builddir)/src/api/java/vomsjapi.jar: makedirs $(JAVA_CLASSES)
-	$(JAR) -cf $(top_builddir)/src/api/java/vomsjapi.jar `find $(top_builddir)/src/api/java -name '*.class' |cut -d'/' -f7-`
-	$(JAVAH) -classpath $(top_builddir)/src/api/java -o ../ccapi/jni-int.h org.glite.security.voms.peers.VomsdataPeer org.glite.security.voms.peers.ContactDataPeer org.glite.security.voms.peers.VomsPeer org.glite.security.voms.peers.DataPeer org.glite.security.voms.peers.AttributePeer org.glite.security.voms.peers.AttributeListPeer
+	TMPDIR=`pwd` \
+	cd $(top_builddir)/src/api/java \
+	$(JAR) -cf $(top_builddir)/src/api/java/vomsjapi.jar `find org -name '*.class'` \
+	cd $(TMPDIR)
+	$(JAVAH) -classpath $(top_builddir)/src/api/java:$(JAVA_CLASSPATH):$(CLASSPATH) -o ../ccapi/jni-int.h org.glite.security.voms.peers.VomsdataPeer org.glite.security.voms.peers.ContactDataPeer org.glite.security.voms.peers.VomsPeer org.glite.security.voms.peers.DataPeer org.glite.security.voms.peers.AttributePeer org.glite.security.voms.peers.AttributeListPeer
 
 makedirs:
 	mkdir -p $(top_builddir)/src/api/java/org/glite/security/voms/peers

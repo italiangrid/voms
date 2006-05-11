@@ -33,6 +33,21 @@ AC_COMPILER
 # Checks for libraries.
 AC_OPENSSL
 
+# check for dependencies based on project/*m4
+
+AC_ENABLE_GLITE([], have_glite=yes, have_glite=no) # embed AC_GLITE
+
+AC_EXPAT([], have_expat=yes, have_expat=no)        # taken from org.glite
+AC_CPPUNIT([], have_cppunit=yes, have_cppunit=no)  # taken from org.glite
+AC_GLOBUS([], have_globus=yes, have_globus=no)
+
+#AC_CHECK_FUNCS(globus_module_activate)
+# check in acinclude.m4
+
+AC_JAVA
+AC_ENABLE_DOCS
+
+
 # Checks for header files.
 AC_HEADER_DIRENT
 AC_HEADER_STDC
@@ -75,20 +90,6 @@ AC_CHECK_FUNCS([alarm atexit dup2 gethostbyaddr gethostname gethostbyname gethos
 
 AC_REPLACE_FUNCS(getopt_long getopt_long_only daemon setenv)
 
-# check for dependencies based on project/*m4
-
-AC_ENABLE_GLITE([], have_glite=yes, have_glite=no) # embed AC_GLITE
-
-AC_EXPAT([], have_expat=yes, have_expat=no)        # taken from org.glite
-AC_CPPUNIT([], have_cppunit=yes, have_cppunit=no)  # taken from org.glite
-AC_GLOBUS([], have_globus=yes, have_globus=no)
-
-#AC_CHECK_FUNCS(globus_module_activate)
-# check in acinclude.m4
-
-AC_ENABLE_DOCS
-
-AC_JAVA
 
 TEST_USE_BSD
 TEST_USE_POSIX

@@ -959,29 +959,27 @@ get_group_attributes(const std::string &dn, const std::string &ca,
 
   // compose query
 
-  std::string query = std::string("SELECT usr.dn as username, role, groups.dn as groupname, groups.gid "
-                                  "FROM groups, usr, ca, m "
-                                  "left join roles on roles.rid = m.rid "
-                                  //"left join capabilities on capabilities.cid = m.cid "
-                                  "INNER JOIN Group_attrs on groups.gid = Group_attrs.g_id "           // added
-                                  "INNER JOIN Attributes on Attributes.a_id = Group_attrs.a_id "       // added
-                                  "WHERE groups.gid = m.gid AND ") +
-    (compat_flag ? "usr.uid = m.uid AND " : "usr.userid = m.userid AND ") +
-    "groups.dn = \'" + group + ("\' AND "
-                                "usr.ca  = ca.cid AND "
-                                "ca.ca = \'" + ca + "\' AND "
-                                "usr.dn = \'" + dn + "\' AND "
-                                "m.rid is NULL");
+  std::string query = std::string("SELECT usr.dn as username, role, groups.dn as groupname, Attributes.a_name, groups.gid "
+                                  "FROM usr INNER JOIN ca ON usr.ca=ca.cid "
+                                  "INNER JOIN m ON ") + (compat_flag ? "usr.uid = m.uid" : "usr.userid = m.userid ") +
+    "INNER JOIN groups ON m.gid=groups.gid "
+    "LEFT JOIN roles on roles.rid = m.rid "
+    "INNER JOIN Group_attrs on groups.gid = Group_attrs.g_id "
+    "INNER JOIN Attributes on Attributes.a_id = Group_attrs.a_id "
+    "WHERE groups.dn = \'" + group + "\' AND "
+    "ca.ca = \'" + ca + "\' AND "
+    "usr.dn = \'" + dn + "\' AND "
+    "m.rid is NULL";
   
   return get_attributes_real(dn, ca, dbname, username, contactstring, port, socket, password, query, result);
 }
 
 bool
 get_role_attributes(const std::string &dn, const std::string &ca,
-                              const char *role,
-                              const std::string &dbname, const std::string &username, const std::string &contactstring,
-                              int port, const std::string& socket, const char *password,
-                              std::vector<gattrib> &result)
+                    const char *role,
+                    const std::string &dbname, const std::string &username, const std::string &contactstring,
+                    int port, const std::string& socket, const char *password,
+                    std::vector<gattrib> &result)
 {
   if (dn.empty() || ca.empty() || !role || dbname.empty() || username.empty() || !password)
     return false;
@@ -992,52 +990,46 @@ get_role_attributes(const std::string &dn, const std::string &ca,
     return false;
 
   // compose query
-
   std::string query = std::string("SELECT usr.dn as username, role, groups.dn as groupname, capability, groups.gid, Attributes.a_name, Role_attrs.a_value "
-                                  "FROM groups, usr, ca, m "
-                                  "left join roles on roles.rid = m.rid "
-                                  "left join capabilities on capabilities.cid = m.cid "
-                                  "INNER JOIN Role_attrs on groups.gid = Role_attrs.g_id "             // added
-                                  "INNER JOIN Attributes on Attributes.a_id = Role_attrs.a_id "        // added
-                                  "WHERE Role_attrs.r_id = roles.rid AND "                            // added  
-                                  "groups.gid = m.gid AND ") +
-    (compat_flag ? "usr.uid = m.uid AND " : "usr.userid = m.userid AND ") +
+                                  "FROM usr INNER JOIN ca ON usr.ca=ca.cid"
+                                  "INNER JOIN m ON ") + (compat_flag ? "usr.uid = m.uid" : "usr.userid = m.userid ") +
+    "INNER JOIN groups ON m.gid=groups.gid"
+    "LEFT JOIN roles ON roles.rid = m.rid "
+    "LEFT JOIN capabilities ON capabilities.cid = m.cid "
+    "INNER JOIN Role_attrs on groups.gid = Role_attrs.g_id "
+    "INNER JOIN Attributes on Attributes.a_id = Role_attrs.a_id "
+    "WHERE Role_attrs.r_id = roles.rid AND "
     "roles.role = \'" + role + "\' AND "
-    "usr.ca  = ca.cid AND "
     "ca.ca = \'" + ca + "\' AND "
     "usr.dn = \'" + dn + "\'";
 
   // execute query
-
   return get_attributes_real(dn, ca, dbname, username, contactstring, port, socket, password, query, result);
 }
 
 bool
 get_all_attributes(const std::string &dn, const std::string &ca,
-                              const std::string &dbname, const std::string &username, const std::string &contactstring,
-                              int port, const std::string& socket, const char *password,
-                              std::vector<gattrib> &result)
+                   const std::string &dbname, const std::string &username, const std::string &contactstring,
+                   int port, const std::string& socket, const char *password,
+                   std::vector<gattrib> &result)
 {
   if (dn.empty() || ca.empty() || dbname.empty() || username.empty() || !password)
     return false;
   
   // compose query
-
   std::string query = std::string("SELECT usr.dn as username, role, groups.dn as groupname, capability, groups.gid, Attributes.a_name, Role_attrs.a_value "
-                                  "FROM groups, usr, ca, m "
-                                  "left join roles on roles.rid = m.rid "
-                                  "left join capabilities on capabilities.cid = m.cid "
-                                  "INNER JOIN Role_attrs on groups.gid = Role_attrs.g_id "             // added
-                                  "INNER JOIN Attributes on Attributes.a_id = Role_attrs.a_id "        // added
-                                  "WHERE Role_attrs.r_id = roles.rid AND "                            // added  
-                                  "groups.gid = m.gid AND ") +
-    (compat_flag ? "usr.uid = m.uid AND " : "usr.userid = m.userid AND ") +
-    "usr.ca  = ca.cid AND "
+                                  "FROM usr INNER JOIN ca ON usr.ca=ca.cid "
+                                  "INNER JOIN m ON ") + (compat_flag ? "usr.uid = m.uid" : "usr.userid = m.userid ") +
+    "INNER JOIN groups ON m.gid=groups.gid "
+    "LEFT JOIN roles ON roles.rid = m.rid "
+    "LEFT JOIN capabilities ON capabilities.cid = m.cid "
+    "INNER JOIN Role_attrs on groups.gid = Role_attrs.g_id "
+    "INNER JOIN Attributes on Attributes.a_id = Role_attrs.a_id "
+    "WHERE Role_attrs.r_id = roles.rid AND "   
     "ca.ca = \'" + ca + "\' AND "
     "usr.dn = \'" + dn + "\'";
-
+  
   // execute query
-
   return get_attributes_real(dn, ca, dbname, username, contactstring, port, socket, password, query, result);
 }
 
@@ -1067,24 +1059,22 @@ get_group_and_role_attributes(const std::string &dn, const std::string &ca,
   // compose query
 
   std::string query = std::string("SELECT usr.dn as username, role, groups.dn as groupname, capability, groups.gid, Attributes.a_name, Role_attrs.a_value "
-                                  "FROM groups, usr, ca, m "
-                                  "left join roles on roles.rid = m.rid "
-                                  "left join capabilities on capabilities.cid = m.cid "
-                                  "INNER JOIN Role_attrs on groups.gid = Role_attrs.g_id "             // added
-                                  "INNER JOIN Attributes on Attributes.a_id = Role_attrs.a_id "        // added
-                                  "WHERE Role_attrs.r_id = roles.rid AND "                            // added  
-                                  "groups.gid = m.gid AND ") +
-    (compat_flag ? "usr.uid = m.uid AND " : "usr.userid = m.userid AND ") +
+                                  "FROM usr INNER JOIN ca ON usr.ca=ca.cid "
+                                  "INNER JOIN m ON ") + (compat_flag ? "usr.uid = m.uid" : "usr.userid = m.userid ") +
+    "INNER JOIN groups ON m.gid=groups.gid "
+    "LEFT JOIN roles ON roles.rid = m.rid "
+    "LEFT JOIN capabilities ON capabilities.cid = m.cid "
+    "INNER JOIN Role_attrs on groups.gid = Role_attrs.g_id "
+    "INNER JOIN Attributes on Attributes.a_id = Role_attrs.a_id "
+    "WHERE Role_attrs.r_id = roles.rid AND "  
     "roles.role = \'" + role + "\' AND "
     "groups.dn = \'" + argument + "\' AND "
-    "usr.ca  = ca.cid AND "
     "ca.ca = \'" + ca + "\' AND "
     "usr.dn = \'" + dn + "\'";
-  
+                                  
   free(argument);
 
   // execute query
-
   return get_attributes_real(dn, ca, dbname, username, contactstring, port, socket, password, query, result);
 }
 
@@ -1100,11 +1090,11 @@ get_user_attributes(const std::string &dn, const std::string &ca,
 
   // compose query
   
-  std::string query = std::string("SELECT usr.dn, ca.ca, Attributes.a_name, User_attrs.a_value "
+  std::string query = std::string("SELECT usr.dn, ca.ca, Attributes.a_name, Usr_attrs.a_value "
                                   "FROM usr "
                                   "LEFT JOIN ca on usr.ca = ca.cid "
-                                  "LEFT JOIN User_attrs on usr.userid = User_attrs.u_id "
-                                  "LEFT JOIN Attributes on Attributes.a_id = User_attrs.a_id "
+                                  "LEFT JOIN Usr_attrs on usr.userid = Usr_attrs.u_id "
+                                  "LEFT JOIN Attributes on Attributes.a_id = Usr_attrs.a_id "
                                   "WHERE "
                                   "ca.ca = \'" + ca + "\' AND "
                                   "usr.dn = \'" + dn + "\'");
@@ -1122,25 +1112,24 @@ get_attributes_real(const std::string &dn, const std::string &ca,
   if (dbname.empty() || username.empty() || !password || query.empty())
     return false;
   
-  std::string user_additional = std::string("SELECT usr.dn, ca.ca, Attributes.a_name, User_attrs.a_value "
+  std::string user_additional = std::string("SELECT usr.dn, ca.ca, Attributes.a_name, Usr_attrs.a_value "
                                             "FROM usr "
                                             "LEFT JOIN ca on usr.ca = ca.cid "
-                                            "LEFT JOIN User_attrs on usr.userid = User_attrs.u_id "
-                                            "LEFT JOIN Attributes on Attributes.a_id = User_attrs.a_id "
+                                            "LEFT JOIN Usr_attrs on usr.userid = Usr_attrs.u_id "
+                                            "LEFT JOIN Attributes on Attributes.a_id = Usr_attrs.a_id "
                                             "WHERE "
                                             "ca.ca = \'" + ca + "\' AND "
                                             "usr.dn = \'" + dn + "\'");
 
   std::string additional = std::string("SELECT usr.dn as username, role, groups.dn as groupname, capability, groups.gid, Attributes.a_name, Group_attrs.a_value "
-                                       "FROM groups, usr, ca, m "
+                                       "FROM usr INNER JOIN ca ON usr.ca=ca.cid "
+                                       "INNER JOIN m ON ") + (compat_flag ? "usr.uid = m.uid" : "usr.userid = m.userid ") +
+                                       "INNER JOIN groups ON m.gid=groups.gid "
                                        "left join roles on roles.rid = m.rid "
                                        "left join capabilities on capabilities.cid = m.cid "
-                                       "INNER JOIN Group_attrs on groups.gid = Group_attrs.g_id "             // added
-                                       "INNER JOIN Attributes on Attributes.a_id = Group_attrs.a_id "         // added
-                                       "WHERE groups.gid = m.gid AND ") +
-    (compat_flag ? "usr.uid = m.uid AND " : "usr.userid = m.userid AND ") +
-    "groups.must IS NOT NULL AND "
-    "usr.ca  = ca.cid AND "
+                                       "INNER JOIN Group_attrs on groups.gid = Group_attrs.g_id "
+                                       "INNER JOIN Attributes on Attributes.a_id = Group_attrs.a_id "
+    "WHERE groups.must IS NOT NULL AND "
     "ca.ca = \'" + ca + "\' AND "
     "usr.dn = \'" + dn + "\' AND "
     "m.rid is NULL";
