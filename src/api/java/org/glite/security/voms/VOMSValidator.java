@@ -196,7 +196,7 @@ public class VOMSValidator {
      * @see #validate()
      */
     public static Vector parse(X509Certificate[] myValidatedChain) {
-        System.out.println("WRONG");
+        //System.out.println("WRONG");
         if (log.isDebugEnabled()) {
             log.debug("VOMSValidator : parsing cert chain");
         }
@@ -293,7 +293,7 @@ public class VOMSValidator {
      * @deprecated use the parse(X509Certificate[]) instead
      */
     public VOMSValidator parse() {
-        System.out.println("CORRECT");
+        //System.out.println("CORRECT");
         if (log.isDebugEnabled()) {
             log.debug("VOMSValidator : parsing cert chain");
         }

@@ -54,19 +54,19 @@ static jboolean returnBool(JNIEnv *env, bool v)
 static void printString(JNIEnv *env, jstring str)
 {
   const char *cname = env->GetStringUTFChars(str, 0);
-  fprintf(stderr, "printString: %s\n", cname);
+  //fprintf(stderr, "printString: %s\n", cname);
   env->ReleaseStringUTFChars(str, cname);
 }
 
 static jstring returnString(JNIEnv *env, std::string str)
 {
-  fprintf(stderr, "Creating string from: %s\n", str.c_str());
+  //fprintf(stderr, "Creating string from: %s\n", str.c_str());
 
   jchar *jcs = (jchar *)malloc(str.size()*sizeof(jchar));
   if (!jcs)
     return NULL;
 
-  fprintf(stderr, "creating\n");
+  //fprintf(stderr, "creating\n");
   for (int i = 0; i < str.size(); i++)
     jcs[i] = str[i];
 
@@ -99,23 +99,23 @@ static jobjectArray returnDataPeer(JNIEnv *env, std::vector<data> &data)
 
 static jobjectArray returnAttributeArray(JNIEnv *env, std::vector<attribute> &array)
 {
-  fprintf(stderr, "in returnContactData\n");
-  fprintf(stderr, "dp_class = %d\n", ap_class);
-  fprintf(stderr, "size = %d\n",array.size());
+  //fprintf(stderr, "in returnContactData\n");
+  //fprintf(stderr, "dp_class = %d\n", ap_class);
+  //fprintf(stderr, "size = %d\n",array.size());
   jobjectArray arr = (jobjectArray)env->NewObjectArray(array.size(), ap_class, NULL);
-  fprintf(stderr, "Initialized array\n");
+  //fprintf(stderr, "Initialized array\n");
 
   for (int i = 0; i <array.size(); i++) {
-    fprintf(stderr, "data: name %s, value %s, qualifier:%s\n",
+    //fprintf(stderr, "data: name %s, value %s, qualifier:%s\n",
             array[i].name.c_str(), array[i].value.c_str(),
             array[i].qualifier.c_str());
     jobject obj = env->NewObject(ap_class, ap_constructor, 
                                  returnString(env, array[i].name),
                                  returnString(env, array[i].value),
                                  returnString(env, array[i].qualifier));
-    fprintf(stderr, "Created object\n");
+    //fprintf(stderr, "Created object\n");
     env->SetObjectArrayElement(arr, i, obj);
-    fprintf(stderr, "Added object\n");
+    //fprintf(stderr, "Added object\n");
   }
 
   return arr;
@@ -123,21 +123,21 @@ static jobjectArray returnAttributeArray(JNIEnv *env, std::vector<attribute> &ar
 
 static jobjectArray returnAttributeListArray(JNIEnv *env, std::vector<attributelist> &array)
 {
-  fprintf(stderr, "in returnContactData\n");
-  fprintf(stderr, "dp_class = %d\n", alp_class);
-  fprintf(stderr, "size = %d\n",array.size());
+  //fprintf(stderr, "in returnContactData\n");
+  //fprintf(stderr, "dp_class = %d\n", alp_class);
+  //fprintf(stderr, "size = %d\n",array.size());
   jobjectArray arr = (jobjectArray)env->NewObjectArray(array.size(), alp_class, NULL);
-  fprintf(stderr, "Initialized array\n");
+  //fprintf(stderr, "Initialized array\n");
 
   for (int i = 0; i <array.size(); i++) {
-    fprintf(stderr, "data: grantor %s\n",array[i].grantor.c_str());
+    //fprintf(stderr, "data: grantor %s\n",array[i].grantor.c_str());
 
     jobject obj = env->NewObject(alp_class, alp_constructor, 
                                  returnString(env, array[i].grantor),
                                  returnAttributeArray(env, array[i].attributes));
-    fprintf(stderr, "Created object\n");
+    //fprintf(stderr, "Created object\n");
     env->SetObjectArrayElement(arr, i, obj);
-    fprintf(stderr, "Added object\n");
+    //fprintf(stderr, "Added object\n");
   }
 
   return arr;
@@ -146,14 +146,14 @@ static jobjectArray returnAttributeListArray(JNIEnv *env, std::vector<attributel
 
 static jobjectArray returnContactData(JNIEnv *env, std::vector<contactdata> &array)
 {
-  fprintf(stderr, "in returnContactData\n");
-  fprintf(stderr, "dp_class = %d\n", dp_class);
-  fprintf(stderr, "size = %d\n",array.size());
+  //fprintf(stderr, "in returnContactData\n");
+  //fprintf(stderr, "dp_class = %d\n", dp_class);
+  //fprintf(stderr, "size = %d\n",array.size());
   jobjectArray arr = (jobjectArray)env->NewObjectArray(array.size(), dp_class, NULL);
-  fprintf(stderr, "Initialized array\n");
+  //fprintf(stderr, "Initialized array\n");
 
   for (int i = 0; i <array.size(); i++) {
-    fprintf(stderr, "data: nick %s, host %s, contact:%s, port:%d\n", array[i].nick.c_str(), 
+    //fprintf(stderr, "data: nick %s, host %s, contact:%s, port:%d\n", array[i].nick.c_str(), 
             array[i].host.c_str(), array[i].contact.c_str(),
             array[i].port);
     jobject obj = env->NewObject(dp_class, dp_constructor, 
@@ -161,9 +161,9 @@ static jobjectArray returnContactData(JNIEnv *env, std::vector<contactdata> &arr
                                  returnString(env, array[i].host),
                                  returnString(env, array[i].contact), 
                                  array[i].port, array[i].version);
-    fprintf(stderr, "Created object\n");
+    //fprintf(stderr, "Created object\n");
     env->SetObjectArrayElement(arr, i, obj);
-    fprintf(stderr, "Added object\n");
+    //fprintf(stderr, "Added object\n");
   }
 
   return arr;
@@ -189,8 +189,8 @@ static jobjectArray returnStringArray(JNIEnv *env, std::vector<std::string> &arr
   for (int i = 0; i <objarray.size(); i++)
     env->SetObjectArrayElement(arr, i, objarray[i]);
 
-  if (arr)
-    fprintf(stderr, "Created string array\n");
+  //if (arr)
+    //fprintf(stderr, "Created string array\n");
   return arr;
 }
 
@@ -213,12 +213,12 @@ static jobject returnVomsPeer(JNIEnv *env, voms &v)
   i2d_AC_HOLDER(h, &origholdbuffer);
   i2d_AC_FORM(f, &origfbuffer);
 
-  fprintf(stderr, "Making voms peer\n");
+  //fprintf(stderr, "Making voms peer\n");
   jobject obj = env->NewObject(vp_class, vp_constructor);
 
   env->SetIntField   (obj, vp_version,  v.version);
   env->SetIntField   (obj, vp_siglen,   v.siglen);
-  fprintf(stderr, "siglen: %d\n", v.siglen);
+  //fprintf(stderr, "siglen: %d\n", v.siglen);
 
   env->SetObjectField(obj, vp_sign,     returnByteArray(env, v.signature.data(),
                                                         v.signature.size()));
@@ -242,7 +242,7 @@ static jobject returnVomsPeer(JNIEnv *env, voms &v)
   free(fbuffer);
   free(holdbuffer);
 
-  fprintf(stderr, "Made voms peer\n");
+  //fprintf(stderr, "Made voms peer\n");
 
   return obj;
 }
@@ -310,18 +310,18 @@ JNIEXPORT jobjectArray JNICALL
 Java_org_glite_security_voms_peers_VomsdataPeer_FindByVO(JNIEnv *env, jobject obj, jstring str)
 {
   jlong sl   = env->GetLongField(obj, vd_fid_d);
-  fprintf(stderr, "sl = %d\n", sl);
+  //fprintf(stderr, "sl = %d\n", sl);
   vomsdata *vd = (vomsdata *)sl;
 
   
   const char *cname = env->GetStringUTFChars(str, 0);
-  fprintf(stderr, "cname = %s\n", cname);
+  //fprintf(stderr, "cname = %s\n", cname);
   std::vector<contactdata> r = vd->FindByVO(std::string(cname));
-  fprintf(stderr, "called FindByVO\n");
+  //fprintf(stderr, "called FindByVO\n");
   jobjectArray res = returnContactData(env, r);
-  fprintf(stderr, "called returnContactData\n");
+  //fprintf(stderr, "called returnContactData\n");
   env->ReleaseStringUTFChars(str, cname);
-  fprintf(stderr, "released chars\n");
+  //fprintf(stderr, "released chars\n");
   return res;
 }
 
@@ -427,11 +427,11 @@ Java_org_glite_security_voms_peers_VomsdataPeer_Contact(JNIEnv *env, jobject obj
   const char *subject  = env->GetStringUTFChars(servsubj, 0);
   const char *vcommand = env->GetStringUTFChars(command, 0);
 
-  fprintf(stderr, "CONTACT\n\nhost: %s\nsubj: %s\ncomm: %s\n\n", hostname,
+  //fprintf(stderr, "CONTACT\n\nhost: %s\nsubj: %s\ncomm: %s\n\n", hostname,
           subject, vcommand);
 
   bool res = vd->Contact(hostname, port, subject, vcommand);
-  fprintf(stderr, "res: %d\n", res);
+  //fprintf(stderr, "res: %d\n", res);
   env->SetObjectField(obj, vd_fid_data, returnVomsPeerArray(env, vd->data));
 
   env->ReleaseStringUTFChars(host, hostname);
@@ -510,7 +510,7 @@ Java_org_glite_security_voms_peers_VomsdataPeer_DefaultDataReal(JNIEnv *env, job
     v = NULL;
 
   jstring str = (jstring)env->GetObjectField(v, vp_user);
-  fprintf(stderr, "from DefaulDataReal: ");
+  //fprintf(stderr, "from DefaulDataReal: ");
   printString(env, str);
   return v;
 }
@@ -548,37 +548,37 @@ Java_org_glite_security_voms_peers_VomsdataPeer_initializer(JNIEnv *env, jclass 
   jclass tmp;
 
   vd_fid_d      = env->GetFieldID(cls, "d", "J");
-  fprintf(stderr, "got d\n");
+  //fprintf(stderr, "got d\n");
   vd_fid_data   = env->GetFieldID(cls, "data", "[Lorg/glite/security/voms/peers/VomsPeer;");
-  fprintf(stderr, "got data\n");
+  //fprintf(stderr, "got data\n");
 
   tmp           = env->FindClass("Ljava/lang/String;");
   s_class       = (jclass)env->NewGlobalRef(tmp);
-  fprintf(stderr, "got String\n");
+  //fprintf(stderr, "got String\n");
 
   tmp            = env->FindClass("Lorg/glite/security/voms/peers/ContactDataPeer;");
   dp_class       = (jclass)env->NewGlobalRef(tmp);
-  fprintf(stderr, "got ContactDataPeer\n");
+  //fprintf(stderr, "got ContactDataPeer\n");
 
   tmp             = env->FindClass("Lorg/glite/security/voms/peers/DataPeer;");
   cdp_class       = (jclass)env->NewGlobalRef(tmp);
-  fprintf(stderr, "got DataPeer\n");
+  //fprintf(stderr, "got DataPeer\n");
 
   tmp            = env->FindClass("Lorg/glite/security/voms/peers/VomsPeer;");
   vp_class       = (jclass)env->NewGlobalRef(tmp);
-  fprintf(stderr, "got VomsPeer\n");
+  //fprintf(stderr, "got VomsPeer\n");
 
   tmp            = env->FindClass("Lorg/glite/security/voms/peers/AttributePeer;");
   ap_class       = (jclass)env->NewGlobalRef(tmp);
-  fprintf(stderr, "got AttributePeer\n");
+  //fprintf(stderr, "got AttributePeer\n");
 
   tmp            = env->FindClass("Lorg/glite/security/voms/peers/AttributeListPeer;");
   alp_class       = (jclass)env->NewGlobalRef(tmp);
-  fprintf(stderr, "got AttributeListPeer\n");
+  //fprintf(stderr, "got AttributeListPeer\n");
 
   s_constructor = env->GetMethodID(cls, "<init>", "()V");
 
-  fprintf(stderr, "got constructor (exiting)\n");
+  //fprintf(stderr, "got constructor (exiting)\n");
 }
 
 JNIEXPORT jlong JNICALL 
@@ -635,7 +635,7 @@ Java_org_glite_security_voms_peers_ContactDataPeer_initializer(JNIEnv *env, jcla
 JNIEXPORT void JNICALL
 Java_org_glite_security_voms_peers_VomsPeer_initializer(JNIEnv *env, jclass cls)
 {
-  fprintf(stderr, "cls = %d\n",cls);
+  //fprintf(stderr, "cls = %d\n",cls);
   vp_class    = (jclass)env->NewGlobalRef(cls);
   vp_constructor = env->GetMethodID(cls, "<init>", "()V");
   vp_version  = env->GetFieldID(cls, "version", "I");
