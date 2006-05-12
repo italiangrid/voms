@@ -47,6 +47,7 @@ static char *getfqdn(void);
 static int checkAttributes(STACK_OF(AC_ATTR) *, struct col *, int);
 static int checkExtensions(STACK_OF(X509_EXTENSION) *, X509 *, struct col *, 
 			   int);
+static bool interpret_attributes(AC_FULL_ATTRIBUTES *, struct col *);
 
 static void free_att(struct att *a)
 {
@@ -366,82 +367,6 @@ static int checkAttributes(STACK_OF(AC_ATTR) *atts, struct col *voms, int valids
   if (voms)
     voms->voname = NULL;
 
-  nid  = OBJ_txt2nid("attributes");
-  pos  = X509at_get_attr_by_NID(atts, nid, -1);
-  if (pos >= 0) {
-    /* We have attributes */
-    AC_ATTR *attrs = sk_AC_ATTR_value(atts, pos);
-
-    AC_FULL_ATTRIBUTES *full_attr = sk_AC_FULL_ATTRIBUTES_value(attrs->fullattributes, 0);
-
-    struct full_att *fa = malloc(sizeof(struct full_att));
-    if (!fa)
-      goto err;
-
-    fa->list = NULL;
-
-    STACK_OF(AC_ATT_HOLDER) *providers = full_attr->providers;
-
-    int i;
-    for (i = 0; i < sk_AC_ATT_HOLDER_num(providers); i++) {
-      AC_ATT_HOLDER *holder = sk_AC_ATT_HOLDER_value(providers, i);
-
-      struct att_list *al = malloc(sizeof(struct att_list));
-      al->grantor = NULL;
-      al->attrs   = NULL;
-
-      STACK_OF(AC_ATTRIBUTE) *atts = holder->attributes;
-
-      int j;
-      for (j = 0; j < sk_AC_ATTRIBUTE_num(atts); j++) {
-        AC_ATTRIBUTE *at = sk_AC_ATTRIBUTE_value(atts, j);
-
-        name      = strndup(at->name->data,      at->name->length);
-        value     = strndup(at->value->data,     at->value->length);
-        qualifier = strndup(at->qualifier->data, at->qualifier->length);
-        if (!name || !value || !qualifier)
-          goto err;
-
-        a = malloc(sizeof(struct att));
-        a->name = name;
-        a->val  = value;
-        a->qual = qualifier;
-        name = value = qualifier = NULL;
-
-        char ** tmp = listadd((char **)(al->attrs), (char *)a, sizeof(a));
-        if (tmp) {
-          al->attrs = (struct att **)tmp;
-          a = NULL;
-        }
-        else {
-          listfree((char **)(al->attrs), (freefn)free_att);
-          goto err;
-        }
-      }
-
-      gn = sk_GENERAL_NAME_value(holder->grantor, 0);
-      grant = strndup(gn->d.ia5->data, gn->d.ia5->length);
-      if (!grant)
-        goto err;
-
-      al->grantor = grant;
-      grant = NULL;
-
-      char **tmp = listadd((char **)(fa->list), (char *)al, sizeof(al));
-      if (tmp) {
-        fa->list = (struct att_list **)tmp;
-        al = NULL;
-      }
-      else {
-        listfree((char **)(fa->list), (freefn)free_att_list);
-        goto err;
-      }
-    }
-    voms->atts = fa;
-    fa = NULL;
-  }
-  else
-    voms->atts = NULL;
 
   /* find AC_ATTR with IETFATTR type */
   nid3 = OBJ_txt2nid("idatcap");
@@ -570,11 +495,14 @@ static int checkExtensions(STACK_OF(X509_EXTENSION) *exts, X509 *iss, struct col
   int nid1 = OBJ_txt2nid("idcenoRevAvail");
   int nid2 = OBJ_txt2nid("authorityKeyIdentifier");
   int nid3 = OBJ_txt2nid("idceTargets");
+  int nid5 = OBJ_txt2nid("attributes");
 
   int pos1 = X509v3_get_ext_by_NID(exts, nid1, -1);
   int pos2 = X509v3_get_ext_by_NID(exts, nid2, -1);
   int pos3 = X509v3_get_ext_by_critical(exts, 1, -1);
   int pos4 = X509v3_get_ext_by_NID(exts, nid3, -1);
+  int pos5 = X509v3_get_ext_by_NID(exts, nid5, -1);
+
   int ret = AC_ERR_UNKNOWN;
 
   /* noRevAvail, Authkeyid MUST be present */
@@ -617,7 +545,20 @@ static int checkExtensions(STACK_OF(X509_EXTENSION) *exts, X509 *iss, struct col
       ret = AC_ERR_EXT_CRIT;
     pos3 = X509v3_get_ext_by_critical(exts, 1, pos3);
   }
-  
+
+  voms->atts = NULL;
+
+  if (pos5 >= 0) {
+    X509_EXTENSION *ex = NULL;
+    AC_FULL_ATTRIBUTES *full_attr = NULL;
+    ex = sk_X509_EXTENSION_value(exts, pos5);
+    full_attr = (AC_FULL_ATTRIBUTES *)X509V3_EXT_d2i(ex);
+    if (full_attr) {
+      if (!interpret_attributes(full_attr, voms))
+        ret = AC_ERR_ATTRIB;
+    }
+  }
+
   if (valids & VER_KEYID) {
     if (pos2 >= 0) {
       X509_EXTENSION *ex;
@@ -696,4 +637,103 @@ static char *getfqdn(void)
     }
   }
   return name;
+}
+
+
+static bool interpret_attributes(AC_FULL_ATTRIBUTES *full_attr, struct col *voms)
+{
+
+  struct full_att *fa      = malloc(sizeof(struct full_att));
+  struct att_list *al      = NULL;
+  struct att      *a       = NULL;
+  char            *grantor = NULL;
+
+  if (!fa)
+    return false;
+
+  fa->list = NULL;
+
+  STACK_OF(AC_ATT_HOLDER) *providers = full_attr->providers;
+
+  int i;
+  for (i = 0; i < sk_AC_ATT_HOLDER_num(providers); i++) {
+    AC_ATT_HOLDER *holder = sk_AC_ATT_HOLDER_value(providers, i);
+
+    al = malloc(sizeof(struct att_list));
+    if (!al)
+      goto err;
+
+    al->grantor = NULL;
+    al->attrs   = NULL;
+
+    STACK_OF(AC_ATTRIBUTE) *atts = holder->attributes;
+
+    int j;
+    for (j = 0; j < sk_AC_ATTRIBUTE_num(atts); j++) {
+      AC_ATTRIBUTE *at = sk_AC_ATTRIBUTE_value(atts, j);
+
+      name      = strndup(at->name->data,      at->name->length);
+      value     = strndup(at->value->data,     at->value->length);
+      qualifier = strndup(at->qualifier->data, at->qualifier->length);
+      if (!name || !value || !qualifier)
+        goto err;
+
+      a = malloc(sizeof(struct att));
+      a->name = name;
+      a->val  = value;
+      a->qual = qualifier;
+      name = value = qualifier = NULL;
+
+      char ** tmp = listadd((char **)(al->attrs), (char *)a, sizeof(a));
+      if (tmp) {
+        al->attrs = (struct att **)tmp;
+        a = NULL;
+      }
+      else {
+        listfree((char **)(al->attrs), (freefn)free_att);
+        goto err;
+      }
+    }
+
+    gn = sk_GENERAL_NAME_value(holder->grantor, 0);
+    grant = strndup(gn->d.ia5->data, gn->d.ia5->length);
+    if (!grant)
+      goto err;
+    
+    al->grantor = grant;
+    grant = NULL;
+
+    char **tmp = listadd((char **)(fa->list), (char *)al, sizeof(al));
+    if (tmp) {
+      fa->list = (struct att_list **)tmp;
+      al = NULL;
+    }
+    else {
+      listfree((char **)(fa->list), (freefn)free_att_list);
+      goto err;
+    }
+  }
+  voms->atts = fa;
+  fa = NULL;
+
+ err:
+  if (grant)
+    free(grant);
+  if (name)
+    free(name);
+  if (value)
+    free(value);
+  if (qualifier)
+    free(qualifier);
+  if (a)
+    free_att(a);
+  if (al)
+    free_att_list(al);
+  if (fa) {
+    free_full_att(fa);
+    return false;
+  }
+  else
+    return true;
+
 }

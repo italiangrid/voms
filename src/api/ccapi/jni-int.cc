@@ -107,8 +107,8 @@ static jobjectArray returnAttributeArray(JNIEnv *env, std::vector<attribute> &ar
 
   for (int i = 0; i <array.size(); i++) {
     //fprintf(stderr, "data: name %s, value %s, qualifier:%s\n",
-            array[i].name.c_str(), array[i].value.c_str(),
-            array[i].qualifier.c_str());
+    //            array[i].name.c_str(), array[i].value.c_str(),
+    //            array[i].qualifier.c_str());
     jobject obj = env->NewObject(ap_class, ap_constructor, 
                                  returnString(env, array[i].name),
                                  returnString(env, array[i].value),
@@ -154,8 +154,8 @@ static jobjectArray returnContactData(JNIEnv *env, std::vector<contactdata> &arr
 
   for (int i = 0; i <array.size(); i++) {
     //fprintf(stderr, "data: nick %s, host %s, contact:%s, port:%d\n", array[i].nick.c_str(), 
-            array[i].host.c_str(), array[i].contact.c_str(),
-            array[i].port);
+    //            array[i].host.c_str(), array[i].contact.c_str(),
+    //            array[i].port);
     jobject obj = env->NewObject(dp_class, dp_constructor, 
                                  returnString(env, array[i].nick),
                                  returnString(env, array[i].host),
@@ -428,7 +428,7 @@ Java_org_glite_security_voms_peers_VomsdataPeer_Contact(JNIEnv *env, jobject obj
   const char *vcommand = env->GetStringUTFChars(command, 0);
 
   //fprintf(stderr, "CONTACT\n\nhost: %s\nsubj: %s\ncomm: %s\n\n", hostname,
-          subject, vcommand);
+  //          subject, vcommand);
 
   bool res = vd->Contact(hostname, port, subject, vcommand);
   //fprintf(stderr, "res: %d\n", res);

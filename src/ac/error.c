@@ -60,6 +60,7 @@ static ERR_STRING_DATA AC_str_functs[] = {
   {ERR_PACK(0, ASN1_F_D2I_AC_TARGETS, 0), "d2i_AC_TARGETS"},
   {ERR_PACK(0, ASN1_F_D2I_AC_SEQ, 0), "d2i_AC_SEQ"},
   {ERR_PACK(0, AC_F_AC_SEQ_new, 0), "AC_SEQ_new"},
+  {ERR_PACK(0, AC_ERR_ATTRIBS, 0), "AC_FULL_ATTRIBUTES"},
   {0, NULL}};
 #endif
 

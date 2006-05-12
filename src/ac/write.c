@@ -38,7 +38,7 @@ int writeac(X509 *issuerc, STACK_OF(X509) *issuerstack, X509 *holder, EVP_PKEY *
   GENERAL_NAME *dirn, *dirn2;
   ASN1_INTEGER  *serial, *holdserial, *version;
   ASN1_BIT_STRING *uid;
-  AC_ATTR *capabilities, *attributes;
+  AC_ATTR *capabilities;
   AC_IETFATTR *capnames;
   AC_FULL_ATTRIBUTES *ac_full_attrs;
   ASN1_OBJECT *cobj, *aobj;
@@ -60,7 +60,7 @@ int writeac(X509 *issuerc, STACK_OF(X509) *issuerstack, X509 *holder, EVP_PKEY *
   version = serial = holdserial = NULL;
   time1 = time2 = NULL;
   uid = NULL;
-  capabilities = attributes = NULL;
+  capabilities = NULL;
   capnames = NULL;
   cobj = aobj = NULL;
   certstack = auth = targets = norevavail = NULL;
@@ -98,7 +98,6 @@ int writeac(X509 *issuerc, STACK_OF(X509) *issuerstack, X509 *holder, EVP_PKEY *
   serial              = BN_to_ASN1_INTEGER(s, NULL);
   version             = BN_to_ASN1_INTEGER((BIGNUM *)(BN_value_one()), NULL);
   capabilities        = AC_ATTR_new();
-  attributes          = AC_ATTR_new();
   cobj                = OBJ_txt2obj("idatcap",0);
   aobj                = OBJ_txt2obj("attributes",0);
   capnames            = AC_IETFATTR_new();
@@ -107,7 +106,7 @@ int writeac(X509 *issuerc, STACK_OF(X509) *issuerstack, X509 *holder, EVP_PKEY *
   ac_att_holder       = AC_ATT_HOLDER_new();
 
   if (!subjdup || !issdup || !dirn || !dirn2 || !holdserial || !serial ||
-      !capabilities || !attributes || !cobj || !capnames || !time1 || !time2 ||
+      !capabilities || !cobj || !capnames || !time1 || !time2 ||
       !null || !ac_full_attrs || !ac_att_holder)
     ERROR(AC_ERR_MEMORY);
 
@@ -189,7 +188,7 @@ int writeac(X509 *issuerc, STACK_OF(X509) *issuerstack, X509 *holder, EVP_PKEY *
     if (qual)
       ASN1_OCTET_STRING_set(ac_attr->qualifier, qual, strlen(qual));
     else
-      ASN1_OCTET_STRING_set(ac_attr->qualifier, "", strlen(""));
+      ASN1_OCTET_STRING_set(ac_attr->qualifier, vo, strlen(vo));
 
     ASN1_OCTET_STRING_set(ac_attr->name,        name,  strlen(name));
     ASN1_OCTET_STRING_set(ac_attr->value,       value, strlen(value));
@@ -222,17 +221,21 @@ int writeac(X509 *issuerc, STACK_OF(X509) *issuerstack, X509 *holder, EVP_PKEY *
 
     sk_AC_ATT_HOLDER_push(ac_full_attrs->providers, ac_att_holder);
   }  
-
-
-  // stuff the AC_FULL_ATTRIBUTES in values and define its object
-  sk_AC_FULL_ATTRIBUTES_push(attributes->fullattributes, ac_full_attrs);
-  attributes->get_type = GET_TYPE_ATTRIBUTES;
-  ASN1_OBJECT_free(attributes->type);
-  attributes->type = aobj;
   
   // push both AC_ATTR into STACK_OF(AC_ATTR)
   sk_AC_ATTR_push(a->acinfo->attrib, capabilities);
-  sk_AC_ATTR_push(a->acinfo->attrib, attributes);
+
+  if (ac_full_attrs) {
+    X509_EXTENSION *ext = NULL;
+    ext=X509V3_EXT_conf_nid(NULL, NULL, OBJ_txt2nid("attributes"), ac_full_attrs);
+    if (!ext)
+      ERROR(AC_ERR_NO_EXTENSION);
+
+    //    X509_EXTENSION_set_critical(targets,1);
+    sk_X509_EXTENSION_push(a->acinfo->exts, ext);
+    AC_FULL_ATTRIBUTES_free(ac_full_attrs);
+    ac_full_attrs = NULL;
+  }
 
   STACK_OF(X509) *stk = NULL;
   if (issuerstack)
