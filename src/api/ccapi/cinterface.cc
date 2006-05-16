@@ -26,7 +26,7 @@ extern "C" {
 #include <stdlib.h>
 }
 
-
+#include "realdata.h"
 
 
 #if 1
@@ -97,10 +97,13 @@ struct vomsdatar *VOMS_Init(char *voms, char *cert)
   return vd;
 }
 
+#define GetPointer(v) (((struct realdata *)(((struct vomsdatar *)((v)->my2))->real->data[v->mydata].realdata)))
+#define GetV(v) (((struct vomsdatar *)((v)->my2))->real->data[v->mydata])
+
 int VOMS_GetAttributeSourcesNumber(struct vomsr *v, struct vomsdatar *vd, int *error)
 {
   try {
-    return ((struct vomsdatar *)(v->my2))->real->data[v->mydata].attributes.size();
+    return GetV(v).GetAttributes().size();
   }
   catch(...) {
     *error = VERR_PARAM;
@@ -111,7 +114,7 @@ int VOMS_GetAttributeSourcesNumber(struct vomsr *v, struct vomsdatar *vd, int *e
 int VOMS_GetAttributeSourceHandle(struct vomsr *v, int num, struct vomsdatar *vd, int *error)
 {
   try {
-    if (((struct vomsdatar *)(v->my2))->real->data[v->mydata].attributes.size() <= num)
+    if (VOMS_GetAttributeSourcesNumber(v, vd, error) <= num)
       return num;
   }
   catch(...) {
@@ -123,7 +126,7 @@ int VOMS_GetAttributeSourceHandle(struct vomsr *v, int num, struct vomsdatar *vd
 const char *VOMS_GetAttributeGrantor(struct vomsr *v, int handle, struct vomsdatar *vd, int *error)
 {
   try {
-    return ((struct vomsdatar *)(v->my2))->real->data[v->mydata].attributes[handle].grantor.c_str();
+    return ((GetV(v).GetAttributes())[handle].grantor.c_str());
   }
   catch(...) {
     *error = VERR_PARAM;
@@ -134,7 +137,7 @@ const char *VOMS_GetAttributeGrantor(struct vomsr *v, int handle, struct vomsdat
 int VOMS_GetAttributesNumber(struct vomsr *v, int handle, struct vomsdatar *vd, int *error)
 {
   try {
-    return ((struct vomsdatar *)(v->my2))->real->data[v->mydata].attributes[handle].attributes.size();
+    return ((GetV(v).GetAttributes())[handle].attributes.size());
   }
   catch (...) {
     *error = VERR_PARAM;
@@ -145,7 +148,7 @@ int VOMS_GetAttributesNumber(struct vomsr *v, int handle, struct vomsdatar *vd, 
 int VOMS_GetAttribute(struct vomsr *v, int handle, int num, struct attributer *at, struct vomsdatar *vd, int *error)
 {
   try {
-    struct attribute a = ((struct vomsdatar *)(v->my2))->real->data[v->mydata].attributes[handle].attributes[num];
+    struct attribute a = ((GetV(v).GetAttributes())[handle]).attributes[num];
 
     at->name = a.name.c_str();
     at->qualifier = (a.qualifier.empty() ? NULL : a.qualifier.c_str());
@@ -274,7 +277,8 @@ struct vomsr *voms::translate()
       dst->serial    = mystrdup(serial);
       dst->datalen   = custom.size();
 
-      dst->ac     = (AC *)  ASN1_dup((int(*)())i2d_AC,   (char*(*)())d2i_AC,   (char *)ac);
+      dst->ac     = (AC *)  ASN1_dup((int(*)())i2d_AC,   (char*(*)())d2i_AC,   
+                                     (char *)(((struct realdata *)realdata)->ac));
       dst->holder = (X509 *)ASN1_dup((int(*)())i2d_X509, (char*(*)())d2i_X509, (char *)holder);
 
       if (!dst->holder || !dst->ac)

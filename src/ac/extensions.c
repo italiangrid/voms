@@ -384,7 +384,7 @@ void *acseq_s2i(struct v3_ext_method *method, struct v3_ext_ctx *ctx, char *data
 
 void *attributes_s2i(struct v3_ext_method *method, struct v3_ext_ctx *ctx, char *data)
 {
-  return (void *)a;
+  return (void *)data;
 }
 
 void *targets_s2i(struct v3_ext_method *method, struct v3_ext_ctx *ctx, char *data)
@@ -615,7 +615,7 @@ int initEx(void)
   certseq->r2i      = (X509V3_EXT_R2I) NULL;
   certseq->i2r      = (X509V3_EXT_I2R) NULL;
 
-  attribs->ext_nid  = OBJ_txt2nid("certseq");
+  attribs->ext_nid  = OBJ_txt2nid("attributes");
 #ifndef NOGLOBUS
 #ifdef HAVE_X509V3_EXT_METHOD_IT
   attribs->it = NULL;
@@ -631,7 +631,7 @@ int initEx(void)
   attribs->d2i      = (X509V3_EXT_D2I) d2i_AC_FULL_ATTRIBUTES;
   attribs->i2d      = (X509V3_EXT_I2D) i2d_AC_FULL_ATTRIBUTES;
   attribs->s2i      = (X509V3_EXT_S2I) attributes_s2i;
-  attribs->i2s      = (X509V3_EXT_I2S) attributes_i2s;
+  attribs->i2s      = (X509V3_EXT_I2S) NULL;
   attribs->i2v      = (X509V3_EXT_I2V) NULL;
   attribs->v2i      = (X509V3_EXT_V2I) NULL;
   attribs->r2i      = (X509V3_EXT_R2I) NULL;

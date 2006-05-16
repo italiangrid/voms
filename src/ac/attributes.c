@@ -31,6 +31,7 @@
 #include "attributes.h"
 
 
+#if 0
 
 int i2d_AC_ATTRIBUTE(AC_ATTRIBUTE *a, unsigned char **pp)
 {
@@ -172,3 +173,4 @@ void AC_FULL_ATTRIBUTES_free(AC_FULL_ATTRIBUTES *a)
 IMPL_STACK(AC_ATTRIBUTE)
 IMPL_STACK(AC_ATT_HOLDER)
 IMPL_STACK(AC_FULL_ATTRIBUTES)
+#endif

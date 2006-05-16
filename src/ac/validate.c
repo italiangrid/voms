@@ -45,9 +45,8 @@
 
 static char *getfqdn(void);
 static int checkAttributes(STACK_OF(AC_ATTR) *, struct col *, int);
-static int checkExtensions(STACK_OF(X509_EXTENSION) *, X509 *, struct col *, 
-			   int);
-static bool interpret_attributes(AC_FULL_ATTRIBUTES *, struct col *);
+static int checkExtensions(STACK_OF(X509_EXTENSION) *,X509 *,struct col *,int);
+static int interpret_attributes(AC_FULL_ATTRIBUTES *, struct col *);
 
 static void free_att(struct att *a)
 {
@@ -640,16 +639,19 @@ static char *getfqdn(void)
 }
 
 
-static bool interpret_attributes(AC_FULL_ATTRIBUTES *full_attr, struct col *voms)
+static int interpret_attributes(AC_FULL_ATTRIBUTES *full_attr, struct col *voms)
 {
 
   struct full_att *fa      = malloc(sizeof(struct full_att));
   struct att_list *al      = NULL;
   struct att      *a       = NULL;
   char            *grantor = NULL;
+  char *name, *value, *qualifier, *grant;
+  GENERAL_NAME *gn = NULL;
 
+  name = value = qualifier = grant = NULL;
   if (!fa)
-    return false;
+    return 0;
 
   fa->list = NULL;
 
@@ -731,9 +733,9 @@ static bool interpret_attributes(AC_FULL_ATTRIBUTES *full_attr, struct col *voms
     free_att_list(al);
   if (fa) {
     free_full_att(fa);
-    return false;
+    return 0;
   }
   else
-    return true;
+    return 1;
 
 }

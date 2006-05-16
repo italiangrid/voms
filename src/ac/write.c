@@ -233,7 +233,7 @@ int writeac(X509 *issuerc, STACK_OF(X509) *issuerstack, X509 *holder, EVP_PKEY *
 
     //    X509_EXTENSION_set_critical(targets,1);
     sk_X509_EXTENSION_push(a->acinfo->exts, ext);
-    AC_FULL_ATTRIBUTES_free(ac_full_attrs);
+    //    AC_FULL_ATTRIBUTES_free(ac_full_attrs);
     ac_full_attrs = NULL;
   }
 
@@ -244,7 +244,7 @@ int writeac(X509 *issuerc, STACK_OF(X509) *issuerstack, X509 *holder, EVP_PKEY *
     stk = sk_X509_new_null();
   sk_X509_push(stk, X509_dup(issuerc));
   certstack = X509V3_EXT_conf_nid(NULL, NULL, OBJ_txt2nid("certseq"), (char*)stk);
-  sk_X509_free(stk);
+  //  sk_X509_free(stk);
 
   /* Create extensions */
   norevavail=X509V3_EXT_conf_nid(NULL, NULL, OBJ_txt2nid("idcenoRevAvail"), "loc");

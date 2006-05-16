@@ -238,7 +238,8 @@ static jobject returnVomsPeer(JNIEnv *env, voms &v)
   env->SetObjectField(obj, vp_holder,   returnByteArray(env, (const char *)holdbuffer, holdlen));
   env->SetObjectField(obj, vp_issuer,   returnByteArray(env, (const char *)fbuffer, flen));
   env->SetObjectField(obj, vp_uri,      returnString(env, v.uri));
-  env->SetObjectField(obj, vp_attribs,  returnAttributeListArray(env, v.attributes));
+  std::vector<attributelist> al = v.GetAttributes();
+  env->SetObjectField(obj, vp_attribs,  returnAttributeListArray(env, al));
   free(fbuffer);
   free(holdbuffer);
 

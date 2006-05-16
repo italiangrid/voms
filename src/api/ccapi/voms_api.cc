@@ -50,6 +50,9 @@ extern "C" {
 #include "data.h"
 #include "vomsxml.h"
 
+#include "realdata.h"
+
+static bool noglobus = false;
 
 extern bool retrieve(X509 *cert, STACK_OF(X509) *chain, recurse_type how, 
 		     std::string &buffer, std::string &vo, std::string &file, 
@@ -167,8 +170,7 @@ vomsdata::vomsdata(std::string voms_dir, std::string cert_dir) :  ca_cert_dir(ce
                                                                   error(VERR_NONE),
                                                                   workvo(""),
                                                                   extra_data(""),
-                                                                  ver_type(VERIFY_FULL),
-                                                                  noglobus(false)
+                                                                  ver_type(VERIFY_FULL)
 {
   if (voms_cert_dir.empty()) {
     char *v;
@@ -552,11 +554,11 @@ bool vomsdata::Export(std::string &buffer)
     }
 
     /* This is an AC format. */
-    int len  = i2d_AC(v->ac, NULL);
+    int len  = i2d_AC(((struct realdata *)v->realdata)->ac, NULL);
     unsigned char *tmp, *tmp2;
 
     if ((tmp2 = (tmp = (unsigned char *)OPENSSL_malloc(len)))) {
-      i2d_AC(v->ac,&tmp);
+      i2d_AC(((struct realdata *)v->realdata)->ac,&tmp);
       result += std::string((char *)tmp2, len);
       OPENSSL_free(tmp2);
     }
@@ -817,16 +819,24 @@ voms::voms(const voms &orig)
   custom    = orig.custom;
   fqan      = orig.fqan;
   serial    = orig.serial;
-  ac = (AC *)ASN1_dup((int (*)())i2d_AC, (char * (*)())d2i_AC, (char *)orig.ac);
+  realdata  = calloc(1, sizeof(struct realdata));
+  ((struct realdata *)realdata)->ac = (AC *)ASN1_dup((int (*)())i2d_AC, 
+                                                     (char * (*)())d2i_AC, 
+                                                     (char *)((struct realdata *)orig.realdata)->ac);
   holder = (X509 *)ASN1_dup((int (*)())i2d_X509,
 			    (char * (*)())d2i_X509,
 			    (char *)orig.holder);
-  attributes = orig.attributes;
+
+  
+  ((struct realdata *)realdata)->attributes = 
+    new std::vector<attributelist>(*(((struct realdata *)orig.realdata)->attributes));
 }
 
 
-voms::voms(): version(0), siglen(0), ac(NULL), holder(NULL)
-{}
+voms::voms(): version(0), siglen(0), holder(NULL)
+{
+  realdata = (void *)calloc(1, sizeof(struct realdata));
+}
 
 voms &voms::operator=(const voms &orig)
 {
@@ -849,21 +859,36 @@ voms &voms::operator=(const voms &orig)
   custom    = orig.custom;
   fqan      = orig.fqan;
   serial    = orig.serial;
-  ac = (AC *)ASN1_dup((int (*)())i2d_AC, (char * (*)())d2i_AC, (char *)orig.ac);
+  if (((struct realdata *)realdata)->ac)
+    AC_free(((struct realdata *)realdata)->ac);
+  ((struct realdata *)realdata)->ac = (AC *)ASN1_dup((int (*)())i2d_AC, 
+                                                     (char * (*)())d2i_AC, 
+                                                     (char *)((struct realdata *)orig.realdata)->ac);
   holder = (X509 *)ASN1_dup((int (*)())i2d_X509, (char * (*)())d2i_X509, (char *)orig.holder);
-  attributes = orig.attributes;
+  delete ((struct realdata *)realdata)->attributes;
+  ((struct realdata *)realdata)->attributes = 
+    new std::vector<attributelist>(*(((struct realdata *)orig.realdata)->attributes));
   return *this;
 }
 
 voms::~voms()
 {
-  AC_free(ac);
+  AC_free(((struct realdata *)realdata)->ac);
+  delete (((struct realdata *)realdata)->attributes);
+  free(realdata);
   X509_free(holder);
 }
 
 AC *voms::GetAC()
 {
-  return (AC *)ASN1_dup((int (*)())i2d_AC, (char * (*)())d2i_AC, (char *)ac);
+  return (AC *)ASN1_dup((int (*)())i2d_AC, 
+                        (char * (*)())d2i_AC, 
+                        (char *)((struct realdata *)realdata)->ac);
+}
+
+std::vector<attributelist>& voms::GetAttributes()
+{
+  return *((struct realdata *)realdata)->attributes;
 }
 
 vomsdata::vomsdata(const vomsdata &orig) : ca_cert_dir(orig.ca_cert_dir),
@@ -877,8 +902,7 @@ vomsdata::vomsdata(const vomsdata &orig) : ca_cert_dir(orig.ca_cert_dir),
                                            extra_data(orig.extra_data),
                                            ver_type(orig.ver_type),
                                            serverrors(orig.serverrors),
-                                           errmessage(orig.errmessage),
-                                           noglobus(orig.noglobus) {}
+                                           errmessage(orig.errmessage) {}
 
 
 

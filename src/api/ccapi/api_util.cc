@@ -62,6 +62,8 @@ extern "C" {
 #include "vomsxml.h"
 #include "ccval.h"
 
+#include "realdata.h"
+
 static bool check_sig_ac(X509 *, void *, verror_type &);
 static bool dncompare(const std::string &mut, const std::string &fixed);
 
@@ -285,7 +287,7 @@ vomsdata::verifydata(std::string &message, std::string subject, std::string ca,
       return false;
     }
     else {
-      v.ac = tmp;
+      ((struct realdata *)v.realdata)->ac = tmp;
       tmp = NULL;
     }
     
@@ -341,8 +343,9 @@ vomsdata::verifydata(AC *ac, const std::string& subject, const std::string& ca,
     return false;
   }
   else {
-    v.ac = (AC *)ASN1_dup((int (*) ())i2d_AC,
-                         (char * (*) ())d2i_AC, (char *)ac);
+    ((struct realdata *)v.realdata)->ac = (AC *)ASN1_dup((int (*) ())i2d_AC,
+                                                         (char * (*) ())d2i_AC,
+                                                         (char *)ac);
   }
   
   if (result && (ver_type & VERIFY_ID)) {

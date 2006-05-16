@@ -28,6 +28,7 @@ extern "C" {
 }
 
 
+#include "realdata.h"
 
 
 /* 
@@ -109,6 +110,7 @@ struct col {
   int buflen;
 };
 
+
 extern "C" {
 extern int validate(X509 *, X509 *, AC *, struct col *, int);
 extern char *get_error(int);
@@ -125,14 +127,24 @@ extern char *get_error(int);
 
 bool vomsdata::verifyac(X509 *cert, X509 *issuer, AC *ac, voms &v)
 {
+  struct realdata *rd = NULL;
+
   struct col *vv = NULL;
   int result = 1;
 
   vv = (struct col *)calloc(1, sizeof(struct col));
-  if (!vv) {
+  rd = (struct realdata *)calloc(1, sizeof(struct realdata));
+
+  if (!vv || !rd) {
+    free(vv);
+    free(rd);
     seterror(VERR_MEM, "Out of memory.");
     return false;
   }
+
+  v.realdata = rd;
+
+  rd->attributes = new std::vector<attributelist>;
 
   int typ = 0;
 
@@ -237,7 +249,7 @@ bool vomsdata::verifyac(X509 *cert, X509 *issuer, AC *ac, voms &v)
         l.attributes.push_back(a);
         j++;
       }
-      v.attributes.push_back(l);
+      rd->attributes->push_back(l);
       i++;
     }
   }

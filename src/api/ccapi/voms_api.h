@@ -97,7 +97,7 @@ struct voms {
   /* Data below this line is private. */
 
 private:
-  AC *ac;                  /*!< Original AC format. */
+  void *realdata;                  /*!< Original AC format. */
   X509 *holder;
 public:
   voms(const voms &);
@@ -113,7 +113,7 @@ public:
   AC *GetAC();
 
 public:
-  std::vector<attributelist> attributes;   /*!< Generic attributes */
+  std::vector<attributelist>& GetAttributes();   /*!< Generic attributes */
 };
 
 enum recurse_type { 
@@ -353,7 +353,7 @@ private:
   bool verifydata(AC *ac, const std::string& subject, const std::string& ca, 
                   X509 *holder, voms &v);
   bool evaluate(AC_SEQ *, const std::string&, const std::string&, X509*);
-  bool noglobus;
+
 public:
 
   std::string ErrorMessage(void); /*!< Gets a textual description of the error.
@@ -384,7 +384,6 @@ private:
 
 public:
   vomsdata(const vomsdata &);
-
 };
 
 
