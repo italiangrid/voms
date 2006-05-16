@@ -648,6 +648,8 @@ static int interpret_attributes(AC_FULL_ATTRIBUTES *full_attr, struct col *voms)
   char            *grantor = NULL;
   char *name, *value, *qualifier, *grant;
   GENERAL_NAME *gn = NULL;
+  STACK_OF(AC_ATT_HOLDER) *providers = NULL;
+  int i;
 
   name = value = qualifier = grant = NULL;
   if (!fa)
@@ -655,11 +657,14 @@ static int interpret_attributes(AC_FULL_ATTRIBUTES *full_attr, struct col *voms)
 
   fa->list = NULL;
 
-  STACK_OF(AC_ATT_HOLDER) *providers = full_attr->providers;
+  providers = full_attr->providers;
 
-  int i;
+
   for (i = 0; i < sk_AC_ATT_HOLDER_num(providers); i++) {
     AC_ATT_HOLDER *holder = sk_AC_ATT_HOLDER_value(providers, i);
+    STACK_OF(AC_ATTRIBUTE) *atts = holder->attributes;
+    char **tmp = NULL;
+    int j;
 
     al = malloc(sizeof(struct att_list));
     if (!al)
@@ -668,11 +673,12 @@ static int interpret_attributes(AC_FULL_ATTRIBUTES *full_attr, struct col *voms)
     al->grantor = NULL;
     al->attrs   = NULL;
 
-    STACK_OF(AC_ATTRIBUTE) *atts = holder->attributes;
 
-    int j;
+
+
     for (j = 0; j < sk_AC_ATTRIBUTE_num(atts); j++) {
       AC_ATTRIBUTE *at = sk_AC_ATTRIBUTE_value(atts, j);
+      char ** tmp = NULL;
 
       name      = strndup(at->name->data,      at->name->length);
       value     = strndup(at->value->data,     at->value->length);
@@ -686,7 +692,7 @@ static int interpret_attributes(AC_FULL_ATTRIBUTES *full_attr, struct col *voms)
       a->qual = qualifier;
       name = value = qualifier = NULL;
 
-      char ** tmp = listadd((char **)(al->attrs), (char *)a, sizeof(a));
+      tmp = listadd((char **)(al->attrs), (char *)a, sizeof(a));
       if (tmp) {
         al->attrs = (struct att **)tmp;
         a = NULL;
@@ -705,7 +711,7 @@ static int interpret_attributes(AC_FULL_ATTRIBUTES *full_attr, struct col *voms)
     al->grantor = grant;
     grant = NULL;
 
-    char **tmp = listadd((char **)(fa->list), (char *)al, sizeof(al));
+    tmp = listadd((char **)(fa->list), (char *)al, sizeof(al));
     if (tmp) {
       fa->list = (struct att_list **)tmp;
       al = NULL;

@@ -47,6 +47,7 @@ int writeac(X509 *issuerc, STACK_OF(X509) *issuerstack, X509 *holder, EVP_PKEY *
   X509_EXTENSION *norevavail, *targets, *auth, *certstack;
   AC_ATT_HOLDER *ac_att_holder;
   char *qual, *name, *value, *tmp, *tmp2;
+  STACK_OF(X509) *stk = NULL;
 
   ASN1_NULL *null;
   int i = 0;
@@ -155,6 +156,9 @@ int writeac(X509 *issuerc, STACK_OF(X509) *issuerstack, X509 *holder, EVP_PKEY *
   i = 0;
   // prepare AC_FULL_ATTRIBUTES
   while(attributes_strings[i]) {
+    char *qual, *name, *value;
+    char *tmp = NULL, *tmp2 = NULL;
+
     AC_ATTRIBUTE *ac_attr      = AC_ATTRIBUTE_new();
 
     if (!ac_attr) {
@@ -162,9 +166,9 @@ int writeac(X509 *issuerc, STACK_OF(X509) *issuerstack, X509 *holder, EVP_PKEY *
       ERROR(AC_ERR_MEMORY);
     }
     
-    char *qual, *name, *value;
 
-    char *tmp =strstr(attributes_strings[i], "::");
+
+    tmp =strstr(attributes_strings[i], "::");
     if (tmp == attributes_strings[i]) {
       qual = NULL;
       tmp = attributes_strings[i] + 2;
@@ -175,7 +179,7 @@ int writeac(X509 *issuerc, STACK_OF(X509) *issuerstack, X509 *holder, EVP_PKEY *
       tmp += 2;
     }
 
-    char *tmp2 = strstr(tmp, "=");
+    tmp2 = strstr(tmp, "=");
     if (!tmp2) {
       ERROR(AC_ERR_PARAMETERS);
     }
@@ -227,7 +231,7 @@ int writeac(X509 *issuerc, STACK_OF(X509) *issuerstack, X509 *holder, EVP_PKEY *
 
   if (ac_full_attrs) {
     X509_EXTENSION *ext = NULL;
-    ext=X509V3_EXT_conf_nid(NULL, NULL, OBJ_txt2nid("attributes"), ac_full_attrs);
+    ext=X509V3_EXT_conf_nid(NULL, NULL, OBJ_txt2nid("attributes"), (char *)ac_full_attrs);
     if (!ext)
       ERROR(AC_ERR_NO_EXTENSION);
 
@@ -237,7 +241,7 @@ int writeac(X509 *issuerc, STACK_OF(X509) *issuerstack, X509 *holder, EVP_PKEY *
     ac_full_attrs = NULL;
   }
 
-  STACK_OF(X509) *stk = NULL;
+  stk = NULL;
   if (issuerstack)
     stk = sk_X509_dup(issuerstack);
   else

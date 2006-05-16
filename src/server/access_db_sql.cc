@@ -1204,7 +1204,7 @@ get_attributes_real0(sqliface::interface *db, const std::string &dn,
       catch(sqliface::DBEXC& e)
       {
         if(e.what() == "Unknown column GROUPNAME.")
-          rec.qualifier.clear();
+          rec.qualifier = "";
       }
       catch(...) {
         LOGM(VARP, logh, LEV_DEBUG, T_REQUEST, "UNKNOWN EXCEPTION: %s", ".");

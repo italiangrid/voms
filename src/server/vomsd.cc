@@ -846,7 +846,7 @@ VOMSServer::Execute(const std::string &client_name, const std::string &ca_name,
     int res = 1;
     std::string codedac;
 
-    if (comm.at(0) != "N")
+    if (comm[0] != "N")
     {
       if (!serial)
         LOG(logh, LEV_ERROR, T_PRE, "Can't get Serial Number!");
@@ -903,7 +903,7 @@ VOMSServer::Execute(const std::string &client_name, const std::string &ca_name,
 
     for (std::vector<std::string>::iterator i = compact.begin(); i != compact.end(); i++) {
       LOGM(VARP, logh, LEV_INFO, T_PRE, "Request Result: %s",  (*i).c_str());
-      if (comm.at(0) == "N")
+      if (comm[0] == "N")
         data += (*i).c_str() + std::string("\n");
     }
 

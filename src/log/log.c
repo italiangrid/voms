@@ -551,9 +551,10 @@ int LogMessage(void *data, loglevels lev, logtypes type, const char *message, co
       int mode = 0;
       const char *dateformat = (li->dateformat ? li->dateformat : "%c");
       char *str = NULL;
+      char *holder = NULL;
 
       msgcopy = strdup(message);
-      char *holder = msgcopy;
+      holder = msgcopy;
 
       if (!msgcopy)
         return 0;

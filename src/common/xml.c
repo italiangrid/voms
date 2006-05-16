@@ -158,9 +158,9 @@ char *XMLEncodeReq(const char *command, const char *order, const char *targets,
     (targets ? strlen(targets) : 0) + 149;
 
   if ((res = (char *)malloc(size))) {
+    char * prev = command, * next;
     strcpy(res, "<?xml version=\"1.0\" encoding = \"US-ASCII\"?><voms>");
 
-    char * prev = command, * next;
     while(next != 0)
     { 
       next = strchr(prev, ',');
