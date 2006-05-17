@@ -232,6 +232,8 @@ int writeac(X509 *issuerc, STACK_OF(X509) *issuerstack, X509 *holder, EVP_PKEY *
   if (ac_full_attrs) {
     X509_EXTENSION *ext = NULL;
     ext=X509V3_EXT_conf_nid(NULL, NULL, OBJ_txt2nid("attributes"), (char *)(ac_full_attrs->providers));
+    AC_FULL_ATTRIBUTES_free(ac_full_attrs);
+
     if (!ext)
       ERROR(AC_ERR_NO_EXTENSION);
 
@@ -241,12 +243,19 @@ int writeac(X509 *issuerc, STACK_OF(X509) *issuerstack, X509 *holder, EVP_PKEY *
     ac_full_attrs = NULL;
   }
 
-  stk = NULL;
-  fprintf(stderr, "issuerc: %d\n", issuerc);
-  sk_X509_push(issuerstack, X509_dup(sk_X509_value(issuerstack, 0)));
+/*   stk = NULL; */
+/*   fprintf(stderr, "issuerc: %d\n", issuerc); */
+/*   issuerstack=sk_X509_new_null(); */
 
-  for (i=0; i <sk_X509_num(issuerstack); i ++)
-    fprintf(stderr, "issuerstack[%i] = %d\n", i , sk_X509_value(issuerstack, i));
+/*   sk_X509_push(issuerstack, X509_dup(issuerc)); */
+/*   sk_X509_push(issuerstack, X509_dup(holder)); */
+
+/*   if (issuerstack) { */
+/*     //  sk_X509_push(issuerstack, X509_dup(sk_X509_value(issuerstack, 0))); */
+
+/*   for (i=0; i <sk_X509_num(issuerstack); i ++) */
+/*     fprintf(stderr, "issuerstack[%i] = %s\n", i , X509_NAME_oneline(X509_get_subject_name((X509 *)sk_X509_value(issuerstack, i)), NULL, 0)); */
+/*   } */
 
   stk = sk_X509_new_null();
 
@@ -255,16 +264,17 @@ int writeac(X509 *issuerc, STACK_OF(X509) *issuerstack, X509 *holder, EVP_PKEY *
       sk_X509_push(stk, X509_dup(sk_X509_value(issuerstack, i)));
   }
 
-  for (i=0; i <sk_X509_num(stk); i ++)
-    fprintf(stderr, "stk[%i] = %d\n", i , sk_X509_value(stk, i));
+/*   for (i=0; i <sk_X509_num(stk); i ++) */
+/*     fprintf(stderr, "stk[%i] = %s\n", i , X509_NAME_oneline(X509_get_subject_name((X509 *)sk_X509_value(stk, i)), NULL, 0)); */
 
   sk_X509_push(stk,
                (X509 *)ASN1_dup((int (*)())i2d_X509,(char * (*)())d2i_X509, (char *)issuerc));
-  for (i=0; i <sk_X509_num(stk); i ++)
-    fprintf(stderr, "stk[%i] = %d\n", i , sk_X509_value(stk, i));
+/*   for (i=0; i <sk_X509_num(stk); i ++) */
+/*     fprintf(stderr, "stk[%i] = %d\n", i , sk_X509_value(stk, i)); */
 
   certstack = X509V3_EXT_conf_nid(NULL, NULL, OBJ_txt2nid("certseq"), (char*)stk);
   //  sk_X509_free(stk);
+  sk_X509_pop_free(stk, X509_free);
 
   /* Create extensions */
   norevavail=X509V3_EXT_conf_nid(NULL, NULL, OBJ_txt2nid("idcenoRevAvail"), "loc");

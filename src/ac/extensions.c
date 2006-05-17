@@ -432,12 +432,18 @@ void *certs_s2i(struct v3_ext_method *method, struct v3_ext_ctx *ctx, char *data
 {
   STACK_OF(X509) *certs =
     (STACK_OF(X509) *)data;
+  int i = 0;
 
   if (data) {
     AC_CERTS *a = AC_CERTS_new();
 
     sk_X509_pop_free(a->stackcert, X509_free);
-    a->stackcert = sk_X509_dup(certs);
+    a->stackcert = sk_X509_new_null();
+
+/*     a->stackcert = sk_X509_dup(certs); */
+    for (i =0; i < sk_X509_num(certs); i++)
+      sk_X509_push(a->stackcert, X509_dup(sk_X509_value(certs, i)));
+
     return a;
   }
 
@@ -446,6 +452,7 @@ void *certs_s2i(struct v3_ext_method *method, struct v3_ext_ctx *ctx, char *data
 
 void *attributes_s2i(struct v3_ext_method *method, struct v3_ext_ctx *ctx, char *data)
 {
+  int i = 0;
 
   STACK_OF(AC_ATT_HOLDER) *stack =
     (STACK_OF(AC_ATT_HOLDER) *)data;
@@ -453,7 +460,15 @@ void *attributes_s2i(struct v3_ext_method *method, struct v3_ext_ctx *ctx, char 
   if (data) {
     AC_FULL_ATTRIBUTES *a = AC_FULL_ATTRIBUTES_new();
     sk_AC_ATT_HOLDER_pop_free(a->providers, AC_ATT_HOLDER_free);
-    a->providers = sk_AC_ATT_HOLDER_dup(stack);
+    a->providers = sk_AC_ATT_HOLDER_new_null();
+/*     a->providers = sk_AC_ATT_HOLDER_dup(stack); */
+    for (i = 0; i < sk_AC_ATT_HOLDER_num(stack); i++) 
+      sk_AC_ATT_HOLDER_push(a->providers,
+                            (AC_ATT_HOLDER *)ASN1_dup((int (*)())i2d_AC_ATT_HOLDER,
+                                                      (char * (*)())d2i_AC_ATT_HOLDER, 
+                                                      (char *)(sk_AC_ATT_HOLDER_value(stack, i))));
+
+    
     return a;
   }
   return NULL;
