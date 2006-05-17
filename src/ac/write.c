@@ -231,7 +231,7 @@ int writeac(X509 *issuerc, STACK_OF(X509) *issuerstack, X509 *holder, EVP_PKEY *
 
   if (ac_full_attrs) {
     X509_EXTENSION *ext = NULL;
-    ext=X509V3_EXT_conf_nid(NULL, NULL, OBJ_txt2nid("attributes"), (char *)ac_full_attrs);
+    ext=X509V3_EXT_conf_nid(NULL, NULL, OBJ_txt2nid("attributes"), (char *)(ac_full_attrs->providers));
     if (!ext)
       ERROR(AC_ERR_NO_EXTENSION);
 
@@ -242,11 +242,27 @@ int writeac(X509 *issuerc, STACK_OF(X509) *issuerstack, X509 *holder, EVP_PKEY *
   }
 
   stk = NULL;
-  if (issuerstack)
-    stk = sk_X509_dup(issuerstack);
-  else
-    stk = sk_X509_new_null();
-  sk_X509_push(stk, X509_dup(issuerc));
+  fprintf(stderr, "issuerc: %d\n", issuerc);
+  sk_X509_push(issuerstack, X509_dup(sk_X509_value(issuerstack, 0)));
+
+  for (i=0; i <sk_X509_num(issuerstack); i ++)
+    fprintf(stderr, "issuerstack[%i] = %d\n", i , sk_X509_value(issuerstack, i));
+
+  stk = sk_X509_new_null();
+
+  if (issuerstack) {
+    for (i =0; i < sk_X509_num(issuerstack); i++)
+      sk_X509_push(stk, X509_dup(sk_X509_value(issuerstack, i)));
+  }
+
+  for (i=0; i <sk_X509_num(stk); i ++)
+    fprintf(stderr, "stk[%i] = %d\n", i , sk_X509_value(stk, i));
+
+  sk_X509_push(stk,
+               (X509 *)ASN1_dup((int (*)())i2d_X509,(char * (*)())d2i_X509, (char *)issuerc));
+  for (i=0; i <sk_X509_num(stk); i ++)
+    fprintf(stderr, "stk[%i] = %d\n", i , sk_X509_value(stk, i));
+
   certstack = X509V3_EXT_conf_nid(NULL, NULL, OBJ_txt2nid("certseq"), (char*)stk);
   //  sk_X509_free(stk);
 

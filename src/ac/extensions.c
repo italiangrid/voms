@@ -367,6 +367,11 @@ char *null_i2s(struct v3_ext_method *method, void *ext)
   return norep();
 }
 
+char *attributes_i2s(struct v3_ext_method *method, void *ext)
+{
+  return norep();
+}
+
 void *acseq_s2i(struct v3_ext_method *method, struct v3_ext_ctx *ctx, char *data)
 {
   AC **list = (AC **)data;
@@ -380,11 +385,6 @@ void *acseq_s2i(struct v3_ext_method *method, struct v3_ext_ctx *ctx, char *data
     sk_AC_push(a->acs, *list++);
 
   return (void *)a;
-}
-
-void *attributes_s2i(struct v3_ext_method *method, struct v3_ext_ctx *ctx, char *data)
-{
-  return (void *)data;
 }
 
 void *targets_s2i(struct v3_ext_method *method, struct v3_ext_ctx *ctx, char *data)
@@ -444,6 +444,20 @@ void *certs_s2i(struct v3_ext_method *method, struct v3_ext_ctx *ctx, char *data
   return NULL;    
 }
 
+void *attributes_s2i(struct v3_ext_method *method, struct v3_ext_ctx *ctx, char *data)
+{
+
+  STACK_OF(AC_ATT_HOLDER) *stack =
+    (STACK_OF(AC_ATT_HOLDER) *)data;
+
+  if (data) {
+    AC_FULL_ATTRIBUTES *a = AC_FULL_ATTRIBUTES_new();
+    sk_AC_ATT_HOLDER_pop_free(a->providers, AC_ATT_HOLDER_free);
+    a->providers = sk_AC_ATT_HOLDER_dup(stack);
+    return a;
+  }
+  return NULL;
+}
 
 void *null_s2i(struct v3_ext_method *method, struct v3_ext_ctx *ctx, char *data)
 {
@@ -631,7 +645,7 @@ int initEx(void)
   attribs->d2i      = (X509V3_EXT_D2I) d2i_AC_FULL_ATTRIBUTES;
   attribs->i2d      = (X509V3_EXT_I2D) i2d_AC_FULL_ATTRIBUTES;
   attribs->s2i      = (X509V3_EXT_S2I) attributes_s2i;
-  attribs->i2s      = (X509V3_EXT_I2S) NULL;
+  attribs->i2s      = (X509V3_EXT_I2S) attributes_i2s;
   attribs->i2v      = (X509V3_EXT_I2V) NULL;
   attribs->v2i      = (X509V3_EXT_V2I) NULL;
   attribs->r2i      = (X509V3_EXT_R2I) NULL;
