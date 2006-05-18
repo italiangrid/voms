@@ -1,0 +1,33 @@
+Changes since 1.6.22:
+
+Added support for generic attributes (requested by LHCb and Atlas experiments,
+                                      no bug number.)
+
+   Also, in consequence of this:
+
+   New C/C++/Java APIs to access the attributes.
+
+   New C/C++ API libraries that do not depend on Globus:
+   -- use vomsapi_nog.h and vomsapic_nog.h headers.
+   -- Contact methods temporarily disabled. Always return an
+      error now.
+   -- Link against libvomsapi_nog.so
+
+   Integration of Java APIs in the main code:
+   -- Removed dependency on org.glite.security.java-utils package..
+   -- Depends on either libvomsapi.so or libvomsapi_nog.so. The first
+      takes priority over the second one if both are found.
+   -- The org.glite.security.voms.ac package is now deprecated.  All
+      the get*() methods have been moved to the 
+      org.glite.security.voms.VOMSAttribute class, which is now the
+      only official way to access credential data.
+   
+Fix problem with UID/USERID in CA names (no bug number, reported by GIN)
+
+Fix for bug #16576
+Fix for bug #15436
+Fix for bug #15572
+Fix for bug #12514
+Fix for bug #10967 (java part. C and C++ were already fixed)
+Fix for bug #14026 (Easier configuration for clients)
+
