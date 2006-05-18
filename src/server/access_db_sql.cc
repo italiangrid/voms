@@ -1200,6 +1200,17 @@ get_attributes_real0(sqliface::interface *db, const std::string &dn,
       try
       {
         rec.qualifier = r->get("GROUPNAME");
+        std::string tmp = rec.qualifier;
+        try
+        {
+          std::string tmp = r->get("ROLE");
+          if(tmp != "NULL")
+            rec.qualifier += "/Role=" + tmp;
+        }
+        catch(sqliface::DBEXC& e)
+        {
+          rec.qualifier = tmp;
+        }
       }    
       catch(sqliface::DBEXC& e)
       {
