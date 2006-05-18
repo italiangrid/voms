@@ -235,11 +235,7 @@ AC_DEFUN([AC_JAVA],
       AC_MSG_RESULT([hope it is in $CLASSPATH])
     fi
   else
-    if test -e "$wbc"; then
-      AC_MSG_RESULT([found: $wbc])
-    else
-      AC_MSG_ERROR([bouncycastle not found])
-    fi
+    AC_MSG_RESULT([specified: $wbc])
   fi
 
   if test "x$have_java" = "xyes"; then
@@ -254,11 +250,7 @@ AC_DEFUN([AC_JAVA],
       AC_MSG_RESULT([hope it is in $CLASSPATH])
     fi
   else
-    if test -e "$wlog4j" ; then
-      AC_MSG_RESULT([found: $wlog4j])
-    else
-      AC_MSG_ERROR([log4j not found])
-    fi
+    AC_MSG_RESULT([specified: $wlog4j])
   fi
   JAVA_CLASSPATH=".:$wbc:$wlog4j"
   AC_SUBST(JAVA_CLASSPATH)    

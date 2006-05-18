@@ -20480,14 +20480,8 @@ fi;
 echo "${ECHO_T}hope it is in $CLASSPATH" >&6
     fi
   else
-    if test -e "$wbc"; then
-      echo "$as_me:$LINENO: result: found: $wbc" >&5
-echo "${ECHO_T}found: $wbc" >&6
-    else
-      { { echo "$as_me:$LINENO: error: bouncycastle not found" >&5
-echo "$as_me: error: bouncycastle not found" >&2;}
-   { (exit 1); exit 1; }; }
-    fi
+    echo "$as_me:$LINENO: result: specified: $wbc" >&5
+echo "${ECHO_T}specified: $wbc" >&6
   fi
 
   if test "x$have_java" = "xyes"; then
@@ -20508,14 +20502,8 @@ fi;
 echo "${ECHO_T}hope it is in $CLASSPATH" >&6
     fi
   else
-    if test -e "$wlog4j" ; then
-      echo "$as_me:$LINENO: result: found: $wlog4j" >&5
-echo "${ECHO_T}found: $wlog4j" >&6
-    else
-      { { echo "$as_me:$LINENO: error: log4j not found" >&5
-echo "$as_me: error: log4j not found" >&2;}
-   { (exit 1); exit 1; }; }
-    fi
+    echo "$as_me:$LINENO: result: specified: $wlog4j" >&5
+echo "${ECHO_T}specified: $wlog4j" >&6
   fi
   JAVA_CLASSPATH=".:$wbc:$wlog4j"
 
