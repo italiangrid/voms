@@ -139,7 +139,7 @@ libvomsapi_gcc32_la_SOURCES = \
 libvomsapi_gcc32_la_CPPFLAGS = \
 	-I$(top_srcdir)/src/include \
 	$(API_INCLUDES) \
-	$(GLOBUS_GCC_CFLAGS)
+	$(GLOBUS_GCC32_CFLAGS)
 
 libvomsapi_gcc32_la_LIBADD = \
 	$(CCLIBADD) \
@@ -203,7 +203,7 @@ libvomsc_gcc32_la_SOURCES = \
 libvomsc_gcc32_la_CPPFLAGS = \
 	-I$(top_srcdir)/src/include \
 	$(API_INCLUDES) \
-	$(GLOBUS_CFLAGS)
+	$(GLOBUS_GCC32_CFLAGS)
 
 libvomsc_gcc32_la_LIBADD = \
 	$(CCLIBADD) \
@@ -219,7 +219,7 @@ libvomsc_gcc32dbg_la_SOURCES = \
 libvomsc_gcc32dbg_la_CPPFLAGS = \
 	-I$(top_srcdir)/src/include \
 	$(API_INCLUDES) \
-	$(GLOBUS_CFLAGS)
+	$(GLOBUS_GCC32DBG_CFLAGS)
 
 libvomsc_gcc32dbg_la_LIBADD = \
 	$(CCLIBADD) \
@@ -235,7 +235,7 @@ libvomsc_gcc32pthr_la_SOURCES = \
 libvomsc_gcc32pthr_la_CPPFLAGS = \
 	-I$(top_srcdir)/src/include \
 	$(API_INCLUDES) \
-	$(GLOBUS_CFLAGS)
+	$(GLOBUS_GCC32PTHR_CFLAGS)
 
 libvomsc_gcc32pthr_la_LIBADD = \
 	$(CCLIBADD) \
@@ -251,7 +251,7 @@ libvomsc_gcc32dbgpthr_la_SOURCES = \
 libvomsc_gcc32dbgpthr_la_CPPFLAGS = \
 	-I$(top_srcdir)/src/include \
 	$(API_INCLUDES) \
-	$(GLOBUS_CFLAGS)
+	$(GLOBUS_GCC32DBGPTHR_CFLAGS)
 
 libvomsc_gcc32dbgpthr_la_LIBADD = \
 	$(CCLIBADD) \
@@ -333,7 +333,8 @@ libvomsc_gcc64_la_SOURCES = \
 
 libvomsc_gcc64_la_CPPFLAGS = \
 	-I$(top_srcdir)/src/include \
-	$(GLOBUS_CFLAGS)
+	$(API_INCLUDES) \
+	$(GLOBUS_GCC64_CFLAGS)
 
 libvomsc_gcc64_la_LIBADD = \
 	$(CCLIBADD) \
@@ -349,7 +350,7 @@ libvomsc_gcc64dbg_la_SOURCES = \
 libvomsc_gcc64dbg_la_CPPFLAGS = \
 	-I$(top_srcdir)/src/include \
 	$(API_INCLUDES) \
-	$(GLOBUS_CFLAGS)
+	$(GLOBUS_GCC64DBG_CFLAGS)
 
 libvomsc_gcc64dbg_la_LIBADD = \
 	$(CCLIBADD) \
@@ -365,7 +366,7 @@ libvomsc_gcc64pthr_la_SOURCES = \
 libvomsc_gcc64pthr_la_CPPFLAGS = \
 	-I$(top_srcdir)/src/include \
 	$(API_INCLUDES) \
-	$(GLOBUS_CFLAGS)
+	$(GLOBUS_GCC64PTHR_CFLAGS)
 
 libvomsc_gcc64pthr_la_LIBADD = \
 	$(CCLIBADD) \
@@ -382,7 +383,7 @@ libvomsc_gcc64dbgpthr_la_SOURCES = \
 libvomsc_gcc64dbgpthr_la_CPPFLAGS = \
 	-I$(top_srcdir)/src/include \
 	$(API_INCLUDES) \
-	$(GLOBUS_CFLAGS)
+	$(GLOBUS_GCC64DBGPTHR_CFLAGS)
 
 libvomsc_gcc64dbgpthr_la_LIBADD = \
 	$(CCLIBADD) \
