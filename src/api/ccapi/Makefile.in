@@ -730,7 +730,8 @@ libvomsapi_gcc32_la_SOURCES = \
 
 libvomsapi_gcc32_la_CPPFLAGS = \
 	-I$(top_srcdir)/src/include \
-	$(API_INCLUDES)
+	$(API_INCLUDES) \
+	$(GLOBUS_GCC_CFLAGS)
 
 libvomsapi_gcc32_la_LIBADD = \
 	$(CCLIBADD) \
