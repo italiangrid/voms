@@ -28,7 +28,7 @@ JAVA_CLASSES = org/glite/security/voms/peers/VomsdataPeer.class \
 all-local: $(top_builddir)/src/api/java/vomsjapi.jar
 
 %.class : %.java
-	$(JAVAC) -sourcepath . -classpath $(JAVA_CLASSPATH):$(CLASSPATH) -d $(top_builddir)/src/api/java $<
+	$(JAVAC) -sourcepath $(top_srcdir)/src/api/java -classpath $(JAVA_CLASSPATH):$(CLASSPATH) -d $(top_builddir)/src/api/java $<
 
 $(top_builddir)/src/api/java/vomsjapi.jar: makedirs $(JAVA_CLASSES)
 	TMPDIR=`pwd` \
