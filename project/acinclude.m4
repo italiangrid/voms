@@ -236,7 +236,7 @@ AC_DEFUN([AC_JAVA],
     fi
   else
     if test -e "$wbc"; then
-      AC_MSG_RESULT([found: $(wbc)])
+      AC_MSG_RESULT([found: $wbc])
     else
       AC_MSG_ERROR([bouncycastle not found])
     fi
@@ -255,7 +255,7 @@ AC_DEFUN([AC_JAVA],
     fi
   else
     if test -e "$wlog4j" ; then
-      AC_MSG_RESULT([found: $(wlog4j)])
+      AC_MSG_RESULT([found: $wlog4j])
     else
       AC_MSG_ERROR([log4j not found])
     fi
