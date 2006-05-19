@@ -198,8 +198,8 @@ AC_DEFUN([AC_JAVA],
     [  --enable-java   Enable compilation of the Java libraries],
     [
       case "$enableval" in
-      yes) build_java="yes" ;;
-      no)  build_java="no" ;;
+      yes) have_java="yes" ;;
+      no)  have_java="no" ;;
       *) AC_MSG_ERROR([bad value $(enableval) for --enable-java]) ;;
       esac
     ],

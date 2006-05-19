@@ -20418,8 +20418,8 @@ if test "${enable_java+set}" = set; then
   enableval="$enable_java"
 
       case "$enableval" in
-      yes) build_java="yes" ;;
-      no)  build_java="no" ;;
+      yes) have_java="yes" ;;
+      no)  have_java="no" ;;
       *) { { echo "$as_me:$LINENO: error: bad value $(enableval) for --enable-java" >&5
 echo "$as_me: error: bad value $(enableval) for --enable-java" >&2;}
    { (exit 1); exit 1; }; } ;;
