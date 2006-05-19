@@ -31,10 +31,7 @@ all-local: $(top_builddir)/src/api/java/vomsjapi.jar
 	$(JAVAC) -sourcepath $(top_srcdir)/src/api/java -classpath $(JAVA_CLASSPATH):$(CLASSPATH) -d $(top_builddir)/src/api/java $<
 
 $(top_builddir)/src/api/java/vomsjapi.jar: makedirs $(JAVA_CLASSES)
-	TMPDIR=`pwd` \
-	cd $(top_builddir)/src/api/java \
-	$(JAR) -cf $(top_builddir)/src/api/java/vomsjapi.jar `find org -name '*.class'` \
-	cd $(TMPDIR)
+	$(JAR) -cf $(top_builddir)/src/api/java/vomsjapi.jar `find org -name '*.class'` ; \
 	$(JAVAH) -classpath $(top_builddir)/src/api/java:$(JAVA_CLASSPATH):$(CLASSPATH) -o ../ccapi/jni-int.h org.glite.security.voms.peers.VomsdataPeer org.glite.security.voms.peers.ContactDataPeer org.glite.security.voms.peers.VomsPeer org.glite.security.voms.peers.DataPeer org.glite.security.voms.peers.AttributePeer org.glite.security.voms.peers.AttributeListPeer
 
 makedirs:
