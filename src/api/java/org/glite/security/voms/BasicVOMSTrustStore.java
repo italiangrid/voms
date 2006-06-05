@@ -4,6 +4,46 @@
  * For license conditions see the license file or http://eu-egee.org/license.html
  */
 
+/*
+ * Copyright (c) 2002 on behalf of the EU DataGrid Project:
+ * The European Organization for Nuclear Research (CERN),
+ * the Particle Physics and Astronomy Research Council (PPARC),
+ * the Helsinki Institute of Physics and
+ * the Swedish Research Council (SRC). All rights reserved.
+ * see LICENSE file for details
+ *
+ * DirectoryList.java
+ *
+ * @author  Joni Hahkala
+ * Created on December 10, 2001, 6:50 PM
+ */
+/*
+ * Copyright (c) 2002 on behalf of the EU DataGrid Project:
+ * The European Organization for Nuclear Research (CERN),
+ * the Particle Physics and Astronomy Research Council (PPARC),
+ * the Helsinki Institute of Physics and
+ * the Swedish Research Council (SRC). All rights reserved.
+ * see LICENSE file for details
+ *
+ * FileEndingIterator.java
+ *
+ * @author  Joni Hahkala
+ * Created on December 3, 2001, 9:16 AM
+ */
+/*
+ * Copyright (c) 2002 on behalf of the EU DataGrid Project:
+ * The European Organization for Nuclear Research (CERN),
+ * the Particle Physics and Astronomy Research Council (PPARC),
+ * the Helsinki Institute of Physics and
+ * the Swedish Research Council (SRC). All rights reserved.
+ * see LICENSE file for details
+ *
+ * FileCertReader.java
+ *
+ * @author  Joni Hahkala
+ * Created on March 27, 2002, 8:24 PM
+ */
+
 package org.glite.security.voms;
 
 import org.apache.log4j.Logger;
