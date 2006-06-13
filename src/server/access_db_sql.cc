@@ -964,8 +964,8 @@ get_group_attributes(const std::string &dn, const std::string &ca,
                                   "INNER JOIN m ON ") + (compat_flag ? "usr.uid = m.uid" : "usr.userid = m.userid ") +
     "INNER JOIN groups ON m.gid=groups.gid "
     "LEFT JOIN roles on roles.rid = m.rid "
-    "INNER JOIN Group_attrs on groups.gid = Group_attrs.g_id "
-    "INNER JOIN Attributes on Attributes.a_id = Group_attrs.a_id "
+    "INNER JOIN group_attrs on groups.gid = group_attrs.g_id "
+    "INNER JOIN Attributes on Attributes.a_id = group_attrs.a_id "
     "WHERE groups.dn = \'" + group + "\' AND "
     "ca.ca = \'" + ca + "\' AND "
     "usr.dn = \'" + dn + "\' AND "
@@ -990,15 +990,15 @@ get_role_attributes(const std::string &dn, const std::string &ca,
     return false;
 
   // compose query
-  std::string query = std::string("SELECT usr.dn as username, role, groups.dn as groupname, capability, groups.gid, Attributes.a_name, Role_attrs.a_value "
+  std::string query = std::string("SELECT usr.dn as username, role, groups.dn as groupname, capability, groups.gid, Attributes.a_name, role_attrs.a_value "
                                   "FROM usr INNER JOIN ca ON usr.ca=ca.cid"
                                   "INNER JOIN m ON ") + (compat_flag ? "usr.uid = m.uid" : "usr.userid = m.userid ") +
     "INNER JOIN groups ON m.gid=groups.gid"
     "LEFT JOIN roles ON roles.rid = m.rid "
     "LEFT JOIN capabilities ON capabilities.cid = m.cid "
-    "INNER JOIN Role_attrs on groups.gid = Role_attrs.g_id "
-    "INNER JOIN Attributes on Attributes.a_id = Role_attrs.a_id "
-    "WHERE Role_attrs.r_id = roles.rid AND "
+    "INNER JOIN role_attrs on groups.gid = role_attrs.g_id "
+    "INNER JOIN Attributes on Attributes.a_id = role_attrs.a_id "
+    "WHERE role_attrs.r_id = roles.rid AND "
     "roles.role = \'" + role + "\' AND "
     "ca.ca = \'" + ca + "\' AND "
     "usr.dn = \'" + dn + "\'";
@@ -1017,15 +1017,15 @@ get_all_attributes(const std::string &dn, const std::string &ca,
     return false;
   
   // compose query
-  std::string query = std::string("SELECT usr.dn as username, role, groups.dn as groupname, capability, groups.gid, Attributes.a_name, Role_attrs.a_value "
+  std::string query = std::string("SELECT usr.dn as username, role, groups.dn as groupname, capability, groups.gid, Attributes.a_name, role_attrs.a_value "
                                   "FROM usr INNER JOIN ca ON usr.ca=ca.cid "
                                   "INNER JOIN m ON ") + (compat_flag ? "usr.uid = m.uid" : "usr.userid = m.userid ") +
     "INNER JOIN groups ON m.gid=groups.gid "
     "LEFT JOIN roles ON roles.rid = m.rid "
     "LEFT JOIN capabilities ON capabilities.cid = m.cid "
-    "INNER JOIN Role_attrs on groups.gid = Role_attrs.g_id "
-    "INNER JOIN Attributes on Attributes.a_id = Role_attrs.a_id "
-    "WHERE Role_attrs.r_id = roles.rid AND "   
+    "INNER JOIN role_attrs on groups.gid = role_attrs.g_id "
+    "INNER JOIN Attributes on Attributes.a_id = role_attrs.a_id "
+    "WHERE role_attrs.r_id = roles.rid AND "   
     "ca.ca = \'" + ca + "\' AND "
     "usr.dn = \'" + dn + "\'";
   
@@ -1058,15 +1058,15 @@ get_group_and_role_attributes(const std::string &dn, const std::string &ca,
 
   // compose query
 
-  std::string query = std::string("SELECT usr.dn as username, role, groups.dn as groupname, capability, groups.gid, Attributes.a_name, Role_attrs.a_value "
+  std::string query = std::string("SELECT usr.dn as username, role, groups.dn as groupname, capability, groups.gid, Attributes.a_name, role_attrs.a_value "
                                   "FROM usr INNER JOIN ca ON usr.ca=ca.cid "
                                   "INNER JOIN m ON ") + (compat_flag ? "usr.uid = m.uid" : "usr.userid = m.userid ") +
     "INNER JOIN groups ON m.gid=groups.gid "
     "LEFT JOIN roles ON roles.rid = m.rid "
     "LEFT JOIN capabilities ON capabilities.cid = m.cid "
-    "INNER JOIN Role_attrs on groups.gid = Role_attrs.g_id "
-    "INNER JOIN Attributes on Attributes.a_id = Role_attrs.a_id "
-    "WHERE Role_attrs.r_id = roles.rid AND "  
+    "INNER JOIN role_attrs on groups.gid = role_attrs.g_id "
+    "INNER JOIN Attributes on Attributes.a_id = role_attrs.a_id "
+    "WHERE role_attrs.r_id = roles.rid AND "  
     "roles.role = \'" + role + "\' AND "
     "groups.dn = \'" + argument + "\' AND "
     "ca.ca = \'" + ca + "\' AND "
@@ -1090,11 +1090,11 @@ get_user_attributes(const std::string &dn, const std::string &ca,
 
   // compose query
   
-  std::string query = std::string("SELECT usr.dn, ca.ca, Attributes.a_name, Usr_attrs.a_value "
+  std::string query = std::string("SELECT usr.dn, ca.ca, Attributes.a_name, usr_attrs.a_value "
                                   "FROM usr "
                                   "LEFT JOIN ca on usr.ca = ca.cid "
-                                  "LEFT JOIN Usr_attrs on usr.userid = Usr_attrs.u_id "
-                                  "LEFT JOIN Attributes on Attributes.a_id = Usr_attrs.a_id "
+                                  "LEFT JOIN usr_attrs on usr.userid = usr_attrs.u_id "
+                                  "LEFT JOIN Attributes on Attributes.a_id = usr_attrs.a_id "
                                   "WHERE "
                                   "ca.ca = \'" + ca + "\' AND "
                                   "usr.dn = \'" + dn + "\'");
@@ -1112,23 +1112,23 @@ get_attributes_real(const std::string &dn, const std::string &ca,
   if (dbname.empty() || username.empty() || !password || query.empty())
     return false;
   
-  std::string user_additional = std::string("SELECT usr.dn, ca.ca, Attributes.a_name, Usr_attrs.a_value "
+  std::string user_additional = std::string("SELECT usr.dn, ca.ca, Attributes.a_name, usr_attrs.a_value "
                                             "FROM usr "
                                             "LEFT JOIN ca on usr.ca = ca.cid "
-                                            "LEFT JOIN Usr_attrs on usr.userid = Usr_attrs.u_id "
-                                            "LEFT JOIN Attributes on Attributes.a_id = Usr_attrs.a_id "
+                                            "LEFT JOIN usr_attrs on usr.userid = usr_attrs.u_id "
+                                            "LEFT JOIN Attributes on Attributes.a_id = usr_attrs.a_id "
                                             "WHERE "
                                             "ca.ca = \'" + ca + "\' AND "
                                             "usr.dn = \'" + dn + "\'");
 
-  std::string additional = std::string("SELECT usr.dn as username, role, groups.dn as groupname, capability, groups.gid, Attributes.a_name, Group_attrs.a_value "
+  std::string additional = std::string("SELECT usr.dn as username, role, groups.dn as groupname, capability, groups.gid, Attributes.a_name, group_attrs.a_value "
                                        "FROM usr INNER JOIN ca ON usr.ca=ca.cid "
                                        "INNER JOIN m ON ") + (compat_flag ? "usr.uid = m.uid" : "usr.userid = m.userid ") +
                                        "INNER JOIN groups ON m.gid=groups.gid "
                                        "left join roles on roles.rid = m.rid "
                                        "left join capabilities on capabilities.cid = m.cid "
-                                       "INNER JOIN Group_attrs on groups.gid = Group_attrs.g_id "
-                                       "INNER JOIN Attributes on Attributes.a_id = Group_attrs.a_id "
+                                       "INNER JOIN group_attrs on groups.gid = group_attrs.g_id "
+                                       "INNER JOIN Attributes on Attributes.a_id = group_attrs.a_id "
     "WHERE groups.must IS NOT NULL AND "
     "ca.ca = \'" + ca + "\' AND "
     "usr.dn = \'" + dn + "\' AND "
