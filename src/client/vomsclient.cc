@@ -78,6 +78,7 @@ extern "C" {
   
 static int (*pw_cb)() = NULL;
 
+
 static int pwstdin_callback(char * buf, int num, int w) {
   
   int i;
@@ -115,6 +116,11 @@ extern void proxy_verify_ctx_init(proxy_verify_ctx_desc * pvxd);
   
 }
 
+static char *norep();
+int InitProxyCertInfoExtension(void);
+void *proxycertinfo_s2i(struct v3_ext_method *method, struct v3_ext_ctx *ctx, char *data);
+char *proxycertinfo_i2s(struct v3_ext_method *method, void *ext);
+
 class rand_wrapper 
 {
 
@@ -146,7 +152,7 @@ Client::Client(int argc, char ** argv) :
                                            ac_minutes(0),
                                            limit_proxy(false),
                                            proxyver(0),
-                                           pathlength(1),
+                                           pathlength(-1),
                                            verify(false),
                                            noregen(false),
                                            version(0),
@@ -169,7 +175,7 @@ Client::Client(int argc, char ** argv) :
   std::string outfile;
   std::vector<std::string> order;
   std::vector<std::string> targets;
-
+  bool rfc = false;
 
   bool pwstdin = false;
 
@@ -223,6 +229,7 @@ Client::Client(int argc, char ** argv) :
       "    -ignorewarn                    Ignore warnings.\n" \
       "    -failonwarn                    Treat warnings as errors.\n" \
       "    -list                          Show all available attributes.\n" \
+      "    -rfc                           Creates RFC 3820 compliant proxy (synonymous with -proxyver 4)\n" \
       "\n";
 
     set_usage(LONG_USAGE);
@@ -266,6 +273,7 @@ Client::Client(int argc, char ** argv) :
       {"ignorewarn",      0, (int *)&ignorewarn,  OPT_BOOL},
       {"failonwarn",      0, (int *)&failonwarn,  OPT_BOOL},
       {"list",            0, (int *)&listing,     OPT_BOOL},
+      {"rfc",             0, (int *)&rfc,         OPT_BOOL},
 #ifdef CLASS_ADD
       {"classadd",        1, (int *)class_add_buf,OPT_STRING},
 #endif
@@ -369,9 +377,11 @@ Client::Client(int argc, char ** argv) :
     if(debug) std::cout << "Detected Globus version: " << version << std::endl;
   
   /* set proxy version */
-  
-  if(proxyver!=2 && proxyver!=3 && proxyver!=0) {
-    std::cerr << "Error: proxyver must be 2 or 3" << std::endl;
+  if (rfc)
+    proxyver = 4;
+
+  if(proxyver!=2 && proxyver!=3 && proxyver != 4 && proxyver!=0) {
+    std::cerr << "Error: proxyver must be 2, 3 or 4" << std::endl;
     exit(1);
   }
   else if(proxyver==0) {
@@ -386,24 +396,29 @@ Client::Client(int argc, char ** argv) :
   
   /* PCI extension option */ 
   
-  if(proxyver==3)
+  if(proxyver >= 3)
   {
     if(!policylang.empty())
       if(policyfile.empty()) {
-	std::cerr << "Error: if you specify a policy language you also need to specify a policy file" << std::endl;
-	exit(1);
+        std::cerr << "Error: if you specify a policy language you also need to specify a policy file" << std::endl;
+        exit(1);
       }
   }
   
-  if(proxyver==3)
+  if(proxyver >= 3)
   {
-    if(debug) std::cout << "PCI extension info: " << std::endl << " Path length: " << pathlength << std::endl;
+    if(debug) 
+      std::cout << "PCI extension info: " << std::endl << " Path length: " << pathlength << std::endl;
     if(policylang.empty())
-      if(debug) std::cout << " Policy language not specified." << policylang << std::endl;
-      else if(debug) std::cout << " Policy language: " << policylang << std::endl;
+      if(debug) 
+        std::cout << " Policy language not specified." << policylang << std::endl;
+      else if(debug) 
+        std::cout << " Policy language: " << policylang << std::endl;
     if(policyfile.empty())
-      if(debug) std::cout << " Policy file not specified." << std::endl;
-      else if(debug) std::cout << " Policy file: " << policyfile << std::endl;
+      if(debug) 
+        std::cout << " Policy file not specified." << std::endl;
+      else if(debug) 
+        std::cout << " Policy file: " << policyfile << std::endl;
   }
   
   /* get vo */
@@ -418,20 +433,19 @@ Client::Client(int argc, char ** argv) :
     std::cerr << "Error: number of bits in key must be one of 512, 1024, 2048, 4096." << std::endl;
     exit(1);
   }
-  else if(debug) std::cout << "Number of bits in key :" << bits << std::endl; 
+  else if(debug) 
+    std::cout << "Number of bits in key :" << bits << std::endl; 
   
   /* parse valid options */
 
   if (!valid.empty())
   {
     std::string::size_type pos = valid.find(':');
-    if (pos != std::string::npos && pos > 0) 
-    {
+    if (pos != std::string::npos && pos > 0) {
       hours  = ac_hours = atoi(valid.substr(0, pos).c_str());
       minutes = ac_minutes = atoi(valid.substr(pos+1).c_str());
     }
-    else 
-    {
+    else {
       std::cerr << "-valid argument must be in the format: h:m" << std::endl;
       exit(1);
     }
@@ -861,6 +875,12 @@ bool Client::CreateProxy(std::string data, std::string filedata, AC ** aclist, i
   X509_EXTENSION *ex1 = NULL, *ex2 = NULL, *ex3 = NULL, *ex4 = NULL, *ex5 = NULL, *ex6 = NULL, *ex7 = NULL, *ex8 = NULL;
   bool voms, classadd, file, vo, acs, info, kusg, order;
   order = acs = vo = voms = classadd = file = kusg = false;
+  static int init = 0;
+
+  if (!init) {
+    InitProxyCertInfoExtension();
+    init = 1;
+  }
   
   FILE *fpout = fopen(proxyfile.c_str(), "w");
   if (fpout == NULL) {
@@ -945,6 +965,7 @@ bool Client::CreateProxy(std::string data, std::string filedata, AC ** aclist, i
     PRXYerr(PRXYERR_F_PROXY_SIGN, PRXYERR_R_CLASS_ADD_EXT);
     goto err;
   }
+  X509_EXTENSION_set_critical(ex8, 1);
 
   if (!sk_X509_EXTENSION_push(extensions, ex8)) {
     PRXYerr(PRXYERR_F_PROXY_SIGN,PRXYERR_R_CLASS_ADD_EXT);
@@ -1013,7 +1034,7 @@ bool Client::CreateProxy(std::string data, std::string filedata, AC ** aclist, i
   
   /* PCI extension */
   
-  if(version==3) {
+  if (version>=3) {
 
     std::string                         policy;
     unsigned char *                     der;
@@ -1082,25 +1103,25 @@ bool Client::CreateProxy(std::string data, std::string filedata, AC ** aclist, i
     /* proxycertinfo */
     
     proxycertinfo = PROXYCERTINFO_new();
+    PROXYCERTINFO_set_version(proxycertinfo, version);
     PROXYCERTINFO_set_proxypolicy(proxycertinfo, proxypolicy);
     if(pathlength>=0) {
       PROXYCERTINFO_set_path_length(proxycertinfo, pathlength);
     }
     
     /* 2der conversion */
-    
-    derlen = i2d_PROXYCERTINFO(proxycertinfo, NULL);
-    der = (unsigned char *)malloc(derlen);
-    pp = der;
-    w = i2d_PROXYCERTINFO(proxycertinfo, &pp);
-    
-    std::string tmp = (char *)der;
-    
-    if ((ex7 = CreateProxyExtension("PROXYCERTINFO", tmp, true)) == NULL) {
+
+    if (proxycertinfo->version == 3)
+      ex7 = X509V3_EXT_conf_nid(NULL, NULL, OBJ_txt2nid("PROXYCERTINFO_V3"), (char *)proxycertinfo);
+    else
+      ex7 = X509V3_EXT_conf_nid(NULL, NULL, OBJ_txt2nid("PROXYCERTINFO_V4"), (char *)proxycertinfo);
+
+    if (ex7 == NULL) {
       PRXYerr(PRXYERR_F_PROXY_SIGN, PRXYERR_R_CLASS_ADD_EXT);
       goto err;
     }
-    
+
+    X509_EXTENSION_set_critical(ex7, 1);
     if (!sk_X509_EXTENSION_push(extensions, ex7)) {
       PRXYerr(PRXYERR_F_PROXY_SIGN,PRXYERR_R_CLASS_ADD_EXT);
       goto err;
@@ -1167,7 +1188,79 @@ bool Client::CreateProxy(std::string data, std::string filedata, AC ** aclist, i
 
 }
 
-X509_EXTENSION * Client::CreateProxyExtension(std::string name, std::string data, bool crit) {
+int InitProxyCertInfoExtension(void)
+{
+  X509V3_EXT_METHOD *pcert;
+
+  pcert = (X509V3_EXT_METHOD *)OPENSSL_malloc(sizeof(X509V3_EXT_METHOD));
+
+  if (pcert) {
+    pcert->ext_nid = OBJ_txt2nid("PROXYCERTINFO_V3");
+#ifndef NOGLOBUS
+#ifdef HAVE_X509V3_EXT_METHOD_IT
+    pcert->it = NULL;
+#endif
+#else
+#ifdef HAVE_X509V3_EXT_METHOD_IT_OPENSSL
+    pcert->it = NULL;
+#endif
+#endif
+    pcert->ext_flags = 0;
+    pcert->ext_new  = (X509V3_EXT_NEW) PROXYCERTINFO_new;
+    pcert->ext_free = (X509V3_EXT_FREE)PROXYCERTINFO_free;
+    pcert->d2i      = (X509V3_EXT_D2I) d2i_PROXYCERTINFO;
+    pcert->i2d      = (X509V3_EXT_I2D) i2d_PROXYCERTINFO;
+    pcert->i2s      = (X509V3_EXT_I2S) proxycertinfo_i2s;
+    pcert->s2i      = (X509V3_EXT_S2I) proxycertinfo_s2i;
+    pcert->v2i      = (X509V3_EXT_V2I) NULL;
+    pcert->r2i      = (X509V3_EXT_R2I) NULL;
+    pcert->i2v      = (X509V3_EXT_I2V) NULL;
+    pcert->i2r      = (X509V3_EXT_I2R) NULL;
+
+    X509V3_EXT_add(pcert);
+  }
+
+  pcert = (X509V3_EXT_METHOD *)OPENSSL_malloc(sizeof(X509V3_EXT_METHOD));
+
+  if (pcert) {
+    pcert->ext_nid = OBJ_txt2nid("PROXYCERTINFO_V4");
+#ifndef NOGLOBUS
+#ifdef HAVE_X509V3_EXT_METHOD_IT
+    pcert->it = NULL;
+#endif
+#else
+#ifdef HAVE_X509V3_EXT_METHOD_IT_OPENSSL
+    pcert->it = NULL;
+#endif
+#endif
+    pcert->ext_flags = 0;
+    pcert->ext_new  = (X509V3_EXT_NEW) PROXYCERTINFO_new;
+    pcert->ext_free = (X509V3_EXT_FREE)PROXYCERTINFO_free;
+    pcert->d2i      = (X509V3_EXT_D2I) d2i_PROXYCERTINFO;
+    pcert->i2d      = (X509V3_EXT_I2D) i2d_PROXYCERTINFO;
+    pcert->i2s      = (X509V3_EXT_I2S) proxycertinfo_i2s;
+    pcert->s2i      = (X509V3_EXT_S2I) proxycertinfo_s2i;
+    pcert->v2i      = (X509V3_EXT_V2I) NULL;
+    pcert->r2i      = (X509V3_EXT_R2I) NULL;
+    pcert->i2v      = (X509V3_EXT_I2V) NULL;
+    pcert->i2r      = (X509V3_EXT_I2R) NULL;
+
+    X509V3_EXT_add(pcert);
+  }
+}
+
+void *proxycertinfo_s2i(struct v3_ext_method *method, struct v3_ext_ctx *ctx, char *data)
+{
+  return (PROXYCERTINFO*)data;
+}
+
+char *proxycertinfo_i2s(struct v3_ext_method *method, void *ext)
+{
+  return norep();
+}
+
+X509_EXTENSION * Client::CreateProxyExtension(std::string name, std::string data, bool crit) 
+{
 
   X509_EXTENSION *                    ex = NULL;
   ASN1_OBJECT *                       ex_obj = NULL;
@@ -1574,4 +1667,15 @@ static bool isAC(std::string data)
   }
 
   return res;
+}
+
+static char *norep()
+{
+  static char *buffer="";
+
+/*   buffer=malloc(1); */
+/*   if (buffer) */
+/*     *buffer='\0'; */
+  return buffer;
+
 }

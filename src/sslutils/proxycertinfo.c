@@ -118,8 +118,9 @@ unsigned char * PROXYPOLICY_get_policy(PROXYPOLICY * proxypolicy, int * length) 
 }
 
 /* internal to der conversion */
-int i2d_PROXYPOLICY(PROXYPOLICY * policy, unsigned char ** pp) {
-
+int i2d_PROXYPOLICY(PROXYPOLICY * policy, unsigned char ** pp) 
+{
+#if 0
   int                                 v1 = 0;
     
   M_ASN1_I2D_vars(policy);
@@ -131,7 +132,22 @@ int i2d_PROXYPOLICY(PROXYPOLICY * policy, unsigned char ** pp) {
   M_ASN1_I2D_put_EXP_opt(policy->policy, i2d_ASN1_OCTET_STRING, 0, v1);
 
   M_ASN1_I2D_finish();
+#endif
 
+  M_ASN1_I2D_vars(policy);
+
+  M_ASN1_I2D_len(policy->policy_language, i2d_ASN1_OBJECT);
+
+  if(policy->policy) { 
+    M_ASN1_I2D_len(policy->policy, i2d_ASN1_OCTET_STRING);
+  }
+    
+  M_ASN1_I2D_seq_total();
+  M_ASN1_I2D_put(policy->policy_language, i2d_ASN1_OBJECT);
+  if(policy->policy) { 
+    M_ASN1_I2D_put(policy->policy, i2d_ASN1_OCTET_STRING);
+  }
+  M_ASN1_I2D_finish();
 }
 
 PROXYPOLICY * d2i_PROXYPOLICY(PROXYPOLICY ** a, unsigned char ** pp, long length)
@@ -217,6 +233,23 @@ int PROXYCERTINFO_set_path_length(PROXYCERTINFO * proxycertinfo, long path_lengt
 
 }
 
+int PROXYCERTINFO_set_version(PROXYCERTINFO * proxycertinfo, int version)
+{
+  if (proxycertinfo != NULL) {
+    proxycertinfo->version = version;
+    return 1;
+  }
+  return 0;
+}
+
+int PROXYCERTINFO_get_version(PROXYCERTINFO * proxycertinfo)
+{
+  if (proxycertinfo)
+    return proxycertinfo->version;
+  return -1;
+}
+
+
 /* get path length */
 long PROXYCERTINFO_get_path_length(PROXYCERTINFO * proxycertinfo) {
 
@@ -251,7 +284,7 @@ PROXYPOLICY * PROXYCERTINFO_get_proxypolicy(PROXYCERTINFO * proxycertinfo) {
 }
 
 /* internal to der conversion */
-int i2d_PROXYCERTINFO(PROXYCERTINFO * proxycertinfo, unsigned char ** pp) {
+static int i2d_PROXYCERTINFO_v3(PROXYCERTINFO * proxycertinfo, unsigned char ** pp) {
 
     int                                 v1;
 
@@ -269,7 +302,44 @@ int i2d_PROXYCERTINFO(PROXYCERTINFO * proxycertinfo, unsigned char ** pp) {
 
 }
 
-PROXYCERTINFO * d2i_PROXYCERTINFO(PROXYCERTINFO ** cert_info, unsigned char ** pp, long length)
+static int i2d_PROXYCERTINFO_v4(PROXYCERTINFO * proxycertinfo, unsigned char ** pp) 
+{
+    M_ASN1_I2D_vars(proxycertinfo);
+
+    if(proxycertinfo->path_length)
+    { 
+        M_ASN1_I2D_len(proxycertinfo->path_length, i2d_ASN1_INTEGER);
+    }
+    
+    M_ASN1_I2D_len(proxycertinfo->proxypolicy, i2d_PROXYPOLICY);
+
+    M_ASN1_I2D_seq_total();
+    if(proxycertinfo->path_length)
+    { 
+        M_ASN1_I2D_put(proxycertinfo->path_length, i2d_ASN1_INTEGER);
+    }
+    M_ASN1_I2D_put(proxycertinfo->proxypolicy, i2d_PROXYPOLICY);
+    M_ASN1_I2D_finish();
+}
+
+int i2d_PROXYCERTINFO(PROXYCERTINFO * proxycertinfo, unsigned char ** pp) 
+{
+  switch(proxycertinfo->version) {
+  case 3:
+    return i2d_PROXYCERTINFO_v3(proxycertinfo, pp);
+    break;
+
+  case 4:
+    return i2d_PROXYCERTINFO_v4(proxycertinfo, pp);
+    break;
+
+  default:
+    return -1;
+    break;
+  }
+}
+
+static PROXYCERTINFO * d2i_PROXYCERTINFO_v3(PROXYCERTINFO ** cert_info, unsigned char ** pp, long length)
 {
     M_ASN1_D2I_vars(cert_info, PROXYCERTINFO *, PROXYCERTINFO_new);
 
@@ -280,6 +350,29 @@ PROXYCERTINFO * d2i_PROXYCERTINFO(PROXYCERTINFO ** cert_info, unsigned char ** p
 
     M_ASN1_D2I_get_EXP_opt(ret->path_length, d2i_ASN1_INTEGER, 1);
 
+    ret->version = 3;
     M_ASN1_D2I_Finish(cert_info, PROXYCERTINFO_free, ASN1_F_D2I_PROXYCERTINFO);
+}
 
+static PROXYCERTINFO * d2i_PROXYCERTINFO_v4(PROXYCERTINFO ** cert_info, unsigned char ** pp, long length)
+{
+    M_ASN1_D2I_vars(cert_info, PROXYCERTINFO *, PROXYCERTINFO_new);
+
+    M_ASN1_D2I_Init();
+    M_ASN1_D2I_start_sequence();
+
+    M_ASN1_D2I_get_EXP_opt(ret->path_length, d2i_ASN1_INTEGER, 1);
+    
+    M_ASN1_D2I_get_opt(ret->path_length, d2i_ASN1_INTEGER, V_ASN1_INTEGER);
+
+    M_ASN1_D2I_get(ret->proxypolicy,d2i_PROXYPOLICY);
+
+    ret->version = 4;
+    M_ASN1_D2I_Finish(cert_info, PROXYCERTINFO_free, ASN1_F_D2I_PROXYCERTINFO);
+}
+
+PROXYCERTINFO * d2i_PROXYCERTINFO(PROXYCERTINFO ** cert_info, unsigned char ** pp, long length)
+{
+  if (!d2i_PROXYCERTINFO_v3(cert_info, pp, length))
+    return d2i_PROXYCERTINFO_v4(cert_info, pp, length);
 }

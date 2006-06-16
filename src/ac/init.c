@@ -44,7 +44,8 @@ void declareOIDs(void)
 #define certseq               "1.3.6.1.4.1.8005.100.100.10"
 #define email                 idpkcs9 ".1"
 
-#define PROXYCERTINFO         "1.3.6.1.4.1.3536.1.222"
+#define PROXYCERTINFO_V3      "1.3.6.1.4.1.3536.1.222"
+#define PROXYCERTINFO_V4      "1.3.6.1.5.5.7.1.14"
 
 #define OBJC(c,n) OBJ_create(c,n,#c)
 
@@ -68,7 +69,8 @@ void declareOIDs(void)
   OBJC(certseq, "certseq");
 
   /* Proxy Certificate Extension's related objects */
-  OBJC(PROXYCERTINFO, "PROXYCERTINFO");
+  OBJC(PROXYCERTINFO_V3, "PROXYCERTINFO_V3");
+  OBJC(PROXYCERTINFO_V4, "PROXYCERTINFO_V4");
 
 }
 

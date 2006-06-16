@@ -54,7 +54,7 @@ typedef struct PROXYCERTINFO_st {
  
   ASN1_INTEGER * path_length;
   PROXYPOLICY * proxypolicy;
-
+  int version;
 } PROXYCERTINFO;
 
 
@@ -109,4 +109,5 @@ int i2d_PROXYCERTINFO(PROXYCERTINFO * proxycertinfo, unsigned char ** pp);
 /* der to internal conversion */
 PROXYCERTINFO * d2i_PROXYCERTINFO(PROXYCERTINFO ** cert_info, unsigned char ** a, long length);
 
+int PROXYCERTINFO_set_version(PROXYCERTINFO *cert_info, int version);
 #endif

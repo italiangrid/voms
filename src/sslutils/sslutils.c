@@ -977,7 +977,7 @@ proxy_sign(
     /* EVP_MD_CTX                          md_ctx; */
     long                                sub_hash;
 
-    if(proxyver==3) {
+    if(proxyver>=3) {
 
       user_public_key = X509_get_pubkey(user_cert);
       ASN1_digest(i2d_PUBKEY, EVP_sha1(), (char *) user_public_key, md, &len);
@@ -1001,7 +1001,7 @@ proxy_sign(
            newcn, dig_len))
     {
         PRXYerr(PRXYERR_F_PROXY_SIGN,PRXYERR_R_PROCESS_SIGN);
-	if (proxyver == 3)
+	if (proxyver >= 3)
 	  free(newcn);
         return 1;
     }
@@ -1022,7 +1022,7 @@ proxy_sign(
     }
 
     X509_NAME_free(subject_name);
-    if (proxyver == 3)
+    if (proxyver >= 3)
       free(newcn);
 
     return rc;
