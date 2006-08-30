@@ -28,6 +28,17 @@ import java.util.Vector;
  * Implementation of <code>IetfAttrSyntax</code> as specified
  * by RFC3281.
  *
+ * <pre>
+ * IetfAttrSyntax ::= SEQUENCE {
+ *   policyAuthority [0] GeneralNames OPTIONAL,
+ *   values SEQUENCE OF CHOICE {
+ *     octets OCTET STRING,
+ *     oid OBJECT IDENTIFIER,
+ *     string UTF8String
+ *   }
+ * }
+ * </pre>
+ *
  * @author mulmo
  */
 public class IetfAttrSyntax implements DEREncodable {
@@ -94,19 +105,6 @@ public class IetfAttrSyntax implements DEREncodable {
         return values;
     }
 
-    /**
-     *
-     * <pre>
-     * IetfAttrSyntax ::= SEQUENCE {
-     *   policyAuthority [0] GeneralNames OPTIONAL,
-     *   values SEQUENCE OF CHOICE {
-     *     octets OCTET STRING,
-     *     oid OBJECT IDENTIFIER,
-     *     string UTF8String
-     *   }
-     * }
-     * </pre>
-     */
     public DERObject getDERObject() {
         DEREncodableVector v = new DEREncodableVector();
 

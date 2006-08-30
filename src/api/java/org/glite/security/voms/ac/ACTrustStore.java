@@ -12,6 +12,8 @@ import javax.security.auth.x500.X500Principal;
 
 
 /**
+ * @deprecated This does not expose the necessary information.
+ *
  * @author mulmo
  */
 public interface ACTrustStore {
@@ -23,7 +25,7 @@ public interface ACTrustStore {
      * <b>NOTE:</b> No actual verification or validation of signature
      * takes place in this function.
      *
-     * @param ac the attribute certificate to find an issuer for.
+     * @param issuer the principal to find an issuer for.
      * If <code>null</code>, all known AAs will be returned.
      * @return an array of issuer candidates, or <code>null</code> in
      * case of an error.

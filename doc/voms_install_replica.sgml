@@ -7,13 +7,13 @@
 
 <refentry id='voms-install-replica1'>
 <refmeta>
-<refentrytitle>voms_install_replica</refentrytitle>
+<refentrytitle>voms-install-replica</refentrytitle>
 <manvolnum>1</manvolnum>
 <refmiscinfo class='source'>VOMS Server Slave setup</refmiscinfo>
 </refmeta>
 
 <refnamediv id='name'>
-<refname>voms_install_replica</refname>
+<refname>voms-install-replica</refname>
 <refpurpose>Setup the voms server as a slave of a master server</refpurpose>
 </refnamediv>
 

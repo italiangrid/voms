@@ -95,6 +95,14 @@ public class Holder implements DEREncodable {
         }
     }
 
+    public GeneralNames getIssuer() {
+        if (baseCertificateID != null)
+            return baseCertificateID.getIssuer();
+        else if (entityName != null)
+            return entityName;
+        return null;
+    }
+
     protected static boolean matchesDN(X500Principal subject, GeneralNames targets) {
         Enumeration e = ((ASN1Sequence) targets.getDERObject()).getObjects();
 

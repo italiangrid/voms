@@ -9,7 +9,12 @@ package org.glite.security.voms.ac;
 import org.apache.log4j.Logger;
 
 import java.security.cert.X509Certificate;
+import java.io.IOException;
+import java.security.cert.CertificateException;
+import java.security.cert.CRLException;
 
+import org.glite.security.voms.PKIVerifier;
+import org.glite.security.voms.BasicVOMSTrustStore;
 
 /**
  * Validator class capable of validating an Attribute Certificate
@@ -22,6 +27,8 @@ public class ACValidator {
     protected static Logger log = Logger.getLogger(ACValidator.class);
     private static ACValidator theInstance = null;
     protected ACTrustStore myTrustStore;
+    protected VOMSTrustStore myVOMSStore;
+    protected PKIVerifier    theVerifier;
 
     public ACValidator(ACTrustStore trustStore) {
         if (trustStore == null) {
@@ -31,20 +38,63 @@ public class ACValidator {
         myTrustStore = trustStore;
     }
 
-    public static ACValidator getInstance() {
-        return getInstance(null);
+    public ACValidator(VOMSTrustStore theStore) {
+        if (theStore == null)
+            throw new IllegalArgumentException("ACValidator: constructor must have a VOMSTrustStore");
+
+        myVOMSStore = theStore;
+        try {
+            theVerifier = new PKIVerifier(myVOMSStore);
+        }
+        catch(IOException e) {
+            log.error("Problems while initializing the verifier: " + e.getMessage());
+            throw new IllegalArgumentException("Problems with the passed store: " + e.getMessage());
+        }
+        catch (CertificateException e) {
+            log.error("Problems while initializing the verifier: " + e.getMessage());
+            throw new IllegalArgumentException("Problems with the passed store: " + e.getMessage());
+        }
+        catch (CRLException e) {
+            log.error("Problems while initializing the verifier: " + e.getMessage());
+            throw new IllegalArgumentException("Problems with the passed store: " + e.getMessage());
+        }
     }
 
-    public static ACValidator getInstance(ACTrustStore trustStore) {
+    public static ACValidator getInstance() {
+        return getInstance((VOMSTrustStore)null);
+    }
+
+    public static ACValidator getInstance(ACTrustStore trustStore) throws IllegalArgumentException {
         return (theInstance = (theInstance != null) ? theInstance : new ACValidator(trustStore));
     }
 
-    public boolean validate(AttributeCertificate ac) {
-        X509Certificate[] candidates;
+    public static ACValidator getInstance(VOMSTrustStore trustStore) throws IllegalArgumentException {
+        return (theInstance = (theInstance != null) ? theInstance : new ACValidator(trustStore));
+    }
 
+
+    public void cleanup() {
+        if (myTrustStore != null)
+            if (myTrustStore instanceof BasicVOMSTrustStore)
+                ((BasicVOMSTrustStore)myTrustStore).stopRefresh();
+
+        if (myVOMSStore != null)
+            myVOMSStore.stopRefresh();
+
+        if (theVerifier != null)
+            theVerifier.cleanup();
+    }
+
+    public boolean validate(AttributeCertificate ac) {
         if (ac == null) {
             return false;
         }
+
+        if (theVerifier != null) {
+            return theVerifier.verify(ac);
+        }
+
+        X509Certificate[] candidates;
 
         if (!ac.isValid()) {
             if (log.isDebugEnabled()) {

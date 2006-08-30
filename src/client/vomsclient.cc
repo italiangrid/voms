@@ -202,17 +202,21 @@ Client::Client(int argc, char ** argv) :
       "    -verify                        Verifies certificate to make proxy for\n" \
       "    -pwstdin                       Allows passphrase from stdin\n" \
       "    -limited                       Creates a limited proxy\n" \
-      "    -valid <h:m>                   Proxy is valid for h hours and m minutes (default to 12:00)\n" \
+      "    -valid <h:m>                   Proxy is valid for h hours and m minutes\n" \
+      "                                   (defaults to 12:00)\n" \
       "    -hours H                       Proxy is valid for H hours (default:12)\n" \
       "    -bits                          Number of bits in key {512|1024|2048|4096}\n" \
       "    -cert     <certfile>           Non-standard location of user certificate\n" \
       "    -key      <keyfile>            Non-standard location of user key\n" \
       "    -certdir  <certdir>            Non-standard location of trusted cert dir\n" \
       "    -out      <proxyfile>          Non-standard location of new proxy cert\n" \
-      "    -voms <voms<:command>>         Specify voms server. :command is optional.\n" \
+      "    -voms <voms<:command>>         Specify voms server. :command is optional,\n" \
+      "                                   and is used to ask for specific attributes\n" \
+      "                                   (e.g: roles)\n" \
       "    -order <group<:role>>          Specify ordering of attributes.\n" \
       "    -target <hostname>             Targets the AC against a specific hostname.\n" \
-      "    -vomslife <h:m>                Try to get a VOMS pseudocert valid for h hours and m minutes (default to value of -valid).\n" \
+      "    -vomslife <h:m>                Try to get a VOMS pseudocert valid for h hours\n" \
+      "                                   and m minutes (default to value of -valid).\n" \
       "    -include <file>                Include the contents of the specified file.\n" \
       "    -conf <file>                   Read options from <file>.\n" \
       "    -confile <file>                Non-standard location of voms server addresses.\n" \
@@ -296,7 +300,9 @@ Client::Client(int argc, char ** argv) :
       "    -key      <keyfile>            Non-standard location of user key\n" \
       "    -certdir  <certdir>            Non-standard location of trusted cert dir\n" \
       "    -out      <proxyfile>          Non-standard location of new proxy cert\n" \
-      "    -voms <voms<:command>>         Specify voms server. :command is optional.\n" \
+      "    -voms <voms<:command>>         Specify voms server. :command is optional,\n" \
+      "                                   and is used to ask for specific attributes\n" \
+      "                                   (e.g: roles)\n" \
       "    -include <file>                Include the contents of the specified file.\n" \
       "    -conf <file>                   Read options from <file>.\n" \
       "    -confile <file>                Non-standard location of voms server addresses.\n" \
@@ -868,8 +874,8 @@ bool Client::CreateProxy(std::string data, std::string filedata, AC ** aclist, i
   char *confstr = NULL;
 
   X509 * ncert = NULL;
-  EVP_PKEY * npkey;
-  X509_REQ * req;
+  EVP_PKEY * npkey = NULL;
+  X509_REQ * req = NULL;
   BIO * bp = NULL;
   STACK_OF(X509_EXTENSION) * extensions = NULL;
   X509_EXTENSION *ex1 = NULL, *ex2 = NULL, *ex3 = NULL, *ex4 = NULL, *ex5 = NULL, *ex6 = NULL, *ex7 = NULL, *ex8 = NULL;
@@ -881,22 +887,48 @@ bool Client::CreateProxy(std::string data, std::string filedata, AC ** aclist, i
     InitProxyCertInfoExtension();
     init = 1;
   }
-  
-  FILE *fpout = fopen(proxyfile.c_str(), "w");
-  if (fpout == NULL) {
-    PRXYerr(PRXYERR_F_LOCAL_CREATE, PRXYERR_R_PROBLEM_PROXY_FILE);
-    ERR_add_error_data(2, "\nOpen failed for File=", proxyfile.c_str());
-    goto err;
+
+  FILE * fpout = NULL;
+  int fdout = -1;
+  int try_counter;
+
+  try_counter = 3;  /* try 3 times in case of asynchrounous calls */
+  while ( (try_counter > 0) && (fdout < 0) )
+  {
+    /* We always unlink the file first; it is the only way to be
+     * certain that the file we open has never in its entire lifetime
+     * had the world-readable bit set.  
+     */
+    unlink(proxyfile.c_str());
+    
+    /* Now, we must open w/ O_EXCL to make certain that WE are 
+     * creating the file, so we know that the file was BORN w/ mode 0600.
+     * As a bonus, O_EXCL flag will cause a failure in the precense
+     * of a symlink, so we are safe from zaping a file due to the
+     * presence of a symlink.
+     */
+    fdout = open(proxyfile.c_str(), O_WRONLY|O_EXCL|O_CREAT,0600);
+    try_counter--;
   }
-  
+ 
+ 
+  /* Now, make a call to set proper permissions, just in case the
+   * user's umask is stupid.  Note this call to fchmod will also
+   * fail if our fdout is still -1 because our open failed above.
+   */
 #ifndef WIN32
-  if (fchmod(fileno(fpout),0600) == -1) {
+  if(fchmod(fdout, S_IRUSR|S_IWUSR) < 0)
+  {
     PRXYerr(PRXYERR_F_LOCAL_CREATE, PRXYERR_R_PROBLEM_PROXY_FILE);
-    ERR_add_error_data(2, "\n        chmod failed for File=", proxyfile.c_str());
+    ERR_add_error_data(2, "\nchmod failed for file ", proxyfile.c_str());
     goto err;
   }
-#endif
+#endif 
   
+  /* Finally, we have a safe fd.  Make it a stream like ssl wants. */
+  fpout = fdopen(fdout, "w");
+
+
   if (proxy_genreq(pcd->ucert, &req, &npkey, bits, (int (*)())kpcallback, pcd))
     goto err;
 

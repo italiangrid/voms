@@ -6,6 +6,8 @@
 
 package org.glite.security.voms.ac;
 
+import org.glite.security.voms.PKIUtils;
+
 import org.apache.log4j.Logger;
 
 import org.bouncycastle.asn1.ASN1EncodableVector;
@@ -20,10 +22,14 @@ import org.bouncycastle.asn1.DERObject;
 import org.bouncycastle.asn1.DERObjectIdentifier;
 import org.bouncycastle.asn1.DEROutputStream;
 import org.bouncycastle.asn1.DERSequence;
+import org.bouncycastle.asn1.DERInteger;
 import org.bouncycastle.asn1.x509.AlgorithmIdentifier;
 import org.bouncycastle.asn1.x509.AttCertValidityPeriod;
 import org.bouncycastle.asn1.x509.GeneralName;
+import org.bouncycastle.asn1.x509.GeneralNames;
 import org.bouncycastle.asn1.x509.X509Extensions;
+
+import org.bouncycastle.jce.X509Principal;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -31,6 +37,8 @@ import java.io.InputStream;
 
 import java.security.PublicKey;
 import java.security.Signature;
+
+import java.security.cert.X509Certificate;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -56,8 +64,10 @@ public class AttributeCertificate implements DEREncodable {
     AttributeCertificateInfo acInfo;
     AlgorithmIdentifier signatureAlgorithm;
     DERBitString signatureValue;
+    DERObject signedObj = null;
 
     public AttributeCertificate(ASN1Sequence seq) throws IOException {
+        signedObj = ((ASN1Sequence)seq.getObjectAt(0)).getDERObject();
         acInfo = new AttributeCertificateInfo((ASN1Sequence) seq.getObjectAt(0));
         signatureAlgorithm = AlgorithmIdentifier.getInstance(seq.getObjectAt(1));
         signatureValue = (DERBitString) seq.getObjectAt(2);
@@ -68,7 +78,7 @@ public class AttributeCertificate implements DEREncodable {
      * DER-encoded data
      *
      * @param in
-     * @return
+     * @return the Attribute Certificate
      * @throws IOException
      */
     public static AttributeCertificate getInstance(InputStream in)
@@ -93,6 +103,85 @@ public class AttributeCertificate implements DEREncodable {
         }
 
         return acInfo.getAttributes();
+    }
+
+    public DERInteger getSerialNumber() {
+        if (acInfo == null)
+            return null;
+
+        return acInfo.getSerialNumber();
+    }
+
+    public String getVO() {
+        if (acInfo == null)
+            return null;
+
+        return acInfo.getVO();
+    }
+
+    public String getHostPort() {
+        if (acInfo == null)
+            return null;
+
+        return acInfo.getHostPort();
+    }
+
+    public String getHost() {
+        if (acInfo == null)
+            return null;
+
+        return acInfo.getHost();
+    }
+
+    public int getPort() {
+        if (acInfo == null)
+            return -1;
+
+        return acInfo.getPort();
+    }
+
+    public FullAttributes getFullAttributes() {
+        if (acInfo == null)
+            return null;
+
+        return acInfo.getFullAttributes();
+    }
+
+    public ACCerts getCertList() {
+        if (acInfo == null)
+            return null;
+
+        return acInfo.getCertList();
+    }
+    public ACTargets getTargets() {
+        if (acInfo == null)
+            return null;
+
+        return acInfo.getTargets();
+    }
+
+    /**
+     * @return List of String of the VOMS fully qualified
+     * attributes names (FQANs):<br>
+     * <code>vo[/group[/group2...]][/Role=[role]][/Capability=capability]</code>
+     */
+    public List getFullyQualifiedAttributes() {
+        if (acInfo == null)
+            return null;
+
+        return acInfo.getFullyQualifiedAttributes();
+    }
+
+    /**
+     * @return List of FQAN of the VOMS fully qualified
+     * attributes names (FQANs)
+     * @see org.glite.security.voms.FQAN
+     */
+    public List getListOfFQAN() {
+        if (acInfo == null)
+            return null;
+
+        return acInfo.getListOfFQAN();
     }
 
     /**
@@ -132,6 +221,28 @@ public class AttributeCertificate implements DEREncodable {
         return (acInfo == null) ? null : acInfo.getExtensions();
     }
 
+    public X509Principal getIssuerX509() {
+        if (acInfo == null) {
+            return null;
+        }
+
+        if (acInfo.getIssuer() == null) {
+            return null;
+        }
+
+        ASN1Sequence seq = (ASN1Sequence) acInfo.getIssuer().getIssuerName().getDERObject();
+
+        for (Enumeration e = seq.getObjects(); e.hasMoreElements();) {
+            GeneralName gn = GeneralName.getInstance((ASN1TaggedObject) e.nextElement());
+
+            if (gn.getTagNo() == 4) {
+                return Util.generalNameToX509Name(gn);
+            }
+        }
+
+        return null;
+    }
+
     public X500Principal getIssuer() {
         if (acInfo == null) {
             return null;
@@ -148,6 +259,29 @@ public class AttributeCertificate implements DEREncodable {
 
             if (gn.getTagNo() == 4) {
                 return Util.generalNameToX500Name(gn);
+            }
+        }
+
+        return null;
+    }
+
+    public String getHolderX509() {
+        if (acInfo == null) {
+            return null;
+        }
+
+        if (acInfo.getHolder() == null) {
+            return null;
+        }
+
+        GeneralNames gns = acInfo.getHolder().getIssuer();
+
+        for (Enumeration e = ((ASN1Sequence)gns.getDERObject()).getObjects(); e.hasMoreElements();) {
+            GeneralName gn = GeneralName.getInstance((ASN1TaggedObject) e.nextElement());
+
+            if (gn.getTagNo() == 4) {
+                X509Principal principal = Util.generalNameToX509Name(gn);
+                return PKIUtils.getOpenSSLFormatPrincipal(principal);
             }
         }
 
@@ -193,6 +327,10 @@ public class AttributeCertificate implements DEREncodable {
         return signatureValue;
     }
 
+    public byte[] getSignature() {
+        return signatureValue.getBytes();
+    }
+
     /**
      * Checks if the AC was valid at the provided timestamp.
      * @param date if <code>null</code>, current time is used
@@ -234,8 +372,80 @@ public class AttributeCertificate implements DEREncodable {
             ByteArrayOutputStream b = new ByteArrayOutputStream();
             new DEROutputStream(b).writeObject(acInfo);
 
+            //            System.out.println("Algorithm name: " + signatureAlgorithm.getObjectId().getId());
+            //            System.out.println("Algorithm name: " + signatureAlgorithm.getObjectId().toString());
+            //            System.out.print("Verifying: ");
+            byte[] data = null; //signedObj.getDEREncoded();
+            //            for (int i= 0; i <data.length; i++)
+            //                System.out.print(Integer.toHexString(data[i]) + " ");
+            //            System.out.println("");
+
+
+            //            System.out.print("\n\nsignature: ");
+            data = signatureValue.getBytes();
+            //            for (int i= 0; i <data.length; i++)
+            //                System.out.print(Integer.toHexString(data[i]) + " ");
+            //            System.out.println("");
+
             Signature sig = Signature.getInstance(signatureAlgorithm.getObjectId().getId());
+            //            System.out.println("Key is: " + key.getClass());
+            //            System.out.println("Key is: " + key.toString());
             sig.initVerify(key);
+
+//             System.out.print("\n\n computedsignature: ");
+//             data = sig.sign();
+//             for (int i= 0; i <data.length; i++)
+//                 System.out.print(Integer.toHexString(data[i]) + " ");
+//             System.out.println("");
+
+            //            sig.update(b.toByteArray());
+            sig.update(b.toByteArray());
+
+            return sig.verify(signatureValue.getBytes());
+        } catch (Exception e) {
+            if (logger.isDebugEnabled()) {
+                logger.debug("Error verifying signature of AC issued by " + getIssuer().getName() + " : " +
+                    e.getMessage());
+            }
+        }
+
+        return false;
+    }
+
+    public boolean verifyCert(X509Certificate cert) {
+        String error = null;
+
+        try {
+            ByteArrayOutputStream b = new ByteArrayOutputStream();
+            new DEROutputStream(b).writeObject(acInfo);
+
+//             System.out.println("Algorithm name: " + signatureAlgorithm.getObjectId().getId());
+//             System.out.println("Algorithm name: " + signatureAlgorithm.getObjectId().toString());
+//             System.out.print("Verifying: ");
+//             byte[] data = signedObj.getDEREncoded();
+//             for (int i= 0; i <data.length; i++)
+//                 System.out.print(Integer.toHexString(data[i]) + " ");
+//             System.out.println("");
+
+
+//             System.out.print("\n\nsignature: ");
+//             data = signatureValue.getBytes();
+//             for (int i= 0; i <data.length; i++)
+//                 System.out.print(Integer.toHexString(data[i]) + " ");
+//             System.out.println("");
+
+            Signature sig = Signature.getInstance(signatureAlgorithm.getObjectId().getId());
+//             System.out.println("Key is: " + key.getClass());
+//             System.out.println("Key is: " + key.toString());
+            sig.initVerify(cert);
+
+//             System.out.print("\n\n computedsignature: ");
+//             data = sig.sign();
+//             for (int i= 0; i <data.length; i++)
+//                 System.out.print(Integer.toHexString(data[i]) + " ");
+//             System.out.println("");
+
+            //            sig.update(b.toByteArray());
             sig.update(b.toByteArray());
 
             return sig.verify(signatureValue.getBytes());

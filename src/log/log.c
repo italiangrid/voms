@@ -294,7 +294,7 @@ void *LogAddStreamer(void *data, void *id, void *userdata, const char *name, int
 
   StartLogger(data, name, maxlog);
   
-  fd[0] = open(fifo, O_WRONLY, O_NONBLOCK);
+  fd[0] = open(fifo, O_WRONLY | O_NONBLOCK);
   out->in = out->out = fd[0];
   if (fd[0] == -1) {
     printf("Unable to open fifo : %s\n", strerror(errno));

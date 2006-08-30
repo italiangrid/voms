@@ -62,4 +62,21 @@ public class Util {
             throw new IllegalArgumentException("Bad DN encoding of Attribute Certificate issuer");
         }
     }
+    public static X509Principal generalNameToX509Name(GeneralName name) {
+        int tag = -1;
+
+        if ((name == null) || ((tag = name.getTagNo()) != 4)) {
+            throw new IllegalArgumentException("GeneralName is not a DirectoryName (tag=" + tag + ")");
+        }
+
+        try {
+            ByteArrayOutputStream b = new ByteArrayOutputStream();
+            new DEROutputStream(b).writeObject(name.getName());
+
+            return new X509Principal(b.toByteArray());
+        } catch (IOException i) {
+            throw new IllegalArgumentException("Bad DN encoding of Attribute Certificate issuer");
+        }
+    }
+
 }

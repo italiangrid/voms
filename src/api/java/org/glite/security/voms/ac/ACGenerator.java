@@ -22,6 +22,22 @@ import javax.security.auth.x500.X500Principal;
 
 
 /**
+ *
+ * <pre>
+ *     AttributeCertificateInfo ::= SEQUENCE {
+ *          version              AttCertVersion -- version is v2,
+ *          holder               Holder,
+ *          issuer               AttCertIssuer,
+ *          signature            AlgorithmIdentifier,
+ *          serialNumber         CertificateSerialNumber,
+ *          attrCertValidityPeriod   AttCertValidityPeriod,
+ *          attributes           SEQUENCE OF Attribute,
+ *          issuerUniqueID       UniqueIdentifier OPTIONAL,
+ *          extensions           Extensions OPTIONAL
+ *     }
+ *
+ *     AttCertVersion ::= INTEGER { v2(1) }
+ * </pre>
  * @author mulmo
  */
 public class ACGenerator {
@@ -91,25 +107,6 @@ public class ACGenerator {
         notBefore = date;
     }
 
-    /**
-     *
-     * <pre>
-     *     AttributeCertificateInfo ::= SEQUENCE {
-     *          version              AttCertVersion -- version is v2,
-     *          holder               Holder,
-     *          issuer               AttCertIssuer,
-     *          signature            AlgorithmIdentifier,
-     *          serialNumber         CertificateSerialNumber,
-     *          attrCertValidityPeriod   AttCertValidityPeriod,
-     *          attributes           SEQUENCE OF Attribute,
-     *          issuerUniqueID       UniqueIdentifier OPTIONAL,
-     *          extensions           Extensions OPTIONAL
-     *     }
-     *
-     *     AttCertVersion ::= INTEGER { v2(1) }
-     *
-     * </pre>
-     */
     public AttributeCertificateInfo generateACInfo() {
         if ((issuer == null) || (holderIssuer == null) || (holderSerial == null) || (notAfter == null) ||
                 (notBefore == null)) {

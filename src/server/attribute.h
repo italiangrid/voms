@@ -51,4 +51,7 @@ class gattrib {
   
 };
 
+bool operator==(const gattrib& lhs,
+                const gattrib& rhs);
+
 #endif /* __ATTRIBUTE_H */

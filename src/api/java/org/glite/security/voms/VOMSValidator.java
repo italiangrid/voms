@@ -7,7 +7,15 @@
 package org.glite.security.voms;
 
 import java.io.ByteArrayInputStream;
+import java.io.IOException;
+
+import java.security.Provider;
+import java.security.Security;
+
 import java.security.cert.X509Certificate;
+import java.security.cert.CRLException;
+import java.security.cert.CertificateException;
+
 import java.util.Enumeration;
 import java.util.Hashtable;
 import java.util.Iterator;
@@ -18,15 +26,17 @@ import java.util.Vector;
 
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
+
 import org.bouncycastle.asn1.ASN1Sequence;
 import org.bouncycastle.asn1.DERInputStream;
 import org.bouncycastle.asn1.DEROctetString;
+
+import org.bouncycastle.jce.provider.BouncyCastleProvider;
+
 import org.glite.security.voms.ac.ACTrustStore;
+import org.glite.security.voms.ac.VOMSTrustStore;
 import org.glite.security.voms.ac.ACValidator;
 import org.glite.security.voms.ac.AttributeCertificate;
-
-import org.glite.security.voms.peers.VomsdataPeer;
-import org.glite.security.voms.peers.VomsPeer;
 
 /**
  * Reads a DER-encode, Base64-encoded, or PEM-encoded certificate from disk
@@ -86,6 +96,7 @@ class CertUtil {
  * </pre>
  *
  * @author mulmo
+ * @author Vincenzo Ciaschini
  */
 public class VOMSValidator {
     static Logger log = Logger.getLogger(VOMSValidator.class);
@@ -96,14 +107,21 @@ public class VOMSValidator {
     protected Vector myVomsAttributes = new Vector();
     protected boolean isParsed = false;
     protected boolean isValidated = false;
-    protected boolean isPreValidated = false;
+    //    protected boolean isPreValidated = false;
     protected FQANTree myFQANTree = null;
-    private VomsdataPeer vp = null;
-    
+    //    private VomsdataPeer vp = null;
+    protected static VOMSTrustStore vomsStore = null;
+
+    static {
+        if (Security.getProvider("BC") == null) {
+            Security.addProvider(new BouncyCastleProvider());
+        }
+    }
+
     /**
      * Convenience constructor in the case where you have a single
      * cert and not a chain.
-     * @param cert
+     * @param validatedCert
      * @see #VOMSValidator(X509Certificate[])
      */
     public VOMSValidator(X509Certificate validatedCert) {
@@ -133,15 +151,38 @@ public class VOMSValidator {
     public VOMSValidator(X509Certificate[] validatedChain, ACValidator acValidator) {
         myValidatedChain = validatedChain; // allow null
 
-        if (acValidator == null) {
-            if (theTrustStore == null) {
-                theTrustStore = new BasicVOMSTrustStore();
+
+        if (theTrustStore == null) {
+            if (vomsStore == null) {
+                try {
+                    vomsStore = new PKIStore("/etc/grid-security/vomsdir", PKIStore.TYPE_VOMSDIR, true);
+                }
+                catch(IOException e) {}
+                catch(CertificateException e) {}
+                catch(CRLException e) {}
             }
         }
+        else if (theTrustStore instanceof BasicVOMSTrustStore) {
+            BasicVOMSTrustStore store = (BasicVOMSTrustStore)theTrustStore;
+            store.stopRefresh();
+            if (vomsStore == null) {
+                String directory = store.getDirList();
+                
+                try {
+                    vomsStore = new PKIStore(directory, PKIStore.TYPE_VOMSDIR, true);
+                }
+                catch(IOException e) {}
+                catch(CertificateException e) {}
+                catch(CRLException e) {}
+            }
+        }
+        else if (vomsStore == null)
+            log.error("Cannot replace passed truststore.  Validation may not be complete.");
 
-        myValidator = (acValidator == null) ? new ACValidator(theTrustStore) : acValidator;
-        vp = new VomsdataPeer();
-        isPreValidated = vp.Retrieve(validatedChain[0], validatedChain, VomsdataPeer.RECURSIVE);
+        if (vomsStore != null)
+            myValidator = (acValidator == null) ? new ACValidator(vomsStore) : acValidator;
+        else
+            myValidator = (acValidator == null) ? new ACValidator(theTrustStore) : acValidator;
     }
 
     /**
@@ -149,10 +190,73 @@ public class VOMSValidator {
      * ACValidator. Default is <code>BasicVOMSTrustStore</code>
      *
      * @param trustStore
+     *
+     * @see #setTrustStore(VOMSTrustStore trustStore)
      * @see BasicVOMSTrustStore
+     * @deprecated use setTrustStore(VOMSTrustStore trustStore) instead.
      */
     public static void setTrustStore(ACTrustStore trustStore) {
-        theTrustStore = trustStore;
+        if (trustStore instanceof BasicVOMSTrustStore) {
+            BasicVOMSTrustStore store = (BasicVOMSTrustStore)trustStore;
+            String directory = store.getDirList();
+            try {
+                setTrustStore(new PKIStore(directory, PKIStore.TYPE_VOMSDIR, true));
+                store.stopRefresh();
+            }
+            catch(Exception e) {
+                log.error("Cannot set upgraded truststore!");
+                theTrustStore = trustStore;
+            }
+        }
+        else {
+            log.error("Cannot set upgraded truststore!");
+            theTrustStore = trustStore;
+        }
+    }
+
+    /**
+     * Sets the trustStore to use with the default ACValidator.
+     *
+     * @param trustStore the trustStore.
+     *
+     * @see org.glite.security.voms.ac.VOMSTrustStore
+     */
+    public static void setTrustStore(VOMSTrustStore trustStore) {
+        vomsStore = trustStore;
+    }
+
+    /**
+     * Cleans up the object.
+     *
+     * This method MUST be called before disposing of the object, on pains of
+     * a memory leak.
+     */
+    public void cleanup() {
+        myValidatedChain = null;
+
+        if (myVomsAttributes != null) {
+            myVomsAttributes.clear();
+            myVomsAttributes  = null;
+        }
+
+        myFQANTree       = null;
+
+        if (myValidator != null) {
+            myValidator.cleanup();
+            myValidator = null;
+        }
+
+        if (vomsStore != null) {
+            vomsStore.stopRefresh();
+            vomsStore = null;
+        }
+
+        if (theTrustStore != null) {
+            if (theTrustStore instanceof BasicVOMSTrustStore) {
+                ((BasicVOMSTrustStore)theTrustStore).stopRefresh();
+            }
+            theTrustStore = null;
+        }
     }
 
     /**
@@ -173,12 +277,13 @@ public class VOMSValidator {
         myVomsAttributes = new Vector();
         myFQANTree = null;
         isParsed = false;
+        isValidated = false;
 
-        if (vp != null)
-            vp = null;
+        //        if (vp != null)
+        //            vp = null;
 
-        vp = new VomsdataPeer();
-        isPreValidated = vp.Retrieve(validatedChain[0], validatedChain, VomsdataPeer.RECURSIVE);
+        //        vp = new VomsdataPeer();
+        //        isPreValidated = vp.Retrieve(validatedChain[0], validatedChain, VomsdataPeer.RECURSIVE);
 
         return this;
     }
@@ -196,7 +301,7 @@ public class VOMSValidator {
      * @see #validate()
      */
     public static Vector parse(X509Certificate[] myValidatedChain) {
-        //System.out.println("WRONG");
+        System.out.println("WRONG");
         if (log.isDebugEnabled()) {
             log.debug("VOMSValidator : parsing cert chain");
         }
@@ -214,8 +319,8 @@ public class VOMSValidator {
                 myValidatedChain[clientIdx].getSubjectX500Principal().getName());
         }
 
-        VomsdataPeer vp = new VomsdataPeer("","");
-        vp.Retrieve(myValidatedChain[0], myValidatedChain, VomsdataPeer.RECURSIVE);
+        //        VomsdataPeer vp = new VomsdataPeer("","");
+        //        vp.Retrieve(myValidatedChain[0], myValidatedChain, VomsdataPeer.RECURSIVE);
 
         Vector myVomsAttributes = new Vector();
 
@@ -250,7 +355,7 @@ public class VOMSValidator {
 
                         for (int j = clientIdx; j < myValidatedChain.length; j++) {
                             if (ac.getHolder().isHolder(myValidatedChain[j])) {
-                                VOMSAttribute va = new VOMSAttribute(ac, vp.GetData(aclen));
+                                VOMSAttribute va = new VOMSAttribute(ac);
 
                                 if (log.isDebugEnabled()) {
                                     log.debug("Found VOMS attribute from " + va.getHostPort() +
@@ -293,7 +398,7 @@ public class VOMSValidator {
      * @deprecated use the parse(X509Certificate[]) instead
      */
     public VOMSValidator parse() {
-        //System.out.println("CORRECT");
+        //        System.out.println("CORRECT");
         if (log.isDebugEnabled()) {
             log.debug("VOMSValidator : parsing cert chain");
         }
@@ -345,7 +450,7 @@ public class VOMSValidator {
                         for (int j = clientIdx; j < myValidatedChain.length; j++) {
                             if (ac.getHolder().isHolder(myValidatedChain[j])) {
                                 aclen++;
-                                VOMSAttribute va = new VOMSAttribute(ac, vp.GetData(aclen));
+                                VOMSAttribute va = new VOMSAttribute(ac);
 
                                 if (log.isDebugEnabled()) {
                                     log.debug("Found VOMS attribute from " + va.getHostPort() +
@@ -395,15 +500,15 @@ public class VOMSValidator {
             isParsed = true;
         }
 
-        if (!isPreValidated) {
+        //        if (!isPreValidated) {
             for (ListIterator i = myVomsAttributes.listIterator(); i.hasNext();) {
-                AttributeCertificate ac = ((VOMSAttribute) i.next()).getAC();
+                AttributeCertificate ac = ((VOMSAttribute) i.next()).privateGetAC();
 
                 if (!myValidator.validate(ac)) {
                     i.remove();
                 }
             }
-        }
+            //        }
 
         isValidated = true;
 
@@ -449,8 +554,8 @@ public class VOMSValidator {
      * is thrown.
      *
      * @param subGroup
-     * @see #FQANTree
-     * @return
+     * @see VOMSValidator.FQANTree
+     * @return the List of roles.
      */
     public List getRoles(String subGroup) {
         if (!isParsed && !isValidated) {
@@ -474,8 +579,9 @@ public class VOMSValidator {
      * is thrown.
      *
      * @param subGroup
-     * @see #FQANTree
-     * @return
+     * @see VOMSValidator.FQANTree
+     * @return A list containing all the capabilities
+     * @deprecated Capabilities are deprecated.
      */
     public List getCapabilities(String subGroup) {
         if (!isParsed && !isValidated) {

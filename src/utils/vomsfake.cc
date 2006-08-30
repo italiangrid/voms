@@ -874,7 +874,7 @@ bool Fake::Retrieve()
       if (hcert && hkey) {
         ac = AC_new();
         if (ac)
-          res = createac(holder, NULL, hcert, hkey, (BIGNUM *)(BN_value_one()), fqans, 
+          res = createac(hcert, NULL, holder, hkey, (BIGNUM *)(BN_value_one()), fqans,
                          targets, attributes, &ac, voms, uri, hours*3600, !newformat);
       }
     }

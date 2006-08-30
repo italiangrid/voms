@@ -7,29 +7,14 @@ lib_LTLIBRARIES = \
 	libvomsc.la \
 	$(WANTED_API_LIBS) # may add the libraries defined in EXTRA_LTLIBRARIES
 
-if BUILD_JAVA
-CCSOURCES = \
-	api_util.cc \
-	jni-int.cc \
-	voms_api.cc \
-	ccval.cc \
-	cinterface.cc
-else
 CCSOURCES = \
 	api_util.cc \
 	voms_api.cc \
 	ccval.cc \
 	cinterface.cc
-endif
 
-if BUILD_JAVA
-API_INCLUDES = \
-	$(JAVA_INCLUDES) \
-	-I$(top_srcdir)/src/include
-else
 API_INCLUDES = \
 	-I$(top_srcdir)/src/include
-endif
 
 libvomsapi_nog_la_SOURCES = \
 	$(CCSOURCES)
@@ -72,20 +57,11 @@ libvomsapi_la_LIBADD = \
 	$(top_builddir)/src/socklib/libsock.la \
 	$(top_builddir)/src/ac/libccattcert.la
 
-if BUILD_JAVA
-CSOURCES = \
-	api_util.cc \
-	voms_api.cc \
-	ccval.cc \
-	jni-int.cc \
-	cinterface.cc
-else
 CSOURCES = \
 	api_util.cc \
 	voms_api.cc \
 	ccval.cc \
 	cinterface.cc
-endif
 
 libvomsc_la_SOURCES = \
 	$(CSOURCES)
@@ -405,7 +381,6 @@ EXTRA_DIST = \
 	voms_api.h \
 	voms_apic.h \
 	cinterface.h \
-	jni-int.h \
   ctest.c
 
 CLEANFILES = \

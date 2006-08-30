@@ -130,6 +130,8 @@
 	<!-- ==============================================
 		 Overridden global targets
 		 ============================================== -->
+  <target name="rpm"></target>
+  <target name="rpm-init"></target>
 
 	<target name="init" depends="envcheck"
 		description="">

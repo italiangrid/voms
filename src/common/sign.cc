@@ -106,7 +106,7 @@ extern "C" {
 
 bool sign(EVP_PKEY *pkey, const std::string source, std::string &result);
 bool verify(EVP_PKEY *key, const std::string data, const std::string signature);
-
+#if 0
 /*
  * Function:
  *   sign(key, data, len, sig_len)
@@ -194,3 +194,4 @@ verify(EVP_PKEY *key, const std::string data, const std::string signature)
   
   return (err == 1);
 }
+#endif

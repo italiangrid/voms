@@ -422,6 +422,11 @@ VOMSServer::VOMSServer(int argc, char *argv[]) : sock(0,0,NULL,50,false),
 
   if ((v == 2) || ((v == 1) && compat_flag))
     ;
+  else if (v == 0)
+  {
+    LOGM(VARP, logh, LEV_ERROR, T_PRE, "Error connecting to the database.");
+    throw VOMSInitException("Error connecting to the database.");
+  }
   else {
     LOGM(VARP, logh, LEV_ERROR, T_PRE, "Detected DB Version: %d. Required DB version >= 2", v);
     throw VOMSInitException("wrong database version");
@@ -598,8 +603,14 @@ VOMSServer::Execute(const std::string &client_name, const std::string &ca_name,
 {
   std::string message;
   std::string client = client_name;
+  std::string ca = ca_name;
+  std::string::size_type pos = 0;
+  while((pos = ca.find_first_of("'", pos+3)) != std::string::npos)
+    ca.insert(pos, "'");
+  while((pos = client.find_first_of("'", pos+3)) != std::string::npos)
+    client.insert(pos, "'");
   std::string newname = translate(client);
-  std::string newca   = translate(ca_name);
+  std::string newca   = translate(ca);
 
   if (!sock.Receive(message)) {
     LOG(logh, LEV_ERROR, T_PRE, "Unable to receive request.");
@@ -648,18 +659,17 @@ VOMSServer::Execute(const std::string &client_name, const std::string &ca_name,
     }
   }
 
-  std::string real_ca = (ca_name == newca ? ca_name :
+  std::string real_ca = (ca == newca ? ca :
                          ( get_correct_ca(dbname, username, passwd(), 
                                           contactstring, mysql_port, 
-                                          mysql_socket, ca_name) ?
-                           ca_name : newca));
+                                          mysql_socket, ca) ? 
+                           ca : newca));
 
   std::string real_user = (client == newname ? client :
                            ( get_correct_dn(dbname, username, passwd(), 
                                             contactstring, mysql_port, 
                                             mysql_socket, client) ?
                              client : newname));
-
 
   std::string command;
   for(std::vector<std::string>::iterator i = comm.begin(); i < comm.end(); ++i)

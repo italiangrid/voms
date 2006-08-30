@@ -57,8 +57,8 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 
-import java.security.KeyStore;
-import java.security.PrivateKey;
+//import java.security.KeyStore;
+//import java.security.PrivateKey;
 import java.security.Provider;
 import java.security.Security;
 import java.security.cert.CRLException;
@@ -674,19 +674,24 @@ class DirectoryList {
 }
 
 /**
+ * @deprecated  This class does not expose the necessary information. Use
+ * PKIStore instead.
+ *
  * Implementation of a AC trust store for use with VOMS. The store
  * keeps an in-memory cache of issuer certificates, which can be
  * refreshed periodically.
  *
  * @author mulmo
+ * @author Vincenzo Ciaschini
  */
 public final class BasicVOMSTrustStore implements ACTrustStore {
     static Logger log = Logger.getLogger(BasicVOMSTrustStore.class);
     public static final String DEFAULT_TRUST_STORE_LISTING = "/etc/grid-security/vomsdir/";
-    private String trustedDirList = null;
+    String trustedDirList = null;
     private Hashtable issuerCerts = new Hashtable();
     private long refreshPeriod = -1;
     private String path = null;
+    private Timer theTimer = null;
 
     /**
      * Creates a default VOMS trust store. Equivalent to<br>
@@ -706,7 +711,7 @@ public final class BasicVOMSTrustStore implements ACTrustStore {
      * @param trustedDirList directory listing containing trusted VOMS certs
      * @param refreshPeriod  refresh period in milliseconds
      *
-     * @see org.glite.security.util.DirectoryList
+     * @see DirectoryList
      */
     public BasicVOMSTrustStore(String trustedDirList, long refreshPeriod) {
         super();
@@ -737,9 +742,20 @@ public final class BasicVOMSTrustStore implements ACTrustStore {
         }
 
         if (refreshPeriod > 0) {
-            new Timer( /* daemon = */
-                true).scheduleAtFixedRate(new Refreshener(), 0, refreshPeriod);
+            theTimer = new Timer(true);
+            theTimer.scheduleAtFixedRate(new Refreshener(), 0, refreshPeriod);
         }
+    }
+
+    public String getDirList() {
+        return trustedDirList;
+    }
+
+
+    public void stopRefresh() {
+        if (theTimer != null)
+            theTimer.cancel();
+        theTimer = null;
     }
 
     /**

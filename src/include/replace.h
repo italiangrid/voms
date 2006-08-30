@@ -24,21 +24,6 @@ extern void unsetenv(const char *);
 #include <string.h>
 extern char *strndup(const char *, size_t);
 #endif
-#ifndef NOGLOBUS
-#ifndef HAVE_EVP_MD_CTX_INIT
-#define EVP_MD_CTX_init
-#endif
-#ifndef HAVE_EVP_MD_CTX_CLEANUP
-#define EVP_MD_CTX_cleanup
-#endif
-#else
-#ifndef HAVE_EVP_MD_CTX_INIT_OPENSSL
-#define EVP_MD_CTX_init
-#endif
-#ifndef HAVE_EVP_MD_CTX_CLEANUP_OPENSSL
-#define EVP_MD_CTX_cleanup
-#endif
-#endif
 #ifdef __cplusplus
 }
 #endif

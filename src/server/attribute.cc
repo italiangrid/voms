@@ -49,3 +49,8 @@ std::string gattrib::str() const
   return (qualifier.empty() ? "" : qualifier) + "::" + name + "=" + value;
 }
 
+bool operator==(const gattrib &lhs, 
+                const gattrib &rhs)
+{
+  return ((lhs.name == rhs.name) && (lhs.qualifier == rhs.qualifier));
+}
