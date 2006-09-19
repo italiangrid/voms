@@ -85,7 +85,7 @@ function start() {
                 if test "x$pid" != "x"; then
                     if checkpid $pid; then
                         echo "VOMS ($pid) is already running" && failure
-                        return 1
+                        continue;
                     fi
                 fi
             fi
@@ -96,15 +96,20 @@ function start() {
                 TNS_ADMIN="$tnsvalue" ${voms} --conf $@LOCATION_ENV@/etc/voms/$vo/voms.conf
             fi
 
-	    # get process id
-            pid=$(ps axo pid,args | grep "${voms} --conf $@LOCATION_ENV@/etc/voms/$vo/voms.conf" | grep -v grep | cut -f 1 -d '/')
+	          # get process id
+            pid=$(ps axo pid,args | grep "${voms} --conf $@LOCATION_ENV@/etc/voms/$vo/voms.conf" | grep -v grep | cut -f 1 -d '/'|head -1)
             pids=`ps -efww | grep "$@LOCATION_ENV@/sbin/edg-voms --conf $@LOCATION_ENV@/etc/voms/$vo/voms.conf" | grep -v grep | awk '{ print $2; }'`
-            RETVAL=$?
-            echo
+            NUM=$(($pid))
+            if test $NUM -eq 0; then
+                RETVAL=1
+            else
+                RETVAL=0
+            fi
             [ $RETVAL -eq 0 ] && echo $pid > $@VAR_LOCATION_ENV@/lock/subsys/voms.$vo
-            RETGLOB=$((RETVAL+RETGLOB))
-            [ "$RETGLOB" -eq 0 ] && success || failure 
-            
+            if test $RETVAL -ne 0; then
+                RETGLOB=$(($RETGLOB + 1 ))
+            fi
+            [ "$RETVAL" -eq 0 ] && success || failure 
         fi
     done
     
@@ -232,7 +237,13 @@ function stop() {
 #	    pids=$(ps axo pid,args | grep "${voms} --conf $@LOCATION_ENV@/etc/voms/$vo/voms.conf" | grep -v grep | cut -f 1 -d '/')
             pids=`ps -efww | grep "$@LOCATION_ENV@/sbin/edg-voms --conf $@LOCATION_ENV@/etc/voms/$vo/voms.conf" | grep -v grep|awk '{ print $2; }'`
             dbname=`grep dbname $@LOCATION_ENV@/etc/voms/$vo/voms.conf | awk -F"=" '{ print $2; }'`
-            pids2=`ps -efww | grep middleman$dbname | grep -v grep | awk '{ print $2; }'`
+            username=`grep username $@LOCATION_ENV@/etc/voms/$vo/voms.conf | awk -F"=" '{ print $2; }'`
+            if test "x$username" = "x"; then
+                pids="";
+                pids2="";
+            else 
+                pids2=`ps -efww | grep middleman$dbname | grep $username | grep -v grep | awk '{ print $2; }'`
+            fi
             if test "x$pids2" != "x"; then
                 kill -TERM $pids2
                 usleep 100000
@@ -289,18 +300,15 @@ function condrestart() {
 function getstatus() {
     # Stop daemons.
     prog=`basename ${voms}`
-    if test -z $1; then
-        vos=`ls $@LOCATION_ENV@/etc/voms`
-    else
-        vos=$1
-    fi
+
+    # get vos
+    vos=${1:-`find /data/valerio/opt/edg/etc/voms/ -type d -printf "%f "`}
 
     value=0
 
     for vo in $vos ; do
         if test -f $@LOCATION_ENV@/etc/voms/$vo/voms.conf ; then
             echo -n "Status $prog($vo): "
-#	    pids=$(ps axo pid,args | grep "${voms} --conf $@LOCATION_ENV@/etc/voms/$vo/voms.conf" | grep -v grep | cut -f 1 -d '/')
             pids=`ps -efww | grep "$@LOCATION_ENV@/sbin/edg-voms --conf $@LOCATION_ENV@/etc/voms/$vo/voms.conf" | grep -v grep | awk '{ print $2; }'`
             if test -z "$pids"; then
                 if [ -f /var/lock/subsys/voms.$vo ]; then
@@ -319,29 +327,34 @@ function getstatus() {
         fi
     done
 
-    return $RETGLOB
+    return $value
 }
 
 # See how we were called.
 case "$1" in
     start)
         start $2
+        RETVAL=$?
         ;;
     stop)
         stop $2
+        RETVAL=$?
         ;;
     status)
         getstatus $2
+        RETVAL=$?
         ;;
     restart)
         stop $2
         start $2
+        RETVAL=$?
         ;;
     condrestart)
         condrestart $2
+        RETVAL=$?
         ;;
     *)
-        echo $"Usage: $0 {start|stop|restart|status|condrestart}"
+        echo $"Usage: $0 {start|stop|restart|status|condrestart} [VO]"
         RETVAL=1
 esac
 

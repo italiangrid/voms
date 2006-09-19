@@ -49,7 +49,9 @@ Description:
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <sys/types.h>
 #include <sys/stat.h>
+#include <fcntl.h>
 #include <string.h>
 
 #include "openssl/buffer.h"
@@ -58,6 +60,7 @@ Description:
 #include "openssl/objects.h"
 #include "openssl/asn1.h"
 #include "openssl/evp.h"
+#include "openssl/pkcs12.h"
 
 #include "openssl/rsa.h"
 #include "openssl/rand.h"
@@ -3120,6 +3123,36 @@ proxy_get_filenames(
                                                 
                 user_cert = default_user_cert;
                 user_key = default_user_key;
+
+                /* Support for pkcs12 credentials. */
+                {
+                  int fd = open(default_user_cert, O_RDONLY);
+                  if (fd == -1) {
+                    free(default_user_cert);
+                    free(default_user_key);
+
+                    len = strlen(home) + strlen(X509_DEFAULT_USER_CERT) + 2;
+                    default_user_cert = (char *)malloc(len);
+
+                    if (!default_user_cert) {
+                      PRXYerr(PRXYERR_F_INIT_CRED, PRXYERR_R_OUT_OF_MEMORY);
+                      goto err;
+                    } 
+
+                    sprintf(default_user_cert,"%s%s%s",
+                            home, FILE_SEPERATOR, X509_DEFAULT_USER_CERT_P12);
+
+                    default_user_key = strndup(default_user_cert, strlen(default_user_cert));
+
+                    if (!default_user_key) {
+                      PRXYerr(PRXYERR_F_INIT_CRED, PRXYERR_R_OUT_OF_MEMORY);
+                      goto err;
+                    }
+                                                
+                    user_cert = default_user_cert;
+                    user_key = default_user_key;
+                  }
+                }
             }
         }
     }
@@ -3192,6 +3225,77 @@ Parameters:
 
 Returns:
 **********************************************************************/
+
+static int cert_load_pkcs12(BIO *bio, int (*pw_cb)(), X509 **cert, EVP_PKEY **key, STACK_OF(X509) *chain) 
+{
+  PKCS12 *p12 = NULL;
+  char *password = NULL;
+  char buffer[1024];
+
+  p12 = d2i_PKCS12_bio(bio, NULL);
+  if (!p12)
+    return 0;
+
+  if (!PKCS12_verify_mac(p12, "", 0)) {
+
+    int sz = 0;
+
+    if (pw_cb)
+      sz = pw_cb(buffer, 1024, 0);
+    else 
+      if (EVP_read_pw_string(buffer, 1024, EVP_get_pw_prompt(), 0) != -1)
+        sz = strlen(buffer);
+
+    if (sz)
+      password = buffer;
+    else
+      goto err;
+  }
+  else
+    password="";
+
+  int ret = PKCS12_parse(p12, password, key, cert, chain);
+
+ err:
+  memset(buffer, 0, 1024);
+
+  if (p12)
+     PKCS12_free(p12);
+
+  return ret;
+}
+
+int proxy_load_user_cert_and_key_pkcs12(proxy_cred_desc *pcd,
+                                        const char *user_cert,
+                                        int (*pw_cb) ())
+{
+  X509 *c = NULL;
+  EVP_PKEY *k = NULL;
+  STACK_OF (X509) *chain = NULL;
+
+  BIO *bio = BIO_new_file(user_cert, "rb");
+  int res = cert_load_pkcs12(bio, pw_cb, &c, &k, &chain);
+  BIO_free(bio);
+  if (res) {
+    pcd->ucert = c;
+    pcd->upkey = k;
+    pcd->cert_chain = chain;
+    return 1;
+  }
+  else {
+    if (ERR_peek_error() == ERR_PACK(ERR_LIB_PEM,PEM_F_PEM_READ_BIO,PEM_R_NO_START_LINE)) {
+      ERR_clear_error();
+      PRXYerr(PRXYERR_F_INIT_CRED,PRXYERR_R_INVALID_CERT);
+    } 
+    else { 
+      PRXYerr(PRXYERR_F_INIT_CRED,PRXYERR_R_PROCESS_CERT);
+    }
+    ERR_add_error_data(2, "\n        File=", user_cert);
+    return 0;
+  }
+}
+
+
 
 int
 proxy_load_user_cert(
@@ -3304,7 +3408,7 @@ proxy_load_user_cert(
         else
         {
 
-            if((fp = fopen(user_cert,"r")) == NULL)
+            if((fp = fopen(user_cert,"rb")) == NULL)
             {
                 if (pcd->type == CRED_TYPE_PROXY && pcd->owner == CRED_OWNER_USER)
                 {
@@ -3332,29 +3436,25 @@ proxy_load_user_cert(
 
             if (PEM_read_X509(fp,
                               &(pcd->ucert),
-                              OPENSSL_PEM_CB(NULL,NULL)) == NULL)
-            {
-               if (ERR_peek_error() == ERR_PACK(ERR_LIB_PEM,PEM_F_PEM_READ_BIO,PEM_R_NO_START_LINE))
-                {
-                    ERR_clear_error();
-                    PRXYerr(PRXYERR_F_INIT_CRED,PRXYERR_R_INVALID_CERT);
-                    status = PRXYERR_R_INVALID_CERT;
-                } 
-                else
-                { 
-                    PRXYerr(PRXYERR_F_INIT_CRED,PRXYERR_R_PROCESS_CERT);
-                    status = PRXYERR_R_PROCESS_CERT;
-                }
-                    ERR_add_error_data(2, "\n        File=", user_cert);
-                    fclose(fp);
-                    goto err;
-                
+                              OPENSSL_PEM_CB(NULL,NULL)) == NULL) {
+              if (ERR_peek_error() == ERR_PACK(ERR_LIB_PEM,PEM_F_PEM_READ_BIO,PEM_R_NO_START_LINE)) {
+                ERR_clear_error();
+                PRXYerr(PRXYERR_F_INIT_CRED,PRXYERR_R_INVALID_CERT);
+                status = PRXYERR_R_INVALID_CERT;
+              } 
+              else { 
+                PRXYerr(PRXYERR_F_INIT_CRED,PRXYERR_R_PROCESS_CERT);
+                status = PRXYERR_R_PROCESS_CERT;
+              }
+              ERR_add_error_data(2, "\n        File=", user_cert);
+              fclose(fp);
+              goto err;
             }
             fclose(fp);
         }
     }
     status = 0;
-err:
+ err:
 
     return status;
 }
@@ -3487,7 +3587,7 @@ proxy_load_user_key(
         else
         {
             int keystatus;
-            if ((fp = fopen(user_key,"r")) == NULL)
+            if ((fp = fopen(user_key,"rb")) == NULL)
             {
                 if (pcd->owner==CRED_OWNER_SERVER)
                 {    

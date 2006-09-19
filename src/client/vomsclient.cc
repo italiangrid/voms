@@ -202,7 +202,7 @@ Client::Client(int argc, char ** argv) :
       "    -verify                        Verifies certificate to make proxy for\n" \
       "    -pwstdin                       Allows passphrase from stdin\n" \
       "    -limited                       Creates a limited proxy\n" \
-      "    -valid <h:m>                   Proxy is valid for h hours and m minutes\n" \
+      "    -valid <h:m>                   Proxy and AC are valid for h hours and m minutes\n" \
       "                                   (defaults to 12:00)\n" \
       "    -hours H                       Proxy is valid for H hours (default:12)\n" \
       "    -bits                          Number of bits in key {512|1024|2048|4096}\n" \
@@ -460,7 +460,7 @@ Client::Client(int argc, char ** argv) :
       std::cerr << "-valid argument must be in the format: h:m" << std::endl;
       exit(1);
     }    
-    if(minutes < 0 || minutes >59)
+    if(minutes < 0 || minutes > 59)
     {
       std::cerr << "specified minutes must be in the range 0-59" << std::endl;
       exit(1);
@@ -533,7 +533,8 @@ Client::Client(int argc, char ** argv) :
     if(debug)
       std::cout << "Using configuration file "<< *i << std::endl;
     if (!v.LoadSystemContacts(*i))
-      std::cerr << v.ErrorMessage() << std::endl;
+      if (*i != userconf)
+        std::cerr << v.ErrorMessage() << std::endl;
   }
 
   for (unsigned int i = 0; i < vomses.size(); i++) {
@@ -713,18 +714,6 @@ bool Client::Run() {
           std::cout << " Done" << std::endl;
       }
       
-      /* print status */
-      if(!status)
-      {
-        if(!quiet) 
-          std::cout << " Failed" << std::endl;
-      }        
-      else
-      {
-        if(!quiet)
-          std::cout << " Done" << std::endl;
-      }
-      
       /* check for socket error */
 
       if (!status && v.error == VERR_NOSOCKET)
@@ -790,7 +779,7 @@ bool Client::Run() {
       }
       else 
       {
-        if (!quiet) std::cout << std::endl << "Failed to contact servers for " << beg->vo << "." << std::endl;
+        if (!quiet) std::cout << std::endl << "None of the contacted servers for " << beg->vo << " were capable\nof returning a valid AC for the user." << std::endl;
         if(!noregen) 
           unlink(proxyfile.c_str());
         exit(1);
@@ -1597,31 +1586,39 @@ bool Client::pcdInit() {
     EVP_set_pw_prompt("Enter card pin:");
   else
     EVP_set_pw_prompt(const_cast<char *>("Enter GRID pass phrase for this identity:"));
+
+  if (strcmp(this->certfile + strlen(this->certfile) - 4, ".p12")) {
+    if(proxy_load_user_cert(pcd, this->certfile, pw_cb, NULL))
+      goto err;
   
-  if(proxy_load_user_cert(pcd, this->certfile, pw_cb, NULL))
-    goto err;
   
+    EVP_set_pw_prompt("Enter GRID pass phrase:");
+  
+    if (!strncmp(this->keyfile, "SC:", 3))
+      EVP_set_pw_prompt("Enter card pin:");
+
+    if (proxy_load_user_key(pcd, this->keyfile, pw_cb, NULL))
+      goto err;
+
+    if (strncmp(this->certfile, "SC:", 3) && !strcmp(this->certfile, this->keyfile)) {
+      if (pcd->cert_chain == NULL)
+        pcd->cert_chain = sk_X509_new_null();
+      if (proxy_load_user_proxy(pcd->cert_chain, this->certfile, NULL) < 0)
+        goto err;
+    } 
+  }
+  else {
+    if (!proxy_load_user_cert_and_key_pkcs12(pcd, this->certfile, NULL))
+      goto err;
+  }
+
   if(!quiet) {
     char * s = NULL;
     s = X509_NAME_oneline(X509_get_subject_name(pcd->ucert),NULL,0);
     std::cout << "Your identity: " << s << std::endl;
     free(s);
   }
-  
-  EVP_set_pw_prompt("Enter GRID pass phrase:");
-  
-  if (!strncmp(this->keyfile, "SC:", 3))
-    EVP_set_pw_prompt("Enter card pin:");
 
-  if (proxy_load_user_key(pcd, this->keyfile, pw_cb, NULL))
-    goto err;
-  
-  if (strncmp(this->certfile, "SC:", 3) && !strcmp(this->certfile, this->keyfile)) {
-    if (pcd->cert_chain == NULL)
-      pcd->cert_chain = sk_X509_new_null();
-    if (proxy_load_user_proxy(pcd->cert_chain, this->certfile, NULL) < 0)
-      goto err;
-  } 
   
   status = true;
   

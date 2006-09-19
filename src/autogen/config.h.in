@@ -40,18 +40,6 @@
 /* Define to 1 if you have the `dup2' function. */
 #undef HAVE_DUP2
 
-/* Define to 1 if you have EVP_MD_CTX_cleanup */
-#undef HAVE_EVP_MD_CTX_CLEANUP
-
-/* Define to 1 if you have EVP_MD_CTX_cleanup (OpenSSL system libs) */
-#undef HAVE_EVP_MD_CTX_CLEANUP_OPENSSL
-
-/* Define to 1 if you have EVP_MD_CTX_init */
-#undef HAVE_EVP_MD_CTX_INIT
-
-/* Define to 1 if you have EVP_MD_CTX_init (OpenSSL system libs) */
-#undef HAVE_EVP_MD_CTX_INIT_OPENSSL
-
 /* Define to 1 if you have the <fcntl.h> header file. */
 #undef HAVE_FCNTL_H
 
@@ -181,7 +169,7 @@
 /* Define to 1 if you have the <string.h> header file. */
 #undef HAVE_STRING_H
 
-/* Define to 1 if you have time_t _timezone type in time.h */
+/* Define to 1 if you have strndup in string.h */
 #undef HAVE_STRNDUP
 
 /* Define to 1 if you have the `strrchr' function. */

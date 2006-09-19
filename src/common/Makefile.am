@@ -9,14 +9,12 @@ libutilities_la_SOURCES = \
 	data.cc \
 	options.cc \
 	pass.cc \
-	sign.cc \
 	xmlcc.cc
 
 libutilities_nog_la_SOURCES = \
 	data.cc \
 	options.cc \
 	pass.cc \
-	sign.cc \
 	xmlcc.cc
 
 libutilities_nog_la_CFLAGS = \

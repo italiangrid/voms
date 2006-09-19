@@ -43,19 +43,19 @@ Name of the db to create. The default is 'voms'.</para>
 Listens on port <emphasis remap='I'>port</emphasis>. The default is 15000.</para>
 
 <para><option>--voms-vo</option> <replaceable>name</replaceable>
-Sets the vo name. The default is 'unspecified'.</para>
+Sets the vo name. There is no default.  This option must always be specified.</para>
 
-<para><option>--mysql-admin</option> <replaceable>name</replaceable>
+<para><option>--db-admin</option> <replaceable>name</replaceable>
 The name of the MySQL admin user. The default is 'root'.</para>
 
-<para><option>--mysql-pwd</option> <replaceable>value</replaceable>
+<para><option>--db-pwd</option> <replaceable>value</replaceable>
 The password of the MySQL admin user, The default is to not use a password.</para>
 
 <para><option>--voms-name</option> <replaceable>name</replaceable>
-The name of the voms user. The default is 'voms'.</para>
+The name of the voms user. The default is 'voms_[voname]'.</para>
 
 <para><option>--voms-pwd</option> <replaceable>value</replaceable>
-The password of the voms user. The default is 'password'.</para>
+The password of the voms user. The default is random.</para>
 
 <para><option>--code</option> <replaceable>c</replaceable>
 Defines a set of AC serial numbers to be used in case several serers share the

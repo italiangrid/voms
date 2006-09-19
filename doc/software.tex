@@ -77,26 +77,25 @@ be listening.  There is no default value for this option, although
 15000 is the recommended choice for the first server installed on a
 host, and additional servers may use 15001, 15002, etc\ldots\\
 \textbf{--voms-vo} & This is the name of the VO to which the VOMS
-server belongs.  Its default value is ``unspecified'' which is
-\emph{not} a valid value for a VO name.  For this reason, this option
-should be \emph{always} specified.\\
-\textbf{--mysql-admin} & This is the name of the MySQL root user.  It is
-needed because the script needs to create a new DB and a new user. Its
-default value is ``root'', which is the standard on the default MySQL
-installation.\\
-\textbf{--mysql-pwd} & This is the password of the MySQL account
+server belongs.  There is no default. For this reason, this option
+must be \emph{always} specified.\\
+\textbf{--db-admin} & This is the name of the DB user which will create 
+the tables.  It is needed because the script needs to create a new DB 
+and a new user. Its default value is ``root'', which is the standard 
+on the default MySQL installation.\\
+\textbf{--db-pwd} & This is the password of the DB account
 specified by the previous option.  Its default value is ``'', meaning
 that there is no password.  This is \emph{not} advisable.  The root
-account of a MySQL server hosting a VOMS DB \emph{must} be protected
+account of a DB server hosting a VOMS DB \emph{must} be protected
 by a password.\\
 \textbf{--voms-name} & This is the username of the voms MySQL account
 that will be setup to access the newly created DB.  Its default value
-is ``voms'', and it is perfectly fine if you are installing a single
+is ``voms\_[VONAME]'', and it is perfectly fine if you are installing a single
 server.  If you are installing further servers on the same machine, you
 \emph{MUST} change this name to some other value.\\
 \textbf{--voms-pwd} & This is the password associated with the
-\emph{voms-name} account.  It does have a default value, but this
-should never be used.  You should always specify a new value.\\
+\emph{voms-name} account.  If not specified, a random password is created.  
+You should always specify a new value.\\
 \textbf{--code} & This is a unique code for each server installed on the
 same host. It is a value between 0 and 65535, and its default is the
 value of \textbf{--port}.\\

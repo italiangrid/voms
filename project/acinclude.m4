@@ -294,10 +294,10 @@ AC_DEFUN([AC_ENABLE_GLITE],
     	AC_SUBST(DISTTAR)
 #	EDG_SET_RPM_TOPDIR
     	AC_SUBST(LOCATION_ENV, "VOMS_LOCATION")
-    	AC_SUBST(LOCATION_DIR, "$prefix")
+    	AC_SUBST(LOCATION_DIR, "${prefix}")
     	AC_SUBST(VAR_LOCATION_ENV, "VOMS_LOCATION_VAR")
     	AC_DEFINE(LOCATION_ENV, "VOMS_LOCATION", [Environment variable name])
-    	AC_DEFINE(LOCATION_DIR, "$prefix", [Location of system directory])
+    	AC_DEFINE_UNQUOTED(LOCATION_DIR, "$prefix", [Location of system directory])
     	AC_DEFINE(USER_DIR, ".edg", [Location of user directory])
     else
     	AC_MSG_RESULT([Preparing for gLite environment])
@@ -396,7 +396,7 @@ AC_DEFUN([AC_VOMS_STRNDUP],
                 [
                 char *s = strndup("prova",5);
                 ],
-                [AC_DEFINE(HAVE_STRNDUP, 1, [Define to 1 if you have time_t _timezone type in time.h])
+                [AC_DEFINE(HAVE_STRNDUP, 1, [Define to 1 if you have strndup in string.h])
                  AC_MSG_RESULT(yes)],
                 [AC_LIBOBJ(strndup)
                 AC_MSG_RESULT(no)])
@@ -485,82 +485,6 @@ AC_DEFUN([AC_OPENSSL_EXT_METHOD],
     CFLAGS="$CFLAGS_SAVE"
 ])
 
-# AC_VOMS_OPENSSL_EVP_MD_CTX
-# ------------------------------------------------------------
-AC_DEFUN([AC_VOMS_OPENSSL_EVP_MD_CTX],
-[
-    AC_MSG_CHECKING([for EVP_MD_CTX_init])
-    CPPFLAGS_SAVE="$CPPFLAGS"
-    CPPFLAGS="$CPPFLAGS $GLOBUS_CFLAGS $GLOBUS_GSS_LIBS"
-    AC_LANG_PUSH(C++)
-    AC_TRY_LINK(
-      [
-        #include <$with_globus_prefix/include/$with_globus_flavor/openssl/evp.h>
-      ],
-      [
-        EVP_MD_CTX mp; 
-        (void)EVP_MD_CTX_init(&mp)
-      ],
-      [AC_DEFINE(HAVE_EVP_MD_CTX_INIT, 1, [Define to 1 if you have EVP_MD_CTX_init])
-       AC_MSG_RESULT(yes)],
-      [AC_MSG_RESULT(no)]
-    )
-    CPPFLAGS="$CPPFLAGS_SAVE"
-
-    AC_MSG_CHECKING([for EVP_MD_CTX_init (system libs)])
-    CPPFLAGS_SAVE="$CPPFLAGS"
-    CPPFLAGS="$CPPFLAGS $NO_GLOBUS_FLAGS $OPENSSL_LIBS"
-    AC_LANG_PUSH(C++)
-    AC_TRY_LINK(
-      [
-        #include <openssl/evp.h>
-      ],
-      [
-        EVP_MD_CTX mp; 
-        (void)EVP_MD_CTX_init(&mp)
-      ],
-      [AC_DEFINE(HAVE_EVP_MD_CTX_INIT_OPENSSL, 1, [Define to 1 if you have EVP_MD_CTX_init (OpenSSL system libs)])
-       AC_MSG_RESULT(yes)],
-      [AC_MSG_RESULT(no)]
-    )
-    CPPFLAGS="$CPPFLAGS_SAVE"
-
-    AC_MSG_CHECKING([for EVP_MD_CTX_cleanup])
-    CPPFLAGS_SAVE="$CPPFLAGS"
-    CPPFLAGS="$CPPFLAGS $GLOBUS_CFLAGS $GLOBUS_GSS_LIBS"
-    AC_TRY_LINK(
-      [
-        #include <$with_globus_prefix/include/$with_globus_flavor/openssl/evp.h>
-      ],
-      [
-        EVP_MD_CTX mp; 
-        (void)EVP_MD_CTX_cleanup(&mp)
-      ],
-      [AC_DEFINE(HAVE_EVP_MD_CTX_CLEANUP, 1, [Define to 1 if you have EVP_MD_CTX_cleanup])
-       AC_MSG_RESULT(yes)],
-      [AC_MSG_RESULT(no)]
-      )
-    AC_LANG_POP(C++)
-    CPPFLAGS="$CPPFLAGS_SAVE"
-
-    AC_MSG_CHECKING([for EVP_MD_CTX_cleanup (system libs)])
-    CPPFLAGS_SAVE="$CPPFLAGS"
-    CPPFLAGS="$CPPFLAGS $NO_GLOBUS_FLAGS $OPENSSL_LIBS"
-    AC_TRY_LINK(
-      [
-        #include <openssl/evp.h>
-      ],
-      [
-        EVP_MD_CTX mp; 
-        (void)EVP_MD_CTX_cleanup(&mp)
-      ],
-      [AC_DEFINE(HAVE_EVP_MD_CTX_CLEANUP_OPENSSL, 1, [Define to 1 if you have EVP_MD_CTX_cleanup (OpenSSL system libs)])
-       AC_MSG_RESULT(yes)],
-      [AC_MSG_RESULT(no)]
-      )
-    AC_LANG_POP(C++)
-    CPPFLAGS="$CPPFLAGS_SAVE"
-])
 
 # AC_VOMS_LONG_LONG check whether long long type is present
 # ------------------------------------------------------------

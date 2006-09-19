@@ -39,26 +39,30 @@ grid-proxy-init, and have the exact same meaning. The meaning of the other
 ones is the following.</para>
 
 <para><option>-help</option>
-Displays usage</para>
+Displays usage.</para>
 
 <para><option>-version</option>
-Displays version</para>
+Displays version.</para>
 
 <para><option>-debug</option>
-Enables extra debug output</para>
+Enables extra debug output.  This is for bug reports only.  Users must not
+rely on the extra output printed by this option.</para>
 
 <para><option>-q</option>
-Quiet mode, minimal output</para>
+Quiet mode, minimal output.</para>
 
 <para><option>-file</option> <replaceable>proxyfile</replaceable>
 The name of the file containing the proxy, in case it is in a 
 non-standard place.</para>
 
 <para><option>-subject</option>
-Prints the proxy's subject</para>
+Prints the DN of the proxy's subject.</para>
 
 <para><option>-issuer</option>
-Prints the proxy's issuer</para>
+Prints the DN of the proxy's issuer.</para>
+
+<para><option>-identity</option>
+Prints the DN of the iodentity represented by the proxy.  This is synonimous</para>
 
 <para><option>-type</option>
 Print the proxy's type (limited or not)</para>
@@ -69,12 +73,10 @@ Prints the proxy's strength. I.e. the number of bits in the key.</para>
 <para><option>-valid</option>
 Print validity times.</para>
 
-<para><option>-time</option>
-Prints how much time is left (in seconds) instead of the end time. This
+<para><option>-timeleft</option>
+Prints how much time is left (in seconds) instead of the end time of the proxy. This
 option implies -valid</para>
 
-<para><option>-info</option>
-Prints also the information included in the VOMS extension.</para>
 
 <para><option>-all</option>
 Prints everything.</para>
@@ -82,17 +84,35 @@ Prints everything.</para>
 <para><option>-fqan</option>
 Prints the VOMS attributes in the FQAN format. Default</para>
 
-<para><option>-extended</option>
-Prints the VOMS attrributes in the extended format.</para>
-
-<para><option>-defaultinfo</option>
-Prints only the VOMS default information, i.e. the first AC.</para>
-
 <para> <option>-exists</option> <replaceable>-bits N</replaceable> <replaceable>-hours H</replaceable>
 Verifies if the proxy is valid for at least other H hours and has a key of at least N bits.</para>
 
+<para> <option>-acexists</option> <replaceable>voname</replaceable>
+Verifies if an AC for the VO specified is present in the proxy.</para>
+
 <para><option>-conf</option> <replaceable>file</replaceable>
 Read options from <emphasis remap='I'>file</emphasis>.</para>
+
+<para><option>-text</option>
+Prints the certificate to standard output.</para>
+
+<para><option>-path</option>
+Prints the full path name of the proxy file.</para>
+
+<para><option>-vo</option>
+Prints the names of the VOs whose AC are present in the proxy</para>
+
+<para><option>-acsubject</option>
+Prints the subject of the owners of the ACs in the proxy.</para>
+
+<para><option>-acissuer</option>
+Prints the issuer of the owners of the ACs in the proxy.</para>
+
+<para><option>-actimeleft</option>
+Prints how much time is left (in seconds) instead of the end time of the AC.</para>
+
+<para><option>-serial</option>
+Prints the serial number of each AC present in the proxy.</para>
 
 </refsect1>
 

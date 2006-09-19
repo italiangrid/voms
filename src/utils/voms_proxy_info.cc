@@ -145,6 +145,7 @@ main(int argc, char **argv)
     "   [printoptions]            Prints information about proxy and attribute certificate\n"
     "   -exists [options]         Returns 0 if valid proxy exists, 1 otherwise\n"
     "   -acexists <voname>        Returns 0 if AC exists corresponding to voname, 1 otherwise\n"
+    "   -conf <name>              Read options from file <name>\n"
     "\n"
     "   [printoptions]\n"
     "      -subject              Distinguished name (DN) of proxy subject\n"
@@ -191,7 +192,7 @@ main(int argc, char **argv)
     {"strength",    1, (int *)&strength,    OPT_BOOL},
     {"path",        1, (int *)&path,        OPT_BOOL},
     {"all",         1, (int *)&all,         OPT_BOOL},
-    {"text",        1, (int *)&text,         OPT_BOOL},
+    {"text",        1, (int *)&text,        OPT_BOOL},
     {"vo",          1, (int *)&vo,          OPT_BOOL},
     {"fqan",        1, (int *)&fqan,        OPT_BOOL},
     {"acsubject",   1, (int *)&acsubject,   OPT_BOOL},
@@ -527,15 +528,12 @@ static bool print(X509 *cert, vomsdata &vd)
 
   for (std::vector<voms>::iterator v = vd.data.begin(); v != vd.data.end(); v++) {
     if(vo)
-      for (std::vector<std::string>::iterator s = v->fqan.begin(); s != v->fqan.end(); s++)
         std::cout << v->voname << "\n";
 
     if (acsubject) 
-      for (std::vector<std::string>::iterator s = v->fqan.begin(); s != v->fqan.end(); s++)
         std::cout << v->user << "\n";
 
     if (acissuer) 
-      for (std::vector<std::string>::iterator s = v->fqan.begin(); s != v->fqan.end(); s++)
         std::cout << v->server << "\n";
 
     ASN1_TIME * after  = convtime(v->date2);
@@ -543,7 +541,6 @@ static bool print(X509 *cert, vomsdata &vd)
     leftac = (leftac<0) ? 0 : leftac;
 
     if (actimeleft)
-      for (std::vector<std::string>::iterator s = v->fqan.begin(); s != v->fqan.end(); s++)
         std::cout << leftac << "\n";
 
     if (fqan) {
@@ -552,7 +549,6 @@ static bool print(X509 *cert, vomsdata &vd)
     }
 
     if (serial)
-      for (std::vector<std::string>::iterator s = v->fqan.begin(); s != v->fqan.end(); s++)
         std::cout << v->serial << "\n";
   }
 

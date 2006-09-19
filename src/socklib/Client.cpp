@@ -138,10 +138,10 @@ GSISocketClient::InitGSIAuthentication(int sock)
 					  "Failed to acquire credentials: ",
 					  major_status, minor_status, 0);
      LOGM(VARP, logh, LEV_ERROR, T_PRE, "Globus Error: %s", str);
+     SetError(std::string("Globus Error: ") + str + "\nFailed to find valid user certificate!");
      free(str);
      if (credential != GSS_C_NO_CREDENTIAL)
        gss_release_cred(&status, &credential);
-     SetError("Failed to find user certificate!");
      return false;
    }
    
@@ -357,7 +357,7 @@ GSISocketClient::Receive(std::string& s)
     char *str = NULL;
     globus_gss_assist_display_status_str(&str, 
 					 "GSS authentication failure ",
-					 maj_stat, min_stat, token_status); 
+           ret, min_stat, token_status); 
     LOG(logh, LEV_ERROR, T_PRE, str);
     SetError(str);
     free(str);

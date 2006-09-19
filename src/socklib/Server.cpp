@@ -399,17 +399,19 @@ GSISocketServer::Receive(std::string& s)
   ret = my_recv(&min_stat, context, &message, &length, &token_status, 
                 get_token, &newsck, logh);
 
-  if (ret) 
+  if (ret) {
     s = std::string(message,length);
+    free(message);
+  }
   else {
     char *str = NULL;
     globus_gss_assist_display_status_str(&str, 
 					 "GSS authentication failure ",
-					 maj_stat, min_stat, token_status); 
+                                         ret, min_stat, token_status); 
     LOG(logh, LEV_ERROR, T_PRE, str);
     free(str);
   }
-  free(message);
+
   return ret == 1;
 }
 

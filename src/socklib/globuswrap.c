@@ -44,7 +44,13 @@ int my_send(OM_uint32 *m, const gss_ctx_id_t h, char *data, size_t len,
       res = globus_gss_assist_wrap_send(m, h, data, len, tok_stat, gt, get_ctx, f);
       fflush(f);
       if (GSS_ERROR(res)) {
-        done = LogBuffer(f, logh, LEV_ERROR, -1, "Globus error:");
+        char *str = NULL;
+        globus_gss_assist_display_status_str(&str,
+                                             "Failed to send data:",
+                                             res, m, tok_stat);
+        done = LogBuffer(f, logh, LEV_ERROR, -1, str);
+        LOG(logh, LEV_ERROR, -1, str);
+        free(str);
       }
       else
         trueres=1;
@@ -77,7 +83,13 @@ int my_recv(OM_uint32 *m, const gss_ctx_id_t h, char **data, size_t *len, int *t
       res = globus_gss_assist_get_unwrap(m, h, data, len, t_s, gt, gs, f);
       fflush(f);
       if (GSS_ERROR(res)) {
-        done = LogBuffer(f, logh, LEV_ERROR, -1, "Globus error:");
+        char *str = NULL;
+        globus_gss_assist_display_status_str(&str,
+                                             "Failed to receive data: ",
+                                             res, m, t_s);
+        done = LogBuffer(f, logh, LEV_ERROR, -1, str);
+        LOG(logh, LEV_ERROR, -1, str);
+        free(str);
       }
       else
         trueres=1;
@@ -91,5 +103,6 @@ int my_recv(OM_uint32 *m, const gss_ctx_id_t h, char **data, size_t *len, int *t
   if (!trueres && !done)
     LOG(logh, LEV_ERROR, -1, "Globus error: unable to log");
 
+  LOGM(VARP, logh, LEV_ERROR, -1, "trueres = %d\n", trueres);
   return trueres;
 }

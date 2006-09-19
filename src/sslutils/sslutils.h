@@ -106,6 +106,7 @@ EXTERN_C_BEGIN
 #define GSI_REGISTRY_DIR "software\\Globus\\GSI"
 #define X509_DEFAULT_CERT_DIR   ".globus\\certificates"
 #define X509_DEFAULT_USER_CERT  ".globus\\usercert.pem"
+#define X509_DEFAULT_USER_CERT_P12  ".globus\\usercert.p12"
 #define X509_DEFAULT_USER_KEY   ".globus\\userkey.pem"
 #define X509_INSTALLED_CERT_DIR "share\\certificates"
 #define X509_INSTALLED_HOST_CERT_DIR "NEEDS_TO_BE_DETERMINED"
@@ -114,6 +115,7 @@ EXTERN_C_BEGIN
 #else
 #define X509_DEFAULT_CERT_DIR   ".globus/certificates"
 #define X509_DEFAULT_USER_CERT  ".globus/usercert.pem"
+#define X509_DEFAULT_USER_CERT_P12  ".globus/usercert.p12"
 #define X509_DEFAULT_USER_KEY   ".globus/userkey.pem"
 #define X509_INSTALLED_CERT_DIR "share/certificates"
 #define X509_INSTALLED_HOST_CERT_DIR "/etc/grid-security/certificates"
@@ -337,6 +339,10 @@ proxy_cred_desc_new();
 
 int
 proxy_cred_desc_free(proxy_cred_desc * pcd);
+
+int proxy_load_user_cert_and_key_pkcs12(proxy_cred_desc *pcd,
+                                        const char *user_cert,
+                                        int (*pw_cb) ());
 
 int
 proxy_get_filenames(

@@ -617,15 +617,21 @@ bool vomsdata::loadfile(std::string filename, uid_t uid, gid_t gid)
     return false;
   }
 
-  if (!(stats.st_mode == (S_IFREG | S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH) ||
-        stats.st_mode == (S_IFDIR |
-                          S_IRUSR | S_IWUSR | S_IXUSR |
-                          S_IRGRP | S_IXGRP |
-                          S_IROTH | S_IXOTH))) {
+  if (stats.st_mode & (S_IWGRP | S_IWOTH)) {
     seterror(VERR_DIR, std::string("Wrong permissions on file: ") + filename + 
-             "\nThey should be: 644 (for files) or 755 (for dirs)\n");
+             "\nWriting permissions are allowed only for the owner\n");
     return false;
   }
+
+//   if (!(stats.st_mode == (S_IFREG | S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH) ||
+//         stats.st_mode == (S_IFDIR |
+//                           S_IRUSR | S_IWUSR | S_IXUSR |
+//                           S_IRGRP | S_IXGRP |
+//                           S_IROTH | S_IXOTH))) {
+//     seterror(VERR_DIR, std::string("Wrong permissions on file: ") + filename + 
+//              "\nThey should be: 644 (for files) or 755 (for dirs)\n");
+//     return false;
+//   }
 
   if (stats.st_mode & S_IFREG)
     return loadfile0(filename, uid, gid);

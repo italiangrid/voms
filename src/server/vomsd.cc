@@ -652,7 +652,7 @@ VOMSServer::Execute(const std::string &client_name, const std::string &ca_name,
   if (requested != 0) {
     if (validity < requested) {
       err.num = WARN_SHORT_VALIDITY;
-      err.message = uri + ": validity shortened to " +
+      err.message = uri + ": The validity of this VOMS AC in your proxy is shortened to " +
         stringify(validity, tmp) + " seconds!";
       errs.push_back(err);
       requested = validity;

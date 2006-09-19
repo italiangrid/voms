@@ -269,9 +269,9 @@ getopts_real(int argc, char * const argv[], struct option *longopts, struct opti
     if (c != -1 && c != '?')
     {
       if (longopts[index].flag == NULL && 
-	  !(longopts[index].val == OPT_NONE ||
-	    longopts[index].val == OPT_HELP ||
-	    longopts[index].val == OPT_CONFIG)) 
+          !(longopts[index].val == OPT_NONE ||
+            longopts[index].val == OPT_HELP ||
+            longopts[index].val == OPT_CONFIG))
       {
         c = '?';
         break;
@@ -296,61 +296,61 @@ getopts_real(int argc, char * const argv[], struct option *longopts, struct opti
         break;
       
       case OPT_FUNCTION0:
-        {
+      {
           bool (*zero)(void)  = (bool (*)(void))(longopts[index].flag);
           if (!zero())
             c = '?';
-        }
-        break;
+      }
+      break;
       
       case OPT_FUNCTION1:
-        {
-          bool (*one)(char *)  = (bool (*)(char *))(longopts[index].flag);
+      {
+        bool (*one)(char *)  = (bool (*)(char *))(longopts[index].flag);
           
-          if (!one(optarg))
-            c = '?';
-        }
-        break;
+        if (!one(optarg))
+          c = '?';
+      }
+      break;
       
       case OPT_MULTI: 
-        {
-          std::vector<std::string> *v =((std::vector<std::string> *)(longopts[index].flag));
-          if(optarg)
-            v->push_back((std::string)(optarg));
-          else c = '?';
-        }
-        break;
+      {
+        std::vector<std::string> *v =((std::vector<std::string> *)(longopts[index].flag));
+        if(optarg)
+          v->push_back((std::string)(optarg));
+        else c = '?';
+      }
+      break;
       
       case OPT_CONFIG: 
-        {
-          std::ifstream f(optarg);
-          bool res = true;
-          std::string line;
-          char *optargsave;
-          int optindsave, opterrsave, optoptsave;
+      {
+        std::ifstream f(optarg);
+        bool res = true;
+        std::string line;
+        char *optargsave;
+        int optindsave, opterrsave, optoptsave;
 	  
-          while (f >> line) {
-            if (line.c_str()[0] != '#') {
-              std::vector<const char *> v;
-              v.push_back(argv[0]);
-              v.push_back(line.c_str());
-              optargsave = optarg;
-              optindsave = optind;
-              opterrsave = opterr;
-              optoptsave = optopt;
-              optind = 0;
-              res &= getopts_real(2, const_cast<char * const *>(&v[0]),
-                                  longopts, opts);
-              optarg = optargsave;
-              optind = optindsave;
-              opterr = opterrsave;
-              optopt = optoptsave;
-            }
+        while (f >> line) {
+          if (line.c_str()[0] != '#') {
+            std::vector<const char *> v;
+            v.push_back(argv[0]);
+            v.push_back(line.c_str());
+            optargsave = optarg;
+            optindsave = optind;
+            opterrsave = opterr;
+            optoptsave = optopt;
+            optind = 0;
+            res &= getopts_real(2, const_cast<char * const *>(&v[0]),
+                                longopts, opts);
+            optarg = optargsave;
+            optind = optindsave;
+            opterr = opterrsave;
+            optopt = optoptsave;
           }
-          if (!res)
-            c = '?';
         }
-        break;
+        if (!res)
+          c = '?';
+      }
+      break;
       
       case OPT_HELP:
         c = '?';
@@ -362,23 +362,22 @@ getopts_real(int argc, char * const argv[], struct option *longopts, struct opti
       }
     }
     
-    if (c == ':') 
+    if (c == ':')
     {
       c = '?';
     }
     
   } while (c != '?' && c != -1);
 
-  if (c == '?') 
+  if (c == '?')
   {
     usage(argv[0]);
     return false;
   }
   else if (optind < argc && argv[optind][0] != '#' ) {
-     std::cerr << "Junk found in command line!" << std::endl;
-     return false;
+    std::cerr << "Found non option element " << argv[optind] << " in command line." << std::endl;
+    return false;
   }
 
   return true;
-
 }
