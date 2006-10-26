@@ -687,7 +687,7 @@ bool Client::Run() {
         if(debug) std::cout << "to " << proxyfile << " " << std::flush;
         int tmp = hours;
         hours = 1;
-        if(CreateProxy("", "", NULL, (beg->version == -1 ? proxyver : beg->version)))
+        if(CreateProxy("", "", NULL, (beg->version == -1 ? proxyver : beg->version/10)))
           goto err;
         hours = tmp;
       }
@@ -827,7 +827,7 @@ bool Client::Run() {
   if(!quiet) std::cout << "Creating proxy " << std::flush; 
   if(debug) std::cout << "to " << proxyfile << " " << std::flush;
   if(CreateProxy(data, filedata, vomses.empty() ? NULL : aclist, proxyver)) {
-    listfree((char **)aclist, (freefn)AC_free);
+    //    listfree((char **)aclist, (freefn)AC_free);
     goto err;
   }
   else

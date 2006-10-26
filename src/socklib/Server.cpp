@@ -27,6 +27,9 @@ extern "C" {
 
 #include <sys/types.h>
 #include <unistd.h>
+#include <sys/socket.h>
+#include <netinet/in.h>
+#include <arpa/inet.h>
 
 #include "gssapi.h"
 #include <memory.h>
@@ -350,10 +353,11 @@ GSISocketServer::Listen()
 
     if (he) {
       if (he->h_name)
-      LOGM(VARP, logh, LEV_INFO, T_PRE, "Received connection from: %s\n", he->h_name);
-    else
-        LOG(logh, LEV_INFO, T_PRE, "Cannot discover connection origin!\n");
+        LOGM(VARP, logh, LEV_INFO, T_PRE, "Received connection from: %s (%s)\n", he->h_name, inet_ntoa(peeraddr_in.sin_addr));
     }
+    else
+      LOGM(VARP, logh, LEV_INFO, T_PRE, "Received connection from: %s\n", inet_ntoa(peeraddr_in.sin_addr));
+
     newopened = true;
     return true;
   }

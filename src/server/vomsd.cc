@@ -752,6 +752,8 @@ VOMSServer::Execute(const std::string &client_name, const std::string &ca_name,
       err.message = voname + ": User unknown to this VO.";
     else
       err.message = voname + ": Unable to satisfy " + command + " Request!";
+
+    LOG(logh, LEV_ERROR, T_PRE, err.message.c_str());
     errs.push_back(err);
     std::string ret = XML_Ans_Encode("A", errs);
     LOGM(VARP, logh, LEV_DEBUG, T_PRE, "Sending: %s", ret.c_str());

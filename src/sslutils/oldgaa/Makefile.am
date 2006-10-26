@@ -9,10 +9,12 @@ liboldgaa_la_SOURCES = $(SOURCES)
 liboldgaa_nog_la_SOURCES = $(SOURCES)
 
 liboldgaa_la_CFLAGS = \
-	$(GLOBUS_CFLAGS)
+	$(GLOBUS_CFLAGS) \
+	-I $(top_srcdir)/src/include
 
 liboldgaa_nog_la_CFLAGS = \
 	$(NO_GLOBUS_FLAGS) \
+	-I $(top_srcdir)/src/include \
 	$(GLOBUS_CFLAGS)
 
 liboldgaa_la_LIBADD = \
@@ -34,7 +36,8 @@ liboldgaa_gcc32_la_SOURCES = \
 	$(SOURCES)
 
 liboldgaa_gcc32_la_CFLAGS = \
-	$(GLOBUS_GCC32_CFLAGS)
+	$(GLOBUS_GCC32_CFLAGS) \
+	-I $(top_srcdir)/src/include
 
 liboldgaa_gcc32_la_LIBADD = \
 	$(GLOBUS_GCC32_GSS_LIBS)
@@ -43,7 +46,8 @@ liboldgaa_gcc32dbg_la_SOURCES = \
 	$(SOURCES)
 
 liboldgaa_gcc32dbg_la_CFLAGS = \
-	$(GLOBUS_GCC32DBG_CFLAGS)
+	$(GLOBUS_GCC32DBG_CFLAGS) \
+	-I $(top_srcdir)/src/include
 
 liboldgaa_gcc32dbg_la_LIBADD = \
 	$(GLOBUS_GCC32DBG_GSS_LIBS)
@@ -52,7 +56,8 @@ liboldgaa_gcc32pthr_la_SOURCES = \
 	$(SOURCES)
 
 liboldgaa_gcc32pthr_la_CFLAGS = \
-	$(GLOBUS_GCC32PTHR_CFLAGS)
+	$(GLOBUS_GCC32PTHR_CFLAGS) \
+	-I $(top_srcdir)/src/include
 
 liboldgaa_gcc32pthr_la_LIBADD = \
 	$(GLOBUS_GCC32PTHR_GSS_LIBS)
@@ -61,7 +66,8 @@ liboldgaa_gcc32dbgpthr_la_SOURCES = \
 	$(SOURCES)
 
 liboldgaa_gcc32dbgpthr_la_CFLAGS = \
-	$(GLOBUS_GCC32DBGPTHR_CFLAGS)
+	$(GLOBUS_GCC32DBGPTHR_CFLAGS) \
+	-I $(top_srcdir)/src/include
 
 liboldgaa_gcc32dbgpthr_la_LIBADD = \
 	$(GLOBUS_GCC32DBGPTHR_GSS_LIBS)
@@ -70,7 +76,8 @@ liboldgaa_gcc64_la_SOURCES = \
 	$(SOURCES)
 
 liboldgaa_gcc64_la_CFLAGS = \
-	$(GLOBUS_GCC64_CFLAGS)
+	$(GLOBUS_GCC64_CFLAGS) \
+	-I $(top_srcdir)/src/include
 
 liboldgaa_gcc64_la_LIBADD = \
 	$(GLOBUS_GCC64_GSS_LIBS)
@@ -79,7 +86,8 @@ liboldgaa_gcc64dbg_la_SOURCES = \
 	$(SOURCES)
 
 liboldgaa_gcc64dbg_la_CFLAGS = \
-	$(GLOBUS_GCC64DBG_CFLAGS)
+	$(GLOBUS_GCC64DBG_CFLAGS) \
+	-I $(top_srcdir)/src/include
 
 liboldgaa_gcc64dbg_la_LIBADD = \
 	$(GLOBUS_GCC64DBG_GSS_LIBS)
@@ -88,7 +96,8 @@ liboldgaa_gcc64pthr_la_SOURCES = \
 	$(SOURCES)
 
 liboldgaa_gcc64pthr_la_CFLAGS = \
-	$(GLOBUS_GCC64PTHR_CFLAGS)
+	$(GLOBUS_GCC64PTHR_CFLAGS) \
+	-I $(top_srcdir)/src/include
 
 liboldgaa_gcc64pthr_la_LIBADD = \
 	$(GLOBUS_GCC64PTHR_GSS_LIBS)
@@ -97,7 +106,8 @@ liboldgaa_gcc64dbgpthr_la_SOURCES = \
 	$(SOURCES)
 
 liboldgaa_gcc64dbgpthr_la_CFLAGS = \
-	$(GLOBUS_GCC64DBGPTHR_CFLAGS)
+	$(GLOBUS_GCC64DBGPTHR_CFLAGS) \
+	-I $(top_srcdir)/src/include
 
 liboldgaa_gcc64dbgpthr_la_LIBADD = \
 	$(GLOBUS_GCC64DBGPTHR_GSS_LIBS)

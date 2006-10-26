@@ -1,5 +1,5 @@
 
-AC_INIT([GLite Security VOMS], [1.7.8])
+AC_INIT([GLite Security VOMS], [1.7.9])
 AC_PREREQ(2.59)
 AC_CONFIG_AUX_DIR([./project])
 AM_INIT_AUTOMAKE
@@ -16,8 +16,6 @@ See LICENCE file for details
 WORKDIR=`pwd`
 AC_SUBST(WORKDIR)
 
-AM_CONDITIONAL(WANT_UNIT_TEST, test x = y)
-
 # Checks for programs.
 AC_PROG_CXX
 AC_PROG_AWK
@@ -29,6 +27,8 @@ AC_PROG_MAKE_SET
 AC_PROG_LIBTOOL
 
 AC_COMPILER
+AC_CPPUNIT
+AC_UTEST
 
 # Checks for libraries.
 AC_OPENSSL

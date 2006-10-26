@@ -318,29 +318,29 @@ uint32               inv_minor_status = 0, inv_major_status = 0;
 
 	/* ignore errors to allow for incomplete context handles */
 
-        if ((*cred)->mech_type != NULL) free((*cred)->mech_type);
-        if ((*cred)->type      != NULL) free((*cred)->type);
-        if ((*cred)->value     != NULL) free((*cred)->value);
+  if ((*cred)->mech_type != NULL) free((*cred)->mech_type);
+  if ((*cred)->type      != NULL) free((*cred)->type);
+  if ((*cred)->value     != NULL) free((*cred)->value);
 
     
-        if ((*cred)->conditions!= NULL) 
-	inv_major_status = oldgaa_release_cond_bindings(&inv_minor_status,
-			      &((*cred)->conditions));
+  if ((*cred)->conditions!= NULL) 
+    inv_major_status = oldgaa_release_cond_bindings(&inv_minor_status,
+                                                    &((*cred)->conditions));
 
-       if ((*cred)->mech_spec_cred!= NULL) 
-       {
-           inv_major_status = 
-					oldgaa_release_buffer_contents(&inv_minor_status,
-			           (*cred)->mech_spec_cred);
-           inv_major_status =oldgaa_release_buffer(&inv_minor_status,
-                       &((*cred)->mech_spec_cred));
-       }
+  if ((*cred)->mech_spec_cred!= NULL) 
+    {
+      inv_major_status = 
+        oldgaa_release_buffer_contents(&inv_minor_status,
+                                       (*cred)->mech_spec_cred);
+      inv_major_status =oldgaa_release_buffer(&inv_minor_status,
+                                              &((*cred)->mech_spec_cred));
+    }
+  
+  if ((*cred)->next!= NULL) 
+    inv_major_status = oldgaa_release_attributes(&inv_minor_status,
+                                                 &((*cred)->next));
 
-       if ((*cred)->next!= NULL) 
-       inv_major_status = oldgaa_release_attributes(&inv_minor_status,
-			                         &((*cred)->next));
-
-     free(*cred);
+  free(*cred);
 
   return OLDGAA_SUCCESS;
 
@@ -416,24 +416,23 @@ oldgaa_release_principals(uint32             *minor_status,
                        oldgaa_principals_ptr *principals)
 {
 
-oldgaa_principals_ptr  *cred = principals;
-uint32               inv_minor_status = 0, inv_major_status = 0;
+  oldgaa_principals_ptr  *cred = principals;
+  uint32               inv_minor_status = 0, inv_major_status = 0;
 
 	if (*cred == NULL || *cred == OLDGAA_NO_PRINCIPALS) 
-	return OLDGAA_SUCCESS;
+    return OLDGAA_SUCCESS;
 
 	/* ignore errors to allow for incomplete context handles */
 
 
-       if ((*cred)->rights != NULL) 
-       inv_major_status = oldgaa_release_rights(&inv_minor_status,
-			      &((*cred)->rights));
+  if ((*cred)->rights != NULL) 
+    inv_major_status = oldgaa_release_rights(&inv_minor_status,
+                                             &((*cred)->rights));
 
 
-       if ((*cred)->next != NULL) 
-       inv_major_status = oldgaa_release_principals(&inv_minor_status,
-			      &((*cred)->next));
-    
+  if ((*cred)->next != NULL) 
+    inv_major_status = oldgaa_release_principals(&inv_minor_status,
+                                                 &((*cred)->next));
        if ((*cred)->type      != NULL) free((*cred)->type);
        if ((*cred)->authority != NULL) free((*cred)->authority);
        if ((*cred)->value     != NULL) free((*cred)->value);
@@ -553,34 +552,71 @@ Returns:
 
 oldgaa_error_code 
 oldgaa_release_conditions(uint32             *minor_status,
-                       oldgaa_conditions_ptr *cond)
+                          oldgaa_conditions_ptr *cond)
 {
   oldgaa_conditions_ptr  *cred = cond;
-  uint32               inv_minor_status = 0, inv_major_status = 0;
+  uint32 inv_minor_status = 0, inv_major_status = 0;
 
 	if (*cred == NULL || *cred == OLDGAA_NO_CONDITIONS) 
-	return OLDGAA_SUCCESS;
+    return OLDGAA_SUCCESS;
 
-    (*cred)->reference_count--;
-    if ((*cred)->reference_count > 0) {
-        *cond = NULL;
-        return OLDGAA_SUCCESS;
+  oldgaa_conditions_ptr start   = *cond;
+  oldgaa_conditions_ptr anchor  = NULL;
+  oldgaa_conditions_ptr current = NULL;
+
+  while (start) {
+    start->reference_count --;
+    if (start->reference_count > 0) {
+      if (anchor == NULL) {
+        current = anchor = start;
+      }
+      current->next = start;
+      current = start;
+      start = start->next;
     }
-	/* ignore errors to allow for incomplete context handles */
+    else {
+      oldgaa_conditions_ptr tmp = start->next;
 
-       if ((*cred)->next != NULL) 
-       inv_major_status = oldgaa_release_conditions(&inv_minor_status,
-			      &((*cred)->next));
-       
-	if ((*cred)->type      != NULL) free((*cred)->type);
-	if ((*cred)->authority != NULL) free((*cred)->authority);
-	if ((*cred)->value     != NULL) free((*cred)->value);
+      free(start->type);
+      free(start->authority);
+      free(start->value);
+      free(start);
+      start = tmp;
+    }
+  }
 
-    free(*cred);
+  if (anchor) {
+    current->next = NULL;
+    *cond = anchor;
+  }
+  else
+    *cond = NULL;
 
   return OLDGAA_SUCCESS;
+}
+/*   if ( */
 
-} 
+/*   (*cred)->reference_count--; */
+/*   if ((*cred)->reference_count > 0) { */
+/*     *cond = NULL; */
+/*     return OLDGAA_SUCCESS; */
+/*   } */
+/* 	/\* ignore errors to allow for incomplete context handles *\/ */
+
+/*   if ((*cred)->next != NULL) { */
+/*     inv_major_status = oldgaa_release_conditions(&inv_minor_status, */
+/*                                                  &((*cred)->next)); */
+/*   } */
+
+/* 	if ((*cred)->type      != NULL) free((*cred)->type); */
+/* 	if ((*cred)->authority != NULL) free((*cred)->authority); */
+/* 	if ((*cred)->value     != NULL) free((*cred)->value); */
+
+/*   free(*cred); */
+
+/*   return OLDGAA_SUCCESS; */
+
+/* }  */
 /**********************************************************************
 Function:   oldgaa_rlease_answer()
 
@@ -643,7 +679,7 @@ uint32              inv_minor_status = 0, inv_major_status = 0;
        if ((*cred)->next != NULL) 
        inv_major_status = oldgaa_release_sec_attrb(&inv_minor_status,
 			      &((*cred)->next));
-    
+
 	if ((*cred)->type      != NULL) free((*cred)->type);
 	if ((*cred)->authority != NULL) free((*cred)->authority);
 	if ((*cred)->value     != NULL) free((*cred)->value);

@@ -556,6 +556,7 @@ static int checkExtensions(STACK_OF(X509_EXTENSION) *exts, X509 *iss, struct col
       if (!interpret_attributes(full_attr, voms))
         ret = AC_ERR_ATTRIB;
     }
+    AC_FULL_ATTRIBUTES_free(full_attr);
   }
 
   if (valids & VER_KEYID) {

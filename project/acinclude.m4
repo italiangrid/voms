@@ -759,3 +759,21 @@ rm -rf conftest*
 AC_LANG_POP(C)
 
 ])
+
+# AC_VOMS_GLOBUS_CONFIG_H check whether globus_config.h is present 
+# -------------------------------------------------------------------
+AC_DEFUN([AC_UTEST],
+[
+  AC_ARG_ENABLE(unit-test,
+    [  --enable-unit-test   Enable unit test],
+    [
+      case "$enableval" in
+      yes) have_unit_test="yes" ;;
+      no)  have_unit_test="no" ;;
+      *) AC_MSG_ERROR([bad value $(enableval) for --enable-unit-test]) ;;
+      esac
+    ],
+    [ have_unit_test="no" ])
+
+  AM_CONDITIONAL(WANT_UNIT_TEST, test x$have_unit_test = xyes)
+])

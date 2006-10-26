@@ -23,6 +23,7 @@ import java.util.List;
 import java.util.ListIterator;
 import java.util.StringTokenizer;
 import java.util.Vector;
+import java.util.ArrayList;
 
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
@@ -530,6 +531,22 @@ public class VOMSValidator {
         for (ListIterator i = myVomsAttributes.listIterator(); i.hasNext();) {
             myFQANTree.add(((VOMSAttribute) i.next()).getListOfFQAN());
         }
+    }
+
+    /**
+     * Returns a collection of all the FQANs in all the ACs found in the
+     * credential, in order.
+     * @return Vector of FQANs
+     */
+    public String[] getAllFullyQualifiedAttributes() {
+        ArrayList clientAttributes = new ArrayList();
+
+        for (int i = 0; i < myVomsAttributes.size(); i++) {
+            List vomsAttributes = ((VOMSAttribute)myVomsAttributes.get(i)).getFullyQualifiedAttributes();
+            clientAttributes.addAll(vomsAttributes);
+        }
+
+        return (String[])clientAttributes.toArray(new String[] {});
     }
 
     /**

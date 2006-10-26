@@ -657,10 +657,6 @@ oldgaa_globus_parse_policy (policy_file_context_ptr  pcontext,
 
     }
 
-    /* bind paresed rights for this entry to the paresed principals 
-      from this entry */
-
-    oldgaa_bind_rights_to_principals(start_principals, start_rights);
  
    /* get conditions, if any */
   
@@ -671,7 +667,7 @@ oldgaa_globus_parse_policy (policy_file_context_ptr  pcontext,
                                  str,
                                 &cond_bind,
                                 &new_entry);
-   
+
    if (oldgaa_error != OLDGAA_SUCCESS)               
    {
      oldgaa_handle_error(&(pcontext->parse_error),
@@ -686,7 +682,13 @@ oldgaa_globus_parse_policy (policy_file_context_ptr  pcontext,
     from this entry */
 
   else  oldgaa_bind_rights_to_conditions(start_rights, cond_bind);   
-   
+
+    /* bind paresed rights for this entry to the paresed principals 
+      from this entry */
+
+    oldgaa_bind_rights_to_principals(start_principals, start_rights);
+    oldgaa_collapse_policy(policy_handle);
+
  } /* if(cond_present == TRUE) */
   
  
@@ -699,19 +701,20 @@ oldgaa_globus_parse_policy (policy_file_context_ptr  pcontext,
  * using conditions. 
  */
 
-  {
-	oldgaa_conditions_ptr   c1p, c2p;
+/*   { */
+/* 	oldgaa_conditions_ptr   c1p, c2p; */
 
-	c1p = all_conditions;
-    while(c1p)
-    {
-	  c2p = c1p->next;
-      c1p->next = NULL;
-	  c1p = c2p;
-    }
-  }
+/* 	c1p = all_conditions; */
+/*     while(c1p) */
+/*     { */
+/* 	  c2p = c1p->next; */
+/*       c1p->next = NULL; */
+/* 	  c1p = c2p; */
+/*     } */
+/*   } */
 	
   if (pcontext) oldgaa_globus_policy_file_close(pcontext);
+
 
   return OLDGAA_SUCCESS;
 
@@ -820,9 +823,9 @@ do
 
     if (*policy == NULL) *policy = principal;
 
-    if(first == TRUE){ *start = principal;  first = FALSE; } 
+    principal = oldgaa_add_principal(policy, principal); /* add new principal to the list */
 
-   oldgaa_add_principal(policy, principal); /* add new principal to the list */
+    if(first == TRUE){ *start = principal;  first = FALSE; } 
 
     if (oldgaa_globus_help_read_string(pcontext, str,
                          "parse_principals: Missing rights"))
@@ -985,7 +988,7 @@ do
    return OLDGAA_RETRIEVE_ERROR;
 
    if (str) cond->authority = oldgaa_strcopy(str, cond->authority);
-   
+
    if (oldgaa_globus_help_read_string(pcontext, str,
                        "parse_conditions: Missing condition value"))
    return OLDGAA_RETRIEVE_ERROR;
@@ -1007,7 +1010,7 @@ do
 
    if(first == TRUE){ *list = cond_bind; first = FALSE; } 
    else  oldgaa_add_cond_binding(list, cond_bind);
- 
+
    if (oldgaa_globus_read_string(pcontext, str, NULL))    
    return OLDGAA_RETRIEVE_ERROR;
       

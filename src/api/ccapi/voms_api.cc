@@ -272,7 +272,17 @@ void vomsdata::ResetOrder(void)
 
 void vomsdata::Order(std::string att)
 {
-  ordering += (ordering.empty() ? "" : ",") + att;
+  /*
+  std::string::size_type position = att.find("/Role=");
+  if (position == std::string::npos)
+  */  
+  ordering += (ordering.empty() ? ""  : ",") + att;
+  /*
+  else {
+    std::string temp = att.substr(0, position) + ":" + att.substr(position+6);
+    ordering += (ordering.empty() ? ""  : ",") + temp;
+  }
+  */
 }
 
 bool vomsdata::ContactRaw(std::string hostname, int port, std::string servsubject, std::string command, std::string &raw, int& version)
@@ -709,6 +719,7 @@ bool vomsdata::loadfile0(std::string filename, uid_t uid, gid_t gid)
     std::string line;
 
     if (getline(f,line) && !empty(line)) {
+      ok = verok = true;
       unsigned int start = 0;
       std::string port, version;
 

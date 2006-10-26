@@ -97,7 +97,7 @@ struct voms {
 #define VERIFY_SIGN      0x00000008
 #define VERIFY_ORDER     0x00000010
 #define VERIFY_ID        0x00000020
-
+#define VERIFY_CERTLIST  0x00000040
 /*! \brief Error codes.
 */
 

@@ -132,17 +132,19 @@ bool vomsdata::verifyac(X509 *cert, X509 *issuer, AC *ac, voms &v)
   struct col *vv = NULL;
   int result = 1;
 
-  vv = (struct col *)calloc(1, sizeof(struct col));
-  rd = (struct realdata *)calloc(1, sizeof(struct realdata));
+  rd = (struct realdata *)v.realdata;
+  delete rd->attributes;
+  AC_free(rd->ac);
+  rd->ac = NULL;
+  rd->attributes = NULL;
 
-  if (!vv || !rd) {
+  vv = (struct col *)calloc(1, sizeof(struct col));
+
+  if (!vv) {
     free(vv);
-    free(rd);
     seterror(VERR_MEM, "Out of memory.");
     return false;
   }
-
-  v.realdata = rd;
 
   rd->attributes = new std::vector<attributelist>;
 
