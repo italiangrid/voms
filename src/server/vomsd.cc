@@ -96,6 +96,7 @@ cdb NewDB;
 c   connect_with_port_and_socket;
 
 bool compat_flag = false;
+bool short_flags = false;
 
 static void
 sigchld_handler(int sig)
@@ -252,7 +253,8 @@ VOMSServer::VOMSServer(int argc, char *argv[]) : sock(0,0,NULL,50,false),
                                                  logdf("%c"),
                                                  logf("%d:%h:%s(%p):%V:%T:%F (%f:%l):%m"),
                                                  newformat(false),
-                                                 insecure(false)
+                                                 insecure(false),
+                                                 shortfqans(false)
 {
   struct stat statbuf;
 
@@ -312,6 +314,7 @@ VOMSServer::VOMSServer(int argc, char *argv[]) : sock(0,0,NULL,50,false),
     {"logmax",          1, &logmax,                   OPT_NUM},
     {"newformat",       1, (int *)&newformat,         OPT_BOOL},
     {"skipcacheck",     1, (int *)&insecure,          OPT_BOOL},
+    {"shortfqans",      0, (int *)&shortfqans,        OPT_BOOL},
     {0, 0, 0, 0}
   };
 
@@ -329,10 +332,14 @@ VOMSServer::VOMSServer(int argc, char *argv[]) : sock(0,0,NULL,50,false),
             "[-x509_user_proxy file] [-test] [-uri uri] [-code num]\n"
             "[-loglevel lev] [-logtype type] [-logformat format]\n"
             "[-logdateformat format] [-debug] [-backlog num] [-skipcacheck]\n"
-            "[-version][-sqlloc path][-compat][-logmax n][-socktimeout n]\n");
+            "[-version][-sqlloc path][-compat][-logmax n][-socktimeout n]\n"
+            "[-shortfqans]\n");
 
   if (!getopts(argc, argv, opts))
     throw VOMSInitException("unable to read options");
+
+
+  short_flags = shortfqans;
 
   if (socktimeout == -1 && debug)
     socktimeout = 0;
@@ -970,8 +977,8 @@ void VOMSServer::UpdateOpts(void)
     {"timeout",         1, &validity,                 OPT_NUM},
     {"dbname",          1, (int *)&dbname,            OPT_STRING},
     {"contactstring",   1, (int *)&contactstring,     OPT_STRING},
-    {"mysql-port",       1, (int *)&mysql_port,         OPT_NUM},
-    {"mysql-socket",     1, (int *)&mysql_socket,       OPT_STRING},
+    {"mysql-port",      1, (int *)&mysql_port,         OPT_NUM},
+    {"mysql-socket",    1, (int *)&mysql_socket,       OPT_STRING},
     {"passfile",        1, (int *)&passfile,          OPT_STRING},
     {"vo",              1, (int *)&voname,            OPT_STRING},
     {"uri",             1, (int *)&fakeuri,           OPT_STRING},
@@ -985,11 +992,12 @@ void VOMSServer::UpdateOpts(void)
     {"logformat",       1, (int *)&logf,              OPT_STRING},
     {"logdateformat",   1, (int *)&logdf,             OPT_STRING},
     {"sqlloc",          1, (int *)&sqllib,            OPT_STRING},
-    {"compat",          1, (int *)&compat_flag,       OPT_BOOL},
+    {"compat",          0, (int *)&compat_flag,       OPT_BOOL},
     {"socktimeout",     1, &socktimeout,              OPT_NUM},
     {"logmax",          1, &logmax,                   OPT_NUM},
-    {"newformat",       1, (int *)&newformat,         OPT_BOOL},
-    {"skipcacheck",     1, (int *)&insecure,          OPT_BOOL},
+    {"newformat",       0, (int *)&newformat,         OPT_BOOL},
+    {"skipcacheck",     0, (int *)&insecure,          OPT_BOOL},
+    {"shortfqans",      0, (int *)&shortfqans,        OPT_BOOL},
     {0, 0, 0, 0}
   };
 
@@ -999,6 +1007,8 @@ void VOMSServer::UpdateOpts(void)
     LOG(logh, LEV_ERROR, T_PRE, "Unable to read options!");
     throw VOMSInitException("unable to read options");
   }
+
+  short_flags = shortfqans;
 
   if (nlogfile != logfile) {
     LOGM(VARP, logh, LEV_INFO, T_PRE, "Redirecting logs to: %s", logfile.c_str());

@@ -84,5 +84,6 @@ private:
   std::string     logf;
   bool            newformat;
   bool            insecure;
+  bool            shortfqans;
 };
 #endif

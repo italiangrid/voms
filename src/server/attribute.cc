@@ -16,12 +16,14 @@
 
 #include <attribute.h>
 
+extern bool short_flags;
+
 std::string attrib::str() const 
 {
   std::string tmp = group;
-  if(!role.empty())
+  if(!role.empty() && (!short_flags && role != "NULL"))
     tmp += "/Role=" + role;
-  if(!cap.empty())
+  if(!cap.empty() && (!short_flags && cap != "NULL"))
     tmp += "/Capability=" + cap;
   
   return tmp;
