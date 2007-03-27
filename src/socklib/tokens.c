@@ -25,6 +25,10 @@
 #include "config.h"
 #include "replace.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #include <stdlib.h>
 #include <stdio.h>
 #include <signal.h>
@@ -33,6 +37,10 @@
 #include <errno.h>
 #include <unistd.h>
 #include <globus_gss_assist.h>
+
+#ifdef __cplusplus
+}
+#endif
 
 static int alarmed = 0;
 int sockalarmed = 0;

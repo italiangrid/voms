@@ -15,6 +15,10 @@
 #ifndef VOMS_API_H
 #define VOMS_API_H
 
+extern "C" {
+#include <openssl/asn1.h>
+}
+
 #include <fstream>
 #include <string>
 #include <vector>

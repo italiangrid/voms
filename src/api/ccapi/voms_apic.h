@@ -14,9 +14,15 @@
 
 #ifndef VOMS_APIC_H
 #define VOMS_APIC_H
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #ifndef NOGLOBUS
+#include <openssl/asn1.h>
 #include <gssapi.h>
 #else
+#include <openssl/asn1.h>
 typedef void * gss_cred_id_t;
 typedef void * gss_ctx_id_t;
 #endif
@@ -389,5 +395,8 @@ int getMajorVersionNumber(void);
 int getMinorVersionNumber(void);
 int getPatchVersionNumber(void);
 
+#ifdef __cplusplus
+}
+#endif
 
 #endif

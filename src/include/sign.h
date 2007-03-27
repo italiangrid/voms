@@ -14,7 +14,16 @@
 #ifndef VOMS_SIGN_H
 #define VOMS_SIGN_H
 #include <string>
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #include <openssl/pem.h>
+
+#ifdef __cplusplus
+}
+#endif
 
 extern bool sign(EVP_PKEY *pkey, const std::string source, std::string &result);
 extern bool verify(EVP_PKEY *key, const std::string data, const std::string signature);

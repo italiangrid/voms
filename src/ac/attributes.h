@@ -12,7 +12,14 @@
  * follows.
  *
  *********************************************************************/
+#ifndef VOMS_AC_ATTRIBUTES_H
+#define VOMS_AC_ATTRIBUTES_H
+
 #include "config.h"
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 #include <stdlib.h>
 #include <string.h>
@@ -63,3 +70,9 @@ extern AC_FULL_ATTRIBUTES *AC_FULL_ATTRIBUTES_new();
 extern void AC_ATTRIBUTE_free(AC_ATTRIBUTE *);
 extern void AC_ATT_HOLDER_free(AC_ATT_HOLDER *);
 extern void AC_FULL_ATTRIBUTES_free(AC_FULL_ATTRIBUTES *);
+
+#ifdef __cplusplus
+}
+#endif
+
+#endif

@@ -15,6 +15,10 @@
 #define VOMS_XML_H
 #include "errortype.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 struct req {
   char *order;
   char **command;
@@ -43,4 +47,8 @@ char *XMLEncodeReq(const char *, const char *, const char *, int);
 char *XMLEncodeAns(struct error **, const char *, int, const char *, int);
 int XMLDecodeReq(const char *, struct req *);
 int XMLDecodeAns(const char *, struct ans *);
+
+#ifdef __cplusplus
+}
+#endif
 #endif

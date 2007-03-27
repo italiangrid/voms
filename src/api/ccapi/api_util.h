@@ -58,9 +58,6 @@ extern "C" {
 #include <iostream>
 #include <iomanip>
 
-
-#include "sign.h"
-
 #ifndef MS_CALLBACK
 #define MS_CALLBACK
 #endif

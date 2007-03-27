@@ -31,6 +31,58 @@ HERE
   LD_LIBRARY_PATH="$SAVE_LD_LIBRARY_PATH"
 ])
 
+AC_DEFUN([AC_MAC_ISSUES],
+[
+	AC_MSG_CHECKING([for libtool name])
+
+	arch=`$ac_aux_dir/config.guess | cut -d'-' -f 2`
+
+	if test "x$arch" = "xapple" ; then
+		LIBTOOL=glibtool
+		AC_MSG_RESULT([glibtool])
+	else
+		AC_MSG_RESULT([libtool])
+	fi
+])
+
+AC_DEFUN([AC_LINKER_E],
+[
+	AC_MSG_CHECKING([whether linker supports -E])
+
+cat >conftest.c <<HERE
+int main(int argc, char *argv[])
+{
+	const char hw[] = "Hello, World\n";
+}
+HERE
+	$CC -Wl,-E -dD conftest.c >/dev/null 2>/dev/null
+	have_e=$?
+	rm conftest.c
+	if test $have_e -ne 0 ; then
+		AC_MSG_RESULT(no)
+	else
+		AC_MSG_RESULT(yes)
+	fi
+	AM_CONDITIONAL(LINK_FULL_TABLE, test $have_e -eq 0)
+])
+
+AC_DEFUN([AC_BROKEN_MAC],
+[
+	AC_MSG_CHECKING([for broken MAC C++])
+	AC_LANG_PUSH(C++)
+	AC_COMPILE_IFELSE([AC_LANG_PROGRAM([[extern "C" {
+#include <openssl/asn1.h>
+}
+
+int t() { return 1; }]],
+[[char *s = ASN1_dup((int (*)())t, (char * (*)())t, f); ]]
+)], AC_MSG_RESULT(no), 
+AC_MSG_RESULT(yes)
+AC_DEFINE(BROKEN_MAC, 1, [ define if mac compiler does not respect extern "C"] ))
+	AC_LANG_POP(C++)
+])
+
+
 # AC_GLOBUS checks globus prefix, looks for globus 
 # flavors, selects globus flavor and define wanted lib
 # according to flavor installed with their own compiler
@@ -516,7 +568,7 @@ AC_DEFUN([AC_VOMS_SOCKLEN_T],
       ],
       [
         socklen_t addrlen = (socklen_t)5;
-        (void)getsockname(0, NULL, &addrlen); 
+        (void)getsockname(0, (void *)0L, &addrlen); 
         return 0;
       ],
       [ac_have_socklen_t="yes"],
@@ -724,7 +776,9 @@ AC_DEFUN([AC_VOMS_GLOBUS_CONFIG_H],
         *) proc="" ;;
       esac
       arch=`echo $arch | tr a-z A-Z`
-      echo "#define BUILD_LITE 1" > src/include/globus_config.h
+      rm src/include/globus_config.h
+      touch src/include/globus_config.h
+#      echo "#define BUILD_LITE 1" > src/include/globus_config.h
       echo "#define BUILD_DEBUG 1" >> src/include/globus_config.h
       echo "#define TARGET_ARCH_$arch 1" >> src/include/globus_config.h
       if ! test "x$proc" = "x"; then
@@ -756,7 +810,7 @@ int main(int argc, char *argv[]) {
 HERE
 
     if ( ($CXX -c -o conftest.o conftest.cpp > /dev/null 2>&1) ); then
-      if ( (nm -C conftest.o | grep cerr > /dev/null 2>&1) ); then
+      if ( (nm conftest.o | grep cerr > /dev/null 2>&1) ); then
         AH_BOTTOM([#ifdef __cplusplus
 #include <new>
 #endif])

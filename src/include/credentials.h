@@ -15,6 +15,11 @@
 #ifndef VOMS_CREDENTIALS_H
 #define VOMS_CREDENTIALS_H
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+#include <openssl/asn1.h>
 #ifndef NOGLOBUS
 #include "gssapi.h"
 #include "globus_gss_assist.h"
@@ -37,6 +42,10 @@ extern EVP_PKEY *get_delegated_public_key(gss_ctx_id_t context, int globusver);
 extern int get_own_data(gss_cred_id_t credential, int globusver, EVP_PKEY **key, char **issuer, X509 **pcert);
 extern int get_peer_data(gss_ctx_id_t context, int globusver, EVP_PKEY **key, char **issuer, X509 **pcert);
 extern char *get_globusid(gss_cred_id_t handle);
+#endif
+
+#ifdef __cplusplus
+}
 #endif
 
 #endif

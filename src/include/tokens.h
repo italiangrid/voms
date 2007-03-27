@@ -30,11 +30,11 @@
 #ifndef VOMS_TOKENS_H
 #define VOMS_TOKENS_H
 
-#include <unistd.h>
-
 #ifdef __cplusplus
 extern "C" {
 #endif
+
+#include <unistd.h>
 
 int send_token(void *arg, void * token, size_t  token_length);
 int get_token(void *arg, void ** token, size_t * token_length);

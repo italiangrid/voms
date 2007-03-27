@@ -14,6 +14,10 @@
 #ifndef VOMS_ACSTACK_H
 #define VOMS_ACSTACK_H
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #include <openssl/asn1.h>
 #include <openssl/stack.h>
 #include <openssl/safestack.h>
@@ -75,5 +79,9 @@
    extern int i2d_ASN1_SET_OF_##type (STACK_OF(type) *, unsigned char **, int (*)(), int, int, int); \
    extern unsigned char *ASN1_seq_pack_##type (STACK_OF(type) *, int (*)(), unsigned char **, int *); \
    extern STACK_OF(type) *ASN1_seq_unpack_##type (unsigned char *, int, type *(*)(), void (*)(type *)) ;
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif

@@ -22,7 +22,8 @@
 extern "C" {
 
 #include "openssl/bn.h"
-  
+#include "openssl/asn1.h"
+
 #include "sslutils.h"
 #include "newformat.h"
   

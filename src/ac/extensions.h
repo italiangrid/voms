@@ -15,5 +15,14 @@
 #define VOMSAC_EXTENSIONS_H
 #include "config.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 extern int initEx(void);
+
+#ifdef __cplusplus
+}
+#endif
+
 #endif

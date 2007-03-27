@@ -31,6 +31,7 @@ extern "C" {
 #include "newformat.h"
 #include <openssl/bn.h>
 #include <openssl/err.h>
+#include <openssl/asn1.h>
 #include "credentials.h"
 
 #ifndef NOGLOBUS
@@ -843,13 +844,21 @@ voms::voms(const voms &orig)
   fqan      = orig.fqan;
   serial    = orig.serial;
   realdata  = calloc(1, sizeof(struct realdata));
+#if defined(BROKEN_MAC) && defined(NOGLOBUS)
+  ((struct realdata *)realdata)->ac = (AC *)ASN1_dup((int (*)(...))i2d_AC, 
+                                                     (char * (*)(...))d2i_AC, 
+                                                     (char *)((struct realdata *)orig.realdata)->ac);
+  holder = (X509 *)ASN1_dup((int (*)(...))i2d_X509,
+			    (char * (*)(...))d2i_X509,
+			    (char *)orig.holder);
+#else
   ((struct realdata *)realdata)->ac = (AC *)ASN1_dup((int (*)())i2d_AC, 
                                                      (char * (*)())d2i_AC, 
                                                      (char *)((struct realdata *)orig.realdata)->ac);
   holder = (X509 *)ASN1_dup((int (*)())i2d_X509,
 			    (char * (*)())d2i_X509,
 			    (char *)orig.holder);
-
+#endif
   
   ((struct realdata *)realdata)->attributes = 
     new std::vector<attributelist>(*(((struct realdata *)orig.realdata)->attributes));
@@ -884,10 +893,18 @@ voms &voms::operator=(const voms &orig)
   serial    = orig.serial;
   if (((struct realdata *)realdata)->ac)
     AC_free(((struct realdata *)realdata)->ac);
+
+#if defined(BROKEN_MAC) && defined(NOGLOBUS)
+  ((struct realdata *)realdata)->ac = (AC *)ASN1_dup((int (*)(...))i2d_AC, 
+                                                     (char * (*)(...))d2i_AC, 
+                                                     (char *)((struct realdata *)orig.realdata)->ac);
+  holder = (X509 *)ASN1_dup((int (*)(...))i2d_X509, (char * (*)(...))d2i_X509, (char *)orig.holder);
+#else
   ((struct realdata *)realdata)->ac = (AC *)ASN1_dup((int (*)())i2d_AC, 
                                                      (char * (*)())d2i_AC, 
                                                      (char *)((struct realdata *)orig.realdata)->ac);
   holder = (X509 *)ASN1_dup((int (*)())i2d_X509, (char * (*)())d2i_X509, (char *)orig.holder);
+#endif
   delete ((struct realdata *)realdata)->attributes;
   ((struct realdata *)realdata)->attributes = 
     new std::vector<attributelist>(*(((struct realdata *)orig.realdata)->attributes));
@@ -904,9 +921,15 @@ voms::~voms()
 
 AC *voms::GetAC()
 {
+#if defined(BROKEN_MAC) && defined(NOGLOBUS)
+  return (AC *)ASN1_dup((int (*)(...))i2d_AC, 
+                        (char * (*)(...))d2i_AC, 
+                        (char *)((struct realdata *)realdata)->ac);
+#else
   return (AC *)ASN1_dup((int (*)())i2d_AC, 
                         (char * (*)())d2i_AC, 
                         (char *)((struct realdata *)realdata)->ac);
+#endif
 }
 
 std::vector<attributelist>& voms::GetAttributes()

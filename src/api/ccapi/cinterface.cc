@@ -14,9 +14,14 @@
 #include "config.h"
 #include "replace.h"
 
+extern "C" {
+#include <openssl/asn1.h>
+
 #ifndef NOGLOBUS
 #include <gssapi.h>
 #endif
+
+}
 
 #include "voms_api.h"
 
@@ -277,10 +282,15 @@ struct vomsr *voms::translate()
       dst->serial    = mystrdup(serial);
       dst->datalen   = custom.size();
 
+#if defined(BROKEN_MAC) && defined(NOGLOBUS)
+      dst->ac     = (AC *)  ASN1_dup((int(*)(...))i2d_AC,   (char*(*)(...))d2i_AC,   
+                                     (char *)(((struct realdata *)realdata)->ac));
+      dst->holder = (X509 *)ASN1_dup((int(*)(...))i2d_X509, (char*(*)(...))d2i_X509, (char *)holder);
+#else
       dst->ac     = (AC *)  ASN1_dup((int(*)())i2d_AC,   (char*(*)())d2i_AC,   
                                      (char *)(((struct realdata *)realdata)->ac));
       dst->holder = (X509 *)ASN1_dup((int(*)())i2d_X509, (char*(*)())d2i_X509, (char *)holder);
-
+#endif
       if (!dst->holder || !dst->ac)
         throw 3;
 
@@ -727,9 +737,13 @@ struct vomsr *VOMS_Copy(struct vomsr *org, int *error)
       dst->serial    = mystrdup(org->serial);
       dst->datalen   = org->datalen;
 
+#if defined(BROKEN_MAC) && defined(NOGLOBUS)
+      dst->ac     = (AC *)  ASN1_dup((int(*)(...))i2d_AC,   (char*(*)(...))d2i_AC,   (char *)org->ac);
+      dst->holder = (X509 *)ASN1_dup((int(*)(...))i2d_X509, (char*(*)(...))d2i_X509, (char *)org->holder);
+#else
       dst->ac     = (AC *)  ASN1_dup((int(*)())i2d_AC,   (char*(*)())d2i_AC,   (char *)org->ac);
       dst->holder = (X509 *)ASN1_dup((int(*)())i2d_X509, (char*(*)())d2i_X509, (char *)org->holder);
-
+#endif
       if (!dst->holder || !dst->ac)
         throw 3;
 
@@ -851,7 +865,11 @@ vomsdatar *VOMS_Duplicate(vomsdatar *orig)
 
 AC *VOMS_GetAC(vomsr *v)
 {
+#if defined(BROKEN_MAC) && defined(NOGLOBUS)
+  return (AC *)ASN1_dup((int (*)(...))i2d_AC, (char * (*)(...))d2i_AC, (char *)v->ac);
+#else
   return (AC *)ASN1_dup((int (*)())i2d_AC, (char * (*)())d2i_AC, (char *)v->ac);
+#endif
 }
 
 }

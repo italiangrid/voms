@@ -15,6 +15,10 @@
 #ifndef VOMS_NEW_FORMAT_H
 #define VOMS_NEW_FORMAT_H
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #include <openssl/evp.h>
 #include <openssl/asn1.h>
 #include <openssl/asn1_mac.h>
@@ -193,5 +197,9 @@ extern int i2d_AC_CERTS(AC_CERTS *a, unsigned char **pp) ;
 extern AC_CERTS *d2i_AC_CERTS(AC_CERTS **a, unsigned char **pp, long length);
 extern AC_CERTS *AC_CERTS_new(void);
 extern void AC_CERTS_free(AC_CERTS *a);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif

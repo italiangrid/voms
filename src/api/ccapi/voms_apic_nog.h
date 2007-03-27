@@ -16,9 +16,15 @@
 #define VOMS_APIC_NOG_H
 
 #ifndef VOMS_APIC_H
+#ifdef __cplusplus
+extern "C" {
+#endif
 #define NOGLOBUS
 #include <voms_apic.h>
 #undef NOGLOBUS
+#ifdef __cplusplus
+}
+#endif
 #else
 #error The Globus and Globus-free versions are not compatible!
 #endif

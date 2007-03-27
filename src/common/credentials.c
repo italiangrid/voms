@@ -14,21 +14,28 @@
 
 #include "replace.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #include <sys/types.h>
 #include <string.h>
 #include <stdlib.h>
+#include <openssl/asn1.h>
 #include "globus_config.h"
 #include "gssapi_compat.h"
 #include "gssapi.h"
 #include "globus_gss_assist.h"
 
-#include <openssl/asn1.h>
 #include <openssl/x509.h>
 #include <openssl/evp.h>
 #include <openssl/bn.h>
 
 #include "credentials.h"
 
+#ifdef __cplusplus
+}
+#endif
 
 int
 globus(int version)
