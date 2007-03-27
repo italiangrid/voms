@@ -22,56 +22,183 @@
 #include <sys/stat.h>
 #include <fcntl.h>
 #include <unistd.h>
+#include <time.h>
 
-static int filetrans(void *data, loglevels lev)
-{
-  return 0;
-}
+struct localdata {
+  char *name;
+  char *dateformat;
+  int maxlog;
+  int fd;
+  int level;
+};
 
-static int bwrite(int fd, const char * s) 
+static int filereopen(struct localdata *ld);
+
+static char *translate(char *format, char *date)
 {
-  int ret = -1;
-  
-  int slen = strlen(s);
-  int blen = sizeof(int) + slen;
-  
-  char * buffer = malloc(blen);
-  if(buffer) {
-    memcpy(buffer, &slen, sizeof(int));
-    memcpy(buffer + sizeof(int), s, strlen(s));
-    ret = write(fd, buffer, blen);
+  char *position = strstr(format, "%d");
+  char *newstring = NULL;
+
+  while (position) {
+    newstring = malloc(strlen(format) + strlen(date) + 1 - 2);
+    *position++='\0';
+    position++;
+    newstring = strcpy(newstring, format);
+    newstring = strcat(newstring, date);
+    newstring = strcat(newstring, position);
+    free(format);
+    format = newstring;
+    position = strstr(format, "%d");
   }
-  free(buffer);
 
-  return (ret != -1);
+  return format;
 }
 
-static int fileoutputter(void *data, int fd, int lev, const char *s)
+static int fileoutputter(void *data, const char *s)
 {
-  return bwrite(fd, s);
+  int written = 0;
+  int size;
+  int total = 0;
+  char *output = NULL;
+
+  struct localdata *ld = (struct localdata *)data;
+
+  if (!ld || ld->fd == -1)
+    return 0;
+
+  off_t position = lseek(ld->fd, 0, SEEK_CUR);
+
+  if (position > ld->maxlog) {
+    if (logfile_rotate(ld->name)) {
+      if (!filereopen(ld))
+        write(ld->fd, "VOMS: LOGGING ROTATION ERROR\n", 29);
+    }
+    else
+      write(ld->fd, "VOMS: LOGGING ROTATION ERROR\n", 29);
+  }
+
+  output = strdup(s);
+
+  if (ld->dateformat) {
+    char  *data = NULL;
+    int    datasize = 256;
+    size_t len = 0;
+    char  *str = NULL;
+
+    time_t t;
+    struct tm *ti;
+
+    time(&t);
+    ti = localtime(&t);
+
+    do {
+      free(data);
+      if ((data = malloc(datasize)))
+        len = strftime(data, datasize, ld->dateformat, ti);
+      datasize += 50;
+    } while (len == 0 && data);
+
+    output = translate(output, data);
+  }
+
+  size = strlen(output);
+
+  do {
+    written = write(ld->fd, output + total, size - total);
+    total += written;
+  } while (total != size && written != -1);
+
+  free(output);
+
+  return 1;
+}
+
+static int filereopen(struct localdata *ld)
+{
+  int newfd = open(ld->name, O_WRONLY|O_CREAT|O_APPEND);
+
+  if (newfd != -1) {
+    close(ld->fd);
+    ld->fd = newfd;
+    return 1;
+  }
+  return 0;
 }
 
 static void filedestroy(void *data)
-{}
-
-void *FILEStreamerAdd(void *h, FILE *f, const char *name, int maxlog, int code, int reload)
 {
-  if (h && f) {
-    if(LogAddStreamer(h, f, (void *)f, name, maxlog, code, filetrans, fileoutputter, filedestroy, reload))
-      return f;
-  }
-  return 0;
+  struct localdata *ld = (struct localdata *)data;
+
+  if (!ld)
+    return;
+  
+  if (ld->fd != -1)
+    close(ld->fd);
+  free (ld->name);
+  free(ld);
 }
 
-int FILEStreamerRem(void *h, void *f)
+static void *fileinit(void)
 {
-  if (h && f)
-    return LogRemStreamer(h, f);
-  return 0;
+  struct localdata *ld = NULL;
+
+  ld = malloc(sizeof(struct localdata));
+
+  if (ld) {
+    ld->name = NULL;
+    ld->dateformat = NULL;
+    ld->fd       = -1;
+    ld->maxlog   = 0;
+    ld->level    = -1;
+  }
+
+  return ld;
+}
+
+static void fileoptioner(void *data, const char *name, const char *value)
+{
+  struct localdata *ld = (struct localdata *)data;
+
+  if (!ld)
+    return;
+
+  if (strcmp(name, "LEVEL") == 0)
+    ld->level=atoi(value);
+  else if (strcmp(name, "NAME") == 0) {
+    int fd = open(value, O_WRONLY|O_CREAT|O_APPEND);
+
+    if (fd != -1) {
+      if (ld->name) {
+        free(ld->name);
+        if (ld->fd != -1)
+          close(ld->fd);
+      }
+
+      ld->name = strdup(value);
+      ld->fd = fd;
+    }
+  }
+  else if (strcmp(name, "MAXSIZE") == 0) {
+    ld->maxlog = atoi(value);
+  }
+  else if (strcmp(name, "DATEFORMAT") == 0) {
+    if (ld->dateformat)
+      free(ld->dateformat);
+    ld->dateformat = strdup(value);
+  }
+}
+
+void *FILEStreamerAdd(void *h)
+{
+  if (h) {
+    return LogAddStreamer(h, "FILE", fileinit, fileoutputter, 
+                          filedestroy, fileoptioner);
+  }
+  return NULL;
 }
 
  
-int logfile_rotate(const char * name)
+static int logfile_rotate(const char * name)
 {
   int i = 0;
   char *pos, *dirname, *newname, *oldname, *basename;

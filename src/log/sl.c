@@ -15,54 +15,137 @@
 #include "log.h"
 
 #include <stdlib.h>
+#include <string.h>
 #include <syslog.h>
 
+struct localdata {
+  int feature;
+  int level;
+  char *service;
+};
 
-static int syslogtrans(void *data, loglevels lev)
+const char *level[] = {"LOG_EMERG", "LOG_ALERT", "LOG_CRIT", "LOG_ERR",
+                       "LOG_WARNING", "LOG_NOTICE", "LOG_INFO", "LOG_DEBUG",
+                       NULL };
+const int   levelvalue[] = { LOG_EMERG, LOG_ALERT, LOG_CRIT, LOG_ERR,
+                             LOG_WARNING, LOG_NOTICE, LOG_INFO, LOG_DEBUG, 0};
+
+static int syslogtrans(char *v)
 {
-  switch(lev) {
-  case LEV_INFO:
-    return LOG_INFO; break;
-  case LEV_WARN:
-    return LOG_WARNING; break;
-  case LEV_ERROR:
-    return LOG_ERR; break;
-  case LEV_DEBUG:
-    return LOG_DEBUG; break;
-  default:
-    return LOG_ALERT; break;
+  int i = -1;
+  int result = LOG_ALERT;
+
+  while (level[++i]) {
+    if (strcmp(level[i], v) == 0) {
+      result = levelvalue[i];
+      break;
+    }
   }
+
+  return result;
 }
 
-static int syslogoutputter(void *data, int fd, int lev, const char *str)
+static char *translate(char *format)
 {
-  syslog(LOG_USER|lev,"%s",str);
+  char *position = strstr(format, "%d");
+  char *newstring = NULL;
+
+  while (position) {
+    newstring = malloc(strlen(format) + 1 - 2);
+    *position++='\0';
+    position++;
+    newstring = strcpy(newstring, format);
+    newstring = strcat(newstring, position);
+    free(format);
+    format = newstring;
+    position = strstr(format, "%d");
+  }
+
+  return format;
+}
+
+static int syslogoutputter(void *data, const char *str)
+{
+  struct localdata *ld = (struct localdata *)data;
+
+  if (!ld)
+    return;
+
+  char *realstr = strdup(str);
+
+  realstr = translate(realstr);
+
+  if (strlen(realstr) > 100)
+    realstr[1000]='\0';
+
+  syslog(ld->feature|ld->level, "%s", realstr);
+
+  free(realstr);
+
   return 1;
 }
 
-static void syslogdestroyer(void *data)
-{}
-
-void *SYSLOGStreamerAdd(void *h, int code)
+static void syslogoptioner(void *data, const char *name, const char *value)
 {
-  void *f=malloc(1);
-  if (f) {
-    openlog("", 0 , LOG_USER);
-    if (LogAddStreamer(h, f, f, 0, 1, code, syslogtrans, syslogoutputter, syslogdestroyer, 0))
-      return f;
-    closelog();
+  struct localdata *ld = (struct localdata *)data;
+
+  if (!ld)
+    return;
+
+  if (strcmp(name, "SERVICE") == 0) {
+    if (ld->service) {
+      free(ld->service);
+      closelog();
+    }
+
+    ld->service=strdup(value);
+
+    openlog(ld->service, 0, LOG_DAEMON|LOG_DEBUG);
   }
-  return 0;
+  else if (strcmp(name, "FACILITY") == 0) {
+    if (strcmp(value, "LOG_AUTH") == 0 ||
+        strcmp(value, "LOG_AUTHPRIV") == 0)
+      ld->feature = LOG_AUTHPRIV;
+    else if (strcmp(value, "LOG_DAEMON") == 0)
+      ld->feature = LOG_DAEMON;
+    else
+      ld->feature = LOG_USER;
+  }
+  else if (strcmp(name, "LEVEL") == 0) {
+    ld->level = syslogtrans(value);
+  }
 }
 
-int SYSLOGStreamerRem(void *h, void *f)
+static void *sysloginit()
 {
-  int res = 0;
+  struct localdata *ld = malloc(sizeof(struct localdata));
 
-  if (h && f) {
-    res = LogRemStreamer(h, f);
-    closelog();
-    free(f);
+  if (ld) {
+    ld->feature   = LOG_DAEMON;
+    ld->service   = strdup("vomsd");
+    ld->level     = 0;
+    openlog(ld->service, 0, LOG_DAEMON|LOG_DEBUG);
   }
-  return 0;
+
+  return ld;
+}
+
+static void syslogdestroyer(void *data)
+{
+  struct localdata *ld = (struct localdata *)data;
+
+  free(ld->service);
+  free(ld);
+
+  closelog();
+
+}
+
+void *SYSLOGStreamerAdd(void *h)
+{
+  if (h) {
+    return LogAddStreamer(h, "SYSLOG", sysloginit, syslogoutputter, 
+                          syslogdestroyer, syslogoptioner);
+  }
+  return NULL;
 }

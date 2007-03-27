@@ -34,22 +34,25 @@
 
 #include "log.h"
 
+#define LOG_COMMAND       'L'
+#define SET_OPTION        'O'
+#define ACTIVATE_BUFFER   'A'
+#define DEACTIVATE_BUFFER 'D'
+
 static char *typenames[] = { "STARTUP", "REQUEST", "RESULT" };
 
-static char *levnames[] = { "ERROR", "WARN", "INFO", "DEBUG", "NONE"};
+static char *levnames[] = { "LOG_ERROR", "LOG_WARN", "LOG_INFO", "LOG_DEBUG", "NONE"};
 
 static pid_t loggerprocess = 0;
 static pid_t ownerprocess = 0;
 
-void SetOwner(pid_t pid)
+
+static void SetOwner(pid_t pid)
 {
   ownerprocess = pid;
 }
 
-extern int logfile_rotate(const char *);
-
-
-void killogger(void)
+static void killogger(void)
 {
   int status;
 
@@ -60,14 +63,13 @@ void killogger(void)
 }
 
 struct OutputStream {
-  void *id;
-  void *userdata;
-  int in;
-  int out;
-  char *fifoname;
-  int (*translater)(void *, loglevels);
-  int (*outputter)(void *, int, int, const char *);
-  void (*destroyer)(void *);
+  void   *userdata;
+  char   *name;
+  void * (*initter)();
+  int    (*outputter)(void *, const char *);
+  void   (*destroyer)(void *);
+  void   (*optioner)(void *, const char *, const char *);
+  int     active;
 
   struct OutputStream *next;
 };
@@ -79,12 +81,29 @@ struct LogInfo {
   const char *format;
   const char *dateformat;
   const char *service;
+  int         fd;
   struct OutputStream *streamers;
 };
 
+static void Logger(void *data, int fd);
+static void Evaluate(struct LogInfo *li, char *buffer);
+static void Activate(struct LogInfo *li, char *name);
+static void Deactivate(struct LogInfo *li, char *name);
+static void SetOption(struct LogInfo *li, char *name, char *value);
+static void LogCommand(struct LogInfo *li, char *message);
+
 void *LogInit()
 {
-  return calloc(1, sizeof(struct LogInfo));
+  struct LogInfo *info = NULL;
+
+  info = calloc(1, sizeof(struct LogInfo));
+  info->fd = -1;
+  if (info) {
+    FILEStreamerAdd(info);
+    SYSLOGStreamerAdd(info);
+  }
+
+  return info;
 }
 
 int LogBuffer(FILE *f, void *logh, loglevels lev, logtypes type, const char *format)
@@ -107,28 +126,22 @@ int LogBuffer(FILE *f, void *logh, loglevels lev, logtypes type, const char *for
   return 0;
 }
 
-int LogRemStreamer(void *data, void *id)
+static int bwrite(int fd, const char * s) 
 {
-  struct LogInfo *li=(struct LogInfo *)data;
-  struct OutputStream *cur = NULL, *tmp = NULL;
-
-  if (li) {
-    cur = tmp = li->streamers;
-      while (cur && cur->id != id) {
-        tmp = cur;
-        cur = cur->next;
-      }
-    if (cur) {
-      if (cur == li->streamers)
-        li->streamers = cur->next;
-      else
-        tmp->next = cur->next;
-      cur->destroyer(cur->userdata);
-      free(cur);
-      return 1;
-    }
+  int ret = -1;
+  
+  int slen = strlen(s);
+  int blen = sizeof(int) + slen;
+  
+  char * buffer = malloc(blen);
+  if(buffer) {
+    memcpy(buffer, &slen, sizeof(int));
+    memcpy(buffer + sizeof(int), s, strlen(s));
+    ret = write(fd, buffer, blen);
   }
-  return 0;
+  free(buffer);
+
+  return (ret != -1);
 }
 
 static int bread(int fd, char** buffer)
@@ -140,12 +153,6 @@ static int bread(int fd, char** buffer)
   if(read(fd, &slen, sizeof(int)) < sizeof(int))
     return 0;
 
-  if (slen == -1) {
-    reload = 1;
-    if(read(fd, &slen, sizeof(int)) < sizeof(int))
-      return 0;
-  }
-
   *buffer = malloc(slen * sizeof(char) + 1);
   
   if (*buffer) {
@@ -156,116 +163,16 @@ static int bread(int fd, char** buffer)
   return (reload ? -1 : offset);
 }
 
-void StartLogger(void * data, const char *name, int maxlog)
+void StartLogger(void *data, int code)
 {
   struct LogInfo * li = (struct LogInfo *)data;
-  struct OutputStream * out = li->streamers;
 
-  pid_t pid = fork();
-
-  if (pid) {
-    loggerprocess = pid;
-    ownerprocess = getpid();
-    atexit(killogger);
-  }
-
-  if (!pid) {
-    long flen;
-    FILE * f;
-    char * buffer;
-    int ret;
-    int counter = 1;
-
-/*     #ifndef HAVE_MKFIFO */
-/*         close(out->out); */
-/*     #endif */
-
-/* //#ifndef HAVE_MKFIFO  */
-/*     close(out->out); */
-/*     //#endif */
+  int in = -1, out = -1;
 
 #ifdef HAVE_MKFIFO
-    out->in = open(out->fifoname, O_RDONLY);
-#endif
+  char fifo[30];
 
-    for(;;) {
-      counter--;
-
-      flen = ftell((FILE *)out->userdata);
-      if (flen > maxlog) {
-
-        if (!logfile_rotate(name)) {
-          fwrite("VOMS: LOGGING ROTATION ERROR\n", sizeof(char), 29, (FILE *)(out->userdata));
-        }
-
-        f = fopen(name, "a+");
-        if(f) {
-          fclose(out->userdata);
-          /*          out->userdata = out->id = 0;*/
-          setbuf(f, NULL);
-          out->userdata = f;
-          out->id = f; 
-        }
-      }
-      
-
-      ret = bread(out->in, &buffer);
-      if (ret > 0) {
-        if (out->userdata)
-          fwrite(buffer, sizeof(char), strlen(buffer), (FILE *)(out->userdata));
-        free(buffer);
-      }
-      else if (ret == -1) {
-        char *newname;
-
-        newname = malloc(strlen(buffer) + 1);
-        strcpy(newname, buffer);
-        free(buffer);
-
-        f = fopen(newname, "a+");
-        if(f) {
-          fclose(out->userdata);          
-/*         out->userdata = out->id = 0; */
-          setbuf(f, NULL);
-          out->userdata = f;
-          out->id = f; 
-        } 
-      }
-    }
-  }
-  /*close(out->in);*/
-}
-
-
-void *LogAddStreamer(void *data, void *id, void *userdata, const char *name, int maxlog, int code,
-                     int (*t)(void *, loglevels), 
-                     int (*o)(void *, int, int, const char *s), void (*d)(void *), int reload)
-{
-  struct LogInfo *li=(struct LogInfo *)data;
-  struct OutputStream *out = NULL;
-
-  int fd[2];
-  char * fifo;
-
-  if (!reload)
-    out = NULL;
-  else 
-    out = li->streamers;
-
-  /* when reloading options, simply notify the new log file to the child process */
-  if (reload) {
-    int len = -1;
-    write(out->in, &len, sizeof(int));
-    len = strlen(name);
-    write(out->in, &len, sizeof(int));
-    write(out->in, name, len);
-    return out;
-  }
-  
-#ifdef HAVE_MKFIFO
-  fifo = malloc(30);
-  strcpy(fifo, "/tmp/voms_log_fifo_");
-  sprintf(fifo + 19, "%i", code);
+  sprintf(fifo, "/tmp/voms_log_fifo_%i", code);
   
   if(mkfifo(fifo, S_IRUSR | S_IWUSR))
   {
@@ -275,68 +182,239 @@ void *LogAddStreamer(void *data, void *id, void *userdata, const char *name, int
       exit(1);
     }
   }
-
-  if (li && userdata && t && o && d) {
-    out = malloc(sizeof(struct OutputStream));
-    if (out) {
-      out->fifoname=fifo;
-      out->id = id;
-      out->userdata = userdata;
-      out->in = fd[0];
-      out->out = fd[1];
-      out->translater = t;
-      out->outputter = o;
-      out->destroyer = d;
-      out->next = li->streamers;
-      li->streamers = out;
-    }
-  }
-
-  StartLogger(data, name, maxlog);
-  
-  fd[0] = open(fifo, O_WRONLY);
-  out->in = out->out = fd[0];
-  if (fd[0] == -1) {
-    printf("Unable to open fifo : %s\n", strerror(errno));
-    exit(1);
-  }
-
-  fd[1] = fd[0];
-
-/*   //  free(fifo); */
 #else
+  int fd[2];
+
   if (pipe(fd))
   {
     printf("Unable to open pipe : %s\n", strerror(errno));
     exit(1);
   }
+  in = fd[0];
+  out = fd[1];
+#endif
 
-  if (li && userdata && t && o && d) {
-    out = malloc(sizeof(struct OutputStream));
-    if (out) {
-      out->fifoname=fifo;
-      out->id = id;
-      out->userdata = userdata;
-      out->in = fd[0];
-      out->out = fd[1];
-      out->translater = t;
-      out->outputter = o;
-      out->destroyer = d;
-      out->next = li->streamers;
-      li->streamers = out;
+  pid_t pid = fork();
+
+  if (pid) {
+    loggerprocess = pid;
+    ownerprocess = getpid();
+    atexit(killogger);
+    if (out == -1)
+      out = open(fifo, O_WRONLY);
+    li->fd = out;
+    if (in != -1)
+      close(in);
+  }
+  else {
+    if (out != -1)
+      close(out);
+    if (in == -1)
+      in  = open(fifo, O_RDONLY);
+    Logger(data, in);
+  }
+}
+
+static void Logger(void *data, int fd) 
+{
+  char *buffer = NULL;
+  int result;
+
+  struct LogInfo *li = data;
+
+  if (!li)
+    return;
+
+  while(1) {
+    result = bread(fd, &buffer);
+
+    if (result) {
+      if (buffer) {
+        Evaluate(li, buffer);
+        free(buffer);
+        buffer = NULL;
+      }
     }
   }
-#endif
+}
 
-#ifndef HAVE_MKFIFO
-  StartLogger(data, name, maxlog);
-#endif
+static void Evaluate(struct LogInfo *li, char *buffer)
+{
+  char *name = NULL;
+  char *pos = NULL;
 
-#ifndef HAVE_MKFIFO
-  /* close reading end of the pipe */
-  close(out->in);
-#endif
+  switch(*buffer) {
+  case ACTIVATE_BUFFER:
+    name = buffer+1;
+    Activate(li, name);
+    break;
 
+  case DEACTIVATE_BUFFER:
+    name = buffer+1;
+    Deactivate(li, name);
+    break;
+
+  case SET_OPTION:
+    name = buffer+1;
+    pos = strchr(name, '=');
+    if (pos) {
+      *pos++ = '\0';
+      SetOption(li, name, pos);
+    }
+    break;
+
+  case LOG_COMMAND:
+    name = buffer+1;
+    LogCommand(li, name);
+    break;
+
+  default:
+    LogCommand(li, "Unknown logging command: ");
+    LogCommand(li, buffer);
+    break;
+  }
+}
+
+void LogOption(void *data, const char *name, const char *value)
+{
+  struct LogInfo *li=(struct LogInfo *)data;
+  char *buffer = NULL;
+
+  buffer = malloc(strlen(name)+strlen(value)+3);
+  buffer[0]=SET_OPTION;
+  buffer[1]='\0';
+
+  buffer = strcat(buffer, name);
+  buffer = strcat(buffer, "=");
+  buffer = strcat(buffer, value);
+  bwrite(li->fd, buffer);
+  free(buffer);
+
+}
+
+void LogOptionInt(void *data, const char *name, int value)
+{
+#define INTSIZE (((sizeof(int)*CHAR_BIT)/3)+2)
+  static char val[INTSIZE];
+#undef INTSIZE
+  sprintf(val, "%d\0", value);
+
+  LogOption(data, name, val);
+}
+
+void LogActivate(void *data, const char *name)
+{
+  struct LogInfo *li=(struct LogInfo *)data;
+
+  char *buffer = NULL;
+
+  buffer = malloc(strlen(name)+2);
+  buffer[0]=ACTIVATE_BUFFER;
+  buffer[1]='\0';
+
+  buffer = strcat(buffer, name);
+  bwrite(li->fd, buffer);
+  free(buffer);
+}
+
+void LogDeactivate(void *data, const char *name)
+{
+  struct LogInfo *li=(struct LogInfo *)data;
+
+  char *buffer = NULL;
+
+  buffer = malloc(strlen(name)+2);
+  buffer[0] = DEACTIVATE_BUFFER;
+  buffer[1] = '\0';
+
+  buffer = strcat(buffer, name);
+  bwrite(li->fd, buffer);
+  free(buffer);
+}
+
+static void Activate(struct LogInfo *li, char *name)
+{
+  struct OutputStream *stream;
+
+  if (!li)
+    return;
+
+  stream = li->streamers;
+
+  while (stream) {
+    if (strcmp(name, stream->name) == 0) {
+      stream->userdata = stream->initter();
+      if (stream->userdata)
+        stream->active = 1;
+    }
+    stream = stream->next;
+  }
+}
+
+static void Deactivate(struct LogInfo *li, char *name)
+{
+  struct OutputStream *stream;
+
+  if (!li)
+    return;
+
+  stream = li->streamers;
+
+  while (stream) {
+    if (strcmp(name, stream->name) == 0) {
+      stream->destroyer(stream->userdata);
+      stream->userdata = NULL;
+      stream->active = 0;
+    }
+    stream = stream->next;
+  }
+}
+
+
+static void SetOption(struct LogInfo *li, char *name, char *value)
+{
+  struct OutputStream *stream = li->streamers;
+
+  while (stream) {
+    stream->optioner(stream->userdata, name, value);
+    stream = stream->next;
+  }
+}
+
+static void LogCommand(struct LogInfo *li, char *message)
+{
+  struct OutputStream *stream = li->streamers;
+
+  while (stream) {
+    if (stream->active)
+      stream->outputter(stream->userdata, message);
+    stream = stream->next;
+  }
+}
+
+
+void *LogAddStreamer(void *data, const char *name,
+                     void * (*i)(),
+                     int (*o)(void *, const char *s), 
+                     void (*d)(void *),
+                     void (*op)(void *, const char *, const char *))
+{
+  struct LogInfo *li=(struct LogInfo *)data;
+  struct OutputStream *out = NULL;
+
+  out = malloc(sizeof(struct OutputStream));
+  if (out) {
+    out->userdata   = NULL;
+    out->name       = name;
+    out->initter    = i;
+    out->outputter  = o;
+    out->destroyer  = d;
+    out->optioner   = op;
+    out->active     = 0;
+    out->next       = li->streamers;
+    li->streamers = out;
+
+  }
   return out;
 }
 
@@ -431,15 +509,19 @@ const char *LogFormat(void *data, const char *format)
 
 static int LogOutput(void *data, loglevels lev, const char *str)
 {
-  struct LogInfo *li=(struct LogInfo *)data;
-  if (data) {
-    struct OutputStream *out = li->streamers;
 
-    while(out) {
-      out->outputter(out->userdata, out->out, out->translater(out->userdata, lev), str);
-      out = out->next;
-    }
-  }
+  struct LogInfo *li=(struct LogInfo *)data;
+
+  char *buffer = NULL;
+
+  buffer = malloc(strlen(str)+2);
+  buffer[0] = LOG_COMMAND;
+  buffer[1] = '\0';
+
+  buffer = strcat(buffer, str);
+  bwrite(li->fd, buffer);
+  free(buffer);
+
   return 1;
 }
 
@@ -545,6 +627,9 @@ int LogMessage(void *data, loglevels lev, logtypes type, const char *message, co
   if (li) {
     if (type == T_PRE) 
       type = li->deftype;
+
+    LogOption(data, "LEVEL", levnames[lev]);
+
     if (((li->currlev >= lev) && (li->currtype & type)) || 
         (li->currlev == LEV_DEBUG)) {
       const char *format = li->format;
@@ -593,33 +678,7 @@ int LogMessage(void *data, loglevels lev, logtypes type, const char *message, co
           break;
 
         case 'd':
-          if (mode == 0)
-            str = StringAdd(str, "d", len);
-          else if (mode == 1) {
-            if (dateformat) {
-              char *data = NULL;
-              int datasize=256;
-              size_t len = 0;
-              time_t t;
-              struct tm *ti;
-              
-              time(&t);
-              ti = localtime(&t);
-
-              do {
-                free(data);
-                if ((data = malloc(datasize)))
-                  len = strftime(data, datasize, dateformat, ti);
-                datasize += 50;
-              } while (len == 0 && data);
-              if (data)
-                str = StringAdd(str, data, len);
-              free(data);
-            }
-            mode = 0;
-          }
-          else 
-            goto err;
+          str = StringAdd(str, "%d", len);
           break;
 
         case 'p':

@@ -17,7 +17,7 @@
 
 #include <stdio.h>
 
-
+#if 0
 void *FileNameStreamerAdd(void *h, const char *name, int maxlog, int code, int reload)
 {
   if (h && name) {
@@ -38,3 +38,4 @@ int FileNameStreamerRem(void *h, void *f)
   return 0;
 }
 
+#endif

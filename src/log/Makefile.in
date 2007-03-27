@@ -53,7 +53,7 @@ CONFIG_CLEAN_FILES =
 LTLIBRARIES = $(noinst_LTLIBRARIES)
 liblog_la_LIBADD =
 am_liblog_la_OBJECTS = liblog_la-log.lo liblog_la-fs.lo \
-	liblog_la-fns.lo liblog_la-sl.lo
+	liblog_la-sl.lo
 liblog_la_OBJECTS = $(am_liblog_la_OBJECTS)
 DEFAULT_INCLUDES = -I. -I$(srcdir) -I$(top_builddir)/src/autogen
 depcomp = $(SHELL) $(top_srcdir)/./project/depcomp
@@ -225,7 +225,6 @@ noinst_LTLIBRARIES = liblog.la
 liblog_la_SOURCES = \
 	log.c \
 	fs.c \
-	fns.c \
 	sl.c
 
 liblog_la_CFLAGS = \
@@ -282,7 +281,6 @@ mostlyclean-compile:
 distclean-compile:
 	-rm -f *.tab.c
 
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/liblog_la-fns.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/liblog_la-fs.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/liblog_la-log.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/liblog_la-sl.Plo@am__quote@
@@ -321,13 +319,6 @@ liblog_la-fs.lo: fs.c
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	source='fs.c' object='liblog_la-fs.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(LIBTOOL) --tag=CC --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(liblog_la_CFLAGS) $(CFLAGS) -c -o liblog_la-fs.lo `test -f 'fs.c' || echo '$(srcdir)/'`fs.c
-
-liblog_la-fns.lo: fns.c
-@am__fastdepCC_TRUE@	if $(LIBTOOL) --tag=CC --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(liblog_la_CFLAGS) $(CFLAGS) -MT liblog_la-fns.lo -MD -MP -MF "$(DEPDIR)/liblog_la-fns.Tpo" -c -o liblog_la-fns.lo `test -f 'fns.c' || echo '$(srcdir)/'`fns.c; \
-@am__fastdepCC_TRUE@	then mv -f "$(DEPDIR)/liblog_la-fns.Tpo" "$(DEPDIR)/liblog_la-fns.Plo"; else rm -f "$(DEPDIR)/liblog_la-fns.Tpo"; exit 1; fi
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='fns.c' object='liblog_la-fns.lo' libtool=yes @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(LIBTOOL) --tag=CC --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(liblog_la_CFLAGS) $(CFLAGS) -c -o liblog_la-fns.lo `test -f 'fns.c' || echo '$(srcdir)/'`fns.c
 
 liblog_la-sl.lo: sl.c
 @am__fastdepCC_TRUE@	if $(LIBTOOL) --tag=CC --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(liblog_la_CFLAGS) $(CFLAGS) -MT liblog_la-sl.lo -MD -MP -MF "$(DEPDIR)/liblog_la-sl.Tpo" -c -o liblog_la-sl.lo `test -f 'sl.c' || echo '$(srcdir)/'`sl.c; \

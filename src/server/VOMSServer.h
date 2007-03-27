@@ -85,5 +85,6 @@ private:
   bool            newformat;
   bool            insecure;
   bool            shortfqans;
+  bool            do_syslog;
 };
 #endif

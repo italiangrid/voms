@@ -255,6 +255,7 @@ VOMSServer::VOMSServer(int argc, char *argv[]) : sock(0,0,NULL,50,false),
                                                  newformat(false),
                                                  insecure(false),
                                                  shortfqans(false)
+                                                 do_syslog(false)
 {
   struct stat statbuf;
 
@@ -293,9 +294,9 @@ VOMSServer::VOMSServer(int argc, char *argv[]) : sock(0,0,NULL,50,false),
     {"username",        1, (int *)&username,          OPT_STRING},
     {"timeout",         1, &validity,                 OPT_NUM},
     {"dbname",          1, (int *)&dbname,            OPT_STRING},
-    {"contactstring",   1, (int *)&contactstring,    OPT_STRING},
-    {"mysql-port",       1, (int *)&mysql_port,         OPT_NUM},
-    {"mysql-socket",     1, (int *)&mysql_socket,       OPT_STRING},
+    {"contactstring",   1, (int *)&contactstring,     OPT_STRING},
+    {"mysql-port",      1, (int *)&mysql_port,        OPT_NUM},
+    {"mysql-socket",    1, (int *)&mysql_socket,      OPT_STRING},
     {"passfile",        1, (int *)&passfile,          OPT_STRING},
     {"vo",              1, (int *)&voname,            OPT_STRING},
     {"uri",             1, (int *)&fakeuri,           OPT_STRING},
@@ -315,6 +316,7 @@ VOMSServer::VOMSServer(int argc, char *argv[]) : sock(0,0,NULL,50,false),
     {"newformat",       1, (int *)&newformat,         OPT_BOOL},
     {"skipcacheck",     1, (int *)&insecure,          OPT_BOOL},
     {"shortfqans",      0, (int *)&shortfqans,        OPT_BOOL},
+    {"syslog",          0, (int *)&do_syslog,         OPT_BOOL},
     {0, 0, 0, 0}
   };
 
@@ -356,7 +358,7 @@ VOMSServer::VOMSServer(int argc, char *argv[]) : sock(0,0,NULL,50,false),
   }
 
   if ((logh = LogInit())) {
-    if ((logger = FileNameStreamerAdd(logh, logfile.c_str(), logmax, code, 0))) {
+    //    if ((logger = FileNameStreamerAdd(logh, logfile.c_str(), logmax, code, 0))) {
       loglevels lev;
 
       switch(loglev) {
@@ -378,8 +380,16 @@ VOMSServer::VOMSServer(int argc, char *argv[]) : sock(0,0,NULL,50,false),
       (void)SetCurLogType(logh, T_STARTUP);
       (void)LogService(logh, "vomsd");
       (void)LogFormat(logh, logf.c_str());
-      (void)LogDateFormat(logh, logdf.c_str());
-    }
+      //      (void)LogDateFormat(logh, logdf.c_str());
+      (void)StartLogger(logh, code);
+      (void)LogActivate(logh, "FILE");
+      if (do_syslog)
+        (void)LogActivate(logh, "SYSLOG");
+
+      (void)LogOption(logh, "NAME", logfile.c_str());
+      (void)LogOptionInt(logh, "MAXSIZE", logmax);
+      (void)LogOption(logh, "DATEFORMAT", logdf.c_str());
+      //    }
   }
   else
     throw VOMSInitException("logging startup failure");
@@ -1003,6 +1013,8 @@ void VOMSServer::UpdateOpts(void)
 
   (void)SetCurLogType(logh, T_STARTUP);
 
+  nlogfile = "";
+
   if (!getopts(ac, av, opts)) {
     LOG(logh, LEV_ERROR, T_PRE, "Unable to read options!");
     throw VOMSInitException("unable to read options");
@@ -1010,21 +1022,18 @@ void VOMSServer::UpdateOpts(void)
 
   short_flags = shortfqans;
 
-  if (nlogfile != logfile) {
-    LOGM(VARP, logh, LEV_INFO, T_PRE, "Redirecting logs to: %s", logfile.c_str());
+  if (nlogfile.size() != 0) {
+    LOGM(VARP, logh, LEV_INFO, T_PRE, "Attempt redirecting logs to: %s", logfile.c_str());
 
-    void *logger2 = FileNameStreamerAdd(logh, nlogfile.c_str(), logmax, code, 1);
+    LogOption(logh, "NAME", nlogfile.c_str());
 
-    if (!logger2)
-      LOG(logh, LEV_WARN, T_PRE, "Logging redirection failure");
-    else {
-      (void)FileNameStreamerRem(logh, logger);
-      logger = logger2;
-      logfile = nlogfile;
-    }
-    sock.SetFlags(GSS_C_MUTUAL_FLAG | GSS_C_CONF_FLAG | GSS_C_INTEG_FLAG);
-    sock.SetLogger(logh);
+    logfile = nlogfile;
   }
+
+  LogOptionInt(logh, "MAXSIZE", logmax);
+  LogOption(logh, "DATEFORMAT", logdf.c_str());
+
+  sock.SetFlags(GSS_C_MUTUAL_FLAG | GSS_C_CONF_FLAG | GSS_C_INTEG_FLAG);
 
   if (logh) {
     loglevels lev;
@@ -1049,7 +1058,7 @@ void VOMSServer::UpdateOpts(void)
     (void)SetCurLogType(logh, T_STARTUP);
     (void)LogService(logh, "vomsd");
     (void)LogFormat(logh, logf.c_str());
-    (void)LogDateFormat(logh, logdf.c_str());
+    //    (void)LogDateFormat(logh, logdf.c_str());
   }
 
   if (nport != daemon_port) {

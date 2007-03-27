@@ -22,11 +22,12 @@ typedef enum { LEV_ERROR = 0, LEV_WARN, LEV_INFO, LEV_DEBUG, LEV_NONE} loglevels
 #include <stdio.h>
 
 extern void       *LogInit();
-extern int         LogRemStreamer(void *, void *);
-extern void       *LogAddStreamer(void *, void *, void *, const char *, int, int, 
-                                  int (*)(void *, loglevels), 
-                                  int (*)(void *, int, int, const char *), 
-                                  void (*)(void *), int);
+extern void       *LogAddStreamer(void *, const char *,
+                                  void * (*)(), 
+                                  int (*)(void *, const char *), 
+                                  void (*)(void *),
+                                  void (*)(void *, const char *, const char*));
+extern void        StartLogger(void *, int);
 extern void        LogDestroy(void *);
 extern loglevels   LogLevel(void *, loglevels);
 extern logtypes    LogType(void *, int);
@@ -37,6 +38,10 @@ extern int         LogMessage(void *, loglevels, logtypes, const char *, const c
 extern int         LogMessageF(const char *, int, const char *, void *, loglevels, logtypes, const char *, ...);
 extern int         LogBuffer(FILE *, void *, loglevels, logtypes, const char *);
 extern logtypes    SetCurLogType(void *, logtypes);
+extern void        LogActivate(void *, const char *);
+extern void        LogDeactivate(void *, const char *);
+extern void        LogOption(void *, const char *, const char *);
+extern void        LogOptionInt(void *, const char *, int);
 
 #define LOG(h, lev, type, str) \
 LogMessage((h), (lev), (type), (str), FUNC_NAME, __LINE__, __FILE__)
@@ -45,4 +50,4 @@ LogMessage((h), (lev), (type), (str), FUNC_NAME, __LINE__, __FILE__)
 
 #define VARP FUNC_NAME, __LINE__, __FILE__
 
-#endif /* H_LOG_H */
+#endif /* VOMS_LOG_H */
