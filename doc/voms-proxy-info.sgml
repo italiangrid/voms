@@ -55,6 +55,9 @@ Quiet mode, minimal output.</para>
 The name of the file containing the proxy, in case it is in a 
 non-standard place.</para>
 
+<para><option>-chain</option>
+Prints informations about the proxy's certificate chain.</para>
+
 <para><option>-subject</option>
 Prints the DN of the proxy's subject.</para>
 

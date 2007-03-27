@@ -114,7 +114,7 @@ int VOMS_GetAttributeSourcesNumber(struct vomsr *v, struct vomsdatar *vd, int *e
 int VOMS_GetAttributeSourceHandle(struct vomsr *v, int num, struct vomsdatar *vd, int *error)
 {
   try {
-    if (VOMS_GetAttributeSourcesNumber(v, vd, error) <= num)
+    if (VOMS_GetAttributeSourcesNumber(v, vd, error) >= num)
       return num;
   }
   catch(...) {

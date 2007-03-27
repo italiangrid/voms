@@ -74,6 +74,7 @@ static bool get_group_and_role_real(const std::string &dn,
                                     const std::string& socket,
                                     const char *password, 
                                     const std::string &query, 
+                                    bool insecure,
                                     std::vector<attrib> &result);
 
 static bool get_attributes_real(const std::string &dn,
@@ -85,6 +86,7 @@ static bool get_attributes_real(const std::string &dn,
                                 const std::string& socket,
                                 const char *password, 
                                 const std::string &query, 
+                                bool insecure,
                                 std::vector<gattrib> &result);
 
 static bool simple_query(const std::string &dbname, 
@@ -97,7 +99,7 @@ static bool simple_query(const std::string &dbname,
 static bool get_fields(const std::string &dbname, const std::string &username, 
                        const std::string &contactstring, int port, 
                        const std::string& socket, const char *password, 
-                       const std::string &query, std::string &result);
+                       const std::string &query, bool insecure, std::string &result);
 
 static bool get_group_and_role_real0(sqliface::interface *db, const std::string &dn,
                                      const std::string &ca,
@@ -234,7 +236,7 @@ special(const std::string &dn, const std::string &ca,  const char *request,
     /* Retrieves the query */
     if (simple_query(dbname, username, contactstring, port, socket, password, query, "query", realquery))
       if (subst(realquery, dn, ca))
-        return get_fields(dbname, username, contactstring, port, socket, password, realquery, result);
+        return get_fields(dbname, username, contactstring, port, socket, password, realquery, false, result);
   }
 
   return false;
@@ -244,7 +246,7 @@ bool
 getlist(const std::string& dn, const std::string& ca, const std::string& dbname,
         const std::string& user, const std::string& contact, 
         int port, const std::string& socket,const char *password,
-        std::string& result)
+        bool insecure, std::string& result)
 {
   if (dn.empty() || ca.empty() || dbname.empty() || user.empty() || 
       contact.empty() || !password)
@@ -252,27 +254,26 @@ getlist(const std::string& dn, const std::string& ca, const std::string& dbname,
   	 
   std::string query = std::string("SELECT dn FROM groups");
   	 
-  if (get_fields(dbname, user, contact, port, socket, password, "SELECT dn FROM groups", result))
-    return get_fields(dbname, user, contact, port, socket, password, "SELECT role FROM roles", result);
+  if (get_fields(dbname, user, contact, port, socket, password, "SELECT dn FROM groups", insecure, result))
+    return get_fields(dbname, user, contact, port, socket, password, "SELECT role FROM roles", insecure, result);
   return false;
 }
 
 bool getattribs(const std::string& dn, const std::string& ca, const std::string& dbname,
                 const std::string& user, const std::string& contact, 
                 int port, const std::string& socket,const char *password,
-                std::string& result)
+                bool insecure, std::string& result)
 {
-  std::string query = std::string("SELECT groups.dn as groupname, role, capability, groups.gid "
-                                  "FROM groups, usr, ca, m "
-                                  "left join roles on roles.rid = m.rid "
-                                  "left join capabilities on capabilities.cid = m.cid "
-                                  "WHERE groups.gid = m.gid AND ") 
-    + (compat_flag ? "usr.uid = m.uid AND " : "usr.userid = m.userid AND ") +
-    "usr.ca  = ca.cid AND "
-    "ca.ca = \'" + ca + "\' AND "
+  std::string query = std::string("SELECT groups.dn as groupname, role, capability, groups.gid ") +
+    (insecure ? "FROM groups, usr, m " : "FROM groups, usr, ca, m ") +
+    "left join roles on roles.rid = m.rid "
+    "left join capabilities on capabilities.cid = m.cid "
+    "WHERE groups.gid = m.gid AND " + 
+    (compat_flag ? "usr.uid = m.uid AND " : "usr.userid = m.userid AND ") +
+    (insecure ? "" : "usr.ca  = ca.cid AND ca.ca = \'" + ca + "\' AND ") +
     "usr.dn = \'" + dn + "\'";
   
-  return get_fields(dbname, user, contact, port, socket, password, query, result);
+  return get_fields(dbname, user, contact, port, socket, password, query, insecure, result);
 }
 
 /*
@@ -299,7 +300,7 @@ listspecial(const std::string &dbname, const std::string &username,
             int port, const std::string& socket,const char *password, 
             std::string &result)
 {
-  return get_fields(dbname, username, contactstring, port, socket, password, "SELECT qid, query FROM queries", result);
+  return get_fields(dbname, username, contactstring, port, socket, password, "SELECT qid, query FROM queries", false, result);
 }
 
 /*
@@ -329,22 +330,21 @@ get_all(const std::string &dn, const std::string &ca,
         const std::string &dbname, const std::string &username, 
         const std::string &contactstring,	
         int port, const std::string& socket,const char *password, 
-        std::vector<attrib> &result)
+        bool insecure, std::vector<attrib> &result)
 {
   if (ca.empty() || dn.empty())
     return false;
 
-  std::string query = std::string("SELECT usr.dn as username, role, groups.dn as groupname, capability, groups.gid "
-    "FROM groups, usr, ca, m "
+  std::string query = std::string("SELECT usr.dn as username, role, groups.dn as groupname, capability, groups.gid ") +
+    (insecure ? "FROM groups, usr, m " : "FROM groups, usr, ca, m ") +
     "left join roles on roles.rid = m.rid "
     "left join capabilities on capabilities.cid = m.cid "
-    "WHERE groups.gid = m.gid AND ") + 
+    "WHERE groups.gid = m.gid AND " + 
     (compat_flag ? "usr.uid = m.uid AND " : "usr.userid = m.userid AND ") +
-    "usr.ca  = ca.cid AND "
-    "ca.ca = \'" + ca + "\' AND "
+    (insecure ? "" : "usr.ca  = ca.cid AND ca.ca = \'" + ca + "\' AND ") +
     "usr.dn = \'" + dn + "\'";
 
-  return get_group_and_role_real(dn, ca, dbname, username, contactstring, port, socket, password, query, result);
+  return get_group_and_role_real(dn, ca, dbname, username, contactstring, port, socket, password, query, insecure, result);
 }
 
 
@@ -376,23 +376,22 @@ get_role(const std::string &dn, const std::string &ca, const char *role,
          const std::string &dbname, const std::string &username, 
          const std::string& contactstring, 
          int port, const std::string& socket, const char *password,
-         std::vector<attrib> &result)
+         bool insecure, std::vector<attrib> &result)
 {
   if (dn.empty() || ca.empty() || !role || dbname.empty() || username.empty() || !password || !acceptable(role))
     return false;
 
-  std::string query = std::string("SELECT usr.dn as username, role, groups.dn as groupname, capability, groups.gid "
-    "FROM groups, usr, ca, m "
+  std::string query = std::string("SELECT usr.dn as username, role, groups.dn as groupname, capability, groups.gid ") +
+    (insecure ? "FROM groups, usr, m " : "FROM groups, usr, ca, m ") +
     "left join roles on roles.rid = m.rid "
     "left join capabilities on capabilities.cid = m.cid "
-    "WHERE groups.gid = m.gid AND ") +
+    "WHERE groups.gid = m.gid AND " +
     (compat_flag ? "usr.uid = m.uid AND " : "usr.userid = m.userid AND ") +
-    "roles.role = \'" + role + "\' AND "
-    "usr.ca  = ca.cid AND "
-    "ca.ca = \'" + ca + "\' AND "
+    "roles.role = \'" + role + "\' AND " +
+    (insecure ? "" : "usr.ca  = ca.cid AND ca.ca = \'" + ca + "\' AND ") +
     "usr.dn = \'" + dn + "\'";
 
-  return get_group_and_role_real(dn, ca, dbname, username, contactstring, port, socket, password, query, result);
+  return get_group_and_role_real(dn, ca, dbname, username, contactstring, port, socket, password, query, insecure, result);
 }
 
 /*
@@ -423,24 +422,23 @@ get_group(const std::string &dn, const std::string &ca, const char *group,
           const std::string &dbname, const std::string &username,
           const std::string &contactstring, int port,
           const std::string& socket,const char *password,
-          std::vector<attrib> &result)
+          bool insecure, std::vector<attrib> &result)
 {
   if (dn.empty() || ca.empty() || !group || dbname.empty() || username.empty() || !password || !acceptable(group))
     return false;
 
-  std::string query = std::string("SELECT usr.dn as username, role, groups.dn as groupname, capability, groups.gid "
-                                  "FROM groups, usr, ca, m "
-                                  "left join roles on roles.rid = m.rid "
-                                  "left join capabilities on capabilities.cid = m.cid "
-                                  "WHERE groups.gid = m.gid AND ") +
+  std::string query = std::string("SELECT usr.dn as username, role, groups.dn as groupname, capability, groups.gid ") +
+    (insecure ? "FROM groups, usr, m " : "FROM groups, usr, ca, m ") +
+    "left join roles on roles.rid = m.rid "
+    "left join capabilities on capabilities.cid = m.cid "
+    "WHERE groups.gid = m.gid AND " +
     (compat_flag ? "usr.uid = m.uid AND " : "usr.userid = m.userid AND ") +
-    "groups.dn = \'" + group + ("\' AND "
-                                "usr.ca  = ca.cid AND "
-                                "ca.ca = \'" + ca + "\' AND "
-                                "usr.dn = \'" + dn + "\' AND "
-                                "m.rid is NULL");
+    "groups.dn = \'" + group + "\' AND " +
+    (insecure ? "" : "usr.ca  = ca.cid AND ca.ca = \'" + ca + "\' AND ") +
+    "usr.dn = \'" + dn + "\' AND "
+    "m.rid is NULL";
 
-  return get_group_and_role_real(dn, ca, dbname, username, contactstring, port, socket, password, query, result);
+  return get_group_and_role_real(dn, ca, dbname, username, contactstring, port, socket, password, query, insecure, result);
 }
 
 /*
@@ -473,7 +471,7 @@ get_group_and_role(const std::string &dn, const std::string &ca,
                    const std::string &username, 
                    const std::string &contactstring,
                    int port, const std::string& socket,
-                   const char *password, std::vector<attrib> &result)
+                   const char *password, bool insecure, std::vector<attrib> &result)
 {
   char *role;
 
@@ -490,20 +488,19 @@ get_group_and_role(const std::string &dn, const std::string &ca,
   if (!acceptable(argument) || !acceptable(role))
     return false;
 
-  std::string query = std::string("SELECT usr.dn as username, role, groups.dn as groupname, capability, groups.gid "
-                                  "FROM groups, usr, ca, m "
-                                  "left join roles on roles.rid = m.rid "
-                                  "left join capabilities on capabilities.cid = m.cid "
-                                  "WHERE groups.gid = m.gid AND ") +
+  std::string query = std::string("SELECT usr.dn as username, role, groups.dn as groupname, capability, groups.gid ") +
+    (insecure ? "FROM groups, usr, m " : "FROM groups, usr, ca, m ") +
+    "left join roles on roles.rid = m.rid "
+    "left join capabilities on capabilities.cid = m.cid "
+    "WHERE groups.gid = m.gid AND " +
     (compat_flag ? "usr.uid = m.uid AND " : "usr.userid = m.userid AND ") +
     "roles.role = \'" + role + "\' AND "
-    "groups.dn = \'" + argument + "\' AND "
-    "usr.ca  = ca.cid AND "
-    "ca.ca = \'" + ca + "\' AND "
+    "groups.dn = \'" + argument + "\' AND " +
+    (insecure ? "" : "usr.ca  = ca.cid AND ca.ca = \'" + ca + "\' AND ") +
     "usr.dn = \'" + dn + "\'";
   
   free(argument);
-  return get_group_and_role_real(dn, ca, dbname, username, contactstring, port, socket, password, query, result);
+  return get_group_and_role_real(dn, ca, dbname, username, contactstring, port, socket, password, query, insecure, result);
 }
 
 /*
@@ -531,17 +528,16 @@ get_group_and_role_real(const std::string &dn, const std::string &ca,
                         const std::string &dbname, const std::string &username,
                         const std::string &contactstring, 
                         int port, const std::string& socket,const char *password,
-                        const std::string &query,	std::vector<attrib> &results)
+                        const std::string &query, bool insecure, std::vector<attrib> &results)
 {
-  std::string additional = std::string(" SELECT usr.dn as username, role, groups.dn as groupname, capability, groups.gid "
-                                       "FROM groups, usr, ca, m "
-                                       "left join roles on roles.rid = m.rid "
-                                       "left join capabilities on capabilities.cid = m.cid "
-                                       "WHERE groups.gid = m.gid AND ") +
+  std::string additional = std::string(" SELECT usr.dn as username, role, groups.dn as groupname, capability, groups.gid ") +
+    (insecure ? "FROM groups, usr, m " : "FROM groups, usr, ca, m ") +
+    "left join roles on roles.rid = m.rid "
+    "left join capabilities on capabilities.cid = m.cid "
+    "WHERE groups.gid = m.gid AND " +
     (compat_flag ? "usr.uid = m.uid AND " : "usr.userid = m.userid AND ") +
-    "groups.must IS NOT NULL AND "
-    "usr.ca  = ca.cid AND "
-    "ca.ca = \'" + ca + "\' AND "
+    "groups.must IS NOT NULL AND " +
+    (insecure ? "" : "usr.ca  = ca.cid AND ca.ca = \'" + ca + "\' AND ") +
     "usr.dn = \'" + dn + "\' AND "
     "m.rid is NULL";
   
@@ -662,7 +658,7 @@ static bool
 get_fields(const std::string &dbname, const std::string &username, 
            const std::string &contactstring, 
            int port, const std::string& socket, const char *password,
-           const std::string &query, std::string &result)
+           const std::string &query, bool insecure, std::string &result)
 {
   std::string res;
 
@@ -939,27 +935,27 @@ bool
 get_group_attributes(const std::string &dn, const std::string &ca,
                      const char *group,
                      const std::string &dbname, const std::string &username, const std::string &contactstring,
-                     int port, const std::string& socket, const char *password,
+                     int port, const std::string& socket, const char *password, bool insecure, 
                      std::vector<gattrib> &result)
 {
-  if (dn.empty() || ca.empty() || !group || dbname.empty() || username.empty() || !password)
+  if (dn.empty() || ca.empty() || !group || dbname.empty() || username.empty() || !password || !acceptable(group))
     return false;
 
   // compose query
 
-  std::string query = std::string("SELECT usr.dn as username, role, groups.dn as groupname, attributes.a_name, groups.gid, group_attrs.a_value "
-                                  "FROM usr INNER JOIN ca ON usr.ca=ca.cid "
-                                  "INNER JOIN m ON ") + (compat_flag ? "usr.uid = m.uid " : "usr.userid = m.userid ") +
+  std::string query = std::string("SELECT usr.dn as username, role, groups.dn as groupname, attributes.a_name, groups.gid, group_attrs.a_value ") +
+    (insecure ? "FROM usr " : "FROM usr INNER JOIN ca ON usr.ca=ca.cid ") +
+    "INNER JOIN m ON " + (compat_flag ? "usr.uid = m.uid " : "usr.userid = m.userid ") +
     "INNER JOIN groups ON m.gid=groups.gid "
     "LEFT JOIN roles on roles.rid = m.rid "
     "INNER JOIN group_attrs on groups.gid = group_attrs.g_id "
     "INNER JOIN attributes on attributes.a_id = group_attrs.a_id "
-    "WHERE groups.dn = \'" + group + "\' AND "
-    "ca.ca = \'" + ca + "\' AND "
+    "WHERE groups.dn = \'" + group + "\' AND " +
+    (insecure ? "" : "ca.ca = \'" + ca + "\' AND ") +
     "usr.dn = \'" + dn + "\' AND "
     "m.rid is NULL";
   
-  return get_attributes_real(dn, ca, dbname, username, contactstring, port, socket, password, query, result);
+  return get_attributes_real(dn, ca, dbname, username, contactstring, port, socket, password, query, insecure, result);
 }
 
 bool
@@ -967,7 +963,7 @@ get_role_attributes(const std::string &dn, const std::string &ca,
                     const char *role,
                     const std::string &dbname, const std::string &username, const std::string &contactstring,
                     int port, const std::string& socket, const char *password,
-                    std::vector<gattrib> &result)
+                    bool insecure, std::vector<gattrib> &result)
 {
   if (dn.empty() || ca.empty() || !role || dbname.empty() || username.empty() || !password)
     return false;
@@ -978,47 +974,47 @@ get_role_attributes(const std::string &dn, const std::string &ca,
     return false;
 
   // compose query
-  std::string query = std::string("SELECT usr.dn as username, role, groups.dn as groupname, capability, groups.gid, attributes.a_name, role_attrs.a_value "
-                                  "FROM usr INNER JOIN ca ON usr.ca=ca.cid "
-                                  "INNER JOIN m ON ") + (compat_flag ? "usr.uid = m.uid " : "usr.userid = m.userid ") +
+  std::string query = std::string("SELECT usr.dn as username, role, groups.dn as groupname, capability, groups.gid, attributes.a_name, role_attrs.a_value ") +
+    (insecure ? "FROM usr " : "FROM usr INNER JOIN ca ON usr.ca=ca.cid ") +
+    "INNER JOIN m ON " + (compat_flag ? "usr.uid = m.uid " : "usr.userid = m.userid ") +
     "INNER JOIN groups ON m.gid=groups.gid "
     "LEFT JOIN roles ON roles.rid = m.rid "
     "LEFT JOIN capabilities ON capabilities.cid = m.cid "
     "INNER JOIN role_attrs on groups.gid = role_attrs.g_id "
     "INNER JOIN attributes on attributes.a_id = role_attrs.a_id "
     "WHERE role_attrs.r_id = roles.rid AND "
-    "roles.role = \'" + role + "\' AND "
-    "ca.ca = \'" + ca + "\' AND "
+    "roles.role = \'" + role + "\' AND " +
+    (insecure ? "" : "ca.ca = \'" + ca + "\' AND ") +
     "usr.dn = \'" + dn + "\'";
 
   // execute query
-  return get_attributes_real(dn, ca, dbname, username, contactstring, port, socket, password, query, result);
+  return get_attributes_real(dn, ca, dbname, username, contactstring, port, socket, password, query, insecure, result);
 }
 
 bool
 get_all_attributes(const std::string &dn, const std::string &ca,
                    const std::string &dbname, const std::string &username, const std::string &contactstring,
                    int port, const std::string& socket, const char *password,
-                   std::vector<gattrib> &result)
+                   bool insecure, std::vector<gattrib> &result)
 {
   if (dn.empty() || ca.empty() || dbname.empty() || username.empty() || !password)
-    return false;
+      return false;
   
   // compose query
-  std::string query = std::string("SELECT usr.dn as username, role, groups.dn as groupname, capability, groups.gid, attributes.a_name, role_attrs.a_value "
-                                  "FROM usr INNER JOIN ca ON usr.ca=ca.cid "
-                                  "INNER JOIN m ON ") + (compat_flag ? "usr.uid = m.uid " : "usr.userid = m.userid ") +
+  std::string query = std::string("SELECT usr.dn as username, role, groups.dn as groupname, capability, groups.gid, attributes.a_name, role_attrs.a_value ") +
+    (insecure ?  "FROM usr " : "FROM usr INNER JOIN ca ON usr.ca=ca.cid ") +
+    "INNER JOIN m ON " + (compat_flag ? "usr.uid = m.uid " : "usr.userid = m.userid ") +
     "INNER JOIN groups ON m.gid=groups.gid "
     "LEFT JOIN roles ON roles.rid = m.rid "
     "LEFT JOIN capabilities ON capabilities.cid = m.cid "
     "INNER JOIN role_attrs on groups.gid = role_attrs.g_id "
     "INNER JOIN attributes on attributes.a_id = role_attrs.a_id "
-    "WHERE role_attrs.r_id = roles.rid AND "   
-    "ca.ca = \'" + ca + "\' AND "
+    "WHERE role_attrs.r_id = roles.rid AND " +
+    (insecure ? "" : "ca.ca = \'" + ca + "\' AND ") +
     "usr.dn = \'" + dn + "\'";
   
   // execute query
-  return get_attributes_real(dn, ca, dbname, username, contactstring, port, socket, password, query, result);
+  return get_attributes_real(dn, ca, dbname, username, contactstring, port, socket, password, query, insecure, result);
 }
 
 bool
@@ -1026,7 +1022,7 @@ get_group_and_role_attributes(const std::string &dn, const std::string &ca,
                               const char *group,
                               const std::string &dbname, const std::string &username, const std::string &contactstring,
                               int port, const std::string& socket, const char *password,
-                              std::vector<gattrib> &result)
+                              bool insecure, std::vector<gattrib> &result)
 {
   if (dn.empty() || ca.empty() || !group || dbname.empty() || username.empty() || !password)
     return false;
@@ -1046,9 +1042,9 @@ get_group_and_role_attributes(const std::string &dn, const std::string &ca,
 
   // compose query
 
-  std::string query = std::string("SELECT usr.dn as username, role, groups.dn as groupname, capability, groups.gid, attributes.a_name, role_attrs.a_value "
-                                  "FROM usr INNER JOIN ca ON usr.ca=ca.cid "
-                                  "INNER JOIN m ON ") + (compat_flag ? "usr.uid = m.uid " : "usr.userid = m.userid ") +
+  std::string query = std::string("SELECT usr.dn as username, role, groups.dn as groupname, capability, groups.gid, attributes.a_name, role_attrs.a_value ") +
+    (insecure ? "FROM usr " : "FROM usr INNER JOIN ca ON usr.ca=ca.cid ") +
+    "INNER JOIN m ON " + (compat_flag ? "usr.uid = m.uid " : "usr.userid = m.userid ") +
     "INNER JOIN groups ON m.gid=groups.gid "
     "LEFT JOIN roles ON roles.rid = m.rid "
     "LEFT JOIN capabilities ON capabilities.cid = m.cid "
@@ -1056,14 +1052,14 @@ get_group_and_role_attributes(const std::string &dn, const std::string &ca,
     "INNER JOIN attributes on attributes.a_id = role_attrs.a_id "
     "WHERE role_attrs.r_id = roles.rid AND "  
     "roles.role = \'" + role + "\' AND "
-    "groups.dn = \'" + argument + "\' AND "
-    "ca.ca = \'" + ca + "\' AND "
+    "groups.dn = \'" + argument + "\' AND " +
+    (insecure ? "" : "ca.ca = \'" + ca + "\' AND " ) +
     "usr.dn = \'" + dn + "\'";
                                   
   free(argument);
 
   // execute query
-  return get_attributes_real(dn, ca, dbname, username, contactstring, port, socket, password, query, result);
+  return get_attributes_real(dn, ca, dbname, username, contactstring, port, socket, password, query, insecure, result);
 }
 
 bool
@@ -1071,7 +1067,7 @@ get_user_attributes(const std::string &dn, const std::string &ca,
                     const char *group, 
                     const std::string &dbname, const std::string &username, const std::string &contactstring, 
                     int port, const std::string& socket, const char *password, 
-                    std::vector<gattrib> &result)
+                    bool insecure, std::vector<gattrib> &result)
 {
   if (dn.empty() || ca.empty() || !group || dbname.empty() || username.empty() || !password)
     return false;
@@ -1079,15 +1075,15 @@ get_user_attributes(const std::string &dn, const std::string &ca,
   // compose query
   
   std::string query = std::string("SELECT usr.dn, ca.ca, attributes.a_name, usr_attrs.a_value "
-                                  "FROM usr "
-                                  "LEFT JOIN ca on usr.ca = ca.cid "
-                                  "INNER JOIN usr_attrs on usr.userid = usr_attrs.u_id "
-                                  "LEFT JOIN attributes on attributes.a_id = usr_attrs.a_id "
-                                  "WHERE "
-                                  "ca.ca = \'" + ca + "\' AND "
-                                  "usr.dn = \'" + dn + "\'");
+                                  "FROM usr ") +
+    (insecure ? "" : "LEFT JOIN ca on usr.ca = ca.cid ") +
+    "INNER JOIN usr_attrs on usr.userid = usr_attrs.u_id "
+    "LEFT JOIN attributes on attributes.a_id = usr_attrs.a_id "
+    "WHERE " +
+    (insecure ? "" : "ca.ca = \'" + ca + "\' AND ") +
+    "usr.dn = \'" + dn + "\'";
   
-  return get_attributes_real(dn, ca, dbname, username, contactstring, port, socket, password, query, result);
+  return get_attributes_real(dn, ca, dbname, username, contactstring, port, socket, password, query, insecure, result);
 }
 
 static bool
@@ -1095,30 +1091,32 @@ get_attributes_real(const std::string &dn, const std::string &ca,
                     const std::string &dbname, const std::string &username,
                     const std::string &contactstring, 
                     int port, const std::string& socket,const char *password,
-                    const std::string &query,	std::vector<gattrib> &results)
+                    const std::string &query, 
+                    bool insecure, std::vector<gattrib> &results)
 {
   if (dbname.empty() || username.empty() || !password || query.empty())
     return false;
   
-  std::string user_additional = std::string("SELECT usr.dn, ca.ca, attributes.a_name, usr_attrs.a_value "
-                                            "FROM usr "
-                                            "LEFT JOIN ca on usr.ca = ca.cid "
+  std::string user_additional = std::string("SELECT usr.dn") +
+    (insecure ? "" : ", ca.ca") +
+    ", attributes.a_name, usr_attrs.a_value FROM usr " +
+    (insecure ? "" : "LEFT JOIN ca on usr.ca = ca.cid ") +
                                             "INNER JOIN usr_attrs on usr.userid = usr_attrs.u_id "
                                             "LEFT JOIN attributes on attributes.a_id = usr_attrs.a_id "
-                                            "WHERE "
-                                            "ca.ca = \'" + ca + "\' AND "
-                                            "usr.dn = \'" + dn + "\'");
+                                            "WHERE " +
+    (insecure ? "" : "ca.ca = \'" + ca + "\' AND ") +
+                                            "usr.dn = \'" + dn + "\'";
 
-  std::string additional = std::string("SELECT usr.dn as username, role, groups.dn as groupname, capability, groups.gid, attributes.a_name, group_attrs.a_value "
-                                       "FROM usr INNER JOIN ca ON usr.ca=ca.cid "
-                                       "INNER JOIN m ON ") + (compat_flag ? "usr.uid = m.uid " : "usr.userid = m.userid ") +
+  std::string additional = std::string("SELECT usr.dn as username, role, groups.dn as groupname, capability, groups.gid, attributes.a_name, group_attrs.a_value ") +
+    (insecure ? "FROM usr " : "FROM usr INNER JOIN ca ON usr.ca=ca.cid ") +
+                                       "INNER JOIN m ON " + (compat_flag ? "usr.uid = m.uid " : "usr.userid = m.userid ") +
                                        "INNER JOIN groups ON m.gid=groups.gid "
                                        "left join roles on roles.rid = m.rid "
                                        "left join capabilities on capabilities.cid = m.cid "
                                        "INNER JOIN group_attrs on groups.gid = group_attrs.g_id "
                                        "INNER JOIN attributes on attributes.a_id = group_attrs.a_id "
-    "WHERE groups.must IS NOT NULL AND "
-    "ca.ca = \'" + ca + "\' AND "
+    "WHERE groups.must IS NOT NULL AND " +
+    (insecure ? "" : "ca.ca = \'" + ca + "\' AND ") +
     "usr.dn = \'" + dn + "\' AND "
     "m.rid is NULL";
   

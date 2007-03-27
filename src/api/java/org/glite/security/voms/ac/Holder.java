@@ -13,11 +13,7 @@ import java.security.cert.X509Certificate;
 import java.util.Enumeration;
 
 import javax.security.auth.x500.X500Principal;
-import java.security.Principal;
-import java.security.cert.X509Certificate;
 
-import org.apache.log4j.Level;
-import org.apache.log4j.Logger;
 import org.bouncycastle.asn1.ASN1EncodableVector;
 import org.bouncycastle.asn1.ASN1Sequence;
 import org.bouncycastle.asn1.ASN1TaggedObject;

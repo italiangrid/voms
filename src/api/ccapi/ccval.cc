@@ -185,30 +185,34 @@ bool vomsdata::verifyac(X509 *cert, X509 *issuer, AC *ac, voms &v)
     }
 
     struct d **datap = (struct d **)(vv->std);
-    while (*datap) {
-      struct d *dat = *datap;
-      ::data d;
-      d.group = dat->group ? dat->group : "";
-      d.role  = dat->role ? dat->role : "";
-      d.cap   = dat->cap ? dat->cap : "";
-      v.std.push_back(d);
-      free(dat->group);
-      //free(dat->role);
-      //free(dat->cap);
-      free(dat);
-      datap++;
+    if (datap) {
+      while (*datap) {
+        struct d *dat = *datap;
+        ::data d;
+        d.group = dat->group ? dat->group : "";
+        d.role  = dat->role ? dat->role : "";
+        d.cap   = dat->cap ? dat->cap : "";
+        v.std.push_back(d);
+        free(dat->group);
+        //free(dat->role);
+        //free(dat->cap);
+        free(dat);
+        datap++;
+      }
+      free(vv->std);
+      vv->std = NULL;
     }
-    free(vv->std);
-    vv->std = NULL;
 
     char **ctmp = vv->fqan;
-    while (*ctmp) {
-      v.fqan.push_back(*ctmp);
-      free(*ctmp);
-      ctmp++;
+    if (ctmp) {
+      while (*ctmp) {
+        v.fqan.push_back(*ctmp);
+        free(*ctmp);
+        ctmp++;
+      }
+      free(vv->fqan);
+      vv->fqan = NULL;
     }
-    free(vv->fqan);
-    vv->fqan = NULL;
   }
   else
     seterror(VERR_VERIFY, std::string(get_error(result)));

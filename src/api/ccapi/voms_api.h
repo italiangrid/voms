@@ -384,6 +384,13 @@ private:
 
 public:
   vomsdata(const vomsdata &);
+
+private:
+  int retry_count;
+  
+public:
+  void SetRetryCount(int retryCount);
+
 };
 
 

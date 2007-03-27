@@ -13,37 +13,25 @@
  *********************************************************************/
 package org.glite.security.voms.ac;
 
+import java.io.ByteArrayInputStream;
+import java.security.cert.CertificateFactory;
+import java.security.cert.X509Certificate;
+import java.security.NoSuchProviderException;
+import java.security.cert.CertificateException;
+import java.security.Security;
+import java.util.Enumeration;
+import java.util.List;
+import java.util.ListIterator;
+import java.util.Vector;
+
+import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.bouncycastle.asn1.ASN1Sequence;
-//import org.bouncycastle.asn1.ASN1TaggedObject;
 import org.bouncycastle.asn1.DEREncodable;
 import org.bouncycastle.asn1.DEREncodableVector;
 import org.bouncycastle.asn1.DERObject;
-//import org.bouncycastle.asn1.DERObjectIdentifier;
-//import org.bouncycastle.asn1.DEROctetString;
 import org.bouncycastle.asn1.DERSequence;
-//import org.bouncycastle.asn1.DERTaggedObject;
-//import org.bouncycastle.asn1.DERUniversalString;
-//import org.bouncycastle.asn1.x509.GeneralNames;
 import org.bouncycastle.asn1.x509.X509CertificateStructure;
 import org.bouncycastle.jce.provider.X509CertificateObject;
-
-import java.security.cert.X509Certificate;
-
-import java.util.Enumeration;
-//import java.util.Iterator;
-import java.util.List;
-import java.util.Vector;
-import java.util.ListIterator;
-
-//import java.security.cert.CRLException;
-//import java.security.cert.CertificateException;
-import java.security.cert.CertificateFactory;
-//import java.security.cert.CertificateParsingException;
-//import java.security.cert.TrustAnchor;
-//import java.security.cert.X509CRL;
-//import java.security.cert.X509Certificate;
-
-import java.io.ByteArrayInputStream;
 
 /**
  * This class represents the ACCerts extension which may be present in the AC.
@@ -60,6 +48,12 @@ public class ACCerts implements DEREncodable {
         l = new Vector();
     }
 
+    static {
+        if (Security.getProvider("BC") == null) {
+            Security.addProvider(new BouncyCastleProvider());
+        }
+    }
+
     /**
      * Creates an ACCerts starting from a sequence.
      *
@@ -73,7 +67,13 @@ public class ACCerts implements DEREncodable {
         seq = (ASN1Sequence) seq.getObjectAt(0);
         CertificateFactory cf = null;
         try {
-            cf = CertificateFactory.getInstance("X.509");
+            cf = CertificateFactory.getInstance("X.509", "BC");
+        }
+        catch (NoSuchProviderException e) {
+            throw new ExceptionInInitializerError("Cannot find BouncyCastle provider: " + e.getMessage());
+        }
+        catch (CertificateException e) {
+            throw new ExceptionInInitializerError("X.509 Certificates unsupported. " + e.getMessage());
         }
         catch (Exception ex) {
             throw new IllegalArgumentException("Error in setting up ACCerts reader. " + ex.getMessage());
@@ -86,8 +86,11 @@ public class ACCerts implements DEREncodable {
                 ASN1Sequence s = ASN1Sequence.getInstance(o);
                 byte[] data = null;
                 try {
-                    data = new X509CertificateObject(X509CertificateStructure.getInstance(s)).getEncoded();
-                    l.add((X509Certificate)cf.generateCertificate(new ByteArrayInputStream(data)));
+                      data = new X509CertificateObject(X509CertificateStructure.getInstance(s)).getEncoded();
+                      l.add((X509Certificate)cf.generateCertificate(new ByteArrayInputStream(data)));
+//                      X509CertificateObject obj  = null;
+//                      obj = new X509CertificateObject(X509CertificateStructure.getInstance(s));
+//                      l.add(obj);
                 }
                 catch(Exception ex) {
                     throw new IllegalArgumentException("Error in encoding ACCerts. " + ex.getMessage());

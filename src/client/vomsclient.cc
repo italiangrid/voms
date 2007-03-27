@@ -52,7 +52,7 @@ extern "C" {
 
 extern "C" 
 {
-#include "proxycertinfo.h"
+#include "myproxycertinfo.h"
 }
 
 #include "init.h"
@@ -118,8 +118,8 @@ extern void proxy_verify_ctx_init(proxy_verify_ctx_desc * pvxd);
 
 static char *norep();
 int InitProxyCertInfoExtension(void);
-void *proxycertinfo_s2i(struct v3_ext_method *method, struct v3_ext_ctx *ctx, char *data);
-char *proxycertinfo_i2s(struct v3_ext_method *method, void *ext);
+void *myproxycertinfo_s2i(struct v3_ext_method *method, struct v3_ext_ctx *ctx, char *data);
+char *myproxycertinfo_i2s(struct v3_ext_method *method, void *ext);
 
 class rand_wrapper 
 {
@@ -844,7 +844,7 @@ bool Client::Run() {
   
   /* assure user certificate is not expired or going to, else advise but still create proxy */
   
-  if(!Test())
+  if(Test())
     ret = false;
   
   return ret;
@@ -1062,8 +1062,8 @@ bool Client::CreateProxy(std::string data, std::string filedata, AC ** aclist, i
     int                                 derlen;
     unsigned char *                     pp;
     int                                 w;
-    PROXYPOLICY *                       proxypolicy;
-    PROXYCERTINFO *                     proxycertinfo;
+    myPROXYPOLICY *                     proxypolicy;
+    myPROXYCERTINFO *                   proxycertinfo;
     ASN1_OBJECT *                       policy_language;
     
     
@@ -1116,18 +1116,18 @@ bool Client::CreateProxy(std::string data, std::string filedata, AC ** aclist, i
     
     /* proxypolicy */
     
-    proxypolicy = PROXYPOLICY_new();
+    proxypolicy = myPROXYPOLICY_new();
     if(policy.size()>0)
-      PROXYPOLICY_set_policy(proxypolicy, (unsigned char *)policy.c_str(), policy.size());
-    PROXYPOLICY_set_policy_language(proxypolicy, policy_language);
+      myPROXYPOLICY_set_policy(proxypolicy, (unsigned char *)policy.c_str(), policy.size());
+    myPROXYPOLICY_set_policy_language(proxypolicy, policy_language);
 
     /* proxycertinfo */
     
-    proxycertinfo = PROXYCERTINFO_new();
-    PROXYCERTINFO_set_version(proxycertinfo, version);
-    PROXYCERTINFO_set_proxypolicy(proxycertinfo, proxypolicy);
+    proxycertinfo = myPROXYCERTINFO_new();
+    myPROXYCERTINFO_set_version(proxycertinfo, version);
+    myPROXYCERTINFO_set_proxypolicy(proxycertinfo, proxypolicy);
     if(pathlength>=0) {
-      PROXYCERTINFO_set_path_length(proxycertinfo, pathlength);
+      myPROXYCERTINFO_set_path_length(proxycertinfo, pathlength);
     }
     
     /* 2der conversion */
@@ -1211,7 +1211,17 @@ bool Client::CreateProxy(std::string data, std::string filedata, AC ** aclist, i
 
 int InitProxyCertInfoExtension(void)
 {
+
+#define PROXYCERTINFO_V3      "1.3.6.1.4.1.3536.1.222"
+#define PROXYCERTINFO_V4      "1.3.6.1.5.5.7.1.14"
+#define OBJC(c,n) OBJ_create(c,n,#c)
+
   X509V3_EXT_METHOD *pcert;
+
+  /* Proxy Certificate Extension's related objects */
+  OBJC(PROXYCERTINFO_V3, "PROXYCERTINFO_V3");
+  OBJC(PROXYCERTINFO_V4, "PROXYCERTINFO_V4");
+
 
   pcert = (X509V3_EXT_METHOD *)OPENSSL_malloc(sizeof(X509V3_EXT_METHOD));
 
@@ -1227,12 +1237,12 @@ int InitProxyCertInfoExtension(void)
 #endif
 #endif
     pcert->ext_flags = 0;
-    pcert->ext_new  = (X509V3_EXT_NEW) PROXYCERTINFO_new;
-    pcert->ext_free = (X509V3_EXT_FREE)PROXYCERTINFO_free;
-    pcert->d2i      = (X509V3_EXT_D2I) d2i_PROXYCERTINFO;
-    pcert->i2d      = (X509V3_EXT_I2D) i2d_PROXYCERTINFO;
-    pcert->i2s      = (X509V3_EXT_I2S) proxycertinfo_i2s;
-    pcert->s2i      = (X509V3_EXT_S2I) proxycertinfo_s2i;
+    pcert->ext_new  = (X509V3_EXT_NEW) myPROXYCERTINFO_new;
+    pcert->ext_free = (X509V3_EXT_FREE)myPROXYCERTINFO_free;
+    pcert->d2i      = (X509V3_EXT_D2I) d2i_myPROXYCERTINFO;
+    pcert->i2d      = (X509V3_EXT_I2D) i2d_myPROXYCERTINFO;
+    pcert->i2s      = (X509V3_EXT_I2S) myproxycertinfo_i2s;
+    pcert->s2i      = (X509V3_EXT_S2I) myproxycertinfo_s2i;
     pcert->v2i      = (X509V3_EXT_V2I) NULL;
     pcert->r2i      = (X509V3_EXT_R2I) NULL;
     pcert->i2v      = (X509V3_EXT_I2V) NULL;
@@ -1255,12 +1265,12 @@ int InitProxyCertInfoExtension(void)
 #endif
 #endif
     pcert->ext_flags = 0;
-    pcert->ext_new  = (X509V3_EXT_NEW) PROXYCERTINFO_new;
-    pcert->ext_free = (X509V3_EXT_FREE)PROXYCERTINFO_free;
-    pcert->d2i      = (X509V3_EXT_D2I) d2i_PROXYCERTINFO;
-    pcert->i2d      = (X509V3_EXT_I2D) i2d_PROXYCERTINFO;
-    pcert->i2s      = (X509V3_EXT_I2S) proxycertinfo_i2s;
-    pcert->s2i      = (X509V3_EXT_S2I) proxycertinfo_s2i;
+    pcert->ext_new  = (X509V3_EXT_NEW) myPROXYCERTINFO_new;
+    pcert->ext_free = (X509V3_EXT_FREE)myPROXYCERTINFO_free;
+    pcert->d2i      = (X509V3_EXT_D2I) d2i_myPROXYCERTINFO;
+    pcert->i2d      = (X509V3_EXT_I2D) i2d_myPROXYCERTINFO;
+    pcert->i2s      = (X509V3_EXT_I2S) myproxycertinfo_i2s;
+    pcert->s2i      = (X509V3_EXT_S2I) myproxycertinfo_s2i;
     pcert->v2i      = (X509V3_EXT_V2I) NULL;
     pcert->r2i      = (X509V3_EXT_R2I) NULL;
     pcert->i2v      = (X509V3_EXT_I2V) NULL;
@@ -1270,12 +1280,12 @@ int InitProxyCertInfoExtension(void)
   }
 }
 
-void *proxycertinfo_s2i(struct v3_ext_method *method, struct v3_ext_ctx *ctx, char *data)
+void *myproxycertinfo_s2i(struct v3_ext_method *method, struct v3_ext_ctx *ctx, char *data)
 {
-  return (PROXYCERTINFO*)data;
+  return (myPROXYCERTINFO*)data;
 }
 
-char *proxycertinfo_i2s(struct v3_ext_method *method, void *ext)
+char *myproxycertinfo_i2s(struct v3_ext_method *method, void *ext)
 {
   return norep();
 }

@@ -83,5 +83,6 @@ private:
   std::string     logdf;
   std::string     logf;
   bool            newformat;
+  bool            insecure;
 };
 #endif

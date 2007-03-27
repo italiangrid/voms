@@ -16,7 +16,7 @@ Description:
 **********************************************************************/
 #include "config.h"
 #include "replace.h"
-
+#include "myproxycertinfo.h"
 #include "sslutils.h"
 
 #ifdef HAVE_UNISTD_H
@@ -1151,7 +1151,8 @@ proxy_sign_ext(
     /* DEE? will use same serial number, this may help
      * with revocations, or may cause problems.
      */
-    
+
+    /*  this Presupposes that serial are < sizeof(long) in length    
     if (!ASN1_INTEGER_set(X509_get_serialNumber(*new_cert),
                           serial_num? serial_num:
                           ASN1_INTEGER_get(X509_get_serialNumber(user_cert))))
@@ -1159,7 +1160,22 @@ proxy_sign_ext(
         PRXYerr(PRXYERR_F_PROXY_SIGN_EXT,PRXYERR_R_PROCESS_PROXY);
         goto err;
     }
+    */
 
+    {
+      if (serial_num)
+        ASN1_INTEGER_set(X509_get_serialNumber(*new_cert), serial_num);
+      else {
+        ASN1_INTEGER_free(X509_get_serialNumber(*new_cert));
+
+        (*new_cert)->cert_info->serialNumber = 
+          ASN1_INTEGER_dup(X509_get_serialNumber(user_cert));
+      }
+      if (!(*new_cert)->cert_info->serialNumber) {
+        PRXYerr(PRXYERR_F_PROXY_SIGN_EXT,PRXYERR_R_PROCESS_PROXY);
+        goto err;
+      }
+    }
 
     /* set the issuer name */
 
@@ -1761,10 +1777,40 @@ int proxy_check_proxy_name(
     X509_NAME *                         name = NULL;
     X509_NAME_ENTRY *                   ne = NULL;
     ASN1_STRING *                       data;
+    int nidv3, nidv4 = 0;
+    int indexv3 = -1, indexv4 = -1;
 
+    nidv3 = OBJ_txt2nid("PROXYCERTINFO_V3");
+    nidv4 = OBJ_txt2nid("PROXYCERTINFO_V4");
 
+    indexv3 = X509_get_ext_by_NID(cert, nidv3, -1);
+    indexv4 = X509_get_ext_by_NID(cert, nidv4, -1);
+
+    if (indexv3 != -1 || indexv4 != -1) {
+      /* Its a proxy! */
+      X509_EXTENSION *ext = X509_get_ext(cert, (indexv3 == -1 ? indexv4 : indexv3));
+
+      if (ext) {
+        myPROXYCERTINFO *certinfo = NULL;
+
+        certinfo = (myPROXYCERTINFO *)X509V3_EXT_d2i(ext);
+
+        if (certinfo) {
+          myPROXYPOLICY *policy = myPROXYCERTINFO_get_proxypolicy(certinfo);
+
+          if (policy) {
+            ASN1_OBJECT *policylang = myPROXYPOLICY_get_policy_language(policy);
+
+            /* TO DO:  discover exact type of proxy. */
+
+          }
+        }
+        return 1;
+      }
+    }
     subject = X509_get_subject_name(cert);
     ne = X509_NAME_get_entry(subject, X509_NAME_entry_count(subject)-1);
+    
     if (!OBJ_cmp(ne->object,OBJ_nid2obj(NID_commonName)))
     {
         data = X509_NAME_ENTRY_get_data(ne);

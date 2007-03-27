@@ -8,14 +8,11 @@ package org.glite.security.voms;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
-
-import java.security.Provider;
 import java.security.Security;
-
-import java.security.cert.X509Certificate;
 import java.security.cert.CRLException;
 import java.security.cert.CertificateException;
-
+import java.security.cert.X509Certificate;
+import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.Hashtable;
 import java.util.Iterator;
@@ -23,21 +20,16 @@ import java.util.List;
 import java.util.ListIterator;
 import java.util.StringTokenizer;
 import java.util.Vector;
-import java.util.ArrayList;
 
-import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
-
 import org.bouncycastle.asn1.ASN1Sequence;
 import org.bouncycastle.asn1.DERInputStream;
 import org.bouncycastle.asn1.DEROctetString;
-
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
-
 import org.glite.security.voms.ac.ACTrustStore;
-import org.glite.security.voms.ac.VOMSTrustStore;
 import org.glite.security.voms.ac.ACValidator;
 import org.glite.security.voms.ac.AttributeCertificate;
+import org.glite.security.voms.ac.VOMSTrustStore;
 
 /**
  * Reads a DER-encode, Base64-encoded, or PEM-encoded certificate from disk
@@ -302,7 +294,7 @@ public class VOMSValidator {
      * @see #validate()
      */
     public static Vector parse(X509Certificate[] myValidatedChain) {
-        System.out.println("WRONG");
+        //        System.out.println("WRONG");
         if (log.isDebugEnabled()) {
             log.debug("VOMSValidator : parsing cert chain");
         }
@@ -613,16 +605,22 @@ public class VOMSValidator {
     }
 
     /**
-     * @return whether the VOMS attributes are validated or not
+     * @return whether the validation process has been ran on VOMS attributes
      *
      * @see #validate()
      */
     public boolean isValidated() {
         return isValidated;
     }
+    
+    
+    public boolean isValid(){
+        
+        return true;
+    }
 
     public String toString() {
-        return "isParsed : " + isParsed + "\nisValidated : " + isValidated + "\nVOMS attrs:" + myVomsAttributes;
+        return "isParsed : " + isParsed + "\nhas been validated : " + isValidated + "\nVOMS attrs:" + myVomsAttributes;
     }
 
     /**

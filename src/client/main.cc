@@ -31,8 +31,7 @@ int main(int argc, char** argv) {
     exit(1);
 
   Client v(argc, argv);
-  v.Run();
+  bool result = v.Run();
 
-  return 0;
-
+  return (result ? 0 : 1);
 }

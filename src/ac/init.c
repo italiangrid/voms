@@ -37,15 +37,12 @@ void declareOIDs(void)
 #define incfile               "1.3.6.1.4.1.8005.100.100.2"
 #define vo                    "1.3.6.1.4.1.8005.100.100.3"
 #define idatcap               "1.3.6.1.4.1.8005.100.100.4"
-  ///// test
+  /*  ///// test */
 #define attributes            "1.3.6.1.4.1.8005.100.100.11"
 #define acseq                 "1.3.6.1.4.1.8005.100.100.5"
 #define order                 "1.3.6.1.4.1.8005.100.100.6"
 #define certseq               "1.3.6.1.4.1.8005.100.100.10"
 #define email                 idpkcs9 ".1"
-
-#define PROXYCERTINFO_V3      "1.3.6.1.4.1.3536.1.222"
-#define PROXYCERTINFO_V4      "1.3.6.1.5.5.7.1.14"
 
 #define OBJC(c,n) OBJ_create(c,n,#c)
 
@@ -56,7 +53,7 @@ void declareOIDs(void)
   done=1;
   OBJ_create(email, "Email", "Email");
   OBJC(idatcap,"idatcap");
-  //// test
+  /*  //// test */
   OBJC(attributes,"attributes");
   OBJC(idcenoRevAvail, "noRevAvail");
   OBJC(idceauthKeyIdentifier, "authKeyId");
@@ -67,10 +64,6 @@ void declareOIDs(void)
   OBJC(incfile, "incfile");
   OBJC(vo, "vo");
   OBJC(certseq, "certseq");
-
-  /* Proxy Certificate Extension's related objects */
-  OBJC(PROXYCERTINFO_V3, "PROXYCERTINFO_V3");
-  OBJC(PROXYCERTINFO_V4, "PROXYCERTINFO_V4");
 
 }
 

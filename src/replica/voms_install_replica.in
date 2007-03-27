@@ -49,9 +49,12 @@ done
 
 ###############################################################################
 #STOP ACTIVITY 
+
+MYSQL=mysql
 if ! test -z $verbose ; then  echo "VOMS_INSTALL_REPLICA: LOCK MASTER TABLES.."; fi
 $MYSQL -h $master_host -u $master_mysql_user -p$master_mysql_pwd -e "FLUSH TABLES WITH READ LOCK" #  STOP MASTER 
 
+MYSQL="mysql -u$mysql_username_admin -p$mysql_password_admin"
 if ! test -z $verbose ; then echo "VOMS_INSTALL_REPLICA: STOP SLAVE.." ; fi
 #$MYSQL                -e "RESET SLAVE"                  # May help..
 $MYSQL                 -e "STOP SLAVE"                   # STOP SLAVE
@@ -85,8 +88,8 @@ server-id=2
 master-host=$master_host
 master-user=$master_mysql_user
 master-password=$master_mysql_pwd
-replicate-do-db=$matser_db
-replicate-ignore-table=$master-db.seqnumber
+replicate-do-db=$master_db
+replicate-ignore-table=$master_db.seqnumber,$master_db.realtime
 EOF
 
 if ! test -z $verbose ; then echo "VOMS_INSTALL_REPLICA: MYSQL RESTART.." ; fi
@@ -94,6 +97,9 @@ if ! test -z $verbose ; then echo "VOMS_INSTALL_REPLICA: MYSQL RESTART.." ; fi
 #service mysql restart
 sleep 1
 
+$MYSQL                 -e "START SLAVE"                   # START SLAVE
+
+MYSQL=mysql
 if ! test -z $verbose ; then echo "VOMS_INSTALL_REPLICA: UNLOCK MASTER TABLES.." ; fi
 $MYSQL -h $master_host -u $master_mysql_user -p$master_mysql_pwd -e "UNLOCK TABLES" 
 

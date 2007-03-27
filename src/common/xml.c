@@ -425,7 +425,8 @@ int XMLDecodeReq(const char *message, struct req *d)
   int res;
   d->command = (char *)malloc(16);
   d->order = d->targets = d->value = NULL;
-  d->error = d->lifetime = d->depth = d->n = 0;
+  d->error = d->depth = d->n = 0;
+  d->lifetime = -1;
   
   XML_SetUserData(p, d);
   XML_SetElementHandler(p,startreq,endreq);

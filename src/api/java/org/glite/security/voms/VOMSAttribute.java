@@ -6,40 +6,30 @@
 
 package org.glite.security.voms;
 
-import org.apache.log4j.Logger;
-
-import org.bouncycastle.asn1.ASN1OctetString;
-import org.bouncycastle.asn1.ASN1Sequence;
-import org.bouncycastle.asn1.ASN1TaggedObject;
-import org.bouncycastle.asn1.DERIA5String;
-import org.bouncycastle.asn1.DEROutputStream;
-
-import org.bouncycastle.asn1.x509.GeneralName;
-import org.bouncycastle.asn1.x509.GeneralNames;
-
-import java.security.Principal;
-
-import java.security.cert.X509Certificate;
-import javax.security.auth.x500.X500Principal;
-
-import org.glite.security.voms.ac.AttributeCertificate;
-import org.glite.security.voms.ac.IetfAttrSyntax;
-import org.glite.security.voms.ac.FullAttributes;
-import org.glite.security.voms.ac.ACCerts;
-import org.glite.security.voms.ac.ACTargets;
-
-import java.util.SimpleTimeZone;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Vector;
-import java.util.Date;
-import java.util.Enumeration;
-
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.security.Principal;
+import java.security.cert.X509Certificate;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.Enumeration;
+import java.util.List;
+import java.util.SimpleTimeZone;
+import java.util.Vector;
+
+import javax.security.auth.x500.X500Principal;
+
+import org.apache.log4j.Logger;
+import org.bouncycastle.asn1.ASN1Sequence;
+import org.bouncycastle.asn1.ASN1TaggedObject;
+import org.bouncycastle.asn1.DEROutputStream;
+import org.bouncycastle.asn1.x509.GeneralName;
+import org.bouncycastle.asn1.x509.GeneralNames;
+import org.glite.security.voms.ac.ACCerts;
+import org.glite.security.voms.ac.ACTargets;
+import org.glite.security.voms.ac.AttributeCertificate;
+import org.glite.security.voms.ac.FullAttributes;
 
 /**
  * Representation of the authorization information (VO, server address
@@ -408,9 +398,9 @@ public class VOMSAttribute {
     }
 
     /**
-     * Returns the hostname of the issuing VOMS server.
+     * Returns the hostName of the issuing VOMS server.
      *
-     * @return hostname.
+     * @return hostName.
      *
      * @throws IllegalArgumentException if no Attribute Certificate has been
      * loaded.

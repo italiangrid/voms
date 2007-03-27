@@ -251,7 +251,8 @@ VOMSServer::VOMSServer(int argc, char *argv[]) : sock(0,0,NULL,50,false),
                                                  logt(T_STARTUP|T_REQUEST|T_RESULT), 
                                                  logdf("%c"),
                                                  logf("%d:%h:%s(%p):%V:%T:%F (%f:%l):%m"),
-                                                 newformat(false)
+                                                 newformat(false),
+                                                 insecure(false)
 {
   struct stat statbuf;
 
@@ -310,6 +311,7 @@ VOMSServer::VOMSServer(int argc, char *argv[]) : sock(0,0,NULL,50,false),
     {"socktimeout",     1, &socktimeout,              OPT_NUM},
     {"logmax",          1, &logmax,                   OPT_NUM},
     {"newformat",       1, (int *)&newformat,         OPT_BOOL},
+    {"skipcacheck",     1, (int *)&insecure,          OPT_BOOL},
     {0, 0, 0, 0}
   };
 
@@ -326,8 +328,8 @@ VOMSServer::VOMSServer(int argc, char *argv[]) : sock(0,0,NULL,50,false),
             "[-mysql-port port] [-mysql-socket socket] [-timeout limit]\n"
             "[-x509_user_proxy file] [-test] [-uri uri] [-code num]\n"
             "[-loglevel lev] [-logtype type] [-logformat format]\n"
-            "[-logdateformat format] [-debug] [-backlog num]\n"
-            "[-version][--sqlloc path][--compat][--logmax n][--socktimeout n]\n");
+            "[-logdateformat format] [-debug] [-backlog num] [-skipcacheck]\n"
+            "[-version][-sqlloc path][-compat][-logmax n][-socktimeout n]\n");
 
   if (!getopts(argc, argv, opts))
     throw VOMSInitException("unable to read options");
@@ -650,7 +652,9 @@ VOMSServer::Execute(const std::string &client_name, const std::string &ca_name,
   /* Interpret user requests */
 
   if (requested != 0) {
-    if (validity < requested) {
+    if (requested == -1) 
+      requested = validity;
+    else if (validity < requested) {
       err.num = WARN_SHORT_VALIDITY;
       err.message = uri + ": The validity of this VOMS AC in your proxy is shortened to " +
         stringify(validity, tmp) + " seconds!";
@@ -683,24 +687,24 @@ VOMSServer::Execute(const std::string &client_name, const std::string &ca_name,
     {
     case 'A':
       result &=
-        get_all(real_user, real_ca, dbname, username, contactstring, mysql_port, mysql_socket, passwd(), res);
-      result &= get_all_attributes(real_user, real_ca, dbname, username, contactstring, mysql_port, mysql_socket, passwd(), attributes);
+        get_all(real_user, real_ca, dbname, username, contactstring, mysql_port, mysql_socket, passwd(), insecure, res);
+      result &= get_all_attributes(real_user, real_ca, dbname, username, contactstring, mysql_port, mysql_socket, passwd(), insecure, attributes);
       break;
 
     case 'R':
       result &=
-        get_role(real_user, real_ca, i->c_str() + 1, dbname, username, contactstring, mysql_port, mysql_socket, passwd(), res);
-      result &= get_role_attributes(real_user, real_ca, i->c_str() + 1, dbname, username, contactstring, mysql_port, mysql_socket, passwd(), attributes);
+        get_role(real_user, real_ca, i->c_str() + 1, dbname, username, contactstring, mysql_port, mysql_socket, passwd(), insecure, res);
+      result &= get_role_attributes(real_user, real_ca, i->c_str() + 1, dbname, username, contactstring, mysql_port, mysql_socket, passwd(), insecure, attributes);
       break;
 	
     case 'G':
-      result = get_group(real_user, real_ca, i->c_str() + 1, dbname, username, contactstring, mysql_port, mysql_socket, passwd(), res);
-      result &= get_group_attributes(real_user, real_ca, i->c_str() + 1, dbname, username, contactstring, mysql_port, mysql_socket, passwd(), attributes);
+      result = get_group(real_user, real_ca, i->c_str() + 1, dbname, username, contactstring, mysql_port, mysql_socket, passwd(), insecure, res);
+      result &= get_group_attributes(real_user, real_ca, i->c_str() + 1, dbname, username, contactstring, mysql_port, mysql_socket, passwd(), insecure, attributes);
       break;
 
     case 'B':
-      result = get_group_and_role(real_user, real_ca, i->c_str() + 1, dbname, username, contactstring, mysql_port, mysql_socket, passwd(), res);
-      result &= get_group_and_role_attributes(real_user, real_ca, i->c_str() + 1, dbname, username, contactstring, mysql_port, mysql_socket, passwd(), attributes);
+      result = get_group_and_role(real_user, real_ca, i->c_str() + 1, dbname, username, contactstring, mysql_port, mysql_socket, passwd(), insecure, res);
+      result &= get_group_and_role_attributes(real_user, real_ca, i->c_str() + 1, dbname, username, contactstring, mysql_port, mysql_socket, passwd(), insecure, attributes);
       break;
       
     case 'S':
@@ -714,12 +718,12 @@ VOMSServer::Execute(const std::string &client_name, const std::string &ca_name,
       break;
 
     case 'M':
-      result &= getlist(real_user, real_ca, dbname, username, contactstring, mysql_port, mysql_socket, passwd(), data);
+      result &= getlist(real_user, real_ca, dbname, username, contactstring, mysql_port, mysql_socket, passwd(), insecure, data);
       break;
 
     case 'N':
       result &=
-        get_all(real_user, real_ca, dbname, username, contactstring, mysql_port, mysql_socket, passwd(), res);
+        get_all(real_user, real_ca, dbname, username, contactstring, mysql_port, mysql_socket, passwd(), insecure, res);
       break;
 
     default:
@@ -985,6 +989,7 @@ void VOMSServer::UpdateOpts(void)
     {"socktimeout",     1, &socktimeout,              OPT_NUM},
     {"logmax",          1, &logmax,                   OPT_NUM},
     {"newformat",       1, (int *)&newformat,         OPT_BOOL},
+    {"skipcacheck",     1, (int *)&insecure,          OPT_BOOL},
     {0, 0, 0, 0}
   };
 

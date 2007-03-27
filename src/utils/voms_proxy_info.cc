@@ -56,6 +56,7 @@ extern "C" {
 #include "sslutils.h"
 #include "newformat.h"
 #include "listfunc.h"
+#include "myproxycertinfo.h"
 }
 
 extern int AC_Init(void);
@@ -84,7 +85,7 @@ const std::string SUBPACKAGE      = "voms-proxy-info";
 
 static bool test_proxy();
 
-static bool print(X509 *cert, vomsdata &vd);
+static bool print(X509 *cert, STACK_OF(X509) *chain, vomsdata &vd);
 static STACK_OF(X509) *load_chain(char *certfile);
 static time_t stillvalid(ASN1_TIME *ctm);
 static char *proxy_type(X509 *cert);
@@ -123,12 +124,21 @@ static int         hours = 0;
 static int         minutes = 0;
 static int         bits        = 0;
 static std::vector<std::string> acexists;
+static bool        dochain = false;
 
 static bool        serial = false;
+
+static int InitProxyCertInfoExtension(void);
+static void *myproxycertinfo_s2i(struct v3_ext_method *method, struct v3_ext_ctx *ctx, char *data);
+static char *myproxycertinfo_i2s(struct v3_ext_method *method, void *ext);
+static char *norep();
 
 int
 main(int argc, char **argv)
 {
+
+  (void)InitProxyCertInfoExtension();
+
   if (strrchr(argv[0],'/'))
     program = strrchr(argv[0],'/') + 1;
   else
@@ -148,6 +158,7 @@ main(int argc, char **argv)
     "   -conf <name>              Read options from file <name>\n"
     "\n"
     "   [printoptions]\n"
+    "      -chain                Prints information about the whol proxy chain (CA excluded)\n"
     "      -subject              Distinguished name (DN) of proxy subject\n"
     "      -issuer               DN of proxy issuer (certificate signer)\n"
     "      -identity             DN of the identity represented by the proxy\n"
@@ -181,7 +192,7 @@ main(int argc, char **argv)
     {"file",        1, (int *)&file,        OPT_STRING},
     {"exists",      1, (int *)&exists,      OPT_BOOL},
     {"acexists",    1, (int *)&acexists,    OPT_MULTI},
-
+    {"chain",       0, (int *)&dochain,     OPT_BOOL},
     {"conf",        1, NULL,                OPT_CONFIG},
     
     {"subject",     1, (int *)&subject,     OPT_BOOL},
@@ -356,7 +367,7 @@ test_proxy()
         std::cerr << "WARNING: Unable to verify signature! Server certificate possibly not installed.\n" 
                   << "Error: " << d.ErrorMessage() << std::endl;
       }
-      res = !(print(x, d));
+      res = !(print(x, chain, d));
     }
     else {
       std::cerr << std::endl << "Couldn't find a valid proxy." << std::endl << std::endl;
@@ -370,6 +381,7 @@ test_proxy()
 
   return res;
 }
+
 static STACK_OF(X509) *load_chain(char *certfile)
 {
   STACK_OF(X509_INFO) *sk=NULL;
@@ -461,7 +473,7 @@ convtime(std::string data)
   return t;
 }
 
-static bool print(X509 *cert, vomsdata &vd)
+static bool print(X509 *cert, STACK_OF(X509) *chain, vomsdata &vd)
 {
   time_t now;
   time(&now);
@@ -474,7 +486,38 @@ static bool print(X509 *cert, vomsdata &vd)
 
   time_t leftac;
 
-  if (defaultinfo || all) {
+  if (dochain && chain) {
+    int start = sk_X509_num(chain);
+    X509 *cert = NULL;
+    if (start >= 1) {
+      std::cout << "=== Proxy Chain Information ===" << std::endl;
+
+      for (start = sk_X509_num(chain)-1; start >= 1; start--) {
+        char *type = NULL;
+        int totbits = 0;
+        time_t leftcert = 0;
+
+        cert = sk_X509_value(chain, start);
+        totbits = numbits(cert);
+        leftcert = stillvalid(X509_get_notAfter(cert)) - now;
+        leftcert = (leftcert < 0) ? 0 : leftcert;
+        type = proxy_type(cert);
+
+        std::cout << "subject   : " << X509_NAME_oneline(X509_get_subject_name(cert), NULL, 0) << "\n";
+        std::cout << "issuer    : " << X509_NAME_oneline(X509_get_issuer_name(cert), NULL, 0) << "\n";
+        
+        if (strcmp(type, "unknown") != 0)
+          std::cout << "type      : " << proxy_type(cert) << "\n";
+        
+        std::cout << "strength  : " << totbits << " bits" << "\n";
+        std::cout << "timeleft  : " << leftcert/3600 << ":" << std::setw(2) << std::setfill('0') 
+                  << (leftcert%3600)/60 << ":" << std::setw(2) << std::setfill('0') << (leftcert%3600)%60 << "\n\n";
+      }
+    }
+    std::cout << "=== Proxy Information ===\n";
+  }
+ 
+  if (defaultinfo || all || text) {
     std::cout << "subject   : " << X509_NAME_oneline(X509_get_subject_name(cert), NULL, 0) << "\n";
     std::cout << "issuer    : " << X509_NAME_oneline(X509_get_issuer_name(cert), NULL, 0) << "\n";
     std::cout << "identity  : " << X509_NAME_oneline(X509_get_issuer_name(cert), NULL, 0) << "\n";
@@ -523,7 +566,18 @@ static bool print(X509 *cert, vomsdata &vd)
     std::cout << leftcert << "\n";
 
   if(text) {
-    X509_print_fp(stdout, cert);
+    X509 *tmp = (X509 *)ASN1_dup((int (*)())i2d_X509,
+				   (char * (*)())d2i_X509, (char*)cert);
+    X509_print_fp(stdout, tmp);
+
+    if (dochain) {
+      for (int start = sk_X509_num(chain)-1; start >= 1; start--) {
+	X509 *tmp = sk_X509_value(chain, start);
+	X509 *cert = (X509 *)ASN1_dup((int (*)())i2d_X509,
+				      (char * (*)())d2i_X509, (char*)tmp);
+	X509_print_fp(stdout, cert);
+      }
+    }
   }
 
   for (std::vector<voms>::iterator v = vd.data.begin(); v != vd.data.end(); v++) {
@@ -683,4 +737,103 @@ static time_t stillvalid(ASN1_TIME *ctm)
 #endif
 
   return newtime;
+}
+
+static int InitProxyCertInfoExtension(void)
+{
+
+#define PROXYCERTINFO_V3      "1.3.6.1.4.1.3536.1.222"
+#define PROXYCERTINFO_V4      "1.3.6.1.5.5.7.1.14"
+#define OBJC(c,n) OBJ_create(c,n,#c)
+#define IMPERSONATION_PROXY_OID         "1.3.6.1.5.5.7.21.1"
+#define INDEPENDENT_PROXY_OID           "1.3.6.1.5.5.7.21.2"
+#define GLOBUS_GSI_PROXY_GENERIC_POLICY_OID "1.3.6.1.4.1.3536.1.1.1.8"
+#define LIMITED_PROXY_OID               "1.3.6.1.4.1.3536.1.1.1.9"
+
+  X509V3_EXT_METHOD *pcert;
+
+  /* Proxy Certificate Extension's related objects */
+//   OBJC(myPROXYCERTINFO_V3, "myPROXYCERTINFO_V3");
+//   OBJC(myPROXYCERTINFO_V4, "myPROXYCERTINFO_V4");
+//   OBJC(IMPERSONATION_PROXY_OID, "IMPERSONATION_PROXY_OID");
+//   OBJC(INDEPENDENT_PROXY_OID, "INDEPENDENT PROXY_OID");
+//   OBJC(GLOBUS_GSI_PROXY_GENERIC_POLICY_OID, "GLOBUS_GSI_PROXY_GENERIC_POLICY_OID");
+//   OBJC(LIMITED_PROXY_OID, "LIMITED_PROXY_OID");
+
+  pcert = (X509V3_EXT_METHOD *)OPENSSL_malloc(sizeof(X509V3_EXT_METHOD));
+
+  if (pcert) {
+    pcert->ext_nid = OBJ_txt2nid("PROXYCERTINFO_V3");
+#ifndef NOGLOBUS
+#ifdef HAVE_X509V3_EXT_METHOD_IT
+    pcert->it = NULL;
+#endif
+#else
+#ifdef HAVE_X509V3_EXT_METHOD_IT_OPENSSL
+    pcert->it = NULL;
+#endif
+#endif
+    pcert->ext_flags = 0;
+    pcert->ext_new  = (X509V3_EXT_NEW) myPROXYCERTINFO_new;
+    pcert->ext_free = (X509V3_EXT_FREE)myPROXYCERTINFO_free;
+    pcert->d2i      = (X509V3_EXT_D2I) d2i_myPROXYCERTINFO;
+    pcert->i2d      = (X509V3_EXT_I2D) i2d_myPROXYCERTINFO;
+    pcert->i2s      = (X509V3_EXT_I2S) myproxycertinfo_i2s;
+    pcert->s2i      = (X509V3_EXT_S2I) myproxycertinfo_s2i;
+    pcert->v2i      = (X509V3_EXT_V2I) NULL;
+    pcert->r2i      = (X509V3_EXT_R2I) NULL;
+    pcert->i2v      = (X509V3_EXT_I2V) NULL;
+    pcert->i2r      = (X509V3_EXT_I2R) NULL;
+
+    X509V3_EXT_add(pcert);
+  }
+
+  pcert = (X509V3_EXT_METHOD *)OPENSSL_malloc(sizeof(X509V3_EXT_METHOD));
+
+  if (pcert) {
+    pcert->ext_nid = OBJ_txt2nid("PROXYCERTINFO_V4");
+#ifndef NOGLOBUS
+#ifdef HAVE_X509V3_EXT_METHOD_IT
+    pcert->it = NULL;
+#endif
+#else
+#ifdef HAVE_X509V3_EXT_METHOD_IT_OPENSSL
+    pcert->it = NULL;
+#endif
+#endif
+    pcert->ext_flags = 0;
+    pcert->ext_new  = (X509V3_EXT_NEW) myPROXYCERTINFO_new;
+    pcert->ext_free = (X509V3_EXT_FREE)myPROXYCERTINFO_free;
+    pcert->d2i      = (X509V3_EXT_D2I) d2i_myPROXYCERTINFO;
+    pcert->i2d      = (X509V3_EXT_I2D) i2d_myPROXYCERTINFO;
+    pcert->i2s      = (X509V3_EXT_I2S) myproxycertinfo_i2s;
+    pcert->s2i      = (X509V3_EXT_S2I) myproxycertinfo_s2i;
+    pcert->v2i      = (X509V3_EXT_V2I) NULL;
+    pcert->r2i      = (X509V3_EXT_R2I) NULL;
+    pcert->i2v      = (X509V3_EXT_I2V) NULL;
+    pcert->i2r      = (X509V3_EXT_I2R) NULL;
+
+    X509V3_EXT_add(pcert);
+  }
+}
+
+static void *myproxycertinfo_s2i(struct v3_ext_method *method, struct v3_ext_ctx *ctx, char *data)
+{
+  return (myPROXYCERTINFO*)data;
+}
+
+static char *myproxycertinfo_i2s(struct v3_ext_method *method, void *ext)
+{
+  return norep();
+}
+
+static char *norep()
+{
+  static char *buffer="";
+
+/*   buffer=malloc(1); */
+/*   if (buffer) */
+/*     *buffer='\0'; */
+  return buffer;
+
 }

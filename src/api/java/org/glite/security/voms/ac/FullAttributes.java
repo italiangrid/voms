@@ -13,24 +13,16 @@
  *********************************************************************/
 package org.glite.security.voms.ac;
 
+import java.util.Enumeration;
+import java.util.List;
+import java.util.ListIterator;
+import java.util.Vector;
+
 import org.bouncycastle.asn1.ASN1Sequence;
-//import org.bouncycastle.asn1.ASN1TaggedObject;
-//import org.bouncycastle.asn1.ASN1OctetString;
 import org.bouncycastle.asn1.DEREncodable;
 import org.bouncycastle.asn1.DEREncodableVector;
 import org.bouncycastle.asn1.DERObject;
-//import org.bouncycastle.asn1.DERObjectIdentifier;
-//import org.bouncycastle.asn1.DEROctetString;
 import org.bouncycastle.asn1.DERSequence;
-//import org.bouncycastle.asn1.DERTaggedObject;
-//import org.bouncycastle.asn1.DERUniversalString;
-//import org.bouncycastle.asn1.x509.GeneralNames;
-
-import java.util.Enumeration;
-//import java.util.Iterator;
-import java.util.List;
-import java.util.Vector;
-import java.util.ListIterator;
 
 /**
  * This class represents the GenericAttributes extension which may be found

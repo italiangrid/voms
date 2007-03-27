@@ -46,19 +46,10 @@
 
 package org.glite.security.voms;
 
-import org.apache.log4j.Logger;
-
-import org.glite.security.voms.ac.ACTrustStore;
-
-import org.bouncycastle.jce.provider.BouncyCastleProvider;
-
 import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
-
-//import java.security.KeyStore;
-//import java.security.PrivateKey;
 import java.security.Provider;
 import java.security.Security;
 import java.security.cert.CRLException;
@@ -68,7 +59,6 @@ import java.security.cert.CertificateParsingException;
 import java.security.cert.TrustAnchor;
 import java.security.cert.X509CRL;
 import java.security.cert.X509Certificate;
-
 import java.util.Arrays;
 import java.util.Hashtable;
 import java.util.Iterator;
@@ -78,6 +68,10 @@ import java.util.TimerTask;
 import java.util.Vector;
 
 import javax.security.auth.x500.X500Principal;
+
+import org.apache.log4j.Logger;
+import org.bouncycastle.jce.provider.BouncyCastleProvider;
+import org.glite.security.voms.ac.ACTrustStore;
 
 /** Lists all the files in the given directory that end with
  * a certain ending.
@@ -686,7 +680,7 @@ class DirectoryList {
  */
 public final class BasicVOMSTrustStore implements ACTrustStore {
     static Logger log = Logger.getLogger(BasicVOMSTrustStore.class);
-    public static final String DEFAULT_TRUST_STORE_LISTING = "/etc/grid-security/vomsdir/";
+    public static final String DEFAULT_TRUST_STORE_LISTING = PKIStore.DEFAULT_VOMSDIR;
     String trustedDirList = null;
     private Hashtable issuerCerts = new Hashtable();
     private long refreshPeriod = -1;

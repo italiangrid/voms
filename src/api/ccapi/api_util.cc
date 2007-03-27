@@ -64,8 +64,8 @@ extern "C" {
 
 #include "realdata.h"
 
-static bool check_sig_ac(X509 *, void *, verror_type &);
 static bool dncompare(const std::string &mut, const std::string &fixed);
+static bool readdn(std::ifstream &file, char *buffer, int buflen);
 
 
 static bool dncompare(const std::string &first, const std::string &second)
@@ -542,6 +542,9 @@ static bool readdn(std::ifstream &file, char *buffer, int buflen)
 
   int len = 0;
 
+  if (!file)
+    return false;
+
   do {
     file.getline(buffer, buflen -1);
     if (!file)
@@ -603,6 +606,8 @@ static bool readdn(std::ifstream &file, char *buffer, int buflen)
     buffer[len]='\0';
 
   } while (len == 0);
+
+  return true;
 }
 
 

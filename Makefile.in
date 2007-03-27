@@ -144,6 +144,7 @@ INSTALL_PROGRAM = @INSTALL_PROGRAM@
 INSTALL_SCRIPT = @INSTALL_SCRIPT@
 INSTALL_STRIP_PROGRAM = @INSTALL_STRIP_PROGRAM@
 JAVA_CLASSPATH = @JAVA_CLASSPATH@
+JAVA_CLASSPATH2 = @JAVA_CLASSPATH2@
 JAVA_INCLUDES = @JAVA_INCLUDES@
 JHOME = @JHOME@
 LDFLAGS = @LDFLAGS@
@@ -773,6 +774,9 @@ distbin:
 
 testsuite-run:
 	cd test; $(MAKE) testsuite-run; cd ..
+
+gtags:
+	rm -f G*; gtags
 
 tags:
 	rm -f TAGS; find . '(' '(' -name '*.c' -o -name '*.h' -o -name '*.cpp' -o -name '*.hpp' -o -name '*.cc' ')' -a -not -path '*/test/*' ')' -exec etags -a '{}' ';'

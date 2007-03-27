@@ -18,7 +18,10 @@
 	<project name="gLite Security VOMS configure options">                                                                        
 	<property name="with.log4j.path" refid="ext.log4j.classpath" />  
 	<property name="with.bc.path" refid="ext.bcprov-jdk14.classpath" />
+  <property name="with.commons-lang.path" refid="ext.commons-lang.classpath" />
+  <property name="with.commons-cli.path" refid="ext.commons-cli.classpath" />
+  <property name="with.jglobus.path" refid="ext.jglobus.classpath" />
 
         <property name="configure.args"
-	       value="--prefix=${workspace.abs.dir}/stage --with-globus-prefix=${with.globus.prefix} --with-expat-prefix=${with.expat.prefix} --with-glite-location=${with.glite.location} --with-dist-location=${with.dist.location} --with-cppunit-prefix=${with.cppunit.prefix} --enable-glite=yes --enable-java=yes --with-log4j=${with.log4j.path} --with-bc=${with.bc.path}"/>
+	       value="--prefix=${workspace.abs.dir}/stage --with-globus-prefix=${with.globus.prefix} --with-expat-prefix=${with.expat.prefix} --with-glite-location=${with.glite.location} --with-dist-location=${with.dist.location} --with-cppunit-prefix=${with.cppunit.prefix} --enable-glite=yes --enable-java=yes --with-log4j=${with.log4j.path} --with-bc=${with.bc.path} --with-commons-cli=${with.commons-cli.path} --with-commons-lang=${with.commons-lang.path} --with-cog=${with.jglobus.path}"/>
 	</project>

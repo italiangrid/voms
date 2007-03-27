@@ -6,43 +6,15 @@
 
 package org.glite.security.voms.ac;
 
-import org.glite.security.voms.PKIUtils;
-
-import org.apache.log4j.Logger;
-
-import org.bouncycastle.asn1.ASN1EncodableVector;
-import org.bouncycastle.asn1.ASN1Sequence;
-import org.bouncycastle.asn1.ASN1TaggedObject;
-import org.bouncycastle.asn1.DERBitString;
-import org.bouncycastle.asn1.DERConstructedSet;
-import org.bouncycastle.asn1.DEREncodable;
-import org.bouncycastle.asn1.DERGeneralizedTime;
-import org.bouncycastle.asn1.DERInputStream;
-import org.bouncycastle.asn1.DERObject;
-import org.bouncycastle.asn1.DERObjectIdentifier;
-import org.bouncycastle.asn1.DEROutputStream;
-import org.bouncycastle.asn1.DERSequence;
-import org.bouncycastle.asn1.DERInteger;
-import org.bouncycastle.asn1.x509.AlgorithmIdentifier;
-import org.bouncycastle.asn1.x509.AttCertValidityPeriod;
-import org.bouncycastle.asn1.x509.GeneralName;
-import org.bouncycastle.asn1.x509.GeneralNames;
-import org.bouncycastle.asn1.x509.X509Extensions;
-
-import org.bouncycastle.jce.X509Principal;
-
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-
 import java.security.PublicKey;
 import java.security.Signature;
-
 import java.security.cert.X509Certificate;
-
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-
+import java.util.Calendar;
 import java.util.Collections;
 import java.util.Date;
 import java.util.Enumeration;
@@ -51,6 +23,29 @@ import java.util.SimpleTimeZone;
 import java.util.Vector;
 
 import javax.security.auth.x500.X500Principal;
+
+import org.apache.log4j.Logger;
+import org.bouncycastle.asn1.ASN1EncodableVector;
+import org.bouncycastle.asn1.ASN1Sequence;
+import org.bouncycastle.asn1.ASN1TaggedObject;
+import org.bouncycastle.asn1.DERBitString;
+import org.bouncycastle.asn1.DERConstructedSet;
+import org.bouncycastle.asn1.DEREncodable;
+import org.bouncycastle.asn1.DERGeneralizedTime;
+import org.bouncycastle.asn1.DERInputStream;
+import org.bouncycastle.asn1.DERInteger;
+import org.bouncycastle.asn1.DERObject;
+import org.bouncycastle.asn1.DERObjectIdentifier;
+import org.bouncycastle.asn1.DEROutputStream;
+import org.bouncycastle.asn1.DERSequence;
+import org.bouncycastle.asn1.x509.AlgorithmIdentifier;
+import org.bouncycastle.asn1.x509.AttCertValidityPeriod;
+import org.bouncycastle.asn1.x509.GeneralName;
+import org.bouncycastle.asn1.x509.GeneralNames;
+import org.bouncycastle.asn1.x509.X509Extensions;
+import org.bouncycastle.jce.X509Principal;
+import org.glite.security.voms.PKIUtils;
+
 
 
 /**
@@ -342,13 +337,25 @@ public class AttributeCertificate implements DEREncodable {
         if (date == null) {
             date = new Date();
         }
-
-        try {
-            return getDate(validity.getNotAfterTime()).after(date) &&
-            getDate(validity.getNotBeforeTime()).before(date);
+        
+        try{
+        
+            Calendar notAfter = Calendar.getInstance();
+            Calendar notBefore = Calendar.getInstance();
+            
+            notAfter.setTime( getDate( validity.getNotAfterTime() ));
+            notAfter.setTime( getDate( validity.getNotBeforeTime() ));
+            
+            // 5 "academic" minutes tolerance 
+            notAfter.add( Calendar.MINUTE, 5);
+            notBefore.add( Calendar.MINUTE, -5);
+            
+            return notAfter.getTime().after( date ) && notBefore.getTime().before( date );
+        
         } catch (ParseException e) {
             throw new IllegalArgumentException("Invalid validity encoding in Attribute Certificate");
         }
+        
     }
 
     /**

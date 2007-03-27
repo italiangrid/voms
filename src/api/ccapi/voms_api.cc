@@ -170,7 +170,8 @@ vomsdata::vomsdata(std::string voms_dir, std::string cert_dir) :  ca_cert_dir(ce
                                                                   error(VERR_NONE),
                                                                   workvo(""),
                                                                   extra_data(""),
-                                                                  ver_type(VERIFY_FULL)
+                                                                  ver_type(VERIFY_FULL),
+                                                                  retry_count(1)
 {
   if (voms_cert_dir.empty()) {
     char *v;
@@ -356,30 +357,35 @@ bool vomsdata::Contact(std::string hostname, int port, std::string servsubject, 
   bool result = false;
   int version;
 
-  if (ContactRaw(hostname, port, servsubject, command, message, version)) {
+  for (int i=0; i < retry_count; ++i)
+  {
+    if (ContactRaw(hostname, port, servsubject, command, message, version)) {
 
-    X509 *holder = get_own_cert();
+      X509 *holder = get_own_cert();
 
-    if (holder) {
-      error = VERR_NONE;
-      c = X509_NAME_oneline(X509_get_issuer_name(holder), NULL,  0);
-      s = X509_NAME_oneline(X509_get_subject_name(holder), NULL, 0);
+      if (holder) {
+        error = VERR_NONE;
+        c = X509_NAME_oneline(X509_get_issuer_name(holder), NULL,  0);
+        s = X509_NAME_oneline(X509_get_subject_name(holder), NULL, 0);
       
-      if (c && s) {
-        ca = std::string(c);
-        subject = std::string(s);
+        if (c && s) {
+          ca = std::string(c);
+          subject = std::string(s);
     
-        voms v;
-  
-        result = verifydata(message, subject, ca, holder, v);
+          voms v;
+          
+          result = verifydata(message, subject, ca, holder, v);
 	
-        if (result)
-          data.push_back(v);
+          if (result)
+            data.push_back(v);
+        }
+        X509_free(holder);
       }
-      X509_free(holder);
+      else
+        seterror(VERR_NOIDENT, "Cannot discover own credentials.");
+      
+      break;
     }
-    else
-      seterror(VERR_NOIDENT, "Cannot discover own credentials.");
   }
   
   free(c);
@@ -921,8 +927,11 @@ vomsdata::vomsdata(const vomsdata &orig) : ca_cert_dir(orig.ca_cert_dir),
                                            serverrors(orig.serverrors),
                                            errmessage(orig.errmessage) {}
 
-
-
 int getMajorVersionNumber(void) {return 1;}
 int getMinorVersionNumber(void) {return 7;}
 int getPatchVersionNumber(void) {return 0;}
+
+void vomsdata::SetRetryCount(int retryCount)
+{
+  retry_count = retryCount;
+}

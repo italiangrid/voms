@@ -47,7 +47,7 @@ extern "C" {
 
 extern "C" {
 
-#include "proxycertinfo.h"
+#include "myproxycertinfo.h"
 
 }
 
@@ -599,8 +599,8 @@ bool Fake::CreateProxy(std::string data, std::string filedata, AC ** aclist, BIG
     int                                 derlen;
     unsigned char *                     pp;
     int                                 w;
-    PROXYPOLICY *                       proxypolicy;
-    PROXYCERTINFO *                     proxycertinfo;
+    myPROXYPOLICY *                       proxypolicy;
+    myPROXYCERTINFO *                     proxycertinfo;
     ASN1_OBJECT *                       policy_language;
     
     
@@ -655,29 +655,29 @@ bool Fake::CreateProxy(std::string data, std::string filedata, AC ** aclist, BIG
     
     /* proxypolicy */
     
-    proxypolicy = PROXYPOLICY_new();
+    proxypolicy = myPROXYPOLICY_new();
     if (policy.size()>0)
-      PROXYPOLICY_set_policy(proxypolicy, (unsigned char *)policy.c_str(), policy.size());
-    PROXYPOLICY_set_policy_language(proxypolicy, policy_language);
+      myPROXYPOLICY_set_policy(proxypolicy, (unsigned char *)policy.c_str(), policy.size());
+    myPROXYPOLICY_set_policy_language(proxypolicy, policy_language);
 
     /* proxycertinfo */
     
-    proxycertinfo = PROXYCERTINFO_new();
-    PROXYCERTINFO_set_proxypolicy(proxycertinfo, proxypolicy);
+    proxycertinfo = myPROXYCERTINFO_new();
+    myPROXYCERTINFO_set_proxypolicy(proxycertinfo, proxypolicy);
     if (pathlength>=0) {
-      PROXYCERTINFO_set_path_length(proxycertinfo, pathlength);
+      myPROXYCERTINFO_set_path_length(proxycertinfo, pathlength);
     }
     
     /* 2der conversion */
     
-    derlen = i2d_PROXYCERTINFO(proxycertinfo, NULL);
+    derlen = i2d_myPROXYCERTINFO(proxycertinfo, NULL);
     der = (unsigned char *)malloc(derlen);
     pp = der;
-    w = i2d_PROXYCERTINFO(proxycertinfo, &pp);
+    w = i2d_myPROXYCERTINFO(proxycertinfo, &pp);
     
     std::string tmp = (char *)der;
     
-    if ((ex7 = CreateProxyExtension("PROXYCERTINFO", tmp, true)) == NULL) {
+    if ((ex7 = CreateProxyExtension("myPROXYCERTINFO", tmp, true)) == NULL) {
       PRXYerr(PRXYERR_F_PROXY_SIGN, PRXYERR_R_CLASS_ADD_EXT);
       goto err;
     }

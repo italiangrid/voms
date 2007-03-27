@@ -273,18 +273,19 @@ int writeac(X509 *issuerc, STACK_OF(X509) *issuerstack, X509 *holder, EVP_PKEY *
 /*     fprintf(stderr, "stk[%i] = %d\n", i , sk_X509_value(stk, i)); */
 
   certstack = X509V3_EXT_conf_nid(NULL, NULL, OBJ_txt2nid("certseq"), (char*)stk);
-  //  sk_X509_free(stk);
+  /*  sk_X509_free(stk);*/
   sk_X509_pop_free(stk, X509_free);
 
   /* Create extensions */
   norevavail=X509V3_EXT_conf_nid(NULL, NULL, OBJ_txt2nid("idcenoRevAvail"), "loc");
   if (!norevavail)
     ERROR(AC_ERR_NO_EXTENSION);
-/*   X509_EXTENSION_set_critical(norevavail, 0); */
+  X509_EXTENSION_set_critical(norevavail, 0); 
 
   auth = X509V3_EXT_conf_nid(NULL, NULL, OBJ_txt2nid("authKeyId"), (char *)issuerc);
   if (!auth)
     ERROR(AC_ERR_NO_EXTENSION);
+  X509_EXTENSION_set_critical(auth, 0); 
 
   if (t) {
     targets=X509V3_EXT_conf_nid(NULL, NULL, OBJ_txt2nid("idceTargets"), t);

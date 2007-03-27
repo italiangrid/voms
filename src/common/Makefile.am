@@ -31,13 +31,18 @@ libutilc_la_SOURCES = \
 AM_CPPFLAGS = \
 	-I $(top_srcdir)/src/include \
 	-I $(top_srcdir)/src/sslutils \
+	$(EXPAT_CFLAGS) \
 	$(GLOBUS_CFLAGS)
+
+AM_LDFLAGS = \
+	$(EXPAT_LIBS)
 
 libutilc_nog_la_CPPFLAGS = \
 	$(NO_GLOBUS_FLAGS) \
 	-DNOGLOBUS \
 	-I $(top_srcdir)/src/include \
 	-I $(top_srcdir)/src/sslutils \
+	$(EXPAT_CFLAGS) \
 	$(GLOBUS_CFLAGS)
 
 libutilc_nog_la_SOURCES = \

@@ -15,69 +15,58 @@
 
 package org.glite.security.voms;
 
-import org.apache.log4j.Logger;
-
-import java.nio.ByteBuffer;
-//import java.nio.ByteOrder;
-
-import java.security.cert.X509CRL;
-import java.security.cert.X509Certificate;
-import java.security.NoSuchAlgorithmException;
-import java.security.MessageDigest;
-import java.security.cert.CRLException;
-import java.security.cert.CertificateException;
-import java.security.cert.CertificateFactory;
-import java.security.NoSuchProviderException;
-import java.security.Principal;
-//import java.security.Provider;
-import java.security.Security;
-
-import javax.security.auth.x500.X500Principal;
-
-import org.bouncycastle.asn1.x509.X509Name;
-import org.bouncycastle.asn1.x509.AuthorityKeyIdentifier;
-import org.bouncycastle.asn1.x509.SubjectKeyIdentifier;
-import org.bouncycastle.asn1.x509.BasicConstraints;
-import org.bouncycastle.asn1.x509.GeneralName;
-import org.bouncycastle.asn1.x509.GeneralNames;
-//import org.bouncycastle.asn1.x509.X509Extensions;
-//import org.bouncycastle.asn1.DERTags;
-import org.bouncycastle.asn1.ASN1InputStream;
-import org.bouncycastle.asn1.ASN1OctetString;
-import org.bouncycastle.asn1.ASN1Sequence;
-//import org.bouncycastle.asn1.DERSequence;
-//import org.bouncycastle.asn1.DEREncodable;
-import org.bouncycastle.asn1.DERObjectIdentifier;
-import org.bouncycastle.asn1.DERObject;
-import org.bouncycastle.asn1.ASN1TaggedObject;
-import org.bouncycastle.asn1.DERTaggedObject;
-import org.bouncycastle.asn1.DERInteger;
-import org.bouncycastle.asn1.DEROctetString;
-import org.bouncycastle.asn1.DERBitString;
-import org.bouncycastle.asn1.ASN1OutputStream;
-
-import org.bouncycastle.jce.X509Principal;
-
-import org.bouncycastle.jce.provider.BouncyCastleProvider;
-
-import java.util.regex.Pattern;
-import java.util.regex.Matcher;
-
 import java.io.BufferedInputStream;
+import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.ByteArrayInputStream;
 import java.io.FileNotFoundException;
-
-import java.util.List;
-import java.util.Vector;
-import java.util.ListIterator;
-//import java.util.Iterator;
-import java.util.Arrays;
-
+import java.io.IOException;
 import java.math.BigInteger;
+import java.nio.ByteBuffer;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
+import java.security.NoSuchProviderException;
+import java.security.Principal;
+import java.security.Security;
+import java.security.cert.CRLException;
+import java.security.cert.CertificateException;
+import java.security.cert.CertificateFactory;
+import java.security.cert.X509CRL;
+import java.security.cert.X509Certificate;
+import java.security.cert.Certificate;
+import java.util.Arrays;
+import java.util.List;
+import java.util.ListIterator;
+import java.util.Vector;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
+import javax.security.auth.x500.X500Principal;
+
+import org.apache.log4j.Logger;
+import org.bouncycastle.asn1.ASN1InputStream;
+import org.bouncycastle.asn1.ASN1OctetString;
+import org.bouncycastle.asn1.ASN1OutputStream;
+import org.bouncycastle.asn1.ASN1Sequence;
+import org.bouncycastle.asn1.ASN1TaggedObject;
+import org.bouncycastle.asn1.DERBitString;
+import org.bouncycastle.asn1.DERInteger;
+import org.bouncycastle.asn1.DERObject;
+import org.bouncycastle.asn1.DERObjectIdentifier;
+import org.bouncycastle.asn1.DEROctetString;
+import org.bouncycastle.asn1.DERTaggedObject;
+import org.bouncycastle.asn1.DERInputStream;
+import org.bouncycastle.asn1.x509.AuthorityKeyIdentifier;
+import org.bouncycastle.asn1.x509.BasicConstraints;
+import org.bouncycastle.asn1.x509.GeneralName;
+import org.bouncycastle.asn1.x509.GeneralNames;
+import org.bouncycastle.asn1.x509.SubjectKeyIdentifier;
+import org.bouncycastle.asn1.x509.X509Name;
+import org.bouncycastle.asn1.x509.X509CertificateStructure;
+import org.bouncycastle.jce.X509Principal;
+import org.bouncycastle.jce.provider.BouncyCastleProvider;
+import org.bouncycastle.jce.provider.X509CertificateObject;
 
 public class PKIUtils {
     private static final Pattern emailPattern = Pattern.compile("/emailaddress", Pattern.CASE_INSENSITIVE);
@@ -97,22 +86,22 @@ public class PKIUtils {
     private static final int keyCertSign = 5;
     private static final int digitalSignature = 0;
 
-    private static Logger logger = Logger.getLogger(PKIUtils.class.getName());
+    private static final Logger logger = Logger.getLogger(PKIUtils.class);
 
-    static {
+     static {
         if (Security.getProvider("BC") == null) {
             Security.addProvider(new BouncyCastleProvider());
         }
         try {
             factory = CertificateFactory.getInstance("X.509", "BC");
         }
-        catch (NoSuchProviderException e) {
-            throw new ExceptionInInitializerError("Cannot find BouncyCastle provider: " + e.getMessage());
-        }
-        catch (CertificateException e) {
-            throw new ExceptionInInitializerError("X.509 Certificates unsupported. " + e.getMessage());
-        }
-    }
+         catch (NoSuchProviderException e) {
+             throw new ExceptionInInitializerError("Cannot find BouncyCastle provider: " + e.getMessage());
+         }
+         catch (CertificateException e) {
+             throw new ExceptionInInitializerError("X.509 Certificates unsupported. " + e.getMessage());
+         }
+     }
 
     /**
      * Gets the MD5 hash value of the subject of the given certificate.
@@ -270,7 +259,7 @@ public class PKIUtils {
 
     /**
      * Compares two DNs for equality, taking into account different
-     * representations for the Emaail and UserID tags.
+     * representations for the Email and UserID tags.
      *
      * @param dn1 the first dn to compare.
      * @param dn2 the second dn to compare
@@ -420,7 +409,7 @@ public class PKIUtils {
                 logger.debug("akid = " + akid);
 
             if (akid != null) {
-                logger.info("Authority Key Identifier extension found in issued certificate.");
+                logger.debug("Authority Key Identifier extension found in issued certificate.");
 
                 logger.debug("Entered.");
                 SubjectKeyIdentifier skid = PKIUtils.getSKID(issuer);
@@ -429,8 +418,8 @@ public class PKIUtils {
                     logger.debug("sid = " + skid);
 
                 if (skid != null) {
-                    logger.info("subject Key Identifier extensions found in issuer certificate.");
-                    logger.info("comparing skid to akid");
+                    logger.debug("subject Key Identifier extensions found in issuer certificate.");
+                    logger.debug("comparing skid to akid");
 
                     byte[] skidValue = skid.getKeyIdentifier();
                     if (logger.isDebugEnabled()) {
@@ -460,52 +449,63 @@ public class PKIUtils {
                 }
 
                 BigInteger sn = getAuthorityCertificateSerialNumber(akid);
+//
+//                if (sn == null) {
+//                    logger.error("Serial number missing from Authority Key Identifier");
+//                    return false;
+//                }
+//
+//                if (!sn.equals(issuer.getSerialNumber())) {
+//                    logger.error("Serial number in Authority Key Identifier and in issuer certificate do not match");
+//                    logger.error("From akid              : " + sn.toString());
+//                    logger.error("From issuer certificate: " + issuer.getSerialNumber());
+//                    return false;
+//                }
 
-                if (sn == null) {
-                    logger.error("Serial number missing from Authority Key Identifier");
-                    return false;
-                }
-
-                if (!sn.equals(issuer.getSerialNumber())) {
+                if (sn != null && !sn.equals(issuer.getSerialNumber())) {
                     logger.error("Serial number in Authority Key Identifier and in issuer certificate do not match");
                     logger.error("From akid              : " + sn.toString());
                     logger.error("From issuer certificate: " + issuer.getSerialNumber());
                     return false;
                 }
 
-                GeneralName names[] = getNames(getAuthorityCertIssuer(akid));
+                GeneralNames gns = getAuthorityCertIssuer(akid);
 
-                //                System.out.println("GOT CERTISSUER");
+                if (gns != null) {
+                    GeneralName names[] = getNames(gns);
 
-                int i = 0;
-                //                System.out.println("SIZE = " + names.length);
-                while (i < names.length) {
-                    //                    System.out.println("NAME = " + names[i].getName());
-                    //                    System.out.println("TAG IS: " + names[i].getTagNo());
-                    if (names[i].getTagNo() == 4) {
-                        DERObject dobj = names[i].getName().getDERObject();
-                        ByteArrayOutputStream baos = null;
-                        ASN1OutputStream aos = null;
-                        //                        System.out.println("Inside tag 4");
-                        try {
-                            baos = new ByteArrayOutputStream();
-                            aos = new ASN1OutputStream(baos);
-                            aos.writeObject(dobj);
-                            aos.flush();
-                        }
-                        catch (IOException e) {
-                            logger.error("Error in encoding of Authority Key Identifier." + e.getMessage());
-                            return false;
-                        }
-                        X500Principal principal = new X500Principal(baos.toByteArray());
-                        //                        System.out.println("PRINCIPAL: " + principal);
-                        if (issuerSubject.equals(principal)) {
-                            logger.debug("PASSED");
-                            break;
-                        }
-                        else {
-                            logger.error("Issuer Subject not found among Authority Key Identifier's Certifiacte Issuers.");
-                            return false;
+                    //                System.out.println("GOT CERTISSUER");
+
+                    int i = 0;
+                    //                System.out.println("SIZE = " + names.length);
+                    while (i < names.length) {
+                        //                    System.out.println("NAME = " + names[i].getName());
+                        //                    System.out.println("TAG IS: " + names[i].getTagNo());
+                        if (names[i].getTagNo() == 4) {
+                            DERObject dobj = names[i].getName().getDERObject();
+                            ByteArrayOutputStream baos = null;
+                            ASN1OutputStream aos = null;
+                            //                        System.out.println("Inside tag 4");
+                            try {
+                                baos = new ByteArrayOutputStream();
+                                aos = new ASN1OutputStream(baos);
+                                aos.writeObject(dobj);
+                                aos.flush();
+                            }
+                            catch (IOException e) {
+                                logger.error("Error in encoding of Authority Key Identifier." + e.getMessage());
+                                return false;
+                            }
+                            X500Principal principal = new X500Principal(baos.toByteArray());
+                            //                        System.out.println("PRINCIPAL: " + principal);
+                            if (issuerSubject.equals(principal)) {
+                                logger.debug("PASSED");
+                                break;
+                            }
+                            else {
+                                logger.error("Issuer Subject not found among Authority Key Identifier's Certifiacte Issuers.");
+                                return false;
+                            }
                         }
                     }
                 }
@@ -523,7 +523,7 @@ public class PKIUtils {
             return true;
 
         }
-        logger.info("Check Issued failed.");
+        logger.debug("Check Issued failed.");
         return false;
     }
 
@@ -581,11 +581,11 @@ public class PKIUtils {
 
         int isCA = cert.getBasicConstraints();
         if (isCA == -1) {
-            logger.info("Is CA");
+            logger.debug("Is CA");
             return false;
         }
          
-        logger.info("Is not CA");
+        logger.debug("Is not CA");
         return true;
     }
 
@@ -606,8 +606,10 @@ public class PKIUtils {
 
         byte[] proxy = cert.getExtensionValue(PROXYCERTINFO);
         byte[] proxy_old = cert.getExtensionValue(PROXYCERTINFO_OLD);
-        if (proxy != null || proxy_old != null)
+        if (proxy != null || proxy_old != null) {
+            logger.debug("Proxyness confirmed.");
             return true;
+        }
 
         String subject = cert.getSubjectX500Principal().getName();
         String issuer = cert.getIssuerX500Principal().getName();
@@ -621,8 +623,10 @@ public class PKIUtils {
 
             logger.debug("TO CHECK: " + s);
 
-            if (s.equals("CN=proxy,") || s.equals("CN=limited proxy,"))
+            if (s.equals("CN=proxy,") || s.equals("CN=limited proxy,")) {
+                logger.debug("Proxyness confirmed.");
                 return true;
+            }
         }
 
         return false;
@@ -808,6 +812,11 @@ public class PKIUtils {
 
         while ((type = skipToCertBeginning(bis)) != -1) {
             if (type == CERT) {
+//                 Certificate cert = factory.generateCertificate(bis);
+//                 byte[] data = cert.getEncoded();
+//                 ASN1Sequence seq = (ASN1Sequence) new DERInputStream(new ByteArrayInputStream(data)).readObject();
+//                 data = new X509CertificateObject(X509CertificateStructure.getInstance(seq)).getEncoded();
+//                 certificates.add((X509Certificate)factory.generateCertificate(new ByteArrayInputStream(data)));
                 certificates.add(factory.generateCertificate(bis));
             }
         }

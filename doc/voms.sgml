@@ -51,7 +51,7 @@
 <arg choice='opt'><arg choice='plain'>--socktimeout <replaceable>num</replaceable></arg></arg>
 <arg choice='opt'><arg choice='plain'>--maxlog <replaceable>num</replaceable></arg></arg>
 <arg choice='opt'><arg choice='plain'>--newformat</arg></arg>
-
+<arg choice='opt'><arg choice='plain'>--skipcacheck</arg></arg>
 
 
 </cmdsynopsis>
@@ -244,6 +244,19 @@ amount is surpassed, logfiles are rotated. The default is 10Mb</para>
 <para>This forces the server to generate ACs in the new (correct) format.  This is meant
 as a compatibility feature to ease migration while the servers upgrade to the new version.</para>
 
+<para><option>-skipcacheck</option></para>
+<para>This option, if specified,  forces voms to drop some of the checks 
+done as the authorization step before AC creation.  Specifically, voms will no
+longer be capable of distinguishing to certificates with the same DN but
+different issuers.
+
+For obvious reasons, use of this option is discouraged.
+
+Note also that activating this option requires a previous check by the voms
+server administrator that there are no certificates registered in the DB
+which the same DN and different issuers.  If there are, the result of a 
+voms-proxy-init command for one of those users will be unpredictable.
+</para>
 </refsect1>
 
 &bugzilla;

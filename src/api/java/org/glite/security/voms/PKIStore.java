@@ -15,37 +15,16 @@
 
 package org.glite.security.voms;
 
-import org.apache.log4j.Logger;
-//import org.apache.log4j.BasicConfigurator;
-
-import org.bouncycastle.jce.provider.BouncyCastleProvider;
-//import org.bouncycastle.asn1.x509.X509Extensions;
-//import org.bouncycastle.asn1.x509.X509Extension;
-//import org.bouncycastle.asn1.DERObjectIdentifier;
-
-//import java.io.BufferedInputStream;
 import java.io.File;
-//import java.io.FileInputStream;
-import java.io.IOException;
-//import java.io.LineNumberReader;
-//import java.io.FileReader;
 import java.io.FileNotFoundException;
-
-//import java.security.KeyStore;
-//import java.security.PublicKey;
+import java.io.IOException;
 import java.security.Security;
-//import java.security.Principal;
-
 import java.security.cert.CRLException;
 import java.security.cert.CertificateException;
-//import java.security.cert.CertificateNotYetValidException;
-//import java.security.cert.CertificateExpiredException;
-//import java.security.cert.TrustAnchor;
 import java.security.cert.X509CRL;
-//import java.security.cert.X509CRLEntry;
 import java.security.cert.X509Certificate;
-
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.List;
@@ -53,25 +32,12 @@ import java.util.ListIterator;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.Vector;
-//import java.util.Stack;
-//import java.util.Set;
-import java.util.HashSet;
-//import java.util.TreeSet;
-//import java.util.Date;
-//import java.util.Enumeration;
-//import java.util.NoSuchElementException;
-
-//import java.net.InetAddress;
-//import java.net.UnknownHostException;
 
 import javax.security.auth.x500.X500Principal;
 
-//import org.glite.security.voms.VOMSAttribute;
-//import org.glite.security.voms.VOMSValidator;
-//import org.glite.security.voms.ac.AttributeCertificate;
-//import org.glite.security.voms.ac.AttributeCertificateInfo;
-//import org.glite.security.voms.ac.ACCerts;
-//import org.glite.security.voms.ac.ACTargets;
+import org.apache.log4j.Logger;
+import org.bouncycastle.jce.X509Principal;
+import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.glite.security.voms.ac.VOMSTrustStore;
 
 /**
@@ -113,6 +79,14 @@ public class PKIStore implements VOMSTrustStore {
 
     private String certDir = null;
     private int type = -1;
+    
+    public static final String DEFAULT_VOMSDIR= File.separator
+    + "etc" + File.separator + "grid-security" + File.separator
+    + "vomsdir";
+    
+    public static final String DEFAULT_CADIR = File.separator
+    + "etc" + File.separator + "grid-security" + File.separator
+    + "certificates";
 
     /**
      * @return hashtable containing CA certificates.  The key is
@@ -125,7 +99,7 @@ public class PKIStore implements VOMSTrustStore {
      * @see java.util.Vector
      */
     public Hashtable getCAs() {
-        return certificates;
+        return (Hashtable)certificates.clone();
     }
 
     /**
@@ -204,7 +178,7 @@ public class PKIStore implements VOMSTrustStore {
 //             return addr.getCanonicalHostName();
 //         }
 //         catch(UnknownHostException e) {
-//             logger.error("Cannot discover hostname.");
+//             logger.error("Cannot discover hostName.");
 //             return "";
 //         }
 //     }
@@ -289,7 +263,7 @@ public class PKIStore implements VOMSTrustStore {
 
 //          newReader = null;
 
-        System.out.println("STORE REFRESHED");
+//        System.out.println("STORE REFRESHED");
     }
 
     PKIStore(String dir, int type, boolean aggressive, boolean timer)  throws IOException, CertificateException, CRLException {
@@ -304,13 +278,43 @@ public class PKIStore implements VOMSTrustStore {
             type != TYPE_CADIR)
             throw new IllegalArgumentException("Unsupported value for type parameter in PKIReader constructor");
 
-        if ((dir == null) || dir == "") {
+        if ((dir == null) || dir.equals("")) {
             if (type == TYPE_VOMSDIR)
-                dir = "/etc/grid-security/vomsdir";
+                dir = DEFAULT_VOMSDIR;
             else if (type == TYPE_CADIR)
-                dir = "/etc/grid-security/certificates";
+                dir = DEFAULT_CADIR;
         }
 
+        
+        // Some sanity checks on VOMSDIR and CA dir
+        File theDir = new File(dir);
+        
+        if (!theDir.exists()){
+         
+            StringBuffer message = new StringBuffer();
+            message.append( "Directory "+dir+" doesn't exist on this machine!" );
+            if (type == TYPE_VOMSDIR)
+                message.append(" Please specify a value for the vomsdir directory or set the VOMSDIR system property.");
+            else
+                message.append(" Please specify a value for the cadir directory or set the CADIR system property.");
+            
+            throw new FileNotFoundException(message.toString());
+            
+        }
+        
+        if (!theDir.isDirectory()){
+            
+            throw new IllegalArgumentException(((type == TYPE_VOMSDIR)? "Voms certificate" : "CA certificate")+ 
+                    " directory passed as argument is not a directory! ["+theDir.getAbsolutePath()+"]");
+            
+        }
+        
+        if (theDir.list().length == 0){
+            
+            throw new IllegalArgumentException(((type == TYPE_VOMSDIR)? "Voms certificate" : "CA certificate")+ 
+                    " directory passed as argument is empty! ["+theDir.getAbsolutePath()+"]");
+        }
+        
         certDir = dir;
         this.type = type;
 
@@ -415,7 +419,7 @@ public class PKIStore implements VOMSTrustStore {
      * server.
      *
      * @param voName   -- The name of the VO.
-     * @param hostName -- The hostname of the issuing server.
+     * @param hostName -- The hostName of the issuing server.
      *
      * @return The corresponding LSCFile object, or null if none is present.
      */

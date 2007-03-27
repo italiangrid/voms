@@ -27,18 +27,37 @@ JAVA_CLASSES = org/glite/security/voms/BasicVOMSTrustStore.class \
 							 org/glite/security/voms/ac/GenericAttribute.class \
 							 org/glite/security/voms/ac/AttributeHolder.class \
 							 org/glite/security/voms/ac/FullAttributes.class \
-							 org/glite/security/voms/ac/VOMSTrustStore.class
+							 org/glite/security/voms/ac/VOMSTrustStore.class \
+							 org/glite/security/voms/contact/cli/VomsProxyInitClient.class \
+							 org/glite/security/voms/contact/PathNamingScheme.class \
+							 org/glite/security/voms/contact/Test.class \
+							 org/glite/security/voms/contact/UserCredentials.class \
+							 org/glite/security/voms/contact/VOMSDecoder.class \
+							 org/glite/security/voms/contact/VOMSErrorMessage.class \
+							 org/glite/security/voms/contact/VOMSESFileParser.class \
+							 org/glite/security/voms/contact/VOMSException.class \
+							 org/glite/security/voms/contact/VOMSParser.class \
+							 org/glite/security/voms/contact/VOMSProtocol.class \
+							 org/glite/security/voms/contact/VOMSProxyBuilder.class \
+							 org/glite/security/voms/contact/VOMSProxyInit.class \
+							 org/glite/security/voms/contact/VOMSRequestFactory.class \
+							 org/glite/security/voms/contact/VOMSRequestOptions.class \
+							 org/glite/security/voms/contact/VOMSResponse.class \
+							 org/glite/security/voms/contact/VOMSServerInfo.class \
+							 org/glite/security/voms/contact/VOMSServerMap.class \
+							 org/glite/security/voms/contact/VOMSSocket.class \
+							 org/glite/security/voms/contact/MyProxyCertInfo.class \
+							 org/glite/security/voms/contact/VOMSSyntaxException.class
 
 all-local: $(top_builddir)/src/api/java/vomsjapi.jar
 
 %.class : %.java
-	$(JAVAC) -sourcepath $(top_srcdir)/src/api/java -classpath $(JAVA_CLASSPATH):$(CLASSPATH) -d $(top_builddir)/src/api/java $<
+	$(JAVAC) -sourcepath $(top_srcdir)/src/api/java -classpath $(JAVA_CLASSPATH):$(JAVA_CLASSPATH2):$(CLASSPATH) -d $(top_builddir)/src/api/java $<
 
 $(top_builddir)/src/api/java/vomsjapi.jar: makedirs $(JAVA_CLASSES)
-	$(JAR) -cf $(top_builddir)/src/api/java/vomsjapi.jar `find org -name '*.class'` ;
+	$(JAR) -cfm $(top_builddir)/src/api/java/vomsjapi.jar $(top_srcdir)/src/api/java/Manifest.add `find org -name '*.class'` $(top_srcdir)/src/api/java/log4j.properties ;
 
 makedirs:
-	mkdir -p $(top_builddir)/src/api/java/org/glite/security/voms/peers
 	mkdir -p $(top_builddir)/src/api/java/org/glite/security/voms/ac
 
 install-exec-hook:

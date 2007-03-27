@@ -61,6 +61,7 @@ extern bool getlist(const std::string& dn,
                     int port,
                     const std::string& socket,
                     const char * password,
+                    bool insecure, 
                     std::string & result);
 
 extern bool getattribs(const std::string& dn,
@@ -71,6 +72,7 @@ extern bool getattribs(const std::string& dn,
                        int port,
                        const std::string& socket,
                        const char * password,
+                       bool insecure,
                        std::string & result);
 
 extern bool listspecial(const std::string& dbname,
@@ -89,6 +91,7 @@ extern bool get_all(const std::string& dn,
                     int port,
                     const std::string& socket,
                     const char * password,
+                    bool insecure,
                     std::vector<attrib>& result);
 
 extern bool get_role(const std::string& dn,
@@ -100,6 +103,7 @@ extern bool get_role(const std::string& dn,
                      int port,
                      const std::string& socket,
                      const char * password,
+                     bool insecure,
                      std::vector<attrib>& result);
 
 extern bool get_group(const std::string& dn,
@@ -111,6 +115,7 @@ extern bool get_group(const std::string& dn,
                       int port,
                       const std::string& socket,
                       const char * password,
+                      bool insecure,
                       std::vector<attrib>& result);
 
 extern bool get_group_and_role(const std::string& dn,
@@ -122,6 +127,7 @@ extern bool get_group_and_role(const std::string& dn,
                                int port,
                                const std::string& socket,
                                const char * password,
+                               bool insecure,
                                std::vector<attrib>& result);
 
 extern bool get_user_attributes(const std::string& dn,
@@ -132,6 +138,7 @@ extern bool get_user_attributes(const std::string& dn,
                                 int port,
                                 const std::string& socket,
                                 const char * password,
+                                bool insecure, 
                                 std::vector<gattrib>& result);
 
 extern bool get_group_attributes(const std::string& dn,
@@ -143,6 +150,7 @@ extern bool get_group_attributes(const std::string& dn,
                                  int port,
                                  const std::string& socket,
                                  const char * password,
+                                 bool insecure,
                                  std::vector<gattrib>& result);
 
 extern bool get_group_and_role_attributes(const std::string& dn,
@@ -154,6 +162,7 @@ extern bool get_group_and_role_attributes(const std::string& dn,
                                           int port, 
                                           const std::string& socket, 
                                           const char * password,
+                                          bool insecure, 
                                           std::vector<gattrib>& result);
 
 bool get_correct_ca(const std::string &dbname, const std::string &username, 
@@ -167,12 +176,14 @@ bool get_role_attributes(const std::string &dn, const std::string &ca,
                          const char *role, const std::string &dbname, 
                          const std::string &username, const std::string &contactstring,
                          int port, const std::string& socket, const char *password,
+                         bool insecure,
                          std::vector<gattrib> &result);
 
 bool get_all_attributes(const std::string &dn, const std::string &ca,
                         const std::string &dbname, const std::string &username, 
                         const std::string &contactstring, int port, 
                         const std::string& socket, const char *password,
+                        bool insecure, 
                         std::vector<gattrib> &result);
 
 #endif

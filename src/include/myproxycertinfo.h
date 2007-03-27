@@ -43,71 +43,71 @@
 
 /* data structure */
 
-typedef struct PROXYPOLICY_st {
+typedef struct myPROXYPOLICY_st {
 
     ASN1_OBJECT *                       policy_language;
     ASN1_OCTET_STRING *                 policy;
 
-} PROXYPOLICY;
+} myPROXYPOLICY;
 
-typedef struct PROXYCERTINFO_st {
+typedef struct myPROXYCERTINFO_st {
  
   ASN1_INTEGER * path_length;
-  PROXYPOLICY * proxypolicy;
+  myPROXYPOLICY * proxypolicy;
   int version;
-} PROXYCERTINFO;
+} myPROXYCERTINFO;
 
 
-/* PROXYPOLICY function */
+/* myPROXYPOLICY function */
 
 /* allocating and free memory */
-PROXYPOLICY * PROXYPOLICY_new();
-void PROXYPOLICY_free(PROXYPOLICY * proxypolicy);
+myPROXYPOLICY * myPROXYPOLICY_new();
+void myPROXYPOLICY_free(myPROXYPOLICY * proxypolicy);
 
 /* duplicate */
-PROXYPOLICY * PROXYPOLICY_dup(PROXYPOLICY * policy);
+myPROXYPOLICY * myPROXYPOLICY_dup(myPROXYPOLICY * policy);
 
 /* set policy language */
-int PROXYPOLICY_set_policy_language(PROXYPOLICY * policy, ASN1_OBJECT * policy_language);
+int myPROXYPOLICY_set_policy_language(myPROXYPOLICY * policy, ASN1_OBJECT * policy_language);
 
 /* get policy language */
-ASN1_OBJECT * PROXYPOLICY_get_policy_language(PROXYPOLICY * policy);
+ASN1_OBJECT * myPROXYPOLICY_get_policy_language(myPROXYPOLICY * policy);
 
 /* set policy contents */
-int PROXYPOLICY_set_policy(PROXYPOLICY * proxypolicy, unsigned char * policy, int length);
+int myPROXYPOLICY_set_policy(myPROXYPOLICY * proxypolicy, unsigned char * policy, int length);
 
 /* get policy contents */
-unsigned char * PROXYPOLICY_get_policy(PROXYPOLICY * policy, int * length);
+unsigned char * myPROXYPOLICY_get_policy(myPROXYPOLICY * policy, int * length);
 
 /* internal to der conversion */
-int i2d_PROXYPOLICY(PROXYPOLICY * policy, unsigned char ** pp);
+int i2d_myPROXYPOLICY(myPROXYPOLICY * policy, unsigned char ** pp);
 
 /* der to internal conversion */
-PROXYPOLICY * d2i_PROXYPOLICY(PROXYPOLICY ** policy, unsigned char ** pp, long length);
+myPROXYPOLICY * d2i_myPROXYPOLICY(myPROXYPOLICY ** policy, unsigned char ** pp, long length);
 
-/*PROXYCERTINFO function */
+/*myPROXYCERTINFO function */
 
 /* allocating and free memory */
-PROXYCERTINFO * PROXYCERTINFO_new();
-void PROXYCERTINFO_free(PROXYCERTINFO * proxycertinfo);
+myPROXYCERTINFO * myPROXYCERTINFO_new();
+void myPROXYCERTINFO_free(myPROXYCERTINFO * proxycertinfo);
 
 /* set path_length */
-int PROXYCERTINFO_set_path_length(PROXYCERTINFO * proxycertinfo, long path_length);
+int myPROXYCERTINFO_set_path_length(myPROXYCERTINFO * proxycertinfo, long path_length);
 
 /* get ptah length */
-long PROXYCERTINFO_get_path_length(PROXYCERTINFO * proxycertinfo);
+long myPROXYCERTINFO_get_path_length(myPROXYCERTINFO * proxycertinfo);
 
 /* set proxypolicy */
-int PROXYCERTINFO_set_proxypolicy(PROXYCERTINFO * proxycertinfo, PROXYPOLICY * proxypolicy);
+int myPROXYCERTINFO_set_proxypolicy(myPROXYCERTINFO * proxycertinfo, myPROXYPOLICY * proxypolicy);
 
 /* get proxypolicy */
-PROXYPOLICY * PROXYCERTINFO_get_proxypolicy(PROXYCERTINFO * proxycertinfo);
+myPROXYPOLICY * myPROXYCERTINFO_get_proxypolicy(myPROXYCERTINFO * proxycertinfo);
 
 /* internal to der conversion */
-int i2d_PROXYCERTINFO(PROXYCERTINFO * proxycertinfo, unsigned char ** pp);
+int i2d_myPROXYCERTINFO(myPROXYCERTINFO * proxycertinfo, unsigned char ** pp);
 
 /* der to internal conversion */
-PROXYCERTINFO * d2i_PROXYCERTINFO(PROXYCERTINFO ** cert_info, unsigned char ** a, long length);
+myPROXYCERTINFO * d2i_myPROXYCERTINFO(myPROXYCERTINFO ** cert_info, unsigned char ** a, long length);
 
-int PROXYCERTINFO_set_version(PROXYCERTINFO *cert_info, int version);
+int myPROXYCERTINFO_set_version(myPROXYCERTINFO *cert_info, int version);
 #endif

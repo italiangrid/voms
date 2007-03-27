@@ -47,6 +47,11 @@ AC_DEFUN([AC_GLOBUS],
     # to be added
     AC_MSG_RESULT([yes])
 
+    AC_ARG_WITH(bit64,
+                [  --with-bit64    use 64bit libraries only.],
+                [with_64bit="yes"],
+                [with_64bit="no"])
+                
     LD_LIBRARY_PATH="$LD_LIBRARY_PATH:$with_globus_prefix/lib"
     AC_MSG_CHECKING([for GLOBUS flavors])
 
@@ -56,20 +61,55 @@ AC_DEFUN([AC_GLOBUS],
       fi
     done
 
-    if test -e $with_globus_prefix/include/gcc32dbg ; then
-      default_flavor=gcc32dbg
-    elif test -e $with_globus_prefix/include/gcc64dbg ; then
-      default_flavor=gcc64dbg
+    if test "x$with_64bit" == "xno" ; then
+      if test -e $with_globus_prefix/include/gcc32dbg ; then
+        default_flavor=gcc32dbg
+      elif test -e $with_globus_prefix/include/gcc64dbg ; then
+        default_flavor=gcc64dbg
+      else
+        default_flavor=""
+      fi
     else
-      default_flavor=""
-    fi
+      if test -e $with_globus_prefix/include/gcc64dbg ; then
+        default_flavor=gcc64dbg
+      else
+        default_flavor=""
+      fi
+    fi      
 
     AC_ARG_WITH(globus_flavor,
-              	[  --with-globus-flavor=flavor [default=$default_flavor]],
+              	[  --with-globus-flavor=flavor  default=${GLOBUS_FLAVOR:-none}],
               	[with_globus_flavor="$withval"],
-                with_globus_flavor=${GLOBUS_FLAVOR:-${default_flavor}})
+                [with_globus_flavor=${GLOBUS_FLAVOR}])
 
     AC_MSG_RESULT([found $GLOBUS_FLAVORS ($with_globus_flavor selected)])
+
+    new_flavors=""
+
+    for flavor in $GLOBUS_FLAVORS ; do
+      if test "x$with_globus_flavor" != "x" ; then
+        if test "x$flavor" == "x$with_globus_flavor" ; then
+          new_flavors="$flavor $new_flavors"
+        fi
+      else
+          new_flavors="$GLOBUS_FLAVORS"
+      fi
+    done
+
+    GLOBUS_FLAVORS=""
+
+    for flavor in $new_flavors ; do
+      if test "x$with_64bit" == "xyes" ; then
+        echo $flavor | grep 64 >/dev/null
+        if test $? -eq 0 ; then
+          GLOBUS_FLAVORS="$GLOBUS_FLAVORS $flavor"
+        fi
+      else
+        GLOBUS_FLAVORS="$flavor $GLOBUS_FLAVORS"
+      fi
+    done
+
+    AC_MSG_RESULT([Final globus flavors: ${GLOBUS_FLAVORS}])
 
     for flavor in $GLOBUS_FLAVORS ; do
       WANTED_OLDGAA_LIBS="$WANTED_OLDGAA_LIBS liboldgaa_$flavor.la"
@@ -83,6 +123,10 @@ AC_DEFUN([AC_GLOBUS],
     WANTED_API_LIBS="$WANTED_CCAPI_LIBS $WANTED_CAPI_LIBS"
 
     ac_globus_ldlib="-L$with_globus_prefix/lib"
+
+    if test "x$with_globus_flavor" = "x" ; then
+      with_globus_flavor=${default_flavor}
+    fi
 
     for flavor in $GLOBUS_FLAVORS ; do
       if test "x$flavor" = "x$with_globus_flavor" ; then
@@ -225,6 +269,7 @@ AC_DEFUN([AC_JAVA],
   if test "x$have_java" = "xyes"; then
     AC_MSG_CHECKING([for bouncycastle])
   fi
+
   AC_ARG_WITH(bc,
     [  --with-bc=FILE          Specifies the location of the bouncycastle jar, default=$CLASSPATH],
     [ wbc="$withval"],
@@ -241,6 +286,7 @@ AC_DEFUN([AC_JAVA],
   if test "x$have_java" = "xyes"; then
     AC_MSG_CHECKING([for log4j])
   fi
+
   AC_ARG_WITH(log4j,
     [  --with-log4j=FILE        Specifies the location of the log4j jar, default=$CLASSPATH],
     [ wlog4j="$withval"],
@@ -252,8 +298,63 @@ AC_DEFUN([AC_JAVA],
   else
     AC_MSG_RESULT([specified: $wlog4j])
   fi
-  JAVA_CLASSPATH=".:$wbc:$wlog4j"
+
+  if test "x$have_java" = "xyes"; then
+    AC_MSG_CHECKING([for cog])
+  fi
+
+  AC_ARG_WITH(cog,
+    [  --with-cog=jars         Colon-separated list of cog jars, default = $CLASSPATH],
+    [  wcog="$withval"],
+    [  wcog=""])
+  if test "x$wcog" = "x"; then
+    if test "x$have_java" = "xyes"; then
+      AC_MSG_RESULT([hope it is in $CLASSPATH])
+    fi
+  else
+    AC_MSG_RESULT([specified: $wcog])
+  fi
+
+  if test "x$have_java" = "xyes"; then
+    AC_MSG_CHECKING([for commons-cli])
+  fi
+
+  AC_ARG_WITH(commons-cli,
+    [  --with-commons-cli=jars  Specifies the location of the commons-cli jar, default = $CLASSPATH],
+    [  wcomcli="$withval"],
+    [  wcomcli=""])
+  if test "x$wcomcli" = "x"; then
+    if test "x$have_java" = "xyes"; then
+      AC_MSG_RESULT([hope it is in $CLASSPATH])
+    fi
+  else
+    AC_MSG_RESULT([specified: $wcomcli])
+  fi
+
+  if test "x$have_java" = "xyes"; then
+    AC_MSG_CHECKING([for commons-lang])
+  fi
+
+  AC_ARG_WITH(commons-lang,
+    [  --with-commons-lang=jars  Specifies the location of the commons-lang jar, default = $CLASSPATH],
+    [  wcomlang="$withval"],
+    [  wcomlang=""])
+  if test "x$wcomlang" = "x"; then
+    if test "x$have_java" = "xyes"; then
+      AC_MSG_RESULT([hope it is in $CLASSPATH])
+    fi
+  else
+    AC_MSG_RESULT([specified: $wcomlang])
+  fi
+
+  JAVA_CLASSPATH=".:$wbc:$wlog4j:$wcog:$wcomcli:$wcomlang"
+  JAVA_CLASSPATH2=""
+
+#  JAVA_CLASSPATH2='.:/data/marotta/cog-1.1/lib/cog-jglobus.jar:${top_srcdir}/jars/commons-cli-1.0.jar:${top_srcdir}/jars/commons-lang-2.2.jar:/data/marotta/cog-1.1/lib/cryptix32.jar:/data/marotta/cog-1.1/lib/cryptix-asn1.jar:/data/marotta/cog-1.1/lib/cryptix.jar:/data/marotta/cog-1.1/lib/jgss.jar:/data/marotta/cog-1.1/lib/puretls.jar'
+
+  AC_MSG_CHECKING([CLASSPATH is $JAVA_CLASSPATH2])
   AC_SUBST(JAVA_CLASSPATH)    
+  AC_SUBST(JAVA_CLASSPATH2)    
   
 ])
 
@@ -589,7 +690,7 @@ AC_DEFUN([AC_VOMS_STRUCT_IOVEC],
       [ac_have_struct_iovec="no"]
     )
 
-    if test "x$ac_have_globus_off_t" = "xyes" ; then
+    if test "x$ac_have_struct_iovec" = "xyes" ; then
       AC_DEFINE(HAVE_STRUCT_IOVEC, 1, [Define to 1 if you have iovec struct in uio.h]) 
     fi
 
@@ -615,8 +716,8 @@ AC_DEFUN([AC_VOMS_GLOBUS_CONFIG_H],
     )
 
     if test "x$ac_have_globus_config_h" = "xno" ; then
-      proc=`./config.guess | cut -d- -f1`
-      arch=`./config.guess | cut -d- -f3`
+      proc=`$ac_aux_dir/config.guess | cut -d- -f1`
+      arch=`$ac_aux_dir/config.guess | cut -d- -f3`
       case "$proc" in
         i*86) proc=X86 ;;
         ia64) proc=IA64 ;;
@@ -674,7 +775,7 @@ HERE
 
 AC_DEFUN([TEST_USE_BSD],
 [
-    AC_MSG_CHECKING([wether _BSD_SOURCE must be defined])
+    AC_MSG_CHECKING([whether _BSD_SOURCE must be defined])
 
     AC_LANG_PUSH(C)
     
@@ -776,4 +877,55 @@ AC_DEFUN([AC_UTEST],
     [ have_unit_test="no" ])
 
   AM_CONDITIONAL(WANT_UNIT_TEST, test x$have_unit_test = xyes)
+])
+
+AC_DEFUN([AC_VOMS_TRY_OPENSSL_NEW_TYPES],
+[
+  AC_MSG_CHECKING([for i2d_of_void])
+  AC_LANG_PUSH(C)
+
+  CFLAGS_SAVE="$CFLAGS"
+  CFLAGS="$CFLAGS $GLOBUS_CFLAGS"
+
+  AC_TRY_COMPILE(
+    [
+    #include <$with_globus_prefix/include/$with_globus_flavor/openssl/asn1.h>
+    ],
+    [
+      i2d_of_void fun = NULL;
+    ],
+    [ac_have_i2d_of_void="yes"],
+    [ac_have_i2d_of_void="no"])
+
+  if test "x$ac_have_i2d_of_void" = "xyes" ; then
+    AC_DEFINE(HAVE_NEW_OPENSSL_TYPES, 1, [Define to 1 if X_of_void types exist])
+  fi
+
+  AC_MSG_RESULT([$ac_have_i2d_of_void])
+
+  CFLAGS="$CFLAGS_SAVE"
+  CFLAGS_SAVE="$CFLAGS"
+  CFLAGS="$CFLAGS $NO_GLOBUS_FLAGS"
+
+  AC_MSG_CHECKING([for i2d_of_void (system libs)])
+  AC_LANG_PUSH(C)
+
+  AC_TRY_COMPILE(
+    [
+    #include <openssl/asn1.h>
+    ],
+    [
+      i2d_of_void fun = NULL;
+    ],
+    [ac_have_i2d_of_void="yes"],
+    [ac_have_i2d_of_void="no"])
+
+  if test "x$ac_have_i2d_of_void" = "xyes" ; then
+    AC_DEFINE(HAVE_NEW_OPENSSL_TYPES_OPENSSL, 1, [Define to 1 if X_of_void types exist])
+  fi
+
+  AC_MSG_RESULT([$ac_have_i2d_of_void])
+
+  CFLAGS="$CFLAGS_SAVE"
+  AC_LANG_POP(C)
 ])

@@ -118,5 +118,8 @@ distbin:
 testsuite-run:
 	cd test; $(MAKE) testsuite-run; cd ..
 
+gtags:
+	rm -f G*; gtags
+
 tags:
 	rm -f TAGS; find . '(' '(' -name '*.c' -o -name '*.h' -o -name '*.cpp' -o -name '*.hpp' -o -name '*.cc' ')' -a -not -path '*/test/*' ')' -exec etags -a '{}' ';'

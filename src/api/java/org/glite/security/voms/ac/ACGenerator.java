@@ -6,19 +6,17 @@
 
 package org.glite.security.voms.ac;
 
-import org.bouncycastle.asn1.DEREncodableVector;
-import org.bouncycastle.asn1.DERInteger;
-import org.bouncycastle.asn1.x509.AlgorithmIdentifier;
-
 import java.math.BigInteger;
-
 import java.security.PrivateKey;
-
 import java.util.Date;
 import java.util.List;
 import java.util.Vector;
 
 import javax.security.auth.x500.X500Principal;
+
+import org.bouncycastle.asn1.DEREncodableVector;
+import org.bouncycastle.asn1.DERInteger;
+import org.bouncycastle.asn1.x509.AlgorithmIdentifier;
 
 
 /**

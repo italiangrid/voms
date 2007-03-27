@@ -118,6 +118,12 @@
 /* Define to 1 if you have the <netinet/in.h> header file. */
 #undef HAVE_NETINET_IN_H
 
+/* Define to 1 if X_of_void types exist */
+#undef HAVE_NEW_OPENSSL_TYPES
+
+/* Define to 1 if X_of_void types exist */
+#undef HAVE_NEW_OPENSSL_TYPES_OPENSSL
+
 /* Define to 1 if you have the <openssl/e_os2.h> header file. */
 #undef HAVE_OPENSSL_E_OS2_H
 

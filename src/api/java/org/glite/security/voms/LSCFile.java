@@ -17,15 +17,10 @@ package org.glite.security.voms;
 
 //import org.apache.log4j.Logger;
 
-import java.io.File;
-import java.io.IOException;
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.FileReader;
-
-//import java.util.Arrays;
-//import java.util.Iterator;
-//import java.util.List;
-//import java.util.ListIterator;
+import java.io.IOException;
 import java.util.Vector;
 
 /**

@@ -18,19 +18,13 @@ package org.glite.security.voms;
 
 //import org.bouncycastle.jce.provider.BouncyCastleProvider;
 
-import java.io.File;
-import java.io.IOException;
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.FileReader;
-
-//import java.util.Arrays;
-//import java.util.Iterator;
-//import java.util.List;
-//import java.util.ListIterator;
+import java.io.IOException;
 import java.util.Vector;
-
-import java.util.regex.Pattern;
 import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * The purpose of this class is to represent a *.signing_policy file.
