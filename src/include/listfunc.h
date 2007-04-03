@@ -13,11 +13,6 @@
  *********************************************************************/
 #ifndef VOMS_LISTFUNC_H
 #define VOMS_LISTFUNC_H
-
-#ifdef __cplusplus
-extern "C" {
-#endif
-
 #include <stdlib.h>
 
 typedef void (*freefn)(void *);
@@ -25,9 +20,4 @@ typedef void (*freefn)(void *);
 extern char **listjoin(char **base, char **addon, int size);
 extern char **listadd(char **vect, char *data, int size);
 extern void   listfree(char **vect, freefn f);
-
-#ifdef __cplusplus
-}
-#endif
-
 #endif

@@ -14,10 +14,7 @@
 #ifndef VOMS_NEWCA_H
 #define VMS_NEWCA_H
 
-#ifdef __cplusplus
 extern "C" {
-#endif
-
 #include <openssl/x509.h>
 #include <openssl/evp.h>
 #include <gssapi.h>
@@ -31,9 +28,6 @@ extern X509 *get_peer_cert(gss_ctx_id_t contex, int globusver);
 extern X509 *get_own_cert(void *credential, int globusver);
 extern int   get_peer_data(gss_ctx_id_t, int, EVP_PKEY **, char **, X509 **);
 extern int   get_own_data(gss_ctx_id_t, int, EVP_PKEY **, char **, X509 **);
-
-#ifdef __cplusplus
 };
-#endif
 
 #endif

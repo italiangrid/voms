@@ -15,10 +15,6 @@
 #define VOMS_WRITE_H
 #include "config.h"
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-
 #include <openssl/asn1.h>
 #include <openssl/evp.h>
 #include <openssl/x509.h>
@@ -28,8 +24,4 @@ extern int writeac(const X509 *issuerc, const STACK_OF(X509) *certstack, const X
 		   const EVP_PKEY *pkey, BIGNUM *s, char **c, 
 		   const char *t, char **attributes, AC **ac, const char *voname, 
 		   const char *uri, int valid, int old);
-#ifdef __cplusplus
-}
-#endif
-
 #endif

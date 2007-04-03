@@ -17,9 +17,6 @@
 #include "newformat.h"
 /* #include "voms_apic.h" */
 
-#ifdef __cplusplus
-extern "C" {
-#endif
 
 struct att {
   char *name;
@@ -73,7 +70,4 @@ extern int validate(X509 *, X509 *, AC *, struct col *, int);
 #define VER_ID      0x10
 #define VER_ALL     0xffffffff
 
-#ifdef __cplusplus
-}
-#endif
 #endif

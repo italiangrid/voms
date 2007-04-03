@@ -15,14 +15,5 @@
 #define VOMSAC_INIT_H
 #include "config.h"
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-
 extern void declareOIDs(void);
-
-#ifdef __cplusplus
-}
-#endif
-
 #endif

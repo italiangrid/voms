@@ -15,12 +15,6 @@
 #ifndef VOMS_CINTERFACE_H
 #define VOMS_CINTERFACE_H
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-
-#include <openssl/asn1.h>
-
 #ifndef NOGLOBUS
 #include <gssapi.h>
 #endif
@@ -344,10 +338,6 @@ extern AC *VOMS_GetAC(struct vomsr *v);
 int getMajorVersionNumber(void);
 int getMinorVersionNumber(void);
 int getPatchVersionNumber(void);
-#endif
-
-#ifdef __cplusplus
-}
 #endif
 
 #endif

@@ -1,8 +1,5 @@
 /* src/autogen/config.h.in.  Generated from configure.ac by autoheader.  */
 
-/* define if mac compiler does not respect extern "C" */
-#undef BROKEN_MAC
-
 /* Define to 1 if the `closedir' function returns void instead of `int'. */
 #undef CLOSEDIR_VOID
 

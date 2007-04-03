@@ -16,10 +16,7 @@
 #define __USE_GNU 1
 #include <string>
 
-#ifdef __cplusplus
 extern "C" {
-#endif
-
 #if defined(HAVE_GETOPT_LONG) || defined(HAVE_GETOPT_LONG_ONLY)
 #ifndef _GNU_SOURCE
 #define _GNU_SOURCE
@@ -28,10 +25,7 @@ extern "C" {
 #endif
 #include <unistd.h>
 #include "getopts.h"
-
-#ifdef __cplusplus
 };
-#endif
 
 #define OPT_NONE      0
 #define OPT_BOOL      1

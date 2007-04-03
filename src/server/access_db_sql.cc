@@ -54,14 +54,9 @@ extern bool compat_flag;
 #define CATCH \
 catch (sqliface::DBEXC& e) \
 { \
-  /* This is kept for compatibility with old backends */ \
   LOGM(VARP, logh, LEV_ERROR, T_REQUEST, "DBEXC : %s", e.what().c_str()); \
 } \
-catch (const char *c) \
-{ \
-  LOGM(VARP, logh, LEV_ERROR, T_REQUEST, "DBEXC : %s", c); \
-}
-
+  
 typedef std::set<std::string> datahash;
 
 typedef sqliface::interface* (*cdb)();

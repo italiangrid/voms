@@ -12,11 +12,13 @@
  *
  *********************************************************************/
 
-#include "config.h"
-
 extern "C" {
+#include "config.h"
 #include "replace.h"
 
+#ifndef NOGLOBUS
+#include "globus_config.h"
+#endif
 #include <sys/types.h>
 #include <netdb.h>
 #include <dirent.h>
@@ -25,18 +27,18 @@ extern "C" {
 #include <sys/wait.h>
 
 #include <signal.h>
-#include <openssl/x509.h>
-#include <openssl/asn1.h>
-#include <openssl/pem.h>
-#include <openssl/evp.h>
 
 #ifndef NOGLOBUS
-#include "globus_config.h"
+  /*#include "gssapi_compat.h"*/
 #include "gssapi.h"
 #include "globus_gss_assist.h"
 #endif
 
 #include <stdio.h>
+#include <openssl/x509.h>
+#include <openssl/asn1.h>
+#include <openssl/pem.h>
+#include <openssl/evp.h>
 #include "credentials.h"
 }
 
@@ -54,6 +56,7 @@ extern "C" {
 #include <iomanip>
 #include <fstream>
 
+#include "sign.h"
 #include "api_util.h"
 
 #include "vomsxml.h"
@@ -63,6 +66,7 @@ extern "C" {
 
 static bool dncompare(const std::string &mut, const std::string &fixed);
 static bool readdn(std::ifstream &file, char *buffer, int buflen);
+
 
 static bool dncompare(const std::string &first, const std::string &second)
 {
@@ -146,12 +150,7 @@ vomsdata::retrieve(X509 *cert, STACK_OF(X509) *chain, recurse_type how,
     return false;
   }
 
-#if defined(BROKEN_MAC) && defined(NOGLOBUS)
-  *holder = (X509 *)ASN1_dup((int (*)(...))i2d_X509,(char * (*)(...))d2i_X509, (char *)h);
-#else
   *holder = (X509 *)ASN1_dup((int (*)())i2d_X509,(char * (*)())d2i_X509, (char *)h);
-#endif
-
   if (!*holder) {
     seterror(VERR_MEM, "Cannot find enough memory to work!");
     return false;
@@ -309,14 +308,8 @@ vomsdata::verifydata(std::string &message, std::string subject, std::string ca,
   AC_free(tmp);   
   
   if (result)
-#if defined(BROKEN_MAC) && defined(NOGLOBUS)
-    v.holder = (X509 *)ASN1_dup((int (*) (...))i2d_X509, 
-				(char * (*)(...))d2i_X509, (char *)holder);
-#else
     v.holder = (X509 *)ASN1_dup((int (*) ())i2d_X509, 
 				(char * (*)())d2i_X509, (char *)holder);
-#endif
-
   return result;
 }
 
@@ -350,15 +343,9 @@ vomsdata::verifydata(AC *ac, const std::string& subject, const std::string& ca,
     return false;
   }
   else {
-#if defined(BROKEN_MAC) && defined(NOGLOBUS)
-    ((struct realdata *)v.realdata)->ac = (AC *)ASN1_dup((int (*) (...))i2d_AC,
-                                                         (char * (*) (...))d2i_AC,
-                                                         (char *)ac);
-#else
     ((struct realdata *)v.realdata)->ac = (AC *)ASN1_dup((int (*) ())i2d_AC,
                                                          (char * (*) ())d2i_AC,
                                                          (char *)ac);
-#endif
   }
   
   if (result && (ver_type & VERIFY_ID)) {
@@ -377,13 +364,8 @@ vomsdata::verifydata(AC *ac, const std::string& subject, const std::string& ca,
   X509_free(issuer);
   
   if (result)
-#if defined(BROKEN_MAC) && defined(NOGLOBUS)
-    v.holder = (X509 *)ASN1_dup((int (*) (...))i2d_X509, 
-				(char * (*)(...))d2i_X509, (char *)holder);
-#else
     v.holder = (X509 *)ASN1_dup((int (*) ())i2d_X509, 
 				(char * (*)())d2i_X509, (char *)holder);
-#endif
   return result;
 }
 
@@ -398,13 +380,8 @@ bool vomsdata::check_sig_ac(X509 *cert, void *data)
 
   AC *ac = (AC *)data;
 
-#if defined(BROKEN_MAC) && defined(NOGLOBUS)
-  int res = ASN1_verify((int (*)(...))i2d_AC_INFO, ac->sig_alg, ac->signature,
-                        (char *)ac->acinfo, key);
-#else
   int res = ASN1_verify((int (*)())i2d_AC_INFO, ac->sig_alg, ac->signature,
                         (char *)ac->acinfo, key);
-#endif
 
   if (!res)
     seterror(VERR_SIGN, "Unable to verify AC signature");
@@ -699,15 +676,7 @@ X509 *vomsdata::check_from_file(AC *ac, std::ifstream &file, const std::string &
      among those specific for the vo or else in the vomsdir
      directory */
 
-#if defined(BROKEN_MAC) && defined(NOGLOBUS)
-  X509 *cert = (X509 *)ASN1_dup((int (*)(...))i2d_X509, 
-				(char * (*)(...))d2i_X509, 
-				(char *)sk_X509_value(certstack, 0));
-#else
-  X509 *cert = (X509 *)ASN1_dup((int (*)())i2d_X509, 
-				(char * (*)())d2i_X509, 
-				(char *)sk_X509_value(certstack, 0));
-#endif
+  X509 *cert = (X509 *)ASN1_dup((int (*)())i2d_X509, (char * (*)())d2i_X509, (char *)sk_X509_value(certstack, 0));
 
   bool found = false;
 

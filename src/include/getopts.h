@@ -34,7 +34,7 @@
 
 #define VOMS_REP_GETOPT_H 1
 
-#ifdef __cplusplus
+#if defined __cplusplus
 extern "C" {
 #endif
 

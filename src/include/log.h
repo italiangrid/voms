@@ -14,10 +14,6 @@
 #ifndef VOMS_LOG_H
 #define VOMS_LOG_H
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-
 typedef enum { T_PRE = 0x00, T_STARTUP = 0x01, T_REQUEST = 0x02, T_RESULT = 0x04 } logtypes;
 typedef enum { LEV_ERROR = 0, LEV_WARN, LEV_INFO, LEV_DEBUG, LEV_NONE} loglevels;
 
@@ -54,9 +50,4 @@ LogMessage((h), (lev), (type), (str), FUNC_NAME, __LINE__, __FILE__)
 
 #define VARP FUNC_NAME, __LINE__, __FILE__
 
-#ifdef __cplusplus
-}
-#endif
-
-#endif /* VOM_LOG_H */
-
+#endif /* VOMS_LOG_H */

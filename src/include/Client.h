@@ -32,23 +32,20 @@
 #define VOMS_GSISOCKETCLIENT
 
 
-extern "C" {
+
 /** Include the secure socket globus definition. */
 #include <globus_gss_assist.h>
 
 /** This super class header file. */
 #include <openssl/evp.h>
 #include <openssl/x509.h>
-}
 
 #include <string>
 
-extern "C" {
 #include <sys/types.h>
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <netdb.h>
-}
 
 /** 
  * The secure Client.

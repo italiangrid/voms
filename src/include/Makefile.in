@@ -138,8 +138,6 @@ LDFLAGS = @LDFLAGS@
 LIBOBJS = @LIBOBJS@
 LIBS = @LIBS@
 LIBTOOL = @LIBTOOL@
-LINK_FULL_TABLE_FALSE = @LINK_FULL_TABLE_FALSE@
-LINK_FULL_TABLE_TRUE = @LINK_FULL_TABLE_TRUE@
 LN_S = @LN_S@
 LOCATION_DIR = @LOCATION_DIR@
 LOCATION_ENV = @LOCATION_ENV@
@@ -221,7 +219,7 @@ include_HEADERS = \
 
 EXTRA_DIST = Client.h data.h \
 globus_oldgaa.h globus_oldgaa_utils.h gssapi_compat.h \
-newca.h options.h pass.h Server.h streamers.h \
+newca.h options.h pass.h Server.h sign.h streamers.h \
 tokens.h xml.h vomsxml.h errors.h log.h \
 listfunc.h errortype.h credentials.h newformat.h myproxycertinfo.h \
 acstack.h validate.h ccac.h init.h ccwrite.h getopts.h replace.h dbwrap.h \

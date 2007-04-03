@@ -58,7 +58,15 @@ am_voms_OBJECTS = access_db_sql.$(OBJEXT) main.$(OBJEXT) \
 	vomsd.$(OBJEXT) attribute.$(OBJEXT)
 voms_OBJECTS = $(am_voms_OBJECTS)
 am__DEPENDENCIES_1 =
-voms_DEPENDENCIES = $(top_builddir)/src/api/ccapi/libvomsapi.la \
+voms_DEPENDENCIES = $(top_builddir)/src/socklib/libsock.la \
+	$(top_builddir)/src/common/libutilities.la \
+	$(top_builddir)/src/sslutils/libssl_utils.la \
+	$(top_builddir)/src/ac/libccattcert.la \
+	$(top_builddir)/src/common/libutilc.la \
+	$(top_builddir)/src/ac/libattcert.la \
+	$(top_builddir)/src/replib/librep.la \
+	$(top_builddir)/src/log/liblog.la \
+	$(top_builddir)/src/api/ccapi/libvomsapi.la \
 	$(am__DEPENDENCIES_1)
 DEFAULT_INCLUDES = -I. -I$(srcdir) -I$(top_builddir)/src/autogen
 depcomp = $(SHELL) $(top_srcdir)/./project/depcomp
@@ -159,8 +167,6 @@ LDFLAGS = @LDFLAGS@
 LIBOBJS = @LIBOBJS@
 LIBS = @LIBS@
 LIBTOOL = @LIBTOOL@
-LINK_FULL_TABLE_FALSE = @LINK_FULL_TABLE_FALSE@
-LINK_FULL_TABLE_TRUE = @LINK_FULL_TABLE_TRUE@
 LN_S = @LN_S@
 LOCATION_DIR = @LOCATION_DIR@
 LOCATION_ENV = @LOCATION_ENV@
@@ -246,22 +252,18 @@ voms_SOURCES = \
 	attribute.cc
 
 voms_LDADD = \
+	$(top_builddir)/src/socklib/libsock.la \
+	$(top_builddir)/src/common/libutilities.la \
+	$(top_builddir)/src/sslutils/libssl_utils.la \
+	$(top_builddir)/src/ac/libccattcert.la \
+	$(top_builddir)/src/common/libutilc.la \
+	$(top_builddir)/src/ac/libattcert.la \
+	$(top_builddir)/src/replib/librep.la \
+	$(top_builddir)/src/log/liblog.la \
 	$(top_builddir)/src/api/ccapi/libvomsapi.la \
 	$(EXPAT_LIBS)
 
-
-# voms_LDADD = \
-# 	$(top_builddir)/src/socklib/libsock.la \
-# 	$(top_builddir)/src/common/libutilities.la \
-# 	$(top_builddir)/src/sslutils/libssl_utils.la \
-# 	$(top_builddir)/src/ac/libccattcert.la \
-# 	$(top_builddir)/src/common/libutilc.la \
-# 	$(top_builddir)/src/ac/libattcert.la \
-# 	$(top_builddir)/src/replib/librep.la \
-# 	$(top_builddir)/src/log/liblog.la \
-# 	$(top_builddir)/src/api/ccapi/libvomsapi.la \
-# 	$(EXPAT_LIBS)
-@LINK_FULL_TABLE_TRUE@voms_LDFLAGS = -Wl,-E
+voms_LDFLAGS = -Wl,-E
 AM_CPPFLAGS = \
 	-I$(top_srcdir)/src/include \
 	-I$(top_srcdir)/src/api/ccapi \

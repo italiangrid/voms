@@ -13,15 +13,5 @@
  *********************************************************************/
 #ifndef VOMS_INIT_H
 #define VOMS_INIT_H
-
-#ifdef __cplusplus
-extern "C" {
-#endif
-
 extern void declareOIDs(void);
-
-#ifdef __cplusplus
-}
-#endif
-
 #endif

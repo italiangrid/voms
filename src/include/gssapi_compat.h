@@ -24,10 +24,6 @@ Description:
 #ifndef VOMS_GSSAPI_COMPAT_H
 #define VOMS_GSSAPI_COMPAT_H
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-
 /**********************************************************************
                              Include header files
 **********************************************************************/
@@ -217,9 +213,5 @@ typedef struct gss2_ctx_id_desc_struct{
     int                                 locally_initiated;
     gss_delegation_state_t              delegation_state;
 } gss2_ctx_id_desc;
-
-#ifdef __cplusplus
-}
-#endif
 
 #endif /* _GSSAPI_COMPAT_H */

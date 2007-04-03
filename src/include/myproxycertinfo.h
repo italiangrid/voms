@@ -15,10 +15,6 @@
 #ifndef VOMS_PROXYCERTINFO_H
 #define VOMS_PROXYCERTINFO_H
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-
 #include <openssl/x509.h>
 #include <openssl/x509v3.h>
 #include <string.h>
@@ -114,9 +110,4 @@ int i2d_myPROXYCERTINFO(myPROXYCERTINFO * proxycertinfo, unsigned char ** pp);
 myPROXYCERTINFO * d2i_myPROXYCERTINFO(myPROXYCERTINFO ** cert_info, unsigned char ** a, long length);
 
 int myPROXYCERTINFO_set_version(myPROXYCERTINFO *cert_info, int version);
-
-#ifdef __cplusplus
-}
-#endif
-
 #endif

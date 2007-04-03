@@ -14,10 +14,6 @@
 #ifndef VOMS_ERRORTYPE_H
 #define VOMS_ERRORTYPE_H
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-
 struct error {
   int num;
   char *message;
@@ -36,9 +32,5 @@ struct error {
 
 extern void free_error(struct error *);
 extern struct error *alloc_error(int, const char *);
-
-#ifdef __cplusplus
-}
-#endif
 
 #endif

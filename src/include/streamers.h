@@ -13,11 +13,6 @@
  *********************************************************************/
 #ifndef VOMS_STREAMERS_H
 #define VOMS_STREAMERS_H
-
-#ifdef __cplusplus
-extern "C" {
-#endif
-
 #include <stdio.h>
 
 extern void *FILEStreamerAdd(void *h, FILE *f, const char *name, int maxlog, int code, int reload);
@@ -26,9 +21,4 @@ extern void *FileNameStreamerAdd(void *h, const char *name, int maxlog, int code
 extern int   FileNameStreamerRem(void *h, void *f);
 extern void *SYSLOGStreamerAdd(void *h, int code);
 extern int   SYSLOGStreamerRem(void *h, void *f);
-
-#ifdef __cplusplus
-}
-#endif
-
 #endif

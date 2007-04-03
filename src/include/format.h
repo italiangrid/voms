@@ -15,16 +15,7 @@
 #define VOMS_FORMAT_H
 
 #include <string>
-
-#ifdef __cplusplus
-extern "C" {
-#endif
-
 #include <openssl/pem.h>
-
-#ifdef __cplusplus
-}
-#endif
 
 /* format.c */
 struct collection {
