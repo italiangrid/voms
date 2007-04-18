@@ -482,7 +482,7 @@ static bool print(X509 *cert, STACK_OF(X509) *chain, vomsdata &vd)
 
   int totbits = numbits(cert);
 
-  int res = 0;
+  bool res = true;
 
   time_t leftac;
 
@@ -580,6 +580,10 @@ static bool print(X509 *cert, STACK_OF(X509) *chain, vomsdata &vd)
     }
   }
 
+  if (vd.data.empty())
+    if (vo || acsubject || acissuer || actimeleft || fqan || serial)
+      res = false;
+
   for (std::vector<voms>::iterator v = vd.data.begin(); v != vd.data.end(); v++) {
     if(vo)
         std::cout << v->voname << "\n";
@@ -600,6 +604,8 @@ static bool print(X509 *cert, STACK_OF(X509) *chain, vomsdata &vd)
     if (fqan) {
       for (std::vector<std::string>::iterator s = v->fqan.begin(); s != v->fqan.end(); s++)
         std::cout << *s << "\n";
+      if (v->fqan.empty())
+        res = false;
     }
 
     if (serial)
@@ -610,25 +616,30 @@ static bool print(X509 *cert, STACK_OF(X509) *chain, vomsdata &vd)
 
   if (exists) {
     if(leftcert==0)
-      res=1;
+      res = false;
     if(leftcert < (hours*3600 + minutes*60))
-      res = 1;
+      res = false;
     if(totbits < bits)
-      res = 1;
+      res = false;
   }
   
   /* -acexists */
 
   if(!res) {
     for (std::vector<std::string>::iterator i = acexists.begin(); i != acexists.end(); ++i) {
+      bool found = false;
+
       if(!res) {
         for (std::vector<voms>::iterator v = vd.data.begin(); v != vd.data.end(); ++v) {
-          if(v->voname == *i)
+          if(v->voname == *i) {
+            found = true;
             break;
-          if(v == vd.data.end()-1)
-            res = 1;
+          }
         }
       }
+      if (!found)
+        res = false;
+      found = true;
     }
   }
   
