@@ -56,7 +56,6 @@ extern "C" {
 #include <iomanip>
 #include <fstream>
 
-#include "sign.h"
 #include "api_util.h"
 
 #include "vomsxml.h"

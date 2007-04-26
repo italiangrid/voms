@@ -254,7 +254,7 @@ VOMSServer::VOMSServer(int argc, char *argv[]) : sock(0,0,NULL,50,false),
                                                  logf("%d:%h:%s(%p):%V:%T:%F (%f:%l):%m"),
                                                  newformat(false),
                                                  insecure(false),
-                                                 shortfqans(false)
+                                                 shortfqans(false),
                                                  do_syslog(false)
 {
   struct stat statbuf;
