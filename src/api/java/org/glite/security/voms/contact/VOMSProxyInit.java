@@ -77,21 +77,36 @@ public class VOMSProxyInit {
         
         
     }
-    
+
+    private VOMSProxyInit(GlobusCredential credentials) {
+        if (credentials == null)
+            throw new VOMSException("Unable to find GlobusCredentials!");
+
+        try {
+            serverMap = VOMSESFileParser.instance().buildServerMap();
+
+            userCredentials = UserCredentials.instance(credentials);
+        } catch ( IOException e ) {        
+            log.error( "Error parsing vomses files: "+e.getMessage() );
+            if (log.isDebugEnabled())
+                log.error(e.getMessage(),e);
+            
+            throw new VOMSException(e);
+        }        
+    }
+
     public static VOMSProxyInit instance(String privateKeyPassword){
-        if (instance == null)
-            instance = new VOMSProxyInit(privateKeyPassword);
-        
-        return instance;
+        return new VOMSProxyInit(privateKeyPassword);
     }
     
     public static VOMSProxyInit instance(){
-        if (instance == null)
-            instance = new VOMSProxyInit(null);
-        
-        return instance;
+        return new VOMSProxyInit((String)null);
     }
-    
+
+    public static VOMSProxyInit instance(GlobusCredential credentials) {
+        return new VOMSProxyInit(credentials);
+    }
+
     public void addVomsServer(VOMSServerInfo info){
         
         serverMap.add( info );

@@ -1,6 +1,5 @@
 
-noinst_LTLIBRARIES = liboldgaa.la \
-	liboldgaa_nog.la \
+noinst_LTLIBRARIES = \
 	$(WANTED_OLDGAA_LIBS) # may add the libraries defined in EXTRA_LTLIBRARIES
 
 SOURCES = oldgaa_alloc.c oldgaa_api.c oldgaa_gl_internal_err.c oldgaa_gl_internal_err.h oldgaa_policy_evaluator.c oldgaa_policy_evaluator.h oldgaa_release.c oldgaa_utils.c oldgaa_utils.h globus_oldgaa.h globus_oldgaa_utils.c globus_oldgaa_utils.h rfc1779.c
@@ -30,7 +29,9 @@ EXTRA_LTLIBRARIES = \
 	liboldgaa_gcc64.la \
 	liboldgaa_gcc64dbg.la \
 	liboldgaa_gcc64pthr.la \
-	liboldgaa_gcc64dbgpthr.la
+	liboldgaa_gcc64dbgpthr.la \
+	liboldgaa.la \
+	liboldgaa-nog.la
 
 liboldgaa_gcc32_la_SOURCES = \
 	$(SOURCES)

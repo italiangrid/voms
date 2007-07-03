@@ -51,81 +51,81 @@ mkinstalldirs = $(SHELL) $(top_srcdir)/./project/mkinstalldirs
 CONFIG_HEADER = $(top_builddir)/src/autogen/config.h
 CONFIG_CLEAN_FILES =
 LTLIBRARIES = $(noinst_LTLIBRARIES)
+libssl_utils_nog_la_DEPENDENCIES = ./oldgaa/liboldgaa-nog.la
+am__objects_1 = libssl_utils_nog_la-scutils.lo \
+	libssl_utils_nog_la-sslutils.lo \
+	libssl_utils_nog_la-proxycertinfo.lo
+am_libssl_utils_nog_la_OBJECTS = $(am__objects_1)
+libssl_utils_nog_la_OBJECTS = $(am_libssl_utils_nog_la_OBJECTS)
 am__DEPENDENCIES_1 =
-libssl_utils_la_DEPENDENCIES = ./oldgaa/liboldgaa_nog.la \
+libssl_utils_la_DEPENDENCIES = ./oldgaa/liboldgaa.la \
 	$(am__DEPENDENCIES_1)
-am__objects_1 = libssl_utils_la-scutils.lo libssl_utils_la-sslutils.lo \
+am__objects_2 = libssl_utils_la-scutils.lo libssl_utils_la-sslutils.lo \
 	libssl_utils_la-proxycertinfo.lo
-am_libssl_utils_la_OBJECTS = $(am__objects_1)
+am_libssl_utils_la_OBJECTS = $(am__objects_2)
 libssl_utils_la_OBJECTS = $(am_libssl_utils_la_OBJECTS)
 libssl_utils_gcc32_la_DEPENDENCIES = ./oldgaa/liboldgaa_gcc32.la \
 	$(am__DEPENDENCIES_1)
-am__objects_2 = libssl_utils_gcc32_la-scutils.lo \
+am__objects_3 = libssl_utils_gcc32_la-scutils.lo \
 	libssl_utils_gcc32_la-sslutils.lo \
 	libssl_utils_gcc32_la-proxycertinfo.lo
-am_libssl_utils_gcc32_la_OBJECTS = $(am__objects_2)
+am_libssl_utils_gcc32_la_OBJECTS = $(am__objects_3)
 libssl_utils_gcc32_la_OBJECTS = $(am_libssl_utils_gcc32_la_OBJECTS)
 libssl_utils_gcc32dbg_la_DEPENDENCIES =  \
 	./oldgaa/liboldgaa_gcc32dbg.la $(am__DEPENDENCIES_1)
-am__objects_3 = libssl_utils_gcc32dbg_la-scutils.lo \
+am__objects_4 = libssl_utils_gcc32dbg_la-scutils.lo \
 	libssl_utils_gcc32dbg_la-sslutils.lo \
 	libssl_utils_gcc32dbg_la-proxycertinfo.lo
-am_libssl_utils_gcc32dbg_la_OBJECTS = $(am__objects_3)
+am_libssl_utils_gcc32dbg_la_OBJECTS = $(am__objects_4)
 libssl_utils_gcc32dbg_la_OBJECTS =  \
 	$(am_libssl_utils_gcc32dbg_la_OBJECTS)
 libssl_utils_gcc32dbgpthr_la_DEPENDENCIES =  \
 	./oldgaa/liboldgaa_gcc32dbgpthr.la $(am__DEPENDENCIES_1)
-am__objects_4 = libssl_utils_gcc32dbgpthr_la-scutils.lo \
+am__objects_5 = libssl_utils_gcc32dbgpthr_la-scutils.lo \
 	libssl_utils_gcc32dbgpthr_la-sslutils.lo \
 	libssl_utils_gcc32dbgpthr_la-proxycertinfo.lo
-am_libssl_utils_gcc32dbgpthr_la_OBJECTS = $(am__objects_4)
+am_libssl_utils_gcc32dbgpthr_la_OBJECTS = $(am__objects_5)
 libssl_utils_gcc32dbgpthr_la_OBJECTS =  \
 	$(am_libssl_utils_gcc32dbgpthr_la_OBJECTS)
 libssl_utils_gcc32pthr_la_DEPENDENCIES =  \
 	./oldgaa/liboldgaa_gcc32pthr.la $(am__DEPENDENCIES_1)
-am__objects_5 = libssl_utils_gcc32pthr_la-scutils.lo \
+am__objects_6 = libssl_utils_gcc32pthr_la-scutils.lo \
 	libssl_utils_gcc32pthr_la-sslutils.lo \
 	libssl_utils_gcc32pthr_la-proxycertinfo.lo
-am_libssl_utils_gcc32pthr_la_OBJECTS = $(am__objects_5)
+am_libssl_utils_gcc32pthr_la_OBJECTS = $(am__objects_6)
 libssl_utils_gcc32pthr_la_OBJECTS =  \
 	$(am_libssl_utils_gcc32pthr_la_OBJECTS)
 libssl_utils_gcc64_la_DEPENDENCIES = ./oldgaa/liboldgaa_gcc64.la \
 	$(am__DEPENDENCIES_1)
-am__objects_6 = libssl_utils_gcc64_la-scutils.lo \
+am__objects_7 = libssl_utils_gcc64_la-scutils.lo \
 	libssl_utils_gcc64_la-sslutils.lo \
 	libssl_utils_gcc64_la-proxycertinfo.lo
-am_libssl_utils_gcc64_la_OBJECTS = $(am__objects_6)
+am_libssl_utils_gcc64_la_OBJECTS = $(am__objects_7)
 libssl_utils_gcc64_la_OBJECTS = $(am_libssl_utils_gcc64_la_OBJECTS)
 libssl_utils_gcc64dbg_la_DEPENDENCIES =  \
 	./oldgaa/liboldgaa_gcc64dbg.la $(am__DEPENDENCIES_1)
-am__objects_7 = libssl_utils_gcc64dbg_la-scutils.lo \
+am__objects_8 = libssl_utils_gcc64dbg_la-scutils.lo \
 	libssl_utils_gcc64dbg_la-sslutils.lo \
 	libssl_utils_gcc64dbg_la-proxycertinfo.lo
-am_libssl_utils_gcc64dbg_la_OBJECTS = $(am__objects_7)
+am_libssl_utils_gcc64dbg_la_OBJECTS = $(am__objects_8)
 libssl_utils_gcc64dbg_la_OBJECTS =  \
 	$(am_libssl_utils_gcc64dbg_la_OBJECTS)
 libssl_utils_gcc64dbgpthr_la_DEPENDENCIES =  \
 	./oldgaa/liboldgaa_gcc64dbgpthr.la $(am__DEPENDENCIES_1)
-am__objects_8 = libssl_utils_gcc64dbgpthr_la-scutils.lo \
+am__objects_9 = libssl_utils_gcc64dbgpthr_la-scutils.lo \
 	libssl_utils_gcc64dbgpthr_la-sslutils.lo \
 	libssl_utils_gcc64dbgpthr_la-proxycertinfo.lo
-am_libssl_utils_gcc64dbgpthr_la_OBJECTS = $(am__objects_8)
+am_libssl_utils_gcc64dbgpthr_la_OBJECTS = $(am__objects_9)
 libssl_utils_gcc64dbgpthr_la_OBJECTS =  \
 	$(am_libssl_utils_gcc64dbgpthr_la_OBJECTS)
 libssl_utils_gcc64pthr_la_DEPENDENCIES =  \
 	./oldgaa/liboldgaa_gcc64pthr.la $(am__DEPENDENCIES_1)
-am__objects_9 = libssl_utils_gcc64pthr_la-scutils.lo \
+am__objects_10 = libssl_utils_gcc64pthr_la-scutils.lo \
 	libssl_utils_gcc64pthr_la-sslutils.lo \
 	libssl_utils_gcc64pthr_la-proxycertinfo.lo
-am_libssl_utils_gcc64pthr_la_OBJECTS = $(am__objects_9)
+am_libssl_utils_gcc64pthr_la_OBJECTS = $(am__objects_10)
 libssl_utils_gcc64pthr_la_OBJECTS =  \
 	$(am_libssl_utils_gcc64pthr_la_OBJECTS)
-libssl_utils_nog_la_DEPENDENCIES = ./oldgaa/liboldgaa_nog.la
-am__objects_10 = libssl_utils_nog_la-scutils.lo \
-	libssl_utils_nog_la-sslutils.lo \
-	libssl_utils_nog_la-proxycertinfo.lo
-am_libssl_utils_nog_la_OBJECTS = $(am__objects_10)
-libssl_utils_nog_la_OBJECTS = $(am_libssl_utils_nog_la_OBJECTS)
 DEFAULT_INCLUDES = -I. -I$(srcdir) -I$(top_builddir)/src/autogen
 depcomp = $(SHELL) $(top_srcdir)/./project/depcomp
 am__depfiles_maybe = depfiles
@@ -137,16 +137,15 @@ LTCOMPILE = $(LIBTOOL) --tag=CC --mode=compile $(CC) $(DEFS) \
 CCLD = $(CC)
 LINK = $(LIBTOOL) --tag=CC --mode=link $(CCLD) $(AM_CFLAGS) $(CFLAGS) \
 	$(AM_LDFLAGS) $(LDFLAGS) -o $@
-DIST_SOURCES = $(libssl_utils_la_SOURCES) \
-	$(libssl_utils_gcc32_la_SOURCES) \
+DIST_SOURCES = $(libssl_utils_nog_la_SOURCES) \
+	$(libssl_utils_la_SOURCES) $(libssl_utils_gcc32_la_SOURCES) \
 	$(libssl_utils_gcc32dbg_la_SOURCES) \
 	$(libssl_utils_gcc32dbgpthr_la_SOURCES) \
 	$(libssl_utils_gcc32pthr_la_SOURCES) \
 	$(libssl_utils_gcc64_la_SOURCES) \
 	$(libssl_utils_gcc64dbg_la_SOURCES) \
 	$(libssl_utils_gcc64dbgpthr_la_SOURCES) \
-	$(libssl_utils_gcc64pthr_la_SOURCES) \
-	$(libssl_utils_nog_la_SOURCES)
+	$(libssl_utils_gcc64pthr_la_SOURCES)
 RECURSIVE_TARGETS = all-recursive check-recursive dvi-recursive \
 	html-recursive info-recursive install-data-recursive \
 	install-exec-recursive install-info-recursive \
@@ -167,6 +166,8 @@ AUTOCONF = @AUTOCONF@
 AUTOHEADER = @AUTOHEADER@
 AUTOMAKE = @AUTOMAKE@
 AWK = @AWK@
+BUILD_ALL_FALSE = @BUILD_ALL_FALSE@
+BUILD_ALL_TRUE = @BUILD_ALL_TRUE@
 BUILD_DOCS_FALSE = @BUILD_DOCS_FALSE@
 BUILD_DOCS_TRUE = @BUILD_DOCS_TRUE@
 BUILD_JAVA_FALSE = @BUILD_JAVA_FALSE@
@@ -251,9 +252,17 @@ PACKAGE_TARNAME = @PACKAGE_TARNAME@
 PACKAGE_VERSION = @PACKAGE_VERSION@
 PATH_SEPARATOR = @PATH_SEPARATOR@
 RANLIB = @RANLIB@
+SED = @SED@
 SET_MAKE = @SET_MAKE@
 SHELL = @SHELL@
 STRIP = @STRIP@
+USE_ATTCERT_LIB = @USE_ATTCERT_LIB@
+USE_CAPI_LIB = @USE_CAPI_LIB@
+USE_CCAPI_LIB = @USE_CCAPI_LIB@
+USE_CCATTCERT_LIB = @USE_CCATTCERT_LIB@
+USE_OLDGAA_LIB = @USE_OLDGAA_LIB@
+USE_SOCK_LIB = @USE_SOCK_LIB@
+USE_SSL_UTILS_LIB = @USE_SSL_UTILS_LIB@
 VAR_LOCATION_ENV = @VAR_LOCATION_ENV@
 VERSION = @VERSION@
 WANTED_API_LIBS = @WANTED_API_LIBS@
@@ -261,6 +270,7 @@ WANTED_ATTCERT_LIBS = @WANTED_ATTCERT_LIBS@
 WANTED_OLDGAA_LIBS = @WANTED_OLDGAA_LIBS@
 WANTED_SOCK_LIBS = @WANTED_SOCK_LIBS@
 WANTED_SSL_UTILS_LIBS = @WANTED_SSL_UTILS_LIBS@
+WANTED_UTIL_LIBS = @WANTED_UTIL_LIBS@
 WANT_UNIT_TEST_FALSE = @WANT_UNIT_TEST_FALSE@
 WANT_UNIT_TEST_TRUE = @WANT_UNIT_TEST_TRUE@
 WORKDIR = @WORKDIR@
@@ -309,8 +319,6 @@ sysconfdir = @sysconfdir@
 target_alias = @target_alias@
 SUBDIRS = oldgaa
 noinst_LTLIBRARIES = \
-	libssl_utils.la \
-	libssl_utils_nog.la \
 	$(WANTED_SSL_UTILS_LIBS) # may add the libraries defined in EXTRA_LTLIBRARIES
 
 SOURCES = scutils.c scutils.h sslutils.c sslutils.h proxycertinfo.c
@@ -322,7 +330,7 @@ libssl_utils_la_CFLAGS = \
 	$(GLOBUS_CFLAGS)
 
 libssl_utils_la_LIBADD = \
-	./oldgaa/liboldgaa_nog.la \
+	./oldgaa/liboldgaa.la \
 	$(GLOBUS_GSS_LIBS)
 
 libssl_utils_nog_la_CFLAGS = \
@@ -332,7 +340,7 @@ libssl_utils_nog_la_CFLAGS = \
 	$(GLOBUS_CFLAGS)
 
 libssl_utils_nog_la_LIBADD = \
-	./oldgaa/liboldgaa_nog.la
+	./oldgaa/liboldgaa-nog.la
 
 
 ###
@@ -344,7 +352,9 @@ EXTRA_LTLIBRARIES = \
 	libssl_utils_gcc64.la \
 	libssl_utils_gcc64dbg.la \
 	libssl_utils_gcc64pthr.la \
-	libssl_utils_gcc64dbgpthr.la
+	libssl_utils_gcc64dbgpthr.la \
+	libssl_utils.la \
+	libssl_utils-nog.la
 
 libssl_utils_gcc32_la_SOURCES = \
 	$(SOURCES)
@@ -494,6 +504,8 @@ clean-noinstLTLIBRARIES:
 	  echo "rm -f \"$${dir}/so_locations\""; \
 	  rm -f "$${dir}/so_locations"; \
 	done
+libssl_utils-nog.la: $(libssl_utils_nog_la_OBJECTS) $(libssl_utils_nog_la_DEPENDENCIES) 
+	$(LINK)  $(libssl_utils_nog_la_LDFLAGS) $(libssl_utils_nog_la_OBJECTS) $(libssl_utils_nog_la_LIBADD) $(LIBS)
 libssl_utils.la: $(libssl_utils_la_OBJECTS) $(libssl_utils_la_DEPENDENCIES) 
 	$(LINK)  $(libssl_utils_la_LDFLAGS) $(libssl_utils_la_OBJECTS) $(libssl_utils_la_LIBADD) $(LIBS)
 libssl_utils_gcc32.la: $(libssl_utils_gcc32_la_OBJECTS) $(libssl_utils_gcc32_la_DEPENDENCIES) 
@@ -512,8 +524,6 @@ libssl_utils_gcc64dbgpthr.la: $(libssl_utils_gcc64dbgpthr_la_OBJECTS) $(libssl_u
 	$(LINK)  $(libssl_utils_gcc64dbgpthr_la_LDFLAGS) $(libssl_utils_gcc64dbgpthr_la_OBJECTS) $(libssl_utils_gcc64dbgpthr_la_LIBADD) $(LIBS)
 libssl_utils_gcc64pthr.la: $(libssl_utils_gcc64pthr_la_OBJECTS) $(libssl_utils_gcc64pthr_la_DEPENDENCIES) 
 	$(LINK)  $(libssl_utils_gcc64pthr_la_LDFLAGS) $(libssl_utils_gcc64pthr_la_OBJECTS) $(libssl_utils_gcc64pthr_la_LIBADD) $(LIBS)
-libssl_utils_nog.la: $(libssl_utils_nog_la_OBJECTS) $(libssl_utils_nog_la_DEPENDENCIES) 
-	$(LINK)  $(libssl_utils_nog_la_LDFLAGS) $(libssl_utils_nog_la_OBJECTS) $(libssl_utils_nog_la_LIBADD) $(LIBS)
 
 mostlyclean-compile:
 	-rm -f *.$(OBJEXT)
@@ -572,6 +582,27 @@ distclean-compile:
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	source='$<' object='$@' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(LTCOMPILE) -c -o $@ $<
+
+libssl_utils_nog_la-scutils.lo: scutils.c
+@am__fastdepCC_TRUE@	if $(LIBTOOL) --tag=CC --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libssl_utils_nog_la_CFLAGS) $(CFLAGS) -MT libssl_utils_nog_la-scutils.lo -MD -MP -MF "$(DEPDIR)/libssl_utils_nog_la-scutils.Tpo" -c -o libssl_utils_nog_la-scutils.lo `test -f 'scutils.c' || echo '$(srcdir)/'`scutils.c; \
+@am__fastdepCC_TRUE@	then mv -f "$(DEPDIR)/libssl_utils_nog_la-scutils.Tpo" "$(DEPDIR)/libssl_utils_nog_la-scutils.Plo"; else rm -f "$(DEPDIR)/libssl_utils_nog_la-scutils.Tpo"; exit 1; fi
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='scutils.c' object='libssl_utils_nog_la-scutils.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(LIBTOOL) --tag=CC --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libssl_utils_nog_la_CFLAGS) $(CFLAGS) -c -o libssl_utils_nog_la-scutils.lo `test -f 'scutils.c' || echo '$(srcdir)/'`scutils.c
+
+libssl_utils_nog_la-sslutils.lo: sslutils.c
+@am__fastdepCC_TRUE@	if $(LIBTOOL) --tag=CC --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libssl_utils_nog_la_CFLAGS) $(CFLAGS) -MT libssl_utils_nog_la-sslutils.lo -MD -MP -MF "$(DEPDIR)/libssl_utils_nog_la-sslutils.Tpo" -c -o libssl_utils_nog_la-sslutils.lo `test -f 'sslutils.c' || echo '$(srcdir)/'`sslutils.c; \
+@am__fastdepCC_TRUE@	then mv -f "$(DEPDIR)/libssl_utils_nog_la-sslutils.Tpo" "$(DEPDIR)/libssl_utils_nog_la-sslutils.Plo"; else rm -f "$(DEPDIR)/libssl_utils_nog_la-sslutils.Tpo"; exit 1; fi
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='sslutils.c' object='libssl_utils_nog_la-sslutils.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(LIBTOOL) --tag=CC --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libssl_utils_nog_la_CFLAGS) $(CFLAGS) -c -o libssl_utils_nog_la-sslutils.lo `test -f 'sslutils.c' || echo '$(srcdir)/'`sslutils.c
+
+libssl_utils_nog_la-proxycertinfo.lo: proxycertinfo.c
+@am__fastdepCC_TRUE@	if $(LIBTOOL) --tag=CC --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libssl_utils_nog_la_CFLAGS) $(CFLAGS) -MT libssl_utils_nog_la-proxycertinfo.lo -MD -MP -MF "$(DEPDIR)/libssl_utils_nog_la-proxycertinfo.Tpo" -c -o libssl_utils_nog_la-proxycertinfo.lo `test -f 'proxycertinfo.c' || echo '$(srcdir)/'`proxycertinfo.c; \
+@am__fastdepCC_TRUE@	then mv -f "$(DEPDIR)/libssl_utils_nog_la-proxycertinfo.Tpo" "$(DEPDIR)/libssl_utils_nog_la-proxycertinfo.Plo"; else rm -f "$(DEPDIR)/libssl_utils_nog_la-proxycertinfo.Tpo"; exit 1; fi
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='proxycertinfo.c' object='libssl_utils_nog_la-proxycertinfo.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(LIBTOOL) --tag=CC --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libssl_utils_nog_la_CFLAGS) $(CFLAGS) -c -o libssl_utils_nog_la-proxycertinfo.lo `test -f 'proxycertinfo.c' || echo '$(srcdir)/'`proxycertinfo.c
 
 libssl_utils_la-scutils.lo: scutils.c
 @am__fastdepCC_TRUE@	if $(LIBTOOL) --tag=CC --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libssl_utils_la_CFLAGS) $(CFLAGS) -MT libssl_utils_la-scutils.lo -MD -MP -MF "$(DEPDIR)/libssl_utils_la-scutils.Tpo" -c -o libssl_utils_la-scutils.lo `test -f 'scutils.c' || echo '$(srcdir)/'`scutils.c; \
@@ -761,27 +792,6 @@ libssl_utils_gcc64pthr_la-proxycertinfo.lo: proxycertinfo.c
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	source='proxycertinfo.c' object='libssl_utils_gcc64pthr_la-proxycertinfo.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(LIBTOOL) --tag=CC --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libssl_utils_gcc64pthr_la_CFLAGS) $(CFLAGS) -c -o libssl_utils_gcc64pthr_la-proxycertinfo.lo `test -f 'proxycertinfo.c' || echo '$(srcdir)/'`proxycertinfo.c
-
-libssl_utils_nog_la-scutils.lo: scutils.c
-@am__fastdepCC_TRUE@	if $(LIBTOOL) --tag=CC --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libssl_utils_nog_la_CFLAGS) $(CFLAGS) -MT libssl_utils_nog_la-scutils.lo -MD -MP -MF "$(DEPDIR)/libssl_utils_nog_la-scutils.Tpo" -c -o libssl_utils_nog_la-scutils.lo `test -f 'scutils.c' || echo '$(srcdir)/'`scutils.c; \
-@am__fastdepCC_TRUE@	then mv -f "$(DEPDIR)/libssl_utils_nog_la-scutils.Tpo" "$(DEPDIR)/libssl_utils_nog_la-scutils.Plo"; else rm -f "$(DEPDIR)/libssl_utils_nog_la-scutils.Tpo"; exit 1; fi
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='scutils.c' object='libssl_utils_nog_la-scutils.lo' libtool=yes @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(LIBTOOL) --tag=CC --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libssl_utils_nog_la_CFLAGS) $(CFLAGS) -c -o libssl_utils_nog_la-scutils.lo `test -f 'scutils.c' || echo '$(srcdir)/'`scutils.c
-
-libssl_utils_nog_la-sslutils.lo: sslutils.c
-@am__fastdepCC_TRUE@	if $(LIBTOOL) --tag=CC --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libssl_utils_nog_la_CFLAGS) $(CFLAGS) -MT libssl_utils_nog_la-sslutils.lo -MD -MP -MF "$(DEPDIR)/libssl_utils_nog_la-sslutils.Tpo" -c -o libssl_utils_nog_la-sslutils.lo `test -f 'sslutils.c' || echo '$(srcdir)/'`sslutils.c; \
-@am__fastdepCC_TRUE@	then mv -f "$(DEPDIR)/libssl_utils_nog_la-sslutils.Tpo" "$(DEPDIR)/libssl_utils_nog_la-sslutils.Plo"; else rm -f "$(DEPDIR)/libssl_utils_nog_la-sslutils.Tpo"; exit 1; fi
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='sslutils.c' object='libssl_utils_nog_la-sslutils.lo' libtool=yes @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(LIBTOOL) --tag=CC --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libssl_utils_nog_la_CFLAGS) $(CFLAGS) -c -o libssl_utils_nog_la-sslutils.lo `test -f 'sslutils.c' || echo '$(srcdir)/'`sslutils.c
-
-libssl_utils_nog_la-proxycertinfo.lo: proxycertinfo.c
-@am__fastdepCC_TRUE@	if $(LIBTOOL) --tag=CC --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libssl_utils_nog_la_CFLAGS) $(CFLAGS) -MT libssl_utils_nog_la-proxycertinfo.lo -MD -MP -MF "$(DEPDIR)/libssl_utils_nog_la-proxycertinfo.Tpo" -c -o libssl_utils_nog_la-proxycertinfo.lo `test -f 'proxycertinfo.c' || echo '$(srcdir)/'`proxycertinfo.c; \
-@am__fastdepCC_TRUE@	then mv -f "$(DEPDIR)/libssl_utils_nog_la-proxycertinfo.Tpo" "$(DEPDIR)/libssl_utils_nog_la-proxycertinfo.Plo"; else rm -f "$(DEPDIR)/libssl_utils_nog_la-proxycertinfo.Tpo"; exit 1; fi
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='proxycertinfo.c' object='libssl_utils_nog_la-proxycertinfo.lo' libtool=yes @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(LIBTOOL) --tag=CC --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libssl_utils_nog_la_CFLAGS) $(CFLAGS) -c -o libssl_utils_nog_la-proxycertinfo.lo `test -f 'proxycertinfo.c' || echo '$(srcdir)/'`proxycertinfo.c
 
 mostlyclean-libtool:
 	-rm -f *.lo

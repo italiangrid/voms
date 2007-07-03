@@ -1,6 +1,5 @@
 
 noinst_LTLIBRARIES = \
-	libsock.la \
 	$(WANTED_SOCK_LIBS) # may add the libraries defined in EXTRA_LTLIBRARIES
 
 SOURCES = Client.cpp Server.cpp tokens.c globuswrap.c
@@ -29,7 +28,8 @@ EXTRA_LTLIBRARIES = \
 	libsock_gcc64.la \
 	libsock_gcc64dbg.la \
 	libsock_gcc64pthr.la \
-	libsock_gcc64dbgpthr.la
+	libsock_gcc64dbgpthr.la \
+	libsock.la
 
 libsock_gcc32_la_SOURCES = \
 	$(SOURCES)

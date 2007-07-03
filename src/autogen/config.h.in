@@ -270,12 +270,6 @@
 /* Define to 1 if `vfork' works. */
 #undef HAVE_WORKING_VFORK
 
-/* Define to 1 if X509V3_EXT has a member it */
-#undef HAVE_X509V3_EXT_METHOD_IT
-
-/* Define to 1 if X509V3_EXT has a member it (OpenSSL system libs) */
-#undef HAVE_X509V3_EXT_METHOD_IT_OPENSSL
-
 /* Define to 1 if the system has the type `_Bool'. */
 #undef HAVE__BOOL
 

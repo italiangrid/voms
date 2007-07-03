@@ -334,10 +334,4 @@ extern int VOMS_RetrieveFromProxy(int, struct vomsdatar *vd, int *error);
 extern struct vomsdatar *VOMS_Duplicate(struct vomsdatar *vd);
 extern AC *VOMS_GetAC(struct vomsr *v);
 
-#if 0
-int getMajorVersionNumber(void);
-int getMinorVersionNumber(void);
-int getPatchVersionNumber(void);
-#endif
-
 #endif

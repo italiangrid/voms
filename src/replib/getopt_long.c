@@ -1211,10 +1211,6 @@ _getopt_internal (argc, argv, optstring, longopts, longind, long_only)
    Software Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
    02111-1307 USA.  */
 
-#if 0
-#ifdef HAVE_CONFIG_H
-#include <config.h>
-#endif
 
 #ifdef _LIBC
 # include <getopt.h>

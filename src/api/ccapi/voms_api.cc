@@ -52,8 +52,6 @@ extern "C" {
 
 #include "realdata.h"
 
-static bool noglobus = false;
-
 extern bool retrieve(X509 *cert, STACK_OF(X509) *chain, recurse_type how, 
 		     std::string &buffer, std::string &vo, std::string &file, 
 		     std::string &subject, std::string &ca, verror_type &error);
@@ -67,6 +65,8 @@ extern "C" {
 extern char *Decode(const char *, int, int *);
 extern char *Encode(const char *, int, int *);
 }
+
+extern int AC_Init(void);
 
 #ifdef NOGLOBUS
 static pthread_mutex_t *mut_pool = NULL;
@@ -130,27 +130,37 @@ static void openssl_initialize(void)
 #endif
 }
 
+#else
+/* ndef NOGLOBUS */
+
+static globus_thread_once_t l_globus_once_control = GLOBUS_THREAD_ONCE_INIT;
+
+static void l_init_globus_once_func(void) {
+#ifdef HAVE_GLOBUS_MODULE_ACTIVATE
+    (void)globus_module_activate(GLOBUS_GSI_GSS_ASSIST_MODULE);
+    (void)globus_module_activate(GLOBUS_OPENSSL_MODULE);
+#endif
+    SSLeay_add_all_algorithms();
+    ERR_load_crypto_strings();
+    (void)AC_Init();
+}
+
 #endif
 
-extern int AC_Init(void);
 vomsdata::Initializer::Initializer(Initializer &) {}
 vomsdata::Initializer::Initializer()
 {
-#ifndef NOGLOBUS
-#ifdef HAVE_GLOBUS_MODULE_ACTIVATE
-  (void)globus_module_activate(GLOBUS_GSI_GSS_ASSIST_MODULE);
-  (void)globus_module_activate(GLOBUS_OPENSSL_MODULE);
-#endif
-#else
+#ifdef NOGLOBUS
   openssl_initialize();
-#endif
   SSLeay_add_all_algorithms();
   ERR_load_crypto_strings();
 
   (void)AC_Init();
+#endif
 }
 
 vomsdata::Initializer vomsdata::init;
+//bool vomsdata::initialized = false;
 
 void vomsdata::seterror(verror_type err, std::string message)
 {
@@ -173,6 +183,10 @@ vomsdata::vomsdata(std::string voms_dir, std::string cert_dir) :  ca_cert_dir(ce
                                                                   ver_type(VERIFY_FULL),
                                                                   retry_count(1)
 {
+#ifndef NOGLOBUS
+   (void)globus_thread_once(&l_globus_once_control, l_init_globus_once_func);
+#endif
+
   if (voms_cert_dir.empty()) {
     char *v;
     if ( (v = getenv("X509_VOMS_DIR")))
@@ -199,20 +213,6 @@ vomsdata::vomsdata(std::string voms_dir, std::string cert_dir) :  ca_cert_dir(ce
   if (!cdir)
     seterror(VERR_DIR, "Unable to find ca certificates");
 
-#ifndef NOGLOBUS    
-#ifdef HAVE_GLOBUS_MODULE_ACTIVATE
-  if (globus_module_activate(GLOBUS_GSI_GSS_ASSIST_MODULE) != GLOBUS_SUCCESS) {
-    seterror(VERR_NOINIT, "Unable to initialize globus.");
-    noglobus = true;
-  }
-  if (globus_module_activate(GLOBUS_OPENSSL_MODULE) != GLOBUS_SUCCESS) {
-    seterror(VERR_NOINIT, "Unable to initialize globus.");
-    globus_module_deactivate(GLOBUS_GSI_GSS_ASSIST_MODULE);
-    noglobus = true;
-  }
-#endif
-#endif
-
   if (cdir)
     (void)closedir(cdir);
   if (vdir)
@@ -224,7 +224,8 @@ vomsdata::vomsdata(std::string voms_dir, std::string cert_dir) :  ca_cert_dir(ce
 vomsdata::~vomsdata()
 {
 #ifndef NOGLOBUS
-#ifdef HAVE_GLOBUS_MODULE_ACTIVATE
+  //#ifdef HAVE_GLOBUS_MODULE_ACTIVATE
+#if 0
   if (!noglobus) {
     globus_module_deactivate(GLOBUS_GSI_GSS_ASSIST_MODULE);
     globus_module_deactivate(GLOBUS_OPENSSL_MODULE);

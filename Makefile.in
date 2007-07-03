@@ -86,6 +86,8 @@ AUTOCONF = @AUTOCONF@
 AUTOHEADER = @AUTOHEADER@
 AUTOMAKE = @AUTOMAKE@
 AWK = @AWK@
+BUILD_ALL_FALSE = @BUILD_ALL_FALSE@
+BUILD_ALL_TRUE = @BUILD_ALL_TRUE@
 BUILD_DOCS_FALSE = @BUILD_DOCS_FALSE@
 BUILD_DOCS_TRUE = @BUILD_DOCS_TRUE@
 BUILD_JAVA_FALSE = @BUILD_JAVA_FALSE@
@@ -170,9 +172,17 @@ PACKAGE_TARNAME = @PACKAGE_TARNAME@
 PACKAGE_VERSION = @PACKAGE_VERSION@
 PATH_SEPARATOR = @PATH_SEPARATOR@
 RANLIB = @RANLIB@
+SED = @SED@
 SET_MAKE = @SET_MAKE@
 SHELL = @SHELL@
 STRIP = @STRIP@
+USE_ATTCERT_LIB = @USE_ATTCERT_LIB@
+USE_CAPI_LIB = @USE_CAPI_LIB@
+USE_CCAPI_LIB = @USE_CCAPI_LIB@
+USE_CCATTCERT_LIB = @USE_CCATTCERT_LIB@
+USE_OLDGAA_LIB = @USE_OLDGAA_LIB@
+USE_SOCK_LIB = @USE_SOCK_LIB@
+USE_SSL_UTILS_LIB = @USE_SSL_UTILS_LIB@
 VAR_LOCATION_ENV = @VAR_LOCATION_ENV@
 VERSION = @VERSION@
 WANTED_API_LIBS = @WANTED_API_LIBS@
@@ -180,6 +190,7 @@ WANTED_ATTCERT_LIBS = @WANTED_ATTCERT_LIBS@
 WANTED_OLDGAA_LIBS = @WANTED_OLDGAA_LIBS@
 WANTED_SOCK_LIBS = @WANTED_SOCK_LIBS@
 WANTED_SSL_UTILS_LIBS = @WANTED_SSL_UTILS_LIBS@
+WANTED_UTIL_LIBS = @WANTED_UTIL_LIBS@
 WANT_UNIT_TEST_FALSE = @WANT_UNIT_TEST_FALSE@
 WANT_UNIT_TEST_TRUE = @WANT_UNIT_TEST_TRUE@
 WORKDIR = @WORKDIR@
@@ -694,34 +705,50 @@ userdoc-recursive:
 userdoc: userdoc-local userdoc-recursive
 
 install-data-local:
-@BUILD_DOCS_TRUE@	for subpackage in api; do \
-@BUILD_DOCS_TRUE@	  $(mkinstalldirs) $(DESTDIR)$(datadir)/doc/$(PACKAGE)-$${subpackage}$(GCCVER)$(DOCVER); \
-@BUILD_DOCS_TRUE@	  for project in VOMS_CC_API VOMS_C_API; do \
-@BUILD_DOCS_TRUE@	    $(mkinstalldirs) $(DESTDIR)$(datadir)/doc/$(PACKAGE)-$${subpackage}$(GCCVER)$(DOCVER)/$${project}/html; \
-@BUILD_DOCS_TRUE@	    $(mkinstalldirs) $(DESTDIR)$(datadir)/doc/$(PACKAGE)-$${subpackage}$(GCCVER)$(DOCVER)/$${project}/pdf; \
-@BUILD_DOCS_TRUE@	    $(mkinstalldirs) $(DESTDIR)$(datadir)/doc/$(PACKAGE)-$${subpackage}$(GCCVER)$(DOCVER)/$${project}/ps; \
-@BUILD_DOCS_TRUE@	    for file in $(APIDOC_DIR)/$${subpackage}/$${project}//html/*; do \
-@BUILD_DOCS_TRUE@	      $(INSTALL_DATA) $${file} $(DESTDIR)$(datadir)/doc/$(PACKAGE)-$${subpackage}$(GCCVER)$(DOCVER)/$${project}/html; \
-@BUILD_DOCS_TRUE@	    done; \
-@BUILD_DOCS_TRUE@	    $(INSTALL_DATA) $(APIDOC_DIR)/$${subpackage}/$${project}/latex/refman.pdf $(DESTDIR)$(datadir)/doc/$(PACKAGE)-$${subpackage}$(GCCVER)$(DOCVER)/$${project}/pdf/$${project}.pdf; \
-@BUILD_DOCS_TRUE@	    $(INSTALL_DATA) $(APIDOC_DIR)/$${subpackage}/$${project}/latex/refman.ps $(DESTDIR)$(datadir)/doc/$(PACKAGE)-$${subpackage}$(GCCVER)$(DOCVER)/$${project}/ps/$${project}.ps; \
-@BUILD_DOCS_TRUE@	  done; \
-@BUILD_DOCS_TRUE@	done; \
-@BUILD_DOCS_TRUE@	for subpackage in server client utils; do \
-@BUILD_DOCS_TRUE@	  $(mkinstalldirs) $(DESTDIR)$(datadir)/doc/$(PACKAGE)-$${subpackage}$(GCCVER)$(DOCVER); \
-@BUILD_DOCS_TRUE@	  for file in $(USERDOC_FILES); do \
-@BUILD_DOCS_TRUE@	    $(INSTALL_DATA) $${file} $(DESTDIR)$(datadir)/doc/$(PACKAGE)-$${subpackage}$(GCCVER)$(DOCVER); \
-@BUILD_DOCS_TRUE@	  done; \
-@BUILD_DOCS_TRUE@	  for dir in html pdf ps; do \
-@BUILD_DOCS_TRUE@	    $(mkinstalldirs) $(DESTDIR)$(datadir)/doc/$(PACKAGE)-$${subpackage}$(GCCVER)$(DOCVER)/$${dir}; \
-@BUILD_DOCS_TRUE@	    for file in $(USERDOC_DIR)/$${subpackage}/$${dir}/*; do \
-@BUILD_DOCS_TRUE@	      $(INSTALL_DATA) $${file} $(DESTDIR)$(datadir)/doc/$(PACKAGE)-$${subpackage}$(GCCVER)$(DOCVER)/$${dir}; \
-@BUILD_DOCS_TRUE@	    done; \
-@BUILD_DOCS_TRUE@	  done; \
-@BUILD_DOCS_TRUE@	done
-@BUILD_DOCS_TRUE@	for file in $(APIDOC_FILES); do \
-@BUILD_DOCS_TRUE@	   $(INSTALL_DATA) $${file} $(DESTDIR)$(datadir)/doc/$(PACKAGE)-api$(GCCVER)$(DOCVER); \
-@BUILD_DOCS_TRUE@	done;
+@BUILD_ALL_TRUE@@BUILD_DOCS_TRUE@	for subpackage in api; do \
+@BUILD_ALL_TRUE@@BUILD_DOCS_TRUE@	  $(mkinstalldirs) $(DESTDIR)$(datadir)/doc/$(PACKAGE)-$${subpackage}$(GCCVER)$(DOCVER); \
+@BUILD_ALL_TRUE@@BUILD_DOCS_TRUE@	  for project in VOMS_CC_API VOMS_C_API; do \
+@BUILD_ALL_TRUE@@BUILD_DOCS_TRUE@	    $(mkinstalldirs) $(DESTDIR)$(datadir)/doc/$(PACKAGE)-$${subpackage}$(GCCVER)$(DOCVER)/$${project}/html; \
+@BUILD_ALL_TRUE@@BUILD_DOCS_TRUE@	    $(mkinstalldirs) $(DESTDIR)$(datadir)/doc/$(PACKAGE)-$${subpackage}$(GCCVER)$(DOCVER)/$${project}/pdf; \
+@BUILD_ALL_TRUE@@BUILD_DOCS_TRUE@	    $(mkinstalldirs) $(DESTDIR)$(datadir)/doc/$(PACKAGE)-$${subpackage}$(GCCVER)$(DOCVER)/$${project}/ps; \
+@BUILD_ALL_TRUE@@BUILD_DOCS_TRUE@	    for file in $(APIDOC_DIR)/$${subpackage}/$${project}//html/*; do \
+@BUILD_ALL_TRUE@@BUILD_DOCS_TRUE@	      $(INSTALL_DATA) $${file} $(DESTDIR)$(datadir)/doc/$(PACKAGE)-$${subpackage}$(GCCVER)$(DOCVER)/$${project}/html; \
+@BUILD_ALL_TRUE@@BUILD_DOCS_TRUE@	    done; \
+@BUILD_ALL_TRUE@@BUILD_DOCS_TRUE@	    $(INSTALL_DATA) $(APIDOC_DIR)/$${subpackage}/$${project}/latex/refman.pdf $(DESTDIR)$(datadir)/doc/$(PACKAGE)-$${subpackage}$(GCCVER)$(DOCVER)/$${project}/pdf/$${project}.pdf; \
+@BUILD_ALL_TRUE@@BUILD_DOCS_TRUE@	    $(INSTALL_DATA) $(APIDOC_DIR)/$${subpackage}/$${project}/latex/refman.ps $(DESTDIR)$(datadir)/doc/$(PACKAGE)-$${subpackage}$(GCCVER)$(DOCVER)/$${project}/ps/$${project}.ps; \
+@BUILD_ALL_TRUE@@BUILD_DOCS_TRUE@	  done; \
+@BUILD_ALL_TRUE@@BUILD_DOCS_TRUE@	done; \
+@BUILD_ALL_TRUE@@BUILD_DOCS_TRUE@	for subpackage in server client utils; do \
+@BUILD_ALL_TRUE@@BUILD_DOCS_TRUE@	  $(mkinstalldirs) $(DESTDIR)$(datadir)/doc/$(PACKAGE)-$${subpackage}$(GCCVER)$(DOCVER); \
+@BUILD_ALL_TRUE@@BUILD_DOCS_TRUE@	  for file in $(USERDOC_FILES); do \
+@BUILD_ALL_TRUE@@BUILD_DOCS_TRUE@	    $(INSTALL_DATA) $${file} $(DESTDIR)$(datadir)/doc/$(PACKAGE)-$${subpackage}$(GCCVER)$(DOCVER); \
+@BUILD_ALL_TRUE@@BUILD_DOCS_TRUE@	  done; \
+@BUILD_ALL_TRUE@@BUILD_DOCS_TRUE@	  for dir in html pdf ps; do \
+@BUILD_ALL_TRUE@@BUILD_DOCS_TRUE@	    $(mkinstalldirs) $(DESTDIR)$(datadir)/doc/$(PACKAGE)-$${subpackage}$(GCCVER)$(DOCVER)/$${dir}; \
+@BUILD_ALL_TRUE@@BUILD_DOCS_TRUE@	    for file in $(USERDOC_DIR)/$${subpackage}/$${dir}/*; do \
+@BUILD_ALL_TRUE@@BUILD_DOCS_TRUE@	      $(INSTALL_DATA) $${file} $(DESTDIR)$(datadir)/doc/$(PACKAGE)-$${subpackage}$(GCCVER)$(DOCVER)/$${dir}; \
+@BUILD_ALL_TRUE@@BUILD_DOCS_TRUE@	    done; \
+@BUILD_ALL_TRUE@@BUILD_DOCS_TRUE@	  done; \
+@BUILD_ALL_TRUE@@BUILD_DOCS_TRUE@	done
+@BUILD_ALL_TRUE@@BUILD_DOCS_TRUE@	for file in $(APIDOC_FILES); do \
+@BUILD_ALL_TRUE@@BUILD_DOCS_TRUE@	   $(INSTALL_DATA) $${file} $(DESTDIR)$(datadir)/doc/$(PACKAGE)-api$(GCCVER)$(DOCVER); \
+@BUILD_ALL_TRUE@@BUILD_DOCS_TRUE@	done;
+@BUILD_ALL_FALSE@@BUILD_DOCS_TRUE@	for subpackage in api; do \
+@BUILD_ALL_FALSE@@BUILD_DOCS_TRUE@	  $(mkinstalldirs) $(DESTDIR)$(datadir)/doc/$(PACKAGE)-$${subpackage}$(GCCVER)$(DOCVER); \
+@BUILD_ALL_FALSE@@BUILD_DOCS_TRUE@	  for project in VOMS_CC_API VOMS_C_API; do \
+@BUILD_ALL_FALSE@@BUILD_DOCS_TRUE@	    $(mkinstalldirs) $(DESTDIR)$(datadir)/doc/$(PACKAGE)-$${subpackage}$(GCCVER)$(DOCVER)/$${project}/html; \
+@BUILD_ALL_FALSE@@BUILD_DOCS_TRUE@	    $(mkinstalldirs) $(DESTDIR)$(datadir)/doc/$(PACKAGE)-$${subpackage}$(GCCVER)$(DOCVER)/$${project}/pdf; \
+@BUILD_ALL_FALSE@@BUILD_DOCS_TRUE@	    $(mkinstalldirs) $(DESTDIR)$(datadir)/doc/$(PACKAGE)-$${subpackage}$(GCCVER)$(DOCVER)/$${project}/ps; \
+@BUILD_ALL_FALSE@@BUILD_DOCS_TRUE@	    for file in $(APIDOC_DIR)/$${subpackage}/$${project}//html/*; do \
+@BUILD_ALL_FALSE@@BUILD_DOCS_TRUE@	      $(INSTALL_DATA) $${file} $(DESTDIR)$(datadir)/doc/$(PACKAGE)-$${subpackage}$(GCCVER)$(DOCVER)/$${project}/html; \
+@BUILD_ALL_FALSE@@BUILD_DOCS_TRUE@	    done; \
+@BUILD_ALL_FALSE@@BUILD_DOCS_TRUE@	    $(INSTALL_DATA) $(APIDOC_DIR)/$${subpackage}/$${project}/latex/refman.pdf $(DESTDIR)$(datadir)/doc/$(PACKAGE)-$${subpackage}$(GCCVER)$(DOCVER)/$${project}/pdf/$${project}.pdf; \
+@BUILD_ALL_FALSE@@BUILD_DOCS_TRUE@	    $(INSTALL_DATA) $(APIDOC_DIR)/$${subpackage}/$${project}/latex/refman.ps $(DESTDIR)$(datadir)/doc/$(PACKAGE)-$${subpackage}$(GCCVER)$(DOCVER)/$${project}/ps/$${project}.ps; \
+@BUILD_ALL_FALSE@@BUILD_DOCS_TRUE@	  done; \
+@BUILD_ALL_FALSE@@BUILD_DOCS_TRUE@	done; \
+@BUILD_ALL_FALSE@@BUILD_DOCS_TRUE@	for file in $(APIDOC_FILES); do \
+@BUILD_ALL_FALSE@@BUILD_DOCS_TRUE@	   $(INSTALL_DATA) $${file} $(DESTDIR)$(datadir)/doc/$(PACKAGE)-api$(GCCVER)$(DOCVER); \
+@BUILD_ALL_FALSE@@BUILD_DOCS_TRUE@	done;
 
 stage:
 	@set fnord $(MAKEFLAGS); amf=$$2; \

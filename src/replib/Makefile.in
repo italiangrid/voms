@@ -40,7 +40,8 @@ build_triplet = @build@
 host_triplet = @host@
 subdir = src/replib
 DIST_COMMON = $(srcdir)/Makefile.am $(srcdir)/Makefile.in daemon.c \
-	getopt_long.c getopt_long_only.c memcmp.c setenv.c strndup.c
+	getopt_long.c getopt_long_only.c memcmp.c memset.c setenv.c \
+	strndup.c
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 am__aclocal_m4_deps = $(top_srcdir)/project/acinclude.m4 \
 	$(top_srcdir)/project/cppunit.m4 \
@@ -81,6 +82,8 @@ AUTOCONF = @AUTOCONF@
 AUTOHEADER = @AUTOHEADER@
 AUTOMAKE = @AUTOMAKE@
 AWK = @AWK@
+BUILD_ALL_FALSE = @BUILD_ALL_FALSE@
+BUILD_ALL_TRUE = @BUILD_ALL_TRUE@
 BUILD_DOCS_FALSE = @BUILD_DOCS_FALSE@
 BUILD_DOCS_TRUE = @BUILD_DOCS_TRUE@
 BUILD_JAVA_FALSE = @BUILD_JAVA_FALSE@
@@ -165,9 +168,17 @@ PACKAGE_TARNAME = @PACKAGE_TARNAME@
 PACKAGE_VERSION = @PACKAGE_VERSION@
 PATH_SEPARATOR = @PATH_SEPARATOR@
 RANLIB = @RANLIB@
+SED = @SED@
 SET_MAKE = @SET_MAKE@
 SHELL = @SHELL@
 STRIP = @STRIP@
+USE_ATTCERT_LIB = @USE_ATTCERT_LIB@
+USE_CAPI_LIB = @USE_CAPI_LIB@
+USE_CCAPI_LIB = @USE_CCAPI_LIB@
+USE_CCATTCERT_LIB = @USE_CCATTCERT_LIB@
+USE_OLDGAA_LIB = @USE_OLDGAA_LIB@
+USE_SOCK_LIB = @USE_SOCK_LIB@
+USE_SSL_UTILS_LIB = @USE_SSL_UTILS_LIB@
 VAR_LOCATION_ENV = @VAR_LOCATION_ENV@
 VERSION = @VERSION@
 WANTED_API_LIBS = @WANTED_API_LIBS@
@@ -175,6 +186,7 @@ WANTED_ATTCERT_LIBS = @WANTED_ATTCERT_LIBS@
 WANTED_OLDGAA_LIBS = @WANTED_OLDGAA_LIBS@
 WANTED_SOCK_LIBS = @WANTED_SOCK_LIBS@
 WANTED_SSL_UTILS_LIBS = @WANTED_SSL_UTILS_LIBS@
+WANTED_UTIL_LIBS = @WANTED_UTIL_LIBS@
 WANT_UNIT_TEST_FALSE = @WANT_UNIT_TEST_FALSE@
 WANT_UNIT_TEST_TRUE = @WANT_UNIT_TEST_TRUE@
 WORKDIR = @WORKDIR@
@@ -287,6 +299,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@$(DEPDIR)/getopt_long.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@$(DEPDIR)/getopt_long_only.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@$(DEPDIR)/memcmp.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@$(DEPDIR)/memset.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@$(DEPDIR)/setenv.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@$(DEPDIR)/strndup.Plo@am__quote@
 

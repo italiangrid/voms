@@ -7,6 +7,15 @@ AC_DEFUN([AC_OPENSSL],
               [with_openssl_prefix="$withval"],
               [with_openssl_prefix=/usr])
 
+  AC_ARG_WITH(openssl_libs,
+              [ --with-openssl-libs do you want OpenSSL only libs? (yes)],
+              [ with_openssl_libs="$withval"],
+              [ with_openssl_libs="yes"])
+
+  if test "x$with_openssl_libs" != "xno"  -a "x$with_openssl_libs" != "xyes" ; then
+     AC_MSG_ERROR([Value of --with-openssl-libs must be either "yes" or "no"])
+  fi  
+
   SAVE_LD_LIBRARY_PATH=$LD_LIBRARY_PATH
   LD_LIBRARY_PATH="$with_openssl_prefix/lib"
 
@@ -20,6 +29,13 @@ AC_DEFUN([AC_OPENSSL],
     AC_SUBST(NO_GLOBUS_FLAGS)
     AC_SUBST(OPENSSL_LIBS)
     AC_MSG_CHECKING([for system OpenSSL version])
+    if test "x$with_openssl_libs" = "xyes" ; then
+      WANTED_API_LIBS="$WANTED_API_LIBS libvomsapi-nog.la"
+      WANTED_ATTCERT_LIBS="$WANTED_ATTCERT_LIBS libattributes_nog.la"
+      WANTED_SSL_UTILS_LIBS="$WANTED_SSL_UTILS_LIBS libssl_utils-nog.la"
+      WANTED_OLDGAA_LIBS="$WANTED_OLDGAA_LIBS liboldgaa-nog.la"
+      WANTED_UTIL_LIBS="$WANTED_UTIL_LIBS libutilities_nog.la libutilc_nog.la"
+    fi
     cat >conftest.h <<HERE
 #include <openssl/opensslv.h>
 OPENSSL_VERSION_TEXT
@@ -84,6 +100,36 @@ AC_DEFUN([AC_GLOBUS],
 
     AC_MSG_RESULT([found $GLOBUS_FLAVORS ($with_globus_flavor selected)])
 
+    if test "x$with_globus_flavor" = "x" ; then
+      if test "x$USE_OLDGAA_LIB" = "x"; then
+        USE_OLDGAA_LIB="liboldgaa.la"
+      fi
+      if test "x$USE_SSL_UTILS_LIB" = "x"; then
+        USE_SSL_UTILS_LIB="libssl_utils.la"
+      fi
+      if test "x$USE_SOCK_LIB" = "x"; then
+        USE_SOCK_LIB="libsock.la"
+      fi
+      if test "x$USE_CCAPI_LIB" = "x"; then
+        USE_CCAPI_LIB="libvomsapi.la"
+      fi
+      if test "x$USE_CAPI_LIB" = "x"; then
+        USE_CAPI_LIB="libvomsc.la"
+      fi
+      if test "x$USE_ATTCERT_LIB" = "x"; then
+        USE_ATTCERT_LIB="libattcert.la"
+      fi
+      if test "x$USE_CCATTCERT_LIB" = "x"; then
+        USE_CCATTCERT_LIB="libccattcert.la"
+      fi
+
+      WANTED_OLDGAA_LIBS="$WANTED_OLDGAA_LIBS liboldgaa.la"
+      WANTED_SSL_UTILS_LIBS="$WANTED_SSL_UTILS_LIBS libssl_utils.la"
+      WANTED_SOCK_LIBS="$WANTED_SOCK_LIBS libsock.la"
+      WANTED_ATTCERT_LIBS="$WANTED_ATTCERT_LIBS libattcert.la libccattcert.la"
+      WANTED_API_LIBS="$WANTED_API_LIBS libvomsapi.la libvomsc.la"
+      WANTED_UTIL_LIBS="$WANTED_UTIL_LIBS libutilities.la libutilc.la"
+    fi    
     new_flavors=""
 
     for flavor in $GLOBUS_FLAVORS ; do
@@ -112,15 +158,37 @@ AC_DEFUN([AC_GLOBUS],
     AC_MSG_RESULT([Final globus flavors: ${GLOBUS_FLAVORS}])
 
     for flavor in $GLOBUS_FLAVORS ; do
+      if test "x$USE_OLDGAA_LIB" = "x"; then
+        USE_OLDGAA_LIB="liboldgaa_$flavor.la"
+      fi
+      if test "x$USE_SSL_UTILS_LIB" = "x"; then
+        USE_SSL_UTILS_LIB="libssl_utils_$flavor.la"
+      fi
+      if test "x$USE_SOCK_LIB" = "x"; then
+        USE_SOCK_LIB="libsock_$flavor.la"
+      fi
+      if test "x$USE_CCAPI_LIB" = "x"; then
+        USE_CCAPI_LIB="libvomsapi_$flavor.la"
+      fi
+      if test "x$USE_CAPI_LIB" = "x"; then
+        USE_CAPI_LIB="libvomsc_$flavor.la"
+      fi
+      if test "x$USE_ATTCERT_LIB" = "x"; then
+        USE_ATTCERT_LIB="libattcert_$flavor.la"
+      fi
+      if test "x$USE_CCATTCERT_LIB" = "x"; then
+        USE_CCATTCERT_LIB="libccattcert_$flavor.la"
+      fi
       WANTED_OLDGAA_LIBS="$WANTED_OLDGAA_LIBS liboldgaa_$flavor.la"
       WANTED_SSL_UTILS_LIBS="$WANTED_SSL_UTILS_LIBS libssl_utils_"$flavor".la"
       WANTED_SOCK_LIBS="$WANTED_SOCK_LIBS libsock_$flavor.la"
       WANTED_CCAPI_LIBS="$WANTED_CCAPI_LIBS libvomsapi_"$flavor".la"
       WANTED_CAPI_LIBS="$WANTED_CAPI_LIBS libvomsc_"$flavor".la"
       WANTED_ATTCERT_LIBS="$WANTED_ATTCERT_LIBS libattcert_"$flavor".la libccattcert_"$flavor".la"
+      WANTED_UTIL_LIBS="$WANTED_UTIL_LIBS libutilities.la libutilc.la"
     done
 
-    WANTED_API_LIBS="$WANTED_CCAPI_LIBS $WANTED_CAPI_LIBS"
+    WANTED_API_LIBS="$WANTED_API_LIBS $WANTED_CCAPI_LIBS $WANTED_CAPI_LIBS"
 
     ac_globus_ldlib="-L$with_globus_prefix/lib"
 
@@ -184,6 +252,7 @@ AC_DEFUN([AC_GLOBUS],
     AC_SUBST(WANTED_SOCK_LIBS)
     AC_SUBST(WANTED_API_LIBS)
     AC_SUBST(WANTED_ATTCERT_LIBS)
+    AC_SUBST(WANTED_UTIL_LIBS)
 
     AC_SUBST(GLOBUS_CFLAGS)
     AC_SUBST(GLOBUS_GCC32_CFLAGS)
@@ -206,6 +275,15 @@ AC_DEFUN([AC_GLOBUS],
     AC_SUBST(GLOBUS_GCC64DBG_GSS_LIBS)
     AC_SUBST(GLOBUS_GCC64DBGPTHR_GSS_LIBS)
     AC_SUBST(GLOBUS_GCC64PTHR_GSS_LIBS)
+
+    AC_SUBST(USE_OLDGAA_LIB)
+    AC_SUBST(USE_SSL_UTILS_LIB)
+    AC_SUBST(USE_SOCK_LIB)
+    AC_SUBST(USE_CCAPI_LIB)
+    AC_SUBST(USE_CAPI_LIB)
+    AC_SUBST(USE_ATTCERT_LIB)
+    AC_SUBST(USE_CCATTCERT_LIB)
+
 ])
 
 # AC_COMPILER add switch to enable debug and warning
@@ -235,6 +313,22 @@ AC_DEFUN([AC_COMPILER],
 ])
 
 
+
+AC_DEFUN([AC_BUILD_API_ONLY],
+[
+  AC_ARG_WITH(api-only, 
+    [  --with-api-only   Enable compilation of the APIs only (no)],
+    [
+      case "$withval" in
+      yes) have_api_only="yes" ;;
+      no)  have_api_only="no" ;;
+      *) AC_MSG_ERROR([bad value $(withval) for --with-api-only]) ;;
+      esac
+    ],
+    [ have_api_only="no" ])
+
+  AM_CONDITIONAL(BUILD_ALL, test x$have_api_only = xno)
+])
 
 AC_DEFUN([AC_JAVA],
 [
@@ -529,63 +623,6 @@ AC_DEFUN([AC_VOMS_SOCKLEN_T],
 
     AC_MSG_RESULT([$ac_have_socklen_t])
 ])
-
-# AC_OPENSSL_EXT_METHOD check whether X509V3_EXT_METHOD has a 
-# member called it (only in recent openssl version)
-# ------------------------------------------------------------
-AC_DEFUN([AC_OPENSSL_EXT_METHOD],
-[
-    AC_MSG_CHECKING([for it member in X509V3_EXT_METHOD (globus libs)])
-
-    CFLAGS_SAVE="$CFLAGS"
-    CFLAGS="$CFLAGS $GLOBUS_CFLAGS"
-
-    AC_TRY_COMPILE(
-      [
-        #include <$with_globus_prefix/include/$with_globus_flavor/openssl/x509v3.h>
-      ],
-      [
-        X509V3_EXT_METHOD it;
-        it.it = NULL;
-      ],
-      [ac_have_x509v3_member_it="yes"],
-      [ac_have_x509v3_member_it="no"]
-    )
-
-    if test "x$ac_have_socklen_t" = "xyes" ; then
-      AC_DEFINE(HAVE_X509V3_EXT_METHOD_IT, 1, [Define to 1 if X509V3_EXT has a member it]) 
-    fi
-
-    AC_MSG_RESULT([$ac_have_x509v3_member_it])
-
-    CFLAGS="$CFLAGS_SAVE"
-
-    AC_MSG_CHECKING([for it member in X509V3_EXT_METHOD (system libs)])
-
-    CFLAGS_SAVE="$CFLAGS"
-    CFLAGS="$CFLAGS $NO_GLOBUS_FLAGS"
-
-    AC_TRY_COMPILE(
-      [
-        #include <openssl/x509v3.h>
-      ],
-      [
-        X509V3_EXT_METHOD it;
-        it.it = NULL;
-      ],
-      [ac_have_x509v3_member_it="yes"],
-      [ac_have_x509v3_member_it="no"]
-    )
-
-    if test "x$ac_have_socklen_t" = "xyes" ; then
-      AC_DEFINE(HAVE_X509V3_EXT_METHOD_IT_OPENSSL, 1, [Define to 1 if X509V3_EXT has a member it (OpenSSL system libs)]) 
-    fi
-
-    AC_MSG_RESULT([$ac_have_x509v3_member_it])
-
-    CFLAGS="$CFLAGS_SAVE"
-])
-
 
 # AC_VOMS_LONG_LONG check whether long long type is present
 # ------------------------------------------------------------

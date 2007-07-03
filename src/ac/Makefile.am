@@ -1,8 +1,5 @@
 
 noinst_LTLIBRARIES = \
-	libattcert.la \
-	libccattcert.la \
-	libattributes_nog.la \
 	$(WANTED_ATTCERT_LIBS) # may add the libraries defined in EXTRA_LTLIBRARIES
 
 libattcert_la_SOURCES = \
@@ -12,8 +9,7 @@ libattcert_la_SOURCES = \
 	mystack.c \
 	error.c \
 	newformat.c \
-	init.c \
-	attributes.c
+	init.c
 
 libattributes_nog_la_SOURCES = \
 	validate.c \
@@ -74,7 +70,10 @@ EXTRA_LTLIBRARIES = \
 	libccattcert_gcc64.la \
 	libccattcert_gcc64dbg.la \
 	libccattcert_gcc64pthr.la \
-	libccattcert_gcc64dbgpthr.la
+	libccattcert_gcc64dbgpthr.la \
+	libattributes_nog.la \
+	libattcert.la \
+	libccattcert.la
 
 libattcert_gcc32_la_SOURCES = \
 	validate.c \
@@ -281,4 +280,5 @@ EXTRA_DIST = \
 	write.h \
 	init.h \
 	extensions.h \
-	test.c
+	test.c \
+	attributes.h

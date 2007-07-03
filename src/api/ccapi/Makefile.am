@@ -2,9 +2,6 @@
 includedir = $(prefix)/include/glite/security/voms
 
 lib_LTLIBRARIES = \
-	libvomsapi_nog.la \
-	libvomsapi.la \
-	libvomsc.la \
 	$(WANTED_API_LIBS) # may add the libraries defined in EXTRA_LTLIBRARIES
 
 CCSOURCES = \
@@ -24,13 +21,16 @@ libvomsapi_nog_la_CPPFLAGS = \
 	-DNOGLOBUS \
 	$(API_INCLUDES)
 
+libvomsapi_nog_la_LDFLAGS = \
+	-rpath $(libdir)
+
 NOGLIBADD = \
 	$(EXPAT_LIBS) \
 	$(OPENSSL_LIBS) \
 	$(top_builddir)/src/replib/librep.la \
 	$(top_builddir)/src/common/libutilities_nog.la \
 	$(top_builddir)/src/common/libutilc_nog.la \
-	$(top_builddir)/src/sslutils/libssl_utils_nog.la \
+	$(top_builddir)/src/sslutils/libssl_utils-nog.la \
 	$(top_builddir)/src/log/liblog.la
 
 libvomsapi_nog_la_LIBADD = \
@@ -44,6 +44,9 @@ libvomsapi_la_CPPFLAGS = \
 	-I$(top_srcdir)/src/include \
 	$(API_INCLUDES) \
 	$(GLOBUS_CFLAGS)
+
+libvomsapi_la_LDFLAGS = \
+	-rpath $(libdir)
 
 CCLIBADD = \
 	$(EXPAT_LIBS) \
@@ -71,6 +74,10 @@ libvomsc_la_CPPFLAGS = \
 	$(API_INCLUDES) \
 	$(GLOBUS_CFLAGS)
 
+libvomsc_la_LDFLAGS = \
+	-rpath $(libdir)
+
+
 CLIBADD = 
 	$(top_builddir)/src/common/libutilities.la \
 	$(top_builddir)/src/replib/librep.la \
@@ -83,13 +90,13 @@ libvomsc_la_LIBADD = \
 
 # test programs
 
-noinst_PROGRAMS = test ctest
-test_SOURCES = test.cc
-test_LDADD = libvomsapi.la
-test_CPPFLAGS = -I$(top_srcdir)/src/include $(GLOBUS_CFLAGS)
-ctest_SOURCES = ctest.c
-ctest_LDADD = libvomsc.la
-ctest_CPPFLAGS = -I$(top_srcdir)/src/include $(GLOBUS_CFLAGS)
+#noinst_PROGRAMS = test ctest
+#test_SOURCES = test.cc
+#test_LDADD = libvomsapi.la
+#test_CPPFLAGS = -I$(top_srcdir)/src/include $(GLOBUS_CFLAGS)
+#ctest_SOURCES = ctest.c
+#ctest_LDADD = libvomsc.la
+#ctest_CPPFLAGS = -I$(top_srcdir)/src/include $(GLOBUS_CFLAGS)
 
 EXTRA_LTLIBRARIES = \
 	libvomsapi_gcc32.la \
@@ -100,6 +107,8 @@ EXTRA_LTLIBRARIES = \
 	libvomsapi_gcc64dbg.la \
 	libvomsapi_gcc64pthr.la \
 	libvomsapi_gcc64dbgpthr.la \
+	libvomsapi-nog.la \
+	libvomsapi.la \
 	libvomsc_gcc32.la \
 	libvomsc_gcc32dbg.la \
 	libvomsc_gcc32pthr.la \
@@ -107,7 +116,8 @@ EXTRA_LTLIBRARIES = \
 	libvomsc_gcc64.la \
 	libvomsc_gcc64dbg.la \
 	libvomsc_gcc64pthr.la \
-	libvomsc_gcc64dbgpthr.la
+	libvomsc_gcc64dbgpthr.la \
+	libvomsc.la
 
 libvomsapi_gcc32_la_SOURCES = \
 	$(CCSOURCES)
@@ -381,6 +391,7 @@ EXTRA_DIST = \
 	voms_api.h \
 	voms_apic.h \
 	cinterface.h \
+	realdata.h \
   ctest.c
 
 CLEANFILES = \
@@ -399,7 +410,10 @@ CLEANFILES = \
 	libvomsc_gcc32.la \
 	libvomsc_gcc32dbg.la \
 	libvomsc_gcc32pthr.la \
-	libvomsc_gcc32dbgpthr.la
+	libvomsc_gcc32dbgpthr.la \
+	libvomsapi.la \
+	libvomsc.la \
+	libvomsapi-nog.la
 
 ###
 

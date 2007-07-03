@@ -11,15 +11,15 @@ voms_SOURCES = \
 	attribute.cc
 
 voms_LDADD = \
-	$(top_builddir)/src/socklib/libsock.la \
+	$(top_builddir)/src/socklib/$(USE_SOCK_LIB) \
 	$(top_builddir)/src/common/libutilities.la \
-	$(top_builddir)/src/sslutils/libssl_utils.la \
-	$(top_builddir)/src/ac/libccattcert.la \
+	$(top_builddir)/src/sslutils/$(USE_SSL_UTILS_LIB) \
+	$(top_builddir)/src/ac/$(USE_CCATTCERT_LIB) \
 	$(top_builddir)/src/common/libutilc.la \
-	$(top_builddir)/src/ac/libattcert.la \
+	$(top_builddir)/src/ac/$(USE_ATTCERT_LIB) \
 	$(top_builddir)/src/replib/librep.la \
 	$(top_builddir)/src/log/liblog.la \
-	$(top_builddir)/src/api/ccapi/libvomsapi.la \
+	$(top_builddir)/src/api/ccapi/$(USE_CCAPI_LIB) \
 	$(EXPAT_LIBS)
 
 voms_LDFLAGS = -Wl,-E

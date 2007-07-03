@@ -249,7 +249,7 @@ VOMSServer::VOMSServer(int argc, char *argv[]) : sock(0,0,NULL,50,false),
                                                  backlog(50), logger(NULL),
                                                  socktimeout(-1),
                                                  logmax(10000000),loglev(2),
-                                                 logt(T_STARTUP|T_REQUEST|T_RESULT), 
+                                                 logt(T_STARTUP|T_REQUEST|T_RESULT),
                                                  logdf("%c"),
                                                  logf("%d:%h:%s(%p):%V:%T:%F (%f:%l):%m"),
                                                  newformat(false),
@@ -266,11 +266,14 @@ VOMSServer::VOMSServer(int argc, char *argv[]) : sock(0,0,NULL,50,false),
   if ((stat("/etc/nologin", &statbuf)) == 0)
     throw VOMSInitException("/etc/nologin present\n");
 
-#ifdef HAVE_GLOBUS_MODULE_ACTIVATE
-  if (globus_module_activate(GLOBUS_GSI_GSS_ASSIST_MODULE) != GLOBUS_SUCCESS ||
-      globus_module_activate(GLOBUS_OPENSSL_MODULE) != GLOBUS_SUCCESS)
-    throw VOMSInitException("Cannot initializa Globus\n");
-#endif
+#define PROXYCERTINFO_V3      "1.3.6.1.4.1.3536.1.222"
+#define PROXYCERTINFO_V4      "1.3.6.1.5.5.7.1.14"
+#define OBJC(c,n) OBJ_create(c,n,#c)
+
+  /* Proxy Certificate Extension's related objects */
+  OBJC(PROXYCERTINFO_V3, "PROXYCERTINFO_V3");
+  OBJC(PROXYCERTINFO_V4, "PROXYCERTINFO_V4");
+
 
   std::string fakeuri = "";
   bool progversion = false;
@@ -410,7 +413,7 @@ VOMSServer::VOMSServer(int argc, char *argv[]) : sock(0,0,NULL,50,false),
       std::cout << dlerror() << std::endl;
       exit(1);
     }
-    
+
     NewDB = (cdb)dlsym(library, "CreateDB");
     if (!NewDB) {
       LOG(logh, LEV_ERROR, T_PRE, ((std::string)("Cannot load library: " + sqllib)).c_str());
@@ -563,7 +566,7 @@ void VOMSServer::Run()
           if (!debug && !gatekeeper_test)
             sock.CloseListener();
           if (sock.AcceptGSIAuthentication()) {
-	
+
             LOGM(VARP, logh, LEV_INFO, T_PRE, "Self    : %s", sock.own_subject.c_str());
             LOGM(VARP, logh, LEV_INFO, T_PRE, "Self CA : %s", sock.own_ca.c_str());
 
@@ -574,14 +577,14 @@ void VOMSServer::Run()
 
             LOGM(VARP, logh, LEV_INFO, T_PRE, "At: %s Received Contact from:", timestamp().c_str());
             LOGM(VARP, logh, LEV_INFO, T_PRE, " user: %s", user.c_str());
-            LOGM(VARP, logh, LEV_INFO, T_PRE, " ca  : %s", userca.c_str());	
+            LOGM(VARP, logh, LEV_INFO, T_PRE, " ca  : %s", userca.c_str());
             LOGM(VARP, logh, LEV_INFO, T_PRE, " serial: %s", sock.peer_serial.c_str());
 
             LOG(logh, LEV_DEBUG, T_PRE, "Starting Execution.");
             value = Execute(user, userca, sock.own_key, sock.own_cert, sock.peer_cert, sock.GetContext());
           }
           else {
-            LOGM(VARP, logh, LEV_INFO, T_PRE, "Failed to authenticate peer");	
+            LOGM(VARP, logh, LEV_INFO, T_PRE, "Failed to authenticate peer");
             sock.CleanSocket();
           }
 
@@ -614,7 +617,7 @@ static std::string translate(const std::string& name)
     return name.substr(0, uid) + "/USERID=" + name.substr(uid+5);
   else
     return name;
-} 
+}
 
 bool
 VOMSServer::Execute(const std::string &client_name, const std::string &ca_name,
@@ -645,9 +648,9 @@ VOMSServer::Execute(const std::string &client_name, const std::string &ca_name,
     LOGM(VARP, logh, LEV_ERROR, T_PRE, "Unable to interpret command: %s",message.c_str());
     return false;
   }
-  
+
   std::vector<std::string> comm = r.command;
-  
+
   int requested = r.lifetime;
 
   std::vector<std::string> targs;
@@ -669,7 +672,7 @@ VOMSServer::Execute(const std::string &client_name, const std::string &ca_name,
   /* Interpret user requests */
 
   if (requested != 0) {
-    if (requested == -1) 
+    if (requested == -1)
       requested = validity;
     else if (validity < requested) {
       err.num = WARN_SHORT_VALIDITY;
@@ -681,14 +684,14 @@ VOMSServer::Execute(const std::string &client_name, const std::string &ca_name,
   }
 
   std::string real_ca = (ca == newca ? ca :
-                         ( get_correct_ca(dbname, username, passwd(), 
-                                          contactstring, mysql_port, 
-                                          mysql_socket, ca) ? 
+                         ( get_correct_ca(dbname, username, passwd(),
+                                          contactstring, mysql_port,
+                                          mysql_socket, ca) ?
                            ca : newca));
 
   std::string real_user = (client == newname ? client :
-                           ( get_correct_dn(dbname, username, passwd(), 
-                                            contactstring, mysql_port, 
+                           ( get_correct_dn(dbname, username, passwd(),
+                                            contactstring, mysql_port,
                                             mysql_socket, client) ?
                              client : newname));
 
@@ -696,9 +699,9 @@ VOMSServer::Execute(const std::string &client_name, const std::string &ca_name,
   for(std::vector<std::string>::iterator i = comm.begin(); i < comm.end(); ++i)
   {
     command = *i;
-    
+
     LOGM(VARP, logh, LEV_INFO, T_PRE, "Next command : %s", i->c_str());
-    
+
     /* Interpret request by first character */
     switch (*(i->c_str()))
     {
@@ -713,7 +716,7 @@ VOMSServer::Execute(const std::string &client_name, const std::string &ca_name,
         get_role(real_user, real_ca, i->c_str() + 1, dbname, username, contactstring, mysql_port, mysql_socket, passwd(), insecure, res);
       result &= get_role_attributes(real_user, real_ca, i->c_str() + 1, dbname, username, contactstring, mysql_port, mysql_socket, passwd(), insecure, attributes);
       break;
-	
+
     case 'G':
       result = get_group(real_user, real_ca, i->c_str() + 1, dbname, username, contactstring, mysql_port, mysql_socket, passwd(), insecure, res);
       result &= get_group_attributes(real_user, real_ca, i->c_str() + 1, dbname, username, contactstring, mysql_port, mysql_socket, passwd(), insecure, attributes);
@@ -723,7 +726,7 @@ VOMSServer::Execute(const std::string &client_name, const std::string &ca_name,
       result = get_group_and_role(real_user, real_ca, i->c_str() + 1, dbname, username, contactstring, mysql_port, mysql_socket, passwd(), insecure, res);
       result &= get_group_and_role_attributes(real_user, real_ca, i->c_str() + 1, dbname, username, contactstring, mysql_port, mysql_socket, passwd(), insecure, attributes);
       break;
-      
+
     case 'S':
       result &=
         special(real_user, real_ca, i->c_str() + 1, dbname, username, contactstring, mysql_port, mysql_socket, passwd(), data);
@@ -747,12 +750,12 @@ VOMSServer::Execute(const std::string &client_name, const std::string &ca_name,
       result &= false;
       LOGM(VARP, logh, LEV_ERROR, T_PRE, "Unknown Command \"%c\"", i->c_str());
       break;
-    } 
-    
+    }
+
     if(!result)
       break;
-  } 
-  
+  }
+
   // remove duplicates
   for(std::vector<attrib>::iterator i = res.begin(); i != res.end(); ++i)
   {
@@ -760,12 +763,20 @@ VOMSServer::Execute(const std::string &client_name, const std::string &ca_name,
               res.end());
   }
 
+  // remove duplicates from attributes
+  for(std::vector<gattrib>::iterator i = attributes.begin(); 
+      i != attributes.end(); ++i)
+  {
+    attributes.erase(std::remove(i+1, attributes.end(), *i),
+                     attributes.end());
+  }
+
   if(result && !res.empty())
   {
     orderattribs(res);
   }
 
-  if (!result) 
+  if (!result)
   {
     LOG(logh, LEV_ERROR, T_PRE, "Error in executing request!");
     err.num = ERR_NOT_MEMBER;
@@ -790,21 +801,21 @@ VOMSServer::Execute(const std::string &client_name, const std::string &ca_name,
     compact.push_back(i->str());
     j++;
   }
-  
+
   if(!res.empty())
   {
     /* check whether the user is allowed to requests those attributes */
     vomsdata v("", "");
     v.SetVerificationType((verify_type)(VERIFY_SIGN));
     v.RetrieveFromCtx(context, RECURSE_DEEP);
-  
+
     /* find the attributes corresponding to the vo */
     std::vector<std::string> fqans;
     for(std::vector<voms>::iterator index = (v.data).begin(); index != (v.data).end(); ++index)
     {
       if(index->voname == voname)
-        fqans.insert(fqans.end(), 
-                     index->fqan.begin(), 
+        fqans.insert(fqans.end(),
+                     index->fqan.begin(),
                      index->fqan.end());
     }
 
@@ -813,11 +824,11 @@ VOMSServer::Execute(const std::string &client_name, const std::string &ca_name,
     bool subset = false;
     if(!fqans.empty())
       if((compact.erase(remove_if(compact.begin(),
-                                  compact.end(), 
-                                  bind2nd(std::ptr_fun(not_in), fqans)), 
+                                  compact.end(),
+                                  bind2nd(std::ptr_fun(not_in), fqans)),
                         compact.end()) != end))
         subset = true;
-    
+
     // no attributes can be send
     if(compact.empty())
     {
@@ -839,7 +850,7 @@ VOMSServer::Execute(const std::string &client_name, const std::string &ca_name,
       err.message = voname + " : your certificate already contains attributes, only a subset of them can be issued.";
       errs.push_back(err);
     }
-  }   
+  }
 
   if (j) {
     if (!firstgroup.empty()) {
@@ -853,7 +864,7 @@ VOMSServer::Execute(const std::string &client_name, const std::string &ca_name,
         }
       }
     }
-    
+
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
     // test logging retrieved attributes
@@ -870,7 +881,7 @@ VOMSServer::Execute(const std::string &client_name, const std::string &ca_name,
     std::vector<std::string> attributes_compact;
     for(std::vector<gattrib>::iterator i = attributes.begin(); i != attributes.end(); ++i)
       attributes_compact.push_back(i->str());
-    
+
 
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -883,13 +894,13 @@ VOMSServer::Execute(const std::string &client_name, const std::string &ca_name,
     {
       if (!serial)
         LOG(logh, LEV_ERROR, T_PRE, "Can't get Serial Number!");
-      
+
       if (serial) {
         AC *a = AC_new();
 
         LOGM(VARP, logh, LEV_DEBUG, T_PRE, "length = %d", i2d_AC(a, NULL));
         if (a)
-          res = createac(issuer, sock.own_stack, holder, key, serial, 
+          res = createac(issuer, sock.own_stack, holder, key, serial,
                          compact, targs, attributes_compact, &a, voname, uri, requested, !newformat);
 
         LOGM(VARP, logh, LEV_DEBUG, T_PRE, "length = %d", i2d_AC(a, NULL));
@@ -916,7 +927,7 @@ VOMSServer::Execute(const std::string &client_name, const std::string &ca_name,
         }
         AC_free(a);
       }
-      
+
       if (res || codedac.empty()) {
         LOG(logh, LEV_ERROR, T_PRE, "Error in executing request!");
         err.message = voname + ": Unable to satisfy " + command + " request due to database error.";

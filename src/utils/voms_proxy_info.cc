@@ -309,7 +309,7 @@ test_proxy()
   char *of;
   char *cf;
   char *kf;
-  bool res;
+  bool res = false;
   BIO *bio_err;
   proxy_cred_desc *pcd;
   BIO  *in = NULL;
@@ -367,7 +367,7 @@ test_proxy()
         std::cerr << "WARNING: Unable to verify signature! Server certificate possibly not installed.\n" 
                   << "Error: " << d.ErrorMessage() << std::endl;
       }
-      res = !(print(x, chain, d));
+      res &= !(print(x, chain, d));
     }
     else {
       std::cerr << std::endl << "Couldn't find a valid proxy." << std::endl << std::endl;
@@ -774,16 +774,8 @@ static int InitProxyCertInfoExtension(void)
   pcert = (X509V3_EXT_METHOD *)OPENSSL_malloc(sizeof(X509V3_EXT_METHOD));
 
   if (pcert) {
+    memset(pcert, 0, sizeof(*pcert));
     pcert->ext_nid = OBJ_txt2nid("PROXYCERTINFO_V3");
-#ifndef NOGLOBUS
-#ifdef HAVE_X509V3_EXT_METHOD_IT
-    pcert->it = NULL;
-#endif
-#else
-#ifdef HAVE_X509V3_EXT_METHOD_IT_OPENSSL
-    pcert->it = NULL;
-#endif
-#endif
     pcert->ext_flags = 0;
     pcert->ext_new  = (X509V3_EXT_NEW) myPROXYCERTINFO_new;
     pcert->ext_free = (X509V3_EXT_FREE)myPROXYCERTINFO_free;
@@ -802,16 +794,8 @@ static int InitProxyCertInfoExtension(void)
   pcert = (X509V3_EXT_METHOD *)OPENSSL_malloc(sizeof(X509V3_EXT_METHOD));
 
   if (pcert) {
+    memset(pcert, 0, sizeof(*pcert));
     pcert->ext_nid = OBJ_txt2nid("PROXYCERTINFO_V4");
-#ifndef NOGLOBUS
-#ifdef HAVE_X509V3_EXT_METHOD_IT
-    pcert->it = NULL;
-#endif
-#else
-#ifdef HAVE_X509V3_EXT_METHOD_IT_OPENSSL
-    pcert->it = NULL;
-#endif
-#endif
     pcert->ext_flags = 0;
     pcert->ext_new  = (X509V3_EXT_NEW) myPROXYCERTINFO_new;
     pcert->ext_free = (X509V3_EXT_FREE)myPROXYCERTINFO_free;
@@ -840,11 +824,8 @@ static char *myproxycertinfo_i2s(struct v3_ext_method *method, void *ext)
 
 static char *norep()
 {
-  static char *buffer="";
-
-/*   buffer=malloc(1); */
-/*   if (buffer) */
-/*     *buffer='\0'; */
+  static char *buffer = (char *) malloc(1);
+  if (buffer)
+    buffer='\0';
   return buffer;
-
 }

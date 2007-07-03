@@ -120,19 +120,6 @@ unsigned char * myPROXYPOLICY_get_policy(myPROXYPOLICY * proxypolicy, int * leng
 /* internal to der conversion */
 int i2d_myPROXYPOLICY(myPROXYPOLICY * policy, unsigned char ** pp) 
 {
-#if 0
-  int                                 v1 = 0;
-    
-  M_ASN1_I2D_vars(policy);
-
-  M_ASN1_I2D_len(policy->policy_language, i2d_ASN1_OBJECT);
-  M_ASN1_I2D_len_EXP_opt(policy->policy, i2d_ASN1_OCTET_STRING, 0, v1);
-  M_ASN1_I2D_seq_total();
-  M_ASN1_I2D_put(policy->policy_language, i2d_ASN1_OBJECT);
-  M_ASN1_I2D_put_EXP_opt(policy->policy, i2d_ASN1_OCTET_STRING, 0, v1);
-
-  M_ASN1_I2D_finish();
-#endif
 
   M_ASN1_I2D_vars(policy);
 

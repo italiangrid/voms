@@ -55,8 +55,7 @@ libattcert_la_LIBADD =
 am_libattcert_la_OBJECTS = libattcert_la-validate.lo \
 	libattcert_la-write.lo libattcert_la-extensions.lo \
 	libattcert_la-mystack.lo libattcert_la-error.lo \
-	libattcert_la-newformat.lo libattcert_la-init.lo \
-	libattcert_la-attributes.lo
+	libattcert_la-newformat.lo libattcert_la-init.lo
 libattcert_la_OBJECTS = $(am_libattcert_la_OBJECTS)
 am__DEPENDENCIES_1 =
 libattcert_gcc32_la_DEPENDENCIES = $(am__DEPENDENCIES_1)
@@ -250,6 +249,8 @@ AUTOCONF = @AUTOCONF@
 AUTOHEADER = @AUTOHEADER@
 AUTOMAKE = @AUTOMAKE@
 AWK = @AWK@
+BUILD_ALL_FALSE = @BUILD_ALL_FALSE@
+BUILD_ALL_TRUE = @BUILD_ALL_TRUE@
 BUILD_DOCS_FALSE = @BUILD_DOCS_FALSE@
 BUILD_DOCS_TRUE = @BUILD_DOCS_TRUE@
 BUILD_JAVA_FALSE = @BUILD_JAVA_FALSE@
@@ -334,9 +335,17 @@ PACKAGE_TARNAME = @PACKAGE_TARNAME@
 PACKAGE_VERSION = @PACKAGE_VERSION@
 PATH_SEPARATOR = @PATH_SEPARATOR@
 RANLIB = @RANLIB@
+SED = @SED@
 SET_MAKE = @SET_MAKE@
 SHELL = @SHELL@
 STRIP = @STRIP@
+USE_ATTCERT_LIB = @USE_ATTCERT_LIB@
+USE_CAPI_LIB = @USE_CAPI_LIB@
+USE_CCAPI_LIB = @USE_CCAPI_LIB@
+USE_CCATTCERT_LIB = @USE_CCATTCERT_LIB@
+USE_OLDGAA_LIB = @USE_OLDGAA_LIB@
+USE_SOCK_LIB = @USE_SOCK_LIB@
+USE_SSL_UTILS_LIB = @USE_SSL_UTILS_LIB@
 VAR_LOCATION_ENV = @VAR_LOCATION_ENV@
 VERSION = @VERSION@
 WANTED_API_LIBS = @WANTED_API_LIBS@
@@ -344,6 +353,7 @@ WANTED_ATTCERT_LIBS = @WANTED_ATTCERT_LIBS@
 WANTED_OLDGAA_LIBS = @WANTED_OLDGAA_LIBS@
 WANTED_SOCK_LIBS = @WANTED_SOCK_LIBS@
 WANTED_SSL_UTILS_LIBS = @WANTED_SSL_UTILS_LIBS@
+WANTED_UTIL_LIBS = @WANTED_UTIL_LIBS@
 WANT_UNIT_TEST_FALSE = @WANT_UNIT_TEST_FALSE@
 WANT_UNIT_TEST_TRUE = @WANT_UNIT_TEST_TRUE@
 WORKDIR = @WORKDIR@
@@ -391,9 +401,6 @@ sharedstatedir = @sharedstatedir@
 sysconfdir = @sysconfdir@
 target_alias = @target_alias@
 noinst_LTLIBRARIES = \
-	libattcert.la \
-	libccattcert.la \
-	libattributes_nog.la \
 	$(WANTED_ATTCERT_LIBS) # may add the libraries defined in EXTRA_LTLIBRARIES
 
 libattcert_la_SOURCES = \
@@ -403,8 +410,7 @@ libattcert_la_SOURCES = \
 	mystack.c \
 	error.c \
 	newformat.c \
-	init.c \
-	attributes.c
+	init.c
 
 libattributes_nog_la_SOURCES = \
 	validate.c \
@@ -465,7 +471,10 @@ EXTRA_LTLIBRARIES = \
 	libccattcert_gcc64.la \
 	libccattcert_gcc64dbg.la \
 	libccattcert_gcc64pthr.la \
-	libccattcert_gcc64dbgpthr.la
+	libccattcert_gcc64dbgpthr.la \
+	libattributes_nog.la \
+	libattcert.la \
+	libccattcert.la
 
 libattcert_gcc32_la_SOURCES = \
 	validate.c \
@@ -672,7 +681,8 @@ EXTRA_DIST = \
 	write.h \
 	init.h \
 	extensions.h \
-	test.c
+	test.c \
+	attributes.h
 
 all: all-am
 
@@ -819,7 +829,6 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libattcert_gcc64pthr_la-newformat.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libattcert_gcc64pthr_la-validate.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libattcert_gcc64pthr_la-write.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libattcert_la-attributes.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libattcert_la-error.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libattcert_la-extensions.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libattcert_la-init.Plo@am__quote@
@@ -904,13 +913,6 @@ libattcert_la-init.lo: init.c
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	source='init.c' object='libattcert_la-init.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(LIBTOOL) --tag=CC --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libattcert_la_CFLAGS) $(CFLAGS) -c -o libattcert_la-init.lo `test -f 'init.c' || echo '$(srcdir)/'`init.c
-
-libattcert_la-attributes.lo: attributes.c
-@am__fastdepCC_TRUE@	if $(LIBTOOL) --tag=CC --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libattcert_la_CFLAGS) $(CFLAGS) -MT libattcert_la-attributes.lo -MD -MP -MF "$(DEPDIR)/libattcert_la-attributes.Tpo" -c -o libattcert_la-attributes.lo `test -f 'attributes.c' || echo '$(srcdir)/'`attributes.c; \
-@am__fastdepCC_TRUE@	then mv -f "$(DEPDIR)/libattcert_la-attributes.Tpo" "$(DEPDIR)/libattcert_la-attributes.Plo"; else rm -f "$(DEPDIR)/libattcert_la-attributes.Tpo"; exit 1; fi
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='attributes.c' object='libattcert_la-attributes.lo' libtool=yes @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(LIBTOOL) --tag=CC --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libattcert_la_CFLAGS) $(CFLAGS) -c -o libattcert_la-attributes.lo `test -f 'attributes.c' || echo '$(srcdir)/'`attributes.c
 
 libattcert_gcc32_la-validate.lo: validate.c
 @am__fastdepCC_TRUE@	if $(LIBTOOL) --tag=CC --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libattcert_gcc32_la_CFLAGS) $(CFLAGS) -MT libattcert_gcc32_la-validate.lo -MD -MP -MF "$(DEPDIR)/libattcert_gcc32_la-validate.Tpo" -c -o libattcert_gcc32_la-validate.lo `test -f 'validate.c' || echo '$(srcdir)/'`validate.c; \

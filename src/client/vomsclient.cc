@@ -286,6 +286,11 @@ Client::Client(int argc, char ** argv) :
 
     if (!getopts(argc, argv, opts))
       exit(1);
+
+    if (listing && vomses.size() != 1) {
+      std::cerr << "Exactly ONE voms server must be specified!\n" << std::endl;
+      exit(1);
+    }
   }
   else { /* listing mode */
     LONG_USAGE = \
@@ -350,9 +355,7 @@ Client::Client(int argc, char ** argv) :
 
     if (vomses.size() != 1) {
       std::cerr << "Exactly ONE voms server must be specified!\n" << std::endl;
-      if(vomses.size() == 0)
-        exit(0);
-      std::cerr << "Ignoring all subsequent servers.\n" << std::endl;
+      exit(1);
     }
   }
   
@@ -840,7 +843,6 @@ bool Client::Run() {
   else {
     setenv("X509_USER_PROXY", oldenv, 1);
   }
-  free(oldenv);
   
   /* assure user certificate is not expired or going to, else advise but still create proxy */
   
@@ -1222,20 +1224,11 @@ int InitProxyCertInfoExtension(void)
   OBJC(PROXYCERTINFO_V3, "PROXYCERTINFO_V3");
   OBJC(PROXYCERTINFO_V4, "PROXYCERTINFO_V4");
 
-
   pcert = (X509V3_EXT_METHOD *)OPENSSL_malloc(sizeof(X509V3_EXT_METHOD));
 
   if (pcert) {
+    memset(pcert, 0, sizeof(*pcert));
     pcert->ext_nid = OBJ_txt2nid("PROXYCERTINFO_V3");
-#ifndef NOGLOBUS
-#ifdef HAVE_X509V3_EXT_METHOD_IT
-    pcert->it = NULL;
-#endif
-#else
-#ifdef HAVE_X509V3_EXT_METHOD_IT_OPENSSL
-    pcert->it = NULL;
-#endif
-#endif
     pcert->ext_flags = 0;
     pcert->ext_new  = (X509V3_EXT_NEW) myPROXYCERTINFO_new;
     pcert->ext_free = (X509V3_EXT_FREE)myPROXYCERTINFO_free;
@@ -1254,16 +1247,8 @@ int InitProxyCertInfoExtension(void)
   pcert = (X509V3_EXT_METHOD *)OPENSSL_malloc(sizeof(X509V3_EXT_METHOD));
 
   if (pcert) {
+    memset(pcert, 0, sizeof(*pcert));
     pcert->ext_nid = OBJ_txt2nid("PROXYCERTINFO_V4");
-#ifndef NOGLOBUS
-#ifdef HAVE_X509V3_EXT_METHOD_IT
-    pcert->it = NULL;
-#endif
-#else
-#ifdef HAVE_X509V3_EXT_METHOD_IT_OPENSSL
-    pcert->it = NULL;
-#endif
-#endif
     pcert->ext_flags = 0;
     pcert->ext_new  = (X509V3_EXT_NEW) myPROXYCERTINFO_new;
     pcert->ext_free = (X509V3_EXT_FREE)myPROXYCERTINFO_free;
@@ -1277,6 +1262,7 @@ int InitProxyCertInfoExtension(void)
     pcert->i2r      = (X509V3_EXT_I2R) NULL;
 
     X509V3_EXT_add(pcert);
+
   }
 }
 

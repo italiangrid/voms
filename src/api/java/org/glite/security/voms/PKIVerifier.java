@@ -288,6 +288,8 @@ public class PKIVerifier {
                         logger.debug("is is : " + is);
                         logger.debug("canddn is : " + candidateDN);
                         logger.debug("candis is : " + candidateIs);
+                        logger.debug("dn == canddn is " + dn.equals(candidateDN));
+                        logger.debug("is == candis is " + is.equals(candidateIs));
                         if ( !dn.equals( candidateDN ) || !is.equals( candidateIs ) )
                             doBreak = true;
                     }
@@ -306,7 +308,7 @@ public class PKIVerifier {
 
         if ( certificates == null ) {
             // lsc check failed
-
+            logger.debug("lsc check failed.");
             // System.out.println("Looking for certificates.");
             if ( logger.isDebugEnabled() )
                 logger.debug( "Looking for hash: "

@@ -24,18 +24,24 @@ import java.security.KeyStore;
 import java.security.PrivateKey;
 import java.security.Security;
 import java.security.cert.X509Certificate;
+import java.security.cert.CertificateException;
+
 import java.util.Enumeration;
 
 import org.apache.log4j.Logger;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.globus.gsi.CertUtil;
+import org.globus.gsi.GlobusCredential;
 import org.globus.gsi.bc.BouncyCastleOpenSSLKey;
+
+import org.glite.security.voms.PKIUtils;
 
 /**
  * This class implements parsing and handling of X509 user credentials 
  * in PEM or PKCS12 format.
  * 
  * @author Andrea Ceccanti
+ * @author Vincenzo Ciaschini
  *
  */
 public class UserCredentials {
@@ -49,6 +55,7 @@ public class UserCredentials {
     private static final Logger log = Logger.getLogger( UserCredentials.class );
 
     private X509Certificate userCert;
+    private X509Certificate[] userChain;
 
     private BouncyCastleOpenSSLKey userKey;
 
@@ -62,6 +69,17 @@ public class UserCredentials {
     public X509Certificate getUserCertificate() {
 
         return userCert;
+
+    }
+    /**
+     * 
+     *  This method returs the user certificate chain loaded in this {@link UserCredentials}.
+     * 
+     * @return the X509 user certificate.
+     */
+    public X509Certificate[] getUserChain() {
+
+        return userChain;
 
     }
 
@@ -87,22 +105,9 @@ public class UserCredentials {
     private void loadCert(File userCertFile){
         
         try {
-
-            userCert = CertUtil.loadCertificate( new FileInputStream(
-                    userCertFile) );
-
-        } catch ( FileNotFoundException e ) {
-
-            log.debug( "Error loading user certificate: "
-                    + e.getMessage() );
-
-            if ( log.isDebugEnabled() ) {
-                log.error( e.getMessage(), e );
-            }
-
-            throw new VOMSException( e );
-
-        } catch ( GeneralSecurityException e ) {
+            userChain = PKIUtils.loadCertificates(userCertFile);
+            userCert = userChain[0];
+        } catch ( CertificateException e ) {
             log.debug( "Error parsing user certificate: "
                     + e.getMessage() );
 
@@ -124,7 +129,7 @@ public class UserCredentials {
     private void loadKey(File userKeyFile, String password){
         
         try {
-
+            log.debug("File is: " + userKeyFile.getName());
             userKey = new BouncyCastleOpenSSLKey( new FileInputStream(userKeyFile) );
 
         } catch ( IOException e ) {
@@ -149,7 +154,10 @@ public class UserCredentials {
             throw new VOMSException( e );
 
         }
-        
+    
+        log.debug("is encrypted ? " + userKey.isEncrypted());
+        log.debug("is password ? " + password );
+        log.debug("is password null ? " + (password == null));
         if (password != null && userKey.isEncrypted()){
             
             try {
@@ -203,7 +211,8 @@ public class UserCredentials {
             
             // Take the first alias and hope it is the right one...
             String alias = (String)aliases.nextElement();
-            
+
+            userChain = (X509Certificate[]) ks.getCertificateChain( alias);
             userCert=(X509Certificate) ks.getCertificate( alias );
             userKey = new BouncyCastleOpenSSLKey((PrivateKey)ks.getKey( alias, keyPassword.toCharArray()));
             
@@ -219,6 +228,13 @@ public class UserCredentials {
         }    
         
     }
+
+    private UserCredentials(GlobusCredential credentials) {
+        userChain = credentials.getCertificateChain();
+        userKey   = new BouncyCastleOpenSSLKey(credentials.getPrivateKey());
+        userCert  = userChain[0];
+    }
+
     private UserCredentials( String keyPassword ) {
 
         String x509UserCert = System.getProperty( "X509_USER_CERT", null );
@@ -347,7 +363,7 @@ public class UserCredentials {
      */
     public static UserCredentials instance(){
         
-        return new UserCredentials(null);
+        return new UserCredentials((String)null);
     }
     
     /**
@@ -366,6 +382,7 @@ public class UserCredentials {
     }
       
     
+
     /**
      *   Static instance constructor for a {@link UserCredentials}.
      *
@@ -386,5 +403,41 @@ public class UserCredentials {
         return new UserCredentials(userCertFile, userKeyFile, keyPassword);
     }
     
+    /**
+     *   Static instance constructor for a {@link UserCredentials}.
+     *
+     * This methods allows a user to bypass the default credentials search procedure (highlighted {@link #instance() here}),
+     * by specifying the path to a PEM X509 user cert and private key.
+     * 
+     * @param userCertFile, the path to the PEM X509 user certificate.
+     * @param userKeyFile, the path to the PEM X509 private key.
+     * @return the loaded user credentials.
+     * 
+     * @throws  VOMSException 
+     *          if there is an error loading the user credentials.
+     * 
+     */
+    public static UserCredentials instance(String userCertFile, String userKeyFile){
+        
+        return UserCredentials.instance(userCertFile, userKeyFile, null);
+    }
+
+    /**
+     *   Static instance constructor for a {@link UserCredentials}.
+     *
+     * This methods allows a user to bypass the default credentials search procedure (highlighted {@link #instance() here}),
+     * by specifying the path to a PEM X509 user cert and private key.
+     * 
+     * @param credentials, the GlobusCredentials object containing the user's own proxy
+     * @return the loaded user credentials.
+     * 
+     * @throws  VOMSException 
+     *          if there is an error loading the user credentials.
+     * 
+     */
+    public static UserCredentials instance(GlobusCredential credentials) {
+      
+        return new UserCredentials(credentials);
+    }
     
 }

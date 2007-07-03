@@ -1602,7 +1602,7 @@ proxy_marshal_bp(
          * proxy cert, or any self signed certs
          */
 
-        for(i=sk_X509_num(cert_chain)-1;i>=0;i--)
+        for(i=0; i < sk_X509_num(cert_chain); i++)
         {
             cert = sk_X509_value(cert_chain,i);
             if (!(!X509_NAME_cmp_no_set(X509_get_subject_name(cert),
@@ -3174,10 +3174,18 @@ proxy_get_filenames(
                 {
                   int fd = open(default_user_cert, O_RDONLY);
                   if (fd == -1) {
+
+                    char *certname = NULL;
+
                     free(default_user_cert);
                     free(default_user_key);
+                    
 
-                    len = strlen(home) + strlen(X509_DEFAULT_USER_CERT) + 2;
+                    certname = getenv("X509_USER_CRED");
+
+                    len = certname ? strlen(certname) + 1 :
+                      strlen(home) + strlen(X509_DEFAULT_USER_CERT_P12_GT) + 2;
+
                     default_user_cert = (char *)malloc(len);
 
                     if (!default_user_cert) {
@@ -3185,8 +3193,16 @@ proxy_get_filenames(
                       goto err;
                     } 
 
-                    sprintf(default_user_cert,"%s%s%s",
-                            home, FILE_SEPERATOR, X509_DEFAULT_USER_CERT_P12);
+                    if (!certname) {
+                      sprintf(default_user_cert,"%s%s%s",
+                              home, FILE_SEPERATOR, X509_DEFAULT_USER_CERT_P12);
+
+                      if (checkstat(default_user_cert) != 0)
+                        sprintf(default_user_cert,"%s%s%s",
+                                home, FILE_SEPERATOR, X509_DEFAULT_USER_CERT_P12_GT);
+                    }
+                    else
+                      strcpy(default_user_cert, certname);
 
                     default_user_key = strndup(default_user_cert, strlen(default_user_cert));
 

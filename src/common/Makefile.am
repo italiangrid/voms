@@ -1,5 +1,8 @@
 
 noinst_LTLIBRARIES = \
+	$(WANTED_UTIL_LIBS)
+
+EXTRA_LTLIBRARIES = \
 	libutilities.la \
 	libutilities_nog.la \
 	libutilc_nog.la \

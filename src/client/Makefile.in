@@ -60,13 +60,13 @@ voms_proxy_init_OBJECTS = $(am_voms_proxy_init_OBJECTS)
 am__DEPENDENCIES_1 =
 voms_proxy_init_DEPENDENCIES =  \
 	$(top_builddir)/src/common/libutilities.la \
-	$(top_builddir)/src/ac/libattcert.la \
-	$(top_builddir)/src/ac/libccattcert.la \
+	$(top_builddir)/src/ac/$(USE_ATTCERT_LIB) \
+	$(top_builddir)/src/ac/$(USE_CCATTCERT_LIB) \
 	$(top_builddir)/src/common/libutilc.la \
 	$(top_builddir)/src/replib/librep.la \
 	$(top_builddir)/src/log/liblog.la \
-	$(top_builddir)/src/api/ccapi/libvomsapi.la \
-	$(top_builddir)/src/sslutils/libssl_utils.la \
+	$(top_builddir)/src/api/ccapi/$(USE_CCAPI_LIB) \
+	$(top_builddir)/src/sslutils/$(USE_SSL_UTILS_LIB) \
 	$(am__DEPENDENCIES_1)
 DEFAULT_INCLUDES = -I. -I$(srcdir) -I$(top_builddir)/src/autogen
 depcomp = $(SHELL) $(top_srcdir)/./project/depcomp
@@ -102,6 +102,8 @@ AUTOCONF = @AUTOCONF@
 AUTOHEADER = @AUTOHEADER@
 AUTOMAKE = @AUTOMAKE@
 AWK = @AWK@
+BUILD_ALL_FALSE = @BUILD_ALL_FALSE@
+BUILD_ALL_TRUE = @BUILD_ALL_TRUE@
 BUILD_DOCS_FALSE = @BUILD_DOCS_FALSE@
 BUILD_DOCS_TRUE = @BUILD_DOCS_TRUE@
 BUILD_JAVA_FALSE = @BUILD_JAVA_FALSE@
@@ -186,9 +188,17 @@ PACKAGE_TARNAME = @PACKAGE_TARNAME@
 PACKAGE_VERSION = @PACKAGE_VERSION@
 PATH_SEPARATOR = @PATH_SEPARATOR@
 RANLIB = @RANLIB@
+SED = @SED@
 SET_MAKE = @SET_MAKE@
 SHELL = @SHELL@
 STRIP = @STRIP@
+USE_ATTCERT_LIB = @USE_ATTCERT_LIB@
+USE_CAPI_LIB = @USE_CAPI_LIB@
+USE_CCAPI_LIB = @USE_CCAPI_LIB@
+USE_CCATTCERT_LIB = @USE_CCATTCERT_LIB@
+USE_OLDGAA_LIB = @USE_OLDGAA_LIB@
+USE_SOCK_LIB = @USE_SOCK_LIB@
+USE_SSL_UTILS_LIB = @USE_SSL_UTILS_LIB@
 VAR_LOCATION_ENV = @VAR_LOCATION_ENV@
 VERSION = @VERSION@
 WANTED_API_LIBS = @WANTED_API_LIBS@
@@ -196,6 +206,7 @@ WANTED_ATTCERT_LIBS = @WANTED_ATTCERT_LIBS@
 WANTED_OLDGAA_LIBS = @WANTED_OLDGAA_LIBS@
 WANTED_SOCK_LIBS = @WANTED_SOCK_LIBS@
 WANTED_SSL_UTILS_LIBS = @WANTED_SSL_UTILS_LIBS@
+WANTED_UTIL_LIBS = @WANTED_UTIL_LIBS@
 WANT_UNIT_TEST_FALSE = @WANT_UNIT_TEST_FALSE@
 WANT_UNIT_TEST_TRUE = @WANT_UNIT_TEST_TRUE@
 WORKDIR = @WORKDIR@
@@ -252,13 +263,13 @@ voms_proxy_init_SOURCES = \
 
 voms_proxy_init_LDADD = \
 	$(top_builddir)/src/common/libutilities.la \
-	$(top_builddir)/src/ac/libattcert.la \
-	$(top_builddir)/src/ac/libccattcert.la \
+	$(top_builddir)/src/ac/$(USE_ATTCERT_LIB) \
+  $(top_builddir)/src/ac/$(USE_CCATTCERT_LIB) \
 	$(top_builddir)/src/common/libutilc.la \
 	$(top_builddir)/src/replib/librep.la \
 	$(top_builddir)/src/log/liblog.la \
-	$(top_builddir)/src/api/ccapi/libvomsapi.la \
-	$(top_builddir)/src/sslutils/libssl_utils.la \
+  $(top_builddir)/src/api/ccapi/$(USE_CCAPI_LIB) \
+  $(top_builddir)/src/sslutils/$(USE_SSL_UTILS_LIB) \
 	$(EXPAT_LIBS)
 
 AM_CPPFLAGS = -I$(top_srcdir)/src/api/ccapi \

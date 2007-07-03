@@ -22,13 +22,6 @@ extern "C" {
 #include "vomsxml.h"
 #include "errors.h"
 
-#if 0
-std::string XML_Req_Encode(const request &r)
-{
-  return XML_Req_Encode(r.command, r.order, r.targets, r.lifetime);
-}
-#endif
-
 std::string XML_Req_Encode(const std::string command, const std::string order,
                           const std::string targets, const int lifetime)
 {
@@ -91,40 +84,28 @@ bool XML_Req_Decode(const std::string message, request &r)
   struct req d;
 
   d.depth = d.error = 0;
+  d.command = NULL;
 
   int ret = XMLDecodeReq(message.c_str(), &d);
 
   r.order    = (d.order   ? std::string(d.order)   : "");
   r.targets  = (d.targets ? std::string(d.targets) : "");
   
-  for(int i = 0; i < d.n; ++i)
+  int current = 0;
+
+  while(d.command[current])
   {
-    r.command.push_back(std::string(*(d.command + i)));
+    r.command.push_back(std::string(d.command[current]));
+    current++;
   }  
 
   r.lifetime = d.lifetime;
   free(d.order);
   free(d.targets);
-  free(d.command);
+  listfree(d.command, free);
 
   return (ret != 0);
 }
-
-#if 0
-bool XML_Req_Decode(const std::string message, std::string &order,
-                    std::string &targets, std::string &command, int &lifetime)
-{
-  request r;
-  bool ret = XML_Req_Decode(message, r);
-
-  order    = r.order;
-  targets  = r.targets;
-  command  = r.command;
-  lifetime = r.lifetime;
-
-  return ret;
-}
-#endif
 
 bool XML_Ans_Decode(const std::string message, answer &a)
 {

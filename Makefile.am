@@ -35,6 +35,7 @@ userdoc-recursive:
 userdoc: userdoc-local userdoc-recursive
 
 install-data-local:
+if BUILD_ALL
 if BUILD_DOCS
 	for subpackage in api; do \
 	  $(mkinstalldirs) $(DESTDIR)$(datadir)/doc/$(PACKAGE)-$${subpackage}$(GCCVER)$(DOCVER); \
@@ -64,6 +65,26 @@ if BUILD_DOCS
 	for file in $(APIDOC_FILES); do \
 	   $(INSTALL_DATA) $${file} $(DESTDIR)$(datadir)/doc/$(PACKAGE)-api$(GCCVER)$(DOCVER); \
 	done;
+endif
+else
+if BUILD_DOCS
+	for subpackage in api; do \
+	  $(mkinstalldirs) $(DESTDIR)$(datadir)/doc/$(PACKAGE)-$${subpackage}$(GCCVER)$(DOCVER); \
+	  for project in VOMS_CC_API VOMS_C_API; do \
+	    $(mkinstalldirs) $(DESTDIR)$(datadir)/doc/$(PACKAGE)-$${subpackage}$(GCCVER)$(DOCVER)/$${project}/html; \
+	    $(mkinstalldirs) $(DESTDIR)$(datadir)/doc/$(PACKAGE)-$${subpackage}$(GCCVER)$(DOCVER)/$${project}/pdf; \
+	    $(mkinstalldirs) $(DESTDIR)$(datadir)/doc/$(PACKAGE)-$${subpackage}$(GCCVER)$(DOCVER)/$${project}/ps; \
+	    for file in $(APIDOC_DIR)/$${subpackage}/$${project}//html/*; do \
+	      $(INSTALL_DATA) $${file} $(DESTDIR)$(datadir)/doc/$(PACKAGE)-$${subpackage}$(GCCVER)$(DOCVER)/$${project}/html; \
+	    done; \
+	    $(INSTALL_DATA) $(APIDOC_DIR)/$${subpackage}/$${project}/latex/refman.pdf $(DESTDIR)$(datadir)/doc/$(PACKAGE)-$${subpackage}$(GCCVER)$(DOCVER)/$${project}/pdf/$${project}.pdf; \
+	    $(INSTALL_DATA) $(APIDOC_DIR)/$${subpackage}/$${project}/latex/refman.ps $(DESTDIR)$(datadir)/doc/$(PACKAGE)-$${subpackage}$(GCCVER)$(DOCVER)/$${project}/ps/$${project}.ps; \
+	  done; \
+	done; \
+	for file in $(APIDOC_FILES); do \
+	   $(INSTALL_DATA) $${file} $(DESTDIR)$(datadir)/doc/$(PACKAGE)-api$(GCCVER)$(DOCVER); \
+	done;
+endif
 endif
 
 stage:

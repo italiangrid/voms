@@ -63,9 +63,8 @@ public class VomsProxyInitClient {
     
     
     protected void setupUserCredentials(String userCert,String userKey){
-        
-        System.setProperty( "X_509_USER_CERT", userCert);
-        System.setProperty( "X_509_USER_KEY", userKey);
+        System.setProperty( "X509_USER_CERT", userCert);
+        System.setProperty( "X509_USER_KEY", userKey);
         
     }
     
@@ -187,7 +186,7 @@ public class VomsProxyInitClient {
         try {
             
             CommandLine line = parser.parse( options, args );
-            
+
             if (line.hasOption( "h" ))
                 
                 printHelpMessageAndExit( 0 );
@@ -204,9 +203,9 @@ public class VomsProxyInitClient {
             
                 setupVomsesPath( line.getOptionValue( "vomsesPath" ) );
             
-            if (line.hasOption( "usercert ") && line.hasOption( "userkey" ))
-                setupUserCredentials( line.getOptionValue( "usercert" ), line.getOptionValue( "userKey"));
-            
+            if (line.hasOption( "usercert") && line.hasOption( "userkey" ))
+                setupUserCredentials( line.getOptionValue( "usercert" ), line.getOptionValue( "userkey"));
+
             
             if (line.hasOption( "out" ))
                 proxyOutput = line.getOptionValue( "out" );
@@ -240,6 +239,7 @@ public class VomsProxyInitClient {
             helpFormatter.printHelp( "VomsProxyInit", options );
             System.exit(-1);
         }   
+
         
     }
     

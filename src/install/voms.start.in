@@ -302,7 +302,7 @@ function getstatus() {
     prog=`basename ${voms}`
 
     # get vos
-    vos=${1:-`find /data/valerio/opt/edg/etc/voms/ -type d -printf "%f "`}
+    vos=${1:-`find $@LOCATION_ENV@/etc/voms/ -type d -printf "%f "`}
 
     value=0
 

@@ -150,12 +150,24 @@ char *XMLEncodeReq(const char *command, const char *order, const char *targets,
   char *res;
   int size;
   char str[15];
+  char *tmp;
+  int count = 0;
 
   if (!command)
     return NULL;
 
   size = strlen(command) + (order ? strlen(order) : 0) +
     (targets ? strlen(targets) : 0) + 149;
+
+  /* count the number of commands -1*/
+  tmp = command;
+
+  while (tmp = strchr(tmp, ','))  {
+    count ++;
+    tmp++;
+  }
+    
+  size += (count * 19);
 
   if ((res = (char *)malloc(size))) {
     char * prev = command, * next = prev;
@@ -314,8 +326,7 @@ static void  endreq(void *userdata, const char *name)
     d->targets = d->value;
   else if (strcmp(name, "command") == 0)
   {
-    *(d->command + d->n) = d->value;
-    ++(d->n);
+    d->command = listadd(d->command, d->value, sizeof(char *));
   }  
   else if (strcmp(name, "lifetime") == 0)
     d->lifetime = atoi(d->value);
@@ -423,7 +434,7 @@ int XMLDecodeReq(const char *message, struct req *d)
 {
   XML_Parser p = XML_ParserCreate(NULL);
   int res;
-  d->command = (char *)malloc(16);
+  d->command = NULL;
   d->order = d->targets = d->value = NULL;
   d->error = d->depth = d->n = 0;
   d->lifetime = -1;

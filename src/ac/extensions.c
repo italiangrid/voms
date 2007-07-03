@@ -338,13 +338,12 @@ IMPL_STACK(AC_FULL_ATTRIBUTES)
 
 static char *norep()
 {
-  static char *buffer="";
-
-/*   buffer=malloc(1); */
-/*   if (buffer) */
-/*     *buffer='\0'; */
+  static char *buffer = 0;
+  buffer = (char *) malloc(1);
+  if (buffer)
+    *buffer='\0';
+  
   return buffer;
-
 }
 
 char *acseq_i2s(struct v3_ext_method *method, void *ext)
@@ -534,16 +533,8 @@ int initEx(void)
     return 0;
   }
 
+  memset(auth, 0, sizeof(*auth));
   auth->ext_nid  = OBJ_txt2nid("authKeyId");
-#ifndef NOGLOBUS
-#ifdef HAVE_X509V3_EXT_METHOD_IT
-  auth->it = NULL;
-#endif
-#else
-#ifdef HAVE_X509V3_EXT_METHOD_IT_OPENSSL
-  auth->it = NULL;
-#endif
-#endif
   auth->ext_flags = 0;
   auth->ext_new  = (X509V3_EXT_NEW) AUTHORITY_KEYID_new;
   auth->ext_free = (X509V3_EXT_FREE)AUTHORITY_KEYID_free;
@@ -556,16 +547,8 @@ int initEx(void)
   auth->i2v      = (X509V3_EXT_I2V) NULL;
   auth->i2r      = (X509V3_EXT_I2R) NULL;
 
+  memset(avail, 0, sizeof(*avail));
   avail->ext_nid  = OBJ_txt2nid("idcenoRevAvail");
-#ifndef NOGLOBUS
-#ifdef HAVE_X509V3_EXT_METHOD_IT
-  avail->it = NULL;
-#endif
-#else
-#ifdef HAVE_X509V3_EXT_METHOD_IT_OPENSSL
-  avail->it = NULL;
-#endif
-#endif
   avail->ext_flags = 0;
   avail->ext_new  = (X509V3_EXT_NEW) ASN1_NULL_new;
   avail->ext_free = (X509V3_EXT_FREE)ASN1_NULL_free;
@@ -578,16 +561,8 @@ int initEx(void)
   avail->i2v      = (X509V3_EXT_I2V) NULL;
   avail->i2r      = (X509V3_EXT_I2R) NULL;
 
+  memset(targets, 0, sizeof(*targets));
   targets->ext_nid  = OBJ_txt2nid("idceTargets");
-#ifndef NOGLOBUS
-#ifdef HAVE_X509V3_EXT_METHOD_IT
-  targets->it = NULL;
-#endif
-#else
-#ifdef HAVE_X509V3_EXT_METHOD_IT_OPENSSL
-  targets->it = NULL;
-#endif
-#endif
   targets->ext_flags = 0;
   targets->ext_new  = (X509V3_EXT_NEW) AC_TARGETS_new;
   targets->ext_free = (X509V3_EXT_FREE)AC_TARGETS_free;
@@ -600,16 +575,8 @@ int initEx(void)
   targets->r2i      = (X509V3_EXT_R2I) NULL;
   targets->i2r      = (X509V3_EXT_I2R) NULL;
 
+  memset(acseq, 0, sizeof(*acseq));
   acseq->ext_nid  = OBJ_txt2nid("acseq");
-#ifndef NOGLOBUS
-#ifdef HAVE_X509V3_EXT_METHOD_IT
-  acseq->it = NULL;
-#endif
-#else
-#ifdef HAVE_X509V3_EXT_METHOD_IT_OPENSSL
-  acseq->it = NULL;
-#endif
-#endif
   acseq->ext_flags = 0;
   acseq->ext_new  = (X509V3_EXT_NEW) AC_SEQ_new;
   acseq->ext_free = (X509V3_EXT_FREE)AC_SEQ_free;
@@ -622,16 +589,8 @@ int initEx(void)
   acseq->r2i      = (X509V3_EXT_R2I) NULL;
   acseq->i2r      = (X509V3_EXT_I2R) NULL;
 
+  memset(certseq, 0, sizeof(*certseq));
   certseq->ext_nid  = OBJ_txt2nid("certseq");
-#ifndef NOGLOBUS
-#ifdef HAVE_X509V3_EXT_METHOD_IT
-  certseq->it = NULL;
-#endif
-#else
-#ifdef HAVE_X509V3_EXT_METHOD_IT_OPENSSL
-  certseq->it = NULL;
-#endif
-#endif
   certseq->ext_flags = 0;
   certseq->ext_new  = (X509V3_EXT_NEW) AC_CERTS_new;
   certseq->ext_free = (X509V3_EXT_FREE)AC_CERTS_free;
@@ -644,16 +603,8 @@ int initEx(void)
   certseq->r2i      = (X509V3_EXT_R2I) NULL;
   certseq->i2r      = (X509V3_EXT_I2R) NULL;
 
+  memset(attribs, 0, sizeof(*attribs));
   attribs->ext_nid  = OBJ_txt2nid("attributes");
-#ifndef NOGLOBUS
-#ifdef HAVE_X509V3_EXT_METHOD_IT
-  attribs->it = NULL;
-#endif
-#else
-#ifdef HAVE_X509V3_EXT_METHOD_IT_OPENSSL
-  attribs->it = NULL;
-#endif
-#endif
   attribs->ext_flags = 0;
   attribs->ext_new  = (X509V3_EXT_NEW) AC_FULL_ATTRIBUTES_new;
   attribs->ext_free = (X509V3_EXT_FREE)AC_FULL_ATTRIBUTES_free;

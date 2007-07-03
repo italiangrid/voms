@@ -344,7 +344,7 @@ public class AttributeCertificate implements DEREncodable {
             Calendar notBefore = Calendar.getInstance();
             
             notAfter.setTime( getDate( validity.getNotAfterTime() ));
-            notAfter.setTime( getDate( validity.getNotBeforeTime() ));
+            notBefore.setTime( getDate( validity.getNotBeforeTime() ));
             
             // 5 "academic" minutes tolerance 
             notAfter.add( Calendar.MINUTE, 5);

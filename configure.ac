@@ -1,5 +1,5 @@
 
-AC_INIT([GLite Security VOMS], [1.7.16])
+AC_INIT([GLite Security VOMS], [1.7.20])
 AC_PREREQ(2.59)
 AC_CONFIG_AUX_DIR([./project])
 AM_INIT_AUTOMAKE
@@ -88,7 +88,7 @@ AC_FUNC_STRFTIME
 AC_CHECK_FUNCS([alarm atexit dup2 gethostbyaddr gethostname gethostbyname gethostname memmove memset mkfifo mktime munmap putenv select setenv sigaction socket strchr strdup strerror strndup strrchr strspn strstr strtod strtol strtoul strtoull tzset uname getpwnam])
 #AC_CHECK_FUNCS([mktime lstat error strtod realloc malloc stat])
 
-AC_REPLACE_FUNCS(getopt_long getopt_long_only daemon setenv)
+AC_REPLACE_FUNCS(getopt_long getopt_long_only daemon setenv memset)
 
 
 TEST_USE_BSD
@@ -97,7 +97,6 @@ NEW_ISSUES
 AC_DEFINE(_SVID_SOURCE, 1, [Get SVID extensions])
 AC_VOMS_TIME_T_TIMEZONE
 AM_WITH_DMALLOC
-AC_OPENSSL_EXT_METHOD
 AC_VOMS_GLOBUS_CONFIG_H
 AC_VOMS_STRUCT_IOVEC
 AC_VOMS_GLOBUS_OFF_T
@@ -106,6 +105,7 @@ AC_VOMS_FIND_FUNC
 AC_VOMS_LONG_LONG
 AC_VOMS_STRNDUP
 AC_VOMS_TRY_OPENSSL_NEW_TYPES
+AC_BUILD_API_ONLY
 
 AC_PREFIX_DEFAULT("/opt/glite")
 

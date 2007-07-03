@@ -191,7 +191,7 @@ public class VOMSProxyBuilder {
         try {
 
             return factory.createCredential(
-                    new X509Certificate[] { cred.getUserCertificate() }, 
+                    cred.getUserChain(), 
                     cred.getUserKey().getPrivateKey(),
                     512, 
                     lifetime, 
@@ -300,7 +300,7 @@ public class VOMSProxyBuilder {
 
         //        try {
             GlobusCredential proxy = myCreateCredential(
-                               new X509Certificate[] { cred.getUserCertificate() }, 
+                               cred.getUserChain(), 
                                cred.getUserKey().getPrivateKey(), 512, lifetime,
                                delegType, gtVersion, extensions, policyType );
 
