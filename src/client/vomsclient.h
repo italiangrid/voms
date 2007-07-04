@@ -18,6 +18,7 @@
 #include <string>
 #include <vector>
 #include <exception>
+#include "voms_api.h"
 
 extern "C" {
 
@@ -27,6 +28,8 @@ extern "C" {
 #include "newformat.h"
   
 }
+
+
 
 class VOMSException : public std::exception 
 {
@@ -88,7 +91,7 @@ class Client {
   std::vector<std::string> vomses;
   std::string              ordering;
   std::string              targetlist;
-  
+  std::vector<std::string> confiles;
 #ifdef CLASS_ADD
   void *                   class_add_buf = NULL;
   size_t                   class_add_buf_len = 0;
@@ -136,5 +139,7 @@ class Client {
   
   // get openssl error */
   void Error();
+
+  bool LoadVomses(vomsdata &, bool);
 };
 #endif

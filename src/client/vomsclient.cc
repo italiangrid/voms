@@ -67,8 +67,6 @@ const std::string location = (getenv(LOCATION_ENV) ? getenv(LOCATION_ENV) : LOCA
 const std::string CONFILENAME     = (location + "/etc/vomses");
 const std::string USERCONFILENAME = std::string(USER_DIR) + std::string("/vomses");
 
-std::vector<std::string> confiles;
-
 /* global variable for output control */
 
 bool debug = false;
@@ -219,14 +217,14 @@ Client::Client(int argc, char ** argv) :
       "                                   and m minutes (default to value of -valid).\n" \
       "    -include <file>                Include the contents of the specified file.\n" \
       "    -conf <file>                   Read options from <file>.\n" \
-      "    -confile <file>                Non-standard location of voms server addresses.\n" \
-      "    -userconf <file>               Non-standard location of user-defined voms server addresses.\n" \
-      "    -vomses <file>                 Non-standard loation of configuration files.\n"
+      "    -confile <file>                Non-standard location of voms server addresses. Deprecated\n" \
+      "    -userconf <file>               Non-standard location of user-defined voms server addresses. Deprecated\n" \
+      "    -vomses <file>                 Non-standard location of configuration files.\n"
       "    -policy <policyfile>           File containing policy to store in the ProxyCertInfo extension.\n" \
       "    -pl, -policy-language <oid>    OID string for the policy language.\n" \
       "    -policy-language <oid>         OID string for the policy language.\n" \
       "    -path-length <l>               Allow a chain of at most l proxies to be generated from this ones.\n" \
-      "    -globus                        Globus version.\n" \
+      "    -globus <version>              Globus version. (MajorMinor)\n" \
       "    -proxyver                      Version of proxy certificate.\n" \
       "    -noregen                       Use existing proxy certificate to connect to server and sign the new proxy.\n" \
       "    -separate <file>               Saves the informations returned by the server on file <file>.\n" \
@@ -287,7 +285,7 @@ Client::Client(int argc, char ** argv) :
     if (!getopts(argc, argv, opts))
       exit(1);
 
-    if (listing && vomses.size() != 1) {
+    if (!progversion && listing && vomses.size() != 1) {
       std::cerr << "Exactly ONE voms server must be specified!\n" << std::endl;
       exit(1);
     }
@@ -353,7 +351,7 @@ Client::Client(int argc, char ** argv) :
     if (!getopts(argc, argv, opts))
       exit(1);
 
-    if (vomses.size() != 1) {
+    if (!progversion && vomses.size() != 1) {
       std::cerr << "Exactly ONE voms server must be specified!\n" << std::endl;
       exit(1);
     }
@@ -361,11 +359,14 @@ Client::Client(int argc, char ** argv) :
   
   /* wouldn't make sense */
 
+  if(debug)
+    ignorewarn = failonwarn = quiet = false;
+
+  if (quiet)
+    ignorewarn = true;
+
   if (failonwarn)
     ignorewarn = false;
-  
-  if(debug)
-    quiet = false;
 
   /* show version and exit */
   
@@ -529,16 +530,13 @@ Client::Client(int argc, char ** argv) :
   
   vomsdata v;
 
-  confiles.push_back(userconf);
-  confiles.push_back(CONFILENAME);
-
-  for (std::vector<std::string>::iterator i = confiles.begin(); i != confiles.end(); i++) {
-    if(debug)
-      std::cout << "Using configuration file "<< *i << std::endl;
-    if (!v.LoadSystemContacts(*i))
-      if (*i != userconf)
-        std::cerr << v.ErrorMessage() << std::endl;
+  if (confiles.empty()) {
+    confiles.push_back(userconf);
+    confiles.push_back(CONFILENAME);
   }
+
+  if (!LoadVomses(v, true))
+    exit(1);
 
   for (unsigned int i = 0; i < vomses.size(); i++) {
   
@@ -630,7 +628,7 @@ bool Client::Run() {
   for (std::vector<std::string>::iterator i = confiles.begin(); i != confiles.end(); i++) {
     if(debug)
       std::cout << "Using configuration file "<< *i << std::endl;
-    if (!v.LoadSystemContacts(*i))
+    if (!LoadVomses(v, false))
       std::cerr << v.ErrorMessage() << std::endl;
   }
 
@@ -1703,4 +1701,36 @@ static char *norep()
 /*     *buffer='\0'; */
   return buffer;
 
+}
+
+bool Client::LoadVomses(vomsdata& v, bool loud)
+{
+  bool cumulative = false;
+
+  for (std::vector<std::string>::iterator i = confiles.begin(); i != confiles.end(); i++) {
+    if(debug)
+      std::cout << "Using configuration file "<< *i << std::endl;
+    bool res = v.LoadSystemContacts(*i);
+
+    cumulative |= res;
+
+    if (!res) {
+      if (*i != userconf && loud)
+        std::cerr << v.ErrorMessage() << std::endl;
+    }
+    else if (v.error == VERR_DIR && loud) {
+      /* A global return of error and a VERR_DIR may mean some files could not be
+         read, but at least some could. */
+      if (*i != userconf) {
+        if (!v.ErrorMessage().empty()) {
+          if (!ignorewarn)
+            std::cerr << v.ErrorMessage() << std::endl;
+          if (failonwarn)
+            return false;
+        }
+      }
+    }
+  }
+
+  return cumulative;
 }

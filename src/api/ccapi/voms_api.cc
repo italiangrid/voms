@@ -629,8 +629,10 @@ bool vomsdata::loadfile(std::string filename, uid_t uid, gid_t gid)
   if ((stats.st_uid != 0 && stats.st_uid != getuid()) || 
       (stats.st_gid != 0 && stats.st_gid != getgid())) {
     seterror(VERR_DIR, "Wrong ownership on file: " + filename + "\n" +
-             "Expected: either (0,0) or (UID, GID) = (" + stringify(uid, temp) +
-             ", " + stringify(gid, temp) + ")\n");
+             "Expected: either (0,0) or (UID, GID) = (" + stringify(getuid(), temp) +
+             ", " + stringify(getgid(), temp) + ")\n" +
+             "Found:   (UID, GID) = (" + stringify(stats.st_uid, temp) + ", " +
+             stringify(stats.st_gid, temp) + ")\n");
     return false;
   }
 
