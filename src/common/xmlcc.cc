@@ -88,23 +88,27 @@ bool XML_Req_Decode(const std::string message, request &r)
 
   int ret = XMLDecodeReq(message.c_str(), &d);
 
-  r.order    = (d.order   ? std::string(d.order)   : "");
-  r.targets  = (d.targets ? std::string(d.targets) : "");
+  if (ret) {
+    r.order    = (d.order   ? std::string(d.order)   : "");
+    r.targets  = (d.targets ? std::string(d.targets) : "");
   
-  int current = 0;
+    int current = 0;
 
-  while(d.command[current])
-  {
-    r.command.push_back(std::string(d.command[current]));
-    current++;
-  }  
+    if (d.command) {
+      while(d.command[current]) {
+        r.command.push_back(std::string(d.command[current]));
+        current++;
+      }  
+    }
 
-  r.lifetime = d.lifetime;
-  free(d.order);
-  free(d.targets);
-  listfree(d.command, free);
+    r.lifetime = d.lifetime;
+    free(d.order);
+    free(d.targets);
+    listfree(d.command, free);
 
+  }
   return (ret != 0);
+
 }
 
 bool XML_Ans_Decode(const std::string message, answer &a)

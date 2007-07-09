@@ -91,8 +91,14 @@ int my_recv(OM_uint32 *m, const gss_ctx_id_t h, char **data, size_t *len, int *t
         LOG(logh, LEV_ERROR, -1, str);
         free(str);
       }
-      else
+      else if (*len == 0) {
+        LOG(logh, LEV_DEBUG, -1, "Received empty fragment. Retry");
+        return my_recv(m, h, data, len, t_s, gt, gs, logh);
+      }
+      else 
         trueres=1;
+
+
       fclose(f);
       id = -1;
     }

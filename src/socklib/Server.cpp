@@ -217,7 +217,7 @@ bool
 GSISocketServer::AcceptGSIAuthentication()
 {
   OM_uint32      major_status = 0, minor_status = 0, status=0;
-  OM_uint32      ret_flags = 0;
+  OM_uint32      ret_flags = GSS_C_GLOBUS_SSL_COMPATIBLE;
   int            token_status = 0;
   char           *name = NULL;
   gss_cred_id_t  delegated_cred = GSS_C_NO_CREDENTIAL;

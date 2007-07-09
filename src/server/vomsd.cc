@@ -640,6 +640,15 @@ VOMSServer::Execute(const std::string &client_name, const std::string &ca_name,
     return false;
   }
 
+  if (message == "0") {
+    /* GSI Clients may send a "0" first (spurious) message. Just ignore it. */
+    if (!sock.Receive(message)) {
+      LOG(logh, LEV_ERROR, T_PRE, "Unable to receive request.");
+      sock.CleanSocket();
+      return false;
+    }
+  }
+
   LOGM(VARP, logh, LEV_DEBUG, T_PRE, "Received Request: %s", message.c_str());
 
   struct request r;
