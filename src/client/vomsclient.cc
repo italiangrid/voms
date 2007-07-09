@@ -534,6 +534,8 @@ Client::Client(int argc, char ** argv) :
     confiles.push_back(userconf);
     confiles.push_back(CONFILENAME);
   }
+  else
+    userconf="";
 
   if (!LoadVomses(v, true))
     exit(1);
