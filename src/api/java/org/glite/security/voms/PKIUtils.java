@@ -448,6 +448,9 @@ public class PKIUtils {
                     logger.debug("skid/akid check passed.");
                 }
 
+                if (false) {
+                    // The following should be skipped if the previous check passed.
+                    // And code cannot reach here unless the previous step passed.
                 BigInteger sn = getAuthorityCertificateSerialNumber(akid);
 //
 //                if (sn == null) {
@@ -498,16 +501,19 @@ public class PKIUtils {
                             }
                             X500Principal principal = new X500Principal(baos.toByteArray());
                             //                        System.out.println("PRINCIPAL: " + principal);
-                            if (issuerSubject.equals(principal)) {
+                            X500Principal issuerIssuer  = issuer.getIssuerX500Principal();
+
+                            if (issuerIssuer.equals(principal)) {
                                 logger.debug("PASSED");
                                 break;
                             }
                             else {
-                                logger.error("Issuer Subject not found among Authority Key Identifier's Certifiacte Issuers.");
+                                logger.error("Issuer Issuer not found among Authority Key Identifier's Certifiacte Issuers.");
                                 return false;
                             }
                         }
                     }
+                }
                 }
             }
             logger.debug("]]]]]]]]]]]]]]]]]]]]]]]]");

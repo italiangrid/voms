@@ -1,5 +1,5 @@
 
-AC_INIT([GLite Security VOMS], [1.7.21])
+AC_INIT([GLite Security VOMS], [1.7.22])
 AC_PREREQ(2.59)
 AC_CONFIG_AUX_DIR([./project])
 AM_INIT_AUTOMAKE
