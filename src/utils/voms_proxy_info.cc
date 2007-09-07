@@ -738,8 +738,9 @@ static time_t stillvalid(ASN1_TIME *ctm)
    */
 
   tzset();
-
-#if defined(HAVE_TIME_T_TIMEZONE)
+#if defined(HAVE_TIMEGM)
+  newtime = (timegm(&tm) + offset*60*60);
+#elif defined(HAVE_TIME_T_TIMEZONE)
   newtime = (mktime(&tm) + offset*60*60 - timezone);
 #elif defined(HAVE_TIME_T__TIMEZONE)
   newtime = (mktime(&tm) + offset*60*60 - _timezone);

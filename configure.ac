@@ -85,7 +85,7 @@ AC_FUNC_SETVBUF_REVERSED
 #AC_FUNC_STAT
 AC_FUNC_STRFTIME
 #AC_FUNC_STRTOD
-AC_CHECK_FUNCS([alarm atexit dup2 gethostbyaddr gethostname gethostbyname gethostname memmove memset mkfifo mktime munmap putenv select setenv sigaction socket strchr strdup strerror strndup strrchr strspn strstr strtod strtol strtoul strtoull tzset uname getpwnam])
+AC_CHECK_FUNCS([alarm atexit dup2 gethostbyaddr gethostname gethostbyname gethostname memmove memset mkfifo mktime munmap putenv select setenv sigaction socket strchr strdup strerror strndup strrchr strspn strstr strtod strtol strtoul strtoull tzset uname getpwnam timegm])
 #AC_CHECK_FUNCS([mktime lstat error strtod realloc malloc stat])
 
 AC_REPLACE_FUNCS(getopt_long getopt_long_only daemon setenv memset)

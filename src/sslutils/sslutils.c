@@ -4444,8 +4444,9 @@ ASN1_UTCTIME_mktime(
      */
 
     tzset();
-
-#if defined(HAVE_TIME_T_TIMEZONE)
+#if defined(HAVE_TIMEGM)
+    return (timegm(&tm) + offset*60*60);
+#elif defined(HAVE_TIME_T_TIMEZONE)
     return (mktime(&tm) + offset*60*60 - timezone);
 #elif defined(HAVE_TIME_T__TIMEZONE)
     return (mktime(&tm) + offset*60*60 - _timezone);
