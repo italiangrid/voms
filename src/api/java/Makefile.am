@@ -1,53 +1,53 @@
 JAVAC=$(JHOME)/bin/javac
 JAR=$(JHOME)/bin/jar
 
-JAVA_CLASSES = org/glite/security/voms/BasicVOMSTrustStore.class \
-							 org/glite/security/voms/FQAN.class \
-							 org/glite/security/voms/LSCFile.class \
-							 org/glite/security/voms/SigningPolicy.class \
-							 org/glite/security/voms/PKIStore.class \
-							 org/glite/security/voms/PKIUtils.class \
-							 org/glite/security/voms/PKIVerifier.class \
-							 org/glite/security/voms/SigningPolicy.class \
-							 org/glite/security/voms/VOMSAttribute.class \
-							 org/glite/security/voms/VOMSValidator.class \
-							 org/glite/security/voms/ac/ACGenerator.class \
-							 org/glite/security/voms/ac/ACTrustStore.class \
-							 org/glite/security/voms/ac/ACValidator.class \
-							 org/glite/security/voms/ac/AttCertIssuer.class \
-							 org/glite/security/voms/ac/AttributeCertificateInfo.class \
-							 org/glite/security/voms/ac/AttributeCertificate.class \
-							 org/glite/security/voms/ac/Holder.class \
-							 org/glite/security/voms/ac/IetfAttrSyntax.class \
-							 org/glite/security/voms/ac/ObjectDigestInfo.class \
-							 org/glite/security/voms/ac/Util.class \
-							 org/glite/security/voms/ac/ACTarget.class \
-							 org/glite/security/voms/ac/ACTargets.class \
-							 org/glite/security/voms/ac/ACCerts.class \
-							 org/glite/security/voms/ac/GenericAttribute.class \
-							 org/glite/security/voms/ac/AttributeHolder.class \
-							 org/glite/security/voms/ac/FullAttributes.class \
-							 org/glite/security/voms/ac/VOMSTrustStore.class \
-							 org/glite/security/voms/contact/cli/VomsProxyInitClient.class \
-							 org/glite/security/voms/contact/PathNamingScheme.class \
-							 org/glite/security/voms/contact/Test.class \
-							 org/glite/security/voms/contact/UserCredentials.class \
-							 org/glite/security/voms/contact/VOMSDecoder.class \
-							 org/glite/security/voms/contact/VOMSErrorMessage.class \
-							 org/glite/security/voms/contact/VOMSESFileParser.class \
-							 org/glite/security/voms/contact/VOMSException.class \
-							 org/glite/security/voms/contact/VOMSParser.class \
-							 org/glite/security/voms/contact/VOMSProtocol.class \
-							 org/glite/security/voms/contact/VOMSProxyBuilder.class \
-							 org/glite/security/voms/contact/VOMSProxyInit.class \
-							 org/glite/security/voms/contact/VOMSRequestFactory.class \
-							 org/glite/security/voms/contact/VOMSRequestOptions.class \
-							 org/glite/security/voms/contact/VOMSResponse.class \
-							 org/glite/security/voms/contact/VOMSServerInfo.class \
-							 org/glite/security/voms/contact/VOMSServerMap.class \
-							 org/glite/security/voms/contact/VOMSSocket.class \
-							 org/glite/security/voms/contact/MyProxyCertInfo.class \
-							 org/glite/security/voms/contact/VOMSSyntaxException.class
+JAVA_CLASSES = org/glite/voms/BasicVOMSTrustStore.class \
+							 org/glite/voms/FQAN.class \
+							 org/glite/voms/LSCFile.class \
+							 org/glite/voms/SigningPolicy.class \
+							 org/glite/voms/PKIStore.class \
+							 org/glite/voms/PKIUtils.class \
+							 org/glite/voms/PKIVerifier.class \
+							 org/glite/voms/SigningPolicy.class \
+							 org/glite/voms/VOMSAttribute.class \
+							 org/glite/voms/VOMSValidator.class \
+							 org/glite/voms/ac/ACGenerator.class \
+							 org/glite/voms/ac/ACTrustStore.class \
+							 org/glite/voms/ac/ACValidator.class \
+							 org/glite/voms/ac/AttCertIssuer.class \
+							 org/glite/voms/ac/AttributeCertificateInfo.class \
+							 org/glite/voms/ac/AttributeCertificate.class \
+							 org/glite/voms/ac/Holder.class \
+							 org/glite/voms/ac/IetfAttrSyntax.class \
+							 org/glite/voms/ac/ObjectDigestInfo.class \
+							 org/glite/voms/ac/Util.class \
+							 org/glite/voms/ac/ACTarget.class \
+							 org/glite/voms/ac/ACTargets.class \
+							 org/glite/voms/ac/ACCerts.class \
+							 org/glite/voms/ac/GenericAttribute.class \
+							 org/glite/voms/ac/AttributeHolder.class \
+							 org/glite/voms/ac/FullAttributes.class \
+							 org/glite/voms/ac/VOMSTrustStore.class \
+							 org/glite/voms/contact/cli/VomsProxyInitClient.class \
+							 org/glite/voms/contact/PathNamingScheme.class \
+							 org/glite/voms/contact/Test.class \
+							 org/glite/voms/contact/UserCredentials.class \
+							 org/glite/voms/contact/VOMSDecoder.class \
+							 org/glite/voms/contact/VOMSErrorMessage.class \
+							 org/glite/voms/contact/VOMSESFileParser.class \
+							 org/glite/voms/contact/VOMSException.class \
+							 org/glite/voms/contact/VOMSParser.class \
+							 org/glite/voms/contact/VOMSProtocol.class \
+							 org/glite/voms/contact/VOMSProxyBuilder.class \
+							 org/glite/voms/contact/VOMSProxyInit.class \
+							 org/glite/voms/contact/VOMSRequestFactory.class \
+							 org/glite/voms/contact/VOMSRequestOptions.class \
+							 org/glite/voms/contact/VOMSResponse.class \
+							 org/glite/voms/contact/VOMSServerInfo.class \
+							 org/glite/voms/contact/VOMSServerMap.class \
+							 org/glite/voms/contact/VOMSSocket.class \
+							 org/glite/voms/contact/MyProxyCertInfo.class \
+							 org/glite/voms/contact/VOMSSyntaxException.class
 
 all-local: $(top_builddir)/src/api/java/vomsjapi.jar
 
@@ -58,7 +58,7 @@ $(top_builddir)/src/api/java/vomsjapi.jar: makedirs $(JAVA_CLASSES)
 	$(JAR) -cfm $(top_builddir)/src/api/java/vomsjapi.jar $(top_srcdir)/src/api/java/Manifest.add `find org -name '*.class'` $(top_srcdir)/src/api/java/log4j.properties ;
 
 makedirs:
-	mkdir -p $(top_builddir)/src/api/java/org/glite/security/voms/ac
+	mkdir -p $(top_builddir)/src/api/java/org/glite/voms/ac
 
 install-exec-hook:
 	$(mkinstalldirs) $(DESTDIR)/$(datadir)/java
