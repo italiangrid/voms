@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<classpath>
+	<classpathentry excluding="ant_build/" kind="src" path="src/api/java"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
+	<classpathentry kind="lib" path="/home/andrea/glite-workspace/repository/bcprov-jdk14/1.22/share/jars/bcprov-jdk14-122.jar"/>
+	<classpathentry kind="lib" path="/home/andrea/local/commons-lang-2.2/commons-lang-2.2.jar"/>
+	<classpathentry kind="lib" path="/home/andrea/local/commons-cli-1.0/commons-cli-1.0.jar"/>
+	<classpathentry kind="lib" path="/home/andrea/src/cog-1.2/lib/cog-jglobus.jar" sourcepath="/home/andrea/src/cog-1.2/src"/>
+	<classpathentry kind="lib" path="/home/andrea/src/cog-1.2/lib/cryptix.jar"/>
+	<classpathentry kind="lib" path="/home/andrea/src/cog-1.2/lib/cryptix32.jar"/>
+	<classpathentry kind="lib" path="/home/andrea/src/cog-1.2/lib/cryptix-asn1.jar"/>
+	<classpathentry kind="lib" path="/home/andrea/src/cog-1.2/lib/jgss.jar"/>
+	<classpathentry kind="lib" path="/home/andrea/src/cog-1.2/lib/junit.jar"/>
+	<classpathentry kind="lib" path="/home/andrea/src/cog-1.2/lib/log4j-1.2.8.jar"/>
+	<classpathentry kind="lib" path="/home/andrea/src/cog-1.2/lib/puretls.jar"/>
+	<classpathentry kind="output" path="bin"/>
+</classpath>

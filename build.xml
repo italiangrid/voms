@@ -220,7 +220,7 @@
 			</fileset>
 	
 			<manifest>
-				<attribute name="Main-Class" value="org.glite.security.voms.contact.cli.VomsProxyInitClient"/>
+				<attribute name="Main-Class" value="org.glite.voms.contact.cli.VomsProxyInitClient"/>
 			</manifest>
 		</jar>
 	
@@ -229,7 +229,7 @@
 	<target name="voms-proxy-init">
 		<java 
 			classpathref="java-api-runtime-classpath"
-			classname="org.glite.security.voms.contact.cli.VomsProxyInitClient" fork="true">
+			classname="org.glite.voms.contact.cli.VomsProxyInitClient" fork="true">
 		</java>
 	</target>
 
@@ -246,7 +246,7 @@
 			noindex="false" 
 			nonavbar="false" 
 			notree="false" 
-			packagenames="org.glite.security.voms.contact,org.glite.security.voms.contact.cli,org.glite.security.voms.ac,org.glite.security.voms" 
+			packagenames="org.glite.voms.contact,org.glite.voms.contact.cli,org.glite.voms.ac,org.glite.voms" 
 			source="1.3" 
 			sourcepath="src/api/java" 
 			splitindex="true" 
