@@ -405,7 +405,7 @@ void *LogAddStreamer(void *data, const char *name,
   out = malloc(sizeof(struct OutputStream));
   if (out) {
     out->userdata   = NULL;
-    out->name       = name;
+    out->name       = (char *)name;
     out->initter    = i;
     out->outputter  = o;
     out->destroyer  = d;

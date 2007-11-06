@@ -175,7 +175,7 @@ myPROXYCERTINFO * myPROXYCERTINFO_new() {
   ret = NULL;
 
   M_ASN1_New_Malloc(ret, myPROXYCERTINFO);
-  memset(ret, (int) NULL, sizeof(myPROXYCERTINFO));
+  memset(ret, 0, sizeof(myPROXYCERTINFO));
   ret->path_length      = NULL;
   ret->proxypolicy           = myPROXYPOLICY_new();
   return (ret);

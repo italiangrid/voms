@@ -47,7 +47,7 @@ int my_send(OM_uint32 *m, const gss_ctx_id_t h, char *data, size_t len,
         char *str = NULL;
         globus_gss_assist_display_status_str(&str,
                                              "Failed to send data:",
-                                             res, m, tok_stat);
+                                             res, *m, *tok_stat);
         done = LogBuffer(f, logh, LEV_ERROR, -1, str);
         LOG(logh, LEV_ERROR, -1, str);
         free(str);
@@ -86,7 +86,7 @@ int my_recv(OM_uint32 *m, const gss_ctx_id_t h, char **data, size_t *len, int *t
         char *str = NULL;
         globus_gss_assist_display_status_str(&str,
                                              "Failed to receive data: ",
-                                             res, m, t_s);
+                                             res, *m, *t_s);
         done = LogBuffer(f, logh, LEV_ERROR, -1, str);
         LOG(logh, LEV_ERROR, -1, str);
         free(str);

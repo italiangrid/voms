@@ -715,12 +715,12 @@ bool vomsdata::loadfile(std::string filename, uid_t uid, gid_t gid)
 }
 
 static bool
-tokenize(std::string str, unsigned int &start, std::string &value)
+tokenize(std::string str, std::string::size_type &start, std::string &value)
 {
   if (start != std::string::npos) {
-    unsigned int begin = str.find('"',start);
+    std::string::size_type begin = str.find('"',start);
     if (begin != std::string::npos) {
-      unsigned int end = str.find('"',begin+1);
+      std::string::size_type end = str.find('"',begin+1);
       if (end != std::string::npos) {
         value = str.substr(begin+1, end-begin-1);
         start = end+1;
@@ -771,7 +771,7 @@ bool vomsdata::loadfile0(std::string filename, uid_t uid, gid_t gid)
 
     if (getline(f,line) && !empty(line)) {
       ok = verok = true;
-      unsigned int start = 0;
+      std::string::size_type start = 0;
       std::string port, version;
 
       ok &= tokenize(line, start, data.nick);

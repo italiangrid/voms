@@ -187,7 +187,7 @@ Client::Client(int argc, char ** argv) :
   
   /* usage message */
 
-  static char *LONG_USAGE = NULL;
+  static const char *LONG_USAGE = NULL;
 
   if (!listing) {
     LONG_USAGE = \
@@ -983,7 +983,7 @@ bool Client::CreateProxy(std::string data, std::string filedata, AC ** aclist, i
     acs = true;
   }
 
-  confstr =  "digitalSignature: hu, keyEncipherment: hu, dataEncipherment: hu";
+  confstr =  const_cast<char *>("digitalSignature: hu, keyEncipherment: hu, dataEncipherment: hu");
   if ((ex8 = X509V3_EXT_conf_nid(NULL, NULL, NID_key_usage, confstr)) == NULL) {
     PRXYerr(PRXYERR_F_PROXY_SIGN, PRXYERR_R_CLASS_ADD_EXT);
     goto err;
@@ -1579,7 +1579,7 @@ bool Client::pcdInit() {
     pcd->certdir = strdup(this->certdir);
 
   if (!strncmp(this->certfile, "SC:", 3))
-    EVP_set_pw_prompt("Enter card pin:");
+    EVP_set_pw_prompt(const_cast<char *>("Enter card pin:"));
   else
     EVP_set_pw_prompt(const_cast<char *>("Enter GRID pass phrase for this identity:"));
 
@@ -1588,10 +1588,10 @@ bool Client::pcdInit() {
       goto err;
   
   
-    EVP_set_pw_prompt("Enter GRID pass phrase:");
+    EVP_set_pw_prompt(const_cast<char *>("Enter GRID pass phrase:"));
   
     if (!strncmp(this->keyfile, "SC:", 3))
-      EVP_set_pw_prompt("Enter card pin:");
+      EVP_set_pw_prompt(const_cast<char *>("Enter card pin:"));
 
     if (proxy_load_user_key(pcd, this->keyfile, pw_cb, NULL))
       goto err;
@@ -1696,7 +1696,7 @@ static bool isAC(std::string data)
 
 static char *norep()
 {
-  static char *buffer="";
+  static char *buffer=const_cast<char *>("");
 
 /*   buffer=malloc(1); */
 /*   if (buffer) */

@@ -33,6 +33,7 @@ struct localdata {
 };
 
 static int filereopen(struct localdata *ld);
+static int logfile_rotate(const char * name);
 
 static char *translate(char *format, char *date)
 {

@@ -1731,7 +1731,7 @@ Returns:
 
 static int 
 proxy_app_verify_callback(
-    X509_STORE_CTX *                    ctx)
+    X509_STORE_CTX *                    ctx, void *empty)
 {
     /*
      * OpenSSL-0.9.6 has a  check_issued routine which
@@ -3288,7 +3288,7 @@ Parameters:
 Returns:
 **********************************************************************/
 
-static int cert_load_pkcs12(BIO *bio, int (*pw_cb)(), X509 **cert, EVP_PKEY **key, STACK_OF(X509) *chain) 
+static int cert_load_pkcs12(BIO *bio, int (*pw_cb)(), X509 **cert, EVP_PKEY **key, STACK_OF(X509) **chain) 
 {
   PKCS12 *p12 = NULL;
   char *password = NULL;
