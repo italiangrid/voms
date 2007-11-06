@@ -28,6 +28,7 @@ typedef void * gss_cred_id_t;
 typedef void * gss_ctx_id_t;
 #endif
 #include <openssl/x509.h>
+#include <openssl/bio.h>
 #include <sys/types.h>
 #include "newformat.h"
 }
@@ -159,7 +160,8 @@ enum verror_type {
   VERR_TYPE,       /*!< Returned data of unknown type */
   VERR_ORDER,      /*!< Ordering different than required */
   VERR_SERVERCODE, /*!< Error message from the server */
-  VERR_NOTAVAIL    /*!< Method not available */
+  VERR_NOTAVAIL,   /*!< Method not available */
+  VERR_FILE        /*!< Error reading data from file */
 };
 
 typedef bool (*check_sig)(X509 *, void *, verror_type &); /*!<*/
@@ -375,6 +377,13 @@ public:
   bool RetrieveFromProxy(recurse_type how); /*!< Gets VOMS information from an existing globus proxy
              \param how Recursion type
              \return failure (F) or success (T)*/
+
+  bool Retrieve(FILE *file, recurse_type how); /*!< Gets VOMS information from a proxy saved as a file.
+                               \param the file
+                               \param how Recursion type
+                               \return failure (F) or success (T)
+
+                               Note: Does NOT verify that the proxy is valid.  Such verification must be obtained through other means. */
   ~vomsdata();
 private:
   //  X509 *check_file(void *);
@@ -391,6 +400,8 @@ private:
 public:
   void SetRetryCount(int retryCount);
 
+private:
+  STACK_OF(X509) *load_chain(BIO *in);
 };
 
 

@@ -31,6 +31,9 @@ extern "C" {
 #include "newformat.h"
 #include <openssl/bn.h>
 #include <openssl/err.h>
+#include <openssl/bio.h>
+#include <openssl/x509.h>
+#include <openssl/pem.h>
 #include "credentials.h"
 
 #ifndef NOGLOBUS
@@ -399,6 +402,65 @@ bool vomsdata::Contact(std::string hostname, int port, std::string servsubject, 
 #endif
 }
 
+STACK_OF(X509) *vomsdata::load_chain(BIO *in)
+{
+  STACK_OF(X509_INFO) *sk=NULL;
+  STACK_OF(X509) *stack=NULL, *ret=NULL;
+  X509_INFO *xi;
+  int first = 1;
+
+  /* This loads from a file, a stack of x509/crl/pkey sets */
+  if(!(sk=PEM_X509_INFO_read_bio(in,NULL,NULL,NULL))) {
+    seterror(VERR_PARSE, "error reading credentials from file.");
+    goto end;
+  }
+
+  /* scan over it and pull out the certs */
+  while (sk_X509_INFO_num(sk)) {
+    /* skip first cert */
+    if (first) {
+      first = 0;
+      continue;
+    }
+    xi=sk_X509_INFO_shift(sk);
+    if (xi->x509 != NULL) {
+      sk_X509_push(stack,xi->x509);
+      xi->x509=NULL;
+    }
+    X509_INFO_free(xi);
+  }
+  if(!sk_X509_num(stack)) {
+    seterror(VERR_PARSE, "no certificates in file.");
+    sk_X509_free(stack);
+    goto end;
+  }
+  ret=stack;
+end:
+  sk_X509_INFO_free(sk);
+  return(ret);
+}
+
+bool vomsdata::Retrieve(FILE *file, recurse_type how)
+{
+  /* read and builds chain */
+
+  BIO *in = NULL;
+  X509 *x = NULL;
+  bool res = false;
+
+  in = BIO_new_fp(file, BIO_NOCLOSE);
+  if (in) {
+      x = PEM_read_bio_X509(in, NULL, 0, NULL);
+      STACK_OF(X509) *chain = load_chain(in);
+      if (x && chain)
+        res = Retrieve(x, chain, how);
+      X509_free(x);
+      sk_X509_free(chain);
+  }
+  BIO_free(in);
+  return res;
+}
+
 bool vomsdata::RetrieveFromCred(gss_cred_id_t cred, recurse_type how)
 {
 #ifndef NOGLOBUS
@@ -626,34 +688,14 @@ bool vomsdata::loadfile(std::string filename, uid_t uid, gid_t gid)
     return false;
   }
 
-  if ((stats.st_uid != 0 && stats.st_uid != getuid()) || 
-      (stats.st_gid != 0 && stats.st_gid != getgid())) {
-    seterror(VERR_DIR, "Wrong ownership on file: " + filename + "\n" +
-             "Expected: either (0,0) or (UID, GID) = (" + stringify(getuid(), temp) +
-             ", " + stringify(getgid(), temp) + ")\n" +
-             "Found:   (UID, GID) = (" + stringify(stats.st_uid, temp) + ", " +
-             stringify(stats.st_gid, temp) + ")\n");
-    return false;
-  }
-
   if (stats.st_mode & (S_IWGRP | S_IWOTH)) {
     seterror(VERR_DIR, std::string("Wrong permissions on file: ") + filename + 
              "\nWriting permissions are allowed only for the owner\n");
     return false;
   }
 
-//   if (!(stats.st_mode == (S_IFREG | S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH) ||
-//         stats.st_mode == (S_IFDIR |
-//                           S_IRUSR | S_IWUSR | S_IXUSR |
-//                           S_IRGRP | S_IXGRP |
-//                           S_IROTH | S_IXOTH))) {
-//     seterror(VERR_DIR, std::string("Wrong permissions on file: ") + filename + 
-//              "\nThey should be: 644 (for files) or 755 (for dirs)\n");
-//     return false;
-//   }
-
   if (stats.st_mode & S_IFREG)
-    return loadfile0(filename, uid, gid);
+    return loadfile0(filename, 0, 0);
   else {
     DIR *dp = opendir(filename.c_str());
     struct dirent *de;
@@ -663,7 +705,7 @@ bool vomsdata::loadfile(std::string filename, uid_t uid, gid_t gid)
       while ((de = readdir(dp))) {
         char *name = de->d_name;
         if (name && (strcmp(name, ".") != 0) && (strcmp(name, "..") != 0))
-          cumulative |= loadfile(filename + "/" + name, uid, gid);
+          cumulative |= loadfile(filename + "/" + name, 0, 0);
       }
       closedir(dp);
       return cumulative;
@@ -752,10 +794,6 @@ bool vomsdata::loadfile0(std::string filename, uid_t uid, gid_t gid)
         return false;
       }
     }
-//     else {
-//       seterror(VERR_FORMAT, "data format in file: " + filename + " incorrect!\nLine: " + line);
-//       return false;
-//     }
     linenum++;
   }
   return true;

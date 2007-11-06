@@ -363,6 +363,13 @@ extern int VOMS_RetrieveFromCred(gss_cred_id_t cred, int how, struct vomsdata *v
              \param error RETURN PARAMETER: Qualifies the error message
              \return failure (0) or success (<>0)*/
 
+extern int VOMS_RetrieveFromFile(FILE *file, int how, struct vomsdata *vd, int *error); /*!< Gets VOMS information from the given globus credential
+             \param file The file from which to retrieve the certificate.
+             \param how Recursion type
+             \param vd RETURN PARAMETER: contains the data returned by the connection
+             \param error RETURN PARAMETER: Qualifies the error message
+             \return failure (0) or success (<>0)*/
+
 extern int VOMS_RetrieveFromCtx(gss_ctx_id_t ctx, int how, struct vomsdata *vd, int *error); /*!< Gets VOMS information from the given globus context
              \param ctx The context from which to retrieve the certificate.
              \param how Recursion type

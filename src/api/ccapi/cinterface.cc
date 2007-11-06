@@ -597,6 +597,22 @@ int VOMS_RetrieveEXT(X509_EXTENSION *ext, struct vomsdatar *vd, int *error)
   return 0;
 }
 
+int VOMS_RetrieveFromFile(FILE *file, int how, struct vomsdatar *vd, int *error)
+{
+  if (!vd || !vd->real || !error) {
+    *error = VERR_PARAM;
+    return 0;
+  }
+  
+  vomsdata *v = vd->real;
+
+  if (v->Retrieve(file, recurse_type(how)))
+    return TranslateVOMS(vd, v->data, error);
+
+  *error = v->error;
+  return 0;
+}
+
 int VOMS_RetrieveFromCred(gss_cred_id_t cred, int how, struct vomsdatar *vd, int *error)
 {
   if (!vd || !vd->real || !error) {
