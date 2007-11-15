@@ -559,7 +559,11 @@ bool vomsdata::Import(std::string buffer)
   char *buf = NULL;
 
   std::string subject, ca;
+#if OPENSSL_VERSION_NUMBER >= 0x00908000L
+  const unsigned char *buftmp, *copy;
+#else
   unsigned char *buftmp, *copy;
+#endif
 
   char *str;
   int len;

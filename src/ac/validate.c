@@ -17,6 +17,7 @@
 
 #define _GNU_SOURCE
 
+#include <stddef.h>
 #include <openssl/sha.h>
 #include <openssl/asn1.h>
 #include <openssl/asn1_mac.h>
@@ -569,7 +570,7 @@ static int checkExtensions(STACK_OF(X509_EXTENSION) *exts, X509 *iss, struct col
         ret = 0;
         if (iss) {
           if (key->keyid) {
-            char hashed[20];
+            unsigned char hashed[20];
             if (!SHA1(iss->cert_info->key->public_key->data,
                       iss->cert_info->key->public_key->length,
                       hashed))

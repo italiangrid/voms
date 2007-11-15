@@ -34,9 +34,17 @@
 int i2d_AC_SEQ(AC_SEQ *a, unsigned char **pp)
 {
   M_ASN1_I2D_vars(a);
+#ifdef TYPEDEF_I2D_OF
+  M_ASN1_I2D_len_SEQUENCE(a->acs, (i2d_of_void*)i2d_AC);
+#else
   M_ASN1_I2D_len_SEQUENCE(a->acs, i2d_AC);
+#endif
   M_ASN1_I2D_seq_total();
+#ifdef TYPEDEF_I2D_OF
+  M_ASN1_I2D_put_SEQUENCE(a->acs, (i2d_of_void*)i2d_AC);
+#else
   M_ASN1_I2D_put_SEQUENCE(a->acs, i2d_AC);
+#endif
   M_ASN1_I2D_finish();
 }
 
@@ -486,7 +494,7 @@ char *authkey_i2s(struct v3_ext_method *method, void *ext)
 void *authkey_s2i(struct v3_ext_method *method, struct v3_ext_ctx *ctx, char *data)
 {
   X509       *cert = (X509 *)data;
-  char digest[21];
+  unsigned char digest[21];
 
   ASN1_OCTET_STRING *str = ASN1_OCTET_STRING_new();
   AUTHORITY_KEYID *keyid = AUTHORITY_KEYID_new();

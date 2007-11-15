@@ -566,16 +566,14 @@ static bool print(X509 *cert, STACK_OF(X509) *chain, vomsdata &vd)
     std::cout << leftcert << "\n";
 
   if(text) {
-    X509 *tmp = (X509 *)ASN1_dup((int (*)())i2d_X509,
-				   (char * (*)())d2i_X509, (char*)cert);
+    X509 *tmp = X509_dup(cert);
     X509_print_fp(stdout, tmp);
 
     if (dochain) {
       for (int start = sk_X509_num(chain)-1; start >= 1; start--) {
-	X509 *tmp = sk_X509_value(chain, start);
-	X509 *cert = (X509 *)ASN1_dup((int (*)())i2d_X509,
-				      (char * (*)())d2i_X509, (char*)tmp);
-	X509_print_fp(stdout, cert);
+        X509 *tmp = sk_X509_value(chain, start);
+        X509 *cert = X509_dup(tmp);
+        X509_print_fp(stdout, cert);
       }
     }
   }

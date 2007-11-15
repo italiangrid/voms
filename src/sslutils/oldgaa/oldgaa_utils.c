@@ -463,20 +463,20 @@ oldgaa_bind_rights_to_conditions(oldgaa_rights_ptr        start,
   /*DEE - Looks like all the rights will point to this cond_bind*/
   /* With Globus we only have 1, so should not be a problem */
   oldgaa_conditions_ptr c = cond_bind->condition;
-
+  oldgaa_conditions_ptr current = NULL;
   while(element) {
 
     if (!element->cond_bindings) {
       oldgaa_cond_bindings_ptr new_cond_bind = NULL;
       if (oldgaa_allocate_cond_bindings(&new_cond_bind) == OLDGAA_SUCCESS) {
         element->cond_bindings = new_cond_bind;
-        new_cond_bind->reference_count = NULL;
+        new_cond_bind->reference_count = 0;
       }
       else
         return;
     }
     /* walk on passed conditions */
-    oldgaa_conditions_ptr current = cond_bind->condition;
+    current = cond_bind->condition;
     while (current) {
       oldgaa_conditions_ptr new  = NULL;
       if (oldgaa_duplicate_conditions(current, &new) == OLDGAA_SUCCESS) {

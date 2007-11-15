@@ -76,7 +76,7 @@ get_own_cert(void)
   if ((base = decouple_cred(credential, 0, &stk))) {
     cert = get_real_cert(base, stk);
     if (cert) {
-      ret = (X509 *)ASN1_dup((int (*)())i2d_X509, (char * (*)())d2i_X509, (char *)cert);
+      ret = (X509 *)X509_dup(cert);
     }
   }
   gss_release_cred(&minor_status, &credential);

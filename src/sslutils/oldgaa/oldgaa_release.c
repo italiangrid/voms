@@ -557,12 +557,12 @@ oldgaa_release_conditions(uint32             *minor_status,
   oldgaa_conditions_ptr  *cred = cond;
   uint32 inv_minor_status = 0, inv_major_status = 0;
 
-	if (*cred == NULL || *cred == OLDGAA_NO_CONDITIONS) 
-    return OLDGAA_SUCCESS;
-
   oldgaa_conditions_ptr start   = *cond;
   oldgaa_conditions_ptr anchor  = NULL;
   oldgaa_conditions_ptr current = NULL;
+
+	if (*cred == NULL || *cred == OLDGAA_NO_CONDITIONS) 
+    return OLDGAA_SUCCESS;
 
   while (start) {
     start->reference_count --;

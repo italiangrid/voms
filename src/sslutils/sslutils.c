@@ -983,7 +983,11 @@ proxy_sign(
     if(proxyver>=3) {
 
       user_public_key = X509_get_pubkey(user_cert);
+#ifdef TYPEDEF_I2D_OF
+      ASN1_digest((i2d_of_void*)i2d_PUBKEY, EVP_sha1(), (char *) user_public_key, md, &len);
+#else
       ASN1_digest(i2d_PUBKEY, EVP_sha1(), (char *) user_public_key, md, &len);
+#endif
       EVP_PKEY_free(user_public_key);
 
       sub_hash = md[0] + (md[1] + (md[2] + (md[3] >> 1) * 256) * 256) * 256;
@@ -1079,7 +1083,7 @@ int
 proxy_sign_ext(
     X509 *                              user_cert,
     EVP_PKEY *                          user_private_key,
-    EVP_MD *                            method,
+    const EVP_MD *                      method,
     X509_REQ *                          req,
     X509 **                             new_cert,
     X509_NAME *                         subject_name,
@@ -3293,6 +3297,7 @@ static int cert_load_pkcs12(BIO *bio, int (*pw_cb)(), X509 **cert, EVP_PKEY **ke
   PKCS12 *p12 = NULL;
   char *password = NULL;
   char buffer[1024];
+  int ret = 0;
 
   p12 = d2i_PKCS12_bio(bio, NULL);
   if (!p12)
@@ -3316,7 +3321,7 @@ static int cert_load_pkcs12(BIO *bio, int (*pw_cb)(), X509 **cert, EVP_PKEY **ke
   else
     password="";
 
-  int ret = PKCS12_parse(p12, password, key, cert, chain);
+  ret = PKCS12_parse(p12, password, key, cert, chain);
 
  err:
   memset(buffer, 0, 1024);
@@ -3703,15 +3708,27 @@ proxy_load_user_key(
             {
                 fclose(fp);
                 error = ERR_peek_error();
+#ifdef PEM_F_PEM_DEF_CALLBACK
+                if (error == ERR_PACK(ERR_LIB_PEM,
+                                      PEM_F_PEM_DEF_CALLBACK,
+                                      PEM_R_PROBLEMS_GETTING_PASSWORD))
+#else
                 if (error == ERR_PACK(ERR_LIB_PEM,
                                       PEM_F_DEF_CALLBACK,
                                       PEM_R_PROBLEMS_GETTING_PASSWORD))
+#endif
                 {
                     ERR_clear_error(); 
                 }
+#ifdef EVP_F_EVP_DECRYPTFINAL_EX
+                else if (error == ERR_PACK(ERR_LIB_EVP,
+                                           EVP_F_EVP_DECRYPTFINAL_EX,
+                                           EVP_R_BAD_DECRYPT))
+#else
                 else if (error == ERR_PACK(ERR_LIB_EVP,
                                            EVP_F_EVP_DECRYPTFINAL,
                                            EVP_R_BAD_DECRYPT))
+#endif
                 {
                     ERR_clear_error();
                     PRXYerr(PRXYERR_F_INIT_CRED,PRXYERR_R_WRONG_PASSPHRASE);
@@ -4563,7 +4580,11 @@ i2d_integer_bio(
 
     ASN1_INTEGER_set(asn1_int, v);
 
+#ifdef TYPEDEF_I2D_OF
+    ASN1_i2d_bio((i2d_of_void*)i2d_ASN1_INTEGER, bp, (unsigned char *) asn1_int);
+#else
     ASN1_i2d_bio(i2d_ASN1_INTEGER, bp, (unsigned char *) asn1_int);
+#endif
     
     ASN1_INTEGER_free(asn1_int);
     
@@ -4575,12 +4596,18 @@ d2i_integer_bio(
     long *                              v)
 {
     ASN1_INTEGER *                      asn1_int = NULL;
-    
+
+#ifdef TYPEDEF_I2D_OF    
+    ASN1_d2i_bio((void *(*)())ASN1_INTEGER_new,
+                 (d2i_of_void *)d2i_ASN1_INTEGER,
+                 (bp),
+                 (void **)(&asn1_int));
+#else
     ASN1_d2i_bio((char *(*)())ASN1_INTEGER_new,
                  (char *(*)())d2i_ASN1_INTEGER,
                  (bp),
                  (unsigned char **)(&asn1_int));
-    
+#endif    
     *v = ASN1_INTEGER_get(asn1_int);
     ASN1_INTEGER_free(asn1_int);
 

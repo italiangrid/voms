@@ -267,8 +267,13 @@ int writeac(X509 *issuerc, STACK_OF(X509) *issuerstack, X509 *holder, EVP_PKEY *
 /*   for (i=0; i <sk_X509_num(stk); i ++) */
 /*     fprintf(stderr, "stk[%i] = %s\n", i , X509_NAME_oneline(X509_get_subject_name((X509 *)sk_X509_value(stk, i)), NULL, 0)); */
 
+#ifdef TYPEDEF_I2D_OF
+  sk_X509_push(stk,
+               (X509 *)ASN1_dup((i2d_of_void*)i2d_X509,(d2i_of_void*)d2i_X509, (char *)issuerc));
+#else
   sk_X509_push(stk,
                (X509 *)ASN1_dup((int (*)())i2d_X509,(char * (*)())d2i_X509, (char *)issuerc));
+#endif
 /*   for (i=0; i <sk_X509_num(stk); i ++) */
 /*     fprintf(stderr, "stk[%i] = %d\n", i , sk_X509_value(stk, i)); */
 

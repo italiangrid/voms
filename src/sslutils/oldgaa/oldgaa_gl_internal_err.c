@@ -4,6 +4,7 @@
  */
 #include "config.h"
 
+#include <stdlib.h>
 #include "oldgaa_gl_internal_err.h"
 #include <stdio.h>
 

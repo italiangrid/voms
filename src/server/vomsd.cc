@@ -15,6 +15,7 @@
 
 extern "C" {
 #include "replace.h"
+#include "uuid.h"
 
 #define SUBPACKAGE "voms"
 
@@ -725,7 +726,7 @@ VOMSServer::Execute(EVP_PKEY *key, X509 *issuer, X509 *holder, gss_ctx_id_t cont
 
     LOG(logh, LEV_ERROR, T_PRE, err.message.c_str());
     errs.push_back(err);
-    std::string ret = XML_Ans_Encode("A", errs);
+    std::string ret = XML_Ans_Encode("A", errs, dobase64);
     LOGM(VARP, logh, LEV_DEBUG, T_PRE, "Sending: %s", ret.c_str());
     sock.Send(ret);
     return false;
@@ -1143,7 +1144,6 @@ void VOMSServer::UpdateOpts(void)
   else
     LOG(logh, LEV_INFO, T_PRE, "DEBUG MODE INACTIVE ");
 }
-<<<<<<< .working
 
 static BIGNUM *get_serial()
 {
@@ -1154,7 +1154,6 @@ static BIGNUM *get_serial()
 
   return BN_bin2bn(uuid, 16, number);
 }
-=======
 
 static bool determine_group_and_role(std::string command, char *comm, char **group,
                                      char **role)
@@ -1241,4 +1240,3 @@ static bool determine_group_and_role(std::string command, char *comm, char **gro
   return true;
 }
 
->>>>>>> .merge-right.r710

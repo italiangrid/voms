@@ -50,9 +50,15 @@ void myPROXYPOLICY_free(myPROXYPOLICY * policy) {
 
 /* duplicate */
 myPROXYPOLICY * myPROXYPOLICY_dup(myPROXYPOLICY * policy) {
+#ifdef TYPEDEF_I2D_OF
+  return ((myPROXYPOLICY *) ASN1_dup((i2d_of_void *)i2d_myPROXYPOLICY,
+				   (d2i_of_void *)d2i_myPROXYPOLICY,
+				   (char *)policy));
+#else
   return ((myPROXYPOLICY *) ASN1_dup((int (*)())i2d_myPROXYPOLICY,
 				   (char *(*)())d2i_myPROXYPOLICY,
 				   (char *)policy));
+#endif
 }
 
 /* set policy language */

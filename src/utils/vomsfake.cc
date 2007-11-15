@@ -787,7 +787,11 @@ bool Fake::WriteSeparate()
     BIO_write_filename(out, (char *)separate.c_str());
     
     while(*aclist)
+#ifdef TYPEDEF_I2D_OF
+      if (!PEM_ASN1_write_bio(((i2d_of_void*)i2d_AC), "ATTRIBUTE CERTIFICATE", out, (char *)*(aclist++), NULL, NULL, 0, NULL, NULL)) {
+#else
       if (!PEM_ASN1_write_bio(((int (*)())i2d_AC), "ATTRIBUTE CERTIFICATE", out, (char *)*(aclist++), NULL, NULL, 0, NULL, NULL)) {
+#endif
         if (!quiet) 
           std::cout << "Unable to write to BIO" << std::endl;
         return false;
