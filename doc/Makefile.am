@@ -3,20 +3,19 @@ USERDOC_DIR = $(top_builddir)/doc/userdoc
 
 SGML_INCLUDES = authors.sgml bugzilla.sgml license.sgml links.sgml
 
-SGML = $(srcdir)/voms-proxy-init.sgml \
-       $(srcdir)/voms-proxy-list.sgml \
-       $(srcdir)/voms.sgml \
-       $(srcdir)/testvoms.sgml \
-       $(srcdir)/voms_install_db.sgml \
-       $(srcdir)/voms-proxy-info.sgml \
-       $(srcdir)/voms-proxy-destroy.sgml \
-       $(srcdir)/voms_install_replica.sgml \
-       $(srcdir)/voms-proxy-fake.sgml
+SGML = $(srcdir)/voms-proxy-init.xml \
+       $(srcdir)/voms-proxy-list.xml \
+       $(srcdir)/voms.xml \
+       $(srcdir)/testvoms.xml \
+       $(srcdir)/voms-proxy-info.xml \
+       $(srcdir)/voms-proxy-destroy.xml \
+       $(srcdir)/voms-install-replica.xml \
+       $(srcdir)/voms-proxy-fake.xml
 
-SGML_DIST = voms-proxy-init.sgml voms.sgml testvoms.sgml \
-            voms_install_db.sgml voms-proxy-info.sgml \
-            voms-proxy-destroy.sgml voms_install_replica.sgml \
-            voms-proxy-fake.sgml voms-proxy-list.sgml
+SGML_DIST = voms-proxy-init.xml voms.sgml testvoms.xml \
+						voms-proxy-info.xml \
+            voms-proxy-destroy.xml voms-install-replica.xml \
+            voms-proxy-fake.xml voms-proxy-list.xml
 
 LATEX  = $(srcdir)/software.tex $(srcdir)/capi.tex $(srcdir)/c++api.tex $(srcdir)/AC-RFC.tex
 
@@ -74,19 +73,22 @@ DOCS   = capi.pdf c++api.pdf software.pdf AC-RFC.pdf
 
 mandir = $(datadir)/man
 
+if BUILD_JAVA_ONLY
+man_MANS =
+else
 if BUILD_DOCS
 man_MANS = \
 	voms.8 \
 	voms-proxy-init.1 \
 	testvoms.1 \
-	voms_install_db.1 \
 	voms-proxy-info.1 \
 	voms-proxy-destroy.1 \
-	voms_install_replica.1 \
+	voms-install-replica.8 \
 	voms-proxy-fake.1 \
 	voms-proxy-list.1
 else
 man_MANS = 
+endif
 endif
 
 EXTRA_DIST = $(SGML_INCLUDES) $(SGML_DIST) $(LATEX_DIST)
@@ -137,12 +139,6 @@ $(USERDOC_DIR)/utils/ps/%.ps: %.sgml $(SGML_INCLUDES)
 	$(mkinstalldirs) $(USERDOC_DIR)/utils
 	docbook2ps --output $(USERDOC_DIR)/utils/ps $<
 
-%.1: %.sgml $(SGML_INCLUDES)
-	docbook2man $<
-
-%.8: %.sgml $(SGML_INCLUDES)
-	docbook2man $<
-
 %.pdf: %.tex
 	pdflatex $<
 	pdflatex $<
@@ -163,11 +159,17 @@ APIPDOCS = apidoc/api/VOMS_C_API/latex/refman.pdf \
 	apidoc/api/VOMS_CC_API/latex/refman.pdf \
 	apidoc/api/VOMS_CC_API/latex/refman.ps
 
+if BUILD_JAVA_ONLY
+userdoc-local:
+else
 if BUILD_DOCS
-userdoc-local: $(SERVER) $(CLIENT) $(UTILS) $(DOCS) $(APIPDOCS)
+userdoc-local: $(man_MANS)
 else
 userdoc-local:
 endif
+endif
+
+userdoc-all: $(SERVER) $(CLIENT) $(UTILS) $(DOCS) $(APIPDOCS)
 
 if BUILD_DOCS
 $(MAN3) $(HTML) $(LATEX): $(DOXY)
@@ -221,6 +223,9 @@ userdoc-recursive:
 
 userdoc: userdoc-local userdoc-recursive
 
+if BUILD_JAVA_ONLY
+install-data-hook:
+else
 if BUILD_DOCS
 install-data-hook:
 	(cd $(DESTDIR)$(mandir)/man1; \
@@ -231,18 +236,13 @@ install-data-hook:
 	for file in *.8; do \
 	  GZIP=$(GZIP_ENV) gzip -f $${file}; \
 	done)
-	$(mkinstalldirs) $(DESTDIR)/$(datadir)/doc/voms$(DOCVER)
-	cp software.pdf capi.pdf c++api.pdf AC-RFC.pdf $(DESTDIR)/$(datadir)/doc/voms$(DOCVER)
-	cp apidoc/api/VOMS_CC_API/latex/refman.pdf $(DESTDIR)/$(datadir)/doc/voms$(DOCVER)/VOMS_CC_API.pdf
-	cp apidoc/api/VOMS_CC_API/latex/refman.ps $(DESTDIR)/$(datadir)/doc/voms$(DOCVER)/VOMS_CC_API.ps
-	cp apidoc/api/VOMS_C_API/latex/refman.pdf $(DESTDIR)/$(datadir)/doc/voms$(DOCVER)/VOMS_C_API.pdf
-	cp apidoc/api/VOMS_C_API/latex/refman.ps $(DESTDIR)/$(datadir)/doc/voms$(DOCVER)/VOMS_C_API.ps
 	-ln -s voms-proxy-init.1.gz    $(DESTDIR)$(mandir)/man1/edg-voms-proxy-init.1.gz
 	-ln -s voms-proxy-list.1.gz    $(DESTDIR)$(mandir)/man1/edg-voms-proxy-list.1.gz
 	-ln -s voms-proxy-info.1.gz    $(DESTDIR)$(mandir)/man1/edg-voms-proxy-info.1.gz
 	-ln -s voms-proxy-destroy.1.gz $(DESTDIR)$(mandir)/man1/edg-voms-proxy-destroy.1.gz
 	-ln -s voms-proxy-fake.1.gz    $(DESTDIR)$(mandir)/man1/edg-voms-proxy-fake.1.gz
 	-ln -s voms.8.gz               $(DESTDIR)$(mandir)/man8/edg-voms.8.gz
+	-ln -s voms-install-replica.8.gz $(DESTDIR)$(mandir)/man8/edg-voms-install-replica.8.gz
 if ENABLE_GLITE
 	-ln -s voms-proxy-init.1.gz    $(DESTDIR)$(mandir)/man1/glite-voms-proxy-init.1.gz
 	-ln -s voms-proxy-list.1.gz    $(DESTDIR)$(mandir)/man1/glite-voms-proxy-list.1.gz
@@ -250,9 +250,25 @@ if ENABLE_GLITE
 	-ln -s voms-proxy-destroy.1.gz $(DESTDIR)$(mandir)/man1/glite-voms-proxy-destroy.1.gz
 	-ln -s voms-proxy-fake.1.gz    $(DESTDIR)$(mandir)/man1/glite-voms-proxy-fake.1.gz
 	-ln -s voms.8.gz               $(DESTDIR)$(mandir)/man8/glite-voms.8.gz
+	-ln -s voms-install-replica.8.gz $(DESTDIR)$(mandir)/man8/glite-voms-install-replica.8.gz
 endif
 else
 install-data-hook:
+endif
+endif
+
+MAN_STYLESHEET = http://docbook.sourceforge.net/release/xsl/current/manpages/docbook.xsl
+
+if HAVE_DOCBOOK_MAN
+
+%.1: %.xml $(COMMON_XMLFILES)
+	$(XSLTPROC) $(XSLTPROCFLAGS) $(MAN_STYLESHEET) $<
+
+%.8: %.xml $(COMMON_XMLFILES)
+	$(XSLTPROC) $(XSLTPROCFLAGS) $(MAN_STYLESHEET) $<
+
+%.html: %.xml
+	$(XSLTPROC) $(XSLTPROCFLAGS) -o $@ $(HTML_STYLESHEET) $<
 endif
 
 .PHONY: userdoc

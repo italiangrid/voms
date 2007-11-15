@@ -70,6 +70,8 @@ BUILD_ALL_TRUE = @BUILD_ALL_TRUE@
 BUILD_DOCS_FALSE = @BUILD_DOCS_FALSE@
 BUILD_DOCS_TRUE = @BUILD_DOCS_TRUE@
 BUILD_JAVA_FALSE = @BUILD_JAVA_FALSE@
+BUILD_JAVA_ONLY_FALSE = @BUILD_JAVA_ONLY_FALSE@
+BUILD_JAVA_ONLY_TRUE = @BUILD_JAVA_ONLY_TRUE@
 BUILD_JAVA_TRUE = @BUILD_JAVA_TRUE@
 CC = @CC@
 CCDEPMODE = @CCDEPMODE@
@@ -120,6 +122,8 @@ GLOBUS_GCC64PTHR_GSS_LIBS = @GLOBUS_GCC64PTHR_GSS_LIBS@
 GLOBUS_GCC64_CFLAGS = @GLOBUS_GCC64_CFLAGS@
 GLOBUS_GCC64_GSS_LIBS = @GLOBUS_GCC64_GSS_LIBS@
 GLOBUS_GSS_LIBS = @GLOBUS_GSS_LIBS@
+HAVE_DOCBOOK_MAN_FALSE = @HAVE_DOCBOOK_MAN_FALSE@
+HAVE_DOCBOOK_MAN_TRUE = @HAVE_DOCBOOK_MAN_TRUE@
 INSTALL_DATA = @INSTALL_DATA@
 INSTALL_PROGRAM = @INSTALL_PROGRAM@
 INSTALL_SCRIPT = @INSTALL_SCRIPT@
@@ -173,6 +177,8 @@ WANTED_UTIL_LIBS = @WANTED_UTIL_LIBS@
 WANT_UNIT_TEST_FALSE = @WANT_UNIT_TEST_FALSE@
 WANT_UNIT_TEST_TRUE = @WANT_UNIT_TEST_TRUE@
 WORKDIR = @WORKDIR@
+XSLTPROC = @XSLTPROC@
+XSLTPROCFLAGS = @XSLTPROCFLAGS@
 ac_ct_AR = @ac_ct_AR@
 ac_ct_CC = @ac_ct_CC@
 ac_ct_CXX = @ac_ct_CXX@
@@ -218,20 +224,19 @@ sysconfdir = @sysconfdir@
 target_alias = @target_alias@
 USERDOC_DIR = $(top_builddir)/doc/userdoc
 SGML_INCLUDES = authors.sgml bugzilla.sgml license.sgml links.sgml
-SGML = $(srcdir)/voms-proxy-init.sgml \
-       $(srcdir)/voms-proxy-list.sgml \
-       $(srcdir)/voms.sgml \
-       $(srcdir)/testvoms.sgml \
-       $(srcdir)/voms_install_db.sgml \
-       $(srcdir)/voms-proxy-info.sgml \
-       $(srcdir)/voms-proxy-destroy.sgml \
-       $(srcdir)/voms_install_replica.sgml \
-       $(srcdir)/voms-proxy-fake.sgml
+SGML = $(srcdir)/voms-proxy-init.xml \
+       $(srcdir)/voms-proxy-list.xml \
+       $(srcdir)/voms.xml \
+       $(srcdir)/testvoms.xml \
+       $(srcdir)/voms-proxy-info.xml \
+       $(srcdir)/voms-proxy-destroy.xml \
+       $(srcdir)/voms-install-replica.xml \
+       $(srcdir)/voms-proxy-fake.xml
 
-SGML_DIST = voms-proxy-init.sgml voms.sgml testvoms.sgml \
-            voms_install_db.sgml voms-proxy-info.sgml \
-            voms-proxy-destroy.sgml voms_install_replica.sgml \
-            voms-proxy-fake.sgml voms-proxy-list.sgml
+SGML_DIST = voms-proxy-init.xml voms.sgml testvoms.xml \
+						voms-proxy-info.xml \
+            voms-proxy-destroy.xml voms-install-replica.xml \
+            voms-proxy-fake.xml voms-proxy-list.xml
 
 LATEX = $(srcdir)/software.tex $(srcdir)/capi.tex $(srcdir)/c++api.tex $(srcdir)/AC-RFC.tex
 LATEX_DIST = software.tex capi.tex c++api.tex AC-RFC.tex
@@ -281,18 +286,18 @@ UTILS = $(UTILS_HTML) \
          $(UTILS_PS)
 
 DOCS = capi.pdf c++api.pdf software.pdf AC-RFC.pdf
-@BUILD_DOCS_FALSE@man_MANS = 
-@BUILD_DOCS_TRUE@man_MANS = \
-@BUILD_DOCS_TRUE@	voms.8 \
-@BUILD_DOCS_TRUE@	voms-proxy-init.1 \
-@BUILD_DOCS_TRUE@	testvoms.1 \
-@BUILD_DOCS_TRUE@	voms_install_db.1 \
-@BUILD_DOCS_TRUE@	voms-proxy-info.1 \
-@BUILD_DOCS_TRUE@	voms-proxy-destroy.1 \
-@BUILD_DOCS_TRUE@	voms_install_replica.1 \
-@BUILD_DOCS_TRUE@	voms-proxy-fake.1 \
-@BUILD_DOCS_TRUE@	voms-proxy-list.1
+@BUILD_DOCS_FALSE@@BUILD_JAVA_ONLY_FALSE@man_MANS = 
+@BUILD_DOCS_TRUE@@BUILD_JAVA_ONLY_FALSE@man_MANS = \
+@BUILD_DOCS_TRUE@@BUILD_JAVA_ONLY_FALSE@	voms.8 \
+@BUILD_DOCS_TRUE@@BUILD_JAVA_ONLY_FALSE@	voms-proxy-init.1 \
+@BUILD_DOCS_TRUE@@BUILD_JAVA_ONLY_FALSE@	testvoms.1 \
+@BUILD_DOCS_TRUE@@BUILD_JAVA_ONLY_FALSE@	voms-proxy-info.1 \
+@BUILD_DOCS_TRUE@@BUILD_JAVA_ONLY_FALSE@	voms-proxy-destroy.1 \
+@BUILD_DOCS_TRUE@@BUILD_JAVA_ONLY_FALSE@	voms-install-replica.8 \
+@BUILD_DOCS_TRUE@@BUILD_JAVA_ONLY_FALSE@	voms-proxy-fake.1 \
+@BUILD_DOCS_TRUE@@BUILD_JAVA_ONLY_FALSE@	voms-proxy-list.1
 
+@BUILD_JAVA_ONLY_TRUE@man_MANS = 
 EXTRA_DIST = $(SGML_INCLUDES) $(SGML_DIST) $(LATEX_DIST)
 MAINTAINERCLEANFILES = Makefile.in \
                        manpage.links \
@@ -305,6 +310,7 @@ APIPDOCS = apidoc/api/VOMS_C_API/latex/refman.pdf \
 	apidoc/api/VOMS_CC_API/latex/refman.pdf \
 	apidoc/api/VOMS_CC_API/latex/refman.ps
 
+MAN_STYLESHEET = http://docbook.sourceforge.net/release/xsl/current/manpages/docbook.xsl
 all: all-am
 
 .SUFFIXES:
@@ -607,12 +613,6 @@ $(USERDOC_DIR)/utils/ps/%.ps: %.sgml $(SGML_INCLUDES)
 	$(mkinstalldirs) $(USERDOC_DIR)/utils
 	docbook2ps --output $(USERDOC_DIR)/utils/ps $<
 
-%.1: %.sgml $(SGML_INCLUDES)
-	docbook2man $<
-
-%.8: %.sgml $(SGML_INCLUDES)
-	docbook2man $<
-
 %.pdf: %.tex
 	pdflatex $<
 	pdflatex $<
@@ -628,8 +628,11 @@ maintainer-clean-local:
 
 all-local: userdoc-local
 
-@BUILD_DOCS_TRUE@userdoc-local: $(SERVER) $(CLIENT) $(UTILS) $(DOCS) $(APIPDOCS)
-@BUILD_DOCS_FALSE@userdoc-local:
+@BUILD_JAVA_ONLY_TRUE@userdoc-local:
+@BUILD_DOCS_TRUE@@BUILD_JAVA_ONLY_FALSE@userdoc-local: $(man_MANS)
+@BUILD_DOCS_FALSE@@BUILD_JAVA_ONLY_FALSE@userdoc-local:
+
+userdoc-all: $(SERVER) $(CLIENT) $(UTILS) $(DOCS) $(APIPDOCS)
 
 @BUILD_DOCS_TRUE@$(MAN3) $(HTML) $(LATEX): $(DOXY)
 @BUILD_DOCS_TRUE@	doxygen $(CCDOCPLC_DIR)/Doxyfile
@@ -679,34 +682,40 @@ userdoc-recursive:
 
 userdoc: userdoc-local userdoc-recursive
 
-@BUILD_DOCS_TRUE@install-data-hook:
-@BUILD_DOCS_TRUE@	(cd $(DESTDIR)$(mandir)/man1; \
-@BUILD_DOCS_TRUE@	for file in *.1; do \
-@BUILD_DOCS_TRUE@	  GZIP=$(GZIP_ENV) gzip -f $${file}; \
-@BUILD_DOCS_TRUE@	done)
-@BUILD_DOCS_TRUE@	(cd $(DESTDIR)$(mandir)/man8; \
-@BUILD_DOCS_TRUE@	for file in *.8; do \
-@BUILD_DOCS_TRUE@	  GZIP=$(GZIP_ENV) gzip -f $${file}; \
-@BUILD_DOCS_TRUE@	done)
-@BUILD_DOCS_TRUE@	$(mkinstalldirs) $(DESTDIR)/$(datadir)/doc/voms$(DOCVER)
-@BUILD_DOCS_TRUE@	cp software.pdf capi.pdf c++api.pdf AC-RFC.pdf $(DESTDIR)/$(datadir)/doc/voms$(DOCVER)
-@BUILD_DOCS_TRUE@	cp apidoc/api/VOMS_CC_API/latex/refman.pdf $(DESTDIR)/$(datadir)/doc/voms$(DOCVER)/VOMS_CC_API.pdf
-@BUILD_DOCS_TRUE@	cp apidoc/api/VOMS_CC_API/latex/refman.ps $(DESTDIR)/$(datadir)/doc/voms$(DOCVER)/VOMS_CC_API.ps
-@BUILD_DOCS_TRUE@	cp apidoc/api/VOMS_C_API/latex/refman.pdf $(DESTDIR)/$(datadir)/doc/voms$(DOCVER)/VOMS_C_API.pdf
-@BUILD_DOCS_TRUE@	cp apidoc/api/VOMS_C_API/latex/refman.ps $(DESTDIR)/$(datadir)/doc/voms$(DOCVER)/VOMS_C_API.ps
-@BUILD_DOCS_TRUE@	-ln -s voms-proxy-init.1.gz    $(DESTDIR)$(mandir)/man1/edg-voms-proxy-init.1.gz
-@BUILD_DOCS_TRUE@	-ln -s voms-proxy-list.1.gz    $(DESTDIR)$(mandir)/man1/edg-voms-proxy-list.1.gz
-@BUILD_DOCS_TRUE@	-ln -s voms-proxy-info.1.gz    $(DESTDIR)$(mandir)/man1/edg-voms-proxy-info.1.gz
-@BUILD_DOCS_TRUE@	-ln -s voms-proxy-destroy.1.gz $(DESTDIR)$(mandir)/man1/edg-voms-proxy-destroy.1.gz
-@BUILD_DOCS_TRUE@	-ln -s voms-proxy-fake.1.gz    $(DESTDIR)$(mandir)/man1/edg-voms-proxy-fake.1.gz
-@BUILD_DOCS_TRUE@	-ln -s voms.8.gz               $(DESTDIR)$(mandir)/man8/edg-voms.8.gz
-@BUILD_DOCS_TRUE@@ENABLE_GLITE_TRUE@	-ln -s voms-proxy-init.1.gz    $(DESTDIR)$(mandir)/man1/glite-voms-proxy-init.1.gz
-@BUILD_DOCS_TRUE@@ENABLE_GLITE_TRUE@	-ln -s voms-proxy-list.1.gz    $(DESTDIR)$(mandir)/man1/glite-voms-proxy-list.1.gz
-@BUILD_DOCS_TRUE@@ENABLE_GLITE_TRUE@	-ln -s voms-proxy-info.1.gz    $(DESTDIR)$(mandir)/man1/glite-voms-proxy-info.1.gz
-@BUILD_DOCS_TRUE@@ENABLE_GLITE_TRUE@	-ln -s voms-proxy-destroy.1.gz $(DESTDIR)$(mandir)/man1/glite-voms-proxy-destroy.1.gz
-@BUILD_DOCS_TRUE@@ENABLE_GLITE_TRUE@	-ln -s voms-proxy-fake.1.gz    $(DESTDIR)$(mandir)/man1/glite-voms-proxy-fake.1.gz
-@BUILD_DOCS_TRUE@@ENABLE_GLITE_TRUE@	-ln -s voms.8.gz               $(DESTDIR)$(mandir)/man8/glite-voms.8.gz
-@BUILD_DOCS_FALSE@install-data-hook:
+@BUILD_JAVA_ONLY_TRUE@install-data-hook:
+@BUILD_DOCS_TRUE@@BUILD_JAVA_ONLY_FALSE@install-data-hook:
+@BUILD_DOCS_TRUE@@BUILD_JAVA_ONLY_FALSE@	(cd $(DESTDIR)$(mandir)/man1; \
+@BUILD_DOCS_TRUE@@BUILD_JAVA_ONLY_FALSE@	for file in *.1; do \
+@BUILD_DOCS_TRUE@@BUILD_JAVA_ONLY_FALSE@	  GZIP=$(GZIP_ENV) gzip -f $${file}; \
+@BUILD_DOCS_TRUE@@BUILD_JAVA_ONLY_FALSE@	done)
+@BUILD_DOCS_TRUE@@BUILD_JAVA_ONLY_FALSE@	(cd $(DESTDIR)$(mandir)/man8; \
+@BUILD_DOCS_TRUE@@BUILD_JAVA_ONLY_FALSE@	for file in *.8; do \
+@BUILD_DOCS_TRUE@@BUILD_JAVA_ONLY_FALSE@	  GZIP=$(GZIP_ENV) gzip -f $${file}; \
+@BUILD_DOCS_TRUE@@BUILD_JAVA_ONLY_FALSE@	done)
+@BUILD_DOCS_TRUE@@BUILD_JAVA_ONLY_FALSE@	-ln -s voms-proxy-init.1.gz    $(DESTDIR)$(mandir)/man1/edg-voms-proxy-init.1.gz
+@BUILD_DOCS_TRUE@@BUILD_JAVA_ONLY_FALSE@	-ln -s voms-proxy-list.1.gz    $(DESTDIR)$(mandir)/man1/edg-voms-proxy-list.1.gz
+@BUILD_DOCS_TRUE@@BUILD_JAVA_ONLY_FALSE@	-ln -s voms-proxy-info.1.gz    $(DESTDIR)$(mandir)/man1/edg-voms-proxy-info.1.gz
+@BUILD_DOCS_TRUE@@BUILD_JAVA_ONLY_FALSE@	-ln -s voms-proxy-destroy.1.gz $(DESTDIR)$(mandir)/man1/edg-voms-proxy-destroy.1.gz
+@BUILD_DOCS_TRUE@@BUILD_JAVA_ONLY_FALSE@	-ln -s voms-proxy-fake.1.gz    $(DESTDIR)$(mandir)/man1/edg-voms-proxy-fake.1.gz
+@BUILD_DOCS_TRUE@@BUILD_JAVA_ONLY_FALSE@	-ln -s voms.8.gz               $(DESTDIR)$(mandir)/man8/edg-voms.8.gz
+@BUILD_DOCS_TRUE@@BUILD_JAVA_ONLY_FALSE@	-ln -s voms-install-replica.8.gz $(DESTDIR)$(mandir)/man8/edg-voms-install-replica.8.gz
+@BUILD_DOCS_TRUE@@BUILD_JAVA_ONLY_FALSE@@ENABLE_GLITE_TRUE@	-ln -s voms-proxy-init.1.gz    $(DESTDIR)$(mandir)/man1/glite-voms-proxy-init.1.gz
+@BUILD_DOCS_TRUE@@BUILD_JAVA_ONLY_FALSE@@ENABLE_GLITE_TRUE@	-ln -s voms-proxy-list.1.gz    $(DESTDIR)$(mandir)/man1/glite-voms-proxy-list.1.gz
+@BUILD_DOCS_TRUE@@BUILD_JAVA_ONLY_FALSE@@ENABLE_GLITE_TRUE@	-ln -s voms-proxy-info.1.gz    $(DESTDIR)$(mandir)/man1/glite-voms-proxy-info.1.gz
+@BUILD_DOCS_TRUE@@BUILD_JAVA_ONLY_FALSE@@ENABLE_GLITE_TRUE@	-ln -s voms-proxy-destroy.1.gz $(DESTDIR)$(mandir)/man1/glite-voms-proxy-destroy.1.gz
+@BUILD_DOCS_TRUE@@BUILD_JAVA_ONLY_FALSE@@ENABLE_GLITE_TRUE@	-ln -s voms-proxy-fake.1.gz    $(DESTDIR)$(mandir)/man1/glite-voms-proxy-fake.1.gz
+@BUILD_DOCS_TRUE@@BUILD_JAVA_ONLY_FALSE@@ENABLE_GLITE_TRUE@	-ln -s voms.8.gz               $(DESTDIR)$(mandir)/man8/glite-voms.8.gz
+@BUILD_DOCS_TRUE@@BUILD_JAVA_ONLY_FALSE@@ENABLE_GLITE_TRUE@	-ln -s voms-install-replica.8.gz $(DESTDIR)$(mandir)/man8/glite-voms-install-replica.8.gz
+@BUILD_DOCS_FALSE@@BUILD_JAVA_ONLY_FALSE@install-data-hook:
+
+@HAVE_DOCBOOK_MAN_TRUE@%.1: %.xml $(COMMON_XMLFILES)
+@HAVE_DOCBOOK_MAN_TRUE@	$(XSLTPROC) $(XSLTPROCFLAGS) $(MAN_STYLESHEET) $<
+
+@HAVE_DOCBOOK_MAN_TRUE@%.8: %.xml $(COMMON_XMLFILES)
+@HAVE_DOCBOOK_MAN_TRUE@	$(XSLTPROC) $(XSLTPROCFLAGS) $(MAN_STYLESHEET) $<
+
+@HAVE_DOCBOOK_MAN_TRUE@%.html: %.xml
+@HAVE_DOCBOOK_MAN_TRUE@	$(XSLTPROC) $(XSLTPROCFLAGS) -o $@ $(HTML_STYLESHEET) $<
 
 .PHONY: userdoc
 # Tell versions [3.59,3.63) of GNU make to not export all variables.

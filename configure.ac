@@ -1,5 +1,5 @@
 
-AC_INIT([GLite Security VOMS], [1.7.22])
+AC_INIT([GLite Security VOMS], [1.7.24])
 AC_PREREQ(2.59)
 AC_CONFIG_AUX_DIR([./project])
 AM_INIT_AUTOMAKE
@@ -36,6 +36,10 @@ AC_OPENSSL
 # check for dependencies based on project/*m4
 
 AC_ENABLE_GLITE([], have_glite=yes, have_glite=no) # embed AC_GLITE
+
+if test "x$host_cpu" = "xx86_64"; then
+    AC_SUBST([libdir], ['${exec_prefix}/lib64'])
+fi
 
 AC_EXPAT([], have_expat=yes, have_expat=no)        # taken from org.glite
 AC_CPPUNIT([], have_cppunit=yes, have_cppunit=no)  # taken from org.glite
@@ -106,6 +110,8 @@ AC_VOMS_LONG_LONG
 AC_VOMS_STRNDUP
 AC_VOMS_TRY_OPENSSL_NEW_TYPES
 AC_BUILD_API_ONLY
+
+GLITE_DOCBOOK_MAN
 
 AC_PREFIX_DEFAULT("/opt/glite")
 

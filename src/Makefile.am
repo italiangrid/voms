@@ -1,4 +1,7 @@
 if BUILD_ALL
+if BUILD_JAVA_ONLY
+SUBDIRS = api
+else
 SUBDIRS = \
 	include \
 	replib \
@@ -14,6 +17,7 @@ SUBDIRS = \
 	install \
 	replica \
 	support
+endif
 else
 SUBDIRS = \
 	include \

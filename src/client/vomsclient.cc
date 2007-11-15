@@ -547,7 +547,7 @@ Client::Client(int argc, char ** argv) :
     /* exit if any server for that vo known */
     
     std::vector<contactdata> servers;
-    servers = v.FindByAlias(contact.vo());
+    servers = v.FindByAlias(contact.vo().empty() ? contact.nick() : contact.vo());
     if (servers.empty()) 
     {
       std::cerr << "VOMS Server for " << contact.vo() << " not known!" << std::endl;
@@ -644,36 +644,42 @@ bool Client::Run() {
 
   for(std::vector<std::string>::iterator i = vomses.begin(); i != vomses.end(); ++i)
   {
+    if ((*i).empty())
+      continue;
+
     /* will contain all fqans requested for the vo */
     std::vector<std::string> fqans;
     
     Contact contact(*i);
-    fqans.push_back(contact.fqan());
-    
-    /* chech if other requests for the same vo exists */
-    for(std::vector<std::string>::iterator j = i + 1; j < vomses.end(); ++j)
-    {
-      Contact tmp = *j;
-      if(tmp.vo() == contact.vo())
-      {
-        fqans.push_back(tmp.fqan());
-        vomses.erase(j); 
-        --j;
-      }
-    }
 
-    /* parse fqans vector to build the command to send to the server */
-    std::string command = parse_fqan(fqans);
-    
     /* find servers for that vo */
     std::vector<contactdata> servers;
-    servers = v.FindByAlias(contact.vo());
+    servers = v.FindByAlias(contact.nick());
     if (!servers.empty()){
       rand_wrapper rd(time(0));
       random_shuffle(servers.begin(), 
                      servers.end(),
                      rd);
     }
+
+    std::string vo = (contact.vo().empty() ? servers[0].vo : contact.vo());
+
+    fqans.push_back(contact.fqan().empty() ? "/" + vo : contact.fqan());
+    
+    /* chech if other requests for the same vo exists */
+    for (std::vector<std::string>::iterator j = i + 1; j < vomses.end(); ++j) {
+
+      Contact tmp(*j);
+
+      if ((tmp.vo() == vo) || (tmp.nick() == contact.nick())) {
+        fqans.push_back(tmp.fqan().empty() ? "/" + vo : tmp.fqan());
+        *j = "";
+      }
+    }
+
+    /* parse fqans vector to build the command to send to the server */
+    std::string command = parse_fqan(fqans);
+    
     
     /* and contact them */
 

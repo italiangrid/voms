@@ -91,6 +91,8 @@ BUILD_ALL_TRUE = @BUILD_ALL_TRUE@
 BUILD_DOCS_FALSE = @BUILD_DOCS_FALSE@
 BUILD_DOCS_TRUE = @BUILD_DOCS_TRUE@
 BUILD_JAVA_FALSE = @BUILD_JAVA_FALSE@
+BUILD_JAVA_ONLY_FALSE = @BUILD_JAVA_ONLY_FALSE@
+BUILD_JAVA_ONLY_TRUE = @BUILD_JAVA_ONLY_TRUE@
 BUILD_JAVA_TRUE = @BUILD_JAVA_TRUE@
 CC = @CC@
 CCDEPMODE = @CCDEPMODE@
@@ -141,6 +143,8 @@ GLOBUS_GCC64PTHR_GSS_LIBS = @GLOBUS_GCC64PTHR_GSS_LIBS@
 GLOBUS_GCC64_CFLAGS = @GLOBUS_GCC64_CFLAGS@
 GLOBUS_GCC64_GSS_LIBS = @GLOBUS_GCC64_GSS_LIBS@
 GLOBUS_GSS_LIBS = @GLOBUS_GSS_LIBS@
+HAVE_DOCBOOK_MAN_FALSE = @HAVE_DOCBOOK_MAN_FALSE@
+HAVE_DOCBOOK_MAN_TRUE = @HAVE_DOCBOOK_MAN_TRUE@
 INSTALL_DATA = @INSTALL_DATA@
 INSTALL_PROGRAM = @INSTALL_PROGRAM@
 INSTALL_SCRIPT = @INSTALL_SCRIPT@
@@ -194,6 +198,8 @@ WANTED_UTIL_LIBS = @WANTED_UTIL_LIBS@
 WANT_UNIT_TEST_FALSE = @WANT_UNIT_TEST_FALSE@
 WANT_UNIT_TEST_TRUE = @WANT_UNIT_TEST_TRUE@
 WORKDIR = @WORKDIR@
+XSLTPROC = @XSLTPROC@
+XSLTPROCFLAGS = @XSLTPROCFLAGS@
 ac_ct_AR = @ac_ct_AR@
 ac_ct_CC = @ac_ct_CC@
 ac_ct_CXX = @ac_ct_CXX@
@@ -631,7 +637,7 @@ info: info-recursive
 
 info-am:
 
-install-data-am: install-data-local
+install-data-am:
 
 install-exec-am:
 
@@ -670,17 +676,16 @@ uninstall-info: uninstall-info-recursive
 	distclean-generic distclean-hdr distclean-libtool \
 	distclean-recursive distclean-tags distcleancheck distdir \
 	distuninstallcheck dvi dvi-am html html-am info info-am \
-	install install-am install-data install-data-am \
-	install-data-local install-exec install-exec-am install-info \
-	install-info-am install-man install-strip installcheck \
-	installcheck-am installdirs installdirs-am maintainer-clean \
-	maintainer-clean-generic maintainer-clean-recursive \
-	mostlyclean mostlyclean-generic mostlyclean-libtool \
-	mostlyclean-recursive pdf pdf-am ps ps-am tags tags-recursive \
-	uninstall uninstall-am uninstall-info-am
+	install install-am install-data install-data-am install-exec \
+	install-exec-am install-info install-info-am install-man \
+	install-strip installcheck installcheck-am installdirs \
+	installdirs-am maintainer-clean maintainer-clean-generic \
+	maintainer-clean-recursive mostlyclean mostlyclean-generic \
+	mostlyclean-libtool mostlyclean-recursive pdf pdf-am ps ps-am \
+	tags tags-recursive uninstall uninstall-am uninstall-info-am
 
 
-all-local: apidoc-local userdoc-local
+all-local: apidoc-local
 
 apidoc-local: $(APIDOC_FILES)
 	$(mkinstalldirs) $(APIDOC_DIR)
@@ -703,52 +708,6 @@ userdoc-recursive:
 	$(MAKE) userdoc -C doc
 
 userdoc: userdoc-local userdoc-recursive
-
-install-data-local:
-@BUILD_ALL_TRUE@@BUILD_DOCS_TRUE@	for subpackage in api; do \
-@BUILD_ALL_TRUE@@BUILD_DOCS_TRUE@	  $(mkinstalldirs) $(DESTDIR)$(datadir)/doc/$(PACKAGE)-$${subpackage}$(GCCVER)$(DOCVER); \
-@BUILD_ALL_TRUE@@BUILD_DOCS_TRUE@	  for project in VOMS_CC_API VOMS_C_API; do \
-@BUILD_ALL_TRUE@@BUILD_DOCS_TRUE@	    $(mkinstalldirs) $(DESTDIR)$(datadir)/doc/$(PACKAGE)-$${subpackage}$(GCCVER)$(DOCVER)/$${project}/html; \
-@BUILD_ALL_TRUE@@BUILD_DOCS_TRUE@	    $(mkinstalldirs) $(DESTDIR)$(datadir)/doc/$(PACKAGE)-$${subpackage}$(GCCVER)$(DOCVER)/$${project}/pdf; \
-@BUILD_ALL_TRUE@@BUILD_DOCS_TRUE@	    $(mkinstalldirs) $(DESTDIR)$(datadir)/doc/$(PACKAGE)-$${subpackage}$(GCCVER)$(DOCVER)/$${project}/ps; \
-@BUILD_ALL_TRUE@@BUILD_DOCS_TRUE@	    for file in $(APIDOC_DIR)/$${subpackage}/$${project}//html/*; do \
-@BUILD_ALL_TRUE@@BUILD_DOCS_TRUE@	      $(INSTALL_DATA) $${file} $(DESTDIR)$(datadir)/doc/$(PACKAGE)-$${subpackage}$(GCCVER)$(DOCVER)/$${project}/html; \
-@BUILD_ALL_TRUE@@BUILD_DOCS_TRUE@	    done; \
-@BUILD_ALL_TRUE@@BUILD_DOCS_TRUE@	    $(INSTALL_DATA) $(APIDOC_DIR)/$${subpackage}/$${project}/latex/refman.pdf $(DESTDIR)$(datadir)/doc/$(PACKAGE)-$${subpackage}$(GCCVER)$(DOCVER)/$${project}/pdf/$${project}.pdf; \
-@BUILD_ALL_TRUE@@BUILD_DOCS_TRUE@	    $(INSTALL_DATA) $(APIDOC_DIR)/$${subpackage}/$${project}/latex/refman.ps $(DESTDIR)$(datadir)/doc/$(PACKAGE)-$${subpackage}$(GCCVER)$(DOCVER)/$${project}/ps/$${project}.ps; \
-@BUILD_ALL_TRUE@@BUILD_DOCS_TRUE@	  done; \
-@BUILD_ALL_TRUE@@BUILD_DOCS_TRUE@	done; \
-@BUILD_ALL_TRUE@@BUILD_DOCS_TRUE@	for subpackage in server client utils; do \
-@BUILD_ALL_TRUE@@BUILD_DOCS_TRUE@	  $(mkinstalldirs) $(DESTDIR)$(datadir)/doc/$(PACKAGE)-$${subpackage}$(GCCVER)$(DOCVER); \
-@BUILD_ALL_TRUE@@BUILD_DOCS_TRUE@	  for file in $(USERDOC_FILES); do \
-@BUILD_ALL_TRUE@@BUILD_DOCS_TRUE@	    $(INSTALL_DATA) $${file} $(DESTDIR)$(datadir)/doc/$(PACKAGE)-$${subpackage}$(GCCVER)$(DOCVER); \
-@BUILD_ALL_TRUE@@BUILD_DOCS_TRUE@	  done; \
-@BUILD_ALL_TRUE@@BUILD_DOCS_TRUE@	  for dir in html pdf ps; do \
-@BUILD_ALL_TRUE@@BUILD_DOCS_TRUE@	    $(mkinstalldirs) $(DESTDIR)$(datadir)/doc/$(PACKAGE)-$${subpackage}$(GCCVER)$(DOCVER)/$${dir}; \
-@BUILD_ALL_TRUE@@BUILD_DOCS_TRUE@	    for file in $(USERDOC_DIR)/$${subpackage}/$${dir}/*; do \
-@BUILD_ALL_TRUE@@BUILD_DOCS_TRUE@	      $(INSTALL_DATA) $${file} $(DESTDIR)$(datadir)/doc/$(PACKAGE)-$${subpackage}$(GCCVER)$(DOCVER)/$${dir}; \
-@BUILD_ALL_TRUE@@BUILD_DOCS_TRUE@	    done; \
-@BUILD_ALL_TRUE@@BUILD_DOCS_TRUE@	  done; \
-@BUILD_ALL_TRUE@@BUILD_DOCS_TRUE@	done
-@BUILD_ALL_TRUE@@BUILD_DOCS_TRUE@	for file in $(APIDOC_FILES); do \
-@BUILD_ALL_TRUE@@BUILD_DOCS_TRUE@	   $(INSTALL_DATA) $${file} $(DESTDIR)$(datadir)/doc/$(PACKAGE)-api$(GCCVER)$(DOCVER); \
-@BUILD_ALL_TRUE@@BUILD_DOCS_TRUE@	done;
-@BUILD_ALL_FALSE@@BUILD_DOCS_TRUE@	for subpackage in api; do \
-@BUILD_ALL_FALSE@@BUILD_DOCS_TRUE@	  $(mkinstalldirs) $(DESTDIR)$(datadir)/doc/$(PACKAGE)-$${subpackage}$(GCCVER)$(DOCVER); \
-@BUILD_ALL_FALSE@@BUILD_DOCS_TRUE@	  for project in VOMS_CC_API VOMS_C_API; do \
-@BUILD_ALL_FALSE@@BUILD_DOCS_TRUE@	    $(mkinstalldirs) $(DESTDIR)$(datadir)/doc/$(PACKAGE)-$${subpackage}$(GCCVER)$(DOCVER)/$${project}/html; \
-@BUILD_ALL_FALSE@@BUILD_DOCS_TRUE@	    $(mkinstalldirs) $(DESTDIR)$(datadir)/doc/$(PACKAGE)-$${subpackage}$(GCCVER)$(DOCVER)/$${project}/pdf; \
-@BUILD_ALL_FALSE@@BUILD_DOCS_TRUE@	    $(mkinstalldirs) $(DESTDIR)$(datadir)/doc/$(PACKAGE)-$${subpackage}$(GCCVER)$(DOCVER)/$${project}/ps; \
-@BUILD_ALL_FALSE@@BUILD_DOCS_TRUE@	    for file in $(APIDOC_DIR)/$${subpackage}/$${project}//html/*; do \
-@BUILD_ALL_FALSE@@BUILD_DOCS_TRUE@	      $(INSTALL_DATA) $${file} $(DESTDIR)$(datadir)/doc/$(PACKAGE)-$${subpackage}$(GCCVER)$(DOCVER)/$${project}/html; \
-@BUILD_ALL_FALSE@@BUILD_DOCS_TRUE@	    done; \
-@BUILD_ALL_FALSE@@BUILD_DOCS_TRUE@	    $(INSTALL_DATA) $(APIDOC_DIR)/$${subpackage}/$${project}/latex/refman.pdf $(DESTDIR)$(datadir)/doc/$(PACKAGE)-$${subpackage}$(GCCVER)$(DOCVER)/$${project}/pdf/$${project}.pdf; \
-@BUILD_ALL_FALSE@@BUILD_DOCS_TRUE@	    $(INSTALL_DATA) $(APIDOC_DIR)/$${subpackage}/$${project}/latex/refman.ps $(DESTDIR)$(datadir)/doc/$(PACKAGE)-$${subpackage}$(GCCVER)$(DOCVER)/$${project}/ps/$${project}.ps; \
-@BUILD_ALL_FALSE@@BUILD_DOCS_TRUE@	  done; \
-@BUILD_ALL_FALSE@@BUILD_DOCS_TRUE@	done; \
-@BUILD_ALL_FALSE@@BUILD_DOCS_TRUE@	for file in $(APIDOC_FILES); do \
-@BUILD_ALL_FALSE@@BUILD_DOCS_TRUE@	   $(INSTALL_DATA) $${file} $(DESTDIR)$(datadir)/doc/$(PACKAGE)-api$(GCCVER)$(DOCVER); \
-@BUILD_ALL_FALSE@@BUILD_DOCS_TRUE@	done;
 
 stage:
 	@set fnord $(MAKEFLAGS); amf=$$2; \

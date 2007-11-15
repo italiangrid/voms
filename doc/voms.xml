@@ -1,11 +1,13 @@
-<!DOCTYPE refentry PUBLIC "-//OASIS//DTD DocBook V4.1//EN" [
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE refentry PUBLIC "-//OASIS//DTD DocBook V4.1.2//EN" 
+       	"http://www.oasis-open.org/docbook/xml/4.1.2/docbookx.dtd" [
 <!ENTITY authors  SYSTEM "authors.sgml">
 <!ENTITY bugzilla SYSTEM "bugzilla.sgml">
 <!ENTITY license  SYSTEM "license.sgml">
 <!ENTITY links    SYSTEM "links.sgml">
 ]>
 
-<refentry id='voms8'>
+<refentry id="voms8">
 <refmeta>
 <refentrytitle>voms</refentrytitle>
 <manvolnum>8</manvolnum>
@@ -52,7 +54,7 @@
 <arg choice='opt'><arg choice='plain'>--maxlog <replaceable>num</replaceable></arg></arg>
 <arg choice='opt'><arg choice='plain'>--newformat</arg></arg>
 <arg choice='opt'><arg choice='plain'>--skipcacheck</arg></arg>
-<arg choice='opt'><arg choice='plain'>--shortfqans</arg></arg>
+
 
 </cmdsynopsis>
 </refsynopsisdiv>
@@ -257,13 +259,6 @@ server administrator that there are no certificates registered in the DB
 which the same DN and different issuers.  If there are, the result of a 
 voms-proxy-init command for one of those users will be unpredictable.
 </para>
-
-<para><option>-shortfqans</option></para> 
-<para>This option generates FQANs in the shorter format. e.g. you will
-get /vo instead of /vo/Role=NULL .  This format is compatible with
-command line utilities and the APIs starting from version 1.5.4 of
-VOMS.  It has not been tested with previous releases.</para>
-
 </refsect1>
 
 &bugzilla;

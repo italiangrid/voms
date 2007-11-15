@@ -518,11 +518,15 @@ X509 *vomsdata::check_from_certs(AC *ac, const std::string& voname)
         }
       }
     }
+    closedir(dp);
+    dp = NULL;
   }
 
   if (in) 
     BIO_free(in);
-  (void)closedir(dp);
+  if (dp)
+    (void)closedir(dp);
+
   if (found) {
     if (!check_cert(x)) {
       X509_free(x);
