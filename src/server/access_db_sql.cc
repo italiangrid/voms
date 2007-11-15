@@ -34,6 +34,7 @@ extern "C" {
 #include "dbwrap.h"
 #include "access_db_sql.h"
 #include "data.h"
+#include "uuid.h"
 
 #include <openssl/bn.h>
 
@@ -777,108 +778,12 @@ BIGNUM *get_serial(int code, const std::string &dbname,
                    int port, const std::string& socket,
                    const char *password)
 {
+  unsigned char uuid[16];
+  initialize_uuid_generator();
+  generate_uuid(uuid);
+  BIGNUM *number = NULL;
 
-  if (dbname.empty() || username.empty() || !password)
-    return NULL;
-  
-  char codenum[6];
-  sprintf(codenum,"%04x",code);
-
-  try {
-
-    std::auto_ptr<sqliface::interface> db(NewDB());
-    if(connect_with_port_and_socket)
-      connect_with_port_and_socket(db.get(), dbname.c_str(), contactstring.c_str(), username.c_str(), port, (!socket.empty() ? socket.c_str() : NULL), password);
-    else 
-      db->connect(dbname.c_str(), contactstring.c_str(), username.c_str(), password);
-
-    std::auto_ptr<sqliface::query> q3(db->newquery());
-    *q3 << "COMMIT";
-    
-    std::auto_ptr<sqliface::query> q2(db->newquery());
-    
-    std::auto_ptr<sqliface::query> q(db->newquery());
-
-    do {
-
-      try {
-        
-        std::auto_ptr<sqliface::query> q(db->newquery());
-        *q << "SET TRANSACTION ISOLATION LEVEL SERIALIZABLE";
-        LOG(logh, LEV_DEBUG, T_REQUEST, "SET TRANSACTION ISOLATION LEVEL SERIALIZABLE");
-        q->exec();
-    
-        *q << "SELECT seq FROM seqnumber";
-        LOG(logh, LEV_DEBUG, T_REQUEST, "SELECT seq FROM seqnumber");
-        std::auto_ptr<sqliface::results> r(q->result());
-
-        if (!r->valid()) {
-          std::auto_ptr<sqliface::query> q4(db->newquery());
-          *q4 << "ROLLBACK;";
-          LOG(logh, LEV_DEBUG, T_REQUEST, "ROLLBACK");
-          q4->exec();
-          return NULL;
-        }
-        
-        std::string result = r->get("SEQ");
-        
-        while (r->valid()) 
-          (void)r->next();
-
-        BIGNUM *b=NULL;
-        if (BN_hex2bn(&b, result.c_str())) {
-          if (BN_add(b, b, BN_value_one())) {
-          
-            char *str = BN_bn2hex(b);
-            std::string realstr = std::string(str);
-        
-            std::string qq = std::string("UPDATE seqnumber SET seq=\'") + str + "\'";
-
-            *q2 << qq;
-        
-            LOG(logh, LEV_DEBUG, T_REQUEST, qq.c_str());
-            q2->exec();
-            LOG(logh, LEV_DEBUG, T_REQUEST, "COMMIT");
-            q3->exec();
-          
-            free(str);
-       
-            realstr += std::string(codenum);
-            if (realstr.size() > 40)
-              realstr = realstr.substr(realstr.size()-20);
-            BN_free(b);
-            b = NULL;
-            if (BN_hex2bn(&b,realstr.c_str()))
-              return b;
-            else
-              return NULL;
-          }
-          BN_free(b);
-        }
-        
-        std::auto_ptr<sqliface::query> q5(db->newquery());
-        *q5 << "ROLLBACK";
-        LOG(logh, LEV_DEBUG, T_REQUEST, "ROLLBACK");
-        q5->exec();
-        
-      }
-      
-      catch(sqliface::DBEXC& e) {
-        
-        LOGM(VARP, logh, LEV_ERROR, T_REQUEST, "DBEXC : %s", e.what().c_str()); 
-        
-        std::auto_ptr<sqliface::query> q5(db->newquery());
-        *q5 << "ROLLBACK";
-        LOG(logh, LEV_DEBUG, T_REQUEST, "ROLLBACK");
-        q5->exec();
-      }
-
-    } while(q2->error() == SQL_DEADLOCK);
-    
-  }
-  CATCH
-    
-  return NULL;
+  return BN_bin2bn(uuid, 16, number);
 }
 
 int get_version(const std::string &dbname, const std::string &username,

@@ -8,6 +8,8 @@ voms_SOURCES = \
 	vomsd.cc \
 	VOMSServer.h \
 	attribute.h \
+	uuid.c \
+	uuid.h \
 	attribute.cc
 
 voms_LDADD = \
