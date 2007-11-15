@@ -112,6 +112,7 @@ sigchld_handler(int sig)
   signal(SIGCHLD, sigchld_handler);
   errno = save_errno;
 }
+static BIGNUM *get_serial();
 
 static void
 sighup_handler(int sig)
@@ -897,7 +898,7 @@ VOMSServer::Execute(const std::string &client_name, const std::string &ca_name,
 
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-    BIGNUM * serial = get_serial(code, dbname, username, contactstring, mysql_port, mysql_socket, passwd());
+    BIGNUM * serial = get_serial();
 
     int res = 1;
     std::string codedac;
@@ -1140,4 +1141,14 @@ void VOMSServer::UpdateOpts(void)
     LOG(logh, LEV_INFO, T_PRE, "DEBUG MODE ACTIVE ");
   else
     LOG(logh, LEV_INFO, T_PRE, "DEBUG MODE INACTIVE ");
+}
+
+static BIGNUM *get_serial()
+{
+  unsigned char uuid[16];
+  initialize_uuid_generator();
+  generate_uuid(uuid);
+  BIGNUM *number = NULL;
+
+  return BN_bin2bn(uuid, 16, number);
 }

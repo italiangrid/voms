@@ -772,19 +772,6 @@ simple_query0(sqliface::interface *db, const std::string &qq,
     return res;
 }
 
-BIGNUM *get_serial(int code, const std::string &dbname, 
-                   const std::string &username, 
-                   const std::string &contactstring,
-                   int port, const std::string& socket,
-                   const char *password)
-{
-  unsigned char uuid[16];
-  initialize_uuid_generator();
-  generate_uuid(uuid);
-  BIGNUM *number = NULL;
-
-  return BN_bin2bn(uuid, 16, number);
-}
 
 int get_version(const std::string &dbname, const std::string &username,
                 const std::string &contactstring, int port, 
