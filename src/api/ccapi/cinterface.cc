@@ -277,9 +277,8 @@ struct vomsr *voms::translate()
       dst->serial    = mystrdup(serial);
       dst->datalen   = custom.size();
 
-      dst->ac     = (AC *)  ASN1_dup((int(*)())i2d_AC,   (char*(*)())d2i_AC,   
-                                     (char *)(((struct realdata *)realdata)->ac));
-      dst->holder = (X509 *)ASN1_dup((int(*)())i2d_X509, (char*(*)())d2i_X509, (char *)holder);
+      dst->ac     = AC_dup((((struct realdata *)realdata)->ac));
+      dst->holder = X509_dup(holder);
 
       if (!dst->holder || !dst->ac)
         throw 3;
@@ -743,8 +742,8 @@ struct vomsr *VOMS_Copy(struct vomsr *org, int *error)
       dst->serial    = mystrdup(org->serial);
       dst->datalen   = org->datalen;
 
-      dst->ac     = (AC *)  ASN1_dup((int(*)())i2d_AC,   (char*(*)())d2i_AC,   (char *)org->ac);
-      dst->holder = (X509 *)ASN1_dup((int(*)())i2d_X509, (char*(*)())d2i_X509, (char *)org->holder);
+      dst->ac     = AC_dup(org->ac);
+      dst->holder = X509_dup(org->holder);
 
       if (!dst->holder || !dst->ac)
         throw 3;
@@ -867,7 +866,7 @@ vomsdatar *VOMS_Duplicate(vomsdatar *orig)
 
 AC *VOMS_GetAC(vomsr *v)
 {
-  return (AC *)ASN1_dup((int (*)())i2d_AC, (char * (*)())d2i_AC, (char *)v->ac);
+  return AC_dup(v->ac);
 }
 
 }

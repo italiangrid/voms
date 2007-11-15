@@ -22,7 +22,7 @@ voms_LDADD = \
 	$(top_builddir)/src/api/ccapi/$(USE_CCAPI_LIB) \
 	$(EXPAT_LIBS)
 
-voms_LDFLAGS = -Wl,-E
+voms_LDFLAGS =
 
 AM_CPPFLAGS = \
 	-I$(top_srcdir)/src/include \

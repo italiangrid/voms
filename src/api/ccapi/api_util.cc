@@ -149,7 +149,8 @@ vomsdata::retrieve(X509 *cert, STACK_OF(X509) *chain, recurse_type how,
     return false;
   }
 
-  *holder = (X509 *)ASN1_dup((int (*)())i2d_X509,(char * (*)())d2i_X509, (char *)h);
+  *holder = X509_dup(h);
+
   if (!*holder) {
     seterror(VERR_MEM, "Cannot find enough memory to work!");
     return false;
@@ -307,8 +308,7 @@ vomsdata::verifydata(std::string &message, std::string subject, std::string ca,
   AC_free(tmp);   
   
   if (result)
-    v.holder = (X509 *)ASN1_dup((int (*) ())i2d_X509, 
-				(char * (*)())d2i_X509, (char *)holder);
+    v.holder = X509_dup(holder);
   return result;
 }
 
@@ -342,9 +342,7 @@ vomsdata::verifydata(AC *ac, const std::string& subject, const std::string& ca,
     return false;
   }
   else {
-    ((struct realdata *)v.realdata)->ac = (AC *)ASN1_dup((int (*) ())i2d_AC,
-                                                         (char * (*) ())d2i_AC,
-                                                         (char *)ac);
+    ((struct realdata *)v.realdata)->ac = AC_dup(ac);
   }
   
   if (result && (ver_type & VERIFY_ID)) {
@@ -363,8 +361,7 @@ vomsdata::verifydata(AC *ac, const std::string& subject, const std::string& ca,
   X509_free(issuer);
   
   if (result)
-    v.holder = (X509 *)ASN1_dup((int (*) ())i2d_X509, 
-				(char * (*)())d2i_X509, (char *)holder);
+    v.holder = X509_dup(holder);
   return result;
 }
 
@@ -379,8 +376,7 @@ bool vomsdata::check_sig_ac(X509 *cert, void *data)
 
   AC *ac = (AC *)data;
 
-  int res = ASN1_verify((int (*)())i2d_AC_INFO, ac->sig_alg, ac->signature,
-                        (char *)ac->acinfo, key);
+  int res = AC_verify(ac->sig_alg, ac->signature, (char *)ac->acinfo, key);
 
   if (!res)
     seterror(VERR_SIGN, "Unable to verify AC signature");
@@ -679,7 +675,7 @@ X509 *vomsdata::check_from_file(AC *ac, std::ifstream &file, const std::string &
      among those specific for the vo or else in the vomsdir
      directory */
 
-  X509 *cert = (X509 *)ASN1_dup((int (*)())i2d_X509, (char * (*)())d2i_X509, (char *)sk_X509_value(certstack, 0));
+  X509 *cert = X509_dup(sk_X509_value(certstack, 0));
 
   bool found = false;
 

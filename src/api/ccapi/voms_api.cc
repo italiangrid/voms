@@ -888,13 +888,8 @@ voms::voms(const voms &orig)
   fqan      = orig.fqan;
   serial    = orig.serial;
   realdata  = calloc(1, sizeof(struct realdata));
-  ((struct realdata *)realdata)->ac = (AC *)ASN1_dup((int (*)())i2d_AC, 
-                                                     (char * (*)())d2i_AC, 
-                                                     (char *)((struct realdata *)orig.realdata)->ac);
-  holder = (X509 *)ASN1_dup((int (*)())i2d_X509,
-			    (char * (*)())d2i_X509,
-			    (char *)orig.holder);
-
+  ((struct realdata *)realdata)->ac = AC_dup(((struct realdata *)orig.realdata)->ac);
+  holder = X509_dup(orig.holder);
   
   ((struct realdata *)realdata)->attributes = 
     new std::vector<attributelist>(*(((struct realdata *)orig.realdata)->attributes));
@@ -929,10 +924,8 @@ voms &voms::operator=(const voms &orig)
   serial    = orig.serial;
   if (((struct realdata *)realdata)->ac)
     AC_free(((struct realdata *)realdata)->ac);
-  ((struct realdata *)realdata)->ac = (AC *)ASN1_dup((int (*)())i2d_AC, 
-                                                     (char * (*)())d2i_AC, 
-                                                     (char *)((struct realdata *)orig.realdata)->ac);
-  holder = (X509 *)ASN1_dup((int (*)())i2d_X509, (char * (*)())d2i_X509, (char *)orig.holder);
+  ((struct realdata *)realdata)->ac = AC_dup(((struct realdata *)orig.realdata)->ac);
+  holder = X509_dup(orig.holder);
   delete ((struct realdata *)realdata)->attributes;
   ((struct realdata *)realdata)->attributes = 
     new std::vector<attributelist>(*(((struct realdata *)orig.realdata)->attributes));
@@ -949,9 +942,7 @@ voms::~voms()
 
 AC *voms::GetAC()
 {
-  return (AC *)ASN1_dup((int (*)())i2d_AC, 
-                        (char * (*)())d2i_AC, 
-                        (char *)((struct realdata *)realdata)->ac);
+  return AC_dup(((struct realdata *)realdata)->ac);
 }
 
 std::vector<attributelist>& voms::GetAttributes()

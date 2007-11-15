@@ -601,3 +601,16 @@ void AC_free(AC *a)
   M_ASN1_BIT_STRING_free(a->signature);
   OPENSSL_free(a);
 }
+
+/* Wrapping ASN1_dup with AC_dup for use in C++. 
+ * Calling ASN1_dup with casting generates inconsistent behavior across C++ compilers 
+ */
+AC *AC_dup(AC *ac)
+{
+  return (AC *)ASN1_dup((int (*)())i2d_AC, (char * (*) ())d2i_AC, (char *)ac);
+}
+
+int AC_verify(X509_ALGOR *algor1, ASN1_BIT_STRING *signature,char *data, EVP_PKEY *pkey)
+{
+  return ASN1_verify((int (*)())i2d_AC_INFO, algor1, signature, data, pkey);
+}

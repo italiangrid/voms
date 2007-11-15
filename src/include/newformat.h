@@ -194,4 +194,7 @@ extern AC_CERTS *d2i_AC_CERTS(AC_CERTS **a, unsigned char **pp, long length);
 extern AC_CERTS *AC_CERTS_new(void);
 extern void AC_CERTS_free(AC_CERTS *a);
 
+extern AC *AC_dup(AC *ac);
+extern int AC_verify(X509_ALGOR *algor1, ASN1_BIT_STRING *signature,char *data,EVP_PKEY *pkey);
+
 #endif

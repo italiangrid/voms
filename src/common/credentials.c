@@ -41,10 +41,10 @@ globus(int version)
       
       version = strtol(gver, &tmp, 10);
       if (!(*tmp))
-	return 22;
+        return 22;
     }
   }
-
+  
   if (version >= 22 || version == 0)
     version = 22;
 
@@ -89,19 +89,8 @@ decouple_cred(gss_cred_id_t credential, int version, STACK_OF(X509) **stk)
   if (!stk || (credential == GSS_C_NO_CREDENTIAL))
     return NULL;
 
-  if (version == 0)
-    version = globus(0);
-
-  if (version == 20) {
-    *stk = ((gss_cred_id_desc *)credential)->pcd->cert_chain;
-    return ((gss_cred_id_desc *)credential)->pcd->ucert;
-  }
-  else if (version == 22) {
-    *stk = ((gss2_cred_id_desc *)credential)->cred_handle->cert_chain;
-    return ((gss2_cred_id_desc *)credential)->cred_handle->cert;
-  }
-  else
-    return NULL;
+  *stk = ((gss2_cred_id_desc *)credential)->cred_handle->cert_chain;
+  return ((gss2_cred_id_desc *)credential)->cred_handle->cert;
 }
 
 X509 *
@@ -110,19 +99,8 @@ decouple_ctx(gss_ctx_id_t context, int version, STACK_OF(X509) **stk)
   if (!stk || (context == GSS_C_NO_CONTEXT))
     return NULL;
 
-  if (version == 0)
-    version = globus(0);
-
-  if (version == 22) {
-    *stk = ((gss2_ctx_id_desc *)context)->peer_cred_handle->cred_handle->cert_chain;
-    return ((gss2_ctx_id_desc *)context)->peer_cred_handle->cred_handle->cert;
-  }
-  else if (version == 20) {
-    *stk = ((gss_ctx_id_desc *)context)->cred_handle->pcd->cert_chain;
-    return ((gss_ctx_id_desc *)context)->cred_handle->pcd->ucert;
-  }
-  else
-    return NULL;
+  *stk = ((gss2_ctx_id_desc *)context)->peer_cred_handle->cred_handle->cert_chain;
+  return ((gss2_ctx_id_desc *)context)->peer_cred_handle->cred_handle->cert;
 }
 #endif
 
@@ -153,13 +131,7 @@ get_delegated_public_key(gss_ctx_id_t context, int globusver)
   if (!context)
     return NULL;
 
-  if (globusver == 0)
-    globusver = globus(0);
-
-  if (globusver == 20)
-    pkey = X509_extract_key(((((gss_ctx_id_desc *)context)->gs_ssl)->session)->peer);
-  else if (globusver == 22)
-    pkey = X509_extract_key(((((gss2_ctx_id_desc *)context)->gss_ssl)->session)->peer);
+  pkey = X509_extract_key(((((gss2_ctx_id_desc *)context)->gss_ssl)->session)->peer);
 
   return pkey;
 }
@@ -195,16 +167,9 @@ get_private_key(void *credential, int globusver)
   if (!credential)
     return NULL;
 
-  if (globusver == 20) {
-    pcd = ((gss_cred_id_desc *)credential)->pcd;
-    if (pcd)
-      pkey = pcd->upkey;
-  }
-  else if (globusver == 22) {
-    ggch = ((gss2_cred_id_desc *)credential)->cred_handle;
-    if (ggch)
-      pkey = ggch->key;
-  }
+  ggch = ((gss2_cred_id_desc *)credential)->cred_handle;
+  if (ggch)
+    pkey = ggch->key;
   else
     return NULL;
 
