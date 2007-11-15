@@ -16,42 +16,12 @@
 #define VOMS_ATTRIBUTE_H
 
 #include <string>
-
-class attrib {
-
- public:
-  
-  std::string str() const;
-
- public:
-
-  std::string group;
-  std::string role;
-  std::string cap;
-
-};
-
-extern bool operator<(const attrib& lhs, 
-                      const attrib& rhs);
-
-bool operator==(const attrib& lhs,
-                const attrib& rhs);
-
-class gattrib {
-
- public:
-  
-  std::string str() const;
-
- public:
-
-  std::string name;
-  std::string qualifier;
-  std::string value;
-  
-};
+#include "dbwrap.h"
 
 bool operator==(const gattrib& lhs,
                 const gattrib& rhs);
+
+bool operator<(const gattrib& lhs,
+               const gattrib& rhs);
 
 #endif /* __ATTRIBUTE_H */

@@ -41,12 +41,6 @@ int main(int argc, char *argv[])
     return !0;
   }
 
-  // DB exception
-  catch(sqliface::DBEXC& e)
-  {
-    std::cout << "DB error: " << e.what() << std::endl;
-  }
-
   // std::exception
   catch(std::exception& e)
   {

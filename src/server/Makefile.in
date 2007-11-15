@@ -54,8 +54,8 @@ CONFIG_CLEAN_FILES =
 am__installdirs = "$(DESTDIR)$(sbindir)"
 sbinPROGRAMS_INSTALL = $(INSTALL_PROGRAM)
 PROGRAMS = $(sbin_PROGRAMS)
-am_voms_OBJECTS = access_db_sql.$(OBJEXT) main.$(OBJEXT) \
-	vomsd.$(OBJEXT) uuid.$(OBJEXT) attribute.$(OBJEXT)
+am_voms_OBJECTS = main.$(OBJEXT) vomsd.$(OBJEXT) uuid.$(OBJEXT) \
+	attribute.$(OBJEXT)
 voms_OBJECTS = $(am_voms_OBJECTS)
 am__DEPENDENCIES_1 =
 voms_DEPENDENCIES = $(top_builddir)/src/socklib/$(USE_SOCK_LIB) \
@@ -260,8 +260,6 @@ sharedstatedir = @sharedstatedir@
 sysconfdir = @sysconfdir@
 target_alias = @target_alias@
 voms_SOURCES = \
-	access_db_sql.cc \
-	access_db_sql.h \
 	main.cc \
 	vomsd.cc \
 	VOMSServer.h \
@@ -359,7 +357,6 @@ mostlyclean-compile:
 distclean-compile:
 	-rm -f *.tab.c
 
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/access_db_sql.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/attribute.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/main.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/uuid.Po@am__quote@

@@ -2,8 +2,6 @@
 sbin_PROGRAMS = voms
 
 voms_SOURCES = \
-	access_db_sql.cc \
-	access_db_sql.h \
 	main.cc \
 	vomsd.cc \
 	VOMSServer.h \

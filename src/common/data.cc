@@ -85,7 +85,7 @@ acceptable(const char *str)
   if (str) {
     while (*str) {
       if (!filter(*str))
-	return false;
+        return false;
       str++;
     }
   }

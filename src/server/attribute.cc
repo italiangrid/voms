@@ -14,46 +14,20 @@
 
 #include "config.h"
 
-#include <attribute.h>
-
-extern bool short_flags;
-
-std::string attrib::str() const 
-{
-  std::string tmp = group;
-  if(!role.empty() && (!short_flags && role != "NULL"))
-    tmp += "/Role=" + role;
-  if(!cap.empty() && (!short_flags && cap != "NULL"))
-    tmp += "/Capability=" + cap;
-  
-  return tmp;
-}
-
-bool operator<(const attrib &lhs, 
-               const attrib &rhs)
-{
-  if (lhs.group < rhs.group)
-    return true;
-  if (lhs.group == rhs.group)
-    if (lhs.role < rhs.role)
-      return true;
-  return false;
-}
-
-bool operator==(const attrib &lhs, 
-                const attrib &rhs)
-{
-  return ((lhs.group == rhs.group) && (lhs.role == rhs.role) && (lhs.cap == rhs.cap));
-}
-
-std::string gattrib::str() const
-{
-  return (qualifier.empty() ? "" : qualifier) + "::" + name + "=" + value;
-}
+#include <dbwrap.h>
 
 bool operator==(const gattrib &lhs, 
                 const gattrib &rhs)
 {
   return ((lhs.name == rhs.name) && (lhs.qualifier == rhs.qualifier) &&
           (lhs.value == rhs.value));
+}
+
+bool operator<(const gattrib &lhs,
+               const gattrib &rhs)
+{
+  const char *s1 = lhs.str().c_str();
+  const char *s2 = rhs.str().c_str();
+
+  return strcmp(s1, s2) < 0;
 }

@@ -144,25 +144,25 @@ getpasswd(std::string passfile, void *logh)
       fprintf(f, "password: ");
       fflush(f);
       if (0 == tcgetattr(fileno(f), &term)) {
-	term2 = term;
-	term.c_lflag &= ~(ECHO|ISIG);
-	if ((tcsetattr (fileno (f), TCSAFLUSH, &term)))
-	  goto error;
+        term2 = term;
+        term.c_lflag &= ~(ECHO|ISIG);
+        if ((tcsetattr (fileno (f), TCSAFLUSH, &term)))
+          goto error;
       }
       else
-	goto error;
+        goto error;
 
       while (((ch = fgetc(f)) != '\n') && (ch != EOF) && (i < (MAXSIZE-1)))
-	password[i++] = ch;
+        password[i++] = ch;
 
       if (i >= (MAXSIZE - 1)) {
-	LOG(logh, LEV_ERROR, T_STARTUP, "password too long!");
-	goto error;
+        LOG(logh, LEV_ERROR, T_STARTUP, "password too long!");
+        goto error;
       }
 
       if (ch == EOF) {
-	LOG(logh, LEV_ERROR, T_STARTUP, "missing new line at end of file!");
-	goto error;
+        LOG(logh, LEV_ERROR, T_STARTUP, "missing new line at end of file!");
+        goto error;
       }
 
       password[i] = '\0';
@@ -177,43 +177,37 @@ getpasswd(std::string passfile, void *logh)
     /* read from a file */
 
     if ((f = fopen(passfile.c_str(),"r"))) {
-      if (fstat(fileno(f),&pf_stat) == 0) 
-      {
-	if (pf_stat.st_mode != (S_IRUSR|S_IRGRP|S_IWUSR|S_IFREG)) 
-	{
-	  LOG(logh, LEV_ERROR, T_STARTUP, "Wrong permissions of password file!\n"
-	      "Needs to be 640.\n");
-	  goto error;
-	}
-	if(pf_stat.st_uid != 0 && pf_stat.st_uid != uid) 
- 	{
- 	  LOG(logh, LEV_ERROR, T_STARTUP, "Wrong ownership of password file %s\n"
-	      "Needs to be owned by root or by the user.\n");
- 	  goto error;
- 	}
-	if (!setvbuf(f, NULL, _IONBF, 0)) {
-	  while (((ch = fgetc(f)) != '\n') && (ch != EOF) && (i < (MAXSIZE-1)))
-	    password[i++] = ch;
-	  
-	  if (i >= (MAXSIZE - 1)) {
-	    LOGM(VARP, logh, LEV_ERROR, T_STARTUP, "Password too long! Max length = %d", (MAXSIZE-1));
-	    goto error;
-	  }
+      if (fstat(fileno(f),&pf_stat) == 0) {
+        if (pf_stat.st_mode != (S_IRUSR|S_IRGRP|S_IWUSR|S_IFREG)) {
+          LOG(logh, LEV_ERROR, T_STARTUP, "Wrong permissions of password file!\n"
+              "Needs to be 640.\n");
+          goto error;
+        }
+        if(pf_stat.st_uid != 0 && pf_stat.st_uid != uid) {
+          LOG(logh, LEV_ERROR, T_STARTUP, "Wrong ownership of password file %s\n"
+              "Needs to be owned by root or by the user.\n");
+          goto error;
+        }
+        if (!setvbuf(f, NULL, _IONBF, 0)) {
+          while (((ch = fgetc(f)) != '\n') && (ch != EOF) && (i < (MAXSIZE-1)))
+            password[i++] = ch;
+          
+          if (i >= (MAXSIZE - 1)) {
+            LOGM(VARP, logh, LEV_ERROR, T_STARTUP, "Password too long! Max length = %d", (MAXSIZE-1));
+            goto error;
+          }
 
-	  if (ch == EOF) {
-	    LOG(logh, LEV_ERROR, T_STARTUP, "Missing new line at end of file!");
-	    goto error;
-	  }
+          if (ch == EOF) {
+            LOG(logh, LEV_ERROR, T_STARTUP, "Missing new line at end of file!");
+            goto error;
+          }
 
-	  password[i] = '\0';
-	}
-	else goto error;
+          password[i] = '\0';
+        }
+        else goto error;
       }
       else goto error;
     }
-    
-
-
     else goto error;
   }
   

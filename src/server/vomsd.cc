@@ -50,8 +50,6 @@ void *logh = NULL;
 #include "errors.h"
 #include "vomsxml.h"
 
-#include "access_db_sql.h"
-
 #include <map>
 #include <set>
 #include <string>
@@ -59,6 +57,7 @@ void *logh = NULL;
 #include <iostream>
 
 #include "attribute.h"
+
 #include "dbwrap.h"
 
 #include "voms_api.h"
@@ -79,24 +78,27 @@ extern "C" {
 static const int DEFAULT_PORT    = 15000;
 static const int DEFAULT_TIMEOUT = 60;
 
+sqliface::interface *db = NULL;
 
-typedef std::map<attrib, int> ordermap;
+typedef std::map<std::string, int> ordermap;
 
 static ordermap ordering;
 
-static std::string firstgroup="";
-static std::string firstrole="";
+static std::string firstfqan="";
 
 static std::string sqllib = "";
 
 typedef sqliface::interface* (*cdb)();
-typedef void (*c)(sqliface::interface *, const char *, const char *, const char *, int, const char *, const char *);
+typedef int (*gv)();
 
 cdb NewDB;
-c   connect_with_port_and_socket;
+gv  getlibversion;
 
 bool compat_flag = false;
 bool short_flags = false;
+
+static bool determine_group_and_role(std::string command, char *comm, char **group,
+                                     char **role);
 
 static void
 sigchld_handler(int sig)
@@ -120,12 +122,12 @@ sighup_handler(int sig)
   reload = 1;
 }
 
-static bool compare(const attrib &lhs, const attrib &rhs)
+static bool compare(const std::string &lhs, const std::string &rhs)
 {
   ordermap::iterator lhi=ordering.find(lhs);
   ordermap::iterator rhi=ordering.find(rhs);
 
-  LOGM(VARP, logh, LEV_DEBUG, T_PRE, "Comparing: %s:%s to %s:%s",lhs.group.c_str(), lhs.role.c_str(), rhs.group.c_str(), rhs.role.c_str());
+  LOGM(VARP, logh, LEV_DEBUG, T_PRE, "Comparing: %s to %s", lhs.c_str(), rhs.c_str());
   if (lhi == ordering.end()) {
     LOG(logh, LEV_DEBUG, T_PRE, "No left hand side");
     return false;
@@ -138,7 +140,7 @@ static bool compare(const attrib &lhs, const attrib &rhs)
   return (lhi->second < rhi->second);
 }
 
-static void orderattribs(std::vector<attrib> &v)
+static void orderattribs(std::vector<std::string> &v)
 {
   std::partial_sort(v.begin(), v.begin()+ordering.size(), v.end(), compare);
 }
@@ -169,26 +171,24 @@ static void parse_order(const std::string &message, ordermap &ordering)
       attribute = message.substr(position, end_token - position);
     LOGM(VARP, logh, LEV_DEBUG, T_PRE, "Attrib: %s",attribute.c_str());
     std::string::size_type divider = attribute.find(':');
-    attrib temp;
+    std::string fqan;
+
     if (divider == std::string::npos) {
-      if (firstgroup.empty()) {
-        firstgroup = attribute;
-        firstrole = "NULL";
+      fqan = attribute;
+      if (firstfqan.empty()) {
+        firstfqan = fqan;
       }
-      temp.group = attribute;
-      temp.role = "NULL";
     }
     else {
-      if (firstgroup.empty()) {
-        firstgroup = attribute.substr(0, divider);
-        firstrole = attribute.substr(divider+1);
-      }
-      temp.group = attribute.substr(0, divider);
-      temp.role  = attribute.substr(divider+1);
+      fqan = attribute.substr(0, divider) +
+        "/Role=" + attribute.substr(divider+1);
+
+      if (firstfqan.empty())
+        firstfqan = fqan;
     }
-    temp.cap = "";
-    LOGM(VARP, logh, LEV_DEBUG, T_PRE, "Order: %s:%s",temp.group.c_str(),temp.role.c_str());
-    ordering.insert(std::make_pair<attrib, int>(temp,order));
+
+    LOGM(VARP, logh, LEV_DEBUG, T_PRE, "Order: %s",fqan.c_str());
+    ordering.insert(std::make_pair<std::string, int>(fqan,order));
     order++;
     position = end_token;
   }
@@ -417,17 +417,22 @@ VOMSServer::VOMSServer(int argc, char *argv[]) : sock(0,0,NULL,50,false),
       exit(1);
     }
 
-    NewDB = (cdb)dlsym(library, "CreateDB");
-    if (!NewDB) {
-      LOG(logh, LEV_ERROR, T_PRE, ((std::string)("Cannot load library: " + sqllib)).c_str());
-      std::cout << "Cannot load library: "<< sqllib << dlerror() << std::endl;
+    getlibversion = (gv)dlsym(library, "getDBInterfaceVersion");
+    if (!getlibversion || getlibversion() != 3) {
+      LOGM(VARP, logh, LEV_ERROR, T_PRE, "Old version of interface library found. Expecting >= 3, Found: %d", 
+           (getlibversion ? getlibversion() : 1));
+      std::cout << "Old version of interface library found. Expecting >= 3, Found: " << 
+        (getlibversion ? getlibversion() : 1);
       exit(1);
     }
 
-    connect_with_port_and_socket = (c)dlsym(library, "Connect_with_port_and_socket");
-    if (!connect_with_port_and_socket && (mysql_port || !mysql_socket.empty())) {
-      LOG(logh, LEV_ERROR, T_PRE, "Old version of DBMS interface detected: won't use mysql-port and mysql-socket for MySQL connection (you shouldn't be using them if you're using Oracle).");
+    NewDB = (cdb)dlsym(library, "CreateDB");
+    if (!NewDB) {
+      LOG(logh, LEV_ERROR, T_PRE, ((std::string)("Cannot find initialization symbol in: " + sqllib)).c_str());
+      std::cout << "Cannot find initialization symbol in: "<< sqllib << dlerror() << std::endl;
+      exit(1);
     }
+
   }
   else {
     std::cout << "Cannot load library! "<< std::endl;
@@ -443,19 +448,46 @@ VOMSServer::VOMSServer(int argc, char *argv[]) : sock(0,0,NULL,50,false),
   if(contactstring.empty())
     contactstring = (std::string)"localhost";
 
-  int v = get_version(dbname, username, contactstring, mysql_port, mysql_socket, passwd());
+  db = NewDB();
 
-  if ((v == 2) || ((v == 1) && compat_flag))
-    ;
-  else if (v == 0)
-  {
-    LOGM(VARP, logh, LEV_ERROR, T_PRE, "Error connecting to the database.");
-    throw VOMSInitException("Error connecting to the database.");
+  if (!db) {
+    LOG(logh, LEV_ERROR, T_PRE, "Cannot initialize DB library.");
+    std::cout << "Cannot initialize DB library.";
+    exit(1);
+  }
+
+  db->setOption(OPTION_SET_PORT, &mysql_port);
+  if (!mysql_socket.empty())
+    db->setOption(OPTION_SET_SOCKET, (void*)mysql_socket.c_str());
+  db->setOption(OPTION_SET_INSECURE, &insecure);
+
+  if (!db->connect(dbname.c_str(), contactstring.c_str(), 
+                   username.c_str(), passwd())) {
+    LOGM(VARP, logh, LEV_ERROR, T_PRE, "Unable to connect to database: %s", 
+         db->errorMessage());
+    std::cout << "Unable to connect to database: " <<
+      db->errorMessage() << std::endl;
+    exit(1);
+  }
+
+  int v = 0;
+  sqliface::interface *session = db->getSession();
+  bool result = session->operation(OPERATION_GET_VERSION, &v, NULL);
+  std::string errormessage = session->errorMessage();
+  db->releaseSession(session);
+
+  if (result) {
+    if (v < 2) {
+      LOGM(VARP, logh, LEV_ERROR, T_PRE, "Detected DB Version: %d. Required DB version >= 2", v);
+      std::cerr << "Detected DB Version: " << v << ". Required DB version >= 2";
+      throw VOMSInitException("wrong database version");
+    }
   }
   else {
-    LOGM(VARP, logh, LEV_ERROR, T_PRE, "Detected DB Version: %d. Required DB version >= 2", v);
-    throw VOMSInitException("wrong database version");
+    LOGM(VARP, logh, LEV_ERROR, T_PRE, (std::string("Error connecting to the database : ") + errormessage).c_str());
+    throw VOMSInitException((std::string("Error connecting to the database : ") + errormessage));
   }
+
 
   version = globus(version);
   if (version == 0) {
@@ -584,7 +616,7 @@ void VOMSServer::Run()
             LOGM(VARP, logh, LEV_INFO, T_PRE, " serial: %s", sock.peer_serial.c_str());
 
             LOG(logh, LEV_DEBUG, T_PRE, "Starting Execution.");
-            value = Execute(user, userca, sock.own_key, sock.own_cert, sock.peer_cert, sock.GetContext());
+            value = Execute(sock.own_key, sock.own_cert, sock.peer_cert, sock.GetContext());
           }
           else {
             LOGM(VARP, logh, LEV_INFO, T_PRE, "Failed to authenticate peer");
@@ -609,33 +641,10 @@ void VOMSServer::Run()
   catch (...) {}
 }
 
-static std::string translate(const std::string& name)
-{
-  std::string::size_type userid = name.find(std::string("/USERID="));
-  std::string::size_type uid = name.find(std::string("/UID="));
-
-  if (userid != std::string::npos)
-    return name.substr(0, userid) + "/UID=" + name.substr(userid+8);
-  else if (uid != std::string::npos)
-    return name.substr(0, uid) + "/USERID=" + name.substr(uid+5);
-  else
-    return name;
-}
-
 bool
-VOMSServer::Execute(const std::string &client_name, const std::string &ca_name,
-                    EVP_PKEY *key, X509 *issuer, X509 *holder, gss_ctx_id_t context)
+VOMSServer::Execute(EVP_PKEY *key, X509 *issuer, X509 *holder, gss_ctx_id_t context)
 {
   std::string message;
-  std::string client = client_name;
-  std::string ca = ca_name;
-  std::string::size_type pos = 0;
-  while((pos = ca.find_first_of("'", pos+3)) != std::string::npos)
-    ca.insert(pos, "'");
-  while((pos = client.find_first_of("'", pos+3)) != std::string::npos)
-    client.insert(pos, "'");
-  std::string newname = translate(client);
-  std::string newca   = translate(ca);
 
   if (!sock.Receive(message)) {
     LOG(logh, LEV_ERROR, T_PRE, "Unable to receive request.");
@@ -668,17 +677,17 @@ VOMSServer::Execute(const std::string &client_name, const std::string &ca_name,
 
   std::vector<std::string> targs;
 
-  firstgroup = firstrole = "";
+  firstfqan = "";
   ordering.clear();
 
   parse_order(r.order, ordering);
   parse_targets(r.targets, targs);
 
-  std::vector<attrib> res;
   std::vector<gattrib> attributes;
   std::string data = "";
   std::string tmp="";
   bool result = true;
+  bool result2 = true;
   std::vector<errorp> errs;
   errorp err;
 
@@ -696,101 +705,108 @@ VOMSServer::Execute(const std::string &client_name, const std::string &ca_name,
     }
   }
 
-  std::string real_ca = (ca == newca ? ca :
-                         ( get_correct_ca(dbname, username, passwd(),
-                                          contactstring, mysql_port,
-                                          mysql_socket, ca) ?
-                           ca : newca));
-
-  std::string real_user = (client == newname ? client :
-                           ( get_correct_dn(dbname, username, passwd(),
-                                            contactstring, mysql_port,
-                                            mysql_socket, client) ?
-                             client : newname));
-
   std::string command;
+
+  std::vector<std::string> fqans;
+  std::vector<gattrib> attribs;
+  signed long int uid = -1;
+
+  sqliface::interface *newdb = db->getSession();
+
+  if (!newdb->operation(OPERATION_GET_USER, &uid, holder)) {
+    LOG(logh, LEV_ERROR, T_PRE, "Error in executing request!");
+    LOG(logh, LEV_ERROR, T_PRE, newdb->errorMessage());
+    db->releaseSession(newdb);
+    err.num = ERR_NOT_MEMBER;
+    if (command == (std::string("G/")+ voname))
+      err.message = voname + ": User unknown to this VO.";
+    else
+      err.message = voname + ": Unable to satisfy " + command + " Request!";
+
+    LOG(logh, LEV_ERROR, T_PRE, err.message.c_str());
+    errs.push_back(err);
+    std::string ret = XML_Ans_Encode("A", errs);
+    LOGM(VARP, logh, LEV_DEBUG, T_PRE, "Sending: %s", ret.c_str());
+    sock.Send(ret);
+    return false;
+
+  }
+
+  LOGM(VARP, logh, LEV_ERROR, T_PRE, "Userid = \"%ld\"", uid);
+
   for(std::vector<std::string>::iterator i = comm.begin(); i < comm.end(); ++i)
   {
-    command = *i;
+    char comm = '\0';
+    char *group = NULL;
+    char *role = NULL;
+    bool valid = determine_group_and_role(*i, &comm, &group, &role);
 
     LOGM(VARP, logh, LEV_INFO, T_PRE, "Next command : %s", i->c_str());
 
-    /* Interpret request by first character */
-    switch (*(i->c_str()))
-    {
-    case 'A':
-      result &=
-        get_all(real_user, real_ca, dbname, username, contactstring, mysql_port, mysql_socket, passwd(), insecure, res);
-      result &= get_all_attributes(real_user, real_ca, dbname, username, contactstring, mysql_port, mysql_socket, passwd(), insecure, attributes);
-      break;
+    if (valid) {
 
-    case 'R':
-      result &=
-        get_role(real_user, real_ca, i->c_str() + 1, dbname, username, contactstring, mysql_port, mysql_socket, passwd(), insecure, res);
-      result &= get_role_attributes(real_user, real_ca, i->c_str() + 1, dbname, username, contactstring, mysql_port, mysql_socket, passwd(), insecure, attributes);
-      break;
+      /* Interpret request by first character */
+      switch (comm) {
+      case 'A':
+        if (result = newdb->operation(OPERATION_GET_ALL, &fqans, uid))
+          result2 = newdb->operation(OPERATION_GET_ALL_ATTRIBS, &attribs, uid);
+        break;
 
-    case 'G':
-      result = get_group(real_user, real_ca, i->c_str() + 1, dbname, username, contactstring, mysql_port, mysql_socket, passwd(), insecure, res);
-      result &= get_group_attributes(real_user, real_ca, i->c_str() + 1, dbname, username, contactstring, mysql_port, mysql_socket, passwd(), insecure, attributes);
-      break;
+      case 'R':
+        if (result = newdb->operation(OPERATION_GET_ROLE, &fqans, uid, role))
+          result2 = newdb->operation(OPERATION_GET_ROLE_ATTRIBS, &attribs, uid, role);
+        break;
 
-    case 'B':
-      result = get_group_and_role(real_user, real_ca, i->c_str() + 1, dbname, username, contactstring, mysql_port, mysql_socket, passwd(), insecure, res);
-      result &= get_group_and_role_attributes(real_user, real_ca, i->c_str() + 1, dbname, username, contactstring, mysql_port, mysql_socket, passwd(), insecure, attributes);
-      break;
+      case 'G':
+        if (result = newdb->operation(OPERATION_GET_GROUPS, &fqans, uid))
+          result2 = newdb->operation(OPERATION_GET_GROUPS_ATTRIBS, &attribs, uid);
+        break;
 
-    case 'S':
-      result &=
-        special(real_user, real_ca, i->c_str() + 1, dbname, username, contactstring, mysql_port, mysql_socket, passwd(), data);
-      break;
+      case 'B':
+        if (result = newdb->operation(OPERATION_GET_GROUPS_AND_ROLE, &fqans, uid, group, role))
+          result2 = newdb->operation(OPERATION_GET_GROUPS_AND_ROLE_ATTRIBS, &attribs, uid, group, role);
+        break;
 
-    case 'L':
-      result &=
-        listspecial(dbname, username, contactstring, mysql_port, mysql_socket, passwd(), data);
-      break;
+      case 'N':
+        result = newdb->operation(OPERATION_GET_ALL, &fqans, uid);
+        break;
 
-    case 'M':
-      result &= getlist(real_user, real_ca, dbname, username, contactstring, mysql_port, mysql_socket, passwd(), insecure, data);
-      break;
-
-    case 'N':
-      result &=
-        get_all(real_user, real_ca, dbname, username, contactstring, mysql_port, mysql_socket, passwd(), insecure, res);
-      break;
-
-    default:
-      result &= false;
-      LOGM(VARP, logh, LEV_ERROR, T_PRE, "Unknown Command \"%c\"", i->c_str());
-      break;
+      default:
+        result = false;
+        LOGM(VARP, logh, LEV_ERROR, T_PRE, "Unknown Command \"%c\"", comm);
+        break;
+      }
     }
+    else
+      result = false;
 
-    if(!result)
+    free(group); // role is automatically freed.
+
+    if(!result) {
+      LOGM(VARP, logh, LEV_DEBUG, T_PRE, "While retrieving fqans: %s", newdb->errorMessage());
+    }
       break;
+
+    if (!result2)
+      LOGM(VARP, logh, LEV_DEBUG, T_PRE, "While retrieving attributes: %s", newdb->errorMessage());
+
   }
+  db->releaseSession(newdb);
 
   // remove duplicates
-  for(std::vector<attrib>::iterator i = res.begin(); i != res.end(); ++i)
-  {
-    res.erase(std::remove(i+1, res.end(), *i),
-              res.end());
-  }
+  std::sort(fqans.begin(), fqans.end());
+  fqans.erase(std::unique(fqans.begin(), fqans.end()), fqans.end());
 
   // remove duplicates from attributes
-  for(std::vector<gattrib>::iterator i = attributes.begin(); 
-      i != attributes.end(); ++i)
-  {
-    attributes.erase(std::remove(i+1, attributes.end(), *i),
-                     attributes.end());
+  std::sort(attribs.begin(), attribs.end());
+  attribs.erase(std::unique(attribs.begin(), attribs.end()), 
+                attribs.end());
+
+  if(result && !fqans.empty()) {
+    orderattribs(fqans);
   }
 
-  if(result && !res.empty())
-  {
-    orderattribs(res);
-  }
-
-  if (!result)
-  {
+  if (!result) {
     LOG(logh, LEV_ERROR, T_PRE, "Error in executing request!");
     err.num = ERR_NOT_MEMBER;
     if (command == (std::string("G/")+ voname))
@@ -806,45 +822,33 @@ VOMSServer::Execute(const std::string &client_name, const std::string &ca_name,
     return false;
   }
 
-  std::vector<std::string> compact;
-  int j = 0;
-
-  for (std::vector<attrib>::iterator i = res.begin(); i != res.end(); i++)
-  {
-    compact.push_back(i->str());
-    j++;
-  }
-
-  if(!res.empty())
-  {
+  if(!fqans.empty()) {
     /* check whether the user is allowed to requests those attributes */
     vomsdata v("", "");
     v.SetVerificationType((verify_type)(VERIFY_SIGN));
     v.RetrieveFromCtx(context, RECURSE_DEEP);
 
     /* find the attributes corresponding to the vo */
-    std::vector<std::string> fqans;
-    for(std::vector<voms>::iterator index = (v.data).begin(); index != (v.data).end(); ++index)
-    {
+    std::vector<std::string> existing;
+    for(std::vector<voms>::iterator index = (v.data).begin(); index != (v.data).end(); ++index) {
       if(index->voname == voname)
-        fqans.insert(fqans.end(),
+        existing.insert(existing.end(),
                      index->fqan.begin(),
                      index->fqan.end());
     }
 
     /* if attributes were found, only release an intersection beetween the requested and the owned */
-    std::vector<std::string>::iterator end = compact.end();
+    std::vector<std::string>::iterator end = fqans.end();
     bool subset = false;
-    if(!fqans.empty())
-      if((compact.erase(remove_if(compact.begin(),
-                                  compact.end(),
-                                  bind2nd(std::ptr_fun(not_in), fqans)),
-                        compact.end()) != end))
+    if (!existing.empty())
+      if ((fqans.erase(remove_if(fqans.begin(),
+                                 fqans.end(),
+                                 bind2nd(std::ptr_fun(not_in), existing)),
+                       fqans.end()) != end))
         subset = true;
 
     // no attributes can be send
-    if(compact.empty())
-    {
+    if (fqans.empty()) {
       LOG(logh, LEV_ERROR, T_PRE, "Error in executing request!");
       err.num = ERR_ATTR_EMPTY;
       err.message = voname + " : your certificate already contains attributes, only a subset of them can be issued.";
@@ -856,8 +860,7 @@ VOMSServer::Execute(const std::string &client_name, const std::string &ca_name,
     }
 
     // some attributes can't be send
-    if(subset)
-    {
+    if(subset) {
       LOG(logh, LEV_ERROR, T_PRE, "Error in executing request!");
       err.num = WARN_ATTR_SUBSET;
       err.message = voname + " : your certificate already contains attributes, only a subset of them can be issued.";
@@ -865,14 +868,14 @@ VOMSServer::Execute(const std::string &client_name, const std::string &ca_name,
     }
   }
 
-  if (j) {
-    if (!firstgroup.empty()) {
-      std::vector<attrib>::iterator i = res.begin();
-      if (i != res.end()) {
-        LOGM(VARP, logh, LEV_DEBUG, T_PRE,  "fg:fr = %s:%s", firstgroup.c_str(), firstrole.c_str());
-        if ((i->group != firstgroup) || (i->role != firstrole)) {
+  if (!fqans.empty()) {
+    if (!firstfqan.empty()) {
+      std::vector<std::string>::iterator i = fqans.begin();
+      if (i != fqans.end()) {
+        LOGM(VARP, logh, LEV_DEBUG, T_PRE,  "fq = %s", firstfqan.c_str());
+        if (*i != firstfqan) {
           err.num = WARN_NO_FIRST_SELECT;
-          err.message = "GROUP: " + i->group + "\nROLE: " + i->role + " is not the first selected!\n";
+          err.message = "FQAN: " + *i + " is not the first selected!\n";
           errs.push_back(err);
         }
       }
@@ -882,8 +885,7 @@ VOMSServer::Execute(const std::string &client_name, const std::string &ca_name,
 
     // test logging retrieved attributes
 
-    if(result && !attributes.empty())
-    {
+    if(result && !attributes.empty()) {
       for(std::vector<gattrib>::iterator i = attributes.begin(); i != attributes.end(); ++i)
         LOGM(VARP, logh, LEV_DEBUG, T_PRE,  "User got attributes: %s", i->str().c_str());
     }
@@ -892,7 +894,7 @@ VOMSServer::Execute(const std::string &client_name, const std::string &ca_name,
 
     // convert to string
     std::vector<std::string> attributes_compact;
-    for(std::vector<gattrib>::iterator i = attributes.begin(); i != attributes.end(); ++i)
+    for(std::vector<gattrib>::iterator i = attribs.begin(); i != attribs.end(); ++i)
       attributes_compact.push_back(i->str());
 
 
@@ -903,8 +905,7 @@ VOMSServer::Execute(const std::string &client_name, const std::string &ca_name,
     int res = 1;
     std::string codedac;
 
-    if (comm[0] != "N")
-    {
+    if (comm[0] != "N") {
       if (!serial)
         LOG(logh, LEV_ERROR, T_PRE, "Can't get Serial Number!");
 
@@ -914,10 +915,10 @@ VOMSServer::Execute(const std::string &client_name, const std::string &ca_name,
         LOGM(VARP, logh, LEV_DEBUG, T_PRE, "length = %d", i2d_AC(a, NULL));
         if (a)
           res = createac(issuer, sock.own_stack, holder, key, serial,
-                         compact, targs, attributes_compact, &a, voname, uri, requested, !newformat);
+                         fqans, targs, attributes_compact, &a, voname, uri, requested, !newformat);
 
         LOGM(VARP, logh, LEV_DEBUG, T_PRE, "length = %d", i2d_AC(a, NULL));
-        BN_free(serial);
+        //        BN_free(serial);
 
         if (!res) {
           unsigned int len = i2d_AC(a, NULL);
@@ -958,7 +959,7 @@ VOMSServer::Execute(const std::string &client_name, const std::string &ca_name,
     if (comm[0] == "N")
       data = "";
 
-    for (std::vector<std::string>::iterator i = compact.begin(); i != compact.end(); i++) {
+    for (std::vector<std::string>::iterator i = fqans.begin(); i != fqans.end(); i++) {
       LOGM(VARP, logh, LEV_INFO, T_PRE, "Request Result: %s",  (*i).c_str());
       if (comm[0] == "N")
         data += (*i).c_str() + std::string("\n");
@@ -1011,8 +1012,8 @@ void VOMSServer::UpdateOpts(void)
     {"timeout",         1, &validity,                 OPT_NUM},
     {"dbname",          1, (int *)&dbname,            OPT_STRING},
     {"contactstring",   1, (int *)&contactstring,     OPT_STRING},
-    {"mysql-port",      1, (int *)&mysql_port,         OPT_NUM},
-    {"mysql-socket",    1, (int *)&mysql_socket,       OPT_STRING},
+    {"mysql-port",      1, (int *)&mysql_port,        OPT_NUM},
+    {"mysql-socket",    1, (int *)&mysql_socket,      OPT_STRING},
     {"passfile",        1, (int *)&passfile,          OPT_STRING},
     {"vo",              1, (int *)&voname,            OPT_STRING},
     {"uri",             1, (int *)&fakeuri,           OPT_STRING},
@@ -1142,6 +1143,7 @@ void VOMSServer::UpdateOpts(void)
   else
     LOG(logh, LEV_INFO, T_PRE, "DEBUG MODE INACTIVE ");
 }
+<<<<<<< .working
 
 static BIGNUM *get_serial()
 {
@@ -1152,3 +1154,91 @@ static BIGNUM *get_serial()
 
   return BN_bin2bn(uuid, 16, number);
 }
+=======
+
+static bool determine_group_and_role(std::string command, char *comm, char **group,
+                                     char **role)
+{
+  *role = *group = NULL;
+
+  if (command.empty())
+    return false;
+
+  char *string = strdup(command.c_str()+1);
+
+  if (string[0] != '/') {
+    /* old syntax, or maybe new? */
+    *comm = command[0];
+
+    *group = string;
+
+    switch (*comm) {
+    case 'G':
+      *role = NULL;
+      break;
+    case 'R':
+      *role = string;
+      break;
+    case 'B':
+      *role = strchr(string, ':');
+      if (*role)
+        *role++ = '\0';
+    }
+  }
+  else {
+    /* fqan syntax */
+    char *divider  = strstr(string, "/Role=");
+    char *divider2 = strstr(string, ":");
+    if (divider) {
+      if (divider == string) {
+        *group = string;
+        *role = divider + 6;
+        *comm = 'R';
+      }
+      else {
+        *group = string;
+        *role = divider + 6;
+        *divider='\0';
+        *comm='B';
+      }
+    }
+    else if (divider2) {
+      if (divider2 == string) {
+        *group = string;
+        *role = divider2+1;
+        *comm = 'R';
+      }
+      else {
+        *group = string;
+        *role = divider2+1;
+        *divider2 = '\0';
+        *comm = 'B';
+      }
+    }
+    else {
+      *group = string;
+      *role = NULL;
+      *comm='G';
+    }
+    if (strcmp(*group, "/") == 0) {
+      free(string);
+      *role = *group = NULL;
+      *comm = 'A';
+    }
+    if (strcmp(*group, "//") == 0) {
+      free(string);
+      *role = *group = NULL;
+      *comm='N';
+    }
+  }
+
+  if (!acceptable(*group) || !acceptable(*role)) {
+    free(string);
+    *role = *group = NULL;
+    return false;
+  }
+
+  return true;
+}
+
+>>>>>>> .merge-right.r710

@@ -42,7 +42,7 @@ public:
 
 private:
   VOMSServer &operator=(VOMSServer const &) {exit(1);}
-  bool Execute(const std::string &, const std::string &, EVP_PKEY *, X509 *, X509 *, gss_ctx_id_t);
+  bool Execute(EVP_PKEY *, X509 *, X509 *, gss_ctx_id_t);
 
 
   GSISocketServer sock;
