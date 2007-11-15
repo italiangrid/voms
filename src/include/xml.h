@@ -24,6 +24,7 @@ struct req {
   int   error;
   int   lifetime;
   int   depth;
+  int   base64;
 };
 
 struct ans {
@@ -40,7 +41,7 @@ struct ans {
 };
 
 char *XMLEncodeReq(const char *, const char *, const char *, int);
-char *XMLEncodeAns(struct error **, const char *, int, const char *, int);
+char *XMLEncodeAns(struct error **, const char *, int, const char *, int, int);
 int XMLDecodeReq(const char *, struct req *);
 int XMLDecodeAns(const char *, struct ans *);
 #endif

@@ -39,8 +39,6 @@ static std::string retmsg[] = { "VERR_NONE", "VERR_NOSOCKET", "VERR_NOIDENT",
                                 "VERR_IDENT", "VERR_TYPE", "VERR_ORDER",
                                 "VERR_SERVERCODE", "VERR_NOTAVAIL" };
 
-static STACK_OF(X509) *load_chain(char *certfile);
-
 void printvoms(voms *i)
 {
   std::cout << "SIGLEN: " << i->siglen << std::endl << "USER:" << i->user << std::endl
@@ -189,24 +187,20 @@ int main(int argc, char *argv[])
   BIO *in = NULL;
   X509 *x = NULL;
 
-  in = BIO_new(BIO_s_file());
-  if (in) {
-    if (BIO_read_filename(in, "/tmp/x509up_u500") > 0) {
-      x = PEM_read_bio_X509(in, NULL, 0, NULL);
-      STACK_OF(X509) *chain = load_chain("/tmp/x509up_u500");
-      res = d.Retrieve(x, chain, RECURSE_CHAIN);
+  
+  FILE *f = fopen("/tmp/x509up_u502", "rb");
+  d.Retrieve(f, RECURSE_CHAIN);
+  fclose(f);
 
-      if (res) {
-	print(d);
-	voms v;
+  f = fopen("/tmp/x509up_u502", "rb");
+  d.Retrieve(f, RECURSE_CHAIN);
+  fclose(f);
 
-	if (d.DefaultData(v))
-	  printvoms(&v);
-      }
-      else
-	std::cerr << "ERROR!" << std::endl;
-    }
-  }
+  print(d);
+  voms vv;
+
+  if (d.DefaultData(vv))
+    printvoms(&vv);
 
   if (!res) {
     std::cerr << "err: " << retmsg[d.error] << std::endl;
@@ -214,56 +208,4 @@ int main(int argc, char *argv[])
   std::cerr << std::flush;
   
   exit(0);
-}
-
-
-
-static STACK_OF(X509) *load_chain(char *certfile)
-{
-  STACK_OF(X509_INFO) *sk=NULL;
-  STACK_OF(X509) *stack=NULL, *ret=NULL;
-  BIO *in=NULL;
-  X509_INFO *xi;
-  int first = 1;
-
-  if(!(stack = sk_X509_new_null())) {
-    printf("memory allocation failure\n");
-    goto end;
-  }
-
-  if(!(in=BIO_new_file(certfile, "r"))) {
-    printf("error opening the file, %s\n",certfile);
-    goto end;
-  }
-
-  /* This loads from a file, a stack of x509/crl/pkey sets */
-  if(!(sk=PEM_X509_INFO_read_bio(in,NULL,NULL,NULL))) {
-    printf("error reading the file, %s\n",certfile);
-    goto end;
-  }
-
-  /* scan over it and pull out the certs */
-  while (sk_X509_INFO_num(sk)) {
-    /* skip first cert */
-    if (first) {
-      first = 0;
-      continue;
-    }
-    xi=sk_X509_INFO_shift(sk);
-    if (xi->x509 != NULL) {
-      sk_X509_push(stack,xi->x509);
-      xi->x509=NULL;
-    }
-    X509_INFO_free(xi);
-  }
-  if(!sk_X509_num(stack)) {
-    printf("no certificates in file, %s\n",certfile);
-    sk_X509_free(stack);
-    goto end;
-  }
-  ret=stack;
-end:
-  BIO_free(in);
-  sk_X509_INFO_free(sk);
-  return(ret);
 }

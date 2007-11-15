@@ -409,6 +409,10 @@ STACK_OF(X509) *vomsdata::load_chain(BIO *in)
   X509_INFO *xi;
   int first = 1;
 
+  stack = sk_X509_new_null();
+  if (!stack)
+    return NULL;
+
   /* This loads from a file, a stack of x509/crl/pkey sets */
   if(!(sk=PEM_X509_INFO_read_bio(in,NULL,NULL,NULL))) {
     seterror(VERR_PARSE, "error reading credentials from file.");

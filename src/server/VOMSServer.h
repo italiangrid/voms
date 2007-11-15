@@ -86,5 +86,6 @@ private:
   bool            insecure;
   bool            shortfqans;
   bool            do_syslog;
+  bool            base64encoding;
 };
 #endif

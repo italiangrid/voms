@@ -38,15 +38,15 @@ std::string XML_Req_Encode(const std::string command, const std::string order,
 
 std::string XML_Ans_Encode(const answer &a)
 {
-  return XML_Ans_Encode(a.ac, a.errs);
+  return XML_Ans_Encode(a.ac, a.errs, a.base64);
 }
 
-std::string XML_Ans_Encode(const std::string &ac, const std::vector<errorp> e)
+std::string XML_Ans_Encode(const std::string &ac, const std::vector<errorp> e, bool base64)
 {
-  return XML_Ans_Encode(ac, "", e);
+  return XML_Ans_Encode(ac, "", e, base64);
 }
 
-std::string XML_Ans_Encode(const std::string &ac, const std::string &data, const std::vector<errorp> e)
+std::string XML_Ans_Encode(const std::string &ac, const std::string &data, const std::vector<errorp> e, bool base64)
 {
   struct error **vect = NULL, **tmp;
 
@@ -68,7 +68,7 @@ std::string XML_Ans_Encode(const std::string &ac, const std::string &data, const
     }
   }
 
-  char *ret = XMLEncodeAns(vect, ac.data(), ac.size(), data.data(), data.size());
+  char *ret = XMLEncodeAns(vect, ac.data(), ac.size(), data.data(), data.size(), base64);
   listfree((char **)vect, (freefn)free);
   if (ret) {
     std::string s = std::string(ret);
@@ -83,8 +83,9 @@ bool XML_Req_Decode(const std::string message, request &r)
 {
   struct req d;
 
-  d.depth = d.error = 0;
+  d.depth = d.error = d.base64 = 0;
   d.command = NULL;
+  d.base64 = 0;
 
   int ret = XMLDecodeReq(message.c_str(), &d);
 
@@ -102,6 +103,7 @@ bool XML_Req_Decode(const std::string message, request &r)
     }
 
     r.lifetime = d.lifetime;
+    r.base64 = (d.base64 == 1);
     free(d.order);
     free(d.targets);
     listfree(d.command, free);

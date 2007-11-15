@@ -3,6 +3,7 @@
  * Authors: 
  *      
  *      Gidon Moont - g.moont@imperial.ac.uk  
+ *      Vincenzo Ciaschini - vincenzo.ciaschini@cnaf.infn.it
  *          
  * Copyright (c) 2002, 2003, 2004, 2005, 2006 INFN-CNAF on behalf 
  * of the EGEE project.
@@ -21,6 +22,8 @@ package org.glite.voms.contact;
 
 // Voms uses a non-standard Base-64 algorithm.  Hmmm...
 
+import org.bouncycastle.util.encoders.Base64;
+
 /**
  * 
  * This class implements a decoder for the non-standard Base-64 algorithm used
@@ -28,6 +31,7 @@ package org.glite.voms.contact;
  * 
  *  
  * @author Gidon Moont
+ * @author Vincenzo Ciaschini
  *
  */
 public class VOMSDecoder {
@@ -60,7 +64,16 @@ public class VOMSDecoder {
     }
   }
 
-  public static byte[] decode( String s )
+  public static byte[] decode( String s)
+  {
+    if (s.indexOf('\n') != -1) {
+      return Base64.decode(s.trim().replaceAll("\n",""));
+    }
+    else
+      return mydecode(s);
+  }
+
+  private static byte[] mydecode( String s )
   {
 
     char[] in = s.toCharArray() ;

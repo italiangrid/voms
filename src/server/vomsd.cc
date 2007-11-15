@@ -255,7 +255,8 @@ VOMSServer::VOMSServer(int argc, char *argv[]) : sock(0,0,NULL,50,false),
                                                  newformat(false),
                                                  insecure(false),
                                                  shortfqans(false),
-                                                 do_syslog(false)
+                                                 do_syslog(false),
+                                                 base64encoding(false)
 {
   struct stat statbuf;
 
@@ -320,6 +321,7 @@ VOMSServer::VOMSServer(int argc, char *argv[]) : sock(0,0,NULL,50,false),
     {"skipcacheck",     1, (int *)&insecure,          OPT_BOOL},
     {"shortfqans",      0, (int *)&shortfqans,        OPT_BOOL},
     {"syslog",          0, (int *)&do_syslog,         OPT_BOOL},
+    {"base64",          0, (int *)&base64encoding,    OPT_BOOL},
     {0, 0, 0, 0}
   };
 
@@ -660,6 +662,7 @@ VOMSServer::Execute(const std::string &client_name, const std::string &ca_name,
 
   std::vector<std::string> comm = r.command;
 
+  bool dobase64 = base64encoding | r.base64;
   int requested = r.lifetime;
 
   std::vector<std::string> targs;
@@ -796,7 +799,7 @@ VOMSServer::Execute(const std::string &client_name, const std::string &ca_name,
 
     LOG(logh, LEV_ERROR, T_PRE, err.message.c_str());
     errs.push_back(err);
-    std::string ret = XML_Ans_Encode("A", errs);
+    std::string ret = XML_Ans_Encode("A", errs, dobase64);
     LOGM(VARP, logh, LEV_DEBUG, T_PRE, "Sending: %s", ret.c_str());
     sock.Send(ret);
     return false;
@@ -845,7 +848,7 @@ VOMSServer::Execute(const std::string &client_name, const std::string &ca_name,
       err.num = ERR_ATTR_EMPTY;
       err.message = voname + " : your certificate already contains attributes, only a subset of them can be issued.";
       errs.push_back(err);
-      std::string ret = XML_Ans_Encode("A", errs);
+      std::string ret = XML_Ans_Encode("A", errs, dobase64);
       LOGM(VARP, logh, LEV_DEBUG, T_PRE, "Sending: %s", ret.c_str());
       sock.Send(ret);
       return false;
@@ -941,7 +944,7 @@ VOMSServer::Execute(const std::string &client_name, const std::string &ca_name,
         LOG(logh, LEV_ERROR, T_PRE, "Error in executing request!");
         err.message = voname + ": Unable to satisfy " + command + " request due to database error.";
         errs.push_back(err);
-        std::string ret = XML_Ans_Encode("A", errs);
+        std::string ret = XML_Ans_Encode("A", errs, dobase64);
         LOGM(VARP, logh, LEV_DEBUG, T_PRE, "Sending: %s", ret.c_str());
         sock.Send(ret);
 
@@ -960,13 +963,13 @@ VOMSServer::Execute(const std::string &client_name, const std::string &ca_name,
         data += (*i).c_str() + std::string("\n");
     }
 
-    std::string ret = XML_Ans_Encode(codedac, data, errs);
+    std::string ret = XML_Ans_Encode(codedac, data, errs, dobase64);
 
     LOGM(VARP, logh, LEV_DEBUG, T_PRE, "OUTPUT: %s", ret.c_str());
     sock.Send(ret);
   }
   else if (!data.empty()) {
-    std::string ret = XML_Ans_Encode("", data, errs);
+    std::string ret = XML_Ans_Encode("", data, errs, dobase64);
     LOGM(VARP, logh, LEV_DEBUG, T_PRE, "OUTPUT: %s", ret.c_str());
     sock.Send(ret);
   }
@@ -974,7 +977,7 @@ VOMSServer::Execute(const std::string &client_name, const std::string &ca_name,
     err.num = ERR_NOT_MEMBER;
     err.message = std::string("You are not a member of the ") + voname + " VO!";
     errs.push_back(err);
-    std::string ret = XML_Ans_Encode("", errs);
+    std::string ret = XML_Ans_Encode("", errs, dobase64);
     sock.Send(ret);
   }
 

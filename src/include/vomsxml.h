@@ -24,12 +24,14 @@ struct request {
   std::string targets;
   std::vector<std::string> command;
   int lifetime;
+  bool base64;
 };
 
 struct answer {
   std::string data;
   std::string ac;
   std::vector<errorp> errs;
+  bool base64;
 };
 
 std::string XML_Req_Encode(const request &);
@@ -37,9 +39,9 @@ std::string XML_Req_Encode(const std::string, const std::string,
                            const std::string, const int);
 std::string XML_Ans_Encode(const answer &);
 std::string XML_Ans_Encode(const std::string&, 
-                           const std::vector<errorp>);
+                           const std::vector<errorp>, bool);
 std::string XML_Ans_Encode(const std::string&,  const std::string&,
-                           const std::vector<errorp>);
+                           const std::vector<errorp>, bool);
 bool XML_Req_Decode(const std::string, request &);
 bool XML_Req_Decode(const std::string, std::string &, std::string &, int &);
 bool XML_Ans_Decode(const std::string, answer &);

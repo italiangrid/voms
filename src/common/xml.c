@@ -24,6 +24,9 @@
 #include "errortype.h"
 #include "xml.h"
 
+#include <openssl/bio.h>
+#include <openssl/evp.h>
+
 static char trans[] = "abcdefghijklmnopqrstuvwxyz"
                       "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
                       "0123456789[]";
@@ -45,8 +48,104 @@ static char trans2[128] = { 0,   0,  0,  0,  0,  0,  0,  0,
 			    15, 16, 17, 18, 19, 20, 21, 22,
 			    23, 24, 25,  0,  0,  0,  0,  0};
 		     
+static char *MyEncode(const char *data, int size, int *j);
+static char *MyDecode(const char *data, int size, int *j);
 
-char *Encode(const char *data, int size, int *j)
+static char *base64Encode(const char *data, int size, int *j)
+{
+  BIO *in = NULL;
+  BIO *b64 = NULL;
+  int len = 0;
+  char *buffer = NULL;
+
+  in  = BIO_new(BIO_s_mem());
+  b64 = BIO_new(BIO_f_base64());
+  if (!in || !b64)
+    goto err;
+
+  b64 = BIO_push(b64, in);
+
+  BIO_write(b64, data, size);
+  BIO_flush(b64);
+
+  *j = len = BIO_pending(in);
+
+  buffer = (char *)malloc(len);
+  if (!buffer)
+    goto err;
+
+  if (BIO_read(in, buffer, len) != len) {
+    free(buffer);
+    buffer = NULL;
+    goto err;
+  }
+
+ err:
+
+  BIO_free(b64);
+  BIO_free(in);
+  return buffer;
+}
+
+static char *base64Decode(const char *data, int size, int *j)
+{
+  BIO *in = NULL;
+  BIO *b64 = NULL;
+  int len = 0;
+  char *buffer = NULL;
+  int read = 0;
+
+  in  = BIO_new(BIO_s_mem());
+  b64 = BIO_new(BIO_f_base64());
+  if (!in || !b64)
+    goto err;
+
+  b64 = BIO_push(b64, in);
+
+  BIO_write(in, data, size);
+  BIO_flush(in);
+
+  len = BIO_pending(b64);
+
+  buffer = (char *)malloc(len);
+  if (!buffer)
+    goto err;
+
+  *j = read = BIO_read(b64, buffer, len);
+
+  if (read <= 0) {
+    free(buffer);
+    buffer = NULL;
+    goto err;
+  }
+
+ err:
+
+  BIO_free(b64);
+  BIO_free(in);
+  return buffer;
+}
+
+char *Encode(const char *data, int size, int *j, int base64)
+{
+  if (base64)
+    return base64Encode(data, size, j);
+  else
+    return MyEncode(data, size, j);
+}
+
+char *Decode(const char *data, int size, int *j)
+{
+  int i = 0;
+
+  while (i < size)
+    if (data[i++] == '\n')
+      return base64Decode(data, size, j);
+
+  return MyDecode(data, size, j);
+}
+
+static char *MyEncode(const char *data, int size, int *j)
 {
   int bit = 0;
   int i   = 0;
@@ -98,7 +197,7 @@ char *Encode(const char *data, int size, int *j)
   return NULL;
 }
 
-char *Decode(const char *data, int size, int *n)
+static char *MyDecode(const char *data, int size, int *n)
 {
   int bit = 0;
   int i = 0;
@@ -150,14 +249,14 @@ char *XMLEncodeReq(const char *command, const char *order, const char *targets,
   char *res;
   int size;
   char str[15];
-  char *tmp;
+  const char *tmp;
   int count = 0;
 
   if (!command)
     return NULL;
 
   size = strlen(command) + (order ? strlen(order) : 0) +
-    (targets ? strlen(targets) : 0) + 149;
+    (targets ? strlen(targets) : 0) + 167;
 
   /* count the number of commands -1*/
   tmp = command;
@@ -170,7 +269,9 @@ char *XMLEncodeReq(const char *command, const char *order, const char *targets,
   size += (count * 19);
 
   if ((res = (char *)malloc(size))) {
-    char * prev = command, * next = prev;
+    const char * prev = command;
+    const char *next = prev;
+
     strcpy(res, "<?xml version=\"1.0\" encoding = \"US-ASCII\"?><voms>");
 
     while(next != 0)
@@ -196,10 +297,13 @@ char *XMLEncodeReq(const char *command, const char *order, const char *targets,
       strcat(res, "</targets>");
     }
 
+    strcat(res,"<base64>1</base64>");
+
     sprintf(str, "%d", lifetime);
     strcat(res, "<lifetime>");
     strcat(res, str);
     strcat(res, "</lifetime></voms>");
+
 
     return res;
   }
@@ -207,7 +311,7 @@ char *XMLEncodeReq(const char *command, const char *order, const char *targets,
 }
 
 char *XMLEncodeAns(struct error **wande, const char *ac, int lenac,
-                   const char *data, int lendata)
+                   const char *data, int lendata, int base64)
 {
   char *res;
   int size;
@@ -222,8 +326,8 @@ char *XMLEncodeAns(struct error **wande, const char *ac, int lenac,
 
   if (!ac)  lenac  = 0;
 
-  codedac   = Encode(ac, lenac, &newac);
-  codeddata = Encode(data, lendata, &newdata);
+  codedac   = Encode(ac, lenac, &newac, base64);
+  codeddata = Encode(data, lendata, &newdata, base64);
 
   if ((!codedac && ac) && (!codeddata && data)) {
     free(codedac);
@@ -330,6 +434,8 @@ static void  endreq(void *userdata, const char *name)
   }  
   else if (strcmp(name, "lifetime") == 0)
     d->lifetime = atoi(d->value);
+  else if (strcmp(name, "base64") == 0)
+    d->base64 = 1;
   d->value=NULL;
 }
 
@@ -425,7 +531,17 @@ static void  handlerans(void *userdata, const char *s, int len)
   if (!a || a->error)
     return;
 
-  a->value = strndup(s, len);
+  if (!a->value)
+    a->value = strndup(s, len);
+  else {
+    a->value = (char*)realloc(a->value, strlen(a->value) + len + 1);
+
+    if (a->value)
+      a->value = strncat(a->value, s, len);
+    else if (len)
+      a->error = 1;
+  }
+
   if (!a->value && len)
     a->error = 1;
 }
