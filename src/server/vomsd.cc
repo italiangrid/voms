@@ -342,7 +342,7 @@ VOMSServer::VOMSServer(int argc, char *argv[]) : sock(0,0,NULL,50,false),
             "[-loglevel lev] [-logtype type] [-logformat format]\n"
             "[-logdateformat format] [-debug] [-backlog num] [-skipcacheck]\n"
             "[-version][-sqlloc path][-compat][-logmax n][-socktimeout n]\n"
-            "[-shortfqans]\n");
+            "[-shortfqans][-insecure]\n");
 
   if (!getopts(argc, argv, opts))
     throw VOMSInitException("unable to read options");

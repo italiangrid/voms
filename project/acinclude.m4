@@ -921,56 +921,6 @@ AC_DEFUN([AC_UTEST],
   AM_CONDITIONAL(WANT_UNIT_TEST, test x$have_unit_test = xyes)
 ])
 
-AC_DEFUN([AC_VOMS_TRY_OPENSSL_NEW_TYPES],
-[
-  AC_MSG_CHECKING([for i2d_of_void])
-  AC_LANG_PUSH(C)
-
-  CFLAGS_SAVE="$CFLAGS"
-  CFLAGS="$CFLAGS $GLOBUS_CFLAGS"
-
-  AC_TRY_COMPILE(
-    [
-    #include <$with_globus_prefix/include/$with_globus_flavor/openssl/asn1.h>
-    ],
-    [
-      i2d_of_void fun = NULL;
-    ],
-    [ac_have_i2d_of_void="yes"],
-    [ac_have_i2d_of_void="no"])
-
-  if test "x$ac_have_i2d_of_void" = "xyes" ; then
-    AC_DEFINE(HAVE_NEW_OPENSSL_TYPES, 1, [Define to 1 if X_of_void types exist])
-  fi
-
-  AC_MSG_RESULT([$ac_have_i2d_of_void])
-
-  CFLAGS="$CFLAGS_SAVE"
-  CFLAGS_SAVE="$CFLAGS"
-  CFLAGS="$CFLAGS $NO_GLOBUS_FLAGS"
-
-  AC_MSG_CHECKING([for i2d_of_void (system libs)])
-  AC_LANG_PUSH(C)
-
-  AC_TRY_COMPILE(
-    [
-    #include <openssl/asn1.h>
-    ],
-    [
-      i2d_of_void fun = NULL;
-    ],
-    [ac_have_i2d_of_void="yes"],
-    [ac_have_i2d_of_void="no"])
-
-  if test "x$ac_have_i2d_of_void" = "xyes" ; then
-    AC_DEFINE(HAVE_NEW_OPENSSL_TYPES_OPENSSL, 1, [Define to 1 if X_of_void types exist])
-  fi
-
-  AC_MSG_RESULT([$ac_have_i2d_of_void])
-
-  CFLAGS="$CFLAGS_SAVE"
-  AC_LANG_POP(C)
-])
 
 
 dnl This macro written by:
