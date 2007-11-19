@@ -353,10 +353,13 @@ GSISocketServer::Listen()
 
     if (he) {
       if (he->h_name)
-        LOGM(VARP, logh, LEV_INFO, T_PRE, "Received connection from: %s (%s)\n", he->h_name, inet_ntoa(peeraddr_in.sin_addr));
+        LOGM(VARP, logh, LEV_INFO, T_PRE, 
+             "Received connection from: %s (%s):%d\n", he->h_name, 
+             inet_ntoa(peeraddr_in.sin_addr), peeraddr_in.sin_port);
     }
     else
-      LOGM(VARP, logh, LEV_INFO, T_PRE, "Received connection from: %s\n", inet_ntoa(peeraddr_in.sin_addr));
+      LOGM(VARP, logh, LEV_INFO, T_PRE, "Received connection from: %s:%d\n", 
+           inet_ntoa(peeraddr_in.sin_addr), peeraddr_in.sin_port);
 
     newopened = true;
     return true;

@@ -253,7 +253,7 @@ VOMSServer::VOMSServer(int argc, char *argv[]) : sock(0,0,NULL,50,false),
                                                  logmax(10000000),loglev(2),
                                                  logt(T_STARTUP|T_REQUEST|T_RESULT),
                                                  logdf("%c"),
-                                                 logf("%d:%h:%s(%p):%V:%T:%F (%f:%l):%m"),
+                                                 logf("%d:%h:%s[%p]: msg=\"%V:%T:%F (%f:%l):%m\""),
                                                  newformat(false),
                                                  insecure(false),
                                                  shortfqans(false),
@@ -409,6 +409,8 @@ VOMSServer::VOMSServer(int argc, char *argv[]) : sock(0,0,NULL,50,false),
       LOGM(VARP, logh, LEV_DEBUG, T_PRE, "argv[%d] = \"%s\"", i, argv[i]);
   }
 
+
+  LOG(logh, LEV_INFO, T_PRE, "Reconfigured server.");
   if (!sqllib.empty()) {
     void * library = dlopen(sqllib.c_str(), RTLD_LAZY);
     if(!library) {
@@ -611,7 +613,7 @@ void VOMSServer::Run()
             subject = sock.own_subject;
             ca = sock.own_ca;
 
-            LOGM(VARP, logh, LEV_INFO, T_PRE, "At: %s Received Contact from:", timestamp().c_str());
+            LOGM(VARP, logh, LEV_INFO, T_PRE, "At: %s Received Contact :", timestamp().c_str());
             LOGM(VARP, logh, LEV_INFO, T_PRE, " user: %s", user.c_str());
             LOGM(VARP, logh, LEV_INFO, T_PRE, " ca  : %s", userca.c_str());
             LOGM(VARP, logh, LEV_INFO, T_PRE, " serial: %s", sock.peer_serial.c_str());
@@ -1143,6 +1145,8 @@ void VOMSServer::UpdateOpts(void)
     LOG(logh, LEV_INFO, T_PRE, "DEBUG MODE ACTIVE ");
   else
     LOG(logh, LEV_INFO, T_PRE, "DEBUG MODE INACTIVE ");
+
+  LOG(logh, LEV_INFO, T_PRE, "Reconfigured server.");
 }
 
 static BIGNUM *get_serial()

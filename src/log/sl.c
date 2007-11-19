@@ -24,11 +24,10 @@ struct localdata {
   char *service;
 };
 
-const char *level[] = {"LOG_EMERG", "LOG_ALERT", "LOG_CRIT", "LOG_ERR",
-                       "LOG_WARNING", "LOG_NOTICE", "LOG_INFO", "LOG_DEBUG",
+const char *level[] = {"LOG_ERROR", "LOG_WARN", "LOG_INFO", "LOG_DEBUG",
                        NULL };
-const int   levelvalue[] = { LOG_EMERG, LOG_ALERT, LOG_CRIT, LOG_ERR,
-                             LOG_WARNING, LOG_NOTICE, LOG_INFO, LOG_DEBUG, 0};
+const int   levelvalue[] = { LOG_ERR,
+                             LOG_WARNING, LOG_NOTICE, LOG_DEBUG, 0};
 
 static int syslogtrans(char *v)
 {
