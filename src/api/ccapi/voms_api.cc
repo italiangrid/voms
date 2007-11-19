@@ -66,7 +66,7 @@ extern bool verify(std::string message, vomsdata &voms, verror_type &error,
 
 extern "C" {
 extern char *Decode(const char *, int, int *);
-extern char *Encode(const char *, int, int *);
+extern char *Encode(const char *, int, int *, int);
 }
 
 extern int AC_Init(void);
@@ -440,7 +440,7 @@ STACK_OF(X509) *vomsdata::load_chain(BIO *in)
   }
   ret=stack;
 end:
-  sk_X509_INFO_free(sk);
+  sk_X509_INFO_pop_free(sk, X509_INFO_free);
   return(ret);
 }
 
@@ -459,7 +459,7 @@ bool vomsdata::Retrieve(FILE *file, recurse_type how)
       if (x && chain)
         res = Retrieve(x, chain, how);
       X509_free(x);
-      sk_X509_free(chain);
+      sk_X509_pop_free(chain, X509_free);
   }
   BIO_free(in);
   return res;
@@ -657,7 +657,7 @@ bool vomsdata::Export(std::string &buffer)
 
   char *str;
   int len;
-  str = Encode(result.c_str(), result.size(), &len);
+  str = Encode(result.c_str(), result.size(), &len, 0);
   if (str) {
     buffer = std::string(str, len);
     free(str);

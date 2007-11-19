@@ -272,6 +272,7 @@ vomsdata::verifydata(std::string &message, std::string subject, std::string ca,
     issuer = check((void *)tmp);
 
     if (!issuer) {
+      AC_free(tmp);
       //      seterror(VERR_SIGN, "Cannot verify AC signature!");
       return false;
     }
@@ -284,6 +285,7 @@ vomsdata::verifydata(std::string &message, std::string subject, std::string ca,
     result = verifyac(holder, issuer, tmp, v);
     if (!result) {
       //      seterror(VERR_VERIFY, "Cannot verify AC");
+      AC_free(tmp);
       return false;
     }
     else {

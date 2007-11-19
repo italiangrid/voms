@@ -27,7 +27,7 @@ extern "C" {
 
 
 extern "C" {
-char *Encode(char *, int, int *);
+  char *Encode(char *, int, int *, int);
 }
 
 static std::string retmsg[] = { "VERR_NONE", "VERR_NOSOCKET", "VERR_NOIDENT",
@@ -155,7 +155,7 @@ int main(int argc, char *argv[])
   int l;
 
   if (res)
-    std::cout << "------------------\n" << Encode(const_cast<char *>(binary.data()), binary.size(), &l) << "\n-------\n" << std::flush;
+    std::cout << "------------------\n" << Encode(const_cast<char *>(binary.data()), binary.size(), &l,1) << "\n-------\n" << std::flush;
   else
     std::cerr << "Error!" << std::endl;
   if (!res) {
