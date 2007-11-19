@@ -733,7 +733,7 @@ VOMSServer::Execute(EVP_PKEY *key, X509 *issuer, X509 *holder, gss_ctx_id_t cont
 
   }
 
-  LOGM(VARP, logh, LEV_ERROR, T_PRE, "Userid = \"%ld\"", uid);
+  LOGM(VARP, logh, LEV_INFO, T_PRE, "Userid = \"%ld\"", uid);
 
   for(std::vector<std::string>::iterator i = comm.begin(); i < comm.end(); ++i)
   {
