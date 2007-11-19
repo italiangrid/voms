@@ -25,6 +25,7 @@ struct req {
   int   lifetime;
   int   depth;
   int   base64;
+  int   version;
 };
 
 struct ans {
@@ -38,6 +39,7 @@ struct ans {
   char *value;
   int error;
   int depth;
+  int version;
 };
 
 char *XMLEncodeReq(const char *, const char *, const char *, int);

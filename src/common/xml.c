@@ -256,7 +256,7 @@ char *XMLEncodeReq(const char *command, const char *order, const char *targets,
     return NULL;
 
   size = strlen(command) + (order ? strlen(order) : 0) +
-    (targets ? strlen(targets) : 0) + 167;
+    (targets ? strlen(targets) : 0) + 187;
 
   /* count the number of commands -1*/
   tmp = command;
@@ -298,6 +298,7 @@ char *XMLEncodeReq(const char *command, const char *order, const char *targets,
     }
 
     strcat(res,"<base64>1</base64>");
+    strcat(res,"<version>4</version>");
 
     sprintf(str, "%d", lifetime);
     strcat(res, "<lifetime>");
@@ -335,7 +336,7 @@ char *XMLEncodeAns(struct error **wande, const char *ac, int lenac,
     return NULL;
   }
 
-  size = newac + newdata + 95;
+  size = newac + newdata + 115;
 
   if (wande) {
     struct error **tmp = wande;
@@ -349,6 +350,7 @@ char *XMLEncodeAns(struct error **wande, const char *ac, int lenac,
   if ((res = (char *)malloc(size))) {
     strcpy(res, "<?xml version=\"1.0\" encoding = \"US-ASCII\"?><vomsans>");
 
+    strcat(res, "<version>3</version>");
     if (wande) {
       struct error **tmp = wande;
       strcat(res, "<error>");
@@ -436,6 +438,8 @@ static void  endreq(void *userdata, const char *name)
     d->lifetime = atoi(d->value);
   else if (strcmp(name, "base64") == 0)
     d->base64 = 1;
+  else if (strcmp(name, "version") == 0)
+    d->version = atoi(d->value);
   d->value=NULL;
 }
 
@@ -509,6 +513,10 @@ static void  endans(void *userdata, const char *name)
     a->err->message = strdup(a->value);
     free(a->value);
   }
+  else if ((!strcmp(name, "version"))) {
+    a->version = atoi(a->value);
+    free(a->value);
+  }
   a->value = NULL;
 }
       
@@ -554,7 +562,8 @@ int XMLDecodeReq(const char *message, struct req *d)
   d->order = d->targets = d->value = NULL;
   d->error = d->depth = d->n = 0;
   d->lifetime = -1;
-  
+  d->version = d->base64 = 0;
+
   XML_SetUserData(p, d);
   XML_SetElementHandler(p,startreq,endreq);
   XML_SetCharacterDataHandler(p,handlerreq);
@@ -573,6 +582,7 @@ int XMLDecodeAns(const char *message, struct ans *d)
   d->data  = d->ac = d->value = NULL;
   d->list  = NULL;
   d->err   = NULL;
+  d->version = 0;
 
   XML_SetUserData(p, d);
   XML_SetElementHandler(p,startans,endans);

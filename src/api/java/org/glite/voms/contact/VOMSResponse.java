@@ -47,7 +47,21 @@ public class VOMSResponse {
         return VOMSDecoder.decode( acElement.getFirstChild().getNodeValue()); 
 
     }
-    
+
+    /**
+     * Extracts the version from the VOMS response.
+     * 
+     * @return an integer containing the AC.
+     */
+    public int getVersion() {
+        Element versionElement = (Element)xmlResponse.getElementsByTagName("version").item(0);
+        if (versionElement == null) {
+            return 0;
+        }
+        return Integer.parseInt(versionElement.getFirstChild().getNodeValue());
+    }
+
+
     /**
      * Extracts the AC from the VOMS response.
      * 

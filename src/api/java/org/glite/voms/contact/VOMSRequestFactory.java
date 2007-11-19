@@ -162,6 +162,7 @@ public class VOMSRequestFactory {
                
         Iterator fqanIter = options.getRequestedFQANs().iterator();
         frag.buildBase64();
+        frag.buildVersion();
         while (fqanIter.hasNext()){
             
             String FQAN = (String)fqanIter.next();
@@ -204,6 +205,7 @@ class VOMSRequestFragment{
     Element targets;
     Element lifetime;
     Element base64;
+    Element version;
     
     public VOMSRequestFragment(Document doc){
         
@@ -284,6 +286,12 @@ class VOMSRequestFragment{
         base64 = doc.createElement( "base64");
         appendTextChild(base64, "1");
         root.appendChild(base64);
+    }
+
+    void buildVersion() {
+        version = doc.createElement("version");
+        appendTextChild(version, "4");
+        root.appendChild(version);
     }
 
     public DocumentFragment getFragment() {

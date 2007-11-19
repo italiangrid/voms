@@ -104,6 +104,8 @@ bool XML_Req_Decode(const std::string message, request &r)
 
     r.lifetime = d.lifetime;
     r.base64 = (d.base64 == 1);
+    r.version = d.version;
+
     free(d.order);
     free(d.targets);
     listfree(d.command, free);
@@ -122,6 +124,7 @@ bool XML_Ans_Decode(const std::string message, answer &a)
 
   a.ac   = (d.ac  ? std::string(d.ac, d.aclen)      : "");
   a.data = (d.data ? std::string(d.data, d.datalen) : "");
+  a.version = d.version;
 
   struct error **tmp = d.list;
   if (tmp && (*tmp)) {

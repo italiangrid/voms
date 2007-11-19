@@ -25,6 +25,7 @@ struct request {
   std::vector<std::string> command;
   int lifetime;
   bool base64;
+  int version;
 };
 
 struct answer {
@@ -32,6 +33,7 @@ struct answer {
   std::string ac;
   std::vector<errorp> errs;
   bool base64;
+  int version;
 };
 
 std::string XML_Req_Encode(const request &);
