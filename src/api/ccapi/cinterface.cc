@@ -778,10 +778,10 @@ struct vomsr *VOMS_Copy(struct vomsr *org, int *error)
       while (org->std[j]) {
         struct datar *d = (struct datar *)calloc(1, sizeof(struct datar));
         if (d) {
-          dst->std[j++] = d;
+          dst->std[j] = d;
           d->group = mystrdup(org->std[j]->group);
           d->role  = mystrdup(org->std[j]->role);
-          d->cap   = mystrdup(org->std[j]->cap);
+          d->cap   = mystrdup(org->std[j++]->cap);
         }
 
         if (!d || !d->group || !d->role || !d->cap)

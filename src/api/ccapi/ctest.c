@@ -175,12 +175,15 @@ int main(int argc, char *argv[])
 
       if (res) {
         struct vomsr *v;
-
+        struct vomsr *new;
         print(vd);
 
         v = VOMS_DefaultData(vd, &err);
         if (err == VERR_NONE)
           printvoms(v);
+
+        new = VOMS_Copy(v, &err);
+        printvoms(new);
       }
       else
         printf("ERROR!\n");
