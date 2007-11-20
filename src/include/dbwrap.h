@@ -85,6 +85,7 @@ public:
 extern "C" {
   sqliface::interface *CreateDB();
   int getDBInterfaceVersion();
+  int getDBInterfaceVersionMinor();
 }
 
 #endif

@@ -30,7 +30,7 @@ AC_DEFUN([AC_OPENSSL],
     AC_SUBST(OPENSSL_LIBS)
     AC_MSG_CHECKING([for system OpenSSL version])
     if test "x$with_openssl_libs" = "xyes" ; then
-      WANTED_API_LIBS="$WANTED_API_LIBS libvomsapi-nog.la"
+      WANTED_API_LIBS="$WANTED_API_LIBS libvomsapi_nog.la"
       WANTED_ATTCERT_LIBS="$WANTED_ATTCERT_LIBS libattributes_nog.la"
       WANTED_SSL_UTILS_LIBS="$WANTED_SSL_UTILS_LIBS libssl_utils-nog.la"
       WANTED_OLDGAA_LIBS="$WANTED_OLDGAA_LIBS liboldgaa-nog.la"

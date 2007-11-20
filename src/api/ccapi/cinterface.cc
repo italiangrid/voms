@@ -61,20 +61,25 @@ int TranslateVOMS(struct vomsdatar *vd, std::vector<voms> &v, int *error)
 }
 #endif
 
-extern "C" {
-
 static char *
-mystrdup(const std::string &str)
+mystrdup(const char *str, int len = 0)
 {
-  if (str.empty())
+  if (!str)
     return NULL;
   else {
-    char *res = strdup(str.c_str());
+    if (!len)
+      len = strlen(str);
+    char *res = (char*)malloc(len+1);
     if (!res)
       throw std::bad_alloc();
+    memcpy(res, str, len);
+    res[len]='\0';
     return res;
   }
 }
+
+extern "C" {
+
 
 struct vomsdatar *VOMS_Init(char *voms, char *cert)
 {
@@ -84,8 +89,8 @@ struct vomsdatar *VOMS_Init(char *voms, char *cert)
                                (cert ? std::string(cert) : ""));
 
     if ((vd = (struct vomsdatar *)malloc(sizeof(struct vomsdatar)))) {
-      vd->cdir = mystrdup(voms ? std::string(voms) : "");
-      vd->vdir = mystrdup(cert ? std::string(cert) : "");
+      vd->cdir = mystrdup(voms ? voms : "");
+      vd->vdir = mystrdup(cert ? cert : "");
       vd->data = NULL;
       vd->extra_data = vd->workvo = NULL;
       vd->volen = vd->extralen = 0;
@@ -263,18 +268,18 @@ struct vomsr *voms::translate()
     try {
       dst->version   = version;
       dst->siglen    = siglen;
-      dst->signature = mystrdup(signature);
-      dst->user      = mystrdup(user);
-      dst->userca    = mystrdup(userca);
-      dst->server    = mystrdup(server);
-      dst->serverca  = mystrdup(serverca);
-      dst->voname    = mystrdup(voname);
-      dst->uri       = mystrdup(uri);
-      dst->date1     = mystrdup(date1);
-      dst->date2     = mystrdup(date2);
+      dst->signature = mystrdup(signature.c_str(), signature.size());
+      dst->user      = mystrdup(user.c_str());
+      dst->userca    = mystrdup(userca.c_str());
+      dst->server    = mystrdup(server.c_str());
+      dst->serverca  = mystrdup(serverca.c_str());
+      dst->voname    = mystrdup(voname.c_str());
+      dst->uri       = mystrdup(uri.c_str());
+      dst->date1     = mystrdup(date1.c_str());
+      dst->date2     = mystrdup(date2.c_str());
       dst->type      = type;
-      dst->custom    = mystrdup(custom);
-      dst->serial    = mystrdup(serial);
+      dst->custom    = mystrdup(custom.c_str(), custom.size());
+      dst->serial    = mystrdup(serial.c_str());
       dst->datalen   = custom.size();
 
       dst->ac     = AC_dup((((struct realdata *)realdata)->ac));
@@ -292,7 +297,7 @@ struct vomsr *voms::translate()
 
       for (std::vector<std::string>::iterator i = fqan.begin();
            i != fqan.end(); i++)
-        if (!(dst->fqan[j++] = mystrdup(*i)))
+        if (!(dst->fqan[j++] = mystrdup((*i).c_str())))
           throw 3;
     
       j = 0;
@@ -301,9 +306,9 @@ struct vomsr *voms::translate()
         struct datar *d = (struct datar *)calloc(1, sizeof(struct datar));
         if (d) {
           dst->std[j++] = d;
-          d->group = mystrdup(i->group);
-          d->role  = mystrdup(i->role);
-          d->cap   = mystrdup(i->cap);
+          d->group = mystrdup(i->group.c_str());
+          d->role  = mystrdup(i->role.c_str());
+          d->cap   = mystrdup(i->cap.c_str());
         }
         else
           throw 3;
@@ -720,15 +725,13 @@ struct vomsr *VOMS_Copy(struct vomsr *org, int *error)
 {
   *error = VERR_MEM;
 
-  char **arrf = NULL;
-  struct datar **arrd = NULL;
   struct vomsr *dst = NULL;
 
   if ((dst = (struct vomsr *)calloc(1, sizeof(struct vomsr)))) {
     try {
       dst->version   = org->version;
       dst->siglen    = org->siglen;
-      dst->signature = mystrdup(org->signature);
+      dst->signature = mystrdup(org->signature, org->siglen);
       dst->user      = mystrdup(org->user);
       dst->userca    = mystrdup(org->userca);
       dst->server    = mystrdup(org->server);
@@ -738,7 +741,7 @@ struct vomsr *VOMS_Copy(struct vomsr *org, int *error)
       dst->date1     = mystrdup(org->date1);
       dst->date2     = mystrdup(org->date2);
       dst->type      = org->type;
-      dst->custom    = mystrdup(org->custom);
+      dst->custom    = mystrdup(org->custom, org->datalen);
       dst->serial    = mystrdup(org->serial);
       dst->datalen   = org->datalen;
 
@@ -747,7 +750,6 @@ struct vomsr *VOMS_Copy(struct vomsr *org, int *error)
 
       if (!dst->holder || !dst->ac)
         throw 3;
-
 
       int size = 0;
       while (org->fqan[size++])
@@ -760,16 +762,15 @@ struct vomsr *VOMS_Copy(struct vomsr *org, int *error)
         ;
 
       dst->std  = (struct datar **)calloc(1, sizeof(struct datar *)*size);
-      if (!arrf || !arrd)
+      if (!(dst->fqan) || !(dst->std))
         throw 3;
 
       int j = 0;
 
       while(org->fqan[j]) {
-        if (!(arrf[j] = mystrdup(org->fqan[j])))
+        if (!(dst->fqan[j] = mystrdup(org->fqan[j])))
           throw 3;
         j++;
-
       }
 
       j = 0;
@@ -777,7 +778,7 @@ struct vomsr *VOMS_Copy(struct vomsr *org, int *error)
       while (org->std[j]) {
         struct datar *d = (struct datar *)calloc(1, sizeof(struct datar));
         if (d) {
-          arrd[j++] = d;
+          dst->std[j++] = d;
           d->group = mystrdup(org->std[j]->group);
           d->role  = mystrdup(org->std[j]->role);
           d->cap   = mystrdup(org->std[j]->cap);
