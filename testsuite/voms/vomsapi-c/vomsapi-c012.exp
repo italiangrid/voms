@@ -1,0 +1,27 @@
+load_lib vomstest.exp
+
+testheader "See if server data can be retrieved (one server, by vo)."
+
+set ::_buildout [exec mktemp $::SCRATCHDIR/voms-api-c-XXXXXX]
+set res [_exeC loadbyvo.c]
+
+set LOGOUTS "$LOGOUTS $::_buildout"
+
+if $res then {
+    fail "execution failed."
+} else {
+    set correct "\"voms1\" \"localhost\" \"/C=IT/CN=003\" \"voms1\" \"33334\" \"-1\""
+
+    set out [exec cat $::_buildout]
+    if [regexp $correct $out] then {
+        pass "output correct"
+    } else {
+        set outname2 [exec mktemp $::SCRATCHDIR/voms-api-c-XXXXXX]
+        set id [open $outname2 "w+"]
+        puts $id $correct
+        close $id
+
+        set LOGOUTS "$LOGOUTS $outname2"
+        fail "output wrong"
+    }
+}

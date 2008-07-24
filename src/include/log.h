@@ -18,7 +18,8 @@ typedef enum { T_PRE = 0x00, T_STARTUP = 0x01, T_REQUEST = 0x02, T_RESULT = 0x04
 typedef enum { LEV_ERROR = 0, LEV_WARN, LEV_INFO, LEV_DEBUG, LEV_NONE} loglevels;
 
 #include "config.h"
-
+#include <sys/types.h>
+#include <unistd.h>
 #include <stdio.h>
 
 extern void       *LogInit();
@@ -42,6 +43,7 @@ extern void        LogActivate(void *, const char *);
 extern void        LogDeactivate(void *, const char *);
 extern void        LogOption(void *, const char *, const char *);
 extern void        LogOptionInt(void *, const char *, int);
+extern void        SetOwner(pid_t);
 
 #define LOG(h, lev, type, str) \
 LogMessage((h), (lev), (type), (str), FUNC_NAME, __LINE__, __FILE__)

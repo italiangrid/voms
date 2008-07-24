@@ -184,7 +184,8 @@ vomsdata::vomsdata(std::string voms_dir, std::string cert_dir) :  ca_cert_dir(ce
                                                                   workvo(""),
                                                                   extra_data(""),
                                                                   ver_type(VERIFY_FULL),
-                                                                  retry_count(1)
+                                                                  retry_count(1),
+                                                                  verificationtime(0)
 {
 #ifndef NOGLOBUS
    (void)globus_thread_once(&l_globus_once_control, l_init_globus_once_func);
@@ -961,11 +962,15 @@ vomsdata::vomsdata(const vomsdata &orig) : ca_cert_dir(orig.ca_cert_dir),
                                            servers(orig.servers),
                                            targets(orig.targets),
                                            error(orig.error),
+                                           data(orig.data),
                                            workvo(orig.workvo),
                                            extra_data(orig.extra_data),
                                            ver_type(orig.ver_type),
                                            serverrors(orig.serverrors),
-                                           errmessage(orig.errmessage) {}
+                                           errmessage(orig.errmessage),
+                                           retry_count(orig.retry_count),
+                                           verificationtime(orig.verificationtime)
+{}
 
 int getMajorVersionNumber(void) {return 1;}
 int getMinorVersionNumber(void) {return 8;}
@@ -974,4 +979,38 @@ int getPatchVersionNumber(void) {return 0;}
 void vomsdata::SetRetryCount(int retryCount)
 {
   retry_count = retryCount;
+}
+
+void vomsdata::SetVerificationTime(time_t thistime)
+{
+  verificationtime = thistime;
+}
+
+std::vector<std::string> voms::GetTargets()
+{
+  AC *ac = GetAC();
+
+  std::vector<std::string> targets;
+
+  STACK_OF(X509_EXTENSION) *exts = ac->acinfo->exts;
+
+  int nid3 = OBJ_txt2nid("idceTargets");
+  int pos4 = X509v3_get_ext_by_NID(exts, nid3, -1);
+
+  if (pos4 >= 0) {
+    X509_EXTENSION *ex = sk_X509_EXTENSION_value(exts, pos4);
+    AC_TARGETS *target = (AC_TARGETS *)X509V3_EXT_d2i(ex);
+
+    if (target != NULL) {
+      for (int i = 0; i < sk_AC_TARGET_num(target->targets); i++) {
+        AC_TARGET *name = NULL;
+        name = sk_AC_TARGET_value(target->targets, i);
+        if (name->name->type == GEN_URI)
+          targets.push_back(std::string((char*)(name->name->d.ia5->data), 
+                                        name->name->d.ia5->length));
+      }
+    }
+  }
+
+  return targets;
 }

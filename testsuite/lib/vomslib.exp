@@ -1,0 +1,362 @@
+variable LOGOUTS
+variable REPORTDIR
+variable INSTALLDIR
+variable SCRATCHDIR
+variable CADIR
+
+variable _initted
+variable _logdescriptor
+variable _cadir
+variable _capath
+variable _certdir
+variable _vomsdir
+
+rename cleanup _cleanup
+
+proc _activateCert {cert} {
+    file mkdir $::env(HOME)/.globus2
+    file copy -force "$::_certdir/$cert-cert.pem" $::env(HOME)/.globus2/usercert.pem
+    file copy -force "$::_certdir/$cert-key.pem"  $::env(HOME)/.globus2/userkey.pem
+    exec chmod 644 $::env(HOME)/.globus2/usercert.pem
+    exec chmod 400 $::env(HOME)/.globus2/userkey.pem
+}
+
+proc _activateHostCertificate {cert} {
+    file mkdir $::INSTALLDIR/certs
+    file copy -force "$::_certdir/$cert-cert.pem" $::INSTALLDIR/certs/hostcert.pem
+    file copy -force "$::_certdir/$cert-key.pem" $::INSTALLDIR/certs/hostkey.pem
+    exec chmod 644 $::INSTALLDIR/certs/hostcert.pem
+    exec chmod 400 $::INSTALLDIR/certs/hostkey.pem
+
+}
+
+proc _getcert {cert} {
+    return "$::_certdir/$cert-cert.pem"
+}
+
+proc _getkey {cert} {
+    return "$::_certdir/$cert-key.pem"
+}
+
+proc _getdn {cert} {
+    regexp {subject= (.*)} [exec openssl x509 -subject -noout -in [_getcert $cert]] dummy value
+    return $value
+}
+
+proc _getdnfile {cert} {
+    regexp {subject= (.*)} [exec openssl x509 -subject -noout -in $cert] dummy value
+    return $value
+}
+
+proc _getca {cert} {
+    regexp {issuer= (.*)} [exec openssl x509 -issuer -noout -in [_getcert $cert]] dummy value
+    return $value
+}
+
+proc _revoke_cert { cert name } {
+    exec openssl ca -config $::_capath/$name/$name.cnf -revoke $::_certdir/$cert-cert.pem -batch 2>/dev/null
+}
+
+proc _do_ca_dir_setup {} {
+    set ::_cadir   $::INSTALLDIR/etc/grid-security/certificates
+    set ::_capath  $::INSTALLDIR/ca
+    set ::_certdir $::INSTALLDIR/certs
+
+    catch { file delete -force $::_capath }
+    catch { file delete -force $::_cadir }
+    catch { file delete -force $::_certdir }
+    file mkdir $::_capath
+    file mkdir $::_cadir
+    file mkdir $::_certdir
+
+    set ::CADIR ::_cadir
+}
+
+proc _make_crl { ca } {
+    exec openssl ca -gencrl -config $::_capath/$ca/$ca.cnf -out $::_capath/$ca/$ca.crl 2>/dev/null
+    # some versions of openssl are buggy and return 1 in case of CRL hash success.
+    # so we get the hashname from the corresponding CA certificate
+    set hashname [exec openssl x509 -hash -noout -in $::_capath/$ca/cacert.pem ]
+    file copy -force $::_capath/$ca/$ca.crl $::_cadir/$hashname.r0
+}
+
+proc _make_ca { dn name { day 365 } {condsubject "" }} {
+    if [expr ![file exists "$::_capath/$name"]] then {
+        file mkdir $::_capath/$name
+        file mkdir $::_capath/$name/private
+
+        _ca_make_config $dn $name "$::_capath/$name"
+        exec touch $::_capath/$name/index.txt
+        set id [open "$::_capath/$name/serial" w+]
+        puts $id "00"
+        flush $id
+        close $id
+
+        exec openssl req -config $::_capath/$name/$name.cnf -new -x509 -nodes -keyout $::_capath/$name/certkey.pem -out $::_capath/$name/cacertreq.pem -batch 2>/dev/null
+        file copy $::_capath/$name/cacertreq.pem $::_capath/$name/cacert.pem
+
+        if [expr $day < 0] then {
+            set seconds     [clock scan [exec date -u]]
+            set expireddate [clock format [expr $seconds + (86400 * $day)] -format "%y%m%d%H%M%SZ" ] 
+            set startdate   [clock format [expr $seconds + (86400 * ($day - 1))] -format "%y%m%d%H%M%SZ" ] 
+            exec openssl ca -config $::_capath/$name/$name.cnf -startdate "$startdate" -enddate "$expireddate" -ss_cert $::_capath/$name/cacertreq.pem -extensions usrca_cert -out $::_capath/$name/cacert.pem -batch 2>/dev/null
+        } else {
+            exec openssl ca -config $::_capath/$name/$name.cnf -days $day -ss_cert $::_capath/$name/cacertreq.pem -extensions usrca_cert -out $::_capath/$name/cacert.pem -batch 2>/dev/null
+        }
+
+        set hashname [exec openssl x509 -hash -noout -in $::_capath/$name/cacert.pem]
+        file copy -force $::_capath/$name/cacert.pem $::_cadir/$hashname.0
+        set dn [_getdnfile $::_cadir/$hashname.0]
+        set id [open "$::_cadir/$hashname.signing_policy" w+]
+        set out "/C=IT/*"
+        if {[string bytelength $condsubject]} then {
+            set out $consubject
+        }
+        puts $id "access_id_CA       X509    '$dn'
+pos_rights         globus   CA:sign
+cond_subjects      globus   '\"$out\"'"
+        flush $id
+        close $id
+    }
+}
+
+proc _make_ca_from_ca { dn fathername name {day 365 } {condsubject ""}} {
+    if [expr ![file exists "$::_capath/$name"]] then {
+        file mkdir $::_capath/$name
+        file mkdir $::_capath/$name/private
+
+        _ca_make_config $dn $name "$::_capath/$name"
+        exec touch $::_capath/$name/index.txt
+        set id [open "$::_capath/$name/serial" w+]
+        puts $id "00"
+        flush $id
+        close $id
+
+        exec openssl req -config $::_capath/$fathername/$fathername.cnf -new -nodes -keyout $::_capath/$name/certkey.pem -subj "$dn" -out $::_capath/$name/careq.pem -extensions usrca_cert -batch 2>/dev/null
+
+        if [expr $day >= 0] then {
+            exec openssl ca  -config $::_capath/$fathername/$fathername.cnf -days $day -policy policy_anything -days 2 -out $::_capath/$name/cacert.pem -in $::_capath/$name/careq.pem -extensions usrca_cert -batch 2>/dev/null
+
+        } else {
+            set seconds     [clock scan [exec date -u]]
+            set expireddate [clock format [expr $seconds + (86400 * $day)] -format "%y%m%d%H%M%SZ" ] 
+            set startdate   [clock format [expr $seconds + (86400 * ($day - 1))] -format "%y%m%d%H%M%SZ" ] 
+            exec openssl ca  -config $::_capath/$fathername/$fathername.cnf -startdate "$startdate" -enddate "$expireddate" -policy policy_anything -days 2 -out $::_capath/$name/cacert.pem -in $::_capath/$name/careq.pem -extensions usrca_cert -batch 2>/dev/null
+
+        }
+
+        set hashname [exec openssl x509 -hash -noout -in $::_capath/$name/cacert.pem]
+        file copy -force $::_capath/$name/cacert.pem $::_cadir/$hashname.0
+        set dn [_getdnfile $::_cadir/$hashname.0]
+        set id [open "$::_cadir/$hashname.signing_policy" w+]
+        set out "/C=IT/*"
+        if {[string bytelength $condsubject]} then {
+            set out $consubject
+        }
+        puts $id "access_id_CA       X509    '$dn'
+pos_rights         globus   CA:sign
+cond_subjects      globus   '\"$out\"'"
+        flush $id
+        close $id
+        file copy $::_capath/$name/cacert.pem $::_certdir/$name-cert.pem
+        file copy $::_capath/$name/certkey.pem $::_certdir/$name-key.pem
+    }
+}
+
+
+proc _make_cert_from_ca { dn name certname {day 2}} {
+    if [expr ![file exists "$::_capath/$name"]] then {
+        puts "CA $name does not exist!"
+        exit
+    }
+
+    if [expr ![file exists "$::_certdir"]] then {
+        file mkdir $::_certdir
+    }
+
+    exec openssl req -config $::_capath/$name/$name.cnf -new -nodes -keyout $::_certdir/$certname-key.pem -subj "$dn" -out $::_certdir/$certname-cert.req -batch 2>/dev/null
+    if [expr $day < 0 ] then {
+        set seconds     [clock scan [exec date -u]]
+        set expireddate [clock format [expr $seconds + (86400 * $day)] -format "%y%m%d%H%M%SZ" ] 
+        set startdate   [clock format [expr $seconds + (86400 * ($day - 1))] -format "%y%m%d%H%M%SZ" ] 
+        exec openssl ca  -config $::_capath/$name/$name.cnf -policy policy_anything -startdate "$startdate" -enddate "$expireddate" -out $::_certdir/$certname-cert.pem -in $::_certdir/$certname-cert.req -batch 2>/dev/null
+    } else {
+        exec openssl ca  -config $::_capath/$name/$name.cnf -policy policy_anything -days $day -out $::_certdir/$certname-cert.pem -in $::_certdir/$certname-cert.req -batch 2>/dev/null
+    }
+
+    
+}
+
+proc _ca_make_config { dn name path } {
+
+    if [catch {set cadesc [open $path/$name.cnf w+]}] then {
+        puts "ERROR"
+        exit
+    }
+
+    set CVAL ""
+    set STVAL ""
+    set OVAL ""
+    set OUVAL ""
+    set CNVAL ""
+    set EVAL ""
+    set LVAL ""
+    regexp {.*/C=([^/]*).*}     $dn dummy CVAL
+    regexp {.*/ST=([^/]*).*}    $dn dummy STVAL
+    regexp {.*/O=([^/]*).*}     $dn dummy OVAL
+    regexp {.*/OU=([^/]*).*}    $dn dummy OUVAL
+    regexp {.*/CN=([^/]*).*}    $dn dummy CNVAL
+    regexp {.*/Email=([^/]*).*} $dn dummy EVAL
+    regexp {.*/L=([^/]*).*}     $dn dummy LVAL
+
+#
+# OpenSSL example configuration file.
+# This is mostly being used for generation of certificate requests.
+#
+
+puts $cadesc "
+HOME			= $path
+RANDFILE		= \$ENV::HOME/.rnd
+
+oid_section		= new_oids
+
+\[ new_oids \]
+
+\[ ca \]
+default_ca	= CA_default		# The default ca section
+
+\[ CA_default \]
+
+dir		= $path     		  # Where everything is kept
+certs		= \$dir		          # Where the issued certs are kept
+crl_dir		= \$dir		          # Where the issued crl are kept
+database	= \$dir/index.txt	  # database index file.
+new_certs_dir	= \$dir          	  # default place for new certs.
+
+certificate	= \$dir/cacert.pem 	  # The CA certificate
+serial		= \$dir/serial 		  # The current serial number
+crl		= \$dir/crl.pem 		  # The current CRL
+private_key	= \$dir/certkey.pem         # The private key
+RANDFILE	= \$dir/private/.rand	  # private random number file
+
+x509_extensions	= usr_cert		  # The extentions to add to the cert
+
+name_opt 	= ca_default		  # Subject Name options
+cert_opt 	= ca_default		  # Certificate field options
+
+default_days	= 365			# how long to certify for
+default_crl_days= 30			# how long before next CRL
+default_md	= md5			# which md to use.
+preserve	= no			# keep passed DN ordering
+policy		= policy_anything
+
+\[ policy_match \]
+countryName		= match
+stateOrProvinceName	= match
+organizationName	= match
+organizationalUnitName	= optional
+commonName		= supplied
+emailAddress		= optional
+
+\[ policy_anything \]
+countryName		= optional
+stateOrProvinceName	= optional
+localityName		= optional
+organizationName	= optional
+organizationalUnitName	= optional
+commonName		= supplied
+emailAddress		= optional
+
+\[req\]
+default_bits		= 1024
+default_keyfile 	= privkey.pem
+distinguished_name=req_distinguished_name
+#attributes		= req_attributes
+x509_extensions	= v3_ca	# The extentions to add to the self signed cert
+
+string_mask = nombstr
+
+\[req_distinguished_name\]
+countryName			= Country Name (2 letter code)
+countryName_default		= $CVAL
+countryName_min			= 2
+countryName_max			= 2
+
+stateOrProvinceName		= State or Province Name (full name)
+stateOrProvinceName_default	= $STVAL
+
+localityName			= Locality Name (eg, city)
+localityName_default		= $LVAL
+
+0.organizationName		= Organization Name (eg, company)
+0.organizationName_default	= $OVAL
+
+organizationalUnitName		= Organizational Unit Name (eg, section)
+organizationalUnitName_default = $OUVAL
+
+commonName			= Common Name (eg, your name or your server\'s hostname)
+commonName_default = $CNVAL
+commonName_max			= 64
+
+emailAddress			= Email Address
+emailAddress_default = $EVAL
+emailAddress_max		= 64
+
+\[ req_attributes \]
+challengePassword		= A challenge password
+challengePassword_min		= 4
+challengePassword_max		= 20
+
+unstructuredName		= An optional company name
+
+\[ usr_cert \]
+
+basicConstraints=CA:FALSE
+
+nsComment			= \"OpenSSL Generated Certificate for VOMS testing purposes\"
+
+subjectKeyIdentifier=hash
+authorityKeyIdentifier=keyid,issuer:always
+keyUsage = nonRepudiation, digitalSignature, keyEncipherment
+
+\[ usrca_cert \]
+
+basicConstraints=CA:TRUE
+
+nsComment			= \"OpenSSL Generated Certificate for VOMS testing purposes\"
+
+subjectKeyIdentifier=hash
+authorityKeyIdentifier=keyid,issuer:always
+keyUsage = critical, keyCertSign, cRLSign
+
+\[ v3_req \]
+
+basicConstraints = CA:FALSE
+keyUsage = critical, nonRepudiation, digitalSignature, keyEncipherment
+
+\[ v3_ca \]
+
+subjectKeyIdentifier=hash
+
+authorityKeyIdentifier=keyid,issuer:always
+
+basicConstraints = CA:true
+
+\[ crl_ext \]
+
+authorityKeyIdentifier=keyid,issuer:always"
+    flush $cadesc
+    close $cadesc
+}
+
+proc cleanup {} {
+    _cleanup
+    puts $::_logdescriptor "</table>"
+
+    puts $::_logdescriptor "</body></html>"
+    flush $::_logdescriptor
+    close $::_logdescriptor
+#    catch {exec rm -rf $::INSTALLDIR/ca}
+}
+
+

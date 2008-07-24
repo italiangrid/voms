@@ -1,0 +1,16 @@
+load_lib vomstest.exp
+
+testheader "See if requesting a too long proxy fails."
+_activateCert mycert2
+
+_vomsStart voms1
+set outname [exec mktemp $::SCRATCHDIR/voms-proxy-init-XXXXXX]
+set res [catch {set out [exec $::INSTALLDIR/bin/voms-proxy-init --voms voms1 --valid 100:00 >& $outname]}]
+_vomsStop voms1
+
+if $res then {
+    pass "voms-proxy-init correctly failed."
+} else {
+    set LOGOUTS "$LOGOUTS $outname"
+    fail "voms-proxy-init incorrectly suceeded."
+}

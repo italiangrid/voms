@@ -1,0 +1,16 @@
+load_lib vomstest.exp
+
+testheader "See if voms-proxy-init --failonwarn works."
+_activateCert mycert2
+
+_vomsStart voms1
+set outname [exec mktemp $::SCRATCHDIR/voms-proxy-init-XXXXXX]
+set res [catch {set out [exec $::INSTALLDIR/bin/voms-proxy-init --voms voms1 --vomslife 1000:00  --failonwarn >& $outname]}]
+_vomsStop voms1
+
+if $res then {
+    pass "voms-proxy-init failed."
+} else {
+    set LOGOUTS "$LOGOUTS $outname"
+    fail "voms-proxy-init succeeded."
+}

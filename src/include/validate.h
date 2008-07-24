@@ -15,6 +15,7 @@
 #define VOMS_VALIDATE_H
 
 #include "newformat.h"
+#include <stddef.h>
 /* #include "voms_apic.h" */
 
 
@@ -60,7 +61,7 @@ struct col {
   int buflen;
 };
 
-extern int validate(X509 *, X509 *, AC *, struct col *, int);
+extern int validate(X509 *, X509 *, AC *, struct col *, int, time_t);
 
 #define VER_NONE    0x00
 #define VER_DATE    0x01

@@ -143,7 +143,7 @@ Client::Client(int argc, char ** argv) :
                                            userconf(""),
                                            incfile(""),
                                            separate(""),
-                                           bits(512),
+                                           bits(1024),
                                            hours(12),
                                            minutes(0),
                                            ac_hours(12),
@@ -679,7 +679,6 @@ bool Client::Run() {
 
     /* parse fqans vector to build the command to send to the server */
     std::string command = parse_fqan(fqans);
-    
     
     /* and contact them */
 
@@ -1336,7 +1335,7 @@ bool Client::WriteSeparate() {
     
     while(*aclist)
 #ifdef TYPEDEF_I2D_OF
-      if(!PEM_ASN1_write_bio((i2d_of_void *)i2d_AC), "ATTRIBUTE CERTIFICATE", out, (char *)*(aclist++), NULL, NULL, 0, NULL, NULL)) {
+      if(!PEM_ASN1_write_bio((i2d_of_void *)i2d_AC, "ATTRIBUTE CERTIFICATE", out, (char *)*(aclist++), NULL, NULL, 0, NULL, NULL)) {
 #else
       if(!PEM_ASN1_write_bio(((int (*)())i2d_AC), "ATTRIBUTE CERTIFICATE", out, (char *)*(aclist++), NULL, NULL, 0, NULL, NULL)) {
 #endif

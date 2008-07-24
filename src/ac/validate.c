@@ -105,7 +105,10 @@ char *get_error(int e)
     return "AC serial number too long.";
     break;
   case AC_ERR_DATES:
-    return "AC not yet (or not anymore) valid.";
+    return "AC not yet valid.";
+    break;
+  case AC_ERR_DATES2:
+    return "AC not valid anymore.";
     break;
   case AC_ERR_ATTRIBS:
     return "VOMS Attributes missing from AC.";
@@ -159,7 +162,7 @@ char *get_error(int e)
 #define WARNING(a) do { if ((a)) ERROR(AC_ERR_SET); } while (0)
 
   
-int validate(X509 *cert, X509 *issuer, AC *ac, struct col *voms, int valids)
+int validate(X509 *cert, X509 *issuer, AC *ac, struct col *voms, int valids, time_t vertime)
 {
   STACK_OF(GENERAL_NAME) *names;
   GENERAL_NAME  *name;
@@ -294,7 +297,12 @@ int validate(X509 *cert, X509 *issuer, AC *ac, struct col *voms, int valids)
 
   if (valids & VER_DATE) {
     time_t ctime, dtime;
-    time (&ctime);
+    if (vertime == 0) {
+      time (&ctime);
+      vertime = ctime;
+    }
+    else
+      ctime = vertime;
     ctime += 300;
     dtime = ctime-600;
 
@@ -302,11 +310,12 @@ int validate(X509 *cert, X509 *issuer, AC *ac, struct col *voms, int valids)
         (b->type != V_ASN1_GENERALIZEDTIME))
       ERROR(AC_ERR_DATES);
 
-    if (((X509_cmp_current_time(b) >= 0) &&
-         (X509_cmp_time(b, &ctime) >= 0)) ||
-        ((X509_cmp_current_time(a) <= 0) &&
-         (X509_cmp_time(a, &dtime) <= 0)))
+    if (((X509_cmp_time(b, &vertime) >= 0) &&
+         (X509_cmp_time(b, &ctime) >= 0))) 
       ERROR(AC_ERR_DATES);
+    if (((X509_cmp_time(a, &dtime) <= 0) &&
+         (X509_cmp_time(a, &dtime) <= 0)))
+      ERROR(AC_ERR_DATES2);
   }
 
   if (valids) {

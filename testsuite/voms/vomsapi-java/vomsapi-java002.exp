@@ -1,0 +1,14 @@
+load_lib vomstest.exp
+
+testheader "See if the library can be linked."
+
+set ::_buildout [exec mktemp $::SCRATCHDIR/program-out-XXXXXX]
+set res [_buildJava basictest.java]
+
+if $res then {
+    set LOGOUTS "$LOGOUTS $::_buildout"
+    fail "library cannot be linked."
+} else {
+    pass "library can be linked"
+}
+

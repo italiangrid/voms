@@ -570,6 +570,8 @@ void VOMSServer::Run()
     if (daemon(0,0))
       exit(0);
 
+  SetOwner(getpid());
+
   try {
     signal(SIGHUP, sighup_handler);
     LOG(logh, LEV_DEBUG, T_PRE, "Trying to open socket.");
@@ -737,6 +739,11 @@ VOMSServer::Execute(EVP_PKEY *key, X509 *issuer, X509 *holder, gss_ctx_id_t cont
 
   LOGM(VARP, logh, LEV_INFO, T_PRE, "Userid = \"%ld\"", uid);
 
+  bool setuporder = false;
+
+  if (r.order.empty())
+    setuporder = true;
+
   for(std::vector<std::string>::iterator i = comm.begin(); i < comm.end(); ++i)
   {
     char comm = '\0';
@@ -758,16 +765,35 @@ VOMSServer::Execute(EVP_PKEY *key, X509 *issuer, X509 *holder, gss_ctx_id_t cont
       case 'R':
         if (result = newdb->operation(OPERATION_GET_ROLE, &fqans, uid, role))
           result2 = newdb->operation(OPERATION_GET_ROLE_ATTRIBS, &attribs, uid, role);
+        result2 |= newdb->operation(OPERATION_GET_GROUPS_ATTRIBS, &attribs, uid);
+
+        if (setuporder)
+          if (!r.order.empty())
+            r.order += ",";
+        r.order += std::string("/Role=") + role;
         break;
 
       case 'G':
         if (result = newdb->operation(OPERATION_GET_GROUPS, &fqans, uid))
           result2 = newdb->operation(OPERATION_GET_GROUPS_ATTRIBS, &attribs, uid);
+
+        if (setuporder)
+          if (!r.order.empty())
+            r.order += ",";
+          r.order += group;
+
         break;
 
       case 'B':
         if (result = newdb->operation(OPERATION_GET_GROUPS_AND_ROLE, &fqans, uid, group, role))
           result2 = newdb->operation(OPERATION_GET_GROUPS_AND_ROLE_ATTRIBS, &attribs, uid, group, role);
+        result2 |= newdb->operation(OPERATION_GET_GROUPS_ATTRIBS, &attribs, uid);
+
+        if (setuporder)
+          if (!r.order.empty())
+            r.order += ",";
+        r.order += group + std::string("/Role=") + role;
+
         break;
 
       case 'N':
@@ -795,6 +821,9 @@ VOMSServer::Execute(EVP_PKEY *key, X509 *issuer, X509 *holder, gss_ctx_id_t cont
 
   }
   db->releaseSession(newdb);
+
+  if (setuporder)
+    parse_order(r.order, ordering);
 
   // remove duplicates
   std::sort(fqans.begin(), fqans.end());
@@ -881,6 +910,24 @@ VOMSServer::Execute(EVP_PKEY *key, X509 *issuer, X509 *holder, gss_ctx_id_t cont
           err.message = "FQAN: " + *i + " is not the first selected!\n";
           errs.push_back(err);
         }
+      }
+    }
+
+    // Adjust for long/short format
+    if (!short_flags) {
+      std::vector<std::string> newfqans(fqans);
+      fqans.clear();
+      std::vector<std::string>::iterator i = newfqans.begin();
+      while (i != newfqans.end()) {
+        std::string fqan = *i;
+        LOGM(VARP, logh, LEV_DEBUG, T_PRE, "Initial FQAN: %s", fqan.c_str());
+        if (fqan.find("/Role=") != std::string::npos)
+          fqan += "/Capability=NULL";
+        else
+          fqan += "/Role=NULL/Capability=NULL";
+        LOGM(VARP, logh, LEV_DEBUG, T_PRE, "Processed FQAN: %s", fqan.c_str());
+        fqans.push_back(fqan);
+        i++;
       }
     }
 

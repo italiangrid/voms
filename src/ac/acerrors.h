@@ -84,4 +84,5 @@
 #define ASN1_F_I2D_AC_ATTRIBUTEVAL  5061
 #define AC_F_AC_ATTRIBUTEVAL_New    5062
 #define AC_ERR_ATTRIB               5063
+#define AC_ERR_DATES2               5064
 #endif

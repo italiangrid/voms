@@ -26,8 +26,10 @@ bool operator==(const gattrib &lhs,
 bool operator<(const gattrib &lhs,
                const gattrib &rhs)
 {
-  const char *s1 = lhs.str().c_str();
-  const char *s2 = rhs.str().c_str();
+  return lhs.str() < rhs.str();
 
-  return strcmp(s1, s2) < 0;
+//   const char *s1 = lhs.str().c_str();
+//   const char *s2 = rhs.str().c_str();
+
+//   return strcmp(s1, s2) < 0;
 }

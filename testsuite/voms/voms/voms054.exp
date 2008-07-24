@@ -1,0 +1,21 @@
+load_lib vomstest.exp
+
+testheader "See if voms --skipcacheck works."
+_activateCert mycertsameasmycert2
+
+_backupVOMS voms1
+_addVOMSOption voms1 skipcacheck
+_vomsStart voms1
+set outname [exec mktemp $::SCRATCHDIR/voms-proxy-init-XXXXXX]
+set res [catch {set out [exec $::INSTALLDIR/bin/voms-proxy-init --voms voms1 >& $outname]}]
+_vomsStop voms1
+_restoreVOMS voms1
+
+set LOGOUTS "$LOGOUTS $::INSTALLDIR/etc/voms/voms1/voms.conf"
+
+if $res then {
+    set LOGOUTS "$LOGOUTS $outname"
+    fail "voms-proxy-init failed."
+} else {
+    pass "--skipcacheck works."
+}

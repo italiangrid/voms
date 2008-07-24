@@ -116,7 +116,7 @@ static int fileoutputter(void *data, const char *s)
 
 static int filereopen(struct localdata *ld)
 {
-  int newfd = open(ld->name, O_WRONLY|O_CREAT|O_APPEND);
+  int newfd = open(ld->name, O_WRONLY|O_CREAT|O_APPEND, S_IRUSR|S_IWUSR);
 
   if (newfd != -1) {
     close(ld->fd);
@@ -166,7 +166,7 @@ static void fileoptioner(void *data, const char *name, const char *value)
   if (strcmp(name, "LEVEL") == 0)
     ld->level=atoi(value);
   else if (strcmp(name, "NAME") == 0) {
-    int fd = open(value, O_WRONLY|O_CREAT|O_APPEND);
+    int fd = open(value, O_WRONLY|O_CREAT|O_APPEND, S_IRUSR|S_IWUSR);
 
     if (fd != -1) {
       if (ld->name) {
@@ -226,7 +226,7 @@ static int logfile_rotate(const char * name)
   strcpy(fname, name);
   strcat(fname, "-lck");
 
-  if ((fd = open(fname, O_CREAT|O_EXCL|O_RDONLY)) != -1) {
+  if ((fd = open(fname, O_CREAT|O_EXCL|O_RDONLY, S_IRUSR|S_IWUSR)) != -1) {
     pos = strrchr(name, '/');
   
     if (pos == NULL) {

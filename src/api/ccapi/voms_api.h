@@ -115,6 +115,7 @@ public:
 
 public:
   std::vector<attributelist>& GetAttributes();   /*!< Generic attributes */
+  std::vector<std::string> GetTargets();
 };
 
 enum recurse_type { 
@@ -402,6 +403,13 @@ public:
 
 private:
   STACK_OF(X509) *load_chain(BIO *in);
+
+public:
+  void SetVerificationTime(time_t);
+
+private:
+  time_t verificationtime;
+  bool verifyac(X509 *, X509 *, AC*, time_t, voms&);
 };
 
 

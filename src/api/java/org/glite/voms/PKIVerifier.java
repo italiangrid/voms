@@ -844,7 +844,7 @@ public class PKIVerifier {
                     {
                         if ( candidateCRL.getCriticalExtensionOIDs() == null ) {
                             if ( candidateCRL.getIssuerX500Principal().equals(
-                                    issuer.getIssuerX500Principal() ) ) {
+                                    issuer.getSubjectX500Principal() ) ) {
                                 if ( candidateCRL.getNextUpdate().compareTo(
                                         new Date() ) >= 0
                                         && candidateCRL.getThisUpdate()

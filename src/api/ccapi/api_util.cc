@@ -225,7 +225,7 @@ vomsdata::retrieve(X509 *cert, STACK_OF(X509) *chain, recurse_type how,
       if (index >= 0) {
         ext = X509_get_ext(cert,index);
         if (ext){
-          extra_data = std::string((char *)(ext->value->data),ext->value->length);
+	  extra_data = std::string((char *)(ext->value->data),ext->value->length);
           found = true;
         }
       }
@@ -273,7 +273,7 @@ vomsdata::verifydata(std::string &message, std::string subject, std::string ca,
 
     if (!issuer) {
       AC_free(tmp);
-      //      seterror(VERR_SIGN, "Cannot verify AC signature!");
+      seterror(VERR_SIGN, "Cannot verify AC signature!");
       return false;
     }
   }
@@ -282,7 +282,7 @@ vomsdata::verifydata(std::string &message, std::string subject, std::string ca,
     size_t off = str - orig;
     message = message.substr(off);
 
-    result = verifyac(holder, issuer, tmp, v);
+    result = verifyac(holder, issuer, tmp, verificationtime, v);
     if (!result) {
       //      seterror(VERR_VERIFY, "Cannot verify AC");
       AC_free(tmp);
@@ -333,14 +333,14 @@ vomsdata::verifydata(AC *ac, const std::string& subject, const std::string& ca,
     issuer = check((void *)ac);
 
     if (!issuer) {
-      //      seterror(VERR_SIGN, "Cannot verify AC signature!");
+      seterror(VERR_SIGN, "Cannot verify AC signature!");
       return false;
     }
   }
 
-  result = verifyac(holder, issuer, ac, v);
+  result = verifyac(holder, issuer, ac, verificationtime, v);
   if (!result) {
-    //      seterror(VERR_VERIFY, "Cannot verify AC");
+    //    seterror(VERR_VERIFY, "Cannot verify AC");
     return false;
   }
   else {
@@ -723,6 +723,9 @@ vomsdata::check_cert(X509 *cert)
         ERR_clear_error();
         error = VERR_VERIFY;
         X509_STORE_CTX_init(csc,ctx,cert,NULL);
+        if (verificationtime) {
+	  X509_STORE_CTX_set_time(csc, 0, verificationtime);
+        }
         i = X509_verify_cert(csc);
       }
     }

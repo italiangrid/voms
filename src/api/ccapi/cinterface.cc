@@ -24,6 +24,7 @@
 extern "C" {
 #include "cinterface.h"
 #include <stdlib.h>
+#include <time.h>
 }
 
 #include "realdata.h"
@@ -369,37 +370,9 @@ struct vomsdatar *VOMS_CopyALL(struct vomsdatar *vd, int *error)
     return NULL;
   }
 
-  vomsdata *v = (vomsdata *)vd->real;
-  struct vomsdatar *dst = NULL;
+  *error = VERR_MEM;
 
-  try {
-    vomsdata *vn = new vomsdata(*v);
-    dst = (struct vomsdatar *)calloc(1, sizeof(struct vomsdatar));
-    dst->real       = vn;
-    dst->cdir       = mystrdup(vd->cdir);
-    dst->vdir       = mystrdup(vd->vdir);
-    dst->workvo     = mystrdup(vd->workvo);
-    dst->extra_data = mystrdup(vd->extra_data);
-    dst->volen      = vd->volen;
-    dst->extralen   = vd->extralen;
-
-    /* get size */
-    int i = 0;
-    while(vd->data[i++]);
-
-    dst->data = (struct vomsr **)calloc(1, sizeof(struct vomsr *)*i);
-    for (int j = 0; j < i; j++) {
-      dst->data[i] = VOMS_Copy(vd->data[i], error);
-      if (!dst->data)
-        throw 3;
-    }
-  }
-  catch(...) {
-    *error = VERR_MEM;
-    VOMS_Destroy(dst);
-    return NULL;
-  }
-  return dst;
+  return VOMS_Duplicate(vd);
 }
 
 void VOMS_Destroy(struct vomsdatar *vd)
@@ -450,6 +423,10 @@ void VOMS_FreeTargets(struct vomsdatar *vd, int *error)
 
 char *VOMS_ListTargets(struct vomsdatar *vd, int *error)
 {
+  if (!vd || !vd->real || !error) {
+    *error = VERR_PARAM;
+    return NULL;
+  }
 
   vomsdata *v = vd->real;
 
@@ -473,9 +450,28 @@ char *VOMS_ListTargets(struct vomsdatar *vd, int *error)
 
 int VOMS_SetVerificationType(int type, struct vomsdatar *vd, int *error)
 {
+  if (!vd || !vd->real || !error) {
+    *error = VERR_PARAM;
+    return 0;
+  }
+
   vomsdata *v = vd->real;
 
   v->SetVerificationType(verify_type(type));
+
+  return 1;
+}
+
+int VOMS_SetVerificationTime(time_t vertime, struct vomsdatar *vd, int *error)
+{
+  if (!vd || !vd->real || !error) {
+    *error = VERR_PARAM;
+    return 0;
+  }
+
+  vomsdata *v = vd->real;
+
+  v->SetVerificationTime(vertime);
 
   return 1;
 }
@@ -723,9 +719,15 @@ struct vomsr *VOMS_DefaultData(struct vomsdatar *vd, int *error)
 
 struct vomsr *VOMS_Copy(struct vomsr *org, int *error)
 {
+  if (!org || !error) {
+    *error = VERR_PARAM;
+    return NULL;
+  }
+
   *error = VERR_MEM;
 
   struct vomsr *dst = NULL;
+
 
   if ((dst = (struct vomsr *)calloc(1, sizeof(struct vomsr)))) {
     try {
@@ -745,8 +747,10 @@ struct vomsr *VOMS_Copy(struct vomsr *org, int *error)
       dst->serial    = mystrdup(org->serial);
       dst->datalen   = org->datalen;
 
-      dst->ac     = AC_dup(org->ac);
-      dst->holder = X509_dup(org->holder);
+      dst->ac        = AC_dup(org->ac);
+      dst->holder    = X509_dup(org->holder);
+      dst->mydata    = org->mydata;
+      dst->my2       = org->my2;
 
       if (!dst->holder || !dst->ac)
         throw 3;
@@ -847,7 +851,7 @@ vomsdatar *VOMS_Duplicate(vomsdatar *orig)
 
       vd->cdir = (orig->cdir ? strdup(orig->cdir) : NULL );
       vd->vdir = (orig->vdir ? strdup(orig->vdir) : NULL );
-      //      vd->data = NULL;
+      vd->data = NULL;
       vd->extra_data = (orig->extra_data ? strdup(orig->extra_data) : NULL);
       vd->workvo = (orig->workvo ? strdup(orig->workvo) : NULL);
       vd->volen = orig->volen;
@@ -868,6 +872,57 @@ vomsdatar *VOMS_Duplicate(vomsdatar *orig)
 AC *VOMS_GetAC(vomsr *v)
 {
   return AC_dup(v->ac);
+}
+
+char **VOMS_GetTargetsList(struct vomsr *v, struct vomsdatar *vd, int *error)
+{
+  if (!v || !vd) {
+    if (error)
+      *error = VERR_PARAM;
+    return NULL;
+  }
+
+  std::vector<std::string> targets = GetV(v).GetTargets();
+
+  int size = targets.size();
+
+  char **array = (char **)malloc(sizeof(char*)*(size+1));
+
+  if (array) {
+    int i = 0;
+    for (i = 0; i < size; i++) {
+      array[i] = mystrdup(targets[i].c_str());
+      if (!array[i])
+        goto err;
+    }
+    array[i] = NULL;
+    
+    return array;
+
+  }
+
+err:
+  if (array) {
+    int j = 0;
+
+    while (array[j])
+      free(array[j++]);
+  }
+  free(array);
+
+  return NULL;
+}
+
+
+void VOMS_FreeTargetsList(char **targets)
+{
+  if (targets) {
+    int j = 0;
+    while (targets[j])
+      free(targets[j++]);
+  }
+
+  free(targets);
 }
 
 }

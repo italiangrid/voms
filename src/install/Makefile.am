@@ -14,6 +14,7 @@ libexecdir = $(prefix)/libexec/voms
 libexec_SCRIPTS = \
 	voms_install_db \
 	upgrade1to2 \
+	voms-ping \
 	mysql2oracle
 
 initdir = $(prefix)/etc/init.d
@@ -25,6 +26,7 @@ EXTRA_DIST = \
 	voms_install_db \
 	upgrade1to2 \
 	voms.start \
+	voms-ping \
 	voms.sh.in
 
 MAINTAINERCLEANFILES = Makefile.in

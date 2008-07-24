@@ -214,17 +214,26 @@ oldgaa_add_principal(oldgaa_policy_ptr   *list,
                      oldgaa_principals_ptr new)
 {
   oldgaa_principals_ptr element;
+  uint32 minor=0;
 
   element = *list;
-
-  if (oldgaa_compare_principals(element, new)) return element; /* found
-                                                                  this principal in the list */ 
+  
+  if (oldgaa_compare_principals(element, new)) {
+    /* found this principal in the list */ 
+    if (element != new)
+      oldgaa_release_principals(&minor, &new);
+    return element;
+  }
 
   while(element->next ) 
     {
       element = element->next;
-      if (oldgaa_compare_principals(element, new)) return element; /* found
-                                                                      this principal in the list */    
+      if (oldgaa_compare_principals(element, new)) {
+        /* found this principal in the list */    
+        if (element != new)
+          oldgaa_release_principals(&minor, &new);
+        return element; 
+      }
     }
 
   element->next = new; /* add new element to the end of the list */
@@ -360,10 +369,12 @@ oldgaa_collapse_policy(oldgaa_policy_ptr *policy)
               strcat(previousright->cond_bindings->condition->value, current->value);
             current = current->next;
           }
-
-          bindings->condition = NULL;
-          bindings = bindings->next;
-
+          {
+            uint32 minor = 0;
+            oldgaa_release_conditions(&minor, &(bindings->condition));
+            bindings->condition = NULL;
+            bindings = bindings->next;
+          }
         }
         thisright = thisright->next;
         
@@ -410,7 +421,7 @@ oldgaa_bind_rights_to_principals(oldgaa_principals_ptr start,
 {
   oldgaa_principals_ptr element = start;
 
-  while(element != NULL) {  
+  /*  while(element != NULL) {  */
 /*     if (oldgaa_compare_rights(element->rights, rights) == TRUE) { */
 /*       oldgaa_release_rights(*rights); */
 /*       *rights = element->rights; */
@@ -420,8 +431,8 @@ oldgaa_bind_rights_to_principals(oldgaa_principals_ptr start,
       element->rights = rights;
       rights->reference_count++;
 
-      element         = element->next;
-    }
+      /*      element         = element->next;*/
+      /*    }*/
  
   return OLDGAA_SUCCESS;
 }  
@@ -459,10 +470,10 @@ oldgaa_bind_rights_to_conditions(oldgaa_rights_ptr        start,
                                  oldgaa_cond_bindings_ptr cond_bind)
 {
   oldgaa_rights_ptr element = start;
-
+  uint32 minor = 0;
   /*DEE - Looks like all the rights will point to this cond_bind*/
   /* With Globus we only have 1, so should not be a problem */
-  oldgaa_conditions_ptr c = cond_bind->condition;
+  /*  oldgaa_conditions_ptr c = cond_bind->condition;*/
   oldgaa_conditions_ptr current = NULL;
   while(element) {
 
@@ -490,6 +501,8 @@ oldgaa_bind_rights_to_conditions(oldgaa_rights_ptr        start,
     }
     element = element->next;
   }
+  oldgaa_release_cond_bindings(&minor, &cond_bind);
+
 }
 /* /\*       if (oldgaa_compare_cond_bindings(element->cond_bindings, cond_bind)) { *\/ */
 /*       if (element->cond_bindings) { */

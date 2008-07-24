@@ -1,0 +1,396 @@
+variable _vomsdefinitions
+variable _buildout
+
+proc _doScript {command} {
+    set id [open "$::SCRATCHDIR/script.sh" w+]
+    puts $id "#!/bin/sh"
+    puts $id $command
+    flush $id
+    close $id
+    exec chmod 700 $::SCRATCHDIR/script.sh
+    set val [exec $::SCRATCHDIR/script.sh]
+    file delete $::SCRATCHDIR/script.sh
+    return $val
+}
+
+proc _determineVomsPID {name} {
+    set pids ""
+    catch { set pids [exec ps aux | grep voms | grep -v grep | grep /etc/voms/$name] }
+    if {[string equal $pids ""]} then {
+        error "server $name is not running."
+    } else {
+        
+    }
+}
+
+proc _vomsServersInit {} {
+    catch { file delete -force $::_vomsdefinitions }
+    set ::_vomsdefinitions $::INSTALLDIR/vomsservers
+    file mkdir $::_vomsdefinitions
+}
+
+proc _defineVOMSServer {name} {
+    if [expr ![file exists "$::_vomsdefinitions/$name"]] then {
+        file mkdir $::_vomsdefinitions/$name
+        file mkdir $::_vomsdefinitions/$name/options
+    } else {
+        set files [glob -directory $::_vomsdefinitions/$name/options *]
+
+        foreach f $files {
+            file delete $f
+        }
+    }
+}
+
+proc _undefineVOMSServer {name} {
+    catch { file delete -force $::_vomsdefinitions/$name }
+}
+
+proc _defineVOMSOption {name option { value ""}} {
+    if [expr ![file exists "$::_vomsdefinitions/$name"]] then {
+        puts "VOMS $name does not exists!"
+        exit
+    }
+
+    set id [open "$::_vomsdefinitions/$name/options/$option" w+]
+    puts $id "$value"
+    flush $id
+    close $id
+}
+
+proc _undefVOMSOption {name option} {
+    if [expr ![file exists "$::_vomsdefinitions/$name"]] then {
+        error "VOMS $name does not exists!"
+    }
+
+    catch { file delete -force $::_vomsdefinitions/$name/options/$option }
+}
+
+proc _makeVomses {name} {
+    file mkdir $::INSTALLDIR/etc/vomses
+    file attributes $::INSTALLDIR/etc/vomses -permissions 00700
+    set id [open "$::INSTALLDIR/etc/vomses/$name" "w+"]
+    puts $id "\"$name\" \"localhost\" \"[exec cat $::_vomsdefinitions/$name/options/port]\" \"[_getdnfile $::INSTALLDIR/certs/hostcert.pem]\" \"$name\""
+    close $id
+    file attributes $::INSTALLDIR/etc/vomses/$name -permissions 00644
+}
+
+proc _addVOMSOption {name option {value ""}} {
+    set filename $::INSTALLDIR/etc/voms/$name/voms.conf
+    set id [open $filename "a"]
+    if [expr ! [string equal $value ""]] then {
+        puts $id "--$option=$value"
+    } else {
+        puts $id "--$option"
+    }
+    close $id
+}
+
+proc _removeVOMSOption {name option} {
+    exec grep -v "^--$option" $::INSTALLDIR/etc/voms/$name/voms.conf >$::SCRATCHDIR/newconf.conf
+    file copy -force $::SCRATCHDIR/newconf.conf $::INSTALLDIR/etc/voms/$name/voms.conf
+}
+
+proc _backupVOMS {name} {
+    file copy -force $::INSTALLDIR/etc/voms/$name/voms.conf $::INSTALLDIR/etc/voms/$name/voms.conf.back
+}
+
+proc _restoreVOMS {name} {
+    file copy -force $::INSTALLDIR/etc/voms/$name/voms.conf.back $::INSTALLDIR/etc/voms/$name/voms.conf
+}
+
+proc _vomsStart {name } {
+    exec /bin/sh -c "rm -f $::INSTALLDIR/var/log/voms.$name*"
+    exec $::INSTALLDIR/etc/init.d/voms start [exec cat $::_vomsdefinitions/$name/options/voms-vo] >/dev/null
+}
+
+proc _vomsStop {name } {
+    exec $::INSTALLDIR/etc/init.d/voms stop [exec cat $::_vomsdefinitions/$name/options/voms-vo] >/dev/null
+}
+
+proc _vomsSetup {name} {
+    if [expr ![file exists "$::_vomsdefinitions/$name"]] then {
+        error "VOMS $name does not exists!"
+    }
+
+    # voms exists
+
+    set files [glob -directory $::_vomsdefinitions/$name/options *]
+    set options ""
+
+    set id [open "$::SCRATCHDIR/vomsinit.sh" w+]
+    puts $id "#!/bin/sh"
+
+    foreach f $files {
+        set value [exec cat $f]
+        if [string equal $value ""] then {
+            set options "$options --[file tail $f] "
+        } else {
+            set options "$options --[file tail $f]=[exec cat $f] "
+        }
+    }
+    puts $id "CERTDIR=$::INSTALLDIR/etc/grid-security/certificates $::INSTALLDIR/libexec/voms/voms_install_db $options"
+    flush $id
+    close $id
+
+    set outname [exec mktemp $::SCRATCHDIR/vomsinit-XXXXXX]
+    exec chmod 700 $::SCRATCHDIR/vomsinit.sh
+    set val [catch {exec $::SCRATCHDIR/vomsinit.sh 2>$outname}]
+#    file delete $::SCRATCHDIR/vomsinit.sh
+    exec cat $outname
+
+    if {$val} {
+        puts [exec cat $outname]
+        file delete $outname
+        error "error while executing _vomsSetup: cannot start voms"
+    }
+
+    file delete $outname
+#    file mkdir $::env(HOME)/.vomses2
+#    set id [open "$::env(HOME)/.vomses2/$name" w+]
+#    puts $id "\"$name\" \"localhost\" \"[exec cat $::_vomsdefinitions/$name/options/port]\" \"\" \"$name\""
+#    close $id
+}
+
+proc _doVOMSDB { name script } {
+
+    set file [open "$::_vomsdefinitions/$name/options/db-type" r]
+    set dbtype [gets $file]
+    close $file
+
+    if [expr [string equal $dbtype "mysql"]] then {
+        set options ""
+        if [file exists $::_vomsdefinitions/$name/options/contactstring] then {
+            set id [open "$::_vomsdefinitions/$name/options/contactstring"]
+            set contactstring [gets $id]
+            close $id
+            set options "$options -h$contactstring"
+        }
+        if [file exists $::_vomsdefinitions/$name/options/port] then {
+            set id [open "$::_vomsdefinitions/$name/options/port"]
+            set port [gets $id]
+            close $id
+            set options "$options -P$port"
+        }
+
+        set id [open "$::_vomsdefinitions/$name/options/db"]
+        set dbname [gets $id]
+        close $id
+        set options "$options -D$dbname"
+
+        if [file exists $::_vomsdefinitions/$name/options/db-pwd] then {
+            set id [open $::_vomsdefinitions/$name/options/db-pwd]
+            set passwd [gets $id]
+            close $id
+            set options "$options -p$passwd"
+        }
+
+        set id [open $::_vomsdefinitions/$name/options/db-admin]
+        set usr [gets $id]
+        close $id
+        set options "$options -u$usr"
+
+        set options "$options -ss -e\"$script\""
+        # build command line
+
+        return [_doScript "mysql ${options}"]
+    } else {
+        if [expr [string equal $dbtype "oracle"]] then {
+            set id [open "$::_vomsdefinitions/$name/options/db"]
+            set dbname [gets $id]
+            close $id
+
+            set id [open $::_vomsdefinitions/$name/options/db-pwd]
+            set passwd [gets $id]
+            close $id
+
+            set id [open $::_vomsdefinitions/$name/options/db-admin]
+            set usr [gets $id]
+            close $id
+
+            set options "$usr/$passwd@$dbname <$script"
+            # build command line
+
+            return [_doScript "sqlplus -S ${options}"]
+
+        } else {
+            error "Unknown DB type"
+        }
+    }
+}
+
+proc _vomscreateuser {name cert} {
+    set subject [_getdn $cert]
+    set issuer  [_getca $cert]
+
+    set cid [_doVOMSDB $name "SELECT cid FROM ca where ca='$issuer';"]
+    _doVOMSDB $name "INSERT INTO usr VALUES (0, '$subject', $cid, '', '', '');"
+}
+
+proc _vomscreategroup {name group parent} {
+    set gid [_doVOMSDB $name "SELECT gid FROM groups WHERE dn='$parent'"]
+    _doVOMSDB $name "INSERT INTO groups VALUES (0, '$group', $gid, 1);"
+}
+
+proc _vomscreaterole {name role} {
+    _doVOMSDB $name "INSERT INTO roles VALUES (0, '$role');"
+}
+
+proc _vomsaddusertogroup {name cert group} {
+    set subject [_getdn $cert]
+    set issuer  [_getca $cert]
+
+    set uid [_doVOMSDB $name "SELECT userid FROM usr,ca WHERE usr.dn='$subject' AND usr.ca=ca.cid AND ca.ca='$issuer'"]
+    set gid [_doVOMSDB $name "SELECT gid FROM groups WHERE dn='$group'"]
+    _doVOMSDB $name "INSERT INTO m VALUES (0, $uid, $gid, NULL, NULL);"
+}
+
+proc _vomsaddusertogroupandrole {name cert group role} {
+    set subject [_getdn $cert]
+    set issuer  [_getca $cert]
+
+    set uid [_doVOMSDB $name "SELECT userid FROM usr,ca WHERE usr.dn='$subject' AND usr.ca=ca.cid AND ca.ca='$issuer'"]
+    set gid [_doVOMSDB $name "SELECT gid FROM groups WHERE dn='$group'"]
+    set rid [_doVOMSDB $name "SELECT rid FROM roles WHERE role='$role'"]
+    _doVOMSDB $name "INSERT INTO m VALUES (0, $uid, $gid, $rid, NULL);"
+}
+
+proc _vomscreatega { name id } {
+    _doVOMSDB $name "INSERT INTO attributes VALUES (1, '$id', '', 1);"
+}
+
+proc _vomsgivegatouser { name user id value } {
+    set subject [_getdn $user]
+    set issuer  [_getca $user]
+
+    set uid [_doVOMSDB $name "SELECT userid FROM usr,ca WHERE usr.dn='$subject' AND usr.ca=ca.cid AND ca.ca='$issuer'"]
+    set aid [_doVOMSDB $name "SELECT a_id FROM attributes WHERE attributes.a_name='$id';"]
+
+    _doVOMSDB $name "INSERT INTO usr_attrs VALUES ($aid, $uid, '$value');"
+}
+
+proc _vomsgivegatogroup { name group id value } {
+    set gid [_doVOMSDB $name "SELECT gid FROM groups WHERE dn='$group'"]
+    set aid [_doVOMSDB $name "SELECT a_id FROM attributes WHERE attributes.a_name='$id';"]
+
+    _doVOMSDB $name "INSERT INTO group_attrs VALUES ($aid, $gid, '$value');"
+}
+
+proc _vomsgivegatogroupandrole { name group role id value } {
+    set rid [_doVOMSDB $name "SELECT rid FROM roles WHERE role='$role'"]
+    set gid [_doVOMSDB $name "SELECT gid FROM groups WHERE dn='$group'"]
+    set aid [_doVOMSDB $name "SELECT a_id FROM attributes WHERE attributes.a_name='$id';"]
+
+    _doVOMSDB $name "INSERT INTO role_attrs VALUES ($aid, $gid, $rid, '$value');"
+}
+
+
+proc _buildC { name } {
+    set realname "[file dirname [info script]]/$name"
+    set realout  "$::SCRATCHDIR/a.out"
+    if [file exists $realname] then {
+        return [catch {set out [ exec gcc -g -O0 @GLOBUS_CFLAGS@ -o $realout -I$::INSTALLDIR/include/glite/security/voms $realname -L $::INSTALLDIR/lib -lvomsc >& $::_buildout ]}]
+    } else {
+        fail "File does not exists!"
+    }
+}
+
+proc _buildCC { name } {
+    set realname "[file dirname [info script]]/$name"
+    set realout  "$::SCRATCHDIR/a.out"
+    if [file exists $realname] then {
+        return [catch {set out [ exec g++ -g -O0 @GLOBUS_CFLAGS@ -o $realout -I$::INSTALLDIR/include/glite/security/voms $realname -L $::INSTALLDIR/lib -lvomsapi >& $::_buildout ]}]
+    } else {
+        fail "File does not exists!"
+    }
+}
+
+proc _buildJava { name } {
+    set realname "[file dirname [info script]]/$name"
+    set realout  "$::SCRATCHDIR/a.out"
+    if [file exists $realname] then {
+        return [catch {set out [ exec javac -classpath $::INSTALLDIR/share/java/vomsjapi.jar:@JAVA_CLASSPATH2@:@JAVA_CLASSPATH@:$::env(CLASSPATH) $realname >& $::_buildout]}]
+    } else {
+        fail "File does not exists!"
+    }
+}
+
+proc _execJava { name {arg1 ""} } {
+    set res [_buildJava $name]
+    set classname [string range $name 0 [string last .java $name]]
+    if $res then {
+        return $res
+    } else {
+        if [string equal $arg1 ""] then {
+            set res [catch {exec java -classpath .:$::INSTALLDIR/share/java/vomsapi.jar:@JAVA_CLASSPATH@:$::env(CLASSPATH) $classname >& $::_buildout }]
+        } else {
+            set res [catch {exec java -classpath .:$::INSTALLDIR/share/java/vomsapi.jar:@JAVA_CLASSPATH@:$::env(CLASSPATH) $classname $arg >& $::_buildout }]
+        }
+        return $res
+    }
+}
+
+    
+proc _exeC { name {arg1 ""} {arg2 ""}} {
+    if [string equal $arg1 "-useproxy"] then {
+        set arg $arg2
+        set proxy 1
+    } else {
+        set arg $arg1
+        set proxy 0
+    }
+    set res [_buildC $name]
+    if $res then {
+        return $res
+    } else {
+#       Workaround for buggy globus libs        
+
+        if [expr $proxy == 1] then {
+            set back $::env(X509_USER_KEY)
+            set ::env(X509_USER_KEY) ""
+        }
+        if [string equal $arg ""] then {
+            set res [catch {exec $::SCRATCHDIR/a.out >& $::_buildout}]
+        } else {
+            set res [catch {exec $::SCRATCHDIR/a.out $arg >& $::_buildout}]
+        }
+        if [expr $proxy == 1] then {
+            set ::env(X509_USER_KEY) $back
+        }
+
+        return $res
+
+    }
+}
+
+proc _exeCC { name {arg1 ""} {arg2 ""}} {
+    if [string equal $arg1 "-useproxy"] then {
+        set arg $arg2
+        set proxy 1
+    } else {
+        set arg $arg1
+        set proxy 0
+    }
+    set res [_buildCC $name]
+    if $res then {
+        return $res
+    } else {
+#       Workaround for buggy glubs libs        
+
+        if [expr $proxy == 1] then {
+            set back $::env(X509_USER_KEY)
+            set ::env(X509_USER_KEY) ""
+        }
+        if [string equal $arg ""] then {
+            set res [catch {exec $::SCRATCHDIR/a.out >& $::_buildout}]
+        } else {
+            set res [catch {exec $::SCRATCHDIR/a.out $arg >& $::_buildout}]
+        }
+        if [expr $proxy == 1] then {
+            set ::env(X509_USER_KEY) $back
+        }
+
+        return $res
+
+    }
+}

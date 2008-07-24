@@ -330,8 +330,12 @@ extern int VOMS_RetrieveEXT(X509_EXTENSION *ext, struct vomsdatar *vd, int *erro
 extern int VOMS_RetrieveFromCred(gss_cred_id_t, int, struct vomsdatar *vd, int *error);
 extern int VOMS_RetrieveFromCtx(gss_ctx_id_t, int, struct vomsdatar *vd, int *error);
 extern int VOMS_RetrieveFromProxy(int, struct vomsdatar *vd, int *error);
+extern int VOMS_RetrieveFromFILE(FILE *f, int, struct vomsdatar *vd, int *error);
 
 extern struct vomsdatar *VOMS_Duplicate(struct vomsdatar *vd);
 extern AC *VOMS_GetAC(struct vomsr *v);
 
+extern int VOMS_SetVerificationTime(time_t verificationtime, struct vomsdatar *vd, int *error);
+extern char **VOMS_GetTargetsList(struct vomsr *v, struct vomsdatar *vd, int *error);
+extern void VOMS_FreeTargetsList(char **);
 #endif

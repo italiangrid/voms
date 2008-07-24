@@ -1,0 +1,18 @@
+load_lib vomstest.exp
+
+testheader "See if voms certificates are distinguished by CA."
+_activateCert mycertsameasmycert2
+
+_vomsStart voms1
+set outname [exec mktemp $::SCRATCHDIR/voms-proxy-init-XXXXXX]
+set res [catch {set out [exec $::INSTALLDIR/bin/voms-proxy-init --voms voms1 >& $outname]}]
+_vomsStop voms1
+
+set LOGOUTS "$LOGOUTS $::INSTALLDIR/etc/voms/voms1/voms.conf"
+
+if $res then {
+    pass "certificates were considered different."
+} else {
+    set LOGOUTS "$LOGOUTS $outname"
+    fail "certificates were considered the same."
+}

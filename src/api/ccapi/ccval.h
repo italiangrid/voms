@@ -21,7 +21,4 @@ extern "C" {
 }
 
 #include "voms_api.h"
-
-extern bool verifyac(X509 *, X509 *, AC *, voms &, verify_type type);
-
 #endif

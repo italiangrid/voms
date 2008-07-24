@@ -1,0 +1,229 @@
+load_lib vomslib.exp
+load_lib db.exp
+load_lib newfail.exp
+load_lib vomssetup.exp
+
+proc _inittests {} {
+    global _initted
+    global HOSTNAME
+
+    if {[info exists _initted] == 0} then {
+        set _initted 1
+
+        fconfigure stdout -buffering none
+        puts -nonewline "Doing Initialization..."
+
+        #killing stray processes
+
+        catch {exec killall edg-voms 2>/dev/null}
+        catch {exec killall middleman 2>/dev/null}
+
+        puts -nonewline "."
+        if [catch {set basepath $::env(INSTALLDIR)}] then {
+            set basepath "@prefix@"
+        }
+
+        set ::INSTALLDIR $basepath
+
+        if [catch {set ::REPORTDIR $::env(REPORTDIR)}] then {
+            set ::REPORTDIR $basepath
+            if [file exists $basepath/reports] then {
+                set ::REPORTDIR $basepath/reports
+            }
+        }
+
+        puts -nonewline "."
+        if [file exists $::objdir/SuiteConfig] then {
+            _readConfigFile $::objdir/SuiteConfig
+        }
+
+        puts -nonewline "."
+        if [file exists $::env(HOME)/.SuiteConfig] then {
+            _readConfigFile $::env(HOME)/.SuiteConfig
+        }
+
+        puts -nonewline "."
+        if [expr ![catch {file exists $::env(SUITECONFIG)}]] then {
+            _readConfigFile $::env(SUITECONFIG)
+        }
+
+        puts -nonewline "."
+        if [file exists $::SCRATCHDIR/suitefiles] then {
+            file delete -force $::SCRATCHDIR/suitefiles
+        }
+        file mkdir $::SCRATCHDIR/suitefiles
+        set ::SCRATCHDIR "$::SCRATCHDIR/suitefiles"
+
+        puts -nonewline "."
+        if [catch {set ::_logdescriptor [open $::REPORTDIR/index.html w+]}] then {
+            error "ERROR in opening REPORTDIR($::REPORTDIR/index.html)"
+        }
+
+        puts -nonewline "."
+        puts $::_logdescriptor "<html><head><title>Test results on: [exec hostname] running [exec uname -a]</title></head>
+                <body>
+                      <h1>Test results on: [exec hostname] running [exec uname -a] on [exec date]</h3>
+                <table style=\"width: 100%;\" border=\"1\"><d>
+                <tr>
+                <th align=\"left\">test file</th>
+                <th align=\"left\">test name</th>
+                <th align=\"left\">result</th>
+                <th align=\"left\">comment</th>
+                <th align=\"left\">artifacts</th><tr>"
+
+        puts -nonewline "."
+        _setupPKI
+        puts -nonewline "."
+        _activateHostCertificate mycert3
+        puts -nonewline "."
+        set ::env(CERTDIR) "$:INSTALLDIR/etc/grid-security/certificates"
+        _vomsServersInit
+        puts -nonewline "."
+        set ::env(X509_USER_CERT) $::env(HOME)/.globus2/usercert.pem
+        set ::env(X509_USER_KEY)  $::env(HOME)/.globus2/userkey.pem
+        set ::env(X509_USER_PROXY) "/tmp/x509up_u[exec id -u]"
+        set ::env(X509_CERT_DIR)  $::_cadir
+        set ::env(X509_VOMS_DIR)  $::_vomsdir
+        set ::env(VOMS_USERCONF)  $::INSTALLDIR/etc/vomses
+        if [catch {set ::env(LD_LIBRARY_PATH) "$::INSTALLDIR/lib:$::env(LD_LIBRARY_PATH)"}] then {
+            set ::env(LD_LIBRARY_PATH) "$::INSTALLDIR/lib"
+        }
+
+
+        set ::vomsproxyinit    $::INSTALLDIR/bin/voms-proxy-init
+        set ::vomsproxyinfo    $::INSTALLDIR/bin/voms-proxy-info
+        set ::vomsproxydestroy $::INSTALLDIR/bin/voms-proxy-destroy
+        set HOSTNAME [exec hostname]
+        puts ". Done!"
+    }
+}
+
+proc _vomsServersInit {} {
+    puts -nonewline "."
+    catch { file delete -force $::_vomsdefinitions }
+    set ::_vomsdefinitions $::INSTALLDIR/vomsservers
+    file mkdir $::_vomsdefinitions
+
+    puts -nonewline "."
+    _setupNormalVomsMysql
+    puts -nonewline "."
+    _vomscreategroup voms1 /voms1/group1 /voms1
+    _vomscreategroup voms1 /voms1/group2 /voms1
+    _vomscreategroup voms1 /voms1/group1/subgroup1 /voms1/group1
+    puts -nonewline "."
+    _vomscreaterole  voms1 TestRole
+    _vomscreateuser  voms1 mycert2
+    puts -nonewline "."
+    _vomsaddusertogroup voms1 mycert2 "/voms1"
+    _vomsaddusertogroup voms1 mycert2 "/voms1/group1"
+    _vomsaddusertogroupandrole voms1 mycert2 "/voms1/group1" TestRole
+    _vomscreatega voms1 shortid
+    _vomsgivegatouser  voms1 mycert2        shortid mycert2
+    _vomsgivegatogroup voms1 "/voms1/group1" shortid mycert2-g
+    _vomsgivegatogroupandrole  voms1 "/voms1/group1" "TestRole" shortid mycert2-r
+
+    puts -nonewline "."
+    if {[string equal $::HAVEORACLE "yes"] } then {
+        _setupNormalVomsOracle
+        puts -nonewline "."
+        _vomscreategroup voms2 /voms2/group1 /voms2
+        _vomscreategroup voms2 /voms2/group2 /voms2
+        _vomscreategroup voms2 /voms2/group1/subgroup1 /voms2/group1
+        puts -nonewline "."
+        _vomscreaterole  voms2 TestRole
+        _vomscreateuser  voms2 mycert2
+        puts -nonewline "."
+        _vomsaddusertogroup voms2 mycert2 "/voms2"
+        _vomsaddusertogroup voms2 mycert2 "/voms2/group1"
+        _vomsaddusertogroupandrole voms2 mycert2 "/voms2/group1" TestRole
+        puts -nonewline "."
+    }
+}
+
+proc _readConfigFile {file} {
+    set id [open $file r+]
+
+    while {[expr ! [eof $id]]} {
+        gets $id text
+        regexp {\s*([a-zA-Z0-9_]*)\s*(.*)} $text dummy name value
+        if [expr ! [string equal $dummy ""]] then {
+            set ::$name $value
+        }
+    }
+}
+
+proc _setupPKI {} {
+    puts -nonewline "."
+    _do_ca_dir_setup
+    _make_ca "/C=IT/O=INFN/ST=IT/L=THISL/OU=INFN/CN=thisCN" testCA
+    _make_crl testCA
+    puts -nonewline "."
+    _make_ca_from_ca "/C=IT/O=INFN/CN=CAFromthisCN" testCA caFromTestCA
+    _make_crl caFromTestCA
+    puts -nonewline "."
+    _make_cert_from_ca "/C=IT/CN=000" caFromTestCA mycert1
+    _make_cert_from_ca "/C=IT/CN=001" caFromTestCA mycert2
+    _make_cert_from_ca "/C=IT/CN=003" caFromTestCA mycert3
+    _make_cert_from_ca "/C=IT/CN=004" caFromTestCA mycert4
+    _make_cert_from_ca "/C=IT/CN=  005  " caFromTestCA mycertwithspaces
+    _make_cert_from_ca "/C=IT/CN=expired" caFromTestCA mycertexpired -2
+    _make_cert_from_ca "/C=IT/CN=revoked" caFromTestCA mycertrevoked
+    _make_cert_from_ca "/C=IT/CN=001" testCA mycertsameasmycert2
+    puts -nonewline "."
+    _revoke_cert mycertrevoked caFromTestCA
+    puts -nonewline "."
+    _make_crl caFromTestCA
+    _make_ca_from_ca "/C=IT/O=INFN/CN=RevokedCA" testCA revokedCA
+    puts -nonewline "."
+    _make_crl revokedCA
+    _make_cert_from_ca "/C=IT/CN=Valid From Revoked" revokedCA validFromRevoked
+    _revoke_cert revokedCA testCA
+    puts -nonewline "."
+    _make_crl testCA
+}
+
+proc _setupNormalVomsMysql {} {
+    _defineVOMSServer voms1
+    _defineVOMSOption voms1 db-type   mysql
+    _defineVOMSOption voms1 db        voms_test1
+    if [expr ! [string equal $::DBPASSWORD ""]] then {
+        _defineVOMSOption voms1 db-pwd    $::DBPASSWORD
+    }
+    _defineVOMSOption voms1 db-admin  $::DBUSERNAME
+    _defineVOMSOption voms1 voms-vo   voms1
+    _defineVOMSOption voms1 sqlloc    $::INSTALLDIR/lib/libvomsmysql.so
+    _defineVOMSOption voms1 voms-name user_test1
+    _defineVOMSOption voms1 voms-pwd  passwd
+    _defineVOMSOption voms1 loglevel  5
+    _defineVOMSOption voms1 newformat
+    _defineVOMSOption voms1 port 33334
+
+    _vomsSetup voms1
+    _addVOMSOption voms1 x509_user_cert $::INSTALLDIR/certs/hostcert.pem
+    _addVOMSOption voms1 x509_user_key $::INSTALLDIR/certs/hostkey.pem
+    _addVOMSOption voms1 shortfqans
+    _makeVomses voms1
+    set ::_vomsdir $::INSTALLDIR/vomsdir
+    file mkdir $::_vomsdir
+    file copy -force $::INSTALLDIR/certs/hostcert.pem $::_vomsdir/voms1.pem
+}
+
+proc _setupNormalVomsOracle {} {
+    _defineVOMSServer voms2
+    _defineVOMSOption voms2 db-type   oracle
+    _defineVOMSOption voms2 db        voms_test2
+    if [expr ! [string equal $::ORACLEDBPASSWORD ""]] then {
+        _defineVOMSOption voms2 db-pwd    $::ORACLEDBPASSWORD
+        _defineVOMSOption voms2 voms-pwd  $::ORACLEDBPASSWORD
+    }
+    _defineVOMSOption voms2 db-admin  $::ORACLEDBUSERNAME
+    _defineVOMSOption voms2 voms-vo   voms2
+    _defineVOMSOption voms2 sqlloc    $::INSTALLDIR/lib/libvomsoracle.so
+    _defineVOMSOption voms2 voms-name $::ORACLEDBUSERNAME
+    _defineVOMSOption voms2 loglevel  5
+    _defineVOMSOption voms2 port 33333
+    _defineVOMSOption voms2 newformat
+
+    _vomsSetup voms2
+}
+_inittests

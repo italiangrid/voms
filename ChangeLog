@@ -1,0 +1,3122 @@
+------------------------------------------------------------------------
+r959 | marotta | 2008-07-15 15:35:14 +0200 (Tue, 15 Jul 2008) | 1 line
+Changed paths:
+   M /voms/branches/voms-1-8-series/configure
+   M /voms/branches/voms-1-8-series/configure.ac
+   M /voms/branches/voms-1-8-series/project/version.properties
+   M /voms/branches/voms-1-8-series/src/replica/Makefile.in
+
+Bumped revision to 1.8.4
+------------------------------------------------------------------------
+r958 | marotta | 2008-07-15 15:30:52 +0200 (Tue, 15 Jul 2008) | 1 line
+Changed paths:
+   M /voms/branches/voms-1-8-series/ChangeLog
+
+History of changes according to svn.
+------------------------------------------------------------------------
+r957 | marotta | 2008-07-15 15:15:24 +0200 (Tue, 15 Jul 2008) | 1 line
+Changed paths:
+   M /voms/branches/voms-1-8-series/src/replib/memset.c
+   M /voms/branches/voms-1-8-series/testsuite/lib/newfail.exp
+   M /voms/branches/voms-1-8-series/testsuite/site.exp
+   M /voms/branches/voms-1-8-series/testsuite/voms/voms/voms053.exp
+
+Random fixes.
+------------------------------------------------------------------------
+r956 | marotta | 2008-07-15 15:15:13 +0200 (Tue, 15 Jul 2008) | 1 line
+Changed paths:
+   M /voms/branches/voms-1-8-series/src/server/vomsd.cc
+   A /voms/branches/voms-1-8-series/testsuite/voms/voms/voms059.exp
+
+fix for bug #38506
+------------------------------------------------------------------------
+r955 | marotta | 2008-07-15 14:14:07 +0200 (Tue, 15 Jul 2008) | 1 line
+Changed paths:
+   M /voms/branches/voms-1-8-series/src/replica/voms_replica_master_setup.sh
+   M /voms/branches/voms-1-8-series/src/replica/voms_replica_slave_setup.sh
+
+new version of replication scripts.
+------------------------------------------------------------------------
+r954 | marotta | 2008-07-08 15:04:17 +0200 (Tue, 08 Jul 2008) | 1 line
+Changed paths:
+   M /voms/branches/voms-1-8-series/src/replica/Makefile.am
+   A /voms/branches/voms-1-8-series/src/replica/voms_replica_master_setup.sh
+   A /voms/branches/voms-1-8-series/src/replica/voms_replica_slave_setup.sh
+
+Intermediate version of replica scripts.
+------------------------------------------------------------------------
+r953 | marotta | 2008-07-08 10:23:31 +0200 (Tue, 08 Jul 2008) | 1 line
+Changed paths:
+   M /voms/branches/voms-1-8-series/testsuite/lib/newfail.exp
+
+Fixes to the test suite.
+------------------------------------------------------------------------
+r952 | marotta | 2008-06-27 13:18:50 +0200 (Fri, 27 Jun 2008) | 1 line
+Changed paths:
+   M /voms/branches/voms-1-8-series/src/install/voms_install_db.in
+   M /voms/branches/voms-1-8-series/testsuite/lib/vomssetup.exp.in
+   M /voms/branches/voms-1-8-series/testsuite/lib/vomstest.exp
+   M /voms/branches/voms-1-8-series/testsuite/site.exp
+   M /voms/branches/voms-1-8-series/testsuite/voms/voms/voms002.exp
+   M /voms/branches/voms-1-8-series/testsuite/voms/voms/voms058.exp
+   M /voms/branches/voms-1-8-series/testsuite/voms/vomsapi-c/vomsapi-c003.exp
+   M /voms/branches/voms-1-8-series/testsuite/voms/vomsapi-c/vomsapi-c006.exp
+   M /voms/branches/voms-1-8-series/testsuite/voms/vomsapi-cpp/vomsapi-cpp003.exp
+
+Fixes for test suite use outside of testbed002.
+------------------------------------------------------------------------
+r951 | marotta | 2008-06-26 22:05:57 +0200 (Thu, 26 Jun 2008) | 1 line
+Changed paths:
+   D /voms/branches/voms-1-8-series/testsuite/Makefile
+   D /voms/branches/voms-1-8-series/testsuite/lib/vomssetup.exp
+
+Removed useless files.
+------------------------------------------------------------------------
+r950 | marotta | 2008-06-26 21:59:47 +0200 (Thu, 26 Jun 2008) | 1 line
+Changed paths:
+   M /voms/branches/voms-1-8-series/src/api/ccapi/api_util.cc
+   M /voms/branches/voms-1-8-series/testsuite/Makefile
+   M /voms/branches/voms-1-8-series/testsuite/lib/vomssetup.exp
+
+Remove 0.8.7 OpenSSL dependency.
+------------------------------------------------------------------------
+r949 | marotta | 2008-06-26 18:36:49 +0200 (Thu, 26 Jun 2008) | 1 line
+Changed paths:
+   M /voms/branches/voms-1-8-series/src/utils/voms_proxy_info.cc
+
+Fix bug with return value for voms-proxy-info.
+------------------------------------------------------------------------
+r948 | marotta | 2008-06-26 18:03:00 +0200 (Thu, 26 Jun 2008) | 1 line
+Changed paths:
+   M /voms/branches/voms-1-8-series/testsuite/lib/newfail.exp
+   M /voms/branches/voms-1-8-series/testsuite/lib/vomssetup.exp.in
+   M /voms/branches/voms-1-8-series/testsuite/lib/vomstest.exp
+   M /voms/branches/voms-1-8-series/testsuite/voms/voms/voms053.exp
+
+Fix for compilation where builddir != srcdir
+------------------------------------------------------------------------
+r947 | marotta | 2008-06-25 21:17:09 +0200 (Wed, 25 Jun 2008) | 1 line
+Changed paths:
+   M /voms/branches/voms-1-8-series/testsuite/voms/voms/voms056.exp
+
+fixed pass caluse in timeout
+------------------------------------------------------------------------
+r946 | marotta | 2008-06-25 17:24:37 +0200 (Wed, 25 Jun 2008) | 1 line
+Changed paths:
+   M /voms/branches/voms-1-8-series/src/utils/voms_proxy_info.cc
+   M /voms/branches/voms-1-8-series/testsuite/lib/vomssetup.exp
+   M /voms/branches/voms-1-8-series/testsuite/lib/vomstest.exp
+   A /voms/branches/voms-1-8-series/testsuite/voms/voms/voms054.exp
+   A /voms/branches/voms-1-8-series/testsuite/voms/voms/voms055.exp
+   A /voms/branches/voms-1-8-series/testsuite/voms/voms/voms056.exp
+   A /voms/branches/voms-1-8-series/testsuite/voms/voms/voms057.exp
+   A /voms/branches/voms-1-8-series/testsuite/voms/voms/voms058.exp
+
+more texts and vom-proxy-info fixes.
+------------------------------------------------------------------------
+r945 | marotta | 2008-06-25 15:24:34 +0200 (Wed, 25 Jun 2008) | 1 line
+Changed paths:
+   M /voms/branches/voms-1-8-series/testsuite/lib/vomssetup.exp
+   M /voms/branches/voms-1-8-series/testsuite/voms/voms/voms044.exp
+   M /voms/branches/voms-1-8-series/testsuite/voms/voms/voms051.exp
+   M /voms/branches/voms-1-8-series/testsuite/voms/voms/voms052.exp
+   A /voms/branches/voms-1-8-series/testsuite/voms/voms/voms053.exp
+
+New test and infrastructure fix.
+------------------------------------------------------------------------
+r944 | marotta | 2008-06-25 04:05:31 +0200 (Wed, 25 Jun 2008) | 1 line
+Changed paths:
+   A /voms/branches/voms-1-8-series/testsuite/voms/voms/voms051.exp
+   A /voms/branches/voms-1-8-series/testsuite/voms/voms/voms052.exp
+
+voms-proxy-destroy tests.
+------------------------------------------------------------------------
+r943 | marotta | 2008-06-24 20:12:15 +0200 (Tue, 24 Jun 2008) | 1 line
+Changed paths:
+   A /voms/branches/voms-1-8-series/testsuite/voms/voms/voms050.exp
+
+More tests.
+------------------------------------------------------------------------
+r942 | marotta | 2008-06-24 18:40:06 +0200 (Tue, 24 Jun 2008) | 1 line
+Changed paths:
+   M /voms/branches/voms-1-8-series/src/utils/voms_proxy_info.cc
+   A /voms/branches/voms-1-8-series/testsuite/voms/voms/voms045.exp
+   A /voms/branches/voms-1-8-series/testsuite/voms/voms/voms046.exp
+   A /voms/branches/voms-1-8-series/testsuite/voms/voms/voms047.exp
+   A /voms/branches/voms-1-8-series/testsuite/voms/voms/voms048.exp
+   A /voms/branches/voms-1-8-series/testsuite/voms/voms/voms049.exp
+
+even more tests
+------------------------------------------------------------------------
+r941 | marotta | 2008-06-24 16:36:39 +0200 (Tue, 24 Jun 2008) | 1 line
+Changed paths:
+   A /voms/branches/voms-1-8-series/testsuite/voms/voms/voms042.exp
+   A /voms/branches/voms-1-8-series/testsuite/voms/voms/voms043.exp
+   A /voms/branches/voms-1-8-series/testsuite/voms/voms/voms044.exp
+
+Fixed bugs in voms-proxy-info, plus more tests.
+------------------------------------------------------------------------
+r940 | marotta | 2008-06-24 16:35:18 +0200 (Tue, 24 Jun 2008) | 1 line
+Changed paths:
+   M /voms/branches/voms-1-8-series/src/utils/voms_proxy_info.cc
+   M /voms/branches/voms-1-8-series/testsuite/voms/voms/voms003.exp
+   A /voms/branches/voms-1-8-series/testsuite/voms/voms/voms038.exp
+   A /voms/branches/voms-1-8-series/testsuite/voms/voms/voms039.exp
+   A /voms/branches/voms-1-8-series/testsuite/voms/voms/voms040.exp
+   A /voms/branches/voms-1-8-series/testsuite/voms/voms/voms041.exp
+
+Fixed bugs in voms-proxy-info, plus more tests.
+------------------------------------------------------------------------
+r939 | marotta | 2008-06-18 17:11:48 +0200 (Wed, 18 Jun 2008) | 1 line
+Changed paths:
+   M /voms/branches/voms-1-8-series/testsuite/lib/vomstest.exp
+   A /voms/branches/voms-1-8-series/testsuite/voms/voms/voms034.exp
+   A /voms/branches/voms-1-8-series/testsuite/voms/voms/voms035.exp
+   A /voms/branches/voms-1-8-series/testsuite/voms/voms/voms036.exp
+   A /voms/branches/voms-1-8-series/testsuite/voms/voms/voms037.exp
+
+More tests + SCRATCHDIR cleanup
+------------------------------------------------------------------------
+r938 | marotta | 2008-06-18 15:07:46 +0200 (Wed, 18 Jun 2008) | 1 line
+Changed paths:
+   A /voms/branches/voms-1-8-series/testsuite/voms/voms/voms032.exp
+   A /voms/branches/voms-1-8-series/testsuite/voms/voms/voms033.exp
+
+Added even more tests for voms-proxy-info
+------------------------------------------------------------------------
+r937 | marotta | 2008-06-18 14:35:21 +0200 (Wed, 18 Jun 2008) | 1 line
+Changed paths:
+   M /voms/branches/voms-1-8-series/testsuite/voms/voms/voms019.exp
+   A /voms/branches/voms-1-8-series/testsuite/voms/voms/voms024.exp
+   A /voms/branches/voms-1-8-series/testsuite/voms/voms/voms025.exp
+   A /voms/branches/voms-1-8-series/testsuite/voms/voms/voms026.exp
+   A /voms/branches/voms-1-8-series/testsuite/voms/voms/voms027.exp
+   A /voms/branches/voms-1-8-series/testsuite/voms/voms/voms028.exp
+   A /voms/branches/voms-1-8-series/testsuite/voms/voms/voms029.exp
+   A /voms/branches/voms-1-8-series/testsuite/voms/voms/voms030.exp
+   A /voms/branches/voms-1-8-series/testsuite/voms/voms/voms031.exp
+
+Added more tests for voms-proxy-info
+------------------------------------------------------------------------
+r936 | marotta | 2008-06-18 10:33:33 +0200 (Wed, 18 Jun 2008) | 1 line
+Changed paths:
+   M /voms/branches/voms-1-8-series/src/utils/voms_proxy_info.cc
+   A /voms/branches/voms-1-8-series/testsuite/voms/voms/voms023.exp
+
+Fixed bug while reporting proxy version.
+------------------------------------------------------------------------
+r935 | marotta | 2008-06-18 10:16:10 +0200 (Wed, 18 Jun 2008) | 1 line
+Changed paths:
+   A /voms/branches/voms-1-8-series/testsuite/voms/voms/voms022.exp
+
+New test.
+------------------------------------------------------------------------
+r934 | marotta | 2008-06-18 09:51:30 +0200 (Wed, 18 Jun 2008) | 1 line
+Changed paths:
+   M /voms/branches/voms-1-8-series/testsuite/voms/voms/voms021.exp
+
+Made voms-proxy-info report targets.
+------------------------------------------------------------------------
+r933 | marotta | 2008-06-18 09:50:57 +0200 (Wed, 18 Jun 2008) | 1 line
+Changed paths:
+   M /voms/branches/voms-1-8-series/src/utils/voms_proxy_info.cc
+   A /voms/branches/voms-1-8-series/testsuite/voms/voms/voms021.exp
+
+Made voms-proxy-info report targets.
+------------------------------------------------------------------------
+r932 | marotta | 2008-06-17 17:11:50 +0200 (Tue, 17 Jun 2008) | 1 line
+Changed paths:
+   M /voms/branches/voms-1-8-series/src/ac/extensions.c
+   M /voms/branches/voms-1-8-series/src/api/ccapi/cinterface.cc
+   M /voms/branches/voms-1-8-series/src/api/ccapi/cinterface.h
+   M /voms/branches/voms-1-8-series/src/api/ccapi/voms_api.cc
+   M /voms/branches/voms-1-8-series/src/api/ccapi/voms_api.h
+   M /voms/branches/voms-1-8-series/src/api/ccapi/voms_apic.h
+   M /voms/branches/voms-1-8-series/src/common/xml.c
+
+Fixed bug with targets (second part).
+------------------------------------------------------------------------
+r931 | marotta | 2008-06-17 17:11:19 +0200 (Tue, 17 Jun 2008) | 1 line
+Changed paths:
+   M /voms/branches/voms-1-8-series/testsuite/lib/vomstest.exp
+   A /voms/branches/voms-1-8-series/testsuite/voms/vomsapi-c/loadbyvo.c
+   A /voms/branches/voms-1-8-series/testsuite/voms/vomsapi-c/printtargets.c
+   A /voms/branches/voms-1-8-series/testsuite/voms/vomsapi-c/vomsapi-c012.exp
+   A /voms/branches/voms-1-8-series/testsuite/voms/vomsapi-c/vomsapi-c013.exp
+
+Fixed bug with targets.
+------------------------------------------------------------------------
+r930 | marotta | 2008-06-16 14:20:46 +0200 (Mon, 16 Jun 2008) | 1 line
+Changed paths:
+   A /voms/branches/voms-1-8-series/testsuite/voms/vomsapi-c/proxyfromfile.c
+   A /voms/branches/voms-1-8-series/testsuite/voms/vomsapi-c/vomsapi-c011.exp
+
+Test for VOMS_RetrieveFromFile().
+------------------------------------------------------------------------
+r929 | marotta | 2008-06-16 14:03:54 +0200 (Mon, 16 Jun 2008) | 1 line
+Changed paths:
+   M /voms/branches/voms-1-8-series/src/api/ccapi/cinterface.cc
+   M /voms/branches/voms-1-8-series/src/api/java/org/glite/voms/PKIStore.java
+
+Removed commented out code.
+------------------------------------------------------------------------
+r928 | marotta | 2008-06-16 13:45:25 +0200 (Mon, 16 Jun 2008) | 1 line
+Changed paths:
+   M /voms/branches/voms-1-8-series/src/api/ccapi/cinterface.cc
+   A /voms/branches/voms-1-8-series/testsuite/voms/vomsapi-c/copydata3.c
+   A /voms/branches/voms-1-8-series/testsuite/voms/vomsapi-c/vomsapi-c010.exp
+
+Fixed bug in VOMS_Copy().
+------------------------------------------------------------------------
+r927 | marotta | 2008-06-16 11:17:04 +0200 (Mon, 16 Jun 2008) | 1 line
+Changed paths:
+   M /voms/branches/voms-1-8-series/src/api/ccapi/cinterface.cc
+   M /voms/branches/voms-1-8-series/src/api/ccapi/voms_api.cc
+   M /voms/branches/voms-1-8-series/src/log/sl.c
+   M /voms/branches/voms-1-8-series/testsuite/Makefile
+   A /voms/branches/voms-1-8-series/testsuite/voms/vomsapi-c/copydata.c
+   A /voms/branches/voms-1-8-series/testsuite/voms/vomsapi-c/readfromproxy.c
+   A /voms/branches/voms-1-8-series/testsuite/voms/vomsapi-c/vomsapi-c007.exp
+   A /voms/branches/voms-1-8-series/testsuite/voms/vomsapi-c/vomsapi-c008.exp
+
+Fixed bugs with VOMS_Duplicate() and related tests.
+------------------------------------------------------------------------
+r925 | marotta | 2008-06-12 09:44:04 +0200 (Thu, 12 Jun 2008) | 1 line
+Changed paths:
+   M /voms/branches/voms-1-8-series/Makefile.in
+   M /voms/branches/voms-1-8-series/configure
+   M /voms/branches/voms-1-8-series/configure.ac
+   M /voms/branches/voms-1-8-series/doc/Makefile.in
+   M /voms/branches/voms-1-8-series/project/acinclude.m4
+   M /voms/branches/voms-1-8-series/src/Makefile.in
+   M /voms/branches/voms-1-8-series/src/ac/Makefile.in
+   M /voms/branches/voms-1-8-series/src/api/Makefile.in
+   M /voms/branches/voms-1-8-series/src/api/ccapi/Makefile.in
+   M /voms/branches/voms-1-8-series/src/api/java/Makefile.in
+   M /voms/branches/voms-1-8-series/src/client/Makefile.in
+   M /voms/branches/voms-1-8-series/src/common/Makefile.in
+   M /voms/branches/voms-1-8-series/src/include/Makefile.in
+   M /voms/branches/voms-1-8-series/src/install/Makefile.in
+   M /voms/branches/voms-1-8-series/src/log/Makefile.in
+   M /voms/branches/voms-1-8-series/src/replib/Makefile.in
+   M /voms/branches/voms-1-8-series/src/replica/Makefile.in
+   M /voms/branches/voms-1-8-series/src/server/Makefile.in
+   M /voms/branches/voms-1-8-series/src/socklib/Makefile.in
+   M /voms/branches/voms-1-8-series/src/sslutils/Makefile.in
+   M /voms/branches/voms-1-8-series/src/sslutils/oldgaa/Makefile.in
+   M /voms/branches/voms-1-8-series/src/utils/Makefile.in
+   M /voms/branches/voms-1-8-series/test/Makefile.in
+   M /voms/branches/voms-1-8-series/test/utest/Makefile.in
+   M /voms/branches/voms-1-8-series/testsuite/Makefile
+   M /voms/branches/voms-1-8-series/testsuite/Makefile.in
+   A /voms/branches/voms-1-8-series/testsuite/SuiteConfig.in
+
+Integrated testsuite with configure.
+------------------------------------------------------------------------
+r924 | marotta | 2008-06-10 17:35:10 +0200 (Tue, 10 Jun 2008) | 1 line
+Changed paths:
+   M /voms/branches/voms-1-8-series/src/api/ccapi/cinterface.cc
+   M /voms/branches/voms-1-8-series/src/api/ccapi/voms_apic.h
+
+forgot C interface to SetVerificationTime()
+------------------------------------------------------------------------
+r923 | marotta | 2008-06-10 16:55:06 +0200 (Tue, 10 Jun 2008) | 1 line
+Changed paths:
+   M /voms/branches/voms-1-8-series/src/ac/acerrors.h
+   M /voms/branches/voms-1-8-series/src/ac/validate.c
+   M /voms/branches/voms-1-8-series/testsuite/voms/vomsapi-cpp/vomsapi-cpp004.exp
+
+Fix for bug #37071
+------------------------------------------------------------------------
+r922 | marotta | 2008-06-10 16:32:27 +0200 (Tue, 10 Jun 2008) | 1 line
+Changed paths:
+   M /voms/branches/voms-1-8-series/src/ac/validate.c
+   M /voms/branches/voms-1-8-series/src/api/ccapi/api_util.cc
+   M /voms/branches/voms-1-8-series/src/api/ccapi/ccval.cc
+   M /voms/branches/voms-1-8-series/src/api/ccapi/ccval.h
+   M /voms/branches/voms-1-8-series/src/api/ccapi/voms_api.cc
+   M /voms/branches/voms-1-8-series/src/api/ccapi/voms_api.h
+   M /voms/branches/voms-1-8-series/src/include/validate.h
+
+Added APIs for validation at specified date (useful for both tests and real).
+------------------------------------------------------------------------
+r921 | marotta | 2008-06-10 16:31:38 +0200 (Tue, 10 Jun 2008) | 1 line
+Changed paths:
+   A /voms/branches/voms-1-8-series/testsuite/voms/vomsapi-cpp/verifier.cc
+   A /voms/branches/voms-1-8-series/testsuite/voms/vomsapi-cpp/vomsapi-cpp004.exp
+
+Check to see if 'not yet valid' == 'not valid anymore'
+------------------------------------------------------------------------
+r920 | marotta | 2008-06-10 14:41:58 +0200 (Tue, 10 Jun 2008) | 1 line
+Changed paths:
+   M /voms/branches/voms-1-8-series/src/api/ccapi/api_util.cc
+
+Set correct message in case of AC verification failure.
+------------------------------------------------------------------------
+r919 | marotta | 2008-06-10 10:44:29 +0200 (Tue, 10 Jun 2008) | 1 line
+Changed paths:
+   M /voms/branches/voms-1-8-series/Makefile.am
+   M /voms/branches/voms-1-8-series/Makefile.in
+   M /voms/branches/voms-1-8-series/configure
+   M /voms/branches/voms-1-8-series/configure.ac
+   M /voms/branches/voms-1-8-series/test/Makefile.in
+   D /voms/branches/voms-1-8-series/test/tests
+
+Readjusted build to exclude (even more) useless files/dirs
+------------------------------------------------------------------------
+r918 | marotta | 2008-06-10 10:42:21 +0200 (Tue, 10 Jun 2008) | 1 line
+Changed paths:
+   M /voms/branches/voms-1-8-series/test/Makefile.am
+   D /voms/branches/voms-1-8-series/test/setup_env.sh
+   D /voms/branches/voms-1-8-series/test/tests/Makefile.am
+   D /voms/branches/voms-1-8-series/test/tests/Makefile.in
+   D /voms/branches/voms-1-8-series/test/tests/masstest.sh
+   D /voms/branches/voms-1-8-series/test/tests/servicecert.sh
+   D /voms/branches/voms-1-8-series/test/tests/simpleac.sh
+   D /voms/branches/voms-1-8-series/test/tests/spurious.sh
+   D /voms/branches/voms-1-8-series/test/tests/voms_install_db_test1.sh
+   D /voms/branches/voms-1-8-series/test/tests/voms_install_db_test2.sh
+
+Readjusted build to exclude (more) useless files/dirs
+------------------------------------------------------------------------
+r917 | marotta | 2008-06-10 10:39:47 +0200 (Tue, 10 Jun 2008) | 1 line
+Changed paths:
+   M /voms/branches/voms-1-8-series/Makefile.in
+   M /voms/branches/voms-1-8-series/configure
+   M /voms/branches/voms-1-8-series/src/Makefile.am
+   M /voms/branches/voms-1-8-series/src/Makefile.in
+   D /voms/branches/voms-1-8-series/src/support
+
+Readjusted build to exclude useless files/dirs
+------------------------------------------------------------------------
+r916 | marotta | 2008-06-10 10:37:32 +0200 (Tue, 10 Jun 2008) | 1 line
+Changed paths:
+   M /voms/branches/voms-1-8-series/configure.ac
+   D /voms/branches/voms-1-8-series/src/server/access_db_sql.cc
+   D /voms/branches/voms-1-8-series/src/server/access_db_sql.h
+   D /voms/branches/voms-1-8-series/src/support/Makefile.am
+   D /voms/branches/voms-1-8-series/src/support/Makefile.in
+   D /voms/branches/voms-1-8-series/src/support/test_clean.in
+   D /voms/branches/voms-1-8-series/src/support/test_setup.in
+   D /voms/branches/voms-1-8-series/src/support/test_start.in
+   D /voms/branches/voms-1-8-series/src/support/testvoms.in
+   M /voms/branches/voms-1-8-series/testsuite/lib/vomssetup.exp.in
+
+Removed unused files
+------------------------------------------------------------------------
+r915 | marotta | 2008-06-10 10:21:48 +0200 (Tue, 10 Jun 2008) | 1 line
+Changed paths:
+   M /voms/branches/voms-1-8-series/src/common/options.cc
+   M /voms/branches/voms-1-8-series/src/server/vomsd.cc
+   M /voms/branches/voms-1-8-series/testsuite/lib/vomssetup.exp
+   M /voms/branches/voms-1-8-series/testsuite/lib/vomstest.exp
+   M /voms/branches/voms-1-8-series/testsuite/voms/voms/voms020.exp
+
+Fix for bug #37008
+------------------------------------------------------------------------
+r914 | marotta | 2008-05-30 15:15:23 +0200 (Fri, 30 May 2008) | 1 line
+Changed paths:
+   M /voms/branches/voms-1-8-series/testsuite/voms/voms/voms006.exp
+   M /voms/branches/voms-1-8-series/testsuite/voms/voms/voms007.exp
+   M /voms/branches/voms-1-8-series/testsuite/voms/voms/voms020.exp
+
+Corrected various errors in test cases.
+------------------------------------------------------------------------
+r913 | marotta | 2008-05-29 15:37:08 +0200 (Thu, 29 May 2008) | 1 line
+Changed paths:
+   M /voms/branches/voms-1-8-series/testsuite/lib/vomssetup.exp
+   A /voms/branches/voms-1-8-series/testsuite/voms/voms/voms020.exp
+
+Added test for long FQANs.
+------------------------------------------------------------------------
+r912 | marotta | 2008-05-16 09:57:59 +0200 (Fri, 16 May 2008) | 1 line
+Changed paths:
+   M /voms/branches/voms-1-8-series/src/install/voms_install_db.in
+   M /voms/branches/voms-1-8-series/src/log/fs.c
+   M /voms/branches/voms-1-8-series/src/utils/voms_proxy_info.cc
+   M /voms/branches/voms-1-8-series/testsuite/site.exp
+   A /voms/branches/voms-1-8-series/testsuite/voms/voms/voms018.exp
+   A /voms/branches/voms-1-8-series/testsuite/voms/voms/voms019.exp
+
+Fixes for bugs #36573, #36052
+------------------------------------------------------------------------
+r909 | marotta | 2008-04-30 11:58:48 +0200 (Wed, 30 Apr 2008) | 1 line
+Changed paths:
+   A /voms/branches/voms-1-8-series/testsuite/lib/vomssetup.exp
+
+corrected.
+------------------------------------------------------------------------
+r908 | marotta | 2008-04-30 11:57:46 +0200 (Wed, 30 Apr 2008) | 1 line
+Changed paths:
+   M /voms/branches/voms-1-8-series/Makefile.in
+   M /voms/branches/voms-1-8-series/configure
+   M /voms/branches/voms-1-8-series/configure.ac
+   M /voms/branches/voms-1-8-series/src/api/ccapi/api_util.cc
+   M /voms/branches/voms-1-8-series/src/install/voms_install_db.in
+   M /voms/branches/voms-1-8-series/src/server/attribute.cc
+   M /voms/branches/voms-1-8-series/testsuite/Makefile
+   M /voms/branches/voms-1-8-series/testsuite/Makefile.am
+   M /voms/branches/voms-1-8-series/testsuite/lib/newfail.exp
+   D /voms/branches/voms-1-8-series/testsuite/lib/vomssetup.exp
+   A /voms/branches/voms-1-8-series/testsuite/lib/vomssetup.exp.in (from /voms/branches/testsuite/testsuite/lib/vomssetup.exp.in:905)
+   M /voms/branches/voms-1-8-series/testsuite/lib/vomstest.exp
+   A /voms/branches/voms-1-8-series/testsuite/voms/voms (from /voms/branches/testsuite/testsuite/voms/voms:905)
+   R /voms/branches/voms-1-8-series/testsuite/voms/voms/voms001.exp (from /voms/branches/testsuite/testsuite/voms/voms/voms001.exp:905)
+   R /voms/branches/voms-1-8-series/testsuite/voms/voms/voms002.exp (from /voms/branches/testsuite/testsuite/voms/voms/voms002.exp:905)
+   R /voms/branches/voms-1-8-series/testsuite/voms/voms/voms003.exp (from /voms/branches/testsuite/testsuite/voms/voms/voms003.exp:905)
+   R /voms/branches/voms-1-8-series/testsuite/voms/voms/voms004.exp (from /voms/branches/testsuite/testsuite/voms/voms/voms004.exp:905)
+   R /voms/branches/voms-1-8-series/testsuite/voms/voms/voms005.exp (from /voms/branches/testsuite/testsuite/voms/voms/voms005.exp:905)
+   R /voms/branches/voms-1-8-series/testsuite/voms/voms/voms006.exp (from /voms/branches/testsuite/testsuite/voms/voms/voms006.exp:905)
+   R /voms/branches/voms-1-8-series/testsuite/voms/voms/voms007.exp (from /voms/branches/testsuite/testsuite/voms/voms/voms007.exp:905)
+   R /voms/branches/voms-1-8-series/testsuite/voms/voms/voms008.exp (from /voms/branches/testsuite/testsuite/voms/voms/voms008.exp:905)
+   R /voms/branches/voms-1-8-series/testsuite/voms/voms/voms009.exp (from /voms/branches/testsuite/testsuite/voms/voms/voms009.exp:905)
+   R /voms/branches/voms-1-8-series/testsuite/voms/voms/voms010.exp (from /voms/branches/testsuite/testsuite/voms/voms/voms010.exp:905)
+   R /voms/branches/voms-1-8-series/testsuite/voms/voms/voms011.exp (from /voms/branches/testsuite/testsuite/voms/voms/voms011.exp:905)
+   R /voms/branches/voms-1-8-series/testsuite/voms/voms/voms012.exp (from /voms/branches/testsuite/testsuite/voms/voms/voms012.exp:905)
+   R /voms/branches/voms-1-8-series/testsuite/voms/voms/voms013.exp (from /voms/branches/testsuite/testsuite/voms/voms/voms013.exp:905)
+   R /voms/branches/voms-1-8-series/testsuite/voms/voms/voms014.exp (from /voms/branches/testsuite/testsuite/voms/voms/voms014.exp:905)
+   R /voms/branches/voms-1-8-series/testsuite/voms/voms/voms015.exp (from /voms/branches/testsuite/testsuite/voms/voms/voms015.exp:905)
+   R /voms/branches/voms-1-8-series/testsuite/voms/voms/voms016.exp (from /voms/branches/testsuite/testsuite/voms/voms/voms016.exp:905)
+   R /voms/branches/voms-1-8-series/testsuite/voms/voms/voms017.exp (from /voms/branches/testsuite/testsuite/voms/voms/voms017.exp:905)
+   D /voms/branches/voms-1-8-series/testsuite/voms/voms.exp
+   D /voms/branches/voms-1-8-series/testsuite/voms/voms01.exp
+   D /voms/branches/voms-1-8-series/testsuite/voms/voms02.exp
+   D /voms/branches/voms-1-8-series/testsuite/voms/voms03.exp
+   D /voms/branches/voms-1-8-series/testsuite/voms/voms04.exp
+   D /voms/branches/voms-1-8-series/testsuite/voms/voms05.exp
+   D /voms/branches/voms-1-8-series/testsuite/voms/voms06.exp
+   D /voms/branches/voms-1-8-series/testsuite/voms/voms07.exp
+   D /voms/branches/voms-1-8-series/testsuite/voms/voms2.exp
+   A /voms/branches/voms-1-8-series/testsuite/voms/vomsapi-c (from /voms/branches/testsuite/testsuite/voms/vomsapi-c:905)
+   R /voms/branches/voms-1-8-series/testsuite/voms/vomsapi-c/basictest.c (from /voms/branches/testsuite/testsuite/voms/vomsapi-c/basictest.c:905)
+   R /voms/branches/voms-1-8-series/testsuite/voms/vomsapi-c/loadbyalias.c (from /voms/branches/testsuite/testsuite/voms/vomsapi-c/loadbyalias.c:905)
+   R /voms/branches/voms-1-8-series/testsuite/voms/vomsapi-c/makeac.c (from /voms/branches/testsuite/testsuite/voms/vomsapi-c/makeac.c:905)
+   R /voms/branches/voms-1-8-series/testsuite/voms/vomsapi-c/parsetest.c (from /voms/branches/testsuite/testsuite/voms/vomsapi-c/parsetest.c:905)
+   R /voms/branches/voms-1-8-series/testsuite/voms/vomsapi-c/vomsapi-c001.exp (from /voms/branches/testsuite/testsuite/voms/vomsapi-c/vomsapi-c001.exp:905)
+   R /voms/branches/voms-1-8-series/testsuite/voms/vomsapi-c/vomsapi-c002.exp (from /voms/branches/testsuite/testsuite/voms/vomsapi-c/vomsapi-c002.exp:905)
+   R /voms/branches/voms-1-8-series/testsuite/voms/vomsapi-c/vomsapi-c003.exp (from /voms/branches/testsuite/testsuite/voms/vomsapi-c/vomsapi-c003.exp:905)
+   R /voms/branches/voms-1-8-series/testsuite/voms/vomsapi-c/vomsapi-c004.exp (from /voms/branches/testsuite/testsuite/voms/vomsapi-c/vomsapi-c004.exp:905)
+   R /voms/branches/voms-1-8-series/testsuite/voms/vomsapi-c/vomsapi-c005.exp (from /voms/branches/testsuite/testsuite/voms/vomsapi-c/vomsapi-c005.exp:905)
+   R /voms/branches/voms-1-8-series/testsuite/voms/vomsapi-c/vomsapi-c006.exp (from /voms/branches/testsuite/testsuite/voms/vomsapi-c/vomsapi-c006.exp:905)
+   A /voms/branches/voms-1-8-series/testsuite/voms/vomsapi-cpp (from /voms/branches/testsuite/testsuite/voms/vomsapi-cpp:905)
+   R /voms/branches/voms-1-8-series/testsuite/voms/vomsapi-cpp/basictest.cc (from /voms/branches/testsuite/testsuite/voms/vomsapi-cpp/basictest.cc:905)
+   R /voms/branches/voms-1-8-series/testsuite/voms/vomsapi-cpp/parsertest.cc (from /voms/branches/testsuite/testsuite/voms/vomsapi-cpp/parsertest.cc:905)
+   R /voms/branches/voms-1-8-series/testsuite/voms/vomsapi-cpp/vomsapi-cpp001.exp (from /voms/branches/testsuite/testsuite/voms/vomsapi-cpp/vomsapi-cpp001.exp:905)
+   R /voms/branches/voms-1-8-series/testsuite/voms/vomsapi-cpp/vomsapi-cpp002.exp (from /voms/branches/testsuite/testsuite/voms/vomsapi-cpp/vomsapi-cpp002.exp:905)
+   R /voms/branches/voms-1-8-series/testsuite/voms/vomsapi-cpp/vomsapi-cpp003.exp (from /voms/branches/testsuite/testsuite/voms/vomsapi-cpp/vomsapi-cpp003.exp:905)
+   A /voms/branches/voms-1-8-series/testsuite/voms/vomsapi-java (from /voms/branches/testsuite/testsuite/voms/vomsapi-java:905)
+   R /voms/branches/voms-1-8-series/testsuite/voms/vomsapi-java/basictest.java (from /voms/branches/testsuite/testsuite/voms/vomsapi-java/basictest.java:905)
+   R /voms/branches/voms-1-8-series/testsuite/voms/vomsapi-java/vomsapi-java001.exp (from /voms/branches/testsuite/testsuite/voms/vomsapi-java/vomsapi-java001.exp:905)
+   R /voms/branches/voms-1-8-series/testsuite/voms/vomsapi-java/vomsapi-java002.exp (from /voms/branches/testsuite/testsuite/voms/vomsapi-java/vomsapi-java002.exp:905)
+
+merged -r 885:905 https://svn.forge.cnaf.infn.it/svn/voms/voms/branches/testsuite
+------------------------------------------------------------------------
+r907 | marotta | 2008-04-30 11:53:10 +0200 (Wed, 30 Apr 2008) | 1 line
+Changed paths:
+   M /voms/branches/voms-1-8-series/Makefile.am
+   M /voms/branches/voms-1-8-series/Makefile.in
+   M /voms/branches/voms-1-8-series/configure
+   M /voms/branches/voms-1-8-series/configure.ac
+   M /voms/branches/voms-1-8-series/test/setup_env.sh
+   A /voms/branches/voms-1-8-series/testsuite (from /voms/branches/testsuite/testsuite:884)
+   R /voms/branches/voms-1-8-series/testsuite/Makefile (from /voms/branches/testsuite/testsuite/Makefile:884)
+   R /voms/branches/voms-1-8-series/testsuite/Makefile.am (from /voms/branches/testsuite/testsuite/Makefile.am:884)
+   R /voms/branches/voms-1-8-series/testsuite/Makefile.in (from /voms/branches/testsuite/testsuite/Makefile.in:884)
+   R /voms/branches/voms-1-8-series/testsuite/lib (from /voms/branches/testsuite/testsuite/lib:884)
+   R /voms/branches/voms-1-8-series/testsuite/lib/db.exp (from /voms/branches/testsuite/testsuite/lib/db.exp:884)
+   R /voms/branches/voms-1-8-series/testsuite/lib/newfail.exp (from /voms/branches/testsuite/testsuite/lib/newfail.exp:884)
+   R /voms/branches/voms-1-8-series/testsuite/lib/vomslib.exp (from /voms/branches/testsuite/testsuite/lib/vomslib.exp:884)
+   R /voms/branches/voms-1-8-series/testsuite/lib/vomssetup.exp (from /voms/branches/testsuite/testsuite/lib/vomssetup.exp:884)
+   R /voms/branches/voms-1-8-series/testsuite/lib/vomstest.exp (from /voms/branches/testsuite/testsuite/lib/vomstest.exp:884)
+   R /voms/branches/voms-1-8-series/testsuite/lib/whois.exp (from /voms/branches/testsuite/testsuite/lib/whois.exp:884)
+   R /voms/branches/voms-1-8-series/testsuite/site.exp (from /voms/branches/testsuite/testsuite/site.exp:884)
+   R /voms/branches/voms-1-8-series/testsuite/voms (from /voms/branches/testsuite/testsuite/voms:884)
+   R /voms/branches/voms-1-8-series/testsuite/voms/voms.exp (from /voms/branches/testsuite/testsuite/voms/voms.exp:884)
+   R /voms/branches/voms-1-8-series/testsuite/voms/voms01.exp (from /voms/branches/testsuite/testsuite/voms/voms01.exp:884)
+   R /voms/branches/voms-1-8-series/testsuite/voms/voms02.exp (from /voms/branches/testsuite/testsuite/voms/voms02.exp:884)
+   R /voms/branches/voms-1-8-series/testsuite/voms/voms03.exp (from /voms/branches/testsuite/testsuite/voms/voms03.exp:884)
+   R /voms/branches/voms-1-8-series/testsuite/voms/voms04.exp (from /voms/branches/testsuite/testsuite/voms/voms04.exp:884)
+   R /voms/branches/voms-1-8-series/testsuite/voms/voms05.exp (from /voms/branches/testsuite/testsuite/voms/voms05.exp:884)
+   R /voms/branches/voms-1-8-series/testsuite/voms/voms06.exp (from /voms/branches/testsuite/testsuite/voms/voms06.exp:884)
+   R /voms/branches/voms-1-8-series/testsuite/voms/voms07.exp (from /voms/branches/testsuite/testsuite/voms/voms07.exp:884)
+   R /voms/branches/voms-1-8-series/testsuite/voms/voms2.exp (from /voms/branches/testsuite/testsuite/voms/voms2.exp:884)
+
+merged -r 809:884 https://svn.forge.cnaf.infn.it/svn/voms/voms/branches/testsuite
+------------------------------------------------------------------------
+r906 | marotta | 2008-04-30 11:48:41 +0200 (Wed, 30 Apr 2008) | 1 line
+Changed paths:
+   M /voms/branches/voms-1-8-series/configure
+   M /voms/branches/voms-1-8-series/configure.ac
+   M /voms/branches/voms-1-8-series/project/ltmain.sh
+   M /voms/branches/voms-1-8-series/src/api/java/log4j.properties
+   M /voms/branches/voms-1-8-series/src/autogen/config.h.in
+   M /voms/branches/voms-1-8-series/src/replica/voms_install_replica.in
+
+Committing changes.
+------------------------------------------------------------------------
+r850 | marotta | 2008-02-21 17:25:31 +0100 (Thu, 21 Feb 2008) | 1 line
+Changed paths:
+   M /voms/branches/voms-1-8-series/configure
+
+Fixes for building with the upcoming VDT 1.8.2 (autogenerated files)
+------------------------------------------------------------------------
+r849 | marotta | 2008-02-21 17:13:53 +0100 (Thu, 21 Feb 2008) | 1 line
+Changed paths:
+   M /voms/branches/voms-1-8-series/project/acinclude.m4
+   M /voms/branches/voms-1-8-series/src/client/vomsclient.cc
+
+Fixes for building with the upcoming VDT 1.8.2
+------------------------------------------------------------------------
+r821 | marotta | 2008-02-05 10:28:25 +0100 (Tue, 05 Feb 2008) | 1 line
+Changed paths:
+   M /voms/branches/voms-1-8-series/configure
+   M /voms/branches/voms-1-8-series/configure.ac
+   M /voms/branches/voms-1-8-series/project/version.properties
+
+Upgraded version to 1.8.3
+------------------------------------------------------------------------
+r820 | marotta | 2008-02-04 16:11:38 +0100 (Mon, 04 Feb 2008) | 1 line
+Changed paths:
+   M /voms/branches/voms-1-8-series/src/client/fqan.cc
+   M /voms/branches/voms-1-8-series/src/client/vomsclient.cc
+   M /voms/branches/voms-1-8-series/src/log/log.c
+   M /voms/branches/voms-1-8-series/src/server/vomsd.cc
+
+Fixed bug #33212, error message by voms-proxy-init, plus mistake in logging.
+------------------------------------------------------------------------
+r795 | marotta | 2008-01-16 10:13:59 +0100 (Wed, 16 Jan 2008) | 1 line
+Changed paths:
+   M /voms/branches/voms-1-8-series/Makefile.in
+   M /voms/branches/voms-1-8-series/aclocal.m4
+   M /voms/branches/voms-1-8-series/configure
+   M /voms/branches/voms-1-8-series/configure.ac
+   M /voms/branches/voms-1-8-series/doc/Makefile.in
+   M /voms/branches/voms-1-8-series/project/config.guess
+   M /voms/branches/voms-1-8-series/project/config.sub
+   M /voms/branches/voms-1-8-series/project/ltmain.sh
+   M /voms/branches/voms-1-8-series/project/version.properties
+   M /voms/branches/voms-1-8-series/src/Makefile.in
+   M /voms/branches/voms-1-8-series/src/ac/Makefile.in
+   M /voms/branches/voms-1-8-series/src/api/Makefile.in
+   M /voms/branches/voms-1-8-series/src/api/ccapi/Makefile.in
+   M /voms/branches/voms-1-8-series/src/api/java/Makefile.in
+   M /voms/branches/voms-1-8-series/src/client/Makefile.in
+   M /voms/branches/voms-1-8-series/src/common/Makefile.in
+   M /voms/branches/voms-1-8-series/src/include/Makefile.in
+   M /voms/branches/voms-1-8-series/src/install/Makefile.in
+   M /voms/branches/voms-1-8-series/src/log/Makefile.in
+   M /voms/branches/voms-1-8-series/src/replib/Makefile.in
+   M /voms/branches/voms-1-8-series/src/replica/Makefile.in
+   M /voms/branches/voms-1-8-series/src/server/Makefile.in
+   M /voms/branches/voms-1-8-series/src/socklib/Makefile.in
+   M /voms/branches/voms-1-8-series/src/sslutils/Makefile.in
+   M /voms/branches/voms-1-8-series/src/sslutils/oldgaa/Makefile.in
+   M /voms/branches/voms-1-8-series/src/support/Makefile.in
+   M /voms/branches/voms-1-8-series/src/utils/Makefile.in
+   M /voms/branches/voms-1-8-series/test/Makefile.in
+   M /voms/branches/voms-1-8-series/test/tests/Makefile.in
+   M /voms/branches/voms-1-8-series/test/utest/Makefile.in
+
+Version bump to 1.8.2
+------------------------------------------------------------------------
+r792 | marotta | 2008-01-15 15:56:26 +0100 (Tue, 15 Jan 2008) | 1 line
+Changed paths:
+   M /voms/branches/voms-1-8-series/src/server/vomsd.cc
+
+Fix for bug #31476 (logging stops) (really, now)
+------------------------------------------------------------------------
+r791 | marotta | 2008-01-15 15:55:02 +0100 (Tue, 15 Jan 2008) | 1 line
+Changed paths:
+   M /voms/branches/voms-1-8-series/src/include/log.h
+   M /voms/branches/voms-1-8-series/src/log/log.c
+   M /voms/branches/voms-1-8-series/src/server/vomsd.cc
+
+Fix for bug #31476 (logging stops)
+------------------------------------------------------------------------
+r788 | marotta | 2008-01-14 11:35:17 +0100 (Mon, 14 Jan 2008) | 1 line
+Changed paths:
+   M /voms/branches/voms-1-8-series/src/api/java/org/glite/voms/PKIVerifier.java
+
+Fixed verification of CRL from CNRS CAs
+------------------------------------------------------------------------
+r782 | marotta | 2007-12-21 17:00:35 +0100 (Fri, 21 Dec 2007) | 1 line
+Changed paths:
+   M /voms/branches/voms-1-8-series/src/utils/voms_proxy_info.cc
+
+Corrected voms-proxy-info returning wrong value.
+------------------------------------------------------------------------
+r780 | marotta | 2007-12-21 15:08:39 +0100 (Fri, 21 Dec 2007) | 1 line
+Changed paths:
+   M /voms/branches/voms-1-8-series/src/install/Makefile.am
+   M /voms/branches/voms-1-8-series/src/install/Makefile.in
+   A /voms/branches/voms-1-8-series/src/install/voms-ping (from /voms/branches/voms-1-8-series/src/install/voms.ping:779)
+   D /voms/branches/voms-1-8-series/src/install/voms.ping
+
+Corrected voms-ping script
+------------------------------------------------------------------------
+r779 | marotta | 2007-12-21 14:52:14 +0100 (Fri, 21 Dec 2007) | 1 line
+Changed paths:
+   M /voms/branches/voms-1-8-series/src/install/voms.ping
+
+Added voms.ping
+------------------------------------------------------------------------
+r778 | marotta | 2007-12-21 11:19:24 +0100 (Fri, 21 Dec 2007) | 1 line
+Changed paths:
+   M /voms/branches/voms-1-8-series/src/install/Makefile.am
+   M /voms/branches/voms-1-8-series/src/install/Makefile.in
+   A /voms/branches/voms-1-8-series/src/install/voms.ping
+
+Added voms.ping
+------------------------------------------------------------------------
+r777 | marotta | 2007-12-21 10:33:29 +0100 (Fri, 21 Dec 2007) | 1 line
+Changed paths:
+   M /voms/branches/voms-1-8-series/configure
+   M /voms/branches/voms-1-8-series/configure.ac
+   M /voms/branches/voms-1-8-series/project/version.properties
+
+Updated version number to 1.8.1.
+------------------------------------------------------------------------
+r771 | marotta | 2007-12-20 17:56:57 +0100 (Thu, 20 Dec 2007) | 1 line
+Changed paths:
+   M /voms/branches/voms-1-8-series/src/common/xml.c
+
+Fix for the base64 decoding bug.
+------------------------------------------------------------------------
+r767 | marotta | 2007-12-20 12:08:39 +0100 (Thu, 20 Dec 2007) | 1 line
+Changed paths:
+   M /voms/branches/voms-1-8-series/src/sslutils/oldgaa/globus_oldgaa_utils.c
+   M /voms/branches/voms-1-8-series/src/sslutils/oldgaa/oldgaa_utils.c
+
+Final fix for bug #32310.
+------------------------------------------------------------------------
+r766 | marotta | 2007-12-19 19:33:27 +0100 (Wed, 19 Dec 2007) | 1 line
+Changed paths:
+   M /voms/branches/voms-1-8-series/src/include/log.h
+   M /voms/branches/voms-1-8-series/src/log/log.c
+   M /voms/branches/voms-1-8-series/src/server/vomsd.cc
+
+removed improper commit
+------------------------------------------------------------------------
+r765 | marotta | 2007-12-19 19:28:42 +0100 (Wed, 19 Dec 2007) | 1 line
+Changed paths:
+   M /voms/branches/voms-1-8-series/src/include/log.h
+   M /voms/branches/voms-1-8-series/src/log/log.c
+   M /voms/branches/voms-1-8-series/src/server/vomsd.cc
+   M /voms/branches/voms-1-8-series/src/sslutils/oldgaa/globus_oldgaa_utils.c
+   M /voms/branches/voms-1-8-series/src/sslutils/oldgaa/oldgaa_utils.c
+
+temporari fix to bug #32310
+------------------------------------------------------------------------
+r763 | marotta | 2007-12-11 10:27:28 +0100 (Tue, 11 Dec 2007) | 1 line
+Changed paths:
+   M /voms/branches/voms-1-8-series/src/utils/voms_proxy_info.cc
+
+Fix for bug #31800
+------------------------------------------------------------------------
+r736 | marotta | 2007-11-21 10:07:17 +0100 (Wed, 21 Nov 2007) | 1 line
+Changed paths:
+   M /voms/branches/voms-1-8-series/configure
+   M /voms/branches/voms-1-8-series/configure.ac
+   M /voms/branches/voms-1-8-series/project/acinclude.m4
+   M /voms/branches/voms-1-8-series/project/version.properties
+   M /voms/branches/voms-1-8-series/src/api/ccapi/Makefile.am
+   M /voms/branches/voms-1-8-series/src/api/ccapi/Makefile.in
+   M /voms/branches/voms-1-8-series/src/api/ccapi/cinterface.cc
+   M /voms/branches/voms-1-8-series/src/api/ccapi/ctest.c
+   M /voms/branches/voms-1-8-series/src/api/ccapi/voms_api.cc
+   M /voms/branches/voms-1-8-series/src/include/dbwrap.h
+
+merged -r 726:731 https://svn.forge.cnaf.infn.it/svn/voms/voms/trunk
+------------------------------------------------------------------------
+r727 | marotta | 2007-11-19 15:51:29 +0100 (Mon, 19 Nov 2007) | 1 line
+Changed paths:
+   A /voms/branches/voms-1-8-series (from /voms/trunk:726)
+
+From release 726 of trunk.
+------------------------------------------------------------------------
+r726 | marotta | 2007-11-19 15:49:33 +0100 (Mon, 19 Nov 2007) | 1 line
+Changed paths:
+   M /voms/trunk/src/log/sl.c
+   M /voms/trunk/src/server/vomsd.cc
+   M /voms/trunk/src/socklib/Server.cpp
+
+Conformance to logging document.
+------------------------------------------------------------------------
+r725 | marotta | 2007-11-19 15:14:05 +0100 (Mon, 19 Nov 2007) | 1 line
+Changed paths:
+   M /voms/trunk/src/server/vomsd.cc
+
+Fixed wrong logging level.
+------------------------------------------------------------------------
+r724 | marotta | 2007-11-19 15:00:44 +0100 (Mon, 19 Nov 2007) | 1 line
+Changed paths:
+   M /voms/trunk/src/api/ccapi/api_util.cc
+   M /voms/trunk/src/api/ccapi/test.cc
+   M /voms/trunk/src/api/ccapi/voms_api.cc
+
+Cleaned up valgrind hits.
+------------------------------------------------------------------------
+r723 | marotta | 2007-11-19 11:39:25 +0100 (Mon, 19 Nov 2007) | 1 line
+Changed paths:
+   M /voms/trunk/src/api/java/org/glite/voms/contact/VOMSRequestFactory.java
+   M /voms/trunk/src/api/java/org/glite/voms/contact/VOMSResponse.java
+   M /voms/trunk/src/common/xml.c
+   M /voms/trunk/src/common/xmlcc.cc
+   M /voms/trunk/src/include/vomsxml.h
+   M /voms/trunk/src/include/xml.h
+
+Added version tag to both answer and response messages.
+------------------------------------------------------------------------
+r722 | marotta | 2007-11-19 10:27:59 +0100 (Mon, 19 Nov 2007) | 1 line
+Changed paths:
+   M /voms/trunk/configure
+   M /voms/trunk/src/autogen/config.h.in
+   M /voms/trunk/src/server/Makefile.in
+
+Removed incompatible build option.
+------------------------------------------------------------------------
+r721 | marotta | 2007-11-16 15:15:43 +0100 (Fri, 16 Nov 2007) | 1 line
+Changed paths:
+   M /voms/trunk/src/server/vomsd.cc
+
+OOPS! --insecure was already present.
+------------------------------------------------------------------------
+r720 | marotta | 2007-11-16 15:14:16 +0100 (Fri, 16 Nov 2007) | 1 line
+Changed paths:
+   M /voms/trunk/configure.ac
+   M /voms/trunk/project/acinclude.m4
+   M /voms/trunk/src/server/vomsd.cc
+
+Added documentation of --insecure option on command help.
+------------------------------------------------------------------------
+r718 | marotta | 2007-11-15 19:34:41 +0100 (Thu, 15 Nov 2007) | 1 line
+Changed paths:
+   M /voms/trunk/src/ac/extensions.c
+   M /voms/trunk/src/ac/validate.c
+   M /voms/trunk/src/ac/write.c
+   M /voms/trunk/src/api/ccapi/voms_api.cc
+   M /voms/trunk/src/client/vomsclient.cc
+   M /voms/trunk/src/common/credentials.c
+   M /voms/trunk/src/server/vomsd.cc
+   M /voms/trunk/src/sslutils/oldgaa/oldgaa_gl_internal_err.c
+   M /voms/trunk/src/sslutils/oldgaa/oldgaa_release.c
+   M /voms/trunk/src/sslutils/oldgaa/oldgaa_utils.c
+   M /voms/trunk/src/sslutils/proxycertinfo.c
+   M /voms/trunk/src/sslutils/sslutils.c
+   M /voms/trunk/src/sslutils/sslutils.h
+   M /voms/trunk/src/utils/voms_proxy_info.cc
+   M /voms/trunk/src/utils/vomsfake.cc
+
+Integrated Eamonn's patch for Openssl 0.9.8 compilation and general tightening.
+------------------------------------------------------------------------
+r717 | marotta | 2007-11-15 18:16:53 +0100 (Thu, 15 Nov 2007) | 1 line
+Changed paths:
+   M /voms/trunk/src/ac/newformat.c
+   M /voms/trunk/src/api/ccapi/api_util.cc
+   M /voms/trunk/src/api/ccapi/cinterface.cc
+   M /voms/trunk/src/api/ccapi/voms_api.cc
+   M /voms/trunk/src/common/credentials.c
+   M /voms/trunk/src/include/newformat.h
+   M /voms/trunk/src/server/Makefile.am
+
+Integrated patch for MAC compilation from Patrick Carlisle.
+------------------------------------------------------------------------
+r716 | marotta | 2007-11-15 17:51:10 +0100 (Thu, 15 Nov 2007) | 1 line
+Changed paths:
+   M /voms/trunk/src/common/data.cc
+   M /voms/trunk/src/common/pass.cc
+   M /voms/trunk/src/include/dbwrap.h
+   M /voms/trunk/src/server/Makefile.am
+   M /voms/trunk/src/server/Makefile.in
+   M /voms/trunk/src/server/VOMSServer.h
+   M /voms/trunk/src/server/attribute.cc
+   M /voms/trunk/src/server/attribute.h
+   M /voms/trunk/src/server/main.cc
+   M /voms/trunk/src/server/vomsd.cc
+
+merged 663:710 of https://svn.forge.cnaf.infn.it/svn/voms/voms/branches/multiple_certs_real
+------------------------------------------------------------------------
+r715 | marotta | 2007-11-15 16:26:35 +0100 (Thu, 15 Nov 2007) | 1 line
+Changed paths:
+   M /voms/trunk/src/server/access_db_sql.cc
+   M /voms/trunk/src/server/vomsd.cc
+
+moved get_serial()
+------------------------------------------------------------------------
+r714 | marotta | 2007-11-15 16:24:19 +0100 (Thu, 15 Nov 2007) | 1 line
+Changed paths:
+   M /voms/trunk/src/server/Makefile.am
+   M /voms/trunk/src/server/Makefile.in
+   M /voms/trunk/src/server/access_db_sql.cc
+   A /voms/trunk/src/server/uuid.c (from /voms/branches/uuidwork/src/server/uuid.c:680)
+   A /voms/trunk/src/server/uuid.h (from /voms/branches/uuidwork/src/server/uuid.h:680)
+
+Merged  644:680 of https://svn.forge.cnaf.infn.it/svn/voms/voms/branches/uuidwork
+------------------------------------------------------------------------
+r713 | marotta | 2007-11-15 15:36:36 +0100 (Thu, 15 Nov 2007) | 1 line
+Changed paths:
+   M /voms/trunk/Makefile.am
+   M /voms/trunk/Makefile.in
+   M /voms/trunk/configure
+   M /voms/trunk/configure.ac
+   M /voms/trunk/doc/Makefile.am
+   M /voms/trunk/doc/Makefile.in
+   D /voms/trunk/doc/testvoms.sgml
+   A /voms/trunk/doc/testvoms.xml (from /voms/branches/voms-1-7-series/doc/testvoms.xml:694)
+   A /voms/trunk/doc/voms-install-replica.xml (from /voms/branches/voms-1-7-series/doc/voms-install-replica.xml:694)
+   D /voms/trunk/doc/voms-proxy-destroy.sgml
+   A /voms/trunk/doc/voms-proxy-destroy.xml (from /voms/branches/voms-1-7-series/doc/voms-proxy-destroy.xml:694)
+   D /voms/trunk/doc/voms-proxy-fake.sgml
+   A /voms/trunk/doc/voms-proxy-fake.xml (from /voms/branches/voms-1-7-series/doc/voms-proxy-fake.xml:694)
+   D /voms/trunk/doc/voms-proxy-info.sgml
+   A /voms/trunk/doc/voms-proxy-info.xml (from /voms/branches/voms-1-7-series/doc/voms-proxy-info.xml:694)
+   D /voms/trunk/doc/voms-proxy-init.sgml
+   A /voms/trunk/doc/voms-proxy-init.xml (from /voms/branches/voms-1-7-series/doc/voms-proxy-init.xml:694)
+   D /voms/trunk/doc/voms-proxy-list.sgml
+   A /voms/trunk/doc/voms-proxy-list.xml (from /voms/branches/voms-1-7-series/doc/voms-proxy-list.xml:694)
+   D /voms/trunk/doc/voms.sgml
+   A /voms/trunk/doc/voms.xml (from /voms/branches/voms-1-7-series/doc/voms.xml:694)
+   D /voms/trunk/doc/voms_install_db.sgml
+   D /voms/trunk/doc/voms_install_replica.sgml
+   M /voms/trunk/project/acinclude.m4
+   M /voms/trunk/project/version.properties
+   M /voms/trunk/src/Makefile.am
+   M /voms/trunk/src/Makefile.in
+   M /voms/trunk/src/ac/Makefile.in
+   M /voms/trunk/src/api/Makefile.am
+   M /voms/trunk/src/api/Makefile.in
+   M /voms/trunk/src/api/ccapi/Makefile.in
+   M /voms/trunk/src/api/ccapi/api_util.cc
+   M /voms/trunk/src/api/java/Makefile.in
+   M /voms/trunk/src/api/java/log4j.properties
+   M /voms/trunk/src/client/Makefile.in
+   M /voms/trunk/src/client/contact.hpp
+   M /voms/trunk/src/client/fqan.cc
+   M /voms/trunk/src/client/fqan.h
+   M /voms/trunk/src/client/vomsclient.cc
+   M /voms/trunk/src/common/Makefile.in
+   M /voms/trunk/src/include/Makefile.in
+   M /voms/trunk/src/install/Makefile.in
+   M /voms/trunk/src/log/Makefile.in
+   M /voms/trunk/src/replib/Makefile.in
+   M /voms/trunk/src/replica/Makefile.in
+   M /voms/trunk/src/server/Makefile.in
+   M /voms/trunk/src/socklib/Makefile.in
+   D /voms/trunk/src/socklib/globus_oldgaa.h
+   D /voms/trunk/src/socklib/globus_oldgaa_utils.h
+   M /voms/trunk/src/sslutils/Makefile.in
+   M /voms/trunk/src/sslutils/oldgaa/Makefile.in
+   M /voms/trunk/src/support/Makefile.in
+   M /voms/trunk/src/utils/Makefile.in
+   M /voms/trunk/test/Makefile.in
+   M /voms/trunk/test/tests/Makefile.in
+   M /voms/trunk/test/utest/Makefile.in
+
+Merged revisions 656:694 of https://svn.forge.cnaf.infn.it/svn/voms/voms/branches/voms-1-7-series.
+------------------------------------------------------------------------
+r712 | marotta | 2007-11-15 14:54:03 +0100 (Thu, 15 Nov 2007) | 1 line
+Changed paths:
+   M /voms/trunk/src/api/ccapi/test.cc
+   M /voms/trunk/src/api/ccapi/voms_api.cc
+   M /voms/trunk/src/api/java/Makefile.in
+   M /voms/trunk/src/api/java/Manifest.add
+   M /voms/trunk/src/api/java/log4j.properties
+   M /voms/trunk/src/api/java/org/glite/voms/contact/VOMSDecoder.java
+   M /voms/trunk/src/api/java/org/glite/voms/contact/VOMSRequestFactory.java
+   M /voms/trunk/src/common/xml.c
+   M /voms/trunk/src/common/xmlcc.cc
+   M /voms/trunk/src/include/vomsxml.h
+   M /voms/trunk/src/include/xml.h
+   M /voms/trunk/src/server/VOMSServer.h
+   M /voms/trunk/src/server/vomsd.cc
+
+Verified OpenSSL.base64() and Retrieve(File *f, how)
+------------------------------------------------------------------------
+r705 | marotta | 2007-11-06 17:22:31 +0100 (Tue, 06 Nov 2007) | 1 line
+Changed paths:
+   M /voms/trunk/src/api/ccapi/voms_api.cc
+   M /voms/trunk/src/client/vomsclient.cc
+   M /voms/trunk/src/log/fs.c
+   M /voms/trunk/src/log/log.c
+   M /voms/trunk/src/socklib/globuswrap.c
+   M /voms/trunk/src/sslutils/proxycertinfo.c
+   M /voms/trunk/src/sslutils/sslutils.c
+
+Fixed various warnings, especially those from bug #27431
+------------------------------------------------------------------------
+r704 | marotta | 2007-11-06 12:31:26 +0100 (Tue, 06 Nov 2007) | 1 line
+Changed paths:
+   M /voms/trunk/src/api/ccapi/cinterface.cc
+   M /voms/trunk/src/api/ccapi/voms_api.cc
+   M /voms/trunk/src/api/ccapi/voms_api.h
+   M /voms/trunk/src/api/ccapi/voms_apic.h
+
+Candidate fixes for bugs #27496 and #28998
+------------------------------------------------------------------------
+r668 | marotta | 2007-09-10 17:15:33 +0200 (Mon, 10 Sep 2007) | 1 line
+Changed paths:
+   M /voms/trunk/src/api/java/Makefile.am
+
+Updated Makefile.
+------------------------------------------------------------------------
+r667 | andrea | 2007-09-10 17:13:54 +0200 (Mon, 10 Sep 2007) | 1 line
+Changed paths:
+   D /voms/trunk/src/api/java/org/glite/security
+
+Renamed java api package name to org.glite.voms
+------------------------------------------------------------------------
+r666 | andrea | 2007-09-10 17:13:19 +0200 (Mon, 10 Sep 2007) | 1 line
+Changed paths:
+   D /voms/trunk/src/api/java/org/glite/security/voms
+
+Renamed java api package name to org.glite.voms
+------------------------------------------------------------------------
+r665 | andrea | 2007-09-10 17:12:32 +0200 (Mon, 10 Sep 2007) | 1 line
+Changed paths:
+   A /voms/trunk/.classpath
+   A /voms/trunk/.settings
+   A /voms/trunk/.settings/org.eclipse.jdt.core.prefs
+   A /voms/trunk/.settings/org.eclipse.jdt.ui.prefs
+   A /voms/trunk/.settings/org.hibernate.eclipse.console.prefs
+   M /voms/trunk/build.xml
+   D /voms/trunk/src/api/java/org/glite/security/voms/contact
+
+Renamed java api package name to org.glite.voms
+------------------------------------------------------------------------
+r664 | andrea | 2007-09-10 17:08:29 +0200 (Mon, 10 Sep 2007) | 1 line
+Changed paths:
+   D /voms/trunk/src/api/java/org/glite/security/voms/BasicVOMSTrustStore.java
+   D /voms/trunk/src/api/java/org/glite/security/voms/FQAN.java
+   D /voms/trunk/src/api/java/org/glite/security/voms/LICENSE
+   D /voms/trunk/src/api/java/org/glite/security/voms/LSCFile.java
+   D /voms/trunk/src/api/java/org/glite/security/voms/PKIStore.java
+   D /voms/trunk/src/api/java/org/glite/security/voms/PKIUtils.java
+   D /voms/trunk/src/api/java/org/glite/security/voms/PKIVerifier.java
+   D /voms/trunk/src/api/java/org/glite/security/voms/SigningPolicy.java
+   D /voms/trunk/src/api/java/org/glite/security/voms/VOMSAttribute.java
+   D /voms/trunk/src/api/java/org/glite/security/voms/VOMSValidator.java
+   D /voms/trunk/src/api/java/org/glite/security/voms/ac
+   D /voms/trunk/src/api/java/org/glite/security/voms/contact/MyProxyCertInfo.java
+   D /voms/trunk/src/api/java/org/glite/security/voms/contact/PathNamingScheme.java
+   D /voms/trunk/src/api/java/org/glite/security/voms/contact/Test.java
+   D /voms/trunk/src/api/java/org/glite/security/voms/contact/UserCredentials.java
+   D /voms/trunk/src/api/java/org/glite/security/voms/contact/VOMSDecoder.java
+   D /voms/trunk/src/api/java/org/glite/security/voms/contact/VOMSESFileParser.java
+   D /voms/trunk/src/api/java/org/glite/security/voms/contact/VOMSErrorMessage.java
+   D /voms/trunk/src/api/java/org/glite/security/voms/contact/VOMSException.java
+   D /voms/trunk/src/api/java/org/glite/security/voms/contact/VOMSParser.java
+   D /voms/trunk/src/api/java/org/glite/security/voms/contact/VOMSProtocol.java
+   D /voms/trunk/src/api/java/org/glite/security/voms/contact/VOMSProxyBuilder.java
+   D /voms/trunk/src/api/java/org/glite/security/voms/contact/VOMSProxyInit.java
+   D /voms/trunk/src/api/java/org/glite/security/voms/contact/VOMSRequestFactory.java
+   D /voms/trunk/src/api/java/org/glite/security/voms/contact/VOMSRequestOptions.java
+   D /voms/trunk/src/api/java/org/glite/security/voms/contact/VOMSResponse.java
+   D /voms/trunk/src/api/java/org/glite/security/voms/contact/VOMSServerInfo.java
+   D /voms/trunk/src/api/java/org/glite/security/voms/contact/VOMSServerMap.java
+   D /voms/trunk/src/api/java/org/glite/security/voms/contact/VOMSSocket.java
+   D /voms/trunk/src/api/java/org/glite/security/voms/contact/VOMSSyntaxException.java
+   D /voms/trunk/src/api/java/org/glite/security/voms/contact/cli
+   A /voms/trunk/src/api/java/org/glite/voms
+   A /voms/trunk/src/api/java/org/glite/voms/BasicVOMSTrustStore.java (from /voms/trunk/src/api/java/org/glite/security/voms/BasicVOMSTrustStore.java:663)
+   A /voms/trunk/src/api/java/org/glite/voms/FQAN.java (from /voms/trunk/src/api/java/org/glite/security/voms/FQAN.java:663)
+   A /voms/trunk/src/api/java/org/glite/voms/LICENSE (from /voms/trunk/src/api/java/org/glite/security/voms/LICENSE:663)
+   A /voms/trunk/src/api/java/org/glite/voms/LSCFile.java (from /voms/trunk/src/api/java/org/glite/security/voms/LSCFile.java:663)
+   A /voms/trunk/src/api/java/org/glite/voms/PKIStore.java (from /voms/trunk/src/api/java/org/glite/security/voms/PKIStore.java:663)
+   A /voms/trunk/src/api/java/org/glite/voms/PKIUtils.java (from /voms/trunk/src/api/java/org/glite/security/voms/PKIUtils.java:663)
+   A /voms/trunk/src/api/java/org/glite/voms/PKIVerifier.java (from /voms/trunk/src/api/java/org/glite/security/voms/PKIVerifier.java:663)
+   A /voms/trunk/src/api/java/org/glite/voms/SigningPolicy.java (from /voms/trunk/src/api/java/org/glite/security/voms/SigningPolicy.java:663)
+   A /voms/trunk/src/api/java/org/glite/voms/VOMSAttribute.java (from /voms/trunk/src/api/java/org/glite/security/voms/VOMSAttribute.java:663)
+   A /voms/trunk/src/api/java/org/glite/voms/VOMSValidator.java (from /voms/trunk/src/api/java/org/glite/security/voms/VOMSValidator.java:663)
+   A /voms/trunk/src/api/java/org/glite/voms/ac (from /voms/trunk/src/api/java/org/glite/security/voms/ac:663)
+   M /voms/trunk/src/api/java/org/glite/voms/ac/ACCerts.java
+   M /voms/trunk/src/api/java/org/glite/voms/ac/ACGenerator.java
+   M /voms/trunk/src/api/java/org/glite/voms/ac/ACTarget.java
+   M /voms/trunk/src/api/java/org/glite/voms/ac/ACTargets.java
+   M /voms/trunk/src/api/java/org/glite/voms/ac/ACTrustStore.java
+   M /voms/trunk/src/api/java/org/glite/voms/ac/ACValidator.java
+   M /voms/trunk/src/api/java/org/glite/voms/ac/AttCertIssuer.java
+   M /voms/trunk/src/api/java/org/glite/voms/ac/AttributeCertificate.java
+   M /voms/trunk/src/api/java/org/glite/voms/ac/AttributeCertificateInfo.java
+   M /voms/trunk/src/api/java/org/glite/voms/ac/AttributeHolder.java
+   M /voms/trunk/src/api/java/org/glite/voms/ac/FullAttributes.java
+   M /voms/trunk/src/api/java/org/glite/voms/ac/GenericAttribute.java
+   M /voms/trunk/src/api/java/org/glite/voms/ac/Holder.java
+   M /voms/trunk/src/api/java/org/glite/voms/ac/IetfAttrSyntax.java
+   M /voms/trunk/src/api/java/org/glite/voms/ac/ObjectDigestInfo.java
+   M /voms/trunk/src/api/java/org/glite/voms/ac/Util.java
+   M /voms/trunk/src/api/java/org/glite/voms/ac/V2Form.java
+   M /voms/trunk/src/api/java/org/glite/voms/ac/VOMSTrustStore.java
+   A /voms/trunk/src/api/java/org/glite/voms/contact
+   A /voms/trunk/src/api/java/org/glite/voms/contact/MyProxyCertInfo.java (from /voms/trunk/src/api/java/org/glite/security/voms/contact/MyProxyCertInfo.java:663)
+   A /voms/trunk/src/api/java/org/glite/voms/contact/PathNamingScheme.java (from /voms/trunk/src/api/java/org/glite/security/voms/contact/PathNamingScheme.java:663)
+   A /voms/trunk/src/api/java/org/glite/voms/contact/Test.java (from /voms/trunk/src/api/java/org/glite/security/voms/contact/Test.java:663)
+   A /voms/trunk/src/api/java/org/glite/voms/contact/UserCredentials.java (from /voms/trunk/src/api/java/org/glite/security/voms/contact/UserCredentials.java:663)
+   A /voms/trunk/src/api/java/org/glite/voms/contact/VOMSDecoder.java (from /voms/trunk/src/api/java/org/glite/security/voms/contact/VOMSDecoder.java:663)
+   A /voms/trunk/src/api/java/org/glite/voms/contact/VOMSESFileParser.java (from /voms/trunk/src/api/java/org/glite/security/voms/contact/VOMSESFileParser.java:663)
+   A /voms/trunk/src/api/java/org/glite/voms/contact/VOMSErrorMessage.java (from /voms/trunk/src/api/java/org/glite/security/voms/contact/VOMSErrorMessage.java:663)
+   A /voms/trunk/src/api/java/org/glite/voms/contact/VOMSException.java (from /voms/trunk/src/api/java/org/glite/security/voms/contact/VOMSException.java:663)
+   A /voms/trunk/src/api/java/org/glite/voms/contact/VOMSParser.java (from /voms/trunk/src/api/java/org/glite/security/voms/contact/VOMSParser.java:663)
+   A /voms/trunk/src/api/java/org/glite/voms/contact/VOMSProtocol.java (from /voms/trunk/src/api/java/org/glite/security/voms/contact/VOMSProtocol.java:663)
+   A /voms/trunk/src/api/java/org/glite/voms/contact/VOMSProxyBuilder.java (from /voms/trunk/src/api/java/org/glite/security/voms/contact/VOMSProxyBuilder.java:663)
+   A /voms/trunk/src/api/java/org/glite/voms/contact/VOMSProxyInit.java (from /voms/trunk/src/api/java/org/glite/security/voms/contact/VOMSProxyInit.java:663)
+   A /voms/trunk/src/api/java/org/glite/voms/contact/VOMSRequestFactory.java (from /voms/trunk/src/api/java/org/glite/security/voms/contact/VOMSRequestFactory.java:663)
+   A /voms/trunk/src/api/java/org/glite/voms/contact/VOMSRequestOptions.java (from /voms/trunk/src/api/java/org/glite/security/voms/contact/VOMSRequestOptions.java:663)
+   A /voms/trunk/src/api/java/org/glite/voms/contact/VOMSResponse.java (from /voms/trunk/src/api/java/org/glite/security/voms/contact/VOMSResponse.java:663)
+   A /voms/trunk/src/api/java/org/glite/voms/contact/VOMSServerInfo.java (from /voms/trunk/src/api/java/org/glite/security/voms/contact/VOMSServerInfo.java:663)
+   A /voms/trunk/src/api/java/org/glite/voms/contact/VOMSServerMap.java (from /voms/trunk/src/api/java/org/glite/security/voms/contact/VOMSServerMap.java:663)
+   A /voms/trunk/src/api/java/org/glite/voms/contact/VOMSSocket.java (from /voms/trunk/src/api/java/org/glite/security/voms/contact/VOMSSocket.java:663)
+   A /voms/trunk/src/api/java/org/glite/voms/contact/VOMSSyntaxException.java (from /voms/trunk/src/api/java/org/glite/security/voms/contact/VOMSSyntaxException.java:663)
+   A /voms/trunk/src/api/java/org/glite/voms/contact/cli (from /voms/trunk/src/api/java/org/glite/security/voms/contact/cli:663)
+   M /voms/trunk/src/api/java/org/glite/voms/contact/cli/VomsProxyInitClient.java
+
+Renamed java api package name to org.glite.voms
+------------------------------------------------------------------------
+r660 | marotta | 2007-09-07 14:52:09 +0200 (Fri, 07 Sep 2007) | 1 line
+Changed paths:
+   M /voms/trunk/configure
+   M /voms/trunk/configure.ac
+   M /voms/trunk/src/autogen/config.h.in
+   M /voms/trunk/src/sslutils/sslutils.c
+   M /voms/trunk/src/utils/voms_proxy_info.cc
+
+Fixed bug #28753: [VOMS 1.7.20-1] strange time offset on Mac OS X 10.4
+------------------------------------------------------------------------
+r657 | marotta | 2007-07-31 11:26:33 +0200 (Tue, 31 Jul 2007) | 1 line
+Changed paths:
+   M /voms/trunk/configure
+   M /voms/trunk/configure.ac
+   M /voms/trunk/project/version.properties
+   M /voms/trunk/src/api/java/log4j.properties
+   M /voms/trunk/src/api/java/org/glite/security/voms/PKIUtils.java
+
+Merged 641:656 of https://svn.forge.cnaf.infn.it/svn/voms/voms/branches/voms-1-7-series
+------------------------------------------------------------------------
+r643 | marotta | 2007-07-09 16:53:52 +0200 (Mon, 09 Jul 2007) | 1 line
+Changed paths:
+   M /voms/trunk/src/common/xmlcc.cc
+   M /voms/trunk/src/server/vomsd.cc
+   M /voms/trunk/src/socklib/Server.cpp
+   M /voms/trunk/src/socklib/globuswrap.c
+   M /voms/trunk/src/socklib/tokens.c
+
+Merged revisions 635:640 of https://svn.forge.cnaf.infn.it/svn/voms/voms/branches/sslandgsi
+------------------------------------------------------------------------
+r642 | marotta | 2007-07-09 16:35:42 +0200 (Mon, 09 Jul 2007) | 1 line
+Changed paths:
+   M /voms/trunk/configure
+   M /voms/trunk/configure.ac
+   M /voms/trunk/project/version.properties
+   M /voms/trunk/src/client/vomsclient.cc
+
+Merged revisions 633:641 of https://svn.forge.cnaf.infn.it/svn/voms/voms/branches/voms-1-7-series
+------------------------------------------------------------------------
+r634 | marotta | 2007-07-04 10:17:17 +0200 (Wed, 04 Jul 2007) | 1 line
+Changed paths:
+   M /voms/trunk/doc/voms-proxy-init.sgml
+   M /voms/trunk/src/api/ccapi/voms_api.cc
+   M /voms/trunk/src/client/vomsclient.cc
+   M /voms/trunk/src/client/vomsclient.h
+
+Merged revisions 628:633 of https://svn.forge.cnaf.infn.it/svn/voms/voms/branches/voms-1-7-series
+------------------------------------------------------------------------
+r629 | marotta | 2007-07-03 13:44:41 +0200 (Tue, 03 Jul 2007) | 1 line
+Changed paths:
+   M /voms/trunk/Makefile.am
+   M /voms/trunk/Makefile.in
+   M /voms/trunk/aclocal.m4
+   M /voms/trunk/configure
+   M /voms/trunk/configure.ac
+   M /voms/trunk/doc/Makefile.in
+   M /voms/trunk/project/acinclude.m4
+   M /voms/trunk/project/config.guess
+   M /voms/trunk/project/config.sub
+   M /voms/trunk/project/ltmain.sh
+   M /voms/trunk/project/version.properties
+   M /voms/trunk/src/Makefile.am
+   M /voms/trunk/src/Makefile.in
+   M /voms/trunk/src/ac/Makefile.am
+   M /voms/trunk/src/ac/Makefile.in
+   D /voms/trunk/src/ac/attributes.c
+   M /voms/trunk/src/ac/extensions.c
+   M /voms/trunk/src/api/Makefile.in
+   M /voms/trunk/src/api/ccapi/Makefile.am
+   M /voms/trunk/src/api/ccapi/Makefile.in
+   M /voms/trunk/src/api/ccapi/cinterface.h
+   M /voms/trunk/src/api/ccapi/voms_api.cc
+   M /voms/trunk/src/api/java/Makefile.in
+   M /voms/trunk/src/api/java/log4j.properties
+   M /voms/trunk/src/api/java/org/glite/security/voms/PKIVerifier.java
+   M /voms/trunk/src/api/java/org/glite/security/voms/ac/AttributeCertificate.java
+   M /voms/trunk/src/api/java/org/glite/security/voms/contact/UserCredentials.java
+   M /voms/trunk/src/api/java/org/glite/security/voms/contact/VOMSProxyBuilder.java
+   M /voms/trunk/src/api/java/org/glite/security/voms/contact/VOMSProxyInit.java
+   M /voms/trunk/src/api/java/org/glite/security/voms/contact/cli/VomsProxyInitClient.java
+   M /voms/trunk/src/autogen/config.h.in
+   M /voms/trunk/src/client/Makefile.am
+   M /voms/trunk/src/client/Makefile.in
+   M /voms/trunk/src/client/vomsclient.cc
+   M /voms/trunk/src/common/Makefile.am
+   M /voms/trunk/src/common/Makefile.in
+   M /voms/trunk/src/common/options.cc
+   M /voms/trunk/src/common/xml.c
+   M /voms/trunk/src/common/xmlcc.cc
+   M /voms/trunk/src/include/Makefile.in
+   M /voms/trunk/src/install/Makefile.in
+   M /voms/trunk/src/install/voms.start.in
+   M /voms/trunk/src/log/Makefile.in
+   M /voms/trunk/src/replib/Makefile.in
+   M /voms/trunk/src/replib/getopt_long.c
+   M /voms/trunk/src/replib/getopt_long_only.c
+   A /voms/trunk/src/replib/memset.c (from /voms/branches/voms-1-7-series/src/replib/memset.c:628)
+   M /voms/trunk/src/replica/Makefile.in
+   M /voms/trunk/src/server/Makefile.am
+   M /voms/trunk/src/server/Makefile.in
+   M /voms/trunk/src/server/attribute.cc
+   M /voms/trunk/src/server/vomsd.cc
+   M /voms/trunk/src/socklib/Makefile.am
+   M /voms/trunk/src/socklib/Makefile.in
+   M /voms/trunk/src/sslutils/Makefile.am
+   M /voms/trunk/src/sslutils/Makefile.in
+   M /voms/trunk/src/sslutils/oldgaa/Makefile.am
+   M /voms/trunk/src/sslutils/oldgaa/Makefile.in
+   M /voms/trunk/src/sslutils/proxycertinfo.c
+   M /voms/trunk/src/sslutils/sslutils.c
+   M /voms/trunk/src/sslutils/sslutils.h
+   M /voms/trunk/src/support/Makefile.in
+   M /voms/trunk/src/utils/Makefile.am
+   M /voms/trunk/src/utils/Makefile.in
+   M /voms/trunk/src/utils/voms_proxy_info.cc
+   M /voms/trunk/test/Makefile.in
+   M /voms/trunk/test/tests/Makefile.in
+   M /voms/trunk/test/utest/Makefile.in
+
+Merged releases 549:628 of https://svn.forge.cnaf.infn.it/svn/voms/voms/branches/voms-1-7-series
+------------------------------------------------------------------------
+r587 | marotta | 2007-04-26 10:43:16 +0200 (Thu, 26 Apr 2007) | 1 line
+Changed paths:
+   M /voms/trunk/src/api/ccapi/api_util.cc
+   M /voms/trunk/src/api/ccapi/api_util.h
+   M /voms/trunk/src/server/vomsd.cc
+
+Fixed include files.
+------------------------------------------------------------------------
+r577 | marotta | 2007-04-18 13:47:37 +0200 (Wed, 18 Apr 2007) | 1 line
+Changed paths:
+   M /voms/trunk/src/replica/voms_install_replica.in
+   M /voms/trunk/src/utils/voms_proxy_info.cc
+
+First replica update.
+------------------------------------------------------------------------
+r557 | marotta | 2007-04-03 11:42:33 +0200 (Tue, 03 Apr 2007) | 1 line
+Changed paths:
+   M /voms/trunk/src/include/Makefile.am
+   M /voms/trunk/src/include/Makefile.in
+
+Redoing changes from the 554 commit.
+------------------------------------------------------------------------
+r556 | marotta | 2007-04-03 11:39:11 +0200 (Tue, 03 Apr 2007) | 1 line
+Changed paths:
+   M /voms/trunk/Makefile.in
+   M /voms/trunk/configure
+   M /voms/trunk/configure.ac
+   M /voms/trunk/doc/Makefile.in
+   M /voms/trunk/project/acinclude.m4
+   M /voms/trunk/src/Makefile.in
+   M /voms/trunk/src/ac/Makefile.in
+   M /voms/trunk/src/ac/attributes.h
+   M /voms/trunk/src/ac/extensions.c
+   M /voms/trunk/src/ac/extensions.h
+   M /voms/trunk/src/ac/init.h
+   M /voms/trunk/src/ac/write.h
+   M /voms/trunk/src/api/Makefile.in
+   M /voms/trunk/src/api/ccapi/Makefile.in
+   M /voms/trunk/src/api/ccapi/api_util.cc
+   M /voms/trunk/src/api/ccapi/api_util.h
+   M /voms/trunk/src/api/ccapi/cinterface.cc
+   M /voms/trunk/src/api/ccapi/cinterface.h
+   M /voms/trunk/src/api/ccapi/voms_api.cc
+   M /voms/trunk/src/api/ccapi/voms_api.h
+   M /voms/trunk/src/api/ccapi/voms_apic.h
+   M /voms/trunk/src/api/ccapi/voms_apic_nog.h
+   M /voms/trunk/src/api/java/Makefile.in
+   M /voms/trunk/src/autogen/config.h.in
+   M /voms/trunk/src/client/Makefile.in
+   M /voms/trunk/src/client/vomsclient.h
+   M /voms/trunk/src/common/Makefile.in
+   M /voms/trunk/src/common/credentials.c
+   M /voms/trunk/src/include/Client.h
+   M /voms/trunk/src/include/Makefile.am
+   M /voms/trunk/src/include/Makefile.in
+   M /voms/trunk/src/include/Server.h
+   M /voms/trunk/src/include/acstack.h
+   M /voms/trunk/src/include/credentials.h
+   M /voms/trunk/src/include/errortype.h
+   M /voms/trunk/src/include/format.h
+   M /voms/trunk/src/include/getopts.h
+   M /voms/trunk/src/include/gssapi_compat.h
+   M /voms/trunk/src/include/init.h
+   M /voms/trunk/src/include/listfunc.h
+   M /voms/trunk/src/include/log.h
+   M /voms/trunk/src/include/myproxycertinfo.h
+   M /voms/trunk/src/include/newca.h
+   M /voms/trunk/src/include/newformat.h
+   M /voms/trunk/src/include/options.h
+   M /voms/trunk/src/include/streamers.h
+   M /voms/trunk/src/include/tokens.h
+   M /voms/trunk/src/include/validate.h
+   M /voms/trunk/src/include/xml.h
+   M /voms/trunk/src/install/Makefile.in
+   M /voms/trunk/src/log/Makefile.in
+   M /voms/trunk/src/replib/Makefile.in
+   M /voms/trunk/src/replica/Makefile.in
+   M /voms/trunk/src/server/Makefile.am
+   M /voms/trunk/src/server/Makefile.in
+   M /voms/trunk/src/server/access_db_sql.cc
+   M /voms/trunk/src/socklib/Makefile.in
+   M /voms/trunk/src/socklib/tokens.c
+   M /voms/trunk/src/sslutils/Makefile.in
+   M /voms/trunk/src/sslutils/oldgaa/Makefile.in
+   M /voms/trunk/src/support/Makefile.in
+   M /voms/trunk/src/utils/Makefile.in
+   M /voms/trunk/test/Makefile.in
+   M /voms/trunk/test/tests/Makefile.in
+   M /voms/trunk/test/utest/Makefile.in
+
+Removed integration of mac branch.
+------------------------------------------------------------------------
+r554 | marotta | 2007-03-27 11:11:20 +0200 (Tue, 27 Mar 2007) | 1 line
+Changed paths:
+   M /voms/trunk/src/include/Makefile.am
+   M /voms/trunk/src/include/Makefile.in
+   D /voms/trunk/src/include/sign.h
+   D /voms/trunk/src/log/fns.c
+
+Removed unused files.
+------------------------------------------------------------------------
+r553 | marotta | 2007-03-27 10:28:02 +0200 (Tue, 27 Mar 2007) | 1 line
+Changed paths:
+   M /voms/trunk/Makefile.in
+   M /voms/trunk/configure
+   M /voms/trunk/configure.ac
+   M /voms/trunk/doc/Makefile.in
+   M /voms/trunk/project/acinclude.m4
+   M /voms/trunk/src/Makefile.in
+   M /voms/trunk/src/ac/Makefile.in
+   M /voms/trunk/src/ac/attributes.h
+   M /voms/trunk/src/ac/extensions.c
+   M /voms/trunk/src/ac/extensions.h
+   M /voms/trunk/src/ac/init.h
+   M /voms/trunk/src/ac/write.h
+   M /voms/trunk/src/api/Makefile.in
+   M /voms/trunk/src/api/ccapi/Makefile.in
+   M /voms/trunk/src/api/ccapi/api_util.cc
+   M /voms/trunk/src/api/ccapi/api_util.h
+   M /voms/trunk/src/api/ccapi/cinterface.cc
+   M /voms/trunk/src/api/ccapi/cinterface.h
+   M /voms/trunk/src/api/ccapi/voms_api.cc
+   M /voms/trunk/src/api/ccapi/voms_api.h
+   M /voms/trunk/src/api/ccapi/voms_apic.h
+   M /voms/trunk/src/api/ccapi/voms_apic_nog.h
+   M /voms/trunk/src/api/java/Makefile.in
+   M /voms/trunk/src/autogen/config.h.in
+   M /voms/trunk/src/client/Makefile.in
+   M /voms/trunk/src/client/vomsclient.h
+   M /voms/trunk/src/common/Makefile.in
+   M /voms/trunk/src/common/credentials.c
+   M /voms/trunk/src/include/Client.h
+   M /voms/trunk/src/include/Makefile.in
+   M /voms/trunk/src/include/Server.h
+   M /voms/trunk/src/include/acstack.h
+   M /voms/trunk/src/include/credentials.h
+   M /voms/trunk/src/include/errortype.h
+   M /voms/trunk/src/include/format.h
+   M /voms/trunk/src/include/getopts.h
+   M /voms/trunk/src/include/gssapi_compat.h
+   M /voms/trunk/src/include/init.h
+   M /voms/trunk/src/include/listfunc.h
+   M /voms/trunk/src/include/log.h
+   M /voms/trunk/src/include/myproxycertinfo.h
+   M /voms/trunk/src/include/newca.h
+   M /voms/trunk/src/include/newformat.h
+   M /voms/trunk/src/include/options.h
+   M /voms/trunk/src/include/sign.h
+   M /voms/trunk/src/include/streamers.h
+   M /voms/trunk/src/include/tokens.h
+   M /voms/trunk/src/include/validate.h
+   M /voms/trunk/src/include/xml.h
+   M /voms/trunk/src/install/Makefile.in
+   M /voms/trunk/src/log/Makefile.in
+   M /voms/trunk/src/replib/Makefile.in
+   M /voms/trunk/src/replica/Makefile.in
+   M /voms/trunk/src/server/Makefile.am
+   M /voms/trunk/src/server/Makefile.in
+   M /voms/trunk/src/server/access_db_sql.cc
+   M /voms/trunk/src/socklib/Makefile.in
+   M /voms/trunk/src/socklib/tokens.c
+   M /voms/trunk/src/sslutils/Makefile.in
+   M /voms/trunk/src/sslutils/oldgaa/Makefile.in
+   M /voms/trunk/src/support/Makefile.in
+   M /voms/trunk/src/utils/Makefile.in
+   M /voms/trunk/test/Makefile.in
+   M /voms/trunk/test/tests/Makefile.in
+   M /voms/trunk/test/utest/Makefile.in
+
+Merged releases 543:548 of https://svn.forge.cnaf.infn.it/svn/voms/voms/branches/mac
+------------------------------------------------------------------------
+r552 | marotta | 2007-03-27 10:24:30 +0200 (Tue, 27 Mar 2007) | 1 line
+Changed paths:
+   M /voms/trunk/src/include/log.h
+   M /voms/trunk/src/log/Makefile.am
+   M /voms/trunk/src/log/Makefile.in
+   M /voms/trunk/src/log/fns.c
+   M /voms/trunk/src/log/fs.c
+   M /voms/trunk/src/log/log.c
+   M /voms/trunk/src/log/sl.c
+   M /voms/trunk/src/server/VOMSServer.h
+   M /voms/trunk/src/server/vomsd.cc
+
+Merged 442:456 of https://svn.forge.cnaf.infn.it/svn/voms/voms/branches/logging
+------------------------------------------------------------------------
+r551 | marotta | 2007-03-27 10:20:01 +0200 (Tue, 27 Mar 2007) | 1 line
+Changed paths:
+   M /voms/trunk/doc/voms.sgml
+   M /voms/trunk/src/server/VOMSServer.h
+   M /voms/trunk/src/server/attribute.cc
+   M /voms/trunk/src/server/vomsd.cc
+
+Merged 470:472 of https://svn.forge.cnaf.infn.it/svn/voms/voms/branches/shortfqans
+------------------------------------------------------------------------
+r550 | marotta | 2007-03-27 10:10:18 +0200 (Tue, 27 Mar 2007) | 1 line
+Changed paths:
+   M /voms/trunk
+   M /voms/trunk/Makefile.am
+   M /voms/trunk/Makefile.in
+   M /voms/trunk/aclocal.m4
+   M /voms/trunk/build.xml
+   M /voms/trunk/configure
+   M /voms/trunk/configure.ac
+   M /voms/trunk/doc/Makefile.in
+   M /voms/trunk/doc/voms-proxy-info.sgml
+   M /voms/trunk/doc/voms.sgml
+   M /voms/trunk/project/acinclude.m4
+   M /voms/trunk/project/config.guess
+   M /voms/trunk/project/config.sub
+   M /voms/trunk/project/configure.properties.xml
+   M /voms/trunk/project/ltmain.sh
+   M /voms/trunk/project/version.properties
+   M /voms/trunk/src/Makefile.in
+   M /voms/trunk/src/ac/Makefile.in
+   M /voms/trunk/src/ac/init.c
+   M /voms/trunk/src/ac/write.c
+   M /voms/trunk/src/api/Makefile.in
+   M /voms/trunk/src/api/ccapi/Makefile.in
+   M /voms/trunk/src/api/ccapi/api_util.cc
+   M /voms/trunk/src/api/ccapi/ccval.cc
+   M /voms/trunk/src/api/ccapi/cinterface.cc
+   M /voms/trunk/src/api/ccapi/voms_api.cc
+   M /voms/trunk/src/api/ccapi/voms_api.h
+   M /voms/trunk/src/api/java/Makefile.am
+   M /voms/trunk/src/api/java/Makefile.in
+   A /voms/trunk/src/api/java/Manifest.add (from /voms/branches/voms-1-7-series/src/api/java/Manifest.add:549)
+   A /voms/trunk/src/api/java/log4j.properties (from /voms/branches/voms-1-7-series/src/api/java/log4j.properties:549)
+   M /voms/trunk/src/api/java/org/glite/security/voms/BasicVOMSTrustStore.java
+   M /voms/trunk/src/api/java/org/glite/security/voms/LSCFile.java
+   M /voms/trunk/src/api/java/org/glite/security/voms/PKIStore.java
+   M /voms/trunk/src/api/java/org/glite/security/voms/PKIUtils.java
+   M /voms/trunk/src/api/java/org/glite/security/voms/PKIVerifier.java
+   M /voms/trunk/src/api/java/org/glite/security/voms/SigningPolicy.java
+   M /voms/trunk/src/api/java/org/glite/security/voms/VOMSAttribute.java
+   M /voms/trunk/src/api/java/org/glite/security/voms/VOMSValidator.java
+   M /voms/trunk/src/api/java/org/glite/security/voms/ac/ACCerts.java
+   M /voms/trunk/src/api/java/org/glite/security/voms/ac/ACGenerator.java
+   M /voms/trunk/src/api/java/org/glite/security/voms/ac/ACTarget.java
+   M /voms/trunk/src/api/java/org/glite/security/voms/ac/ACTargets.java
+   M /voms/trunk/src/api/java/org/glite/security/voms/ac/ACValidator.java
+   M /voms/trunk/src/api/java/org/glite/security/voms/ac/AttributeCertificate.java
+   M /voms/trunk/src/api/java/org/glite/security/voms/ac/AttributeCertificateInfo.java
+   M /voms/trunk/src/api/java/org/glite/security/voms/ac/AttributeHolder.java
+   M /voms/trunk/src/api/java/org/glite/security/voms/ac/FullAttributes.java
+   M /voms/trunk/src/api/java/org/glite/security/voms/ac/GenericAttribute.java
+   M /voms/trunk/src/api/java/org/glite/security/voms/ac/Holder.java
+   M /voms/trunk/src/api/java/org/glite/security/voms/ac/IetfAttrSyntax.java
+   M /voms/trunk/src/api/java/org/glite/security/voms/ac/Util.java
+   M /voms/trunk/src/api/java/org/glite/security/voms/ac/VOMSTrustStore.java
+   A /voms/trunk/src/api/java/org/glite/security/voms/contact (from /voms/branches/voms-1-7-series/src/api/java/org/glite/security/voms/contact:549)
+   R /voms/trunk/src/api/java/org/glite/security/voms/contact/MyProxyCertInfo.java (from /voms/branches/voms-1-7-series/src/api/java/org/glite/security/voms/contact/MyProxyCertInfo.java:549)
+   R /voms/trunk/src/api/java/org/glite/security/voms/contact/PathNamingScheme.java (from /voms/branches/voms-1-7-series/src/api/java/org/glite/security/voms/contact/PathNamingScheme.java:549)
+   R /voms/trunk/src/api/java/org/glite/security/voms/contact/Test.java (from /voms/branches/voms-1-7-series/src/api/java/org/glite/security/voms/contact/Test.java:549)
+   R /voms/trunk/src/api/java/org/glite/security/voms/contact/UserCredentials.java (from /voms/branches/voms-1-7-series/src/api/java/org/glite/security/voms/contact/UserCredentials.java:549)
+   R /voms/trunk/src/api/java/org/glite/security/voms/contact/VOMSDecoder.java (from /voms/branches/voms-1-7-series/src/api/java/org/glite/security/voms/contact/VOMSDecoder.java:549)
+   R /voms/trunk/src/api/java/org/glite/security/voms/contact/VOMSESFileParser.java (from /voms/branches/voms-1-7-series/src/api/java/org/glite/security/voms/contact/VOMSESFileParser.java:549)
+   R /voms/trunk/src/api/java/org/glite/security/voms/contact/VOMSErrorMessage.java (from /voms/branches/voms-1-7-series/src/api/java/org/glite/security/voms/contact/VOMSErrorMessage.java:549)
+   R /voms/trunk/src/api/java/org/glite/security/voms/contact/VOMSException.java (from /voms/branches/voms-1-7-series/src/api/java/org/glite/security/voms/contact/VOMSException.java:549)
+   R /voms/trunk/src/api/java/org/glite/security/voms/contact/VOMSParser.java (from /voms/branches/voms-1-7-series/src/api/java/org/glite/security/voms/contact/VOMSParser.java:549)
+   R /voms/trunk/src/api/java/org/glite/security/voms/contact/VOMSProtocol.java (from /voms/branches/voms-1-7-series/src/api/java/org/glite/security/voms/contact/VOMSProtocol.java:549)
+   R /voms/trunk/src/api/java/org/glite/security/voms/contact/VOMSProxyBuilder.java (from /voms/branches/voms-1-7-series/src/api/java/org/glite/security/voms/contact/VOMSProxyBuilder.java:549)
+   R /voms/trunk/src/api/java/org/glite/security/voms/contact/VOMSProxyInit.java (from /voms/branches/voms-1-7-series/src/api/java/org/glite/security/voms/contact/VOMSProxyInit.java:549)
+   R /voms/trunk/src/api/java/org/glite/security/voms/contact/VOMSRequestFactory.java (from /voms/branches/voms-1-7-series/src/api/java/org/glite/security/voms/contact/VOMSRequestFactory.java:549)
+   R /voms/trunk/src/api/java/org/glite/security/voms/contact/VOMSRequestOptions.java (from /voms/branches/voms-1-7-series/src/api/java/org/glite/security/voms/contact/VOMSRequestOptions.java:549)
+   R /voms/trunk/src/api/java/org/glite/security/voms/contact/VOMSResponse.java (from /voms/branches/voms-1-7-series/src/api/java/org/glite/security/voms/contact/VOMSResponse.java:549)
+   R /voms/trunk/src/api/java/org/glite/security/voms/contact/VOMSServerInfo.java (from /voms/branches/voms-1-7-series/src/api/java/org/glite/security/voms/contact/VOMSServerInfo.java:549)
+   R /voms/trunk/src/api/java/org/glite/security/voms/contact/VOMSServerMap.java (from /voms/branches/voms-1-7-series/src/api/java/org/glite/security/voms/contact/VOMSServerMap.java:549)
+   R /voms/trunk/src/api/java/org/glite/security/voms/contact/VOMSSocket.java (from /voms/branches/voms-1-7-series/src/api/java/org/glite/security/voms/contact/VOMSSocket.java:549)
+   R /voms/trunk/src/api/java/org/glite/security/voms/contact/VOMSSyntaxException.java (from /voms/branches/voms-1-7-series/src/api/java/org/glite/security/voms/contact/VOMSSyntaxException.java:549)
+   R /voms/trunk/src/api/java/org/glite/security/voms/contact/cli (from /voms/branches/voms-1-7-series/src/api/java/org/glite/security/voms/contact/cli:549)
+   R /voms/trunk/src/api/java/org/glite/security/voms/contact/cli/VomsProxyInitClient.java (from /voms/branches/voms-1-7-series/src/api/java/org/glite/security/voms/contact/cli/VomsProxyInitClient.java:549)
+   M /voms/trunk/src/autogen/config.h.in
+   M /voms/trunk/src/client/Makefile.in
+   M /voms/trunk/src/client/main.cc
+   M /voms/trunk/src/client/vomsclient.cc
+   M /voms/trunk/src/common/Makefile.am
+   M /voms/trunk/src/common/Makefile.in
+   M /voms/trunk/src/common/xml.c
+   M /voms/trunk/src/include/Makefile.am
+   M /voms/trunk/src/include/Makefile.in
+   A /voms/trunk/src/include/myproxycertinfo.h (from /voms/branches/voms-1-7-series/src/include/myproxycertinfo.h:549)
+   D /voms/trunk/src/include/proxycertinfo.h
+   M /voms/trunk/src/install/Makefile.in
+   M /voms/trunk/src/log/Makefile.in
+   M /voms/trunk/src/replib/Makefile.in
+   M /voms/trunk/src/replica/Makefile.in
+   M /voms/trunk/src/replica/voms_install_replica.in
+   M /voms/trunk/src/server/Makefile.in
+   M /voms/trunk/src/server/VOMSServer.h
+   M /voms/trunk/src/server/access_db_sql.cc
+   M /voms/trunk/src/server/access_db_sql.h
+   M /voms/trunk/src/server/vomsd.cc
+   M /voms/trunk/src/socklib/Makefile.in
+   M /voms/trunk/src/sslutils/Makefile.in
+   M /voms/trunk/src/sslutils/oldgaa/Makefile.in
+   M /voms/trunk/src/sslutils/proxycertinfo.c
+   M /voms/trunk/src/sslutils/sslutils.c
+   M /voms/trunk/src/support/Makefile.in
+   M /voms/trunk/src/utils/Makefile.in
+   M /voms/trunk/src/utils/voms_proxy_info.cc
+   M /voms/trunk/src/utils/vomsfake.cc
+   M /voms/trunk/test/Makefile.in
+   M /voms/trunk/test/tests/Makefile.in
+   M /voms/trunk/test/utest/Makefile.in
+   D /voms/trunk/test/utest/capi_cu_Main.cpp
+
+Merged releases 421:549 of https://svn.forge.cnaf.infn.it/svn/voms/voms/branches/voms-1-7-series
+------------------------------------------------------------------------
+r422 | marotta | 2006-10-26 16:01:53 +0200 (Thu, 26 Oct 2006) | 1 line
+Changed paths:
+   M /voms/trunk/configure
+   M /voms/trunk/configure.ac
+   M /voms/trunk/project/acinclude.m4
+   M /voms/trunk/project/version.properties
+   M /voms/trunk/src/ac/validate.c
+   M /voms/trunk/src/api/ccapi/ccval.cc
+   M /voms/trunk/src/api/ccapi/voms_api.cc
+   M /voms/trunk/src/api/ccapi/voms_apic.h
+   M /voms/trunk/src/api/java/org/glite/security/voms/VOMSValidator.java
+   M /voms/trunk/src/client/vomsclient.cc
+   M /voms/trunk/src/server/vomsd.cc
+   M /voms/trunk/src/socklib/Server.cpp
+   M /voms/trunk/src/sslutils/oldgaa/Makefile.am
+   M /voms/trunk/src/sslutils/oldgaa/Makefile.in
+   M /voms/trunk/src/sslutils/oldgaa/globus_oldgaa_utils.c
+   M /voms/trunk/src/sslutils/oldgaa/oldgaa_release.c
+   M /voms/trunk/src/sslutils/oldgaa/oldgaa_utils.c
+
+Merged releases 403:421 of https://svn.forge.cnaf.infn.it/svn/voms/voms/branches/voms-1-7-series
+------------------------------------------------------------------------
+r405 | valerio | 2006-09-19 16:51:47 +0200 (Tue, 19 Sep 2006) | 1 line
+Changed paths:
+   M /voms/trunk/aclocal.m4
+   M /voms/trunk/configure
+   M /voms/trunk/configure.ac
+   M /voms/trunk/doc/software.tex
+   M /voms/trunk/doc/voms-proxy-info.sgml
+   M /voms/trunk/doc/voms_install_db.sgml
+   M /voms/trunk/project/acinclude.m4
+   M /voms/trunk/project/config.guess
+   M /voms/trunk/project/config.sub
+   M /voms/trunk/project/ltmain.sh
+   M /voms/trunk/project/version.properties
+   M /voms/trunk/src/api/ccapi/voms_api.cc
+   M /voms/trunk/src/autogen/config.h.in
+   M /voms/trunk/src/client/vomsclient.cc
+   M /voms/trunk/src/common/Makefile.am
+   M /voms/trunk/src/common/Makefile.in
+   M /voms/trunk/src/common/options.cc
+   D /voms/trunk/src/common/sign.cc
+   M /voms/trunk/src/common/xml.c
+   M /voms/trunk/src/install/voms.start.in
+   M /voms/trunk/src/log/log.c
+   M /voms/trunk/src/server/vomsd.cc
+   M /voms/trunk/src/socklib/Client.cpp
+   M /voms/trunk/src/socklib/Server.cpp
+   M /voms/trunk/src/socklib/globuswrap.c
+   M /voms/trunk/src/sslutils/sslutils.c
+   M /voms/trunk/src/sslutils/sslutils.h
+   M /voms/trunk/src/utils/voms_proxy_info.cc
+
+Merged revisions 375:403 of https://svn.forge.cnaf.infn.it/svn/voms/voms/branches/voms-1-7-series
+------------------------------------------------------------------------
+r375 | valerio | 2006-08-30 09:47:39 +0200 (Wed, 30 Aug 2006) | 1 line
+Changed paths:
+   M /voms/trunk/aclocal.m4
+   M /voms/trunk/build.xml
+   M /voms/trunk/configure
+   M /voms/trunk/configure.ac
+   M /voms/trunk/doc/voms_install_replica.sgml
+   M /voms/trunk/project/config.guess
+   M /voms/trunk/project/config.sub
+   M /voms/trunk/project/ltmain.sh
+   M /voms/trunk/project/version.properties
+   M /voms/trunk/src/api/ccapi/Makefile.am
+   M /voms/trunk/src/api/ccapi/Makefile.in
+   D /voms/trunk/src/api/ccapi/jni-int.cc
+   D /voms/trunk/src/api/ccapi/jni-int.h
+   M /voms/trunk/src/api/java/Makefile.am
+   M /voms/trunk/src/api/java/Makefile.in
+   D /voms/trunk/src/api/java/org/glite/security/voms/Attribute.java
+   D /voms/trunk/src/api/java/org/glite/security/voms/AttributeList.java
+   M /voms/trunk/src/api/java/org/glite/security/voms/BasicVOMSTrustStore.java
+   A /voms/trunk/src/api/java/org/glite/security/voms/LSCFile.java (from /voms/branches/voms-1-7-series/src/api/java/org/glite/security/voms/LSCFile.java:374)
+   A /voms/trunk/src/api/java/org/glite/security/voms/PKIStore.java (from /voms/branches/voms-1-7-series/src/api/java/org/glite/security/voms/PKIStore.java:374)
+   A /voms/trunk/src/api/java/org/glite/security/voms/PKIUtils.java (from /voms/branches/voms-1-7-series/src/api/java/org/glite/security/voms/PKIUtils.java:374)
+   A /voms/trunk/src/api/java/org/glite/security/voms/PKIVerifier.java (from /voms/branches/voms-1-7-series/src/api/java/org/glite/security/voms/PKIVerifier.java:374)
+   A /voms/trunk/src/api/java/org/glite/security/voms/SigningPolicy.java (from /voms/branches/voms-1-7-series/src/api/java/org/glite/security/voms/SigningPolicy.java:374)
+   M /voms/trunk/src/api/java/org/glite/security/voms/VOMSAttribute.java
+   M /voms/trunk/src/api/java/org/glite/security/voms/VOMSValidator.java
+   A /voms/trunk/src/api/java/org/glite/security/voms/ac/ACCerts.java (from /voms/branches/voms-1-7-series/src/api/java/org/glite/security/voms/ac/ACCerts.java:374)
+   M /voms/trunk/src/api/java/org/glite/security/voms/ac/ACGenerator.java
+   A /voms/trunk/src/api/java/org/glite/security/voms/ac/ACTarget.java (from /voms/branches/voms-1-7-series/src/api/java/org/glite/security/voms/ac/ACTarget.java:374)
+   A /voms/trunk/src/api/java/org/glite/security/voms/ac/ACTargets.java (from /voms/branches/voms-1-7-series/src/api/java/org/glite/security/voms/ac/ACTargets.java:374)
+   M /voms/trunk/src/api/java/org/glite/security/voms/ac/ACTrustStore.java
+   M /voms/trunk/src/api/java/org/glite/security/voms/ac/ACValidator.java
+   M /voms/trunk/src/api/java/org/glite/security/voms/ac/AttributeCertificate.java
+   M /voms/trunk/src/api/java/org/glite/security/voms/ac/AttributeCertificateInfo.java
+   A /voms/trunk/src/api/java/org/glite/security/voms/ac/AttributeHolder.java (from /voms/branches/voms-1-7-series/src/api/java/org/glite/security/voms/ac/AttributeHolder.java:374)
+   A /voms/trunk/src/api/java/org/glite/security/voms/ac/FullAttributes.java (from /voms/branches/voms-1-7-series/src/api/java/org/glite/security/voms/ac/FullAttributes.java:374)
+   A /voms/trunk/src/api/java/org/glite/security/voms/ac/GenericAttribute.java (from /voms/branches/voms-1-7-series/src/api/java/org/glite/security/voms/ac/GenericAttribute.java:374)
+   M /voms/trunk/src/api/java/org/glite/security/voms/ac/Holder.java
+   M /voms/trunk/src/api/java/org/glite/security/voms/ac/IetfAttrSyntax.java
+   M /voms/trunk/src/api/java/org/glite/security/voms/ac/Util.java
+   A /voms/trunk/src/api/java/org/glite/security/voms/ac/VOMSTrustStore.java (from /voms/branches/voms-1-7-series/src/api/java/org/glite/security/voms/ac/VOMSTrustStore.java:374)
+   D /voms/trunk/src/api/java/org/glite/security/voms/peers
+   M /voms/trunk/src/client/vomsclient.cc
+   M /voms/trunk/src/common/sign.cc
+   M /voms/trunk/src/include/replace.h
+   M /voms/trunk/src/log/log.c
+   M /voms/trunk/src/server/access_db_sql.cc
+   M /voms/trunk/src/server/attribute.cc
+   M /voms/trunk/src/server/attribute.h
+   M /voms/trunk/src/server/vomsd.cc
+   M /voms/trunk/src/utils/vomsfake.cc
+
+Merged revisions 307:317 of https://svn.forge.cnaf.infn.it/svn/voms/voms/branches/voms-1-7-series
+------------------------------------------------------------------------
+r319 | valerio | 2006-06-23 10:09:06 +0200 (Fri, 23 Jun 2006) | 1 line
+Changed paths:
+   M /voms/trunk/configure
+   M /voms/trunk/configure.ac
+   M /voms/trunk/project/version.properties
+   M /voms/trunk/src/server/access_db_sql.cc
+
+Merged revisions 307:317 of https://svn.forge.cnaf.infn.it/svn/voms/voms/branches/voms-1-7-series
+------------------------------------------------------------------------
+r309 | marotta | 2006-06-16 11:39:33 +0200 (Fri, 16 Jun 2006) | 1 line
+Changed paths:
+   M /voms/trunk/project/version.properties
+   M /voms/trunk/src/ac/init.c
+   M /voms/trunk/src/client/vomsclient.cc
+   M /voms/trunk/src/include/proxycertinfo.h
+   M /voms/trunk/src/sslutils/proxycertinfo.c
+   M /voms/trunk/src/sslutils/sslutils.c
+
+Merged revisions 296:307 of https://svn.forge.cnaf.infn.it/svn/voms/voms/branches/voms-1-7-series
+------------------------------------------------------------------------
+r303 | valerio | 2006-06-13 10:18:19 +0200 (Tue, 13 Jun 2006) | 1 line
+Changed paths:
+   M /voms/trunk/configure
+   M /voms/trunk/configure.ac
+   M /voms/trunk/src/server/access_db_sql.cc
+
+Corrected tables names in access_db_sql.cc and increased version.
+------------------------------------------------------------------------
+r297 | marotta | 2006-06-05 10:58:44 +0200 (Mon, 05 Jun 2006) | 1 line
+Changed paths:
+   M /voms/trunk/AUTHORS
+   M /voms/trunk/src/api/java/org/glite/security/voms/BasicVOMSTrustStore.java
+   A /voms/trunk/src/api/java/org/glite/security/voms/LICENSE (from /voms/branches/voms-1-7-series/src/api/java/org/glite/security/voms/LICENSE:296)
+
+Merged revision 291:296 of voms-1-7-series
+------------------------------------------------------------------------
+r291 | marotta | 2006-05-19 12:23:21 +0200 (Fri, 19 May 2006) | 1 line
+Changed paths:
+   M /voms/trunk/src/api/java/Makefile.am
+   M /voms/trunk/src/api/java/Makefile.in
+
+Further EGEE fixes to compilation.
+------------------------------------------------------------------------
+r290 | marotta | 2006-05-19 11:39:42 +0200 (Fri, 19 May 2006) | 1 line
+Changed paths:
+   M /voms/trunk/configure
+   M /voms/trunk/project/acinclude.m4
+
+Fixed bug in --enable-java configure option.
+------------------------------------------------------------------------
+r284 | marotta | 2006-05-18 17:11:21 +0200 (Thu, 18 May 2006) | 1 line
+Changed paths:
+   M /voms/trunk/src/api/ccapi/Makefile.am
+   M /voms/trunk/src/api/ccapi/Makefile.in
+
+Furter further fixes for EGEE buildsystem.
+------------------------------------------------------------------------
+r283 | marotta | 2006-05-18 17:05:02 +0200 (Thu, 18 May 2006) | 1 line
+Changed paths:
+   M /voms/trunk/src/api/ccapi/Makefile.am
+   M /voms/trunk/src/api/ccapi/Makefile.in
+
+Furter further fixes for EGEE buildsystem.
+------------------------------------------------------------------------
+r282 | marotta | 2006-05-18 16:51:21 +0200 (Thu, 18 May 2006) | 1 line
+Changed paths:
+   M /voms/trunk/src/api/ccapi/Makefile.am
+   M /voms/trunk/src/api/ccapi/Makefile.in
+
+Further fixes for EGEE buildsystem.
+------------------------------------------------------------------------
+r281 | marotta | 2006-05-18 16:32:09 +0200 (Thu, 18 May 2006) | 1 line
+Changed paths:
+   M /voms/trunk/configure
+   M /voms/trunk/project/acinclude.m4
+   M /voms/trunk/project/configure.properties.xml
+
+Several fixes for EGEE buildsystem.
+------------------------------------------------------------------------
+r280 | marotta | 2006-05-18 16:08:35 +0200 (Thu, 18 May 2006) | 1 line
+Changed paths:
+   M /voms/trunk/configure
+   M /voms/trunk/configure.ac
+   M /voms/trunk/project/version.properties
+
+Bumped version number.
+------------------------------------------------------------------------
+r279 | marotta | 2006-05-18 15:30:24 +0200 (Thu, 18 May 2006) | 1 line
+Changed paths:
+   M /voms/trunk/configure
+   M /voms/trunk/project/acinclude.m4
+
+Fixed problem with --with-bc and --with-log4j configure options.
+------------------------------------------------------------------------
+r278 | marotta | 2006-05-18 15:25:04 +0200 (Thu, 18 May 2006) | 1 line
+Changed paths:
+   M /voms/trunk/src/api/java/Makefile.am
+   M /voms/trunk/src/api/java/Makefile.in
+
+Corrected sourcepath in java compilation.
+------------------------------------------------------------------------
+r277 | valerio | 2006-05-18 11:02:44 +0200 (Thu, 18 May 2006) | 1 line
+Changed paths:
+   M /voms/trunk/src/server/access_db_sql.cc
+
+Added role to qualifier string in generic attributes;
+------------------------------------------------------------------------
+r276 | marotta | 2006-05-18 10:55:02 +0200 (Thu, 18 May 2006) | 1 line
+Changed paths:
+   A /voms/trunk/doc/RELEASE-NOTES.1-7-0
+
+Updated release notes.
+------------------------------------------------------------------------
+r275 | marotta | 2006-05-17 17:42:55 +0200 (Wed, 17 May 2006) | 1 line
+Changed paths:
+   M /voms/trunk/src/ac/extensions.c
+   M /voms/trunk/src/ac/write.c
+
+Eliminate further sk_dup() problems.
+------------------------------------------------------------------------
+r274 | valerio | 2006-05-17 16:25:22 +0200 (Wed, 17 May 2006) | 1 line
+Changed paths:
+   M /voms/trunk/src/ac/extensions.c
+   M /voms/trunk/src/ac/write.c
+
+Temptative fix for sk_ASN1_dup problem.
+------------------------------------------------------------------------
+r273 | marotta | 2006-05-16 17:23:07 +0200 (Tue, 16 May 2006) | 1 line
+Changed paths:
+   M /voms/trunk/src/ac/validate.c
+   M /voms/trunk/src/ac/write.c
+   M /voms/trunk/src/common/xml.c
+   M /voms/trunk/src/log/log.c
+   M /voms/trunk/src/server/access_db_sql.cc
+   M /voms/trunk/src/server/vomsd.cc
+
+Fixes for compilation under RH 7
+------------------------------------------------------------------------
+r272 | marotta | 2006-05-16 16:23:11 +0200 (Tue, 16 May 2006) | 1 line
+Changed paths:
+   A /voms/trunk/src/api/ccapi/realdata.h
+
+Forgotten file from 271 revision.
+------------------------------------------------------------------------
+r271 | marotta | 2006-05-16 16:22:27 +0200 (Tue, 16 May 2006) | 1 line
+Changed paths:
+   M /voms/trunk/src/ac/attributes.c
+   M /voms/trunk/src/ac/extensions.c
+   M /voms/trunk/src/ac/validate.c
+   M /voms/trunk/src/ac/write.c
+   M /voms/trunk/src/api/ccapi/api_util.cc
+   M /voms/trunk/src/api/ccapi/ccval.cc
+   M /voms/trunk/src/api/ccapi/cinterface.cc
+   M /voms/trunk/src/api/ccapi/jni-int.cc
+   M /voms/trunk/src/api/ccapi/voms_api.cc
+   M /voms/trunk/src/api/ccapi/voms_api.h
+   M /voms/trunk/src/utils/voms_proxy_info.cc
+
+Fixed incompatibility with old libraries and executables.
+------------------------------------------------------------------------
+r270 | marotta | 2006-05-12 18:58:02 +0200 (Fri, 12 May 2006) | 1 line
+Changed paths:
+   M /voms/trunk/src/ac/acerrors.h
+   M /voms/trunk/src/ac/error.c
+   M /voms/trunk/src/ac/extensions.c
+   M /voms/trunk/src/ac/newformat.c
+   M /voms/trunk/src/ac/validate.c
+   M /voms/trunk/src/ac/write.c
+   M /voms/trunk/src/api/ccapi/jni-int.cc
+
+moved attributes to extension.
+------------------------------------------------------------------------
+r269 | marotta | 2006-05-12 09:54:25 +0200 (Fri, 12 May 2006) | 1 line
+Changed paths:
+   M /voms/trunk/src/api/ccapi/jni-int.cc
+   M /voms/trunk/src/api/java/org/glite/security/voms/VOMSValidator.java
+
+Removed debugging output.
+------------------------------------------------------------------------
+r268 | marotta | 2006-05-11 18:02:25 +0200 (Thu, 11 May 2006) | 1 line
+Changed paths:
+   M /voms/trunk/Makefile.in
+   M /voms/trunk/aclocal.m4
+   M /voms/trunk/configure
+   M /voms/trunk/configure.ac
+   M /voms/trunk/doc/Makefile.in
+   M /voms/trunk/project/acinclude.m4
+   M /voms/trunk/project/config.guess
+   M /voms/trunk/project/config.sub
+   M /voms/trunk/project/ltmain.sh
+   M /voms/trunk/src/Makefile.in
+   M /voms/trunk/src/ac/Makefile.in
+   M /voms/trunk/src/api/Makefile.in
+   M /voms/trunk/src/api/ccapi/Makefile.in
+   M /voms/trunk/src/api/java/Makefile.am
+   M /voms/trunk/src/api/java/Makefile.in
+   M /voms/trunk/src/client/Makefile.in
+   M /voms/trunk/src/common/Makefile.in
+   M /voms/trunk/src/include/Makefile.in
+   M /voms/trunk/src/install/Makefile.in
+   M /voms/trunk/src/log/Makefile.in
+   M /voms/trunk/src/replib/Makefile.in
+   M /voms/trunk/src/replica/Makefile.in
+   M /voms/trunk/src/server/Makefile.in
+   M /voms/trunk/src/server/access_db_sql.cc
+   M /voms/trunk/src/socklib/Makefile.in
+   M /voms/trunk/src/sslutils/Makefile.in
+   M /voms/trunk/src/sslutils/oldgaa/Makefile.in
+   M /voms/trunk/src/support/Makefile.in
+   M /voms/trunk/src/utils/Makefile.in
+   M /voms/trunk/test/Makefile.in
+   M /voms/trunk/test/tests/Makefile.in
+   M /voms/trunk/test/utest/Makefile.in
+
+Optional java + oracle fixes.
+------------------------------------------------------------------------
+r267 | marotta | 2006-05-10 18:15:22 +0200 (Wed, 10 May 2006) | 1 line
+Changed paths:
+   M /voms/trunk/Makefile.in
+   M /voms/trunk/configure
+   M /voms/trunk/configure.ac
+   M /voms/trunk/doc/Makefile.in
+   M /voms/trunk/project/acinclude.m4
+   M /voms/trunk/src/Makefile.in
+   M /voms/trunk/src/ac/Makefile.in
+   M /voms/trunk/src/ac/validate.c
+   M /voms/trunk/src/api/Makefile.am
+   M /voms/trunk/src/api/Makefile.in
+   M /voms/trunk/src/api/ccapi/Makefile.am
+   M /voms/trunk/src/api/ccapi/Makefile.in
+   M /voms/trunk/src/api/java/Makefile.am
+   M /voms/trunk/src/api/java/Makefile.in
+   M /voms/trunk/src/client/Makefile.in
+   M /voms/trunk/src/common/Makefile.in
+   M /voms/trunk/src/include/Makefile.in
+   M /voms/trunk/src/install/Makefile.in
+   M /voms/trunk/src/log/Makefile.in
+   M /voms/trunk/src/replib/Makefile.in
+   M /voms/trunk/src/replica/Makefile.in
+   M /voms/trunk/src/server/Makefile.in
+   M /voms/trunk/src/socklib/Makefile.in
+   M /voms/trunk/src/sslutils/Makefile.in
+   M /voms/trunk/src/sslutils/oldgaa/Makefile.in
+   M /voms/trunk/src/support/Makefile.in
+   M /voms/trunk/src/utils/Makefile.in
+   M /voms/trunk/test/Makefile.in
+   M /voms/trunk/test/tests/Makefile.in
+   M /voms/trunk/test/utest/Makefile.in
+
+optional java + corrected memory corruption in src/ac/validate.c
+------------------------------------------------------------------------
+r266 | marotta | 2006-05-10 14:23:06 +0200 (Wed, 10 May 2006) | 1 line
+Changed paths:
+   M /voms/trunk/src/client/vomsclient.cc
+
+Fix for #16576
+------------------------------------------------------------------------
+r265 | marotta | 2006-05-10 12:55:50 +0200 (Wed, 10 May 2006) | 1 line
+Changed paths:
+   M /voms/trunk/src/client/vomsclient.cc
+
+Fix for bug #15436
+------------------------------------------------------------------------
+r264 | marotta | 2006-05-10 12:35:54 +0200 (Wed, 10 May 2006) | 1 line
+Changed paths:
+   M /voms/trunk/project/version.properties
+   M /voms/trunk/src/sslutils/oldgaa/Makefile.am
+   M /voms/trunk/src/sslutils/oldgaa/Makefile.in
+
+Merged releases 242:263 of branch_1_6_20_and_above
+------------------------------------------------------------------------
+r263 | marotta | 2006-05-10 10:49:55 +0200 (Wed, 10 May 2006) | 1 line
+Changed paths:
+   M /voms/trunk/configure
+   M /voms/trunk/configure.ac
+   M /voms/trunk/src/api/ccapi/voms_api.cc
+   M /voms/trunk/src/autogen/config.h.in
+
+Fix for bug #15572
+------------------------------------------------------------------------
+r262 | marotta | 2006-05-09 18:41:36 +0200 (Tue, 09 May 2006) | 1 line
+Changed paths:
+   A /voms/trunk/src/api/java/org/glite/security/voms/Attribute.java
+   A /voms/trunk/src/api/java/org/glite/security/voms/AttributeList.java
+   A /voms/trunk/src/api/java/org/glite/security/voms/peers/AttributeListPeer.java
+   A /voms/trunk/src/api/java/org/glite/security/voms/peers/AttributePeer.java
+
+Forgot to add these files for the previous update.
+------------------------------------------------------------------------
+r261 | marotta | 2006-05-09 18:38:13 +0200 (Tue, 09 May 2006) | 5 lines
+Changed paths:
+   M /voms/trunk/aclocal.m4
+   M /voms/trunk/configure
+   M /voms/trunk/project/config.guess
+   M /voms/trunk/project/config.sub
+   M /voms/trunk/project/ltmain.sh
+   M /voms/trunk/src/api/ccapi/jni-int.cc
+   M /voms/trunk/src/api/ccapi/jni-int.h
+   M /voms/trunk/src/api/java/Makefile.am
+   M /voms/trunk/src/api/java/Makefile.in
+   M /voms/trunk/src/api/java/org/glite/security/voms/VOMSAttribute.java
+   M /voms/trunk/src/api/java/org/glite/security/voms/peers/VomsPeer.java
+   M /voms/trunk/src/server/access_db_sql.cc
+   M /voms/trunk/src/server/access_db_sql.h
+   M /voms/trunk/src/server/vomsd.cc
+
+Added support for attribute to Java API.
+Created get_all_attributes() and get_role_attributes().
+Corrected UID/USERID in CA name bug.
+
+
+------------------------------------------------------------------------
+r260 | marotta | 2006-05-09 15:44:00 +0200 (Tue, 09 May 2006) | 1 line
+Changed paths:
+   M /voms/trunk/aclocal.m4
+   M /voms/trunk/configure
+   M /voms/trunk/project/config.guess
+   M /voms/trunk/project/config.sub
+   M /voms/trunk/project/ltmain.sh
+   M /voms/trunk/src/api/ccapi/ccval.cc
+   M /voms/trunk/src/server/access_db_sql.cc
+   M /voms/trunk/src/server/vomsd.cc
+
+Interim pre-release.
+------------------------------------------------------------------------
+r259 | marotta | 2006-05-09 10:09:31 +0200 (Tue, 09 May 2006) | 1 line
+Changed paths:
+   M /voms/trunk/doc/Makefile.am
+   M /voms/trunk/doc/Makefile.in
+   M /voms/trunk/src/ac/Makefile.am
+   M /voms/trunk/src/ac/Makefile.in
+   M /voms/trunk/src/ac/acerrors.h
+   A /voms/trunk/src/ac/attributes.c (from /voms/branches/generic_attributes/src/ac/attributes.c:256)
+   A /voms/trunk/src/ac/attributes.h (from /voms/branches/generic_attributes/src/ac/attributes.h:256)
+   M /voms/trunk/src/ac/create.cc
+   M /voms/trunk/src/ac/extensions.c
+   M /voms/trunk/src/ac/init.c
+   M /voms/trunk/src/ac/newformat.c
+   M /voms/trunk/src/ac/validate.c
+   M /voms/trunk/src/ac/write.c
+   M /voms/trunk/src/ac/write.h
+   M /voms/trunk/src/api/ccapi/api_util.cc
+   M /voms/trunk/src/api/ccapi/ccval.cc
+   M /voms/trunk/src/api/ccapi/cinterface.cc
+   M /voms/trunk/src/api/ccapi/cinterface.h
+   M /voms/trunk/src/api/ccapi/voms_api.cc
+   M /voms/trunk/src/api/ccapi/voms_api.h
+   M /voms/trunk/src/api/ccapi/voms_apic.h
+   M /voms/trunk/src/common/xml.c
+   M /voms/trunk/src/common/xmlcc.cc
+   M /voms/trunk/src/include/ccwrite.h
+   M /voms/trunk/src/include/newformat.h
+   M /voms/trunk/src/include/validate.h
+   M /voms/trunk/src/log/fs.c
+   M /voms/trunk/src/log/log.c
+   M /voms/trunk/src/server/access_db_sql.cc
+   M /voms/trunk/src/server/access_db_sql.h
+   M /voms/trunk/src/server/attribute.cc
+   M /voms/trunk/src/server/attribute.h
+   M /voms/trunk/src/server/vomsd.cc
+   M /voms/trunk/src/utils/voms_proxy_info.cc
+   M /voms/trunk/src/utils/vomsfake.cc
+
+Merged revisions 227:256 of generic_attributes branch.
+------------------------------------------------------------------------
+r258 | marotta | 2006-05-09 10:00:09 +0200 (Tue, 09 May 2006) | 1 line
+Changed paths:
+   M /voms/trunk/Makefile.in
+   M /voms/trunk/aclocal.m4
+   M /voms/trunk/configure
+   M /voms/trunk/configure.ac
+   M /voms/trunk/doc/Makefile.in
+   M /voms/trunk/project/acinclude.m4
+   M /voms/trunk/project/config.guess
+   M /voms/trunk/project/config.sub
+   M /voms/trunk/project/ltmain.sh
+   M /voms/trunk/src/Makefile.in
+   M /voms/trunk/src/ac/Makefile.am
+   M /voms/trunk/src/ac/Makefile.in
+   M /voms/trunk/src/ac/extensions.c
+   M /voms/trunk/src/api/Makefile.am
+   M /voms/trunk/src/api/Makefile.in
+   M /voms/trunk/src/api/ccapi/Makefile.am
+   M /voms/trunk/src/api/ccapi/Makefile.in
+   M /voms/trunk/src/api/ccapi/api_util.cc
+   M /voms/trunk/src/api/ccapi/api_util.h
+   M /voms/trunk/src/api/ccapi/cinterface.cc
+   M /voms/trunk/src/api/ccapi/cinterface.h
+   A /voms/trunk/src/api/ccapi/jni-int.cc (from /voms/branches/java_api_integration/src/api/ccapi/jni-int.cc:250)
+   A /voms/trunk/src/api/ccapi/jni-int.h (from /voms/branches/java_api_integration/src/api/ccapi/jni-int.h:250)
+   M /voms/trunk/src/api/ccapi/test.cc
+   M /voms/trunk/src/api/ccapi/voms_api.cc
+   M /voms/trunk/src/api/ccapi/voms_api.h
+   A /voms/trunk/src/api/ccapi/voms_api_nog.h (from /voms/branches/java_api_integration/src/api/ccapi/voms_api_nog.h:250)
+   M /voms/trunk/src/api/ccapi/voms_apic.h
+   A /voms/trunk/src/api/ccapi/voms_apic_nog.h (from /voms/branches/java_api_integration/src/api/ccapi/voms_apic_nog.h:250)
+   A /voms/trunk/src/api/java (from /voms/branches/java_api_integration/src/api/java:250)
+   R /voms/trunk/src/api/java/Makefile.am (from /voms/branches/java_api_integration/src/api/java/Makefile.am:250)
+   R /voms/trunk/src/api/java/Makefile.in (from /voms/branches/java_api_integration/src/api/java/Makefile.in:250)
+   R /voms/trunk/src/api/java/org (from /voms/branches/java_api_integration/src/api/java/org:250)
+   R /voms/trunk/src/api/java/org/glite (from /voms/branches/java_api_integration/src/api/java/org/glite:250)
+   R /voms/trunk/src/api/java/org/glite/security (from /voms/branches/java_api_integration/src/api/java/org/glite/security:250)
+   R /voms/trunk/src/api/java/org/glite/security/voms (from /voms/branches/java_api_integration/src/api/java/org/glite/security/voms:250)
+   R /voms/trunk/src/api/java/org/glite/security/voms/BasicVOMSTrustStore.java (from /voms/branches/java_api_integration/src/api/java/org/glite/security/voms/BasicVOMSTrustStore.java:250)
+   R /voms/trunk/src/api/java/org/glite/security/voms/FQAN.java (from /voms/branches/java_api_integration/src/api/java/org/glite/security/voms/FQAN.java:250)
+   R /voms/trunk/src/api/java/org/glite/security/voms/VOMSAttribute.java (from /voms/branches/java_api_integration/src/api/java/org/glite/security/voms/VOMSAttribute.java:250)
+   R /voms/trunk/src/api/java/org/glite/security/voms/VOMSValidator.java (from /voms/branches/java_api_integration/src/api/java/org/glite/security/voms/VOMSValidator.java:250)
+   R /voms/trunk/src/api/java/org/glite/security/voms/ac (from /voms/branches/java_api_integration/src/api/java/org/glite/security/voms/ac:250)
+   R /voms/trunk/src/api/java/org/glite/security/voms/ac/ACGenerator.java (from /voms/branches/java_api_integration/src/api/java/org/glite/security/voms/ac/ACGenerator.java:250)
+   R /voms/trunk/src/api/java/org/glite/security/voms/ac/ACTrustStore.java (from /voms/branches/java_api_integration/src/api/java/org/glite/security/voms/ac/ACTrustStore.java:250)
+   R /voms/trunk/src/api/java/org/glite/security/voms/ac/ACValidator.java (from /voms/branches/java_api_integration/src/api/java/org/glite/security/voms/ac/ACValidator.java:250)
+   R /voms/trunk/src/api/java/org/glite/security/voms/ac/AttCertIssuer.java (from /voms/branches/java_api_integration/src/api/java/org/glite/security/voms/ac/AttCertIssuer.java:250)
+   R /voms/trunk/src/api/java/org/glite/security/voms/ac/AttributeCertificate.java (from /voms/branches/java_api_integration/src/api/java/org/glite/security/voms/ac/AttributeCertificate.java:250)
+   R /voms/trunk/src/api/java/org/glite/security/voms/ac/AttributeCertificateInfo.java (from /voms/branches/java_api_integration/src/api/java/org/glite/security/voms/ac/AttributeCertificateInfo.java:250)
+   R /voms/trunk/src/api/java/org/glite/security/voms/ac/Holder.java (from /voms/branches/java_api_integration/src/api/java/org/glite/security/voms/ac/Holder.java:250)
+   R /voms/trunk/src/api/java/org/glite/security/voms/ac/IetfAttrSyntax.java (from /voms/branches/java_api_integration/src/api/java/org/glite/security/voms/ac/IetfAttrSyntax.java:250)
+   R /voms/trunk/src/api/java/org/glite/security/voms/ac/ObjectDigestInfo.java (from /voms/branches/java_api_integration/src/api/java/org/glite/security/voms/ac/ObjectDigestInfo.java:250)
+   R /voms/trunk/src/api/java/org/glite/security/voms/ac/Util.java (from /voms/branches/java_api_integration/src/api/java/org/glite/security/voms/ac/Util.java:250)
+   R /voms/trunk/src/api/java/org/glite/security/voms/ac/V2Form.java (from /voms/branches/java_api_integration/src/api/java/org/glite/security/voms/ac/V2Form.java:250)
+   R /voms/trunk/src/api/java/org/glite/security/voms/peers (from /voms/branches/java_api_integration/src/api/java/org/glite/security/voms/peers:250)
+   R /voms/trunk/src/api/java/org/glite/security/voms/peers/ContactDataPeer.java (from /voms/branches/java_api_integration/src/api/java/org/glite/security/voms/peers/ContactDataPeer.java:250)
+   R /voms/trunk/src/api/java/org/glite/security/voms/peers/DataPeer.java (from /voms/branches/java_api_integration/src/api/java/org/glite/security/voms/peers/DataPeer.java:250)
+   R /voms/trunk/src/api/java/org/glite/security/voms/peers/VomsPeer.java (from /voms/branches/java_api_integration/src/api/java/org/glite/security/voms/peers/VomsPeer.java:250)
+   R /voms/trunk/src/api/java/org/glite/security/voms/peers/VomsdataPeer.java (from /voms/branches/java_api_integration/src/api/java/org/glite/security/voms/peers/VomsdataPeer.java:250)
+   M /voms/trunk/src/autogen/config.h.in
+   M /voms/trunk/src/client/Makefile.in
+   M /voms/trunk/src/common/Makefile.am
+   M /voms/trunk/src/common/Makefile.in
+   M /voms/trunk/src/common/credentials.c
+   M /voms/trunk/src/include/Makefile.in
+   M /voms/trunk/src/include/credentials.h
+   M /voms/trunk/src/include/replace.h
+   M /voms/trunk/src/install/Makefile.in
+   M /voms/trunk/src/log/Makefile.in
+   M /voms/trunk/src/replib/Makefile.in
+   M /voms/trunk/src/replica/Makefile.in
+   M /voms/trunk/src/server/Makefile.in
+   M /voms/trunk/src/socklib/Makefile.in
+   M /voms/trunk/src/sslutils/Makefile.am
+   M /voms/trunk/src/sslutils/Makefile.in
+   M /voms/trunk/src/sslutils/oldgaa/Makefile.am
+   M /voms/trunk/src/sslutils/oldgaa/Makefile.in
+   M /voms/trunk/src/support/Makefile.in
+   M /voms/trunk/src/utils/Makefile.in
+   M /voms/trunk/test/Makefile.in
+   M /voms/trunk/test/tests/Makefile.in
+   M /voms/trunk/test/utest/Makefile.in
+
+merged revisions 235:250 of java_api_integration branch.
+------------------------------------------------------------------------
+r257 | marotta | 2006-05-09 09:54:17 +0200 (Tue, 09 May 2006) | 1 line
+Changed paths:
+   M /voms/trunk/doc/software.tex
+   M /voms/trunk/src/api/ccapi/api_util.cc
+   M /voms/trunk/src/api/ccapi/voms_api.h
+
+merged revisions 202:254 of the certs_in_ac branch
+------------------------------------------------------------------------
+r243 | valerio | 2006-04-11 12:41:12 +0200 (Tue, 11 Apr 2006) | 1 line
+Changed paths:
+   M /voms/trunk/project/acinclude.m4
+   M /voms/trunk/src/api/ccapi/Makefile.am
+   M /voms/trunk/src/api/ccapi/Makefile.in
+   M /voms/trunk/src/api/ccapi/ccval.cc
+   M /voms/trunk/src/client/vomsclient.cc
+   M /voms/trunk/src/install/voms.start.in
+   M /voms/trunk/src/server/vomsd.cc
+
+Merged revision 207:242 of branch_1_6_20_and_above.
+------------------------------------------------------------------------
+r241 | valerio | 2006-04-07 13:26:24 +0200 (Fri, 07 Apr 2006) | 1 line
+Changed paths:
+   M /voms/trunk/src/client/Makefile.am
+   M /voms/trunk/src/client/Makefile.in
+   A /voms/trunk/src/client/contact.hpp (from /voms/branches/multiple_roles/src/client/contact.hpp:240)
+   M /voms/trunk/src/client/fqan.cc
+   M /voms/trunk/src/client/fqan.h
+   M /voms/trunk/src/client/vomsclient.cc
+   M /voms/trunk/src/common/xml.c
+   M /voms/trunk/src/common/xmlcc.cc
+   M /voms/trunk/src/include/vomsxml.h
+   M /voms/trunk/src/include/xml.h
+   M /voms/trunk/src/server/attribute.cc
+   M /voms/trunk/src/server/attribute.h
+   M /voms/trunk/src/server/vomsd.cc
+
+Merged revision 199:240 of multiple_roles branch.
+------------------------------------------------------------------------
+r225 | valerio | 2006-03-27 16:22:28 +0200 (Mon, 27 Mar 2006) | 1 line
+Changed paths:
+   M /voms/trunk/src/api/ccapi/cinterface.cc
+
+Corrected VOMS_FindBYVO call.
+------------------------------------------------------------------------
+r203 | marotta | 2006-03-02 10:57:42 +0100 (Thu, 02 Mar 2006) | 1 line
+Changed paths:
+   M /voms/trunk/.cvsignore
+   M /voms/trunk/Makefile.am
+   M /voms/trunk/Makefile.in
+   M /voms/trunk/aclocal.m4
+   M /voms/trunk/configure
+   M /voms/trunk/doc/software.tex
+   M /voms/trunk/project/config.guess
+   M /voms/trunk/project/config.sub
+   M /voms/trunk/project/ltmain.sh
+   M /voms/trunk/src/ac/acerrors.h
+   M /voms/trunk/src/ac/create.cc
+   M /voms/trunk/src/ac/extensions.c
+   M /voms/trunk/src/ac/init.c
+   M /voms/trunk/src/ac/mystack.c
+   M /voms/trunk/src/ac/write.c
+   M /voms/trunk/src/ac/write.h
+   M /voms/trunk/src/api/ccapi/api_util.cc
+   M /voms/trunk/src/api/ccapi/ccval.cc
+   M /voms/trunk/src/api/ccapi/voms_api.h
+   M /voms/trunk/src/include/Server.h
+   M /voms/trunk/src/include/ccwrite.h
+   M /voms/trunk/src/include/newformat.h
+   M /voms/trunk/src/server/vomsd.cc
+   M /voms/trunk/src/socklib/Server.cpp
+   M /voms/trunk/src/utils/vomsfake.cc
+
+Merged revisions 196:202 of the certs_in_ac branch.
+------------------------------------------------------------------------
+r187 | vventuri | 2006-02-23 16:20:08 +0100 (Thu, 23 Feb 2006) | 2 lines
+Changed paths:
+   M /voms/trunk/src/client/vomsclient.cc
+
+Corrected check for certificate permissions
+
+------------------------------------------------------------------------
+r183 | vventuri | 2006-02-20 11:53:53 +0100 (Mon, 20 Feb 2006) | 2 lines
+Changed paths:
+   M /voms/trunk/src/install/voms.start.in
+
+Kill middleman process.
+
+------------------------------------------------------------------------
+r182 | vventuri | 2006-02-20 11:36:35 +0100 (Mon, 20 Feb 2006) | 2 lines
+Changed paths:
+   M /voms/trunk/src/install/voms.start.in
+
+Kill middleman process.
+
+------------------------------------------------------------------------
+r181 | vventuri | 2006-02-16 16:59:25 +0100 (Thu, 16 Feb 2006) | 2 lines
+Changed paths:
+   M /voms/trunk/src/client/vomsclient.cc
+
+Added check for correct permissions of cert and key.
+
+------------------------------------------------------------------------
+r179 | marotta | 2006-02-08 10:49:13 +0100 (Wed, 08 Feb 2006) | 2 lines
+Changed paths:
+   M /voms/trunk/aclocal.m4
+   M /voms/trunk/configure
+   M /voms/trunk/configure.ac
+   M /voms/trunk/project/config.guess
+   M /voms/trunk/project/config.sub
+   M /voms/trunk/project/ltmain.sh
+   M /voms/trunk/project/version.properties
+
+cleared various messages.
+
+------------------------------------------------------------------------
+r178 | marotta | 2006-02-08 10:45:13 +0100 (Wed, 08 Feb 2006) | 2 lines
+Changed paths:
+   M /voms/trunk/src/install/voms.start.in
+
+correctly killing middleman
+
+------------------------------------------------------------------------
+r176 | vventuri | 2006-02-01 14:40:47 +0100 (Wed, 01 Feb 2006) | 2 lines
+Changed paths:
+   M /voms/trunk/src/server/vomsd.cc
+   M /voms/trunk/src/socklib/Server.cpp
+
+Error messages corrected.
+
+------------------------------------------------------------------------
+r175 | vventuri | 2006-01-31 11:54:15 +0100 (Tue, 31 Jan 2006) | 2 lines
+Changed paths:
+   M /voms/trunk/doc/voms-proxy-init.sgml
+   M /voms/trunk/doc/voms-proxy-list.sgml
+
+Changed description of noregen option.
+
+------------------------------------------------------------------------
+r174 | vventuri | 2006-01-31 11:40:16 +0100 (Tue, 31 Jan 2006) | 2 lines
+Changed paths:
+   M /voms/trunk/src/client/vomsclient.cc
+
+Check of expiry date before connecting to the server.
+
+------------------------------------------------------------------------
+r172 | vventuri | 2006-01-31 09:58:49 +0100 (Tue, 31 Jan 2006) | 2 lines
+Changed paths:
+   M /voms/trunk/aclocal.m4
+   M /voms/trunk/configure
+   M /voms/trunk/configure.ac
+   M /voms/trunk/project/config.guess
+   M /voms/trunk/project/config.sub
+   M /voms/trunk/project/ltmain.sh
+   M /voms/trunk/project/version.properties
+
+Increased revision number.
+
+------------------------------------------------------------------------
+r171 | vventuri | 2006-01-30 17:46:21 +0100 (Mon, 30 Jan 2006) | 2 lines
+Changed paths:
+   M /voms/trunk/src/api/ccapi/Makefile.am
+   M /voms/trunk/src/api/ccapi/Makefile.in
+
+Wrong linking for libvomsc.
+
+------------------------------------------------------------------------
+r170 | vventuri | 2006-01-30 15:57:43 +0100 (Mon, 30 Jan 2006) | 2 lines
+Changed paths:
+   M /voms/trunk/doc/Makefile.am
+   M /voms/trunk/doc/Makefile.in
+   M /voms/trunk/doc/c++api.tex
+   M /voms/trunk/doc/capi.tex
+   D /voms/trunk/doc/edg-voms-proxy-destroy.sgml
+   D /voms/trunk/doc/edg-voms-proxy-fake.sgml
+   D /voms/trunk/doc/edg-voms-proxy-info.sgml
+   D /voms/trunk/doc/edg-voms-proxy-init.sgml
+   D /voms/trunk/doc/edg-voms-proxy-list.sgml
+   D /voms/trunk/doc/edg-voms.sgml
+   M /voms/trunk/doc/software.tex
+   M /voms/trunk/doc/testvoms.sgml
+   A /voms/trunk/doc/voms-proxy-destroy.sgml
+   A /voms/trunk/doc/voms-proxy-fake.sgml
+   A /voms/trunk/doc/voms-proxy-info.sgml
+   A /voms/trunk/doc/voms-proxy-init.sgml
+   A /voms/trunk/doc/voms-proxy-list.sgml
+   A /voms/trunk/doc/voms.sgml
+   M /voms/trunk/doc/voms_install_db.sgml
+   M /voms/trunk/doc/voms_install_replica.sgml
+
+Removed references to edg.
+
+------------------------------------------------------------------------
+r169 | marotta | 2006-01-30 14:29:35 +0100 (Mon, 30 Jan 2006) | 2 lines
+Changed paths:
+   M /voms/trunk/aclocal.m4
+   M /voms/trunk/configure
+   M /voms/trunk/configure.ac
+   M /voms/trunk/project/config.guess
+   M /voms/trunk/project/config.sub
+   M /voms/trunk/project/ltmain.sh
+   M /voms/trunk/project/version.properties
+
+Reinstated correct version.
+
+------------------------------------------------------------------------
+r167 | marotta | 2006-01-30 11:46:56 +0100 (Mon, 30 Jan 2006) | 2 lines
+Changed paths:
+   M /voms/trunk/configure.ac
+   M /voms/trunk/project/version.properties
+
+Adjusting version number to testversion
+
+------------------------------------------------------------------------
+r165 | vventuri | 2006-01-30 10:18:28 +0100 (Mon, 30 Jan 2006) | 2 lines
+Changed paths:
+   M /voms/trunk/configure
+   M /voms/trunk/configure.ac
+   M /voms/trunk/project/version.properties
+
+Increased revision number.
+
+------------------------------------------------------------------------
+r164 | vventuri | 2006-01-30 09:52:27 +0100 (Mon, 30 Jan 2006) | 2 lines
+Changed paths:
+   M /voms/trunk/src/api/ccapi/Makefile.am
+   M /voms/trunk/src/api/ccapi/Makefile.in
+
+globus flavors for AC libraries.
+
+------------------------------------------------------------------------
+r163 | vventuri | 2006-01-30 09:30:14 +0100 (Mon, 30 Jan 2006) | 2 lines
+Changed paths:
+   M /voms/trunk/Makefile.in
+   M /voms/trunk/aclocal.m4
+   M /voms/trunk/configure
+   M /voms/trunk/doc/Makefile.in
+   M /voms/trunk/project/acinclude.m4
+   M /voms/trunk/project/config.guess
+   M /voms/trunk/project/config.sub
+   M /voms/trunk/project/ltmain.sh
+   M /voms/trunk/src/Makefile.in
+   M /voms/trunk/src/ac/Makefile.am
+   M /voms/trunk/src/ac/Makefile.in
+   M /voms/trunk/src/api/Makefile.in
+   M /voms/trunk/src/api/ccapi/Makefile.am
+   M /voms/trunk/src/api/ccapi/Makefile.in
+   M /voms/trunk/src/client/Makefile.in
+   M /voms/trunk/src/common/Makefile.in
+   M /voms/trunk/src/include/Makefile.in
+   M /voms/trunk/src/install/Makefile.in
+   M /voms/trunk/src/log/Makefile.in
+   M /voms/trunk/src/replib/Makefile.in
+   M /voms/trunk/src/replica/Makefile.in
+   M /voms/trunk/src/server/Makefile.in
+   M /voms/trunk/src/socklib/Makefile.in
+   M /voms/trunk/src/sslutils/Makefile.in
+   M /voms/trunk/src/sslutils/oldgaa/Makefile.in
+   M /voms/trunk/src/support/Makefile.in
+   M /voms/trunk/src/utils/Makefile.in
+   M /voms/trunk/test/Makefile.in
+   M /voms/trunk/test/tests/Makefile.in
+   M /voms/trunk/test/utest/Makefile.in
+
+globus flavors for AC libraries.
+
+------------------------------------------------------------------------
+r161 | vventuri | 2006-01-27 16:12:02 +0100 (Fri, 27 Jan 2006) | 2 lines
+Changed paths:
+   M /voms/trunk/project/version.properties
+
+Increased revision number.
+
+------------------------------------------------------------------------
+r160 | vventuri | 2006-01-27 16:00:05 +0100 (Fri, 27 Jan 2006) | 2 lines
+Changed paths:
+   M /voms/trunk/configure
+   M /voms/trunk/configure.ac
+
+Increased revision number.
+
+------------------------------------------------------------------------
+r159 | vventuri | 2006-01-27 15:51:22 +0100 (Fri, 27 Jan 2006) | 2 lines
+Changed paths:
+   M /voms/trunk/src/socklib/Makefile.am
+   M /voms/trunk/src/socklib/Makefile.in
+
+Forgotten ia64 flavors.
+
+------------------------------------------------------------------------
+r155 | marotta | 2006-01-25 11:24:41 +0100 (Wed, 25 Jan 2006) | 2 lines
+Changed paths:
+   M /voms/trunk/configure
+   M /voms/trunk/configure.ac
+   M /voms/trunk/project/version.properties
+
+merging latest commits.
+
+------------------------------------------------------------------------
+r154 | vventuri | 2006-01-25 11:20:17 +0100 (Wed, 25 Jan 2006) | 2 lines
+Changed paths:
+   M /voms/trunk/src/client/vomsclient.cc
+
+Minor changes.
+
+------------------------------------------------------------------------
+r153 | vventuri | 2006-01-25 11:01:41 +0100 (Wed, 25 Jan 2006) | 2 lines
+Changed paths:
+   M /voms/trunk/src/client/vomsclient.cc
+   M /voms/trunk/src/client/vomsclient.h
+
+Corrected to allow h:m format for voms-proxy-init.
+
+------------------------------------------------------------------------
+r152 | vventuri | 2006-01-25 11:00:24 +0100 (Wed, 25 Jan 2006) | 2 lines
+Changed paths:
+   M /voms/trunk/src/sslutils/sslutils.c
+
+Corrected proxy_sing to allow creation of 0 seconds proxies.
+
+------------------------------------------------------------------------
+r150 | marotta | 2006-01-24 16:06:20 +0100 (Tue, 24 Jan 2006) | 2 lines
+Changed paths:
+   M /voms/trunk/src/ac/validate.c
+
+Fixed wrong declaration.
+
+------------------------------------------------------------------------
+r148 | marotta | 2006-01-24 14:39:14 +0100 (Tue, 24 Jan 2006) | 2 lines
+Changed paths:
+   M /voms/trunk/aclocal.m4
+   M /voms/trunk/configure
+   M /voms/trunk/project/acinclude.m4
+   M /voms/trunk/project/config.guess
+   M /voms/trunk/project/config.sub
+   M /voms/trunk/project/ltmain.sh
+   M /voms/trunk/src/sslutils/Makefile.am
+   M /voms/trunk/src/sslutils/Makefile.in
+   M /voms/trunk/src/sslutils/oldgaa/Makefile.am
+   M /voms/trunk/src/sslutils/oldgaa/Makefile.in
+
+Build fixes for 64 bits.
+
+------------------------------------------------------------------------
+r147 | marotta | 2006-01-24 14:13:15 +0100 (Tue, 24 Jan 2006) | 2 lines
+Changed paths:
+   M /voms/trunk/aclocal.m4
+   M /voms/trunk/configure
+   M /voms/trunk/configure.ac
+   M /voms/trunk/project/acinclude.m4
+   M /voms/trunk/project/config.guess
+   M /voms/trunk/project/config.sub
+   M /voms/trunk/project/ltmain.sh
+   M /voms/trunk/src/ac/validate.c
+   M /voms/trunk/src/api/ccapi/api_util.cc
+   M /voms/trunk/src/client/vomsclient.cc
+   M /voms/trunk/src/client/vomsclient.h
+   M /voms/trunk/src/install/voms_install_db.in
+   M /voms/trunk/src/socklib/Client.cpp
+   M /voms/trunk/src/socklib/Server.cpp
+   M /voms/trunk/src/sslutils/sslutils.c
+   M /voms/trunk/test/setup_env.sh
+
+Fixed memory leaks.
+
+------------------------------------------------------------------------
+r146 | vventuri | 2006-01-20 17:20:19 +0100 (Fri, 20 Jan 2006) | 2 lines
+Changed paths:
+   A /voms/trunk/doc/RELEASE-NOTES.1-6-15
+
+Added release notes.
+
+------------------------------------------------------------------------
+r141 | vventuri | 2005-12-23 14:58:33 +0100 (Fri, 23 Dec 2005) | 2 lines
+Changed paths:
+   M /voms/trunk/configure
+   M /voms/trunk/configure.ac
+   M /voms/trunk/project/version.properties
+
+Increased version.
+
+------------------------------------------------------------------------
+r140 | marotta | 2005-12-23 10:27:47 +0100 (Fri, 23 Dec 2005) | 2 lines
+Changed paths:
+   M /voms/trunk/src/install/voms_install_db.in
+
+Corrected return values.
+
+------------------------------------------------------------------------
+r137 | marotta | 2005-12-22 17:20:48 +0100 (Thu, 22 Dec 2005) | 2 lines
+Changed paths:
+   M /voms/trunk/configure
+   M /voms/trunk/project/acinclude.m4
+
+trying autodetect fix (try 2).
+
+------------------------------------------------------------------------
+r134 | marotta | 2005-12-22 17:03:32 +0100 (Thu, 22 Dec 2005) | 2 lines
+Changed paths:
+   M /voms/trunk/configure
+   M /voms/trunk/project/acinclude.m4
+
+trying autodetect fix.
+
+------------------------------------------------------------------------
+r131 | marotta | 2005-12-21 18:41:13 +0100 (Wed, 21 Dec 2005) | 2 lines
+Changed paths:
+   M /voms/trunk/Makefile.am
+   M /voms/trunk/Makefile.in
+   M /voms/trunk/configure
+   M /voms/trunk/configure.ac
+   M /voms/trunk/doc/Makefile.am
+   M /voms/trunk/doc/Makefile.in
+   M /voms/trunk/project/acinclude.m4
+   M /voms/trunk/src/Makefile.am
+   M /voms/trunk/src/Makefile.in
+   M /voms/trunk/src/ac/Makefile.am
+   M /voms/trunk/src/ac/Makefile.in
+   M /voms/trunk/src/api/Makefile.in
+   M /voms/trunk/src/api/ccapi/Makefile.am
+   M /voms/trunk/src/api/ccapi/Makefile.in
+   M /voms/trunk/src/autogen/config.h.in
+   M /voms/trunk/src/client/Makefile.in
+   M /voms/trunk/src/common/Makefile.in
+   M /voms/trunk/src/include/Makefile.am
+   M /voms/trunk/src/include/Makefile.in
+   M /voms/trunk/src/install/Makefile.am
+   M /voms/trunk/src/install/Makefile.in
+   M /voms/trunk/src/log/Makefile.in
+   M /voms/trunk/src/replib/Makefile.am
+   M /voms/trunk/src/replib/Makefile.in
+   M /voms/trunk/src/replica/Makefile.in
+   M /voms/trunk/src/server/Makefile.in
+   M /voms/trunk/src/socklib/Makefile.in
+   M /voms/trunk/src/sslutils/Makefile.in
+   M /voms/trunk/src/sslutils/oldgaa/Makefile.in
+   M /voms/trunk/src/support/Makefile.in
+   M /voms/trunk/src/utils/Makefile.in
+   M /voms/trunk/test/Makefile.am
+   M /voms/trunk/test/Makefile.in
+   M /voms/trunk/test/setup_env.sh
+   A /voms/trunk/test/tests/Makefile.am
+   A /voms/trunk/test/tests/Makefile.in
+   M /voms/trunk/test/utest/Makefile.in
+
+build fixes for 'make dist' and doc generation.
+
+------------------------------------------------------------------------
+r129 | marotta | 2005-12-20 19:52:47 +0100 (Tue, 20 Dec 2005) | 2 lines
+Changed paths:
+   M /voms/trunk/src/ac/test.c
+   M /voms/trunk/src/ac/validate.c
+   M /voms/trunk/src/api/ccapi/api_util.cc
+   M /voms/trunk/src/api/ccapi/voms_api.cc
+
+Removing unused calls.
+
+------------------------------------------------------------------------
+r128 | marotta | 2005-12-20 12:31:56 +0100 (Tue, 20 Dec 2005) | 2 lines
+Changed paths:
+   M /voms/trunk/configure
+   M /voms/trunk/configure.ac
+   M /voms/trunk/project/acinclude.m4
+   M /voms/trunk/project/version.properties
+   M /voms/trunk/src/api/ccapi/Makefile.am
+   M /voms/trunk/src/api/ccapi/Makefile.in
+
+Build updates.
+
+------------------------------------------------------------------------
+r127 | marotta | 2005-12-19 19:23:18 +0100 (Mon, 19 Dec 2005) | 2 lines
+Changed paths:
+   M /voms/trunk/Makefile.in
+   M /voms/trunk/configure
+   M /voms/trunk/doc/Makefile.in
+   M /voms/trunk/project/acinclude.m4
+   M /voms/trunk/src/Makefile.in
+   M /voms/trunk/src/ac/Makefile.in
+   M /voms/trunk/src/api/Makefile.in
+   M /voms/trunk/src/api/ccapi/Makefile.am
+   M /voms/trunk/src/api/ccapi/Makefile.in
+   M /voms/trunk/src/client/Makefile.in
+   M /voms/trunk/src/common/Makefile.in
+   M /voms/trunk/src/include/Makefile.in
+   M /voms/trunk/src/install/Makefile.in
+   M /voms/trunk/src/log/Makefile.in
+   M /voms/trunk/src/replib/Makefile.in
+   M /voms/trunk/src/replica/Makefile.in
+   M /voms/trunk/src/server/Makefile.in
+   M /voms/trunk/src/socklib/Makefile.in
+   M /voms/trunk/src/sslutils/Makefile.in
+   M /voms/trunk/src/sslutils/oldgaa/Makefile.in
+   M /voms/trunk/src/support/Makefile.in
+   M /voms/trunk/src/utils/Makefile.in
+   M /voms/trunk/test/Makefile.in
+   M /voms/trunk/test/utest/Makefile.in
+
+support for gcc63 flavors.
+
+------------------------------------------------------------------------
+r126 | marotta | 2005-12-19 11:32:37 +0100 (Mon, 19 Dec 2005) | 2 lines
+Changed paths:
+   M /voms/trunk/src/api/ccapi/cinterface.cc
+   M /voms/trunk/src/api/ccapi/voms_api.cc
+
+Fixing memory leaks.
+
+------------------------------------------------------------------------
+r124 | marotta | 2005-12-19 10:21:40 +0100 (Mon, 19 Dec 2005) | 2 lines
+Changed paths:
+   M /voms/trunk/Makefile.in
+   M /voms/trunk/aclocal.m4
+   M /voms/trunk/configure
+   M /voms/trunk/configure.ac
+   M /voms/trunk/doc/Makefile.in
+   M /voms/trunk/project/build.number
+   M /voms/trunk/project/config.guess
+   M /voms/trunk/project/config.sub
+   M /voms/trunk/project/ltmain.sh
+   M /voms/trunk/project/version.properties
+   M /voms/trunk/src/Makefile.in
+   M /voms/trunk/src/ac/Makefile.in
+   M /voms/trunk/src/api/Makefile.in
+   M /voms/trunk/src/api/ccapi/Makefile.am
+   M /voms/trunk/src/api/ccapi/Makefile.in
+   M /voms/trunk/src/client/Makefile.in
+   M /voms/trunk/src/common/Makefile.in
+   M /voms/trunk/src/common/options.cc
+   M /voms/trunk/src/include/Makefile.in
+   M /voms/trunk/src/install/Makefile.in
+   M /voms/trunk/src/log/Makefile.in
+   M /voms/trunk/src/replib/Makefile.in
+   M /voms/trunk/src/replica/Makefile.in
+   M /voms/trunk/src/server/Makefile.in
+   M /voms/trunk/src/socklib/Makefile.am
+   M /voms/trunk/src/socklib/Makefile.in
+   M /voms/trunk/src/sslutils/Makefile.am
+   M /voms/trunk/src/sslutils/Makefile.in
+   M /voms/trunk/src/sslutils/oldgaa/Makefile.am
+   M /voms/trunk/src/sslutils/oldgaa/Makefile.in
+   M /voms/trunk/src/support/Makefile.in
+   M /voms/trunk/src/utils/Makefile.in
+   M /voms/trunk/test/Makefile.in
+   M /voms/trunk/test/utest/Makefile.in
+
+updates for 1.6.13
+
+------------------------------------------------------------------------
+r123 | vventuri | 2005-12-14 19:11:13 +0100 (Wed, 14 Dec 2005) | 2 lines
+Changed paths:
+   M /voms/trunk/src/install/voms_install_db.in
+
+Corrected default location.
+
+------------------------------------------------------------------------
+r122 | vventuri | 2005-12-14 19:07:57 +0100 (Wed, 14 Dec 2005) | 2 lines
+Changed paths:
+   M /voms/trunk/configure
+   M /voms/trunk/configure.ac
+   M /voms/trunk/project/version.properties
+
+Increased version.
+
+------------------------------------------------------------------------
+r121 | vventuri | 2005-12-14 14:33:06 +0100 (Wed, 14 Dec 2005) | 2 lines
+Changed paths:
+   M /voms/trunk/project/version.properties
+
+Initial version set.
+
+------------------------------------------------------------------------
+r120 | vventuri | 2005-12-14 14:30:51 +0100 (Wed, 14 Dec 2005) | 2 lines
+Changed paths:
+   M /voms/trunk/configure
+   M /voms/trunk/configure.ac
+   M /voms/trunk/project/build.number
+   M /voms/trunk/project/version.properties
+
+Initial version set.
+
+------------------------------------------------------------------------
+r119 | vventuri | 2005-12-14 13:10:29 +0100 (Wed, 14 Dec 2005) | 2 lines
+Changed paths:
+   M /voms/trunk/src/include/Makefile.in
+
+Relocation of header files according to glite standard.
+
+------------------------------------------------------------------------
+r118 | vventuri | 2005-12-14 13:10:29 +0100 (Wed, 14 Dec 2005) | 2 lines
+Changed paths:
+   M /voms/trunk/src/api/ccapi/Makefile.am
+   M /voms/trunk/src/api/ccapi/Makefile.in
+   M /voms/trunk/src/include/Makefile.am
+   M /voms/trunk/src/include/Makefile.in
+   M /voms/trunk/src/install/Makefile.am
+   M /voms/trunk/src/install/Makefile.in
+
+Relocation of header files according to glite standard.
+
+------------------------------------------------------------------------
+r117 | vventuri | 2005-12-12 14:59:57 +0100 (Mon, 12 Dec 2005) | 2 lines
+Changed paths:
+   M /voms/trunk/src/client/vomsclient.cc
+
+Minor changes.
+
+------------------------------------------------------------------------
+r116 | vventuri | 2005-12-12 14:59:22 +0100 (Mon, 12 Dec 2005) | 2 lines
+Changed paths:
+   M /voms/trunk/src/include/errortype.h
+   M /voms/trunk/src/server/Makefile.am
+   M /voms/trunk/src/server/Makefile.in
+   M /voms/trunk/src/server/VOMSServer.h
+   M /voms/trunk/src/server/vomsd.cc
+
+Added check for AC already in the user certificate.
+
+------------------------------------------------------------------------
+r115 | vventuri | 2005-12-12 14:56:00 +0100 (Mon, 12 Dec 2005) | 2 lines
+Changed paths:
+   M /voms/trunk/src/api/ccapi/api_util.cc
+   M /voms/trunk/src/api/ccapi/voms_api.h
+
+Added possibility to deeply scan the chain for AC.
+
+------------------------------------------------------------------------
+r114 | vventuri | 2005-12-12 14:54:44 +0100 (Mon, 12 Dec 2005) | 2 lines
+Changed paths:
+   M /voms/trunk/src/include/Server.h
+   M /voms/trunk/src/socklib/Server.cpp
+
+Added method to return the context.
+
+------------------------------------------------------------------------
+r113 | vventuri | 2005-12-12 14:53:01 +0100 (Mon, 12 Dec 2005) | 2 lines
+Changed paths:
+   M /voms/trunk/src/server/attribute.cc
+   M /voms/trunk/src/server/attribute.h
+
+Added method to output the attrib as a std::string.
+
+------------------------------------------------------------------------
+r112 | vventuri | 2005-12-05 10:38:17 +0100 (Mon, 05 Dec 2005) | 2 lines
+Changed paths:
+   M /voms/trunk/configure
+   M /voms/trunk/project/acinclude.m4
+
+Corrected tests for EVP_MD_CTX functions.
+
+------------------------------------------------------------------------
+r111 | vventuri | 2005-12-01 11:45:13 +0100 (Thu, 01 Dec 2005) | 2 lines
+Changed paths:
+   M /voms/trunk/configure
+   M /voms/trunk/project/acinclude.m4
+
+Corrected check for EVP_MD_CTX functions.
+
+------------------------------------------------------------------------
+r110 | vventuri | 2005-12-01 11:00:07 +0100 (Thu, 01 Dec 2005) | 2 lines
+Changed paths:
+   M /voms/trunk/configure
+   M /voms/trunk/project/acinclude.m4
+
+Corrected check for EVP_MD_CTX functions.
+
+------------------------------------------------------------------------
+r109 | vventuri | 2005-11-30 16:29:14 +0100 (Wed, 30 Nov 2005) | 2 lines
+Changed paths:
+   M /voms/trunk/configure
+   M /voms/trunk/project/acinclude.m4
+
+Removed AC_MSG_RESULT.
+
+------------------------------------------------------------------------
+r108 | vventuri | 2005-11-30 15:20:59 +0100 (Wed, 30 Nov 2005) | 2 lines
+Changed paths:
+   D /voms/trunk/src/include/config.h.in
+
+Moved to src/autogen.
+
+------------------------------------------------------------------------
+r107 | vventuri | 2005-11-30 15:05:51 +0100 (Wed, 30 Nov 2005) | 2 lines
+Changed paths:
+   M /voms/trunk/configure
+   M /voms/trunk/project/acinclude.m4
+
+Coorected check from std::string dependency on std::cerr.
+
+------------------------------------------------------------------------
+r106 | vventuri | 2005-11-30 13:44:49 +0100 (Wed, 30 Nov 2005) | 2 lines
+Changed paths:
+   M /voms/trunk/aclocal.m4
+   M /voms/trunk/configure
+   M /voms/trunk/configure.ac
+   M /voms/trunk/project/acinclude.m4
+   M /voms/trunk/src/autogen/config.h.in
+
+Checks forgotten.
+
+------------------------------------------------------------------------
+r105 | vventuri | 2005-11-30 13:44:04 +0100 (Wed, 30 Nov 2005) | 2 lines
+Changed paths:
+   M /voms/trunk/src/Makefile.am
+   M /voms/trunk/src/Makefile.in
+
+Added files.
+
+------------------------------------------------------------------------
+r104 | vventuri | 2005-11-29 17:36:33 +0100 (Tue, 29 Nov 2005) | 2 lines
+Changed paths:
+   M /voms/trunk/src/utils/Makefile.in
+
+Corrected wrong ln name.
+
+------------------------------------------------------------------------
+r103 | vventuri | 2005-11-29 17:36:24 +0100 (Tue, 29 Nov 2005) | 2 lines
+Changed paths:
+   M /voms/trunk/src/client/Makefile.in
+
+Added forgotten ln to voms-proxy-list.
+
+------------------------------------------------------------------------
+r102 | vventuri | 2005-11-29 17:16:52 +0100 (Tue, 29 Nov 2005) | 2 lines
+Changed paths:
+   M /voms/trunk/src/utils/Makefile.am
+
+Corrected wrong ln name.
+
+------------------------------------------------------------------------
+r101 | vventuri | 2005-11-29 17:16:08 +0100 (Tue, 29 Nov 2005) | 2 lines
+Changed paths:
+   M /voms/trunk/src/client/Makefile.am
+
+Added forgotten ln to voms-proxy-list.
+
+------------------------------------------------------------------------
+r100 | vventuri | 2005-11-29 16:40:08 +0100 (Tue, 29 Nov 2005) | 2 lines
+Changed paths:
+   M /voms/trunk/build.xml
+
+Inverted order for call to autogen and configure targets.
+
+------------------------------------------------------------------------
+r99 | vventuri | 2005-11-29 15:33:46 +0100 (Tue, 29 Nov 2005) | 2 lines
+Changed paths:
+   A /voms/trunk/project/config.guess
+   A /voms/trunk/project/ltmain.sh
+
+Created directory structure.
+
+------------------------------------------------------------------------
+r98 | vventuri | 2005-11-29 15:23:09 +0100 (Tue, 29 Nov 2005) | 2 lines
+Changed paths:
+   A /voms/trunk/project/config.sub
+
+Created directory structure.
+
+------------------------------------------------------------------------
+r97 | vventuri | 2005-11-29 15:19:46 +0100 (Tue, 29 Nov 2005) | 2 lines
+Changed paths:
+   D /voms/trunk/doc/manpage.refs
+
+Removed unneeded file.
+
+------------------------------------------------------------------------
+r96 | vventuri | 2005-11-29 13:41:39 +0100 (Tue, 29 Nov 2005) | 2 lines
+Changed paths:
+   M /voms/trunk/src/api/ccapi/cinterface.h
+   M /voms/trunk/src/api/ccapi/voms_api.h
+   M /voms/trunk/src/api/ccapi/voms_apic.h
+
+Removed CVS keyword.
+
+------------------------------------------------------------------------
+r91 | vventuri | 2005-11-29 13:33:54 +0100 (Tue, 29 Nov 2005) | 2 lines
+Changed paths:
+   M /voms/trunk
+   A /voms/trunk/.cvsignore
+   A /voms/trunk/AUTHORS
+   A /voms/trunk/ChangeLog
+   A /voms/trunk/INSTALL
+   A /voms/trunk/LICENSE
+   A /voms/trunk/Makefile.am
+   A /voms/trunk/Makefile.in
+   A /voms/trunk/NEWS
+   A /voms/trunk/README
+   A /voms/trunk/aclocal.m4
+   A /voms/trunk/autogen.sh
+   A /voms/trunk/build.xml
+   A /voms/trunk/configure
+   A /voms/trunk/configure.ac
+   A /voms/trunk/doc
+   A /voms/trunk/doc/AC-RFC.tex
+   A /voms/trunk/doc/Makefile.am
+   A /voms/trunk/doc/Makefile.in
+   A /voms/trunk/doc/authors.sgml
+   A /voms/trunk/doc/bugzilla.sgml
+   A /voms/trunk/doc/c++api.tex
+   A /voms/trunk/doc/capi.tex
+   A /voms/trunk/doc/certificate.txt
+   A /voms/trunk/doc/edg-voms-proxy-destroy.sgml
+   A /voms/trunk/doc/edg-voms-proxy-fake.sgml
+   A /voms/trunk/doc/edg-voms-proxy-info.sgml
+   A /voms/trunk/doc/edg-voms-proxy-init.sgml
+   A /voms/trunk/doc/edg-voms-proxy-list.sgml
+   A /voms/trunk/doc/edg-voms.sgml
+   A /voms/trunk/doc/license.sgml
+   A /voms/trunk/doc/links.sgml
+   A /voms/trunk/doc/manpage.links
+   A /voms/trunk/doc/manpage.refs
+   A /voms/trunk/doc/software.tex
+   A /voms/trunk/doc/testvoms.sgml
+   A /voms/trunk/doc/voms_install_db.sgml
+   A /voms/trunk/doc/voms_install_replica.sgml
+   A /voms/trunk/project
+   A /voms/trunk/project/acinclude.m4
+   A /voms/trunk/project/build.number
+   A /voms/trunk/project/build.properties
+   A /voms/trunk/project/compile
+   A /voms/trunk/project/configure.properties.xml
+   A /voms/trunk/project/cppunit.m4
+   A /voms/trunk/project/depcomp
+   A /voms/trunk/project/expat.m4
+   A /voms/trunk/project/glite.m4
+   A /voms/trunk/project/install-sh
+   A /voms/trunk/project/missing
+   A /voms/trunk/project/mkinstalldirs
+   A /voms/trunk/project/properties.xml
+   A /voms/trunk/project/version.properties
+   A /voms/trunk/src
+   A /voms/trunk/src/Makefile.am
+   A /voms/trunk/src/Makefile.in
+   A /voms/trunk/src/ac
+   A /voms/trunk/src/ac/Makefile.am
+   A /voms/trunk/src/ac/Makefile.in
+   A /voms/trunk/src/ac/acerrors.h
+   A /voms/trunk/src/ac/ccinit.cc
+   A /voms/trunk/src/ac/create.cc
+   A /voms/trunk/src/ac/error.c
+   A /voms/trunk/src/ac/extensions.c
+   A /voms/trunk/src/ac/extensions.h
+   A /voms/trunk/src/ac/init.c
+   A /voms/trunk/src/ac/init.h
+   A /voms/trunk/src/ac/mystack.c
+   A /voms/trunk/src/ac/newformat.c
+   A /voms/trunk/src/ac/test.c
+   A /voms/trunk/src/ac/validate.c
+   A /voms/trunk/src/ac/write.c
+   A /voms/trunk/src/ac/write.h
+   A /voms/trunk/src/api
+   A /voms/trunk/src/api/Makefile.am
+   A /voms/trunk/src/api/Makefile.in
+   A /voms/trunk/src/api/ccapi
+   A /voms/trunk/src/api/ccapi/Makefile.am
+   A /voms/trunk/src/api/ccapi/Makefile.in
+   A /voms/trunk/src/api/ccapi/api_util.cc
+   A /voms/trunk/src/api/ccapi/api_util.h
+   A /voms/trunk/src/api/ccapi/ccval.cc
+   A /voms/trunk/src/api/ccapi/ccval.h
+   A /voms/trunk/src/api/ccapi/cinterface.cc
+   A /voms/trunk/src/api/ccapi/cinterface.h
+   A /voms/trunk/src/api/ccapi/ctest.c
+   A /voms/trunk/src/api/ccapi/test.cc
+   A /voms/trunk/src/api/ccapi/voms_api.cc
+   A /voms/trunk/src/api/ccapi/voms_api.h
+   A /voms/trunk/src/api/ccapi/voms_apic.h
+   A /voms/trunk/src/autogen
+   A /voms/trunk/src/autogen/config.h.in
+   A /voms/trunk/src/client
+   A /voms/trunk/src/client/Makefile.am
+   A /voms/trunk/src/client/Makefile.in
+   A /voms/trunk/src/client/fqan.cc
+   A /voms/trunk/src/client/fqan.h
+   A /voms/trunk/src/client/main.cc
+   A /voms/trunk/src/client/vomsclient.cc
+   A /voms/trunk/src/client/vomsclient.h
+   A /voms/trunk/src/common
+   A /voms/trunk/src/common/Makefile.am
+   A /voms/trunk/src/common/Makefile.in
+   A /voms/trunk/src/common/credentials.c
+   A /voms/trunk/src/common/data.cc
+   A /voms/trunk/src/common/error.c
+   A /voms/trunk/src/common/list.c
+   A /voms/trunk/src/common/options.cc
+   A /voms/trunk/src/common/pass.cc
+   A /voms/trunk/src/common/sign.cc
+   A /voms/trunk/src/common/xml.c
+   A /voms/trunk/src/common/xmlcc.cc
+   A /voms/trunk/src/include
+   A /voms/trunk/src/include/Client.h
+   A /voms/trunk/src/include/Makefile.am
+   A /voms/trunk/src/include/Makefile.in
+   A /voms/trunk/src/include/Server.h
+   A /voms/trunk/src/include/acstack.h
+   A /voms/trunk/src/include/ccac.h
+   A /voms/trunk/src/include/ccwrite.h
+   A /voms/trunk/src/include/config.h.in
+   A /voms/trunk/src/include/credentials.h
+   A /voms/trunk/src/include/data.h
+   A /voms/trunk/src/include/dbwrap.h
+   A /voms/trunk/src/include/errors.h
+   A /voms/trunk/src/include/errortype.h
+   A /voms/trunk/src/include/format.h
+   A /voms/trunk/src/include/getopts.h
+   A /voms/trunk/src/include/globus_oldgaa.h
+   A /voms/trunk/src/include/globus_oldgaa_utils.h
+   A /voms/trunk/src/include/gssapi_compat.h
+   A /voms/trunk/src/include/init.h
+   A /voms/trunk/src/include/listfunc.h
+   A /voms/trunk/src/include/log.h
+   A /voms/trunk/src/include/newca.h
+   A /voms/trunk/src/include/newformat.h
+   A /voms/trunk/src/include/options.h
+   A /voms/trunk/src/include/pass.h
+   A /voms/trunk/src/include/proxycertinfo.h
+   A /voms/trunk/src/include/replace.h
+   A /voms/trunk/src/include/sign.h
+   A /voms/trunk/src/include/stamp-h.in
+   A /voms/trunk/src/include/stamp-h1.in
+   A /voms/trunk/src/include/streamers.h
+   A /voms/trunk/src/include/tokens.h
+   A /voms/trunk/src/include/validate.h
+   A /voms/trunk/src/include/vomsxml.h
+   A /voms/trunk/src/include/xml.h
+   A /voms/trunk/src/install
+   A /voms/trunk/src/install/Makefile.am
+   A /voms/trunk/src/install/Makefile.in
+   A /voms/trunk/src/install/mysql2oracle.in
+   A /voms/trunk/src/install/upgrade1to2.in
+   A /voms/trunk/src/install/voms.csh.in
+   A /voms/trunk/src/install/voms.data
+   A /voms/trunk/src/install/voms.sh.in
+   A /voms/trunk/src/install/voms.start.in
+   A /voms/trunk/src/install/voms_install_db.in
+   A /voms/trunk/src/install/vomses.template
+   A /voms/trunk/src/log
+   A /voms/trunk/src/log/Makefile.am
+   A /voms/trunk/src/log/Makefile.in
+   A /voms/trunk/src/log/fns.c
+   A /voms/trunk/src/log/fs.c
+   A /voms/trunk/src/log/log.c
+   A /voms/trunk/src/log/sl.c
+   A /voms/trunk/src/replib
+   A /voms/trunk/src/replib/Makefile.am
+   A /voms/trunk/src/replib/Makefile.in
+   A /voms/trunk/src/replib/daemon.c
+   A /voms/trunk/src/replib/getopt_long.c
+   A /voms/trunk/src/replib/getopt_long_only.c
+   A /voms/trunk/src/replib/memcmp.c
+   A /voms/trunk/src/replib/setenv.c
+   A /voms/trunk/src/replib/strndup.c
+   A /voms/trunk/src/replica
+   A /voms/trunk/src/replica/Makefile.am
+   A /voms/trunk/src/replica/Makefile.in
+   A /voms/trunk/src/replica/voms_install_replica.in
+   A /voms/trunk/src/server
+   A /voms/trunk/src/server/Makefile.am
+   A /voms/trunk/src/server/Makefile.in
+   A /voms/trunk/src/server/VOMSServer.h
+   A /voms/trunk/src/server/access_db_sql.cc
+   A /voms/trunk/src/server/access_db_sql.h
+   A /voms/trunk/src/server/attribute.cc
+   A /voms/trunk/src/server/attribute.h
+   A /voms/trunk/src/server/main.cc
+   A /voms/trunk/src/server/vomsd.cc
+   A /voms/trunk/src/socklib
+   A /voms/trunk/src/socklib/Client.cpp
+   A /voms/trunk/src/socklib/Makefile.am
+   A /voms/trunk/src/socklib/Makefile.in
+   A /voms/trunk/src/socklib/Server.cpp
+   A /voms/trunk/src/socklib/globus_oldgaa.h
+   A /voms/trunk/src/socklib/globus_oldgaa_utils.h
+   A /voms/trunk/src/socklib/globuswrap.c
+   A /voms/trunk/src/socklib/globuswrap.h
+   A /voms/trunk/src/socklib/tokens.c
+   A /voms/trunk/src/sslutils
+   A /voms/trunk/src/sslutils/Makefile.am
+   A /voms/trunk/src/sslutils/Makefile.in
+   A /voms/trunk/src/sslutils/oldgaa
+   A /voms/trunk/src/sslutils/oldgaa/Makefile.am
+   A /voms/trunk/src/sslutils/oldgaa/Makefile.in
+   A /voms/trunk/src/sslutils/oldgaa/globus_oldgaa.h
+   A /voms/trunk/src/sslutils/oldgaa/globus_oldgaa_utils.c
+   A /voms/trunk/src/sslutils/oldgaa/globus_oldgaa_utils.h
+   A /voms/trunk/src/sslutils/oldgaa/oldgaa_alloc.c
+   A /voms/trunk/src/sslutils/oldgaa/oldgaa_api.c
+   A /voms/trunk/src/sslutils/oldgaa/oldgaa_gl_internal_err.c
+   A /voms/trunk/src/sslutils/oldgaa/oldgaa_gl_internal_err.h
+   A /voms/trunk/src/sslutils/oldgaa/oldgaa_policy_evaluator.c
+   A /voms/trunk/src/sslutils/oldgaa/oldgaa_policy_evaluator.h
+   A /voms/trunk/src/sslutils/oldgaa/oldgaa_release.c
+   A /voms/trunk/src/sslutils/oldgaa/oldgaa_utils.c
+   A /voms/trunk/src/sslutils/oldgaa/oldgaa_utils.h
+   A /voms/trunk/src/sslutils/oldgaa/rfc1779.c
+   A /voms/trunk/src/sslutils/proxycertinfo.c
+   A /voms/trunk/src/sslutils/scutils.c
+   A /voms/trunk/src/sslutils/scutils.h
+   A /voms/trunk/src/sslutils/sslutils.c
+   A /voms/trunk/src/sslutils/sslutils.h
+   A /voms/trunk/src/support
+   A /voms/trunk/src/support/Makefile.am
+   A /voms/trunk/src/support/Makefile.in
+   A /voms/trunk/src/support/test_clean.in
+   A /voms/trunk/src/support/test_setup.in
+   A /voms/trunk/src/support/test_start.in
+   A /voms/trunk/src/support/testvoms.in
+   A /voms/trunk/src/utils
+   A /voms/trunk/src/utils/Makefile.am
+   A /voms/trunk/src/utils/Makefile.in
+   A /voms/trunk/src/utils/voms_proxy_destroy.cc
+   A /voms/trunk/src/utils/voms_proxy_info.cc
+   A /voms/trunk/src/utils/vomsfake.cc
+   A /voms/trunk/src/utils/vomsfake.h
+   A /voms/trunk/test
+   A /voms/trunk/test/Makefile.am
+   A /voms/trunk/test/Makefile.in
+   A /voms/trunk/test/setup_env.sh
+   A /voms/trunk/test/tests
+   A /voms/trunk/test/tests/masstest.sh
+   A /voms/trunk/test/tests/servicecert.sh
+   A /voms/trunk/test/tests/simpleac.sh
+   A /voms/trunk/test/tests/spurious.sh
+   A /voms/trunk/test/tests/voms_install_db_test1.sh
+   A /voms/trunk/test/tests/voms_install_db_test2.sh
+   A /voms/trunk/test/utest
+   A /voms/trunk/test/utest/Makefile.am
+   A /voms/trunk/test/utest/Makefile.in
+   A /voms/trunk/test/utest/ca.pem
+   A /voms/trunk/test/utest/capi_cu_Main.cpp
+   A /voms/trunk/test/utest/capi_cu_main.cpp
+   A /voms/trunk/test/utest/capi_cu_suite.cpp
+   A /voms/trunk/test/utest/capi_cu_suite.h
+   A /voms/trunk/test/utest/csocket_mock.c
+   A /voms/trunk/test/utest/holder.pem
+   A /voms/trunk/test/utest/issuer.pem
+   A /voms/trunk/test/utest/key.pem
+   A /voms/trunk/test/utest/socket_mock.cpp
+   A /voms/trunk/test/utest/voms_cu_main.cpp
+   A /voms/trunk/test/utest/voms_cu_suite.cpp
+   A /voms/trunk/test/utest/voms_cu_suite.h
+   A /voms/trunk/test/utest/vomsclient_cu_main.cpp
+   A /voms/trunk/test/utest/vomsclient_cu_suite.cpp
+   A /voms/trunk/test/utest/vomsclient_cu_suite.h
+   A /voms/trunk/test/utest/vomsdata_cu_main.cpp
+   A /voms/trunk/test/utest/vomsdata_cu_suite.cpp
+   A /voms/trunk/test/utest/vomsdata_cu_suite.h
+   A /voms/trunk/test/utest/vomsdatac_cu_suite.cpp
+   A /voms/trunk/test/utest/vomsdatac_cu_suite.h
+   A /voms/trunk/test/utest/vomses
+   A /voms/trunk/test/utest/x509up_u501
+
+Initial revision
+
+------------------------------------------------------------------------
+r90 | (no author) | 2005-11-29 13:33:54 +0100 (Tue, 29 Nov 2005) | 1 line
+Changed paths:
+   A /voms/branches
+   A /voms/tags
+   A /voms/trunk
+
+New repository initialized by cvs2svn.

@@ -44,10 +44,14 @@ std::string parse_fqan(const std::vector<std::string>& fqans)
       parsed += "R" + i->substr(role_pos+6);
     else if ((*i)[0] == '/')
       parsed += "G" + i->substr(0);
-    
+    else {
+      std::cerr << "Unable to parse command to voms: " << *i <<    std::endl;
+      exit(1);
+    }
     if(i != (fqans.end() - 1))
       parsed += ",";
   }
+
 
   return parsed;
 }

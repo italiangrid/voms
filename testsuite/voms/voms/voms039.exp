@@ -1,0 +1,16 @@
+load_lib vomstest.exp
+
+testheader "See if voms-proxy-init --verify works."
+_activateCert mycertrevoked
+
+_vomsStart voms1
+set outname [exec mktemp $::SCRATCHDIR/voms-proxy-init-XXXXXX]
+set res [catch {set out [exec $::INSTALLDIR/bin/voms-proxy-init --voms voms1 --verify >& $outname]}]
+_vomsStop voms1
+
+if $res then {
+    pass "certificate detected as revoked."
+} else {
+    set LOGOUTS "$LOGOUTS $outname"
+    fail "success with a revoked certificate"
+}

@@ -15,8 +15,7 @@ SUBDIRS = \
 	client \
 	server \
 	install \
-	replica \
-	support
+	replica
 endif
 else
 SUBDIRS = \

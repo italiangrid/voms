@@ -74,7 +74,7 @@ static int syslogoutputter(void *data, const char *str)
 
   realstr = translate(realstr);
 
-  if (strlen(realstr) > 100)
+  if (strlen(realstr) > 1000)
     realstr[1000]='\0';
 
   syslog(ld->feature|ld->level, "%s", realstr);

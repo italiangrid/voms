@@ -1,0 +1,14 @@
+load_lib vomstest.exp
+
+testheader "See if the c++ library can be linked."
+
+set ::_buildout [exec mktemp $::SCRATCHDIR/program-out-XXXXXX]
+set res [_buildCC basictest.cc]
+
+if $res then {
+    set LOGOUTS "$LOGOUTS $::_buildout"
+    fail "library cannot be linked."
+} else {
+    pass "library can be linked"
+}
+

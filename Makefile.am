@@ -1,5 +1,4 @@
-
-SUBDIRS = src doc test
+SUBDIRS = src doc testsuite
 
 EXTRA_DIST = build.xml autogen.sh LICENSE project/build.number project/build.properties \
   project/configure.properties.xml project/properties.xml project/version.properties
@@ -83,9 +82,6 @@ distbin:
 	$(AMTAR) -zcf $(DISTTAR)/$(distdir)_bin.tar.gz .; \
 	popd; \
 	rm -rf $$tmpdistbin
-
-testsuite-run:
-	cd test; $(MAKE) testsuite-run; cd ..
 
 gtags:
 	rm -f G*; gtags

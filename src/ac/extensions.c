@@ -424,7 +424,7 @@ void *targets_s2i(struct v3_ext_method *method, struct v3_ext_ctx *ctx, char *da
       attlist++;
     }
     if (pos)
-      list = pos++;
+      list = ++pos;
   } while (pos);
 
   return a;

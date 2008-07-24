@@ -133,55 +133,12 @@ public class PKIStore implements VOMSTrustStore {
         return signings;
     }
 
-//     /**
-//      * @return hashtable containing LSC files.  The key is
-//      * the VO name of the issuer of the LSC.  The value is
-//      * an Hashtable having as key the fully qualified host name of the
-//      * server which issued the Attribute Certificate, and as value the
-//      * associated LSCFile object.
-//      *
-//      * @see LSCFile
-//      * @see PKIUtils#getHash(X509Certificate cert)
-//      * @see PKIUtils#getHash(X500Principal principal)
-//      * @see PKIUtils#getHash(X509Principal principal)
-//      * @see java.util.Vector
-//      */
-
-//     public Hashtable getLSCs() {
-//         return lscfiles;
-//     }
-
-//     /**
-//      * @return hashtable containing VOMS server certificates.  The key is
-//      * the PKIUtils.getHash() of the AC issuer.  The value is a HashSet
-//      * containing as key the VO name, and as value all the CRL with the given hash.
-//      *
-//      * @see PKIUtils#getHash(X509Certificate cert)
-//      * @see PKIUtils#getHash(X500Principal principal)
-//      * @see PKIUtils#getHash(X509Principal principal)
-//      * @see java.util.Vector
-//      */
-
-//     public Hashtable getVOMSCerts() {
-//         return vomscerts;
-//     }
 
     static {
         if (Security.getProvider("BC") == null) {
             Security.addProvider(new BouncyCastleProvider());
         }
     }
-
-//     private static String getHostName() {
-//         try {
-//             InetAddress addr = InetAddress.getLocalHost();
-//             return addr.getCanonicalHostName();
-//         }
-//         catch(UnknownHostException e) {
-//             logger.error("Cannot discover hostName.");
-//             return "";
-//         }
-//     }
 
 
     private class Refreshener extends TimerTask {
@@ -235,35 +192,6 @@ public class PKIStore implements VOMSTrustStore {
          finally {
              newReader = null;
          }
-//          tmp = certificates;
-//          certificates = newReader.certificates;
-//          //        newReader.certificates = null;
-//          tmp.clear();
-//          tmp = null;
-
-//          tmp = crls;
-//          crls         = newReader.crls;
-//          tmp.clear();
-//          tmp = null;
-
-//          tmp = signings;
-//          signings     = newReader.signings;
-//          tmp.clear();
-//          tmp = null;
-
-//          tmp = lscfiles;
-//          lscfiles     = newReader.lscfiles;
-//          tmp.clear();
-//          tmp = null;
-
-//          tmp = vomscerts;
-//          vomscerts    = newReader.vomscerts;
-//          tmp.clear();
-//          tmp = null;
-
-//          newReader = null;
-
-//        System.out.println("STORE REFRESHED");
     }
 
     PKIStore(String dir, int type, boolean aggressive, boolean timer)  throws IOException, CertificateException, CRLException {
@@ -588,13 +516,6 @@ public class PKIStore implements VOMSTrustStore {
         String key = sp.getName();
 
         signings.put(key, sp);
-//         if (signings.containsKey(key)) 
-//             ((Vector)signings.get(key)).add(sp);
-//         else {
-//             Vector signs = new Vector();
-//             signs.add(sp);
-//             signings.put(key, signs);
-//         }
     }
 
     private void load(SigningPolicy[] sps) {

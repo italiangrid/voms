@@ -181,18 +181,6 @@ usage(char *name)
  *                               number of std::strings entered in the array. The
  *                               pointers to the std::strings themselves will start
  *                               from the third element.
- *                OPT_FUNCTION0: The flag field is expected to be a pointer to
- *                               a function that takes no arguments and returns
- *                               an integer, 0 for error, non-zeo otherwise.
- *                               This function is called whenever the option is
- *                               present on the command line. Obviously, the
- *                               option itself considered not to have an
- *                               argument.
- *                OPT_FUNCTION1: This is completely analogous to OPT_FUNCTION0
- *                               above. The only difference is that the option
- *                               is expected to have a std::string argument, and so
- *                               the function is expected to need a std::string
- *                               argument.
  *
  * Result:
  *   Failure:

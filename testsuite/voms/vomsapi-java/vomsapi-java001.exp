@@ -1,0 +1,5 @@
+load_lib vomstest.exp
+
+testheader "See if the Java API testsuite starts."
+pass "noerror"
+

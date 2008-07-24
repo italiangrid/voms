@@ -1,0 +1,72 @@
+variable _dbinitscript
+
+variable _dbstarted
+
+variable DBTYPE
+
+proc _startdb {} {
+    global _dbstarted
+
+    if [expr $::_dbinitscript == ""] then {
+        return
+    }
+    if {[info exists _dbstarted] == 0} then {
+        set _dbstarted 1
+        exec $::_dbinitscript start
+    } else {
+        if [expr $_dbstarted == 0] then {
+            set _dbstarted 1
+            exec $::_dbinitscript start
+        } else {
+            puts "Another DB was already started!"
+            exit
+        }
+    }
+}
+
+proc _stopdb {} {
+    global _dbstarted
+
+    if [expr $::_dbinitscript == ""] then {
+        return
+    }
+
+    if [expr $_dbstarted == 1] then {
+        set _dbstarted 0
+        exec $::_dbinitscript stop
+    } else {
+        puts "No DB was started!"
+        exit
+    }
+}
+
+proc _setdbtype {name} {
+    _inittests
+
+    # are we root or not ?
+    set id [id -u]
+    if [expr $name == 'oracle'] then {
+        #oracle is typically remote, and cannot be shutdown from a local user
+        set _dbinitscript ""
+    }
+    if [expr $name != "mysql"] then {
+        puts "Only oracle and mysql are supported as DBs."
+        exit
+    }
+
+    set ::DBTYPE $name
+    if [expr $id == 0] then {
+        #we are root
+        set ::_dbinitscript /etc/init.d/mysql
+    } else {
+        set ::_dbinitscript $::env(MYSQLPATH)
+    }
+}
+
+proc _execdb {name script} {
+    if [expr $name == "mysql"] {
+        exec $::_dbscript -e "$script"
+    } else if [expr $name = "oracle" ] {
+        
+    }
+}

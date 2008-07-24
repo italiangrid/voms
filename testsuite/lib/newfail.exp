@@ -1,0 +1,69 @@
+rename fail _fail
+rename pass _pass
+rename xfail _xfail
+rename load_lib _load_lib
+
+proc load_lib {file} {
+    global verbose libdir srcdir base_dir execpath tool
+    global loaded_libs
+
+    if [info exists loaded_libs($file)] {
+        return
+    }
+
+    set loaded_libs($file) ""
+
+    if { [search_and_load_file "library file" $file [list $::objdir/lib]] == 0 } {
+        _load_lib $file
+    }
+}
+
+proc testheader {description {testname ""}} {
+    set scriptname [file normalize [uplevel info script]]
+    set fname [file dirname [file dirname $scriptname]]
+
+    set realname [string range $scriptname [string length $$fname] end]
+    puts $::_logdescriptor "<tr><td align=\"left\">$realname</td><td align=\"left\">$description</td>"
+    set ::LOGOUTS ""
+}
+
+proc fail message {
+    global LOGOUTS
+    global REPORTDIR
+    global _logdescriptor
+    puts $_logdescriptor "<td align=\"left\" bgcolor=\"red\">failed</td><td></td>"
+    puts $_logdescriptor "<td>"
+
+    set scriptname [file normalize [uplevel info script]]
+    set fname [file dirname [file dirname $scriptname]]
+    set realname [string range $scriptname [string length $$fname] end]
+    set newname [exec mktemp $REPORTDIR/out-XXXXXX]
+    file copy -force $scriptname $newname
+    puts $_logdescriptor "<a href=\"$newname\">$realname</a>"
+
+    foreach name [split $LOGOUTS] {
+        if [file exists $name] then {
+            set newname [exec mktemp $REPORTDIR/out-XXXXXX]
+            file copy -force $name $newname
+            puts $_logdescriptor "<a href=\"$newname\">$name</a>"
+        }
+    }
+    puts $_logdescriptor "</td><tr>"
+    flush $_logdescriptor
+    _fail $message
+}
+
+proc pass message {
+    global _logdescriptor
+    puts $_logdescriptor "<td align=\"left\" bgcolor=\"green\">passed</td><td></td>"
+    puts $_logdescriptor "<td></td><tr>"
+    flush $_logdescriptor
+    _pass $message
+}
+
+proc xfail message {
+    global _logdescriptor
+    puts $_logdescriptor "<td align=\"left\" bgcolor=\"green\">expected failure</td><td></td>"
+    puts $_logdescriptor "<td></td><tr>"
+    _xfail $message
+}

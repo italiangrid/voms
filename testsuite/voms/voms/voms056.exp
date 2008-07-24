@@ -1,0 +1,14 @@
+load_lib vomstest.exp
+
+testheader "See if voms --socktimeout works."
+_activateCert mycert2
+
+_vomsStart voms1
+
+set timeout 100
+spawn telnet localhost 33334
+expect {
+    eof { pass "pass" }
+    timeout { fail "fail" }
+}
+_vomsStop voms1

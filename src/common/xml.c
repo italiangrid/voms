@@ -89,40 +89,23 @@ static char *base64Encode(const char *data, int size, int *j)
 
 static char *base64Decode(const char *data, int size, int *j)
 {
-  BIO *in = NULL;
   BIO *b64 = NULL;
-  int len = 0;
-  char *buffer = NULL;
-  int read = 0;
+  BIO *in = NULL;
 
-  in  = BIO_new(BIO_s_mem());
-  b64 = BIO_new(BIO_f_base64());
-  if (!in || !b64)
-    goto err;
-
-  b64 = BIO_push(b64, in);
-
-  BIO_write(in, data, size);
-  BIO_flush(in);
-
-  len = BIO_pending(b64);
-
-  buffer = (char *)malloc(len);
+  char *buffer = (char *)malloc(size);
   if (!buffer)
-    goto err;
+    return NULL;
 
-  *j = read = BIO_read(b64, buffer, len);
+  memset(buffer, 0, size);
 
-  if (read <= 0) {
-    free(buffer);
-    buffer = NULL;
-    goto err;
-  }
+  b64 = BIO_new(BIO_f_base64());
+  in = BIO_new_mem_buf(data, size);
+  in = BIO_push(b64, in);
 
- err:
+  *j = BIO_read(in, buffer, size);
 
-  BIO_free(b64);
-  BIO_free(in);
+  BIO_free_all(in);
+
   return buffer;
 }
 
@@ -428,7 +411,7 @@ static void  endreq(void *userdata, const char *name)
   d->depth--;
   if (strcmp(name, "order") == 0)
     d->order = d->value;
-  else if (strcmp(name, "target") == 0)
+  else if (strcmp(name, "targets") == 0)
     d->targets = d->value;
   else if (strcmp(name, "command") == 0)
   {

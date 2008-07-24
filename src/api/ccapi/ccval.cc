@@ -112,7 +112,7 @@ struct col {
 
 
 extern "C" {
-extern int validate(X509 *, X509 *, AC *, struct col *, int);
+extern int validate(X509 *, X509 *, AC *, struct col *, time_t, int);
 extern char *get_error(int);
 }
 
@@ -126,6 +126,11 @@ extern char *get_error(int);
 #define VER_ALL     0xffffffff
 
 bool vomsdata::verifyac(X509 *cert, X509 *issuer, AC *ac, voms &v)
+{
+  return verifyac(cert, issuer, ac, verificationtime, v);
+}
+
+bool vomsdata::verifyac(X509 *cert, X509 *issuer, AC *ac, time_t verificationtime, voms &v)
 {
   struct realdata *rd = NULL;
 
@@ -157,7 +162,7 @@ bool vomsdata::verifyac(X509 *cert, X509 *issuer, AC *ac, voms &v)
   if (ver_type & VERIFY_ID)     typ |= VER_ID;
   if ((ver_type & VERIFY_FULL) == VERIFY_FULL) typ = VER_ALL;
 
-  result = validate(cert, issuer, ac, vv, typ);
+  result = validate(cert, issuer, ac, vv, typ, verificationtime);
 
   if (!result) {
     v.siglen    = vv->siglen;

@@ -128,6 +128,11 @@ static bool        dochain = false;
 
 static bool        serial = false;
 
+static bool        dont_verify_ac = false;
+static bool        targets = false;
+static bool        included = false;
+static bool        printuri = false;
+
 static int InitProxyCertInfoExtension(void);
 static void *myproxycertinfo_s2i(struct v3_ext_method *method, struct v3_ext_ctx *ctx, char *data);
 static char *myproxycertinfo_i2s(struct v3_ext_method *method, void *ext);
@@ -152,10 +157,12 @@ main(int argc, char **argv)
     "   -version                  Displays version\n"
     "   -debug                    Displays debugging output\n"
     "   -file <proxyfile>         Non-standard location of proxy\n"
+    "   -dont-verify-ac           Skips AC verification\n"
     "   [printoptions]            Prints information about proxy and attribute certificate\n"
     "   -exists [options]         Returns 0 if valid proxy exists, 1 otherwise\n"
     "   -acexists <voname>        Returns 0 if AC exists corresponding to voname, 1 otherwise\n"
     "   -conf <name>              Read options from file <name>\n"
+    "   -included                 Print included file\n"
     "\n"
     "   [printoptions]\n"
     "      -chain                Prints information about the whol proxy chain (CA excluded)\n"
@@ -174,7 +181,7 @@ main(int argc, char **argv)
     "      -acissuer             DN of AC issuer (certificate signer)\n"
     "      -actimeleft           Time (in seconds) until AC expires\n"
     "      -serial               AC serial number \n"
-
+    "      -uri                  Server URI\n"
     "\n"
     "   [options to -exists]      (if none are given, H = B = 0 are assumed)\n"
     "      -valid H:M            time requirement for proxy to be valid\n"
@@ -214,6 +221,11 @@ main(int argc, char **argv)
     {"valid",       1, (int *)&valid,       OPT_STRING},
     {"bits",        1, &bits,               OPT_NUM},
     {"hours",       1, &hours,              OPT_NUM},
+
+    {"dont-verify-ac", 0, (int *)&dont_verify_ac, OPT_BOOL},
+    {"targets",     0, (int*)&targets,      OPT_BOOL},
+    {"included-file",  0, (int *)&included,  OPT_BOOL},
+    {"uri",         0, (int*)&printuri,     OPT_BOOL},
     {0, 0, 0, 0}
   };
 
@@ -224,6 +236,10 @@ main(int argc, char **argv)
     std::cout << SUBPACKAGE << "\nVersion: " << VERSION << std::endl;
     std::cout << "Compiled: " << __DATE__ << " " << __TIME__ << std::endl;
     exit(0);
+  }
+
+  if (getenv("VOMS_PROXY_INFO_DONT_VERIFY_AC") != NULL) {
+      dont_verify_ac = true;
   }
 
   AC_Init();
@@ -242,6 +258,9 @@ main(int argc, char **argv)
      !actimeleft && 
      !serial && 
      !exists && 
+     !targets &&
+     !included &&
+     !printuri &&
      acexists.empty())
     defaultinfo = true;
 
@@ -275,12 +294,26 @@ int numbits(X509 *cert)
   return bits;
 }
 
-
 static char *proxy_type(X509 *cert)
 {
   char *buffer = X509_NAME_oneline(X509_get_subject_name(cert), NULL, 0);
   char *point1 = strstr(buffer,"CN=proxy");
+
+  char *tmp = point1;
+  while (tmp) {
+    tmp = strstr(tmp +1, "CN=proxy");
+    if (tmp)
+      point1 = tmp;
+  }
   char *point2 = strstr(buffer,"CN=limited proxy");
+
+  tmp = point2;
+  while (tmp) {
+    tmp = strstr(tmp +1, "CN=limited proxy");
+    if (tmp)
+      point2 = tmp;
+  }
+
   int len = strlen(buffer);
 
   OPENSSL_free(buffer);
@@ -292,6 +325,18 @@ static char *proxy_type(X509 *cert)
   if (point2)
     if (len == ((point2 - buffer) + 16))
       return "limited proxy";
+
+  int nidv3 = OBJ_txt2nid("PROXYCERTINFO_V3");
+  int nidv4 = OBJ_txt2nid("PROXYCERTINFO_V4");
+
+  int indexv3 = X509_get_ext_by_NID(cert, nidv3, -1);
+  int indexv4 = X509_get_ext_by_NID(cert, nidv4, -1);
+
+  if (indexv4 != -1)
+    return "RFC compliant proxy";
+
+  if (indexv3 != -1)
+    return "GT3-style proxy";
 
   return "unknown";
 }
@@ -358,16 +403,26 @@ test_proxy()
       }
       chain = load_chain(of);
       vomsdata d("","");
-      d.SetVerificationType((verify_type)(VERIFY_SIGN | VERIFY_KEY));
-      res = d.Retrieve(x, chain, RECURSE_CHAIN);
-      if (!res) {
+      if (!dont_verify_ac) {
+          d.SetVerificationType((verify_type)(VERIFY_SIGN | VERIFY_KEY));
+          res = d.Retrieve(x, chain, RECURSE_CHAIN);
+      }
+      if (dont_verify_ac || !res) {
         d.data.clear();
         d.SetVerificationType((verify_type)(VERIFY_NONE));
-        res = d.Retrieve(x, chain, RECURSE_CHAIN);
-        std::cerr << "WARNING: Unable to verify signature! Server certificate possibly not installed.\n" 
-                  << "Error: " << d.ErrorMessage() << std::endl;
+        (void)d.Retrieve(x, chain, RECURSE_CHAIN);
+        if (dont_verify_ac) {
+            res = 1;
+        }
+        else {
+            std::cerr << "WARNING: Unable to verify signature! Server certificate possibly not installed.\n" 
+                      << "Error: " << d.ErrorMessage() << std::endl;
+        }
       }
-      res &= !(print(x, chain, d));
+      bool print_res = print(x, chain, d);
+      if (print_res == false) {
+          res = false;
+      }
     }
     else {
       std::cerr << std::endl << "Couldn't find a valid proxy." << std::endl << std::endl;
@@ -432,25 +487,6 @@ end:
   return(ret);
 }
 
-// static std::string 
-// timestring(ASN1_TIME *time)
-// {
-//   std::string res = "";
-
-//   if (time) {
-//     BIO *bio= BIO_new(BIO_s_mem());
-//     if (bio) {
-//       if (ASN1_TIME_print(bio,time)) {
-//         int len;
-//         char *s;
-//         len = BIO_get_mem_data(bio, &s);
-//         res = std::string(s,len);
-//       }
-//       BIO_free(bio);
-//     }
-//   }
-//   return res;
-// }
 
 static ASN1_TIME *
 convtime(std::string data)
@@ -526,6 +562,9 @@ static bool print(X509 *cert, STACK_OF(X509) *chain, vomsdata &vd)
     std::cout << "path      : " << file << "\n";
     std::cout << "timeleft  : " << leftcert/3600 << ":" << std::setw(2) << std::setfill('0') 
               << (leftcert%3600)/60 << ":" << std::setw(2) << std::setfill('0') << (leftcert%3600)%60 << "\n";
+    if (!vd.extra_data.empty())
+      std::cout << "included  : "  << vd.extra_data << "\n";
+
   }    
   
   if (all) {
@@ -538,6 +577,7 @@ static bool print(X509 *cert, STACK_OF(X509) *chain, vomsdata &vd)
       std::cout << "VO        : " << v->voname << "\n";
       std::cout << "subject   : " << v->user << "\n";
       std::cout << "issuer    : " << v->server << "\n";
+
       for (std::vector<std::string>::iterator s = v->fqan.begin(); s != v->fqan.end(); s++)
         std::cout << "attribute : " << *s << "\n";
       std::vector<attributelist> alist = v->GetAttributes();
@@ -547,6 +587,14 @@ static bool print(X509 *cert, STACK_OF(X509) *chain, vomsdata &vd)
             (t->qualifier.empty() ? "" : " (" + t->qualifier + ")") << std::endl;
       std::cout << "timeleft  : " << leftac/3600 << ":" << std::setw(2) << std::setfill('0')
                 << (leftac%3600)/60 << ":" << std::setw(2) << std::setfill('0') << (leftac%3600)%60 << "\n";
+
+      std::vector<std::string> targetlist = v->GetTargets();
+      if (!targetlist.empty()) {
+        for (std::vector<std::string>::iterator targ = targetlist.begin(); targ != targetlist.end(); targ++)
+          std::cout << "target    : " << *targ << "\n";
+      }
+      std::cout << "uri       : " << v->uri  << "\n";
+
     }
   }
 
@@ -564,6 +612,10 @@ static bool print(X509 *cert, STACK_OF(X509) *chain, vomsdata &vd)
     std::cout << file << "\n";
   if(timeleft)
     std::cout << leftcert << "\n";
+  if (included)
+    if (!vd.extra_data.empty())
+      std::cout << "included  : "  << vd.extra_data << "\n";
+
 
   if(text) {
     X509 *tmp = X509_dup(cert);
@@ -579,7 +631,7 @@ static bool print(X509 *cert, STACK_OF(X509) *chain, vomsdata &vd)
   }
 
   if (vd.data.empty())
-    if (vo || acsubject || acissuer || actimeleft || fqan || serial)
+    if (vo || acsubject || acissuer || actimeleft || fqan || serial || targets || printuri)
       res = false;
 
   for (std::vector<voms>::iterator v = vd.data.begin(); v != vd.data.end(); v++) {
@@ -591,6 +643,9 @@ static bool print(X509 *cert, STACK_OF(X509) *chain, vomsdata &vd)
 
     if (acissuer) 
         std::cout << v->server << "\n";
+
+    if (printuri)
+      std::cout  << v->uri << "\n";
 
     ASN1_TIME * after  = convtime(v->date2);
     leftac = stillvalid(after) - now;
@@ -608,6 +663,15 @@ static bool print(X509 *cert, STACK_OF(X509) *chain, vomsdata &vd)
 
     if (serial)
         std::cout << v->serial << "\n";
+
+    if (targets) {
+      std::vector<std::string> targetlist = v->GetTargets();
+
+      if (!targetlist.empty()) {
+        for (std::vector<std::string>::iterator targ = targetlist.begin(); targ != targetlist.end(); targ++)
+          std::cout << "target    : " << *targ << "\n";
+      }
+    }
   }
 
   /* -exists */
@@ -769,6 +833,12 @@ static int InitProxyCertInfoExtension(void)
 //   OBJC(INDEPENDENT_PROXY_OID, "INDEPENDENT PROXY_OID");
 //   OBJC(GLOBUS_GSI_PROXY_GENERIC_POLICY_OID, "GLOBUS_GSI_PROXY_GENERIC_POLICY_OID");
 //   OBJC(LIMITED_PROXY_OID, "LIMITED_PROXY_OID");
+
+  if (OBJ_txt2nid("PROXYCERTINFO_V3") == 0)
+    OBJC(PROXYCERTINFO_V3, "PROXYCERTINFO_V3");
+
+  if (OBJ_txt2nid("PROXYCERTINFO_V4") == 0)
+    OBJC(PROXYCERTINFO_V4, "PROXYCERTINFO_V4");
 
   pcert = (X509V3_EXT_METHOD *)OPENSSL_malloc(sizeof(X509V3_EXT_METHOD));
 

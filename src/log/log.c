@@ -46,10 +46,12 @@ static char *levnames[] = { "LOG_ERROR", "LOG_WARN", "LOG_INFO", "LOG_DEBUG", "N
 static pid_t loggerprocess = 0;
 static pid_t ownerprocess = 0;
 
+static void killogger(void);
 
-static void SetOwner(pid_t pid)
+void SetOwner(pid_t pid)
 {
   ownerprocess = pid;
+  atexit(killogger);
 }
 
 static void killogger(void)
@@ -116,7 +118,7 @@ int LogBuffer(FILE *f, void *logh, loglevels lev, logtypes type, const char *for
 
   id = fileno(f);
 
-  if (fstat(id, &st)) {
+  if (!fstat(id, &st)) {
     if ((mem = (char *)mmap(0, st.st_size, PROT_READ, 0, id, 0))) {
       LOGM(VARP, logh, type, lev, format, mem);
       munmap(mem, st.st_size);
@@ -149,15 +151,34 @@ static int bread(int fd, char** buffer)
   int reload = 0;
   int offset = 0;
   int slen = 0;
+  ssize_t readbytes = -1;
 
-  if(read(fd, &slen, sizeof(int)) < sizeof(int))
+  do {
+    readbytes = read(fd, &slen, sizeof(int));
+  } while (readbytes < 0 && (errno == EINTR
+#ifdef ERESTART
+                               || errno == ERESTART
+#endif
+                               ));
+
+  if (readbytes != sizeof(int))
     return 0;
 
+
   *buffer = malloc(slen * sizeof(char) + 1);
-  
+
   if (*buffer) {
-    while (offset < slen)
-      offset += read(fd, *buffer + offset, (slen - offset > PIPE_BUF ? PIPE_BUF : slen - offset));
+    while (offset < slen) {
+      do {
+        readbytes = read(fd, *buffer + offset, (slen - offset > PIPE_BUF ? PIPE_BUF : slen - offset));
+      } while (readbytes < 0 && (errno == EINTR
+#ifdef ERESTART
+                                   || errno == ERESTART
+#endif
+                                   ));
+      offset += readbytes;      
+    }
+
     (*buffer)[offset] = '\0';
   }
   return (reload ? -1 : offset);
@@ -198,8 +219,8 @@ void StartLogger(void *data, int code)
 
   if (pid) {
     loggerprocess = pid;
-    ownerprocess = getpid();
-    atexit(killogger);
+/*     ownerprocess = getpid(); */
+/*     atexit(killogger); */
     if (out == -1)
       out = open(fifo, O_WRONLY);
     li->fd = out;

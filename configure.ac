@@ -1,5 +1,5 @@
 
-AC_INIT([GLite Security VOMS], [1.8.0])
+AC_INIT([GLite Security VOMS], [1.8.4])
 AC_PREREQ(2.59)
 AC_CONFIG_AUX_DIR([./project])
 AM_INIT_AUTOMAKE
@@ -92,6 +92,7 @@ AC_FUNC_STRFTIME
 AC_CHECK_FUNCS([alarm atexit dup2 gethostbyaddr gethostname gethostbyname gethostname memmove memset mkfifo mktime munmap putenv select setenv sigaction socket strchr strdup strerror strndup strrchr strspn strstr strtod strtol strtoul strtoull tzset uname getpwnam timegm])
 #AC_CHECK_FUNCS([mktime lstat error strtod realloc malloc stat])
 
+AC_CHECK_DECLS(getopt_data)
 AC_REPLACE_FUNCS(getopt_long getopt_long_only daemon setenv memset)
 
 
@@ -111,6 +112,8 @@ AC_VOMS_STRNDUP
 AC_BUILD_API_ONLY
 
 GLITE_DOCBOOK_MAN
+
+AC_TESTSUITE
 
 AC_PREFIX_DEFAULT("/opt/glite")
 
@@ -133,18 +136,16 @@ AC_CONFIG_FILES([Makefile
                  src/socklib/Makefile
                  src/sslutils/Makefile
                  src/sslutils/oldgaa/Makefile
-                 src/support/Makefile
                  src/utils/Makefile
                  doc/Makefile
+                 testsuite/Makefile
+                 testsuite/SuiteConfig
                  test/Makefile
-                 test/tests/Makefile
                  test/utest/Makefile])
 AC_CONFIG_FILES([src/install/voms_install_db
                  src/install/voms.start
                  src/replica/voms_install_replica
                  src/install/upgrade1to2
                  src/install/mysql2oracle
-                 src/support/test_setup
-                 src/support/test_start
-                 src/support/test_clean])
+                 testsuite/lib/vomssetup.exp])
 AC_OUTPUT

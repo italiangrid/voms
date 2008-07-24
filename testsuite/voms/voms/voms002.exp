@@ -1,0 +1,21 @@
+load_lib vomstest.exp
+
+testheader "See if voms can be started and stopped."
+_activateCert mycert2
+_vomsStart voms1
+set out ""
+catch {set out [exec ps aux | grep voms1 | grep -v grep | grep etc/voms/voms1]}
+if {[string equal $out ""] } then {
+    fail "error - cannot start"
+} else { 
+    _vomsStop voms1
+    set out ""
+    exec sleep 5
+    catch {set out [exec ps aux | grep voms1 | grep -v grep | grep etc/voms/voms1]}
+
+    if {[string equal $out ""] } then {
+        pass "noerror"
+    } else {
+        fail "error - cannot stop"
+    }
+}

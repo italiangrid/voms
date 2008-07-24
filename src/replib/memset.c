@@ -20,7 +20,7 @@ void *memset(const void *s1, int v, size_t n)
   const char *st1 = (const char *)s1;
 
   while (n--) {
-    *st1++ = 0;
+    *st1++ = v;
   }
   return s1;
 }

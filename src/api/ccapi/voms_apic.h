@@ -22,6 +22,7 @@ typedef void * gss_ctx_id_t;
 #endif
 
 #include <openssl/x509.h>
+#include <time.h>
 
 #include "newformat.h"
 
@@ -396,5 +397,10 @@ int getMajorVersionNumber(void);
 int getMinorVersionNumber(void);
 int getPatchVersionNumber(void);
 
+extern int VOMS_SetVerificationTime(time_t verificationtime, struct vomsdata *vd, int *error);
+extern char **VOMS_GetTargetsList(struct voms *v, struct vomsdata *vd, int *error);
+extern void VOMS_FreeTargetsList(char **);
 
 #endif
+
+

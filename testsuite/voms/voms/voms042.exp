@@ -1,0 +1,42 @@
+load_lib vomstest.exp
+
+testheader "See if voms-proxy-init --bits works."
+_activateCert mycert2
+
+_vomsStart voms1
+set outname [exec mktemp $::SCRATCHDIR/voms-proxy-init-XXXXXX]
+set res [catch {set out [exec $::INSTALLDIR/bin/voms-proxy-init --voms voms1 --bits 2048 >& $outname]}]
+_vomsStop voms1
+
+if $res then {
+    set LOGOUTS "$LOGOUTS $outname"
+    fail "voms-proxy-init failed."
+} else {
+    set outname [exec mktemp $::SCRATCHDIR/voms-proxy-info-XXXXXX]
+    if [catch {set out2 [exec $::INSTALLDIR/bin/voms-proxy-info >& $outname]}] then {
+        set LOGOUTS "$LOGOUTS $outname"
+        fail "voms proxy info failed."
+    } else {
+        #match against known (correct) output
+        set correct "subject   : /C=IT/CN=001/CN=proxy
+issuer    : /C=IT/CN=001
+identity  : /C=IT/CN=001
+type      : proxy
+strength  : 2048 bits
+path      : /tmp/x509up_u\[0-9\]*
+timeleft  : \[0-9\]*:\[0-9\]*:\[0-9\]*"
+
+        set out2 [exec cat  $outname]
+
+        if [regexp $correct $out2 dummy] then {
+            pass "voms-proxy-init --bits worked successfully."
+        } else {
+            set outname2 [exec mktemp $::SCRATCHDIR/voms-proxy-info-XXXXXX]
+            set id [open $outname2 "w+"]
+            puts $id $correct
+            close $id
+            set LOGOUTS "$LOGOUTS $outname $outname2"
+            fail "Unexpected output in voms-proxy-info"
+        }
+    }
+}

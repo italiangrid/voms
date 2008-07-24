@@ -90,11 +90,7 @@ master-user=$master_mysql_user
 master-password=$master_mysql_pwd
 replicate-do-db=$master_db
 replicate-ignore-table=$master_db.seqnumber
-replicate-ignore-table=$master_db.realtime
-replicate-ignore-table=$master_db.transactions
 replicate-ignore-table=seqnumber
-replicate-ignore-table=realtime
-replicate-ignore-table=transactions
 EOF
 
 if ! test -z $verbose ; then echo "VOMS_INSTALL_REPLICA: MYSQL RESTART.." ; fi

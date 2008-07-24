@@ -607,17 +607,17 @@ oldgaa_globus_parse_policy (policy_file_context_ptr  pcontext,
   oldgaa_rights_ptr        start_rights     = NULL;
   oldgaa_cond_bindings_ptr cond_bind        = NULL;
   oldgaa_error_code        oldgaa_error;
-
+  oldgaa_principals_ptr    current          = NULL;
   char                  str[MAX_STRING_SIZE] = {NUL};
   int                   cond_present     = FALSE;
   int                   new_entry        = TRUE; 
   int                   line_number;
- 
+
   end_of_file    = 0;
   *policy_handle = NULL;
 	 
   while (!end_of_file)    
- { 
+    { 
   if (new_entry == TRUE) /* start parsing new entry */
   {
    cond_present = FALSE;
@@ -628,7 +628,7 @@ oldgaa_globus_parse_policy (policy_file_context_ptr  pcontext,
     if(oldgaa_globus_parse_principals(pcontext,
                         policy_handle,
                         str,
-                        &start_principals) != OLDGAA_SUCCESS)
+                        &current) != OLDGAA_SUCCESS)
      { 
       oldgaa_handle_error(&(pcontext->parse_error),
 		 "oldgaa_globus_parse_policy: error while parsing principal: ");
@@ -637,6 +637,8 @@ oldgaa_globus_parse_policy (policy_file_context_ptr  pcontext,
       goto err;
      }
 
+    if (!start_principals)
+      start_principals = current;
   }/* if (new_entry == TRUE) */
 
      /* continue parsing an entry */
@@ -678,15 +680,15 @@ oldgaa_globus_parse_policy (policy_file_context_ptr  pcontext,
 
    }
   
-  /* bind paresed conditions for this entry to the paresed rights 
+  /* bind parsed conditions for this entry to the parsed rights 
     from this entry */
 
   else  oldgaa_bind_rights_to_conditions(start_rights, cond_bind);   
 
-    /* bind paresed rights for this entry to the paresed principals 
+    /* bind parsed rights for this entry to the parsed principals 
       from this entry */
 
-    oldgaa_bind_rights_to_principals(start_principals, start_rights);
+    oldgaa_bind_rights_to_principals(current, start_rights);
     oldgaa_collapse_policy(policy_handle);
 
  } /* if(cond_present == TRUE) */

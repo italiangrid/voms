@@ -1,0 +1,4 @@
+load_lib vomstest.exp
+
+testheader "See if the C API testsuite starts."
+pass "noerror"

@@ -199,40 +199,40 @@ AC_DEFUN([AC_GLOBUS],
     for flavor in $GLOBUS_FLAVORS ; do
       if test "x$flavor" = "x$with_globus_flavor" ; then
       	GLOBUS_CFLAGS="-I$with_globus_prefix/include/$flavor"
-        GLOBUS_GSS_LIBS="$ac_globus_ldlib -lglobus_gssapi_gsi_$flavor -lglobus_gss_assist_$flavor -lcrypto_$flavor"
+        GLOBUS_GSS_LIBS="$ac_globus_ldlib -lglobus_gssapi_gsi_$flavor -lglobus_gss_assist_$flavor"
       fi
       if test "x$flavor" = "xgcc32" ; then
 	      GLOBUS_GCC32_CFLAGS="-I$with_globus_prefix/include/$flavor"
-        GLOBUS_GCC32_GSS_LIBS="$ac_globus_ldlib -lglobus_gssapi_gsi_$flavor -lglobus_gss_assist_$flavor -lcrypto_$flavor"
+        GLOBUS_GCC32_GSS_LIBS="$ac_globus_ldlib -lglobus_gssapi_gsi_$flavor -lglobus_gss_assist_$flavor"
       fi
       if test "x$flavor" = "xgcc32dbg" ; then
         GLOBUS_GCC32DBG_CFLAGS="-I$with_globus_prefix/include/$flavor"
-        GLOBUS_GCC32DBG_GSS_LIBS="$ac_globus_ldlib -lglobus_gssapi_gsi_$flavor -lglobus_gss_assist_$flavor -lcrypto_$flavor"
+        GLOBUS_GCC32DBG_GSS_LIBS="$ac_globus_ldlib -lglobus_gssapi_gsi_$flavor -lglobus_gss_assist_$flavor"
       fi
       if test "x$flavor" = "xgcc32dbgpthr" ; then
         GLOBUS_GCC32DBGPTHR_CFLAGS="-I$with_globus_prefix/include/$flavor"
-        GLOBUS_GCC32DBGPTHR_GSS_LIBS="$ac_globus_ldlib -lglobus_gssapi_gsi_$flavor -lglobus_gss_assist_$flavor -lcrypto_$flavor"
+        GLOBUS_GCC32DBGPTHR_GSS_LIBS="$ac_globus_ldlib -lglobus_gssapi_gsi_$flavor -lglobus_gss_assist_$flavor"
       fi
       if test "x$flavor" = "xgcc32pthr" ; then
         GLOBUS_GCC32PTHR_CFLAGS="-I$with_globus_prefix/include/$flavor"
-        GLOBUS_GCC32PTHR_GSS_LIBS="$ac_globus_ldlib -lglobus_gssapi_gsi_$flavor -lglobus_gss_assist_$flavor -lcrypto_$flavor"
+        GLOBUS_GCC32PTHR_GSS_LIBS="$ac_globus_ldlib -lglobus_gssapi_gsi_$flavor -lglobus_gss_assist_$flavor"
       fi
 
       if test "x$flavor" = "xgcc64" ; then
 	      GLOBUS_GCC64_CFLAGS="-I$with_globus_prefix/include/$flavor"
-        GLOBUS_GCC64_GSS_LIBS="$ac_globus_ldlib -lglobus_gssapi_gsi_$flavor -lglobus_gss_assist_$flavor -lcrypto_$flavor"
+        GLOBUS_GCC64_GSS_LIBS="$ac_globus_ldlib -lglobus_gssapi_gsi_$flavor -lglobus_gss_assist_$flavor"
       fi
       if test "x$flavor" = "xgcc64dbg" ; then
         GLOBUS_GCC64DBG_CFLAGS="-I$with_globus_prefix/include/$flavor"
-        GLOBUS_GCC64DBG_GSS_LIBS="$ac_globus_ldlib -lglobus_gssapi_gsi_$flavor -lglobus_gss_assist_$flavor -lcrypto_$flavor"
+        GLOBUS_GCC64DBG_GSS_LIBS="$ac_globus_ldlib -lglobus_gssapi_gsi_$flavor -lglobus_gss_assist_$flavor"
       fi
       if test "x$flavor" = "xgcc64dbgpthr" ; then
         GLOBUS_GCC64DBGPTHR_CFLAGS="-I$with_globus_prefix/include/$flavor"
-        GLOBUS_GCC64DBGPTHR_GSS_LIBS="$ac_globus_ldlib -lglobus_gssapi_gsi_$flavor -lglobus_gss_assist_$flavor -lcrypto_$flavor"
+        GLOBUS_GCC64DBGPTHR_GSS_LIBS="$ac_globus_ldlib -lglobus_gssapi_gsi_$flavor -lglobus_gss_assist_$flavor"
       fi
       if test "x$flavor" = "xgcc64pthr" ; then
         GLOBUS_GCC64PTHR_CFLAGS="-I$with_globus_prefix/include/$flavor"
-        GLOBUS_GCC64PTHR_GSS_LIBS="$ac_globus_ldlib -lglobus_gssapi_gsi_$flavor -lglobus_gss_assist_$flavor -lcrypto_$flavor"
+        GLOBUS_GCC64PTHR_GSS_LIBS="$ac_globus_ldlib -lglobus_gssapi_gsi_$flavor -lglobus_gss_assist_$flavor"
       fi
     done
 
@@ -921,7 +921,55 @@ AC_DEFUN([AC_UTEST],
   AM_CONDITIONAL(WANT_UNIT_TEST, test x$have_unit_test = xyes)
 ])
 
+AC_DEFUN([AC_TESTSUITE],
+[
+  AC_ARG_WITH(report-dir,
+    [  --with-report-dir    Set reportdir for testsuite],
+    [with_reportdir="$withval"],
+    [with_reportdir="$HOME/reports"])
 
+  AC_ARG_WITH(scratch-dir,
+    [  --with-scratch-dir   Set scratchdir for testsuite],
+    [with_scratchdir="$withval"],
+    [with_scratchdir="/tmp"])
+
+  AC_ARG_WITH(dbuser,
+    [  --with-dbuser        Set DB user for testsuite],
+    [with_dbuser="$withval"],
+    [with_dbuser="root"])
+
+  AC_ARG_WITH(dbpwd,
+    [  --with-dbpwd         Set DB password for testsuite],
+    [with_dbpwd="$withval"],
+    [with_dbpwd=""])
+
+  AC_ARG_ENABLE(oracle-tests,
+    [  --enable-oracle-tests  Do tests against Oracle DB],
+    [ case "$enableval" in
+      yes) enable_oracletests="yes" ;;
+      no)  enable_oracletests="no" ;;
+      *) AC_MSG_ERROR([bad value $(enableval) for --enable-oracle-tests]) ;;
+      esac
+    ],
+    [ enable_oracletests="no"])
+
+  AC_ARG_ENABLE(mysql-tests,
+    [  --enable-mysql-tests  Do tests against MySQL DB],
+    [ case "$enableval" in
+      yes) enable_mysqltests="yes" ;;
+      no)  enable_mysqltests="no" ;;
+      *) AC_MSG_ERROR([bad value $(enableval) for --enable-mysql-tests]) ;;
+      esac
+    ],
+    [ enable_mysqltests="yes"])
+
+  AC_SUBST(with_reportdir)
+  AC_SUBST(with_scratchdir)
+  AC_SUBST(with_dbuser)
+  AC_SUBST(with_dbpwd)
+  AC_SUBST(enable_oracletests)
+  AC_SUBST(enable_mysqltests)
+])
 
 dnl This macro written by:
 dnl author: Gabor Gombas.

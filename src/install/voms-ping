@@ -1,0 +1,72 @@
+#!/bin/sh
+#set -x
+RES_COL=40
+MOVE_TO_COL="echo -en \\033[${RES_COL}G"
+SETCOLOR_SUCCESS="echo -en \\033[1;32m"
+SETCOLOR_FAILURE="echo -en \\033[1;31m"
+SETCOLOR_WARNING="echo -en \\033[1;33m"
+SETCOLOR_NORMAL="echo -en \\033[0;39m"
+
+echo_success() {
+  $MOVE_TO_COL
+  echo -n "[  "
+  $SETCOLOR_SUCCESS
+  echo -n $1
+  $SETCOLOR_NORMAL
+  echo "  ]"
+}
+
+echo_failure() {
+  $MOVE_TO_COL
+  echo -n "[  "
+  $SETCOLOR_FAILURE
+  echo -n $1
+  $SETCOLOR_NORMAL
+  echo "  ]"
+}
+
+function test_vo {
+   local voname="$1"
+   local port=`cat $GLITE_LOCATION/etc/voms/$voname/voms.conf  | grep '^--port' | sed 's/^--port=//'`
+   local dn=`openssl x509 -subject -noout -in /etc/grid-security/hostcert.pem|cut -d' ' -f2-`
+   set -e
+   if nc localhost $port < /dev/null; then
+       :
+   else
+       echo_failure Core
+       return 1
+   fi
+   set +e
+   cat >/tmp/vomses <<EOF
+"$voname" "localhost" "$port" "$dn" "$voname"
+EOF
+   rm -f /tmp/oo
+   /opt/glite/bin/voms-proxy-init --voms $vo --out /tmp/proxy --userconf=/tmp/vomses 2>/tmp/oo >/dev/null
+   res=$?
+   if test $res -ne 0; then
+      grep "User unknown to this VO" /tmp/oo >/dev/null
+      res=$?
+      if test $res -ne 0; then
+      echo_failure Core
+      return 1
+      fi
+   fi
+   echo_success OK
+   return 0
+}
+
+vos=$@            # Space-separated list of VOs
+
+result=0
+
+for vo in $vos; do
+    echo -n "Testing $vo: "
+
+    if test_vo $vo; then
+   :
+    else
+   result=1
+    fi
+done
+
+exit $result
