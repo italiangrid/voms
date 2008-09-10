@@ -135,7 +135,11 @@ fi
 MYSQLDUMP=$MYSQL_HOME/bin/mysqldump
 MYSQLINIT=/etc/rc.d/init.d/mysql
 
-$MYSQL -e "GRANT REPLICATION SLAVE ON *.* TO '$mysql_replica_user'@'$slave_host' IDENTIFIED BY '$mysql_replica_user_pwd' REQUIRE SSL; GRANT SELECT ON $master_db.* TO '$mysql_replica_user'@'$slave_host' IDENTIFIED BY '$mysql_replica_user_pwd' REQUIRE SSL; FLUSH PRIVILEGES;"
+if test "x$require_ssl" = "xy" ; then
+   $MYSQL -e "GRANT REPLICATION SLAVE ON *.* TO '$mysql_replica_user'@'$slave_host' IDENTIFIED BY '$mysql_replica_user_pwd' REQUIRE SSL; GRANT SELECT ON $master_db.* TO '$mysql_replica_user'@'$slave_host' IDENTIFIED BY '$mysql_replica_user_pwd' REQUIRE SSL; FLUSH PRIVILEGES;"
+else
+   $MYSQL -e "GRANT REPLICATION SLAVE ON *.* TO '$mysql_replica_user'@'$slave_host' IDENTIFIED BY '$mysql_replica_user_pwd' REQUIRE SSL; GRANT SELECT ON $master_db.* TO '$mysql_replica_user'@'$slave_host' IDENTIFIED BY '$mysql_replica_user_pwd'; FLUSH PRIVILEGES;"
+fi
 
 if test "x$mysql_version" = "x5" ; then
     if test "x$mysql_password_admin" = "x" ; then

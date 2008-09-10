@@ -11,8 +11,6 @@ variable _capath
 variable _certdir
 variable _vomsdir
 
-rename cleanup _cleanup
-
 proc _activateCert {cert} {
     file mkdir $::env(HOME)/.globus2
     file copy -force "$::_certdir/$cert-cert.pem" $::env(HOME)/.globus2/usercert.pem
@@ -348,15 +346,4 @@ authorityKeyIdentifier=keyid,issuer:always"
     flush $cadesc
     close $cadesc
 }
-
-proc cleanup {} {
-    _cleanup
-    puts $::_logdescriptor "</table>"
-
-    puts $::_logdescriptor "</body></html>"
-    flush $::_logdescriptor
-    close $::_logdescriptor
-#    catch {exec rm -rf $::INSTALLDIR/ca}
-}
-
 

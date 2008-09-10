@@ -1,0 +1,30 @@
+load_lib vomstest.exp
+
+testheader "Check message in case of user not registered (role request)."
+_activateCert mycert3
+
+_vomsStart voms1
+set outname [exec mktemp $::SCRATCHDIR/voms-proxy-init-XXXXXX]
+set res [catch {set out [exec $::INSTALLDIR/bin/voms-proxy-init --voms voms1:/voms1/group1/Role=TestRole >& $outname]}]
+_vomsStop voms1
+
+if $res then {
+    set correct "Error: voms1: User unknown to this VO."
+
+    set out2 [exec cat  $outname]
+
+    if [regexp $correct $out2 dummy] then {
+        pass "voms-proxy-init returned the correct error message."
+    } else {
+        set outname2 [exec mktemp $::SCRATCHDIR/voms-proxy-info-XXXXXX]
+        set id [open $outname2 "w+"]
+        puts $id $correct
+        close $id
+        set LOGOUTS "$LOGOUTS $outname $outname2"
+        fail "Unexpected output in voms-proxy-init"
+    }
+} else {
+    set LOGOUTS "$LOGOUTS $outname"
+    fail "voms-prxoy-init did not return an error."
+}
+

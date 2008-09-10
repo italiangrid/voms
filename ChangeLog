@@ -1,4 +1,102 @@
 ------------------------------------------------------------------------
+r976 | marotta | 2008-08-01 15:13:00 +0200 (Fri, 01 Aug 2008) | 1 line
+Changed paths:
+   M /voms/branches/voms-1-8-series/src/server/vomsd.cc 
+
+Fixed memory problem.
+------------------------------------------------------------------------
+r975 | marotta | 2008-08-01 11:41:37 +0200 (Fri, 01 Aug 2008) | 1 line
+Changed paths:
+   M /voms/branches/voms-1-8-series/src/server/vomsd.cc
+
+Fixed error messages when the user is not registered.
+------------------------------------------------------------------------
+r974 | marotta | 2008-08-01 11:32:50 +0200 (Fri, 01 Aug 2008) | 1 line
+Changed paths:
+   M /voms/branches/voms-1-8-series/testsuite/voms/voms/voms060.exp
+   A /voms/branches/voms-1-8-series/testsuite/voms/voms/voms061.exp
+   A /voms/branches/voms-1-8-series/testsuite/voms/voms/voms062.exp
+   A /voms/branches/voms-1-8-series/testsuite/voms/voms/voms063.exp
+
+added tests (one fails)
+------------------------------------------------------------------------
+r972 | marotta | 2008-07-31 17:18:41 +0200 (Thu, 31 Jul 2008) | 1 line
+Changed paths:
+   M /voms/branches/voms-1-8-series/src/server/vomsd.cc
+   M /voms/branches/voms-1-8-series/testsuite/lib/vomssetup.exp.in
+   A /voms/branches/voms-1-8-series/testsuite/voms/voms/voms060.exp
+
+fixed bug for multiple '--voms' options
+------------------------------------------------------------------------
+r971 | marotta | 2008-07-31 15:37:00 +0200 (Thu, 31 Jul 2008) | 1 line
+Changed paths:
+   M /voms/branches/voms-1-8-series/configure
+   M /voms/branches/voms-1-8-series/configure.ac
+   M /voms/branches/voms-1-8-series/project/version.properties
+
+Bumped version to 1.8.5
+------------------------------------------------------------------------
+r970 | marotta | 2008-07-31 15:30:20 +0200 (Thu, 31 Jul 2008) | 1 line
+Changed paths:
+   M /voms/branches/voms-1-8-series/src/replica/voms_replica_master_setup.sh
+
+SSL is no longer obligatory.
+------------------------------------------------------------------------
+r969 | marotta | 2008-07-30 11:06:08 +0200 (Wed, 30 Jul 2008) | 1 line
+Changed paths:
+   M /voms/branches/voms-1-8-series/testsuite/lib/vomstest.exp
+
+Fixed issues with the testsuite (again) (again).
+------------------------------------------------------------------------
+r968 | marotta | 2008-07-30 11:02:38 +0200 (Wed, 30 Jul 2008) | 1 line
+Changed paths:
+   M /voms/branches/voms-1-8-series/testsuite/lib/vomstest.exp
+
+Fixed issues with the testsuite (again).
+------------------------------------------------------------------------
+r967 | marotta | 2008-07-30 10:33:20 +0200 (Wed, 30 Jul 2008) | 1 line
+Changed paths:
+   M /voms/branches/voms-1-8-series/testsuite/lib/newfail.exp
+   M /voms/branches/voms-1-8-series/testsuite/lib/vomslib.exp
+   M /voms/branches/voms-1-8-series/testsuite/lib/vomstest.exp
+
+Fixed issues with the testsuite.
+------------------------------------------------------------------------
+r966 | marotta | 2008-07-28 16:03:28 +0200 (Mon, 28 Jul 2008) | 1 line
+Changed paths:
+   M /voms/branches/voms-1-8-series/testsuite/lib/newfail.exp
+   M /voms/branches/voms-1-8-series/testsuite/lib/vomssetup.exp.in
+   M /voms/branches/voms-1-8-series/testsuite/lib/vomstest.exp
+
+Various fixes for execution from etics + properly fail with tcl problems.
+------------------------------------------------------------------------
+r961 | marotta | 2008-07-17 16:33:12 +0200 (Thu, 17 Jul 2008) | 1 line
+Changed paths:
+   M /voms/branches/voms-1-8-series/src/client/vomsclient.cc
+   M /voms/branches/voms-1-8-series/testsuite/voms/voms/voms002.exp
+   M /voms/branches/voms-1-8-series/testsuite/voms/voms/voms007.exp
+   M /voms/branches/voms-1-8-series/testsuite/voms/voms/voms009.exp
+   M /voms/branches/voms-1-8-series/testsuite/voms/voms/voms010.exp
+   M /voms/branches/voms-1-8-series/testsuite/voms/voms/voms011.exp
+   M /voms/branches/voms-1-8-series/testsuite/voms/voms/voms014.exp
+   M /voms/branches/voms-1-8-series/testsuite/voms/voms/voms016.exp
+   M /voms/branches/voms-1-8-series/testsuite/voms/voms/voms020.exp
+   M /voms/branches/voms-1-8-series/testsuite/voms/voms/voms021.exp
+   M /voms/branches/voms-1-8-series/testsuite/voms/voms/voms025.exp
+   M /voms/branches/voms-1-8-series/testsuite/voms/voms/voms030.exp
+   M /voms/branches/voms-1-8-series/testsuite/voms/voms/voms041.exp
+   M /voms/branches/voms-1-8-series/testsuite/voms/voms/voms043.exp
+   M /voms/branches/voms-1-8-series/testsuite/voms/voms/voms044.exp
+   M /voms/branches/voms-1-8-series/testsuite/voms/voms/voms059.exp
+
+Fix for bug #37704
+------------------------------------------------------------------------
+r960 | marotta | 2008-07-15 15:45:46 +0200 (Tue, 15 Jul 2008) | 1 line
+Changed paths:
+   M /voms/branches/voms-1-8-series/ChangeLog
+
+Adjusting changelog for 1.8.4 candidate.
+------------------------------------------------------------------------
 r959 | marotta | 2008-07-15 15:35:14 +0200 (Tue, 15 Jul 2008) | 1 line
 Changed paths:
    M /voms/branches/voms-1-8-series/configure
@@ -3120,3 +3218,4 @@ Changed paths:
    A /voms/trunk
 
 New repository initialized by cvs2svn.
+------------------------------------------------------------------------

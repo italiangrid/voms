@@ -16,10 +16,10 @@ set LOGOUTS "$LOGOUTS $::_buildout"
 if $res then {
     fail "execution failed."
 } else {
-    set correct "\"voms1\" \"localhost\" \"/C=IT/CN=003\" \"voms1\" \"33334\" \"35\"
-\"voms1\" \"localhost\" \"/C=IT/CN=003\" \"voms1\" \"33334\" \"-1\""
+    set correct "\"voms1\" \"localhost\" \"/C=IT/CN=003\" \"voms1\" \"33334\" \"-1\"
+\"voms1\" \"localhost\" \"/C=IT/CN=003\" \"voms1\" \"33334\" \"35\""
 
-    set out [exec cat $::_buildout]
+    set out [exec cat $::_buildout | sort]
     if [regexp $correct $out] then {
         pass "output correct"
     } else {

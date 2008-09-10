@@ -23,11 +23,11 @@ proc _determineVomsPID {name} {
     }
 }
 
-proc _vomsServersInit {} {
-    catch { file delete -force $::_vomsdefinitions }
-    set ::_vomsdefinitions $::INSTALLDIR/vomsservers
-    file mkdir $::_vomsdefinitions
-}
+#proc _vomsServersInit {} {
+#    catch { file delete -force $::_vomsdefinitions }
+#    set ::_vomsdefinitions $::INSTALLDIR/vomsservers
+#    file mkdir $::_vomsdefinitions
+#}
 
 proc _defineVOMSServer {name} {
     if [expr ![file exists "$::_vomsdefinitions/$name"]] then {
@@ -100,12 +100,28 @@ proc _restoreVOMS {name} {
 }
 
 proc _vomsStart {name } {
+    set saved ""
+    catch {set saved $::env(GLITE_LOCATION)}
+    set ::env(GLITE_LOCATION) $::INSTALLDIR
     exec /bin/sh -c "rm -f $::INSTALLDIR/var/log/voms.$name*"
     exec $::INSTALLDIR/etc/init.d/voms start [exec cat $::_vomsdefinitions/$name/options/voms-vo] >/dev/null
+    if [expr ! [string equal $saved ""]] then {
+        set ::env(GLITE_LOCATION) $saved
+    } else {
+        unset ::env(GLITE_LOCATION)
+    }
 }
 
 proc _vomsStop {name } {
+    set saved ""
+    catch {set saved $::env(GLITE_LOCATION)}
+    set ::env(GLITE_LOCATION) $::INSTALLDIR
     exec $::INSTALLDIR/etc/init.d/voms stop [exec cat $::_vomsdefinitions/$name/options/voms-vo] >/dev/null
+    if [expr ![string equal $saved ""]] then {
+        set ::env(GLITE_LOCATION) $saved
+    } else {
+        unset ::env(GLITE_LOCATION)
+    }
 }
 
 proc _vomsSetup {name} {
@@ -129,7 +145,7 @@ proc _vomsSetup {name} {
             set options "$options --[file tail $f]=[exec cat $f] "
         }
     }
-    puts $id "CERTDIR=$::INSTALLDIR/etc/grid-security/certificates $::INSTALLDIR/libexec/voms/voms_install_db $options"
+    puts $id "GLITE_LOCATION=$::INSTALLDIR CERTDIR=$::INSTALLDIR/etc/grid-security/certificates $::INSTALLDIR/libexec/voms/voms_install_db $options"
     flush $id
     close $id
 

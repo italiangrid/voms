@@ -47,6 +47,10 @@ proc _inittests {} {
             _readConfigFile $::env(SUITECONFIG)
         }
 
+        if [expr ! [file exists $::REPORTDIR]] then {
+            file mkdir $::REPORTDIR
+        }
+
         puts -nonewline "."
         if [file exists $::SCRATCHDIR/suitefiles] then {
             file delete -force $::SCRATCHDIR/suitefiles
@@ -100,6 +104,7 @@ proc _inittests {} {
 
 proc _vomsServersInit {} {
     puts -nonewline "."
+
     catch { file delete -force $::_vomsdefinitions }
     set ::_vomsdefinitions $::INSTALLDIR/vomsservers
     file mkdir $::_vomsdefinitions

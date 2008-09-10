@@ -2,9 +2,10 @@ rename fail _fail
 rename pass _pass
 rename xfail _xfail
 rename load_lib _load_lib
+rename clone_output _clone_output
+rename cleanup _cleanup
 
 proc load_lib {file} {
-    global verbose libdir srcdir base_dir execpath tool
     global loaded_libs
 
     if [info exists loaded_libs($file)] {
@@ -18,19 +19,11 @@ proc load_lib {file} {
     }
 }
 
-proc testheader {description {testname ""}} {
-    set scriptname [file normalize [uplevel info script]]
-    set fname [file dirname [file dirname $scriptname]]
-
-    set realname [string range $scriptname [string length $$fname] end]
-    puts $::_logdescriptor "<tr><td align=\"left\">$realname</td><td align=\"left\">$description</td>"
-    set ::LOGOUTS ""
-}
-
 proc fail message {
     global LOGOUTS
     global REPORTDIR
     global _logdescriptor
+
     puts $_logdescriptor "<td align=\"left\" bgcolor=\"red\">failed</td><td></td>"
     puts $_logdescriptor "<td>"
 
@@ -67,3 +60,34 @@ proc xfail message {
     puts $_logdescriptor "<td></td><tr>"
     _xfail $message
 }
+
+proc clone_output {message} {
+    set value [string compare -length 25 "ERROR: tcl error sourcing" $message]
+    if [expr ! $value] then {
+        fail "$message"
+        puts "CALLED"
+    }
+
+    set msg [_clone_output "$message"]
+    return "$msg"
+}
+
+proc cleanup {} {
+    _cleanup
+    puts $::_logdescriptor "</table>"
+
+    puts $::_logdescriptor "</body></html>"
+    flush $::_logdescriptor
+    close $::_logdescriptor
+#    catch {exec rm -rf $::INSTALLDIR/ca}
+}
+
+proc testheader {description {testname ""}} {
+    set scriptname [file normalize [uplevel info script]]
+    set fname [file dirname [file dirname $scriptname]]
+
+    set realname [string range $scriptname [string length $$fname] end]
+    puts $::_logdescriptor "<tr><td align=\"left\">$realname</td><td align=\"left\">$description</td>"
+    set ::LOGOUTS ""
+}
+
