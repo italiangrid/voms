@@ -32,9 +32,10 @@ AC_DEFUN([AC_OPENSSL],
     if test "x$with_openssl_libs" = "xyes" ; then
       WANTED_API_LIBS="$WANTED_API_LIBS libvomsapi_nog.la"
       WANTED_ATTCERT_LIBS="$WANTED_ATTCERT_LIBS libattributes_nog.la"
-      WANTED_SSL_UTILS_LIBS="$WANTED_SSL_UTILS_LIBS libssl_utils-nog.la"
-      WANTED_OLDGAA_LIBS="$WANTED_OLDGAA_LIBS liboldgaa-nog.la"
+      WANTED_SSL_UTILS_LIBS="$WANTED_SSL_UTILS_LIBS libssl_utils_nog.la"
+      WANTED_OLDGAA_LIBS="$WANTED_OLDGAA_LIBS liboldgaa_nog.la"
       WANTED_UTIL_LIBS="$WANTED_UTIL_LIBS libutilities_nog.la libutilc_nog.la"
+      WANTED_SOCK_LIBS="$WANTED_SOCK_LIBS libsock_nog.la"
     fi
     cat >conftest.h <<HERE
 #include <openssl/opensslv.h>
@@ -109,6 +110,7 @@ AC_DEFUN([AC_GLOBUS],
       fi
       if test "x$USE_SOCK_LIB" = "x"; then
         USE_SOCK_LIB="libsock.la"
+        USE_SOCK_LIB_SERVER="libsock_server.la"
       fi
       if test "x$USE_CCAPI_LIB" = "x"; then
         USE_CCAPI_LIB="libvomsapi.la"
@@ -125,7 +127,7 @@ AC_DEFUN([AC_GLOBUS],
 
       WANTED_OLDGAA_LIBS="$WANTED_OLDGAA_LIBS liboldgaa.la"
       WANTED_SSL_UTILS_LIBS="$WANTED_SSL_UTILS_LIBS libssl_utils.la"
-      WANTED_SOCK_LIBS="$WANTED_SOCK_LIBS libsock.la"
+      WANTED_SOCK_LIBS="$WANTED_SOCK_LIBS libsock.la libsock_server.la"
       WANTED_ATTCERT_LIBS="$WANTED_ATTCERT_LIBS libattcert.la libccattcert.la"
       WANTED_API_LIBS="$WANTED_API_LIBS libvomsapi.la libvomsc.la"
       WANTED_UTIL_LIBS="$WANTED_UTIL_LIBS libutilities.la libutilc.la"
@@ -166,6 +168,7 @@ AC_DEFUN([AC_GLOBUS],
       fi
       if test "x$USE_SOCK_LIB" = "x"; then
         USE_SOCK_LIB="libsock_$flavor.la"
+        USE_SOCK_LIB_SERVER="libsock_server_$flavor.la"
       fi
       if test "x$USE_CCAPI_LIB" = "x"; then
         USE_CCAPI_LIB="libvomsapi_$flavor.la"
@@ -200,39 +203,48 @@ AC_DEFUN([AC_GLOBUS],
       if test "x$flavor" = "x$with_globus_flavor" ; then
       	GLOBUS_CFLAGS="-I$with_globus_prefix/include/$flavor"
         GLOBUS_GSS_LIBS="$ac_globus_ldlib -lglobus_gssapi_gsi_$flavor -lglobus_gss_assist_$flavor"
+        GLOBUS_GSS_API_LIBS="$ac_globus_ldlib -lcrypto_$flavor -lssl_$flavor"
       fi
       if test "x$flavor" = "xgcc32" ; then
 	      GLOBUS_GCC32_CFLAGS="-I$with_globus_prefix/include/$flavor"
         GLOBUS_GCC32_GSS_LIBS="$ac_globus_ldlib -lglobus_gssapi_gsi_$flavor -lglobus_gss_assist_$flavor"
+        GLOBUS_GCC32_GSS_API_LIBS="$ac_globus_ldlib -lcrypto_$flavor -lssl_$flavor"
       fi
       if test "x$flavor" = "xgcc32dbg" ; then
         GLOBUS_GCC32DBG_CFLAGS="-I$with_globus_prefix/include/$flavor"
         GLOBUS_GCC32DBG_GSS_LIBS="$ac_globus_ldlib -lglobus_gssapi_gsi_$flavor -lglobus_gss_assist_$flavor"
+        GLOBUS_GCC32DBG_GSS_API_LIBS="$ac_globus_ldlib -lcrypto_$flavor -lssl_$flavor"
       fi
       if test "x$flavor" = "xgcc32dbgpthr" ; then
         GLOBUS_GCC32DBGPTHR_CFLAGS="-I$with_globus_prefix/include/$flavor"
         GLOBUS_GCC32DBGPTHR_GSS_LIBS="$ac_globus_ldlib -lglobus_gssapi_gsi_$flavor -lglobus_gss_assist_$flavor"
+        GLOBUS_GCC32DPBPTHR_GSS_API_LIBS="$ac_globus_ldlib -lcrypto_$flavor -lssl_$flavor"
       fi
       if test "x$flavor" = "xgcc32pthr" ; then
         GLOBUS_GCC32PTHR_CFLAGS="-I$with_globus_prefix/include/$flavor"
         GLOBUS_GCC32PTHR_GSS_LIBS="$ac_globus_ldlib -lglobus_gssapi_gsi_$flavor -lglobus_gss_assist_$flavor"
+        GLOBUS_GCC32PTHR_GSS_API_LIBS="$ac_globus_ldlib -lcrypto_$flavor -lssl_$flavor"
       fi
 
       if test "x$flavor" = "xgcc64" ; then
 	      GLOBUS_GCC64_CFLAGS="-I$with_globus_prefix/include/$flavor"
         GLOBUS_GCC64_GSS_LIBS="$ac_globus_ldlib -lglobus_gssapi_gsi_$flavor -lglobus_gss_assist_$flavor"
+        GLOBUS_GCC64_GSS_API_LIBS="$ac_globus_ldlib -lcrypto_$flavor -lssl_$flavor"
       fi
       if test "x$flavor" = "xgcc64dbg" ; then
         GLOBUS_GCC64DBG_CFLAGS="-I$with_globus_prefix/include/$flavor"
         GLOBUS_GCC64DBG_GSS_LIBS="$ac_globus_ldlib -lglobus_gssapi_gsi_$flavor -lglobus_gss_assist_$flavor"
+        GLOBUS_GCC64DBG_GSS_API_LIBS="$ac_globus_ldlib -lcrypto_$flavor -lssl_$flavor"
       fi
       if test "x$flavor" = "xgcc64dbgpthr" ; then
         GLOBUS_GCC64DBGPTHR_CFLAGS="-I$with_globus_prefix/include/$flavor"
         GLOBUS_GCC64DBGPTHR_GSS_LIBS="$ac_globus_ldlib -lglobus_gssapi_gsi_$flavor -lglobus_gss_assist_$flavor"
+        GLOBUS_GCC64DBGPTHR_GSS_API_LIBS="$ac_globus_ldlib -lcrypto_$flavor -lssl_$flavor"
       fi
       if test "x$flavor" = "xgcc64pthr" ; then
         GLOBUS_GCC64PTHR_CFLAGS="-I$with_globus_prefix/include/$flavor"
         GLOBUS_GCC64PTHR_GSS_LIBS="$ac_globus_ldlib -lglobus_gssapi_gsi_$flavor -lglobus_gss_assist_$flavor"
+        GLOBUS_GCC64PTHR_GSS_API_LIBS="$ac_globus_ldlib -lcrypto_$flavor -lssl_$flavor"
       fi
     done
 
@@ -266,11 +278,20 @@ AC_DEFUN([AC_GLOBUS],
     AC_SUBST(GLOBUS_GCC64PTHR_CFLAGS)
 
     AC_SUBST(GLOBUS_GSS_LIBS)
+    AC_SUBST(GLOBUS_GSS_API_LIBS)
     AC_SUBST(GLOBUS_GCC32_GSS_LIBS)
     AC_SUBST(GLOBUS_GCC32DBG_GSS_LIBS)
     AC_SUBST(GLOBUS_GCC32DBGPTHR_GSS_LIBS)
     AC_SUBST(GLOBUS_GCC32PTHR_GSS_LIBS)
+    AC_SUBST(GLOBUS_GCC32_GSS_API_LIBS)
+    AC_SUBST(GLOBUS_GCC32DBG_GSS_API_LIBS)
+    AC_SUBST(GLOBUS_GCC32DBGPTHR_GSS_API_LIBS)
+    AC_SUBST(GLOBUS_GCC32PTHR_GSS_API_LIBS)
 
+    AC_SUBST(GLOBUS_GCC64_GSS_API_LIBS)
+    AC_SUBST(GLOBUS_GCC64DBG_GSS_API_LIBS)
+    AC_SUBST(GLOBUS_GCC64DBGPTHR_GSS_API_LIBS)
+    AC_SUBST(GLOBUS_GCC64PTHR_GSS_API_LIBS)
     AC_SUBST(GLOBUS_GCC64_GSS_LIBS)
     AC_SUBST(GLOBUS_GCC64DBG_GSS_LIBS)
     AC_SUBST(GLOBUS_GCC64DBGPTHR_GSS_LIBS)
@@ -279,6 +300,7 @@ AC_DEFUN([AC_GLOBUS],
     AC_SUBST(USE_OLDGAA_LIB)
     AC_SUBST(USE_SSL_UTILS_LIB)
     AC_SUBST(USE_SOCK_LIB)
+    AC_SUBST(USE_SOCK_LIB_SERVER)
     AC_SUBST(USE_CCAPI_LIB)
     AC_SUBST(USE_CAPI_LIB)
     AC_SUBST(USE_ATTCERT_LIB)
@@ -815,6 +837,19 @@ HERE
     AC_LANG_POP(C++)
 ])
 
+AC_DEFUN([PUT_PRIVATES],
+[
+        AH_BOTTOM([#ifdef __GNUC__
+#define UNUSED(z)  z __attribute__ ((unused))
+#define PRIVATE    __attribute__ ((visibility ("hidden")))
+#define PUBLIC     __attribute__ ((visibility ("default")))
+#else
+#define UNUSED
+#define PRIVATE
+#define PUBLIC
+#endif])])
+
+        
 AC_DEFUN([TEST_USE_BSD],
 [
     AC_MSG_CHECKING([whether _BSD_SOURCE must be defined])

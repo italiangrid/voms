@@ -342,13 +342,14 @@ proxy_cred_desc_new();
 int
 proxy_cred_desc_free(proxy_cred_desc * pcd);
 
-int proxy_load_user_cert_and_key_pkcs12(proxy_cred_desc *pcd,
-                                        const char *user_cert,
+int proxy_load_user_cert_and_key_pkcs12(const char *user_cert,
+                                        X509 **cert,
+                                        STACK_OF(X509) **stack,
+                                        EVP_PKEY **pkey,
                                         int (*pw_cb) ());
 
 int
 proxy_get_filenames(
-    proxy_cred_desc *                   pcd, 
     int                                 proxy_in,
     char **                             p_cert_file,
     char **                             p_cert_dir,
@@ -358,16 +359,19 @@ proxy_get_filenames(
 
 int
 proxy_load_user_cert(
-    proxy_cred_desc *                   pcd, 
     const char *                        user_cert,
+    X509 **                             certificate,
     int                                 (*pw_cb)(),
-    BIO *                               bp);
+    BIO *                               bp,
+    unsigned long *                     hSession);
 int
 proxy_load_user_key(
-    proxy_cred_desc *                   pcd, 
+    EVP_PKEY **                         private_key,
+    X509 * ucert,
     const char *                        user_key,
     int                                 (*pw_cb)(),
-    BIO *                               bp);
+    BIO *                               bp,
+    unsigned long *                     hSession);
 
 int
 proxy_create_local(
@@ -397,6 +401,13 @@ void
 proxy_verify_release(
     proxy_verify_desc *                 pvd);
 
+void
+proxy_verify_ctx_init(
+                      proxy_verify_ctx_desc *pvxd);
+void
+proxy_verify_ctx_release(
+                      proxy_verify_ctx_desc *pvxd);
+
 int
 proxy_check_proxy_name(
     X509 *);
@@ -423,8 +434,7 @@ proxy_genreq(
     X509_REQ **                         reqp,
     EVP_PKEY **                         pkeyp,
     int                                 bits,
-    int                                 (*callback)(),
-    proxy_cred_desc *                   pcd);
+    int                                 (*callback)());
 
 int
 proxy_sign(
@@ -481,7 +491,7 @@ proxy_marshal_bp(
 int
 proxy_load_user_proxy(
     STACK_OF(X509) *                    cert_chain,
-    char *                              file,
+    const char *                        file,
     BIO *                               bp);
 
 int
@@ -521,6 +531,15 @@ d2i_integer_bio(
     BIO *                               bp,
     long *                              v);
 
+int PRIVATE determine_filenames(char **cacert, char **certdir, char **outfile,
+                                char **certfile, char **keyfile, int noregen);
+int PRIVATE load_credentials(const char *certname, const char *keyname,
+                             X509 **cert, STACK_OF(X509) **stack, EVP_PKEY **key,
+                             int (*callback)());
+int PRIVATE load_certificate_from_file(FILE *file, X509 **cert, 
+                                       STACK_OF(X509) **stack);
+
 EXTERN_C_END
+
 
 #endif /* _SSLUTILS_H */

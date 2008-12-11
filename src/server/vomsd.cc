@@ -891,7 +891,7 @@ VOMSServer::Execute(EVP_PKEY *key, X509 *issuer, X509 *holder, gss_ctx_id_t cont
     /* check whether the user is allowed to requests those attributes */
     vomsdata v("", "");
     v.SetVerificationType((verify_type)(VERIFY_SIGN));
-    v.RetrieveFromCtx(context, RECURSE_DEEP);
+    v.Retrieve(sock.peer_cert, sock.peer_stack, RECURSE_DEEP);
 
     /* find the attributes corresponding to the vo */
     std::vector<std::string> existing;

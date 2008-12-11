@@ -48,6 +48,9 @@ static pid_t ownerprocess = 0;
 
 static void killogger(void);
 
+extern void *FILEStreamerAdd(void *h);
+extern void *SYSLOGStreamerAdd(void *h);
+
 void SetOwner(pid_t pid)
 {
   ownerprocess = pid;
@@ -655,7 +658,6 @@ int LogMessage(void *data, loglevels lev, logtypes type, const char *message, co
         (li->currlev == LEV_DEBUG)) {
       const char *format = li->format;
       int mode = 0;
-      const char *dateformat = (li->dateformat ? li->dateformat : "%c");
       char *str = NULL;
       char *holder = NULL;
 

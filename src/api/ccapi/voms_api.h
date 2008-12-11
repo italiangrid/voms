@@ -21,12 +21,11 @@
 
 
 extern "C" {
-#ifndef NOGLOBUS
-#include <gssapi.h>
-#else
+#ifndef GSSAPI_H_
 typedef void * gss_cred_id_t;
 typedef void * gss_ctx_id_t;
 #endif
+
 #include <openssl/x509.h>
 #include <openssl/bio.h>
 #include <sys/types.h>
@@ -400,16 +399,24 @@ private:
   
 public:
   void SetRetryCount(int retryCount);
-
+  
 private:
   STACK_OF(X509) *load_chain(BIO *in);
-
+                                
 public:
   void SetVerificationTime(time_t);
-
+                                  
 private:
   time_t verificationtime;
   bool verifyac(X509 *, X509 *, AC*, time_t, voms&);
+
+public:
+  bool LoadCredentials(X509 *cert, STACK_OF(X509) *chain, EVP_PKEY *key);
+
+private:
+  X509           *ucert;
+  STACK_OF(X509) *cert_chain;
+  EVP_PKEY        *upkey;
 };
 
 

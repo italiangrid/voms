@@ -8,16 +8,18 @@ voms_proxy_info_SOURCES = \
 	voms_proxy_info.cc
 
 voms_proxy_info_LDADD = \
-	$(top_builddir)/src/api/ccapi/$(USE_CCAPI_LIB)  \
+	$(top_builddir)/src/api/ccapi/libvomsapi_nog.la  \
 	$(top_builddir)/src/replib/librep.la \
 	$(top_builddir)/src/log/liblog.la \
+	$(top_builddir)/src/sslutils/libssl_utils_nog.la \
 	$(EXPAT_LIBS)
 
 voms_proxy_destroy_SOURCES = \
 	voms_proxy_destroy.cc
 
 voms_proxy_destroy_LDADD = \
-	$(top_builddir)/src/api/ccapi/$(USE_CCAPI_LIB)  \
+	$(top_builddir)/src/api/ccapi/libvomsapi_nog.la  \
+	$(top_builddir)/src/sslutils/libssl_utils_nog.la \
 	$(top_builddir)/src/replib/librep.la \
 	$(top_builddir)/src/log/liblog.la \
 	$(EXPAT_LIBS)
@@ -28,11 +30,10 @@ voms_proxy_fake_SOURCES = \
 
 voms_proxy_fake_LDADD = \
 	$(top_builddir)/src/common/libutilities.la \
-	$(top_builddir)/src/ac/$(USE_ATTCERT_LIB) \
-	$(top_builddir)/src/ac/$(USE_CCATTCERT_LIB) \
+	$(top_builddir)/src/ac/libattributes_nog.la \
 	$(top_builddir)/src/common/libutilc.la \
 	$(top_builddir)/src/replib/librep.la \
-	$(top_builddir)/src/sslutils/$(USE_SSL_UTILS_LIB)
+	$(top_builddir)/src/sslutils/libssl_utils_nog.la
 
 AM_CPPFLAGS = \
 	-I$(top_srcdir)/src/api/ccapi \

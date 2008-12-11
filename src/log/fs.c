@@ -84,7 +84,6 @@ static int fileoutputter(void *data, const char *s)
     char  *data = NULL;
     int    datasize = 256;
     size_t len = 0;
-    char  *str = NULL;
 
     time_t t;
     struct tm *ti;

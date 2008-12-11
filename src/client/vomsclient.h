@@ -98,7 +98,7 @@ class Client {
 #endif
 
   BIGNUM *                 dataorder;
-  proxy_cred_desc *        pcd;
+  //  proxy_cred_desc *        pcd;
   proxy_verify_desc        pvd;
   proxy_verify_ctx_desc    pvxd;
 
@@ -109,6 +109,9 @@ class Client {
   // vo
   std::string voID;
   bool                     listing;
+  STACK_OF(X509)           *cert_chain;
+  X509                     *ucert;
+  EVP_PKEY                 *private_key;
 
  public:
   

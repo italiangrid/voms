@@ -116,6 +116,9 @@ EXTERN_C_BEGIN
 #define	COND_FLG_MET	      0x10  /* condition has been met       */
 #define	COND_FLG_ENFORCE      0x100 /* condition has to be enforced */
 
+void 
+oldgaa_gl__fout_of_memory(const char file[], int line);
+
 #define out_of_memory() oldgaa_gl__fout_of_memory(__FILE__, __LINE__); 
 
 /************************* OLDGAA API data types ****************************/
@@ -481,11 +484,20 @@ oldgaa_allocate_identity_cred(oldgaa_identity_cred_ptr*  buffer_addr  /* IN&OUT 
 oldgaa_error_code
 oldgaa_allocate_answer(oldgaa_answer_ptr *ptr);
 
+oldgaa_error_code
+oldgaa_allocate_data(oldgaa_data_ptr* buffer_addr /* IN  */);
+
+oldgaa_error_code
+oldgaa_allocate_options (oldgaa_options_ptr*  buffer_addr   /* IN  */);
+
 oldgaa_sec_context_ptr
 oldgaa_globus_allocate_sec_context(char *signer);
 
 oldgaa_rights_ptr
 oldgaa_globus_allocate_rights();
+
+oldgaa_error_code
+oldgaa_allocate_sec_attrb (oldgaa_sec_attrb_ptr* buffer_addr   /* IN  */);
 
 
 /************************* Release functions *******************************/

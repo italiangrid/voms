@@ -20,8 +20,8 @@ Parameters:
 Returns:
 **********************************************************************/
 
-oldgaa_error_code 
-oldgaa_release_buffer_contents (uint32         *minor_status,
+oldgaa_error_code  PRIVATE
+oldgaa_release_buffer_contents (UNUSED(uint32         *minor_status),
                     oldgaa_buffer_ptr  buffer)
 {
  	if (buffer == NULL || buffer == OLDGAA_NO_BUFFER) return OLDGAA_SUCCESS;
@@ -43,8 +43,8 @@ Parameters:
 Returns:
 **********************************************************************/
 
-oldgaa_error_code 
-oldgaa_release_buffer(uint32         *minor_status,
+oldgaa_error_code  PRIVATE
+oldgaa_release_buffer(UNUSED(uint32         *minor_status),
                     oldgaa_buffer_ptr *  buffer)
 {
  	if (buffer == NULL || *buffer == NULL) return OLDGAA_SUCCESS;
@@ -67,8 +67,8 @@ Parameters:
 Returns:
 **********************************************************************/
 
-oldgaa_error_code 
-oldgaa_release_options(uint32          *minor_status,
+oldgaa_error_code  PRIVATE
+oldgaa_release_options(UNUSED(uint32          *minor_status),
                     oldgaa_options_ptr  buffer)
 {
  	if (buffer == NULL || buffer == OLDGAA_NO_OPTIONS) return OLDGAA_SUCCESS;
@@ -93,8 +93,8 @@ Parameters:
 Returns:
 **********************************************************************/
 
-oldgaa_error_code 
-oldgaa_release_data (uint32       *minor_status,
+oldgaa_error_code  PRIVATE
+oldgaa_release_data (UNUSED(uint32       *minor_status),
                   oldgaa_data_ptr  buffer)
 {
  	if (buffer == NULL || buffer == OLDGAA_NO_DATA) return OLDGAA_SUCCESS;
@@ -122,8 +122,8 @@ Parameters:
 Returns:
 **********************************************************************/
 
-oldgaa_error_code 
-oldgaa_release_sec_context(uint32             *minor_status,
+oldgaa_error_code  PRIVATE
+oldgaa_release_sec_context(UNUSED(uint32             *minor_status),
                        oldgaa_sec_context_ptr *sec_context)
 {
 
@@ -192,8 +192,8 @@ Parameters:
 Returns:
 **********************************************************************/
 
-oldgaa_error_code 
-oldgaa_release_identity_cred (uint32                *minor_status,
+oldgaa_error_code  PRIVATE
+oldgaa_release_identity_cred (UNUSED(uint32                *minor_status),
                            oldgaa_identity_cred_ptr *identity_cred)
 
 {
@@ -242,8 +242,8 @@ Parameters:
 Returns:
 **********************************************************************/
 
-oldgaa_error_code 
-oldgaa_release_authr_cred(uint32             *minor_status,
+oldgaa_error_code  PRIVATE
+oldgaa_release_authr_cred(UNUSED(uint32             *minor_status),
                        oldgaa_authr_cred_ptr *authr_cred)
 
 {
@@ -305,8 +305,8 @@ Parameters:
 Returns:
 **********************************************************************/
 
-oldgaa_error_code 
-oldgaa_release_attributes(uint32             *minor_status,
+oldgaa_error_code  PRIVATE
+oldgaa_release_attributes(UNUSED(uint32             *minor_status),
                        oldgaa_attributes_ptr *attributes)
 {
 
@@ -357,8 +357,8 @@ Parameters:
 Returns:
 **********************************************************************/
 
-oldgaa_error_code 
-oldgaa_release_uneval_cred(uint32              *minor_status,
+oldgaa_error_code  PRIVATE
+oldgaa_release_uneval_cred(UNUSED(uint32              *minor_status),
                         oldgaa_uneval_cred_ptr *uneval_cred)
 
 {
@@ -411,8 +411,8 @@ Parameters:
 Returns:
 **********************************************************************/
 
-oldgaa_error_code 
-oldgaa_release_principals(uint32             *minor_status,
+oldgaa_error_code  PRIVATE
+oldgaa_release_principals(UNUSED(uint32             *minor_status),
                        oldgaa_principals_ptr *principals)
 {
 
@@ -454,8 +454,8 @@ Parameters:
 Returns:
 **********************************************************************/
 
-oldgaa_error_code 
-oldgaa_release_rights(uint32         *minor_status,
+oldgaa_error_code  PRIVATE
+oldgaa_release_rights(UNUSED(uint32         *minor_status),
                    oldgaa_rights_ptr *rights)
 {
 
@@ -506,8 +506,8 @@ Parameters:
 Returns:
 **********************************************************************/
 
-oldgaa_error_code 
-oldgaa_release_cond_bindings(uint32                 *minor_status,
+oldgaa_error_code  PRIVATE
+oldgaa_release_cond_bindings(UNUSED(uint32                 *minor_status),
                           oldgaa_cond_bindings_ptr  *cond_bind)
 {
   oldgaa_cond_bindings_ptr  *cred = cond_bind;
@@ -550,13 +550,12 @@ Parameters:
 Returns:
 **********************************************************************/
 
-oldgaa_error_code 
-oldgaa_release_conditions(uint32             *minor_status,
+oldgaa_error_code  PRIVATE
+oldgaa_release_conditions(UNUSED(uint32             *minor_status),
                           oldgaa_conditions_ptr *cond)
 {
   oldgaa_conditions_ptr  *cred = cond;
-  uint32 inv_minor_status = 0, inv_major_status = 0;
-
+  
   oldgaa_conditions_ptr start   = *cond;
   oldgaa_conditions_ptr anchor  = NULL;
   oldgaa_conditions_ptr current = NULL;
@@ -628,8 +627,8 @@ Parameters:
 Returns:
 **********************************************************************/
 
-oldgaa_error_code 
-oldgaa_release_answer(uint32         *minor_status,
+oldgaa_error_code  PRIVATE
+oldgaa_release_answer(UNUSED(uint32         *minor_status),
                    oldgaa_answer_ptr *answer)
 {
   oldgaa_answer_ptr  *cred = answer;
@@ -663,8 +662,8 @@ Parameters:
 Returns:
 **********************************************************************/
 
-oldgaa_error_code 
-oldgaa_release_sec_attrb(uint32             *minor_status,
+oldgaa_error_code  PRIVATE
+oldgaa_release_sec_attrb(UNUSED(uint32             *minor_status),
                       oldgaa_sec_attrb_ptr   *attributes)
 {
 

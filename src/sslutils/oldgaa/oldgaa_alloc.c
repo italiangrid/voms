@@ -11,7 +11,7 @@ Description:
 
 /*****************************************************************************/
 
-oldgaa_error_code  
+oldgaa_error_code PRIVATE
 oldgaa_allocate_buffer (oldgaa_buffer_ptr*  buffer_addr   /* IN  */)
 {
   oldgaa_buffer_ptr  buffer;
@@ -30,7 +30,7 @@ oldgaa_allocate_buffer (oldgaa_buffer_ptr*  buffer_addr   /* IN  */)
 
 /*****************************************************************************/
 
-oldgaa_error_code  
+oldgaa_error_code   PRIVATE
 oldgaa_allocate_data(oldgaa_data_ptr* buffer_addr /* IN  */)
 {
   oldgaa_data_ptr  buffer;
@@ -50,7 +50,7 @@ oldgaa_allocate_data(oldgaa_data_ptr* buffer_addr /* IN  */)
 }
 /*****************************************************************************/
 
-oldgaa_error_code  
+oldgaa_error_code   PRIVATE
 oldgaa_allocate_options (oldgaa_options_ptr*  buffer_addr   /* IN  */)
 {
   oldgaa_options_ptr  buffer;
@@ -69,7 +69,7 @@ oldgaa_allocate_options (oldgaa_options_ptr*  buffer_addr   /* IN  */)
 
 /*****************************************************************************/
 
-oldgaa_error_code
+oldgaa_error_code PRIVATE
 oldgaa_allocate_principals (oldgaa_principals_ptr* buffer_addr)
 {
  oldgaa_principals_ptr list = NULL;
@@ -93,7 +93,7 @@ oldgaa_allocate_principals (oldgaa_principals_ptr* buffer_addr)
 
 /*****************************************************************************/
 
-oldgaa_error_code
+oldgaa_error_code PRIVATE
 oldgaa_allocate_conditions (oldgaa_conditions_ptr* buffer_addr)
 {
  oldgaa_conditions_ptr list = NULL;
@@ -117,7 +117,7 @@ oldgaa_allocate_conditions (oldgaa_conditions_ptr* buffer_addr)
 
 /*****************************************************************************/
 
-oldgaa_error_code
+oldgaa_error_code PRIVATE
 oldgaa_allocate_rights (oldgaa_rights_ptr* buffer_addr   /* IN  */)
 {
  oldgaa_rights_ptr list = NULL;
@@ -141,7 +141,7 @@ oldgaa_allocate_rights (oldgaa_rights_ptr* buffer_addr   /* IN  */)
 
 /*****************************************************************************/
 
-oldgaa_error_code
+oldgaa_error_code PRIVATE
 oldgaa_allocate_cond_bindings (oldgaa_cond_bindings_ptr* buffer_addr   /* IN  */)
 {
  oldgaa_cond_bindings_ptr list = NULL;
@@ -162,7 +162,7 @@ oldgaa_allocate_cond_bindings (oldgaa_cond_bindings_ptr* buffer_addr   /* IN  */
 
 /*****************************************************************************/
 
-oldgaa_error_code
+oldgaa_error_code PRIVATE
 oldgaa_allocate_sec_attrb (oldgaa_sec_attrb_ptr* buffer_addr   /* IN  */)
 {
  oldgaa_sec_attrb_ptr list = NULL;
@@ -184,7 +184,7 @@ oldgaa_allocate_sec_attrb (oldgaa_sec_attrb_ptr* buffer_addr   /* IN  */)
 
 /*****************************************************************************/
 
-oldgaa_error_code  
+oldgaa_error_code   PRIVATE
 oldgaa_allocate_sec_context (oldgaa_sec_context_ptr*  buffer_addr)
 
 {   
@@ -219,7 +219,7 @@ oldgaa_allocate_sec_context (oldgaa_sec_context_ptr*  buffer_addr)
                      
 /*****************************************************************************/
 
-oldgaa_error_code
+oldgaa_error_code PRIVATE
 oldgaa_allocate_identity_cred(oldgaa_identity_cred_ptr*  buffer_addr  /* IN&OUT */)
 
 {  
@@ -258,7 +258,7 @@ oldgaa_allocate_identity_cred(oldgaa_identity_cred_ptr*  buffer_addr  /* IN&OUT 
 
 /*****************************************************************************/
 
-oldgaa_error_code
+oldgaa_error_code PRIVATE
 oldgaa_allocate_answer(oldgaa_answer_ptr *ptr)
 {
   oldgaa_time_period_ptr time   = NULL;

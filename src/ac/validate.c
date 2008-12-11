@@ -41,11 +41,12 @@
 
 #include <stdlib.h>
 #include <string.h>
+#include <unistd.h>
 
 #include "replace.h"
 
 static char *getfqdn(void);
-static int checkAttributes(STACK_OF(AC_ATTR) *, struct col *, int);
+static int checkAttributes(STACK_OF(AC_ATTR) *, struct col *);
 static int checkExtensions(STACK_OF(X509_EXTENSION) *,X509 *,struct col *,int);
 static int interpret_attributes(AC_FULL_ATTRIBUTES *, struct col *);
 
@@ -329,15 +330,13 @@ int validate(X509 *cert, X509 *issuer, AC *ac, struct col *voms, int valids, tim
   if ((res = checkExtensions(ac->acinfo->exts, issuer, voms, valids)))
     return res;
 
-  return checkAttributes(ac->acinfo->attrib, voms, valids);
+  return checkAttributes(ac->acinfo->attrib, voms);
 }
 
-static int checkAttributes(STACK_OF(AC_ATTR) *atts, struct col *voms, int valids)
+static int checkAttributes(STACK_OF(AC_ATTR) *atts, struct col *voms)
 {
-  int nid;
   int nid3;
 
-  int pos;
   int pos3;
   int i;
 
@@ -656,7 +655,6 @@ static int interpret_attributes(AC_FULL_ATTRIBUTES *full_attr, struct col *voms)
   struct full_att *fa      = malloc(sizeof(struct full_att));
   struct att_list *al      = NULL;
   struct att      *a       = NULL;
-  char            *grantor = NULL;
   char *name, *value, *qualifier, *grant;
   GENERAL_NAME *gn = NULL;
   STACK_OF(AC_ATT_HOLDER) *providers = NULL;

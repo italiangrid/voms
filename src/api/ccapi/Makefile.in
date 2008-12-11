@@ -151,8 +151,9 @@ am__DEPENDENCIES_3 = $(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1) \
 	$(top_builddir)/src/replib/librep.la \
 	$(top_builddir)/src/common/libutilities_nog.la \
 	$(top_builddir)/src/common/libutilc_nog.la \
-	$(top_builddir)/src/sslutils/libssl_utils-nog.la \
-	$(top_builddir)/src/log/liblog.la
+	$(top_builddir)/src/sslutils/libssl_utils_nog.la \
+	$(top_builddir)/src/log/liblog.la \
+	$(top_builddir)/src/socklib/libsock_nog.la
 libvomsapi_nog_la_DEPENDENCIES = $(am__DEPENDENCIES_3) \
 	$(top_builddir)/src/ac/libattributes_nog.la
 am__objects_10 = libvomsapi_nog_la-api_util.lo \
@@ -334,21 +335,30 @@ GLITE_CFLAGS = @GLITE_CFLAGS@
 GLITE_LOCATION = @GLITE_LOCATION@
 GLOBUS_CFLAGS = @GLOBUS_CFLAGS@
 GLOBUS_GCC32DBGPTHR_CFLAGS = @GLOBUS_GCC32DBGPTHR_CFLAGS@
+GLOBUS_GCC32DBGPTHR_GSS_API_LIBS = @GLOBUS_GCC32DBGPTHR_GSS_API_LIBS@
 GLOBUS_GCC32DBGPTHR_GSS_LIBS = @GLOBUS_GCC32DBGPTHR_GSS_LIBS@
 GLOBUS_GCC32DBG_CFLAGS = @GLOBUS_GCC32DBG_CFLAGS@
+GLOBUS_GCC32DBG_GSS_API_LIBS = @GLOBUS_GCC32DBG_GSS_API_LIBS@
 GLOBUS_GCC32DBG_GSS_LIBS = @GLOBUS_GCC32DBG_GSS_LIBS@
 GLOBUS_GCC32PTHR_CFLAGS = @GLOBUS_GCC32PTHR_CFLAGS@
+GLOBUS_GCC32PTHR_GSS_API_LIBS = @GLOBUS_GCC32PTHR_GSS_API_LIBS@
 GLOBUS_GCC32PTHR_GSS_LIBS = @GLOBUS_GCC32PTHR_GSS_LIBS@
 GLOBUS_GCC32_CFLAGS = @GLOBUS_GCC32_CFLAGS@
+GLOBUS_GCC32_GSS_API_LIBS = @GLOBUS_GCC32_GSS_API_LIBS@
 GLOBUS_GCC32_GSS_LIBS = @GLOBUS_GCC32_GSS_LIBS@
 GLOBUS_GCC64DBGPTHR_CFLAGS = @GLOBUS_GCC64DBGPTHR_CFLAGS@
+GLOBUS_GCC64DBGPTHR_GSS_API_LIBS = @GLOBUS_GCC64DBGPTHR_GSS_API_LIBS@
 GLOBUS_GCC64DBGPTHR_GSS_LIBS = @GLOBUS_GCC64DBGPTHR_GSS_LIBS@
 GLOBUS_GCC64DBG_CFLAGS = @GLOBUS_GCC64DBG_CFLAGS@
+GLOBUS_GCC64DBG_GSS_API_LIBS = @GLOBUS_GCC64DBG_GSS_API_LIBS@
 GLOBUS_GCC64DBG_GSS_LIBS = @GLOBUS_GCC64DBG_GSS_LIBS@
 GLOBUS_GCC64PTHR_CFLAGS = @GLOBUS_GCC64PTHR_CFLAGS@
+GLOBUS_GCC64PTHR_GSS_API_LIBS = @GLOBUS_GCC64PTHR_GSS_API_LIBS@
 GLOBUS_GCC64PTHR_GSS_LIBS = @GLOBUS_GCC64PTHR_GSS_LIBS@
 GLOBUS_GCC64_CFLAGS = @GLOBUS_GCC64_CFLAGS@
+GLOBUS_GCC64_GSS_API_LIBS = @GLOBUS_GCC64_GSS_API_LIBS@
 GLOBUS_GCC64_GSS_LIBS = @GLOBUS_GCC64_GSS_LIBS@
+GLOBUS_GSS_API_LIBS = @GLOBUS_GSS_API_LIBS@
 GLOBUS_GSS_LIBS = @GLOBUS_GSS_LIBS@
 HAVE_DOCBOOK_MAN_FALSE = @HAVE_DOCBOOK_MAN_FALSE@
 HAVE_DOCBOOK_MAN_TRUE = @HAVE_DOCBOOK_MAN_TRUE@
@@ -392,6 +402,7 @@ USE_CCAPI_LIB = @USE_CCAPI_LIB@
 USE_CCATTCERT_LIB = @USE_CCATTCERT_LIB@
 USE_OLDGAA_LIB = @USE_OLDGAA_LIB@
 USE_SOCK_LIB = @USE_SOCK_LIB@
+USE_SOCK_LIB_SERVER = @USE_SOCK_LIB_SERVER@
 USE_SSL_UTILS_LIB = @USE_SSL_UTILS_LIB@
 VAR_LOCATION_ENV = @VAR_LOCATION_ENV@
 VERSION = @VERSION@
@@ -487,8 +498,9 @@ NOGLIBADD = \
 	$(top_builddir)/src/replib/librep.la \
 	$(top_builddir)/src/common/libutilities_nog.la \
 	$(top_builddir)/src/common/libutilc_nog.la \
-	$(top_builddir)/src/sslutils/libssl_utils-nog.la \
-	$(top_builddir)/src/log/liblog.la
+	$(top_builddir)/src/sslutils/libssl_utils_nog.la \
+	$(top_builddir)/src/log/liblog.la\
+	$(top_builddir)/src/socklib/libsock_nog.la
 
 libvomsapi_nog_la_LIBADD = \
 	$(NOGLIBADD) \
@@ -511,8 +523,9 @@ CCLIBADD = \
   $(GLOBUS_LIBS) \
 	$(top_builddir)/src/replib/librep.la \
 	$(top_builddir)/src/common/libutilities.la \
-	$(top_builddir)/src/log/liblog.la
+	$(top_builddir)/src/log/liblog.la 
 
+#	$(top_builddir)/src/sslutils/$(USE_SSL_UTILS_LIB)
 libvomsapi_la_LIBADD = \
 	$(CCLIBADD) \
 	$(top_builddir)/src/socklib/libsock.la \

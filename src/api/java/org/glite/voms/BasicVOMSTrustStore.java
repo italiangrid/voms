@@ -52,6 +52,7 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.security.Provider;
 import java.security.Security;
+import java.security.PrivateKey;
 import java.security.cert.CRLException;
 import java.security.cert.CertificateException;
 import java.security.cert.CertificateFactory;
@@ -71,6 +72,8 @@ import javax.security.auth.x500.X500Principal;
 
 import org.apache.log4j.Logger;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
+import org.bouncycastle.asn1.pkcs.PrivateKeyInfo;
+import org.bouncycastle.asn1.ASN1InputStream;
 import org.glite.voms.ac.ACTrustStore;
 
 /** Lists all the files in the given directory that end with
@@ -169,6 +172,67 @@ class FileEndingIterator {
     }
 }
 
+// class PrivateKeyReader {
+//     public static PrivateKeyReader instance(String filename) {
+//         return new PrivateKeyReader(new File(filename));
+//     }
+
+//     public static PrivateKeyReader instance(File file) {
+//         return new PrivateKeyReader(file);
+//     }
+
+//     private BufferedInputStream stream;
+
+//     private PrivateKeyReader(File file) {
+//         stream = new BufferedInputStream(new FileInputStream(file));
+//     }
+
+//     public PrivateKey readKey() {
+//         return readKey(null);
+//     }
+
+//     public PrivateKey readKey(byte[] password) {
+//         skipComments(stream);
+
+//     }
+
+//     private void skipComments(BufferedInputStream stream) throws IOException {
+//         byte[] b = new byte[BUF_LEN]; // the byte buffer
+//         stream.mark(BUF_LEN + 2); // mark the beginning
+
+//         while (stream.available() > 0) { // check that there are still something to read
+
+//             int num = stream.read(b); // read bytes from the file to the byte buffer
+//             String buffer = new String(b, 0, num); // generate a string from the byte buffer
+//             int index = buffer.indexOf("----BEGIN RSA PRIVATE KEY"); // check if the certificate beginning is in the chars read this time
+
+//             if (index == -1) { // not found
+//                 // System.out.println("skipping:" + buffer);
+//                 stream.reset(); // rewind the file to the beginning of the last read
+//                 stream.skip(BUF_LEN - 100); // skip only part of the way as the "----BEGIN" can be in the transition of two 1000 char block
+//                 stream.mark(BUF_LEN + 2); // mark the new position
+//             } else { // found
+
+//                 while ((buffer.charAt(index - 1) == '-') && (index > 0)) { // search the beginnig of the ----BEGIN tag
+//                     index--;
+
+//                     if (index == 0) { // prevent charAt test when reaching the beginning of buffer
+
+//                         break;
+//                     }
+//                 }
+
+//                 // System.out.println("Last skip:" + buffer.substring(0, index));
+//                 stream.reset(); // rewind to the beginning of the last read
+//                 stream.skip(index); // skip to the beginning of the tag
+//                 stream.mark(10000); // mark the position
+
+//                 return;
+//             }
+//         }
+//     }
+// }
+
 /** Reads all certificates from given files, accepts binary form of DER encoded certs and
  * the Base64 form of the DER encoded certs (PEM). The base64 certs can contain garbage in front of
  * the actual certificate that has to begin with "-----BEGIN".
@@ -266,6 +330,17 @@ class FileCertReader {
         }
 
         return certs;
+    }
+
+    public PrivateKey readPrivateKey(String file) throws IOException {
+        File keyfile = new File(file);
+
+        BufferedInputStream fis = new BufferedInputStream(new FileInputStream(keyfile));
+        skipToKeyBeginning(fis);
+
+        PrivateKey key = (PrivateKey) PrivateKeyInfo.getInstance(new ASN1InputStream(fis).readObject()).getPrivateKey();
+
+        return key;
     }
 
     /** Reads the certificates from the files defined in the
@@ -530,6 +605,46 @@ class FileCertReader {
                 }
 
                 //                System.out.println("Last skip:" + buffer.substring(0, index));
+                stream.reset(); // rewind to the beginning of the last read
+                stream.skip(index); // skip to the beginning of the tag
+                stream.mark(10000); // mark the position
+
+                return;
+            }
+        }
+    }
+
+    static public void skipToKeyBeginning(BufferedInputStream stream)
+        throws IOException {
+        byte[] b = new byte[BUF_LEN]; // the byte buffer
+        stream.mark(BUF_LEN + 2); // mark the beginning
+
+        while (stream.available() > 0) { // check that there are still something to read
+
+            int num = stream.read(b); // read bytes from the file to the byte buffer
+            String buffer = new String(b, 0, num); // generate a string from the byte buffer
+            int index = buffer.indexOf("----BEGIN PRIVATE"); // check if the certificate beginning is in the chars read this time
+
+            if (index == -1)
+                index = buffer.indexOf("----BEGIN ENCRYPTED");
+
+            if (index == -1) { // not found
+                // System.out.println("skipping:" + buffer);
+                stream.reset(); // rewind the file to the beginning of the last read
+                stream.skip(BUF_LEN - 100); // skip only part of the way as the "----BEGIN" can be in the transition of two 1000 char block
+                stream.mark(BUF_LEN + 2); // mark the new position
+            } else { // found
+
+                while ((buffer.charAt(index - 1) == '-') && (index > 0)) { // search the beginnig of the ----BEGIN tag
+                    index--;
+
+                    if (index == 0) { // prevent charAt test when reaching the beginning of buffer
+
+                        break;
+                    }
+                }
+
+                // System.out.println("Last skip:" + buffer.substring(0, index));
                 stream.reset(); // rewind to the beginning of the last read
                 stream.skip(index); // skip to the beginning of the tag
                 stream.mark(10000); // mark the position

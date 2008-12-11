@@ -41,8 +41,6 @@ extern "C" {
 #include <fcntl.h>
 #include <errno.h>
 
-#include "gssapi.h"
-
 #ifdef USE_PKCS11
 #include "scutils.h"
 #endif
@@ -151,7 +149,7 @@ delete_proxy(void)
   cf   = NULL;
   kf   = NULL;
     
-  if (proxy_get_filenames(pcd, 0, &ccaf, &cd, &of, &cf, &kf))
+  if (!determine_filenames(&ccaf, &cd, &of, &cf, &kf, 0))
     return 0;
 
   return destroy_proxy(of, dryrun);

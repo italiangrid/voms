@@ -709,6 +709,8 @@ public class PKIVerifier {
                 .getHash( issuer ) );
 
         logger.debug("signCandidate is: " + signCandidate);
+        boolean matched = false;
+
         if ( signCandidate != null ) {
             logger.debug("Class of issuer is : " + issuer.getClass());
             logger.debug("Class of Subject is: " + issuer.getSubjectDN().getClass());
@@ -723,12 +725,13 @@ public class PKIVerifier {
             if ( nameVector == null )
                 return false;
 
+            logger.debug("Content of Vector is:" + nameVector);
             Iterator i = nameVector.iterator();
 
             while ( i.hasNext() ) {
-                boolean matched = false;
                 String certSubj = (String) i.next();
 
+                logger.debug( "Examining: " + certSubj);
                 logger.debug( "Looking for " + issuerSubj );
                 int index = signCandidate.findIssuer( issuerSubj );
 
@@ -747,13 +750,14 @@ public class PKIVerifier {
                                     + "' to '" + subj + "'" );
 
                             subj = subj.replaceFirst( "\\*", "\\.\\*" );
-                            if ( certSubj.matches( subj ) ) {
+                            if ( certSubj.toUpperCase().matches( subj.toUpperCase() ) ) {
                                 matched = true;
                                 logger.debug( "Subject: '" + certSubj
                                         + "' matches with subject: '" + subj
                                         + "' from signing policy." );
                                 break;
                             }
+                            
                             logger.debug( "Subject: '" + certSubj
                                     + "' does not match subject: '" + subj
                                     + "' from signing policy." );
@@ -763,13 +767,18 @@ public class PKIVerifier {
                     index = signCandidate.findIssuer( issuerSubj, index );
                 }
 
-                if ( !matched ) {
-                    nameVector.clear();
-                    return false;
+                if (matched) {
+                    logger.debug("MATCHED AT LEAST ONCE");
+                    break;
                 }
+
             }
+
+            nameVector.clear();
         }
-        return true;
+
+        logger.debug("Value of Matched is: " + matched);
+        return matched;
     }
 
     private Vector getAllNames( X509Certificate cert ) {
@@ -777,6 +786,8 @@ public class PKIVerifier {
         if ( cert != null ) {
             Vector v = new Vector();
             v.add( PKIUtils.getOpenSSLFormatPrincipal( cert.getSubjectDN() ) );
+            /* Sometime the format of the DN gets reversed. */
+            v.add( PKIUtils.getOpenSSLFormatPrincipal( cert.getSubjectDN() , true));
 
 //             Collection c;
 //             try {

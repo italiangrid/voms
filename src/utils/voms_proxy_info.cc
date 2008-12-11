@@ -38,8 +38,6 @@ extern "C" {
 #include <fcntl.h>
 #include <errno.h>
 
-#include "gssapi.h"
-
 #include "openssl/buffer.h"
 #include "openssl/crypto.h"
 #include "openssl/objects.h"
@@ -388,7 +386,7 @@ test_proxy()
   cf   = NULL;
   kf   = NULL;
     
-  if (proxy_get_filenames(pcd,0, &ccaf, &cd, &of, &cf, &kf))
+  if (!determine_filenames(&ccaf, &cd, &of, &cf, &kf, 0))
     goto err;
 
   file = std::string(of);
@@ -888,7 +886,46 @@ static void *myproxycertinfo_s2i(struct v3_ext_method *method, struct v3_ext_ctx
 
 static char *myproxycertinfo_i2s(struct v3_ext_method *method, void *ext)
 {
-  return norep();
+  myPROXYCERTINFO *pci = NULL;
+
+  pci = (myPROXYCERTINFO *)ext;
+ 
+  if (!pci)
+    return norep();
+
+  std::string encoding = "Path Length: ";
+  if (pci->path_length) {
+    int j = ASN1_INTEGER_get(pci->path_length);
+
+    char buffer[100];
+    snprintf(buffer, 100, "%ld\n", j);
+
+    encoding += std::string(buffer) + "\n";
+  }
+  else
+    encoding += "unlimited\n";
+
+  myPROXYPOLICY *pp = pci->proxypolicy;
+
+  if (pci) {
+    encoding += "Policy Language: ";
+    char oid[256];
+
+    if (i2t_ASN1_OBJECT(oid, 256, pp->policy_language)) {
+      encoding += std::string(oid) + "\n";
+
+      if (pp->policy) {
+        unsigned char *data = ASN1_STRING_data(pp->policy);
+
+        if (data)
+          encoding += "Policy: " + std::string((char *)data) +"\n";
+      }
+    }
+  }
+
+  encoding += "\n";
+
+  return strdup(encoding.c_str());
 }
 
 static char *norep()

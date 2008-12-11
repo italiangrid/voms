@@ -11,6 +11,8 @@ JAVA_CLASSES = org/glite/voms/BasicVOMSTrustStore.class \
 							 org/glite/voms/SigningPolicy.class \
 							 org/glite/voms/VOMSAttribute.class \
 							 org/glite/voms/VOMSValidator.class \
+							 org/glite/voms/VOMSTrustManager.class \
+							 org/glite/voms/VOMSKeyManager.class \
 							 org/glite/voms/ac/ACGenerator.class \
 							 org/glite/voms/ac/ACTrustStore.class \
 							 org/glite/voms/ac/ACValidator.class \
@@ -47,7 +49,10 @@ JAVA_CLASSES = org/glite/voms/BasicVOMSTrustStore.class \
 							 org/glite/voms/contact/VOMSServerMap.class \
 							 org/glite/voms/contact/VOMSSocket.class \
 							 org/glite/voms/contact/MyProxyCertInfo.class \
+							 org/glite/voms/contact/ProxyPolicy.class \
+							 org/glite/voms/contact/VOMSProxyConstants.class \
 							 org/glite/voms/contact/VOMSSyntaxException.class
+
 
 all-local: $(top_builddir)/src/api/java/vomsjapi.jar
 

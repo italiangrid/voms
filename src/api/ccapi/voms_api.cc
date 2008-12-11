@@ -12,6 +12,10 @@
  *
  *********************************************************************/
 
+#ifndef NOGLOBUS
+#define NOGLOBUS
+#endif
+
 extern "C" {
 #ifdef NOGLOBUS
 #include <pthread.h>
@@ -35,6 +39,7 @@ extern "C" {
 #include <openssl/x509.h>
 #include <openssl/pem.h>
 #include "credentials.h"
+#include "sslutils.h"
 
 #ifndef NOGLOBUS
 #ifdef HAVE_GLOBUS_MODULE_ACTIVATE
@@ -100,8 +105,6 @@ static void openssl_initialize(void)
 {
   mut_pool = (pthread_mutex_t *)malloc(CRYPTO_num_locks() * sizeof(pthread_mutex_t));
 
-  fprintf(stderr, "It appears that the value of pthread_mutex_init is %d\n",
-          pthread_mutex_init);
   if (pthread_mutex_init)
     for(int i = 0; i < CRYPTO_num_locks(); i++)
       pthread_mutex_init(&(mut_pool[i]),NULL);
@@ -185,7 +188,10 @@ vomsdata::vomsdata(std::string voms_dir, std::string cert_dir) :  ca_cert_dir(ce
                                                                   extra_data(""),
                                                                   ver_type(VERIFY_FULL),
                                                                   retry_count(1),
-                                                                  verificationtime(0)
+                                                                  verificationtime(0),
+                                                                  ucert(NULL),
+                                                                  cert_chain(NULL),
+                                                                  upkey(NULL)
 {
 #ifndef NOGLOBUS
    (void)globus_thread_once(&l_globus_once_control, l_init_globus_once_func);
@@ -236,6 +242,12 @@ vomsdata::~vomsdata()
   }
 #endif
 #endif
+  if (ucert)
+    X509_free(ucert);
+  if (cert_chain)
+    sk_X509_pop_free(cert_chain, X509_free);
+  if (upkey)
+    EVP_PKEY_free(upkey);
 }
 
 std::string vomsdata::ServerErrors(void)
@@ -293,7 +305,6 @@ void vomsdata::Order(std::string att)
 
 bool vomsdata::ContactRaw(std::string hostname, int port, std::string servsubject, std::string command, std::string &raw, int& version)
 {
-#ifndef NOGLOBUS
   std::string buffer;
   std::string subject, ca;
   std::string lifetime;
@@ -301,6 +312,26 @@ bool vomsdata::ContactRaw(std::string hostname, int port, std::string servsubjec
   std::string comm;
   std::string targs;
   answer a;
+
+  if (!ucert) {
+    char *cacert = NULL;
+    char *certdir = NULL;
+    char *outfile = NULL;
+    char *certfile = NULL;
+    char *keyfile = NULL;
+    bool noregen = false;
+
+    if (determine_filenames(&cacert, &certdir, &outfile, &certfile, &keyfile, noregen)) {
+      if (!load_credentials(certfile, keyfile, &ucert, &cert_chain, &upkey, NULL)) {
+        seterror(VERR_NOIDENT, "Cannot load credentials.");
+        return false;
+      }
+    }
+    else {
+      seterror(VERR_NOIDENT, "Cannot discover credentials.");
+      return false;
+    }
+  }
 
   for (std::vector<std::string>::iterator i = targets.begin(); 
        i != targets.end(); i++) {
@@ -346,15 +377,25 @@ bool vomsdata::ContactRaw(std::string hostname, int port, std::string servsubjec
 
   version = 1;
   return true;
-#else
-  seterror(VERR_NOTAVAIL, "Method not available in this library!");
-  return false;
-#endif
 }
+
+static X509 *get_own_cert()
+{
+  char *certname = NULL;
+
+  if (determine_filenames(NULL, NULL, NULL, &certname, NULL, 0)) {
+    X509 *cert = NULL;
+
+    if (load_credentials(certname, NULL, &cert, NULL, NULL, NULL))
+      return cert;
+  }
+
+  return NULL;
+}
+
 
 bool vomsdata::Contact(std::string hostname, int port, std::string servsubject, std::string command)
 {
-#ifndef NOGLOBUS
   std::string subject, ca;
   char *s = NULL, *c = NULL;
 
@@ -397,126 +438,71 @@ bool vomsdata::Contact(std::string hostname, int port, std::string servsubject, 
   free(s);
 
   return result;
-#else
-  seterror(VERR_NOTAVAIL, "Method not available in this library!");
-  return false;
-#endif
 }
 
-STACK_OF(X509) *vomsdata::load_chain(BIO *in)
-{
-  STACK_OF(X509_INFO) *sk=NULL;
-  STACK_OF(X509) *stack=NULL, *ret=NULL;
-  X509_INFO *xi;
-  int first = 1;
-
-  stack = sk_X509_new_null();
-  if (!stack)
-    return NULL;
-
-  /* This loads from a file, a stack of x509/crl/pkey sets */
-  if(!(sk=PEM_X509_INFO_read_bio(in,NULL,NULL,NULL))) {
-    seterror(VERR_PARSE, "error reading credentials from file.");
-    goto end;
-  }
-
-  /* scan over it and pull out the certs */
-  while (sk_X509_INFO_num(sk)) {
-    /* skip first cert */
-    if (first) {
-      first = 0;
-      continue;
-    }
-    xi=sk_X509_INFO_shift(sk);
-    if (xi->x509 != NULL) {
-      sk_X509_push(stack,xi->x509);
-      xi->x509=NULL;
-    }
-    X509_INFO_free(xi);
-  }
-  if(!sk_X509_num(stack)) {
-    seterror(VERR_PARSE, "no certificates in file.");
-    sk_X509_free(stack);
-    goto end;
-  }
-  ret=stack;
-end:
-  sk_X509_INFO_pop_free(sk, X509_INFO_free);
-  return(ret);
-}
 
 bool vomsdata::Retrieve(FILE *file, recurse_type how)
 {
-  /* read and builds chain */
-
-  BIO *in = NULL;
   X509 *x = NULL;
+  STACK_OF(X509) *chain = NULL;
   bool res = false;
-
-  in = BIO_new_fp(file, BIO_NOCLOSE);
-  if (in) {
-      x = PEM_read_bio_X509(in, NULL, 0, NULL);
-      STACK_OF(X509) *chain = load_chain(in);
-      if (x && chain)
-        res = Retrieve(x, chain, how);
-      X509_free(x);
-      sk_X509_pop_free(chain, X509_free);
+  
+  if (file) {
+    if (load_certificate_from_file(file, &x , &chain)) {
+      res = Retrieve(x, chain, how);
+    }
+    else 
+      seterror(VERR_PARAM, "Cannot load credentials.");
   }
-  BIO_free(in);
+  else
+    seterror(VERR_PARAM, "File parameter invalid.");
+
+  if (chain)
+    sk_X509_pop_free(chain, X509_free);
+
+  if (x)
+    X509_free(x);
+
   return res;
 }
 
 bool vomsdata::RetrieveFromCred(gss_cred_id_t cred, recurse_type how)
 {
-#ifndef NOGLOBUS
   X509 *cert;
   STACK_OF(X509) *chain;
 
-  cert = decouple_cred(cred, 0, &chain);
+  cert = decouple_cred(cred, &chain);
 
   return Retrieve(cert, chain, how);
-#else
-  seterror(VERR_NOTAVAIL, "Method not available in this library!");
-  return false;
-#endif
 }
 
 bool vomsdata::RetrieveFromCtx(gss_ctx_id_t cred, recurse_type how)
 {
-#ifndef NOGLOBUS
-  X509 *cert;
-  STACK_OF(X509) *chain;
+//   X509 *cert;
+//   STACK_OF(X509) *chain;
 
-  cert = decouple_ctx(cred, 0, &chain);
+//   cert = decouple_ctx(cred, &chain);
 
-  return Retrieve(cert, chain, how);
-#else
-  seterror(VERR_NOTAVAIL, "Method not available in this library!");
+//   return Retrieve(cert, chain, how);
   return false;
-#endif
 }
 
 bool vomsdata::RetrieveFromProxy(recurse_type how)
 {
-#ifndef NOGLOBUS
-  gss_cred_id_t cred = GSS_C_NO_CREDENTIAL;
+  gss_cred_id_t cred = 0L;
 
-  OM_uint32 major, minor, status;
+  char *outfile = NULL;
 
-  major = minor = status = 0;
+  if (determine_filenames(NULL, NULL, &outfile, NULL, NULL, 0)) {
+    X509 *cert = NULL;
+    STACK_OF(X509) *stk = NULL;
+    EVP_PKEY *key = NULL;
 
-  major = globus_gss_assist_acquire_cred(&minor, GSS_C_BOTH, &cred);
-  if (major != GSS_S_COMPLETE) {
-    seterror(VERR_NOIDENT, "Could not load proxy.");
+    if (load_credentials(outfile, outfile, &cert, &stk, &key, NULL)) {
+      return Retrieve(cert, stk, how);
+    }
   }
-  
-  bool b = RetrieveFromCred(cred, how);
-  gss_release_cred(&status, &cred);
-  return b;
-#else
-  seterror(VERR_NOTAVAIL, "Method not available in this library!");
   return false;
-#endif
 }
 
 bool vomsdata::Retrieve(X509_EXTENSION *ext)
@@ -1014,3 +1000,20 @@ std::vector<std::string> voms::GetTargets()
 
   return targets;
 }
+
+bool vomsdata::LoadCredentials(X509 *cert, STACK_OF(X509) *chain, EVP_PKEY *pkey)
+{
+  ucert = NULL;
+  cert_chain = NULL;
+  upkey = NULL;
+
+  if (cert)
+    ucert = X509_dup(cert);
+
+  if (chain)
+    cert_chain = sk_X509_dup(chain);
+
+  if (pkey)
+    upkey = EVP_PKEY_dup(pkey);
+}
+

@@ -11,7 +11,7 @@ import java.util.List;
 import javax.xml.transform.TransformerException;
 
 import org.apache.log4j.PropertyConfigurator;
-import org.globus.gsi.GlobusCredential;
+import org.glite.voms.contact.VOMSProxyConstants;
 import org.ietf.jgss.GSSException;
 
 
@@ -37,7 +37,7 @@ public class Test {
         
         VOMSProxyInit proxyInit = VOMSProxyInit.instance();
         
-        GlobusCredential proxy = proxyInit.getVomsProxy( optLists );
+        UserCredentials proxy = proxyInit.getVomsProxy( optLists );
 
     }
 }

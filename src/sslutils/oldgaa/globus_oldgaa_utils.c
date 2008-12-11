@@ -13,6 +13,7 @@ Description:
 
 #include "globus_oldgaa.h"
 #include "globus_oldgaa_utils.h" 
+#include "oldgaa_policy_evaluator.h"
 
 #include "oldgaa_utils.h"
 #include "config.h"
@@ -22,12 +23,35 @@ Description:
 #include <stdlib.h>
 #include <errno.h> 
 
+static
+int
+get_default_policy_file(oldgaa_data_ptr policy_db);
+
+static
+int
+oldgaa_globus_help_read_string(policy_file_context_ptr  pcontext, 
+                 char                    *str, 
+                 const char              *message);
+static
+int
+oldgaa_globus_read_string (policy_file_context_ptr  pcontext,
+                        char                    *str,
+                        char                    **errstring);
+static
+int
+oldgaa_globus_get_string_with_whitespaces(policy_file_context_ptr  pcontext,
+                            char                    *str);
+static
+int
+oldgaa_globus_omit_comment_line(policy_file_context_ptr  pcontext);
+
+
+
 /**********************************************************************
                        Define module specific variables
 **********************************************************************/
 
 static  int     end_of_file;
-static  char   *parse_error  = NULL;
 static  uint32  m_status     = 0;
 
 
@@ -35,7 +59,7 @@ static  uint32  m_status     = 0;
   OLDGAA Cleanup Functions 
  **********************************************************************/
 
-oldgaa_error_code
+oldgaa_error_code PRIVATE
 oldgaa_globus_cleanup(oldgaa_sec_context_ptr *oldgaa_sc,
                    oldgaa_rights_ptr      *rights,
                    oldgaa_options_ptr      options,
@@ -62,7 +86,7 @@ oldgaa_globus_cleanup(oldgaa_sec_context_ptr *oldgaa_sc,
   OLDGAA Initialization Functions 
  **********************************************************************/
 
-oldgaa_error_code
+oldgaa_error_code PRIVATE
 oldgaa_globus_initialize(oldgaa_sec_context_ptr *oldgaa_sc,
                       oldgaa_rights_ptr      *rights,
                       oldgaa_options_ptr     *options,
@@ -115,7 +139,7 @@ Returns:
 	Pointer to a oldgaa_sec_context if successful
 **********************************************************************/
 
-oldgaa_sec_context_ptr
+oldgaa_sec_context_ptr PRIVATE
 oldgaa_globus_allocate_sec_context(char *signer)
 {
   oldgaa_sec_context_ptr sc = NULL;
@@ -163,7 +187,7 @@ Returns:
 	Pointer to a oldgaa_rights if successful
 **********************************************************************/
 
-oldgaa_rights_ptr
+oldgaa_rights_ptr PRIVATE
 oldgaa_globus_allocate_rights()
 {
  oldgaa_rights_ptr rights = NULL;
@@ -201,9 +225,9 @@ Returns:
 
 **********************************************************************/
 
-oldgaa_policy_ptr 
+oldgaa_policy_ptr PRIVATE
 oldgaa_globus_policy_retrieve(uint32      *minor_status,
-			      oldgaa_data_ptr object,
+                              UNUSED(oldgaa_data_ptr object),
 			      oldgaa_data_ptr policy_db, ...)
 { 
   policy_file_context_ptr   pcontext      = NULL; 
@@ -269,8 +293,6 @@ get_default_policy_file(oldgaa_data_ptr policy_db)
 
   if (ca_policy_file_path)
   {
-    struct stat stat_buf;
-
     sprintf(ca_policy_file_path, "%s/%s", cert_dir, ca_policy_filename);
 
     policy_db->str = oldgaa_strcopy(ca_policy_file_path, policy_db->str) ;
@@ -309,7 +331,7 @@ Returns:
 
 **********************************************************************/
 
-policy_file_context_ptr 
+policy_file_context_ptr PRIVATE
 oldgaa_globus_policy_file_open(const char *filename)
 {
   char *		   open_mode = "r";
@@ -365,7 +387,7 @@ Returns:
 
 **********************************************************************/
 
-void
+void PRIVATE
 oldgaa_globus_policy_file_close(policy_file_context_ptr  pcontext)
 {
   if (pcontext)
@@ -592,12 +614,11 @@ Returns:
 
 **********************************************************************/
 
-oldgaa_error_code  
+oldgaa_error_code  PRIVATE
 oldgaa_globus_parse_policy (policy_file_context_ptr  pcontext,
                          oldgaa_policy_ptr          *policy_handle)
 
 {
-  oldgaa_policy_ptr        ptr_policy       = NULL;
   oldgaa_conditions_ptr    all_conditions   = NULL;
 /*
  *DEE all_conditions is only used in this routine to look for
@@ -611,7 +632,6 @@ oldgaa_globus_parse_policy (policy_file_context_ptr  pcontext,
   char                  str[MAX_STRING_SIZE] = {NUL};
   int                   cond_present     = FALSE;
   int                   new_entry        = TRUE; 
-  int                   line_number;
 
   end_of_file    = 0;
   *policy_handle = NULL;
@@ -750,14 +770,14 @@ Returns:
 **********************************************************************/
 
 
-oldgaa_error_code
+oldgaa_error_code PRIVATE
 oldgaa_globus_parse_principals(policy_file_context_ptr  pcontext,
                             oldgaa_policy_ptr          *policy,
                             char                    *tmp_str /* IN&OUT */,
                             oldgaa_principals_ptr      *start)
 {
   char               str[MAX_STRING_SIZE],*type;
-  int                first     = TRUE, ret_val;
+  int                first     = TRUE;
   oldgaa_principals_ptr principal = NULL;
 
  if (*policy == NULL) /* first principal in the policy file */
@@ -866,7 +886,7 @@ Returns:
 
 **********************************************************************/
 
-oldgaa_error_code
+oldgaa_error_code PRIVATE
 oldgaa_globus_parse_rights(policy_file_context_ptr  pcontext,
                         char                    *tmp_str,
                         oldgaa_rights_ptr          *start,
@@ -874,7 +894,7 @@ oldgaa_globus_parse_rights(policy_file_context_ptr  pcontext,
                         int                     *end_of_entry)
 {
   char            str[MAX_STRING_SIZE];
-  int             first  = TRUE, ret_val;
+  int             first  = TRUE;
   oldgaa_rights_ptr  rights = NULL;
   
   strcpy(str, tmp_str); 
@@ -957,7 +977,7 @@ Returns:
 
 **********************************************************************/
 
-oldgaa_error_code
+oldgaa_error_code PRIVATE
 oldgaa_globus_parse_conditions(policy_file_context_ptr  pcontext,
                             oldgaa_conditions_ptr      *conditions,                  
                             char                    *tmp_str,
@@ -965,10 +985,10 @@ oldgaa_globus_parse_conditions(policy_file_context_ptr  pcontext,
                             int                     *end_of_entry )
 {
   char                  str[MAX_STRING_SIZE];
-  int                   first = TRUE, ret_val;
+  int                   first = TRUE;
   oldgaa_conditions_ptr    cond;
   oldgaa_cond_bindings_ptr cond_bind;
-  uint32        inv_minor_status = 0, inv_major_status = 0;
+  uint32        inv_minor_status = 0;
 
   strcpy(str, tmp_str); 
   
@@ -1040,7 +1060,7 @@ do
 
 /**********************************************************************/
 
-oldgaa_error_code
+oldgaa_error_code PRIVATE
 oldgaa_globus_get_trusted_ca_list(oldgaa_sec_attrb_ptr *attributes,
                                oldgaa_policy_ptr     policy_handle,
                                oldgaa_rights_ptr     rights)

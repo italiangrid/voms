@@ -16,7 +16,7 @@ libssl_utils_la_CFLAGS = \
 
 libssl_utils_la_LIBADD = \
 	./oldgaa/liboldgaa.la \
-	$(GLOBUS_GSS_LIBS)
+	$(GLOBUS_GSS_API_LIBS)
 
 libssl_utils_nog_la_CFLAGS = \
 	$(NO_GLOBUS_FLAGS) \
@@ -25,7 +25,7 @@ libssl_utils_nog_la_CFLAGS = \
 	$(GLOBUS_CFLAGS)
 
 libssl_utils_nog_la_LIBADD = \
-	./oldgaa/liboldgaa-nog.la
+	./oldgaa/liboldgaa_nog.la
 
 ###
 
@@ -39,7 +39,7 @@ EXTRA_LTLIBRARIES = \
 	libssl_utils_gcc64pthr.la \
 	libssl_utils_gcc64dbgpthr.la \
 	libssl_utils.la \
-	libssl_utils-nog.la
+	libssl_utils_nog.la
 
 libssl_utils_gcc32_la_SOURCES= \
 	$(SOURCES)
@@ -51,7 +51,7 @@ libssl_utils_gcc32_la_CFLAGS = \
 
 libssl_utils_gcc32_la_LIBADD = \
 	./oldgaa/liboldgaa_gcc32.la \
-	$(GLOBUS_GCC32_GSS_LIBS)
+	$(GLOBUS_GCC32_GSS_API_LIBS)
 
 libssl_utils_gcc32dbg_la_SOURCES= \
 	$(SOURCES)
@@ -63,7 +63,7 @@ libssl_utils_gcc32dbg_la_CFLAGS = \
 
 libssl_utils_gcc32dbg_la_LIBADD = \
 	./oldgaa/liboldgaa_gcc32dbg.la \
-	$(GLOBUS_GCC32DBG_GSS_LIBS)
+	$(GLOBUS_GCC32DBG_GSS_API_LIBS)
 
 libssl_utils_gcc32pthr_la_SOURCES= \
 	$(SOURCES)
@@ -75,7 +75,7 @@ libssl_utils_gcc32pthr_la_CFLAGS = \
 
 libssl_utils_gcc32pthr_la_LIBADD = \
 	./oldgaa/liboldgaa_gcc32pthr.la \
-	$(GLOBUS_GCC32PTHR_GSS_LIBS)
+	$(GLOBUS_GCC32PTHR_GSS_API_LIBS)
 
 libssl_utils_gcc32dbgpthr_la_SOURCES= \
 	$(SOURCES)
@@ -87,7 +87,7 @@ libssl_utils_gcc32dbgpthr_la_CFLAGS = \
 
 libssl_utils_gcc32dbgpthr_la_LIBADD = \
 	./oldgaa/liboldgaa_gcc32dbgpthr.la \
-	$(GLOBUS_GCC32DBGPTHR_GSS_LIBS)
+	$(GLOBUS_GCC32DBGPTHR_GSS_API_LIBS)
 
 libssl_utils_gcc64_la_SOURCES= \
 	$(SOURCES)
@@ -99,7 +99,7 @@ libssl_utils_gcc64_la_CFLAGS = \
 
 libssl_utils_gcc64_la_LIBADD = \
 	./oldgaa/liboldgaa_gcc64.la \
-	$(GLOBUS_GCC64_GSS_LIBS)
+	$(GLOBUS_GCC64_GSS_API_LIBS)
 
 libssl_utils_gcc64dbg_la_SOURCES= \
 	$(SOURCES)
@@ -111,7 +111,7 @@ libssl_utils_gcc64dbg_la_CFLAGS = \
 
 libssl_utils_gcc64dbg_la_LIBADD = \
 	./oldgaa/liboldgaa_gcc64dbg.la \
-	$(GLOBUS_GCC64DBG_GSS_LIBS)
+	$(GLOBUS_GCC64DBG_GSS_API_LIBS)
 
 libssl_utils_gcc64pthr_la_SOURCES= \
 	$(SOURCES)
@@ -123,7 +123,7 @@ libssl_utils_gcc64pthr_la_CFLAGS = \
 
 libssl_utils_gcc64pthr_la_LIBADD = \
 	./oldgaa/liboldgaa_gcc64pthr.la \
-	$(GLOBUS_GCC64PTHR_GSS_LIBS)
+	$(GLOBUS_GCC64PTHR_GSS_API_LIBS)
 
 libssl_utils_gcc64dbgpthr_la_SOURCES= \
 	$(SOURCES)
@@ -135,7 +135,7 @@ libssl_utils_gcc64dbgpthr_la_CFLAGS = \
 
 libssl_utils_gcc64dbgpthr_la_LIBADD = \
 	./oldgaa/liboldgaa_gcc64dbgpthr.la \
-	$(GLOBUS_GCC64DBGPTHR_GSS_LIBS)
+	$(GLOBUS_GCC64DBGPTHR_GSS_API_LIBS)
 
 CLEANFILES = \
 	libssl_utils_gcc64.la \

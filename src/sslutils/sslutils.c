@@ -14,6 +14,8 @@ Description:
 /**********************************************************************
                              Include header files
 **********************************************************************/
+#define _GNU_SOURCE
+
 #include "config.h"
 #include "replace.h"
 #include "myproxycertinfo.h"
@@ -96,37 +98,8 @@ static int fix_add_entry_asn1_set_param = 0;
 #define ns_reject(x, usage) \
 	(((x)->ex_flags & EXFLAG_NSCERT) && !((x)->ex_nscert & (usage)))
 
-static int ca_check(const X509 *x)
-{
-	/* keyUsage if present should allow cert signing */
-	if(ku_reject(x, KU_KEY_CERT_SIGN)) return 0;
-	if(x->ex_flags & EXFLAG_BCONS) {
-		if(x->ex_flags & EXFLAG_CA) return 1;
-		/* If basicConstraints says not a CA then say so */
-		else return 0;
-	} else {
-		if((x->ex_flags & V1_ROOT) == V1_ROOT) return 3;
-		/* If key usage present it must have certSign so tolerate it */
-		else if (x->ex_flags & EXFLAG_KUSAGE) return 3;
-		else return 2;
-	}
-}
 
-/* Check SSL CA: common checks for SSL client and server */
-static int check_ssl_ca(const X509 *x)
-{
-	int ca_ret;
-	ca_ret = ca_check(x);
-	if(!ca_ret) return 0;
-	/* check nsCertType if present */
-	if(x->ex_flags & EXFLAG_NSCERT) {
-		if(x->ex_nscert & NS_SSL_CA) return ca_ret;
-		return 0;
-	}
-	if(ca_ret != 2) return ca_ret;
-	else return 0;
-}
-
+static STACK_OF(X509) *load_chain(BIO *in);
 
 /**********************************************************************
                                Type definitions
@@ -396,7 +369,7 @@ Parameters:
 
 Returns:
 **********************************************************************/
-void 
+void PRIVATE
 ERR_add_error_data( VAR_PLIST( int, num ))
     VAR_ALIST
 {
@@ -415,7 +388,7 @@ Parameters:
 
 Returns:
 **********************************************************************/
-unsigned long 
+unsigned long PRIVATE
 ERR_get_error_line_data(
     char **                             file,
     int *                               line,
@@ -454,7 +427,7 @@ Parameters:
 Returns:
 **********************************************************************/
     
-void
+void PRIVATE
 ERR_set_continue_needed(void)
 {
     ERR_STATE *es;
@@ -479,7 +452,7 @@ Parameters:
 Returns:
 **********************************************************************/
 
-int
+int PRIVATE
 ERR_load_prxyerr_strings(
     int                                 i)
 {
@@ -588,9 +561,7 @@ Returns:
                 3 readable by someone else
                 4 zero length
 **********************************************************************/
-static int
-checkstat(
-    const char*                         filename)
+static int checkstat(const char* filename)
 {
     struct stat                         stx;
 
@@ -633,7 +604,7 @@ Description:
         alloc a new proxy_cred_desc
 *********************************************************************/
 
-proxy_cred_desc *
+proxy_cred_desc PRIVATE *
 proxy_cred_desc_new() 
 {
     proxy_cred_desc *                   pcd;
@@ -672,10 +643,10 @@ Parameters:
 Returns:
 **********************************************************************/
 
-int
+int PRIVATE
 proxy_load_user_proxy(
     STACK_OF(X509) *                    cert_chain,
-    char *                              file,
+    const char *                        file,
     BIO *                               bp)
 {
 
@@ -767,14 +738,13 @@ Parameters:
 Returns:
 **********************************************************************/
 
-int
+int PRIVATE
 proxy_genreq(
     X509 *                              ucert,
     X509_REQ **                         reqp,
     EVP_PKEY **                         pkeyp,
     int                                 bits,
-    int                                 (*callback)(),
-    proxy_cred_desc *                   pcd)
+    int                                 (*callback)())
 
 {
     RSA *                               rsa = NULL;
@@ -957,7 +927,7 @@ err:
  *        will also place a more detailed error on an error stack.
  */
 
-int
+int PRIVATE
 proxy_sign(
     X509 *                              user_cert,
     EVP_PKEY *                          user_private_key,
@@ -1079,7 +1049,7 @@ proxy_sign(
  *        will also place a more detailed error on an error stack.
  */
 
-int
+int PRIVATE 
 proxy_sign_ext(
     X509 *                              user_cert,
     EVP_PKEY *                          user_private_key,
@@ -1336,40 +1306,6 @@ err:
 }
 
 
-/**
- * Check that the given subject name matches the one in the
- * certificate request.
- *
- * Check that the given subject name matches the one in the
- * certificate request.
- *
- * @param req
- *        The certificate request
- * @param subject_name
- *        The subject name to check against.
- *
- * @return
- *        0 on success
- *        1 on failure
- */
-
-
-int
-proxy_check_subject_name(
-    X509_REQ *                          req,
-    X509_NAME *                         subject_name)
-{
-    if (X509_NAME_cmp_no_set(subject_name,req->req_info->subject))
-    {
-        PRXYerr(PRXYERR_F_PROXY_CHECK_SUBJECT_NAME,
-                PRXYERR_R_PROXY_NAME_BAD);
-        return 1;
-    }
-    else
-    {
-        return 0;
-    }
-}
 
 
 /**
@@ -1394,7 +1330,7 @@ proxy_check_subject_name(
  *        will also place a more detailed error on an error stack.
  */
 
-int
+int PRIVATE
 proxy_construct_name(
     X509 *                              cert,
     X509_NAME **                        name,
@@ -1463,7 +1399,7 @@ Parameters:
 
 Returns:
 **********************************************************************/
-int
+int PRIVATE
 proxy_marshal_tmp(
     X509 *                              ncert,
     EVP_PKEY *                          npkey,
@@ -1565,7 +1501,7 @@ Parameters:
 
 Returns:
 **********************************************************************/
-int
+int PRIVATE
 proxy_marshal_bp(
     BIO *                               bp,
     X509 *                              ncert,
@@ -1638,7 +1574,7 @@ Parameters:
 Returns:
 **********************************************************************/
 
-void 
+void PRIVATE
 proxy_verify_init(
     proxy_verify_desc *                 pvd,
     proxy_verify_ctx_desc *             pvxd)
@@ -1665,7 +1601,7 @@ Parameters:
 Returns:
 **********************************************************************/
 
-void 
+void PRIVATE
 proxy_verify_ctx_init(
     proxy_verify_ctx_desc *             pvxd)
 {
@@ -1685,7 +1621,7 @@ Parameters:
 Returns:
 **********************************************************************/
 
-void 
+void PRIVATE
 proxy_verify_release(
     proxy_verify_desc *                 pvd)
 {
@@ -1707,7 +1643,7 @@ Parameters:
 Returns:
 **********************************************************************/
 
-void 
+void PRIVATE
 proxy_verify_ctx_release(
     proxy_verify_ctx_desc *             pvxd)
 {
@@ -1733,9 +1669,8 @@ Returns:
         Same as X509_verify_cert 
 **********************************************************************/
 
-static int 
-proxy_app_verify_callback(
-    X509_STORE_CTX *                    ctx, void *empty)
+int PRIVATE
+proxy_app_verify_callback(X509_STORE_CTX *ctx, UNUSED(void *empty))
 {
     /*
      * OpenSSL-0.9.6 has a  check_issued routine which
@@ -1773,7 +1708,7 @@ Returns:
 
 *********************************************************************/
 
-int proxy_check_proxy_name(
+int PRIVATE proxy_check_proxy_name(
     X509 *                              cert)
 {
     int                                 ret = 0;
@@ -1803,7 +1738,8 @@ int proxy_check_proxy_name(
           myPROXYPOLICY *policy = myPROXYCERTINFO_get_proxypolicy(certinfo);
 
           if (policy) {
-            ASN1_OBJECT *policylang = myPROXYPOLICY_get_policy_language(policy);
+            ASN1_OBJECT *policylang;
+            policylang = myPROXYPOLICY_get_policy_language(policy);
 
             /* TO DO:  discover exact type of proxy. */
 
@@ -1886,9 +1822,9 @@ Returns:
 
 **********************************************************************/
 
-int 
+int PRIVATE
 proxy_check_issued(
-    X509_STORE_CTX *                    ctx,
+    UNUSED(X509_STORE_CTX *                    ctx),
     X509 *                              x,
     X509 *                              issuer)
 {
@@ -1957,7 +1893,7 @@ Returns:
         0 - failed.  The x509_vfy.c will return a failed to caller. 
 **********************************************************************/
 
-int 
+int PRIVATE
 proxy_verify_callback(
     int                                 ok,
     X509_STORE_CTX *                    ctx)
@@ -2567,7 +2503,7 @@ Parameters:
 Returns:
 **********************************************************************/
 
-int
+int PRIVATE
 proxy_verify_cert_chain(
     X509 *                              ucert,
     STACK_OF(X509) *                    cert_chain,
@@ -2650,7 +2586,7 @@ Parameters:
 Returns:
 **********************************************************************/
 
-int
+int PRIVATE
 proxy_get_base_name(
     X509_NAME *                        subject)
 {
@@ -2778,9 +2714,8 @@ Parameters:
 Returns:
 **********************************************************************/
 
-int
+int PRIVATE
 proxy_get_filenames(
-    proxy_cred_desc *                   pcd,
     int                                 proxy_in,
     char **                             p_cert_file,
     char **                             p_cert_dir,
@@ -2818,12 +2753,6 @@ proxy_get_filenames(
 #endif
     
     /* setup some default values */
-    if (pcd) 
-    {
-        pcd->owner = CRED_OWNER_USER;
-        pcd->type = CRED_TYPE_PERMANENT;
-    }
-
     if (p_cert_dir)
     {
         cert_dir = *p_cert_dir;
@@ -3053,7 +2982,6 @@ proxy_get_filenames(
     {
         user_cert = user_proxy;
         user_key = user_proxy;
-        if (pcd) pcd->type = CRED_TYPE_PROXY;
     }
     else
     {
@@ -3124,12 +3052,10 @@ proxy_get_filenames(
             {
                 if (checkstat(X509_DEFAULT_HOST_CERT) != 1)
                 {
-                    if (pcd) pcd->owner=CRED_OWNER_SERVER;
                     user_cert = X509_DEFAULT_HOST_CERT;
                 }
                 if (checkstat(X509_DEFAULT_HOST_KEY) != 1)
                 {
-                    if (pcd) pcd->owner=CRED_OWNER_SERVER;
                     user_key = X509_DEFAULT_HOST_KEY;
                 }
             }
@@ -3332,23 +3258,18 @@ static int cert_load_pkcs12(BIO *bio, int (*pw_cb)(), X509 **cert, EVP_PKEY **ke
   return ret;
 }
 
-int proxy_load_user_cert_and_key_pkcs12(proxy_cred_desc *pcd,
-                                        const char *user_cert,
-                                        int (*pw_cb) ())
+int PRIVATE proxy_load_user_cert_and_key_pkcs12(const char *user_cert,
+                                                X509 **cert,
+                                                STACK_OF(X509) **stack,
+                                                EVP_PKEY **pkey,
+                                                int (*pw_cb) ())
 {
-  X509 *c = NULL;
-  EVP_PKEY *k = NULL;
-  STACK_OF (X509) *chain = NULL;
-
   BIO *bio = BIO_new_file(user_cert, "rb");
-  int res = cert_load_pkcs12(bio, pw_cb, &c, &k, &chain);
+  int res = cert_load_pkcs12(bio, pw_cb, cert, pkey, stack);
   BIO_free(bio);
-  if (res) {
-    pcd->ucert = c;
-    pcd->upkey = k;
-    pcd->cert_chain = chain;
+
+  if (res)
     return 1;
-  }
   else {
     if (ERR_peek_error() == ERR_PACK(ERR_LIB_PEM,PEM_F_PEM_READ_BIO,PEM_R_NO_START_LINE)) {
       ERR_clear_error();
@@ -3364,12 +3285,13 @@ int proxy_load_user_cert_and_key_pkcs12(proxy_cred_desc *pcd,
 
 
 
-int
+int PRIVATE
 proxy_load_user_cert(
-    proxy_cred_desc *                   pcd, 
     const char *                        user_cert,
+    X509 **                              certificate,
     int                                 (*pw_cb)(),
-    BIO *                               bp)
+    BIO *                               bp,
+    UNUSED(unsigned long *                     hSession))
 {
     int                                 status = -1;
     FILE *                              fp;
@@ -3386,19 +3308,11 @@ proxy_load_user_cert(
     /* Check arguments */
     if (!bp && !user_cert)
     {
-        if (pcd->owner==CRED_OWNER_SERVER)
-        {
-            PRXYerr(PRXYERR_F_INIT_CRED,PRXYERR_R_PROBLEM_SERVER_NOCERT_FILE);
-            status = PRXYERR_R_PROBLEM_SERVER_NOCERT_FILE;
-        }
-        else
-        {
-            PRXYerr(PRXYERR_F_INIT_CRED,PRXYERR_R_PROBLEM_USER_NOCERT_FILE);
-            status = PRXYERR_R_PROBLEM_USER_NOCERT_FILE;
-        }
+      PRXYerr(PRXYERR_F_INIT_CRED,PRXYERR_R_PROBLEM_USER_NOCERT_FILE);
+      status = PRXYERR_R_PROBLEM_USER_NOCERT_FILE;
         
-        ERR_add_error_data(1, "\n        No certificate file found");
-        goto err;   
+      ERR_add_error_data(1, "\n        No certificate file found");
+      goto err;   
     }
 
     if (!bp && !strncmp(user_cert,"SC:",3))
@@ -3419,9 +3333,9 @@ proxy_load_user_cert(
             goto err;
         }
         kp++; /* skip the : */
-        if (pcd->hSession == 0)
+        if (*hSession == 0)
         {
-            rc = sc_init(&(pcd->hSession), cp, NULL, NULL, CKU_USER, 0);
+            rc = sc_init(hSession, cp, NULL, NULL, CKU_USER, 0);
             if (rc)
             {
                 PRXYerr(PRXYERR_F_INIT_CRED,PRXYERR_R_PROCESS_CERT);
@@ -3432,8 +3346,8 @@ proxy_load_user_cert(
                 goto err;
             }
         }
-        rc = sc_get_cert_obj_by_label(pcd->hSession,kp,
-                                      &(pcd->ucert));
+        rc = sc_get_cert_obj_by_label(*hSession,kp,
+                                      certificate);
         if (rc)
         {
             PRXYerr(PRXYERR_F_INIT_CRED,PRXYERR_R_PROCESS_CERT);
@@ -3463,7 +3377,7 @@ proxy_load_user_cert(
     {
         if (bp)
         {
-            if (PEM_read_bio_X509(bp,&(pcd->ucert),
+            if (PEM_read_bio_X509(bp, certificate,
                                   OPENSSL_PEM_CB(NULL,NULL)) == NULL)
             {
                 PRXYerr(PRXYERR_F_INIT_CRED,PRXYERR_R_PROCESS_CERT);
@@ -3477,32 +3391,15 @@ proxy_load_user_cert(
 
             if((fp = fopen(user_cert,"rb")) == NULL)
             {
-                if (pcd->type == CRED_TYPE_PROXY && pcd->owner == CRED_OWNER_USER)
-                {
-                    PRXYerr(PRXYERR_F_INIT_CRED, PRXYERR_R_NO_PROXY);
-                    ERR_add_error_data(2, "\n        Proxy File=", user_cert);
-                    status = PRXYERR_R_NO_PROXY;
-                }
-                else
-                {
-                    if (pcd->owner==CRED_OWNER_SERVER)
-                    {
-                        PRXYerr(PRXYERR_F_INIT_CRED,PRXYERR_R_PROBLEM_SERVER_NOCERT_FILE);
-                        status = PRXYERR_R_PROBLEM_SERVER_NOCERT_FILE;
-                    }
-                    else
-                    {
-                        PRXYerr(PRXYERR_F_INIT_CRED,PRXYERR_R_PROBLEM_USER_NOCERT_FILE);
-                        status = PRXYERR_R_PROBLEM_USER_NOCERT_FILE;
-                    }
+              PRXYerr(PRXYERR_F_INIT_CRED,PRXYERR_R_PROBLEM_USER_NOCERT_FILE);
+              status = PRXYERR_R_PROBLEM_USER_NOCERT_FILE;
                     
-                    ERR_add_error_data(2, "\n        Cert File=", user_cert);
-                }
-                goto err;
+              ERR_add_error_data(2, "\n        Cert File=", user_cert);
+              goto err;
             }
 
             if (PEM_read_X509(fp,
-                              &(pcd->ucert),
+                              certificate,
                               OPENSSL_PEM_CB(NULL,NULL)) == NULL) {
               if (ERR_peek_error() == ERR_PACK(ERR_LIB_PEM,PEM_F_PEM_READ_BIO,PEM_R_NO_START_LINE)) {
                 ERR_clear_error();
@@ -3541,12 +3438,14 @@ Returns:
     an int specifying the error
 **********************************************************************/
 
-int
+int PRIVATE
 proxy_load_user_key(
-    proxy_cred_desc *                   pcd, 
+    EVP_PKEY **                         private_key,
+    X509 *                              ucert,
     const char *                        user_key,
     int                                 (*pw_cb)(),
-    BIO *                               bp)
+    BIO *                               bp,
+    UNUSED(unsigned long *                     hSession))
 {
     unsigned long                       error;
     int                                 mismatch = 0;
@@ -3566,19 +3465,11 @@ proxy_load_user_key(
     /* Check arguments */
     if (!bp && !user_key)
     {
-        if (pcd->owner==CRED_OWNER_SERVER)
-        {
-            PRXYerr(PRXYERR_F_INIT_CRED, PRXYERR_R_PROBLEM_SERVER_NOKEY_FILE);
-            status = PRXYERR_R_PROBLEM_SERVER_NOKEY_FILE;
-        }
-        else
-        {
-            PRXYerr(PRXYERR_F_INIT_CRED,PRXYERR_R_PROBLEM_USER_NOKEY_FILE);
-            status = PRXYERR_R_PROBLEM_USER_NOKEY_FILE;
-        }
-
-        ERR_add_error_data(1,"\n        No key file found");
-        goto err;   
+      PRXYerr(PRXYERR_F_INIT_CRED,PRXYERR_R_PROBLEM_USER_NOKEY_FILE);
+      status = PRXYERR_R_PROBLEM_USER_NOKEY_FILE;
+      
+      ERR_add_error_data(1,"\n        No key file found");
+      goto err;   
     }
 
             
@@ -3599,9 +3490,9 @@ proxy_load_user_key(
             goto err;
         }
         kp++; /* skip the : */
-        if (pcd->hSession == 0)
+        if (*hSession == 0)
         {
-            rc = sc_init(&(pcd->hSession), cp, NULL, NULL, CKU_USER, 0);
+            rc = sc_init(hSession, cp, NULL, NULL, CKU_USER, 0);
             if (rc)
             {
                 PRXYerr(PRXYERR_F_INIT_CRED,PRXYERR_R_PROCESS_KEY);
@@ -3612,8 +3503,8 @@ proxy_load_user_key(
                 goto err;
             }
         }
-        rc = sc_get_priv_key_obj_by_label(pcd->hSession,kp,
-                                          &(pcd->upkey));
+        rc = sc_get_priv_key_obj_by_label(hSession,kp,
+                                          private_key);
         if (rc)
         {
             PRXYerr(PRXYERR_F_INIT_CRED,PRXYERR_R_PROCESS_KEY);
@@ -3643,7 +3534,7 @@ proxy_load_user_key(
     {
         if (bp)
         {
-            if (PEM_read_bio_PrivateKey(bp,&(pcd->upkey),
+            if (PEM_read_bio_PrivateKey(bp,private_key,
                                         OPENSSL_PEM_CB(xpw_cb,NULL)) == NULL)
             {
                 PRXYerr(PRXYERR_F_INIT_CRED,PRXYERR_R_PROCESS_KEY);
@@ -3656,40 +3547,24 @@ proxy_load_user_key(
             int keystatus;
             if ((fp = fopen(user_key,"rb")) == NULL)
             {
-                if (pcd->owner==CRED_OWNER_SERVER)
-                {    
-                     PRXYerr(PRXYERR_F_INIT_CRED,PRXYERR_R_PROBLEM_SERVER_NOKEY_FILE);
-                     status = PRXYERR_R_PROBLEM_SERVER_NOKEY_FILE;
-                }
-                else
-                {
-                    PRXYerr(PRXYERR_F_INIT_CRED,PRXYERR_R_PROBLEM_USER_NOKEY_FILE);
-                    status = PRXYERR_R_PROBLEM_USER_NOKEY_FILE;
-                }
+              PRXYerr(PRXYERR_F_INIT_CRED,PRXYERR_R_PROBLEM_USER_NOKEY_FILE);
+              status = PRXYERR_R_PROBLEM_USER_NOKEY_FILE;
 
-                ERR_add_error_data(2, "\n        File=",user_key);
-                goto err;
+              ERR_add_error_data(2, "\n        File=",user_key);
+              goto err;
             }
 
             /* user key must be owned by the user, and readable
              * only be the user
              */
 
-            if (keystatus = checkstat(user_key))
+            if ((keystatus = checkstat(user_key)))
             {
                 if (keystatus == 4)
                 {
-                    if (pcd && pcd->owner==CRED_OWNER_SERVER)
-                    {                    
-                        status = PRXYERR_R_SERVER_ZERO_LENGTH_KEY_FILE;
-                        PRXYerr(PRXYERR_F_INIT_CRED, PRXYERR_R_SERVER_ZERO_LENGTH_KEY_FILE);
-                    }
-                    else
-                    {
-                         status = PRXYERR_R_USER_ZERO_LENGTH_KEY_FILE;
-                         PRXYerr(PRXYERR_F_INIT_CRED,
-                                 PRXYERR_R_USER_ZERO_LENGTH_KEY_FILE);
-                    }
+                  status = PRXYERR_R_USER_ZERO_LENGTH_KEY_FILE;
+                  PRXYerr(PRXYERR_F_INIT_CRED,
+                          PRXYERR_R_USER_ZERO_LENGTH_KEY_FILE);
                 }
                 else
                 {
@@ -3703,7 +3578,7 @@ proxy_load_user_key(
             }
 
             if (PEM_read_PrivateKey(fp,
-                                    &(pcd->upkey),
+                                    private_key,
                                     OPENSSL_PEM_CB(xpw_cb,NULL)) == NULL)
             {
                 fclose(fp);
@@ -3751,10 +3626,11 @@ proxy_load_user_key(
      * Dont want a mixup of keys and certs
      * Will only check rsa type for now. 
      */
-    if (pcd->ucert)
+    if (ucert)
     {
-        ucertpkey =  X509_PUBKEY_get(X509_get_X509_PUBKEY(pcd->ucert));
-        if (ucertpkey!= NULL  && ucertpkey->type == pcd->upkey->type)
+        ucertpkey =  X509_PUBKEY_get(X509_get_X509_PUBKEY(ucert));
+        if (ucertpkey!= NULL  && ucertpkey->type == 
+            (*private_key)->type)
         {
             if (ucertpkey->type == EVP_PKEY_RSA)
             {
@@ -3776,22 +3652,22 @@ proxy_load_user_key(
                 }
                 if ((ucertpkey->pkey.rsa != NULL) && 
                     (ucertpkey->pkey.rsa->n != NULL) &&
-                    (pcd->upkey->pkey.rsa != NULL) )
+                    ((*private_key)->pkey.rsa != NULL) )
                 {
-                    if (pcd->upkey->pkey.rsa->n != NULL
-                        && BN_num_bytes(pcd->upkey->pkey.rsa->n))
+                  if ((*private_key)->pkey.rsa->n != NULL
+                      && BN_num_bytes((*private_key)->pkey.rsa->n))
                     {
                         if (BN_cmp(ucertpkey->pkey.rsa->n,
-                                   pcd->upkey->pkey.rsa->n))
+                                   (*private_key)->pkey.rsa->n))
                         {
                             mismatch=1;
                         }
                     }
                     else
                     {
-                        pcd->upkey->pkey.rsa->n =
+                      (*private_key)->pkey.rsa->n =
                             BN_dup(ucertpkey->pkey.rsa->n);
-                        pcd->upkey->pkey.rsa->e =
+                      (*private_key)->pkey.rsa->e =
                             BN_dup(ucertpkey->pkey.rsa->e);
                     }
                 }
@@ -3816,563 +3692,8 @@ proxy_load_user_key(
 err:
     /* DEE need more cleanup */
     return status;
-
 }
 
-/**********************************************************************
-Function: proxy_init_cred()
-
-Description:
-    Gets the local credentials. Here is establishes the SSL context
-    and set the cert, and key files and directories from the
-    environment.
-    
-Parameters:
-
-Returns:
-**********************************************************************/
-
-int
-proxy_init_cred(
-    proxy_cred_desc *                   pcd,
-    int                                 (*pw_cb)(),
-    BIO *                               bp)
-{
-        
-    int                                 status = -1;
-    int                                 len;
-    int                                 i;
-    int                                 j;
-    char *                              cert_file = NULL;
-    char *                              cert_dir = NULL;
-    char *                              user_proxy = NULL;
-    char *                              user_cert = NULL;
-    char *                              user_key = NULL;
-    char *                              fname = NULL;
-    X509_STORE_CTX                      csc;
-#ifndef WIN32
-    DIR *                               dirp = NULL;
-    struct dirent *                     direntp;
-#endif
-    FILE *                              fp = NULL;
-    X509 *                              ccert = NULL;
-    X509 *                              xcert = NULL;
-
-    if (proxy_get_filenames(pcd,
-                            1,
-                            &cert_file,
-                            &cert_dir,
-                            (pcd->ucert||pcd->upkey)? NULL : &user_proxy,
-                            pcd->ucert? NULL : &user_cert,
-                            pcd->upkey? NULL : &user_key))
-    {
-        goto err;
-    }
-
-    if (cert_dir)
-    {
-        pcd->certdir = strdup(cert_dir);
-
-    }
-
-    if (cert_file)
-    {
-        pcd->certfile = strdup(cert_file);
-    }
-
-    SSLeay_add_ssl_algorithms();
-    pcd->gs_ctx = SSL_CTX_new(SSLv3_method());
-    if(pcd->gs_ctx == NULL)
-    {
-        goto err;
-    }
-
-#if SSLEAY_VERSION_NUMBER >=  0x0090600fL
-    SSL_CTX_set_cert_verify_callback(pcd->gs_ctx, 
-                                     proxy_app_verify_callback,
-                                     NULL);
-#endif
-
-    /* set a small limit on ssl session-id reuse */
-
-    SSL_CTX_sess_set_cache_size(pcd->gs_ctx,5);
-
-    if (!SSL_CTX_load_verify_locations(pcd->gs_ctx,
-                                       cert_file,
-                                       cert_dir))
-    {
-        PRXYerr(PRXYERR_F_INIT_CRED,PRXYERR_R_PROCESS_CERTS);
-        ERR_add_error_data(4, "\n        x509_cert_file=", 
-                           (cert_file) ? cert_file: "NONE" ,
-                           "\n        x509_cert_dir=",
-                           (cert_dir) ? cert_dir : "NONE");
-        status = PRXYERR_R_PROCESS_CERTS;       
-        goto err;
-    }
-        
-    /*
-     * Need to load the cert_file and/or the CA certificates
-     * to get the client_CA_list. This is really only needed
-     * on the server side, but will do it on both for now. 
-     * Some Java implementations insist on having this. 
-     */
-
-    if (cert_file)
-    {
-        SSL_CTX_set_client_CA_list(pcd->gs_ctx,
-                                   SSL_load_client_CA_file(cert_file));
-        if (!SSL_CTX_get_client_CA_list(pcd->gs_ctx))
-        {
-            PRXYerr(PRXYERR_F_INIT_CRED,PRXYERR_R_PROBLEM_CLIENT_CA);
-            ERR_add_error_data(2,"\n        File=", cert_file);
-            status = PRXYERR_R_PROBLEM_CLIENT_CA;
-            goto err;
-        }
-    }
-        
-#ifdef NO_OLDGAA_API
-    /* 
-     * DEE-Get a list of all the CAs from the ca-signing-policy.conf
-     * Problem with this method is that the names are in the 
-     * "X509_NAME_oneline" format, and not X509_NAME, as we realy 
-     * need the DER encoding of the name. 
-     * DEE-Will add later if needed.
-     */
-                                                                          
-#endif
-    /*
-     * So go through the cert_dir looking for certificates
-     * then verify that they are in the ca-signing-policy 
-     * as well. 
-     */ 
-
-#ifndef WIN32
-    if ((dirp = opendir(cert_dir)) != NULL)
-    {
-        while ( (direntp = readdir( dirp )) != NULL )
-        {
-            /* look for hashed file names hhhhhhhh.n */
-            len = strlen(direntp->d_name);
-            if ((len >= 10)
-                && (*(direntp->d_name + 8) == '.')
-                && (strspn(direntp->d_name, 
-                           "0123456789abcdefABCDEF") == 8)
-                && (strspn((direntp->d_name + 9),
-                           "0123456789") == (len - 9)))
-            {
-                fname = (char *)malloc(strlen(cert_dir) + 
-                                       strlen(direntp->d_name) + 2);
-                if (!fname)
-                {
-                    PRXYerr(PRXYERR_F_INIT_CRED, PRXYERR_R_OUT_OF_MEMORY);
-                    status = PRXYERR_R_OUT_OF_MEMORY;
-                    goto err;
-                }
-                sprintf(fname,"%s%s%s", cert_dir,
-                        FILE_SEPERATOR,
-                        direntp->d_name);
-
-                if ((fp = fopen(fname,"r")) == NULL)
-                {
-                    if (pcd->owner==CRED_OWNER_SERVER)
-                    {
-                       PRXYerr(PRXYERR_F_INIT_CRED,PRXYERR_R_PROBLEM_SERVER_NOCERT_FILE);
-                       status = PRXYERR_R_PROBLEM_SERVER_NOCERT_FILE;
-                    }
-                    else
-                    {
-                       PRXYerr(PRXYERR_F_INIT_CRED,PRXYERR_R_PROBLEM_USER_NOCERT_FILE);
-                       status = PRXYERR_R_PROBLEM_USER_NOCERT_FILE;
-                    }
-                    
-                    ERR_add_error_data(2, "\n        File=", fname);
-                    goto err;
-                }
-
-                if (PEM_read_X509(fp,&ccert,OPENSSL_PEM_CB(NULL,NULL)) == NULL)
-                {
-                    PRXYerr(PRXYERR_F_INIT_CRED,PRXYERR_R_PROCESS_CERT);
-                    ERR_add_error_data(2, "\n        File=", fname);
-                    status = PRXYERR_R_PROCESS_CERT;
-                    goto err;
-                }
-
-                free(fname);
-                fname = NULL;
-                fclose(fp);
-                fp = NULL;
-                SSL_CTX_add_client_CA(pcd->gs_ctx, ccert);
-                X509_free(ccert);
-                ccert = NULL;
-            }
-        }
-    }
-#endif /* WIN32 */
-
-    if (!pcd->ucert)
-    {
-        if (status = proxy_load_user_cert(pcd, user_cert,
-                                 pw_cb, bp))
-        {
-            goto err;
-        }
-        
-        if (proxy_check_proxy_name(pcd->ucert)>0)
-        {
-            pcd->type = CRED_TYPE_PROXY;
-        }
-        else
-        {
-            pcd->type = CRED_TYPE_PERMANENT;
-        }
-    }
-    else
-    {
-        pcd->type = CRED_TYPE_PERMANENT;
-    }
-
-    if (!pcd->upkey)
-    {
-        if (status = proxy_load_user_key(pcd, user_key,
-                                pw_cb, bp))
-        {
-            goto err;
-        }
-    }
-                        
-    if (!SSL_CTX_use_certificate(pcd->gs_ctx,pcd->ucert))
-    {
-        PRXYerr(PRXYERR_F_INIT_CRED,PRXYERR_R_PROCESS_CERT);
-        ERR_add_error_data(2,"\n        File=", user_cert);
-        status = PRXYERR_R_PROCESS_CERT;
-        goto err;
-    }
-    /* test if the cert is still valid */
-    if (X509_cmp_current_time(X509_get_notAfter(pcd->ucert)) <= 0)
-    {
-        if (pcd->type==CRED_TYPE_PROXY)
-        {
-            PRXYerr(PRXYERR_F_INIT_CRED,PRXYERR_R_PROXY_EXPIRED);
-            status = PRXYERR_R_PROXY_EXPIRED; 
-        }
-        else if (pcd->type==CRED_OWNER_SERVER)
-        {
-                        
-            PRXYerr(PRXYERR_F_INIT_CRED,PRXYERR_R_SERVER_CERT_EXPIRED);
-            status = PRXYERR_R_SERVER_CERT_EXPIRED; 
-        }
-        else 
-        {
-            PRXYerr(PRXYERR_F_INIT_CRED,PRXYERR_R_USER_CERT_EXPIRED);
-            status = PRXYERR_R_USER_CERT_EXPIRED; 
-        }
-
-        ERR_add_error_data(2,"\n        File=", user_cert);
-        goto err;
-    }
-
-    if (!SSL_CTX_use_PrivateKey(pcd->gs_ctx, pcd->upkey))
-    {
-        PRXYerr(PRXYERR_F_INIT_CRED,PRXYERR_R_PROCESS_KEY);
-        ERR_add_error_data(2, "\n        File=", user_key);
-        status = PRXYERR_R_PROCESS_KEY;
-        goto err;
-    }
-
-    /* if using the user_proxy file, then there may be more certs
-     * we should read in. These are trusted only by the user,
-     * and are part of the certificarte chain.
-     *DEE? need to look at this closer.
-     */
-
-
-    if (bp || user_proxy)
-    {
-        if (pcd->cert_chain == NULL)
-        {
-            pcd->cert_chain = sk_X509_new_null();
-        }
-        
-        if (proxy_load_user_proxy(pcd->cert_chain,
-                                  user_proxy, bp) < 0)
-        {
-            PRXYerr(PRXYERR_F_INIT_CRED,PRXYERR_R_PROCESS_PROXY);
-            if (user_proxy)
-            { 
-                ERR_add_error_data(2,"\n        x509_user_proxy=", user_proxy);
-            }
-            status = PRXYERR_R_PROCESS_PROXY;
-            goto err;
-        }
-    }
-    if (pcd->cert_chain)
-    {
-        for (i=0;i<sk_X509_num(pcd->cert_chain);i++)
-        {
-            xcert = sk_X509_value(pcd->cert_chain,i);
-
-            j = X509_STORE_add_cert(pcd->gs_ctx->cert_store,xcert);
-            if (!j)
-            {
-                if ((ERR_GET_REASON(ERR_peek_error()) ==
-                     X509_R_CERT_ALREADY_IN_HASH_TABLE))
-                {
-                    ERR_clear_error();
-                    break;
-                }
-                else
-                {
-                    goto err;
-                }
-            }
-        }
-    }
-
-    status = 0;
-err:
-    if (fname)
-    {
-        free(fname);
-    }
-    if (fp)
-    {
-        fclose(fp);
-    }
-#ifndef WIN32
-    if (dirp)
-    {
-        closedir(dirp);
-    }
-#endif
-    if(cert_file)
-    {
-        free(cert_file);
-    }
-    if(cert_dir)
-    {
-        free(cert_dir);
-    }
-    if(user_proxy)
-    {
-        free(user_proxy);
-    }
-    if(user_cert)
-    {
-        free(user_cert);
-    }
-    if(user_key)
-    {
-        free(user_key);
-    }
-    return status;
-
-}
-
-/**********************************************************************
-Function: proxy_cred_desc_free()
-
-Description:
-        free the proxy_cred_desc and its contents 
-        X509_certs etc. 
-
-Parameters:
-
-Returns:
-**********************************************************************/
-
-int
-proxy_cred_desc_free(
-    proxy_cred_desc *                   pcd)
-{
-    if (pcd)
-    {
-        if (pcd->ucert != NULL)
-        {
-            X509_free(pcd->ucert);
-            pcd->ucert = NULL;
-        }
-
-        if (pcd->upkey != NULL)
-        {
-            EVP_PKEY_free(pcd->upkey);
-            pcd->upkey = NULL;
-        }
-
-        if (pcd->cert_chain != NULL)
-        {
-            sk_X509_pop_free(pcd->cert_chain,X509_free);
-            pcd->cert_chain = NULL;
-        }
-
-        if (pcd->gs_ctx)
-        {
-            /*
-             * SSLeay or OpenSSL map not free the  
-             * session cache as expected when calling SSL_CTX_free
-             */
-            SSL_CTX_free(pcd->gs_ctx);
-            pcd->gs_ctx = NULL;     
-        }
-        if (pcd->certdir)
-        {
-            free(pcd->certdir);
-            pcd->certdir = NULL;
-        }
-        if (pcd->certfile)
-        {
-            free(pcd->certfile);
-            pcd->certfile = NULL;
-        }
-#ifdef USE_PKCS11
-        if (pcd->hSession)
-        {
-            sc_final(pcd->hSession);
-            pcd->hSession = 0;
-        }
-#endif
-
-        free(pcd);
-    }
-    return 0;
-}
-
-/**********************************************************************
-Function: proxy_create_local()
-
-Description:
-    Creates a proxy on the local machine. Used by globus_proxy_init
-        
-Parameters:
-
-Returns:
-**********************************************************************/
-
-int
-proxy_create_local(
-    proxy_cred_desc *                   pcd,
-    const char *                        outfile,
-    int                                 hours,
-    int                                 bits,
-    int                                 limit_proxy,
-    int                                 proxyver,
-    int                                 (*kpcallback)(),
-    char *                              class_add_buf,
-    int                                 class_add_buf_len)
-{
-        
-    int                                 status = -1;
-    FILE *                              fpout = NULL;
-    X509 *                              ncert = NULL; 
-    EVP_PKEY *                          npkey;
-    X509_REQ *                          req;
-    BIO *                               bp = NULL;
-    STACK_OF(X509_EXTENSION) *          extensions = NULL;
-    X509_EXTENSION *                    ex = NULL;
-
-    fpout=fopen(outfile,"w");
-    if (fpout == NULL)
-    {
-        PRXYerr(PRXYERR_F_LOCAL_CREATE,PRXYERR_R_PROBLEM_PROXY_FILE);
-        ERR_add_error_data(2,"\n        Open failed for File=",outfile);
-        goto err;
-    }
-
-#ifndef WIN32
-    if (fchmod(fileno(fpout),0600) == -1)
-    {
-        PRXYerr(PRXYERR_F_LOCAL_CREATE,PRXYERR_R_PROBLEM_PROXY_FILE);
-        ERR_add_error_data(2, "\n        chmod failed for File=",outfile);
-        goto err;
-    }
-#endif
-    /* 
-     * DEE? may need to create a x509_store with the rest of 
-     * the certificates. If so it needs to be passed to
-     * proxy_marshal_bp
-     */ 
-
-    if (proxy_genreq(pcd->ucert,&req,&npkey,bits,
-                     (int (*)())kpcallback, pcd))
-    {
-        goto err;
-    }
-
-    /* 
-     * Add proxy extensions
-     */
-    if ((extensions = sk_X509_EXTENSION_new_null()) == NULL)
-    {
-        PRXYerr(PRXYERR_F_PROXY_SIGN,PRXYERR_R_CLASS_ADD_EXT);
-        goto err;
-    }
-        
-#ifdef CLASS_ADD
-    if (class_add_buf && class_add_buf_len > 0)
-    {
-        if ((ex = proxy_extension_class_add_create(class_add_buf,
-                                                   class_add_buf_len)) == NULL)
-        {
-            PRXYerr(PRXYERR_F_PROXY_SIGN,PRXYERR_R_CLASS_ADD_EXT);
-            goto err;
-        }
-                
-        if (!sk_X509_EXTENSION_push(extensions, ex))
-        {
-            PRXYerr(PRXYERR_F_PROXY_SIGN,PRXYERR_R_CLASS_ADD_EXT);
-            goto err;
-        }
-    }
-#endif
-
-    if (proxy_sign(pcd->ucert,
-                   pcd->upkey,
-                   req,
-                   &ncert,
-                   hours*60*60,
-                   extensions,
-                   limit_proxy,
-		   proxyver))
-    {
-        goto err;
-    }
-        
-    if ((bp=BIO_new(BIO_s_file())) != NULL)
-    {
-        BIO_set_fp(bp,fpout,BIO_NOCLOSE);
-    }
-
-    if (proxy_marshal_bp(bp,ncert,npkey,pcd->ucert,pcd->cert_chain))
-    {
-        goto err;
-    }
-
-    status = 0;
-err:
-    if (ncert)
-    {
-        X509_free(ncert);
-    }
-    if (bp)
-    {
-        BIO_free(bp);
-    }
-    if (fpout)
-    {
-        fclose(fpout);
-    }
-
-    if (extensions)
-    {
-        sk_X509_EXTENSION_pop_free(extensions, X509_EXTENSION_free);
-    }
-    if (ex)
-    {
-        X509_EXTENSION_free(ex);
-    }
-
-    return status;
-
-}
 
 /**********************************************************************
 Function: ASN1_UTCTIME_mktime()
@@ -4389,7 +3710,7 @@ Returns:
         time_t 
 **********************************************************************/
 
-time_t
+time_t PRIVATE
 ASN1_UTCTIME_mktime(
     ASN1_UTCTIME *                      ctm)
 {
@@ -4490,11 +3811,11 @@ Returns:
 
 **********************************************************************/
 
-int
+int PRIVATE
 proxy_password_callback_no_prompt(
-    char *                              buffer,
-    int                                 size,
-    int                                 w)
+    UNUSED(char *                              buffer),
+    UNUSED(int                                 size),
+    UNUSED(int                                 w))
 {
     PRXYerr(PRXYERR_F_CB_NO_PW, PRXYERR_R_NO_PROXY);
 
@@ -4516,7 +3837,7 @@ Returns:
 
 **********************************************************************/
 
-X509_EXTENSION *
+X509_EXTENSION PRIVATE *
 proxy_extension_class_add_create(
     void *                              buffer,
     size_t                              length)
@@ -4568,29 +3889,29 @@ err:
 
 
 
-int
-i2d_integer_bio(
-    BIO *                               bp,
-    long                                v)
-{
-    ASN1_INTEGER *                      asn1_int;
-    unsigned char *                     buffer;
+/* int */
+/* i2d_integer_bio( */
+/*     BIO *                               bp, */
+/*     long                                v) */
+/* { */
+/*     ASN1_INTEGER *                      asn1_int; */
+/*     unsigned char *                     buffer; */
     
-    asn1_int = ASN1_INTEGER_new();
+/*     asn1_int = ASN1_INTEGER_new(); */
 
-    ASN1_INTEGER_set(asn1_int, v);
+/*     ASN1_INTEGER_set(asn1_int, v); */
 
-#ifdef TYPEDEF_I2D_OF
-    ASN1_i2d_bio((i2d_of_void*)i2d_ASN1_INTEGER, bp, (unsigned char *) asn1_int);
-#else
-    ASN1_i2d_bio(i2d_ASN1_INTEGER, bp, (unsigned char *) asn1_int);
-#endif
+/* #ifdef TYPEDEF_I2D_OF */
+/*     ASN1_i2d_bio((i2d_of_void*)i2d_ASN1_INTEGER, bp, (unsigned char *) asn1_int); */
+/* #else */
+/*     ASN1_i2d_bio(i2d_ASN1_INTEGER, bp, (unsigned char *) asn1_int); */
+/* #endif */
     
-    ASN1_INTEGER_free(asn1_int);
+/*     ASN1_INTEGER_free(asn1_int); */
     
-}
+/* } */
 
-long
+long PRIVATE
 d2i_integer_bio(
     BIO *                               bp,
     long *                              v)
@@ -4612,4 +3933,167 @@ d2i_integer_bio(
     ASN1_INTEGER_free(asn1_int);
 
     return *v;
+}
+
+int PRIVATE determine_filenames(char **cacert, char **certdir, char **outfile,
+                                 char **certfile, char **keyfile, int noregen)
+{
+  char *oldoutfile = NULL;
+
+  if (noregen) {
+    int modify = 0;
+
+    if(*outfile)
+      oldoutfile = *outfile;
+
+    *outfile = NULL;
+
+    if (*certfile == NULL && *keyfile == NULL) 
+      modify = 1;
+
+    if (proxy_get_filenames(0, cacert, certdir, outfile, certfile, keyfile))
+      goto err;
+
+    if (modify)
+      *certfile = *keyfile = *outfile;
+
+    *outfile = oldoutfile;
+    if (proxy_get_filenames(0, cacert, certdir, outfile, certfile, keyfile))
+      goto err;
+  }
+  else if (proxy_get_filenames(0, cacert, certdir, outfile, certfile, keyfile))
+    goto err;
+
+  return 1;
+
+err:
+  return 0;
+}
+
+int PRIVATE load_credentials(const char *certname, const char *keyname,
+                             X509 **cert, STACK_OF(X509) **stack, EVP_PKEY **key,
+                             int (*callback)())
+{
+  STACK_OF(X509) *chain = NULL;
+
+  if (!certname)
+    return 0;
+
+  unsigned long hSession = 0;
+
+  if (!strncmp(certname, "SC:", 3))
+    EVP_set_pw_prompt("Enter card pin:");
+  else
+    EVP_set_pw_prompt("Enter GRID pass phrase for this identity:");
+
+  if (strcmp(certname + strlen(certname) - 4, ".p12")) {
+    if(proxy_load_user_cert(certname, cert, callback, NULL, &hSession))
+      goto err;
+
+    EVP_set_pw_prompt("Enter GRID pass phrase:");
+
+    if (keyname) {
+      if (!strncmp(keyname, "SC:", 3))
+        EVP_set_pw_prompt("Enter card pin:");
+
+      if (proxy_load_user_key(key, *cert, keyname, callback, NULL, &hSession))
+        goto err;
+    }
+
+    if (stack && (strncmp(certname, "SC:", 3) && (!keyname || !strcmp(certname, keyname)))) {
+      chain = sk_X509_new_null();
+      if (proxy_load_user_proxy(chain, certname, NULL) < 0)
+        goto err;
+      *stack = chain;
+    } 
+  }
+  else {
+    if (!proxy_load_user_cert_and_key_pkcs12(certname, cert, stack, key, callback))
+      goto err;
+  }    
+
+  return 1;
+
+err:
+  if (chain)
+    sk_X509_free(chain);
+  if (cert)
+    X509_free(*cert);
+  if (key)
+    EVP_PKEY_free(*key);
+  return 0;
+}
+
+int PRIVATE load_certificate_from_file(FILE *file, X509 **cert, 
+                                       STACK_OF(X509) **stack)
+{
+  BIO *in = NULL;
+
+  if (!cert)
+    return 0;
+
+  in = BIO_new_fp(file, BIO_NOCLOSE);
+
+  if (in) {
+    *cert = PEM_read_bio_X509(in, NULL, 0, NULL);
+
+    if(!*cert)
+      goto err;
+
+    if (stack) {
+      *stack = load_chain(in);
+      if (!(*stack))
+        goto err;
+    }
+  }
+  BIO_free(in);
+  return 1;
+
+ err:
+  BIO_free(in);
+  if (cert)
+    X509_free(*cert);
+  if (stack)
+    sk_X509_pop_free(*stack, X509_free);
+  return 0;
+
+}
+
+static STACK_OF(X509) *load_chain(BIO *in)
+{
+  STACK_OF(X509_INFO) *sk=NULL;
+  STACK_OF(X509) *stack=NULL, *ret=NULL;
+  X509_INFO *xi;
+  int first = 1;
+
+  if(!(stack = sk_X509_new_null()))
+    goto end;
+
+  /* This loads from a file, a stack of x509/crl/pkey sets */
+  if(!(sk=PEM_X509_INFO_read_bio(in,NULL,NULL,NULL)))
+    goto end;
+
+  /* scan over it and pull out the certs */
+  while (sk_X509_INFO_num(sk)) {
+    /* skip first cert */
+    if (first) {
+      first = 0;
+      continue;
+    }
+    xi=sk_X509_INFO_shift(sk);
+    if (xi->x509 != NULL) {
+      sk_X509_push(stack,xi->x509);
+      xi->x509=NULL;
+    }
+    X509_INFO_free(xi);
+  }
+  if(!sk_X509_num(stack)) {
+    sk_X509_free(stack);
+    goto end;
+  }
+  ret=stack;
+
+end:
+  sk_X509_INFO_free(sk);
+  return(ret);
 }

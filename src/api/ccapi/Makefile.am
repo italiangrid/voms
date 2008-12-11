@@ -31,8 +31,9 @@ NOGLIBADD = \
 	$(top_builddir)/src/replib/librep.la \
 	$(top_builddir)/src/common/libutilities_nog.la \
 	$(top_builddir)/src/common/libutilc_nog.la \
-	$(top_builddir)/src/sslutils/libssl_utils-nog.la \
-	$(top_builddir)/src/log/liblog.la
+	$(top_builddir)/src/sslutils/libssl_utils_nog.la \
+	$(top_builddir)/src/log/liblog.la\
+	$(top_builddir)/src/socklib/libsock_nog.la
 
 libvomsapi_nog_la_LIBADD = \
 	$(NOGLIBADD) \
@@ -55,7 +56,8 @@ CCLIBADD = \
   $(GLOBUS_LIBS) \
 	$(top_builddir)/src/replib/librep.la \
 	$(top_builddir)/src/common/libutilities.la \
-	$(top_builddir)/src/log/liblog.la
+	$(top_builddir)/src/log/liblog.la 
+#	$(top_builddir)/src/sslutils/$(USE_SSL_UTILS_LIB)
 
 libvomsapi_la_LIBADD = \
 	$(CCLIBADD) \

@@ -37,7 +37,7 @@ libattcert_la_CFLAGS= \
 	$(GLOBUS_CFLAGS)
 
 #libattcert_la_LIBADD = \
-#	$(GLOBUS_GSS_LIBS)
+#	$(GLOBUS_GSS_API_LIBS)
 
 libccattcert_la_SOURCES = \
 	create.cc \
@@ -46,7 +46,7 @@ libccattcert_la_SOURCES = \
 libccattcert_la_LIBADD  = \
 	libattcert.la
 # \
-#	$(GLOBUS_GSS_LIBS)
+#	$(GLOBUS_GSS_API_LIBS)
 
 AM_CPPFLAGS= \
 	-I $(top_srcdir)/src/include \
@@ -90,7 +90,7 @@ libattcert_gcc32_la_CFLAGS= \
 	$(GLOBUS_GCC32_CFLAGS)
 
 libattcert_gcc32_la_LIBADD = \
-	$(GLOBUS_GCC32_GSS_LIBS)
+	$(GLOBUS_GCC32_GSS_API_LIBS)
 
 libccattcert_gcc32_la_SOURCES = \
 	create.cc \
@@ -98,7 +98,7 @@ libccattcert_gcc32_la_SOURCES = \
 
 libccattcert_gcc32_la_LIBADD  = \
 	libattcert_gcc32.la \
-	$(GLOBUS_GCC32_GSS_LIBS)
+	$(GLOBUS_GCC32_GSS_API_LIBS)
 
 libattcert_gcc32dbg_la_SOURCES = \
 	validate.c \
@@ -115,7 +115,7 @@ libattcert_gcc32dbg_la_CFLAGS= \
 	$(GLOBUS_GCC32DBG_CFLAGS)
 
 libattcert_gcc32dbg_la_LIBADD = \
-	$(GLOBUS_GCC32DBG_GSS_LIBS)
+	$(GLOBUS_GCC32DBG_GSS_API_LIBS)
 
 libccattcert_gcc32dbg_la_SOURCES = \
 	create.cc \
@@ -123,7 +123,7 @@ libccattcert_gcc32dbg_la_SOURCES = \
 
 libccattcert_gcc32dbg_la_LIBADD  = \
 	libattcert_gcc32dbg.la \
-	$(GLOBUS_GCC32DBG_GSS_LIBS)
+	$(GLOBUS_GCC32DBG_GSS_API_LIBS)
 
 libattcert_gcc32pthr_la_SOURCES = \
 	validate.c \
@@ -140,7 +140,7 @@ libattcert_gcc32pthr_la_CFLAGS= \
 	$(GLOBUS_GCC32PTHR_CFLAGS)
 
 libattcert_gcc32pthr_la_LIBADD = \
-	$(GLOBUS_GCC32PTHR_GSS_LIBS)
+	$(GLOBUS_GCC32PTHR_GSS_API_LIBS)
 
 libccattcert_gcc32pthr_la_SOURCES = \
 	create.cc \
@@ -148,7 +148,7 @@ libccattcert_gcc32pthr_la_SOURCES = \
 
 libccattcert_gcc32pthr_la_LIBADD  = \
 	libattcert_gcc32pthr.la \
-	$(GLOBUS_GCC32PTHR_GSS_LIBS)
+	$(GLOBUS_GCC32PTHR_GSS_API_LIBS)
 
 libattcert_gcc32dbgpthr_la_SOURCES = \
 	validate.c \
@@ -165,7 +165,7 @@ libattcert_gcc32dbgpthr_la_CFLAGS= \
 	$(GLOBUS_GCC32DBGPTHR_CFLAGS)
 
 libattcert_gcc32dbgpthr_la_LIBADD = \
-	$(GLOBUS_GCC32DBGPTHR_GSS_LIBS)
+	$(GLOBUS_GCC32DBGPTHR_GSS_API_LIBS)
 
 libccattcert_gcc32dbgpthr_la_SOURCES = \
 	create.cc \
@@ -173,7 +173,7 @@ libccattcert_gcc32dbgpthr_la_SOURCES = \
 
 libccattcert_gcc32dbgpthr_la_LIBADD  = \
 	libattcert_gcc32dbgpthr.la \
-	$(GLOBUS_GCC32DBGPTHR_GSS_LIBS)
+	$(GLOBUS_GCC32DBGPTHR_GSS_API_LIBS)
 
 libattcert_gcc64_la_SOURCES = \
 	validate.c \
@@ -190,7 +190,7 @@ libattcert_gcc64_la_CFLAGS= \
 	$(GLOBUS_GCC64_CFLAGS)
 
 libattcert_gcc64_la_LIBADD = \
-	$(GLOBUS_GCC64_GSS_LIBS)
+	$(GLOBUS_GCC64_GSS_API_LIBS)
 
 libccattcert_gcc64_la_SOURCES = \
 	create.cc \
@@ -198,7 +198,7 @@ libccattcert_gcc64_la_SOURCES = \
 
 libccattcert_gcc64_la_LIBADD  = \
 	libattcert_gcc64.la \
-	$(GLOBUS_GCC64_GSS_LIBS)
+	$(GLOBUS_GCC64_GSS_API_LIBS)
 
 libattcert_gcc64dbg_la_SOURCES = \
 	validate.c \
@@ -215,7 +215,7 @@ libattcert_gcc64dbg_la_CFLAGS= \
 	$(GLOBUS_GCC64DBG_CFLAGS)
 
 libattcert_gcc64dbg_la_LIBADD = \
-	$(GLOBUS_GCC64DBG_GSS_LIBS)
+	$(GLOBUS_GCC64DBG_GSS_API_LIBS)
 
 libccattcert_gcc64dbg_la_SOURCES = \
 	create.cc \
@@ -223,7 +223,7 @@ libccattcert_gcc64dbg_la_SOURCES = \
 
 libccattcert_gcc64dbg_la_LIBADD  = \
 	libattcert_gcc64dbg.la \
-	$(GLOBUS_GCC64DBG_GSS_LIBS)
+	$(GLOBUS_GCC64DBG_GSS_API_LIBS)
 
 libattcert_gcc64pthr_la_SOURCES = \
 	validate.c \
@@ -240,7 +240,7 @@ libattcert_gcc64pthr_la_CFLAGS= \
 	$(GLOBUS_GCC64PTHR_CFLAGS)
 
 libattcert_gcc64pthr_la_LIBADD = \
-	$(GLOBUS_GCC64PTHR_GSS_LIBS)
+	$(GLOBUS_GCC64PTHR_GSS_API_LIBS)
 
 libccattcert_gcc64pthr_la_SOURCES = \
 	create.cc \
@@ -248,7 +248,7 @@ libccattcert_gcc64pthr_la_SOURCES = \
 
 libccattcert_gcc64pthr_la_LIBADD  = \
 	libattcert_gcc64pthr.la \
-	$(GLOBUS_GCC64PTHR_GSS_LIBS)
+	$(GLOBUS_GCC64PTHR_GSS_API_LIBS)
 
 libattcert_gcc64dbgpthr_la_SOURCES = \
 	validate.c \
@@ -265,7 +265,7 @@ libattcert_gcc64dbgpthr_la_CFLAGS= \
 	$(GLOBUS_GCC64DBGPTHR_CFLAGS)
 
 libattcert_gcc64dbgpthr_la_LIBADD = \
-	$(GLOBUS_GCC64DBGPTHR_GSS_LIBS)
+	$(GLOBUS_GCC64DBGPTHR_GSS_API_LIBS)
 
 libccattcert_gcc64dbgpthr_la_SOURCES = \
 	create.cc \
@@ -273,7 +273,7 @@ libccattcert_gcc64dbgpthr_la_SOURCES = \
 
 libccattcert_gcc64dbgpthr_la_LIBADD  = \
 	libattcert_gcc64dbgpthr.la \
-	$(GLOBUS_GCC64DBGPTHR_GSS_LIBS)
+	$(GLOBUS_GCC64DBGPTHR_GSS_API_LIBS)
 
 EXTRA_DIST = \
 	acerrors.h \

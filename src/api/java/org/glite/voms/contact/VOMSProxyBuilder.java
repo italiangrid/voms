@@ -1,16 +1,16 @@
 /*********************************************************************
  *
- * Authors: 
- *      
+ * Authors:
+ *
  *      Vincenzo Ciaschini - vincenzo.ciaschini@cnaf.infn.it
  *      Andrea Ceccanti - andrea.ceccanti@cnaf.infn.it
  *
  * Uses some code originally developed by:
- *      Gidon Moont - g.moont@imperial.ac.uk  
- *          
- * Copyright (c) 2002, 2003, 2004, 2005, 2006 INFN-CNAF on behalf 
+ *      Gidon Moont - g.moont@imperial.ac.uk
+ *
+ * Copyright (c) 2002, 2003, 2004, 2005, 2006 INFN-CNAF on behalf
  * of the EGEE project.
- * 
+ *
  * For license conditions see LICENSE
  *
  * Parts of this code may be based upon or even include verbatim pieces,
@@ -50,6 +50,7 @@ import java.util.Random;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
 import java.util.TimeZone;
+import java.util.Vector;
 
 import java.math.BigInteger;
 
@@ -66,13 +67,6 @@ import org.bouncycastle.asn1.x509.KeyUsage;
 import org.bouncycastle.jce.X509V3CertificateGenerator;
 
 import org.glite.voms.ac.AttributeCertificate;
-import org.globus.gsi.GSIConstants;
-import org.globus.gsi.GlobusCredential;
-
-import org.globus.gsi.bc.BouncyCastleCertProcessingFactory;
-import org.globus.gsi.bc.X509NameHelper;
-
-import org.globus.gsi.proxy.ext.ProxyPolicy;
 
 
 class ExtensionData {
@@ -94,7 +88,7 @@ class ExtensionData {
         ed.obj = obj;
         ed.oid = oid;
         ed.critical = false;
-        
+
         return ed;
     }
 
@@ -112,174 +106,87 @@ class ExtensionData {
 }
 
 /**
- * 
+ *
  * This class implements VOMS X509 proxy certificates creation.
- * 
+ *
  * @author Andrea Ceccanti
- *  
  *
  */
 public class VOMSProxyBuilder {
 
     private static final Logger log = Logger.getLogger( VOMSProxyBuilder.class );
-    
+
     public static final int GT2_PROXY = 2;
     public static final int GT3_PROXY = 3;
     public static final int GT4_PROXY = 4;
-    
+
     public static final int DEFAULT_PROXY_TYPE = GT2_PROXY;
-    
-    public static final int DEFAULT_DELEGATION_TYPE = GSIConstants.DELEGATION_FULL;
-    
+
+    public static final int DEFAULT_DELEGATION_TYPE = VOMSProxyConstants.DELEGATION_FULL;
+
     public static final int DEFAULT_PROXY_LIFETIME = 86400;
-    
+
     private static final String PROXY_CERT_INFO_V3_OID = "1.3.6.1.4.1.3536.1.222";
     private static final String PROXY_CERT_INFO_V4_OID = "1.3.6.1.5.5.7.1.14";
 
     /**
-     * 
+     *
      * This methods buils an {@link AttributeCertificate} (AC) object starting from an array of bytes.
-     * 
-     * @param acBytes, the byte array containing the attribute certificate. 
+     *
+     * @param acBytes, the byte array containing the attribute certificate.
      * @return the {@link AttributeCertificate} object
-     * @throws VOMSException, in case of parsing errors. 
+     * @throws VOMSException, in case of parsing errors.
      */
     public static AttributeCertificate buildAC(byte[] acBytes){
-        
+
         ByteArrayInputStream bai = new ByteArrayInputStream(acBytes);
         AttributeCertificate ac;
-        
+
         try {
             ac = AttributeCertificate.getInstance( bai );
             return ac;
-        
+
         } catch ( IOException e ) {
             log.error("Error parsing attribute certificate:"+e.getMessage());
-            
+
             if (log.isDebugEnabled())
                 log.error(e.getMessage(),e);
-            
+
             throw new VOMSException(e);
-            
-        }
-    }
-    
-    /**
-     * This methods creates a non-voms proxy using the {@link UserCredentials} passed 
-     * as arguments. The proxy is created with a default lifetime of 3600 seconds. 
-     * @param cred, the {@link UserCredentials} from which the proxy must be created.
-     * @return a {@link GlobusCredential} object that represents the proxy.
-     */
-    public static GlobusCredential buildProxy (UserCredentials cred){
-        return buildProxy( cred, 3600, DEFAULT_PROXY_TYPE );
-    }
-    
-    
-    /**
-     * This methods creates a non-voms proxy using the {@link UserCredentials} passed 
-     * as arguments. 
-     * 
-     * @param cred, the {@link UserCredentials} from which the proxy must be created.
-     * @param lifetime, the lifetime (in seconds) of the generated proxy.
-     * @return a {@link GlobusCredential} object that represents the proxy.
-     */
-    public static GlobusCredential buildProxy( UserCredentials cred, int lifetime, int proxyType  ) {
 
-        BouncyCastleCertProcessingFactory factory = BouncyCastleCertProcessingFactory
-                .getDefault();
-
-        try {
-
-            return factory.createCredential(
-                    cred.getUserChain(), 
-                    cred.getUserKey().getPrivateKey(),
-                    512, 
-                    lifetime, 
-                    GSIConstants.DELEGATION_FULL );
-
-        } catch ( GeneralSecurityException e ) {
-            log.error("Error creating temp proxy: "+e.getMessage());
-            
-            if (log.isDebugEnabled())
-                log.error(e.getMessage(),e);
-            
-            throw new VOMSException(e);
-        } catch (Throwable e){
-            
-            log.error("Error creating temp proxy: "+e.getMessage());
-            if (log.isDebugEnabled())
-                log.error(e.getMessage(),e);
-            
-            throw new VOMSException(e.getMessage(),e.getCause());
-            
         }
     }
 
 
     /**
-     * 
+     *
      * This method is used to create a VOMS proxy starting from the {@link UserCredentials}
      * passed as arguments and including a list of {@link AttributeCertificate} objects that
      * will be included in the proxy.
-     * 
-     * @param cred, the {@link UserCredentials} from which the proxy must be created.
-     * @param ACs, the list of {@link AttributeCertificate} objects.
-     * @param lifetime, the lifetime in seconds of the generated proxy.
-     * @return a {@link GlobusCredential} object that represents the proxy.
-     * @throws {@link VOMSException}, if something goes wrong.
-     * 
-     * @author Andrea Ceccanti
-     * @author Gidon Moont
-     * 
-     *  
-     */
-    public static GlobusCredential buildProxy( UserCredentials cred,
-            List ACs, int lifetime ) {
-        try {
-            return buildProxy(cred, ACs, lifetime, DEFAULT_PROXY_TYPE,
-                              DEFAULT_DELEGATION_TYPE, null);
-        }
-        catch (Throwable e){
-            
-            log.error("Error creating proxy: "+e.getMessage());
-            if (log.isDebugEnabled())
-                log.error(e.getMessage(),e);
-            
-            throw new VOMSException(e.getMessage(),e.getCause());
-            
-        }
-
-    }
-
-    /**
-     * 
-     * This method is used to create a VOMS proxy starting from the {@link UserCredentials}
-     * passed as arguments and including a list of {@link AttributeCertificate} objects that
-     * will be included in the proxy.
-     * 
+     *
      * @param cred, the {@link UserCredentials} from which the proxy must be created.
      * @param ACs, the list of {@link AttributeCertificate} objects.
      * @param lifetime, the lifetime in seconds of the generated proxy.
      * @param version, the version of globus to which the proxy conforms
      * @return a {@link GlobusCredential} object that represents the proxy.
      * @throws {@link VOMSException}, if something goes wrong.
-     * 
+     *
      * @author Vincenzo Ciaschini
      * @author Andrea Ceccanti
-     * 
-     *  
+     *
+     *
      */
-    public static GlobusCredential buildProxy( UserCredentials cred,
+    public static UserCredentials buildProxy( UserCredentials cred,
             List ACs, int lifetime, int gtVersion, int delegType,
             String policyType) {
-        
+
         if (ACs.isEmpty())
             throw new VOMSException("Please specify a non-empty list of attribute certificate to build a voms-proxy.");
-        
+
         Iterator i = ACs.iterator();
-        
+
         DEREncodableVector acVector = new DEREncodableVector();
-        
+
         while (i.hasNext())
             acVector.add( (AttributeCertificate)i.next() );
 
@@ -288,8 +195,8 @@ public class VOMSProxyBuilder {
         if (ACs.size() != 0) {
             DERSequence seqac = new DERSequence( acVector );
             DERSequence seqacwrap = new DERSequence( seqac );
-            extensions.put("1.3.6.1.4.1.8005.100.100.5", 
-                           ExtensionData.creator("1.3.6.1.4.1.8005.100.100.5", 
+            extensions.put("1.3.6.1.4.1.8005.100.100.5",
+                           ExtensionData.creator("1.3.6.1.4.1.8005.100.100.5",
                                                  seqacwrap));
         }
 
@@ -299,9 +206,9 @@ public class VOMSProxyBuilder {
                                                           keyUsage.getDERObject()));
 
         //        try {
-            GlobusCredential proxy = myCreateCredential(
-                               cred.getUserChain(), 
-                               cred.getUserKey().getPrivateKey(), 512, lifetime,
+            UserCredentials proxy = myCreateCredential(
+                               cred.getUserChain(),
+                               cred.getUserKey(), 512, lifetime,
                                delegType, gtVersion, extensions, policyType );
 
             return proxy;
@@ -319,17 +226,22 @@ public class VOMSProxyBuilder {
 
     }
 
+    public static UserCredentials buildProxy(UserCredentials cred, int lifetime, int proxy_type) {
+        return myCreateCredential(cred.getUserChain(),
+                                  cred.getUserKey(), 1024, lifetime,
+                                  proxy_type, GT2_PROXY, new HashMap(), "");
+    }
 
-    private static GlobusCredential myCreateCredential(X509Certificate[] certs,
-                                                       PrivateKey privateKey,
-                                                       int bits,
-                                                       int lifetime,
-                                                       int delegationMode,
-                                                       int gtVersion,
-                                                       HashMap extensions,
-                                                       String policyType) {
+    private static UserCredentials myCreateCredential(X509Certificate[] certs,
+                                                     PrivateKey privateKey,
+                                                     int bits,
+                                                     int lifetime,
+                                                     int delegationMode,
+                                                     int gtVersion,
+                                                     HashMap extensions,
+                                                     String policyType) {
         KeyPairGenerator keys = null;
-        
+
         try {
             keys = KeyPairGenerator.getInstance("RSA", "BC");
         }
@@ -337,32 +249,37 @@ public class VOMSProxyBuilder {
             log.error("Error activating bouncycastle: "+e.getMessage());
             if (log.isDebugEnabled())
                 log.error(e.getMessage(),e);
-            
+
             throw new VOMSException(e.getMessage(),e.getCause());
         }
         catch (NoSuchProviderException e) {
             log.error("Error activating bouncycastle: "+e.getMessage());
             if (log.isDebugEnabled())
                 log.error(e.getMessage(),e);
-            
+
             throw new VOMSException(e.getMessage(),e.getCause());
         }
-            
+
         keys.initialize(bits);
         KeyPair pair = keys.genKeyPair();
 
         X509Certificate proxy = myCreateProxyCertificate(certs[0], privateKey,
                                                          pair.getPublic(), lifetime,
                                                          delegationMode,
-                                                         gtVersion, 
+                                                         gtVersion,
                                                          extensions,
                                                          policyType);
 
         X509Certificate[] newCerts = new X509Certificate[certs.length+1];
         newCerts[0] = proxy;
         System.arraycopy(certs, 0, newCerts, 1, certs.length);
-	
-        return new GlobusCredential(pair.getPrivate(), newCerts);
+        if (log.isDebugEnabled()) {
+            for (int i =0; i < newCerts.length; i++)
+                log.debug("CERT["+i+"] IS: " +newCerts[i].getSubjectDN());
+        }
+
+
+        return UserCredentials.instance(pair.getPrivate(), newCerts);
     }
 
     private static X509Certificate myCreateProxyCertificate(X509Certificate cert,
@@ -383,10 +300,10 @@ public class VOMSProxyBuilder {
         case GT2_PROXY:
             serialNum = cert.getSerialNumber();
             switch (delegationMode) {
-            case GSIConstants.DELEGATION_LIMITED:
+            case VOMSProxyConstants.DELEGATION_LIMITED:
                 cnValue="limited proxy";
                 break;
-            case GSIConstants.DELEGATION_FULL:
+            case VOMSProxyConstants.DELEGATION_FULL:
                 cnValue="proxy";
                 break;
             default:
@@ -406,30 +323,30 @@ public class VOMSProxyBuilder {
                 if (policyType == null ) {
 
                     switch (delegationMode) {
-                    case GSIConstants.DELEGATION_LIMITED:
-                    case GSIConstants.GSI_2_LIMITED_PROXY:
-                    case GSIConstants.GSI_3_LIMITED_PROXY:
+                    case VOMSProxyConstants.DELEGATION_LIMITED:
+                    case VOMSProxyConstants.GSI_2_LIMITED_PROXY:
+                    case VOMSProxyConstants.GSI_3_LIMITED_PROXY:
                         policy = new ProxyPolicy(ProxyPolicy.LIMITED);
                         break;
 
-                    case GSIConstants.DELEGATION_FULL:
-                    case GSIConstants.GSI_2_PROXY:
-                    case GSIConstants.GSI_3_IMPERSONATION_PROXY:
+                    case VOMSProxyConstants.DELEGATION_FULL:
+                    case VOMSProxyConstants.GSI_2_PROXY:
+                    case VOMSProxyConstants.GSI_3_IMPERSONATION_PROXY:
                         policy = new ProxyPolicy(ProxyPolicy.IMPERSONATION);
                         break;
 
-                    case GSIConstants.GSI_3_RESTRICTED_PROXY:
+                    case VOMSProxyConstants.GSI_3_RESTRICTED_PROXY:
                         throw new IllegalArgumentException("Restricted proxy requires ProxyCertInfo");
 
-                    case GSIConstants.GSI_3_INDEPENDENT_PROXY:
+                    case VOMSProxyConstants.GSI_3_INDEPENDENT_PROXY:
                         policy = new ProxyPolicy(ProxyPolicy.INDEPENDENT);
                         break;
-                        
+
                     default:
                         throw new IllegalArgumentException("Invalid proxyType");
                     }
                 }
-                else { 
+                else {
                     try {
                         policy = new ProxyPolicy(new DERObjectIdentifier(policyType));
                     }
@@ -443,7 +360,7 @@ public class VOMSProxyBuilder {
                                    ExtensionData.creator(PROXY_CERT_INFO_V3_OID,
                                                          new MyProxyCertInfo(policy, gtVersion).getDERObject()));
                 else
-                    extensions.put(PROXY_CERT_INFO_V4_OID, 
+                    extensions.put(PROXY_CERT_INFO_V4_OID,
                                    ExtensionData.creator(PROXY_CERT_INFO_V4_OID, true,
                                                          new MyProxyCertInfo(policy, gtVersion).getDERObject()));
             }
@@ -454,14 +371,14 @@ public class VOMSProxyBuilder {
             certGen.addExtension(exts[i].getOID(), exts[i].getCritical(), exts[i].getObj());
 
         X509Name issuerDN = (X509Name)cert.getSubjectDN();
-        
-        X509NameHelper issuer  = new X509NameHelper(issuerDN);
-	
-        X509NameHelper subject = new X509NameHelper(issuerDN);
-        subject.add(X509Name.CN, cnValue);
-	
-        certGen.setSubjectDN(subject.getAsName());
-        certGen.setIssuerDN(issuer.getAsName());
+        Vector oids   = issuerDN.getOIDs();
+        Vector values = issuerDN.getValues();
+        oids.add(X509Name.CN);
+        values.add(cnValue);
+        X509Name subjectDN = new X509Name(oids, values);
+
+        certGen.setSubjectDN(subjectDN);
+        certGen.setIssuerDN(issuerDN);
 
         certGen.setSerialNumber(serialNum);
         certGen.setPublicKey(publicKey);
@@ -472,7 +389,7 @@ public class VOMSProxyBuilder {
         /* Allow for a five minute clock skew here. */
         date.add(Calendar.MINUTE, -5);
         certGen.setNotBefore(date.getTime());
-        
+
         /* If hours = 0, then cert lifetime is set to user cert */
         if (lifetime <= 0) {
             certGen.setNotAfter(cert.getNotAfter());
@@ -487,55 +404,54 @@ public class VOMSProxyBuilder {
         }
         catch (SignatureException e) {
             log.error("Error creating proxy: "+e.getMessage());
-            
+
             if (log.isDebugEnabled())
                 log.error(e.getMessage(),e);
-            
+
             throw new VOMSException(e);
         }
         catch (InvalidKeyException e) {
             log.error("Error creating proxy: "+e.getMessage());
-            
+
             if (log.isDebugEnabled())
                 log.error(e.getMessage(),e);
-            
+
             throw new VOMSException(e);
         }
     }
 
     /**
      * This method is write a globus proxy to an output stream.
-     *  
+     *
      * @param cred
      * @param os
      */
-    public static void saveProxy( GlobusCredential cred, OutputStream os ) {
+    public static void saveProxy( UserCredentials cred, OutputStream os ) {
 
         try {
-            
+
             cred.save( os );
-            
         } catch ( IOException e ) {
             log.error("Error saving generated proxy: "+e.getMessage() );
-            
+
             if (log.isDebugEnabled())
                 log.error(e.getMessage(),e);
-            throw new VOMSException("Error saving generated proxy: "+e.getMessage(),e);
+            throw new VOMSException("Error saving generated proxy: "+ e.getMessage(), e);
         }
-        
+
     }
 
     /**
      * This method saves a globus proxy to a file.
-     * 
+     *
      * @param cred
      * @param filename
      * @throws FileNotFoundException
      */
-    public static void saveProxy( GlobusCredential cred, String filename )
+    public static void saveProxy( UserCredentials cred, String filename )
             throws FileNotFoundException {
 
         saveProxy( cred, new FileOutputStream( filename ) );
     }
-    
+
 }

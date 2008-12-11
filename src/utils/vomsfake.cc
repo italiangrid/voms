@@ -135,7 +135,8 @@ Fake::Fake(int argc, char ** argv) :   confile(CONFILENAME),
                                        classs_add_buf(NULL),
                                        class_add_buf_len(0),
 #endif					   
-                                       pcd(NULL), aclist(NULL), voID(""),
+                                       ucert(NULL), upkey(NULL), cert_chain(NULL),
+                                       aclist(NULL), voID(""),
                                        hostcert(""), hostkey(""),
                                        newformat(false)
 {
@@ -381,9 +382,6 @@ Fake::~Fake() {
   if(outfile)  
     free(outfile);
 
-  if(pcd)
-    proxy_cred_desc_free(pcd);
-  
   OBJ_cleanup();
 
 }
@@ -488,7 +486,7 @@ bool Fake::CreateProxy(std::string data, std::string filedata, AC ** aclist, BIG
   }
 #endif
   
-  if (proxy_genreq(pcd->ucert, &req, &npkey, bits, (int (*)())kpcallback, pcd))
+  if (proxy_genreq(ucert, &req, &npkey, bits, (int (*)())kpcallback))
     goto err;
 
   /* Add proxy extensions */
@@ -689,7 +687,7 @@ bool Fake::CreateProxy(std::string data, std::string filedata, AC ** aclist, BIG
     
   }
   
-  if (proxy_sign(pcd->ucert, pcd->upkey, req, &ncert, hours*60*60,
+  if (proxy_sign(ucert, upkey, req, &ncert, hours*60*60,
                  extensions, limit_proxy, version)) {
     goto err;
   }
@@ -697,7 +695,7 @@ bool Fake::CreateProxy(std::string data, std::string filedata, AC ** aclist, BIG
   if ((bp = BIO_new(BIO_s_file())) != NULL)
     BIO_set_fp(bp, fpout, BIO_NOCLOSE);
   
-  if (proxy_marshal_bp(bp, ncert, npkey, pcd->ucert, pcd->cert_chain))
+  if (proxy_marshal_bp(bp, ncert, npkey, ucert, cert_chain))
     goto err;
   
   if (!quiet) std::cout << " Done" << std::endl << std::flush;
@@ -828,7 +826,7 @@ void Fake::Test() {
   ASN1_UTCTIME * asn1_time = ASN1_UTCTIME_new();
   X509_gmtime_adj(asn1_time, 0);
   time_t time_now = ASN1_UTCTIME_mktime(asn1_time);
-  time_t time_after = ASN1_UTCTIME_mktime(X509_get_notAfter(pcd->ucert));
+  time_t time_after = ASN1_UTCTIME_mktime(X509_get_notAfter(ucert));
   time_t time_diff = time_after - time_now ;
 
   if (!quiet) {
@@ -918,33 +916,8 @@ bool Fake::pcdInit() {
   if ((bio_err = BIO_new(BIO_s_file())) != NULL)
     BIO_set_fp(bio_err, stderr, BIO_NOCLOSE);
 
-  if ((pcd = proxy_cred_desc_new()) == NULL)
-    goto err;  
-  
-  pcd->type = CRED_TYPE_PERMANENT;
-  
-  if (noregen) {
 
-    std::string oldoutfile = "";
-    if (outfile)
-      oldoutfile = outfile;
-
-    bool modify = false;
-    outfile = NULL;
-    if (certfile == NULL && keyfile == NULL) 
-      modify = true;
-
-    if (proxy_get_filenames(pcd, 0, &cacertfile, &certdir, &outfile, &certfile, &keyfile))
-      goto err;
-
-    //    if (modify)
-    //      certfile = keyfile = outfile;
-    outfile = (oldoutfile.empty() ? NULL : const_cast<char *>(oldoutfile.c_str()));
-
-    if ( proxy_get_filenames(pcd, 0, &cacertfile, &certdir, &outfile, &certfile, &keyfile))
-      goto err;
-  }
-  else if (proxy_get_filenames(pcd, 0, &cacertfile, &certdir, &outfile, &certfile, &keyfile))
+  if (!determine_filenames(&cacertfile, &certdir, &outfile, &certfile, &keyfile, noregen))
     goto err;
   
   if (debug) std::cout << "Files being used:" << std::endl 
@@ -957,38 +930,8 @@ bool Fake::pcdInit() {
   if (debug)
     std::cout << "Output to " << outfile << std::endl << std::flush;
   
-  if (this->certdir)
-    pcd->certdir = strdup(this->certdir);
-
-  if (!strncmp(this->certfile, "SC:", 3))
-    EVP_set_pw_prompt("Enter card pin:");
-  else
-    EVP_set_pw_prompt(const_cast<char *>("Enter GRID pass phrase for this identity:"));
-  
-  if (proxy_load_user_cert(pcd, this->certfile, pw_cb, NULL))
+  if (!load_credentials(certfile, keyfile, &ucert, &cert_chain, &upkey, pw_cb))
     goto err;
-  
-  if (!quiet) {
-    char * s = NULL;
-    s = X509_NAME_oneline(X509_get_subject_name(pcd->ucert),NULL,0);
-    std::cout << "Your identity: " << s << std::endl;
-    free(s);
-  }
-  
-  EVP_set_pw_prompt("Enter GRID pass phrase:");
-  
-  if (!strncmp(this->keyfile, "SC:", 3))
-    EVP_set_pw_prompt("Enter card pin:");
-
-  if (proxy_load_user_key(pcd, this->keyfile, pw_cb, NULL))
-    goto err;
-  
-  if (strncmp(this->certfile, "SC:", 3) && !strcmp(this->certfile, this->keyfile)) {
-    if (pcd->cert_chain == NULL)
-      pcd->cert_chain = sk_X509_new_null();
-    if (proxy_load_user_proxy(pcd->cert_chain, this->certfile, NULL) < 0)
-      goto err;
-  } 
   
   status = true;
   

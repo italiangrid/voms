@@ -60,13 +60,13 @@ voms_proxy_init_OBJECTS = $(am_voms_proxy_init_OBJECTS)
 am__DEPENDENCIES_1 =
 voms_proxy_init_DEPENDENCIES =  \
 	$(top_builddir)/src/common/libutilities.la \
-	$(top_builddir)/src/ac/$(USE_ATTCERT_LIB) \
-	$(top_builddir)/src/ac/$(USE_CCATTCERT_LIB) \
+	$(top_builddir)/src/ac/libattcert.la \
+	$(top_builddir)/src/ac/libccattcert.la \
 	$(top_builddir)/src/common/libutilc.la \
 	$(top_builddir)/src/replib/librep.la \
 	$(top_builddir)/src/log/liblog.la \
-	$(top_builddir)/src/api/ccapi/$(USE_CCAPI_LIB) \
-	$(top_builddir)/src/sslutils/$(USE_SSL_UTILS_LIB) \
+	$(top_builddir)/src/api/ccapi/libvomsapi_nog.la \
+	$(top_builddir)/src/sslutils/libssl_utils_nog.la \
 	$(am__DEPENDENCIES_1)
 DEFAULT_INCLUDES = -I. -I$(srcdir) -I$(top_builddir)/src/autogen
 depcomp = $(SHELL) $(top_srcdir)/./project/depcomp
@@ -143,21 +143,30 @@ GLITE_CFLAGS = @GLITE_CFLAGS@
 GLITE_LOCATION = @GLITE_LOCATION@
 GLOBUS_CFLAGS = @GLOBUS_CFLAGS@
 GLOBUS_GCC32DBGPTHR_CFLAGS = @GLOBUS_GCC32DBGPTHR_CFLAGS@
+GLOBUS_GCC32DBGPTHR_GSS_API_LIBS = @GLOBUS_GCC32DBGPTHR_GSS_API_LIBS@
 GLOBUS_GCC32DBGPTHR_GSS_LIBS = @GLOBUS_GCC32DBGPTHR_GSS_LIBS@
 GLOBUS_GCC32DBG_CFLAGS = @GLOBUS_GCC32DBG_CFLAGS@
+GLOBUS_GCC32DBG_GSS_API_LIBS = @GLOBUS_GCC32DBG_GSS_API_LIBS@
 GLOBUS_GCC32DBG_GSS_LIBS = @GLOBUS_GCC32DBG_GSS_LIBS@
 GLOBUS_GCC32PTHR_CFLAGS = @GLOBUS_GCC32PTHR_CFLAGS@
+GLOBUS_GCC32PTHR_GSS_API_LIBS = @GLOBUS_GCC32PTHR_GSS_API_LIBS@
 GLOBUS_GCC32PTHR_GSS_LIBS = @GLOBUS_GCC32PTHR_GSS_LIBS@
 GLOBUS_GCC32_CFLAGS = @GLOBUS_GCC32_CFLAGS@
+GLOBUS_GCC32_GSS_API_LIBS = @GLOBUS_GCC32_GSS_API_LIBS@
 GLOBUS_GCC32_GSS_LIBS = @GLOBUS_GCC32_GSS_LIBS@
 GLOBUS_GCC64DBGPTHR_CFLAGS = @GLOBUS_GCC64DBGPTHR_CFLAGS@
+GLOBUS_GCC64DBGPTHR_GSS_API_LIBS = @GLOBUS_GCC64DBGPTHR_GSS_API_LIBS@
 GLOBUS_GCC64DBGPTHR_GSS_LIBS = @GLOBUS_GCC64DBGPTHR_GSS_LIBS@
 GLOBUS_GCC64DBG_CFLAGS = @GLOBUS_GCC64DBG_CFLAGS@
+GLOBUS_GCC64DBG_GSS_API_LIBS = @GLOBUS_GCC64DBG_GSS_API_LIBS@
 GLOBUS_GCC64DBG_GSS_LIBS = @GLOBUS_GCC64DBG_GSS_LIBS@
 GLOBUS_GCC64PTHR_CFLAGS = @GLOBUS_GCC64PTHR_CFLAGS@
+GLOBUS_GCC64PTHR_GSS_API_LIBS = @GLOBUS_GCC64PTHR_GSS_API_LIBS@
 GLOBUS_GCC64PTHR_GSS_LIBS = @GLOBUS_GCC64PTHR_GSS_LIBS@
 GLOBUS_GCC64_CFLAGS = @GLOBUS_GCC64_CFLAGS@
+GLOBUS_GCC64_GSS_API_LIBS = @GLOBUS_GCC64_GSS_API_LIBS@
 GLOBUS_GCC64_GSS_LIBS = @GLOBUS_GCC64_GSS_LIBS@
+GLOBUS_GSS_API_LIBS = @GLOBUS_GSS_API_LIBS@
 GLOBUS_GSS_LIBS = @GLOBUS_GSS_LIBS@
 HAVE_DOCBOOK_MAN_FALSE = @HAVE_DOCBOOK_MAN_FALSE@
 HAVE_DOCBOOK_MAN_TRUE = @HAVE_DOCBOOK_MAN_TRUE@
@@ -201,6 +210,7 @@ USE_CCAPI_LIB = @USE_CCAPI_LIB@
 USE_CCATTCERT_LIB = @USE_CCATTCERT_LIB@
 USE_OLDGAA_LIB = @USE_OLDGAA_LIB@
 USE_SOCK_LIB = @USE_SOCK_LIB@
+USE_SOCK_LIB_SERVER = @USE_SOCK_LIB_SERVER@
 USE_SSL_UTILS_LIB = @USE_SSL_UTILS_LIB@
 VAR_LOCATION_ENV = @VAR_LOCATION_ENV@
 VERSION = @VERSION@
@@ -274,13 +284,13 @@ voms_proxy_init_SOURCES = \
 
 voms_proxy_init_LDADD = \
 	$(top_builddir)/src/common/libutilities.la \
-	$(top_builddir)/src/ac/$(USE_ATTCERT_LIB) \
-  $(top_builddir)/src/ac/$(USE_CCATTCERT_LIB) \
+	$(top_builddir)/src/ac/libattcert.la \
+  $(top_builddir)/src/ac/libccattcert.la \
 	$(top_builddir)/src/common/libutilc.la \
 	$(top_builddir)/src/replib/librep.la \
 	$(top_builddir)/src/log/liblog.la \
-  $(top_builddir)/src/api/ccapi/$(USE_CCAPI_LIB) \
-  $(top_builddir)/src/sslutils/$(USE_SSL_UTILS_LIB) \
+  $(top_builddir)/src/api/ccapi/libvomsapi_nog.la \
+  $(top_builddir)/src/sslutils/libssl_utils_nog.la \
 	$(EXPAT_LIBS)
 
 AM_CPPFLAGS = -I$(top_srcdir)/src/api/ccapi \

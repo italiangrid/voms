@@ -377,3 +377,13 @@
 #ifdef __cplusplus
 #include <new>
 #endif
+
+#ifdef __GNUC__
+#define UNUSED(z)  z __attribute__ ((unused))
+#define PRIVATE    __attribute__ ((visibility ("hidden")))
+#define PUBLIC     __attribute__ ((visibility ("default")))
+#else
+#define UNUSED
+#define PRIVATE
+#define PUBLIC
+#endif

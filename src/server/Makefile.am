@@ -11,7 +11,7 @@ voms_SOURCES = \
 	attribute.cc
 
 voms_LDADD = \
-	$(top_builddir)/src/socklib/$(USE_SOCK_LIB) \
+	$(top_builddir)/src/socklib/$(USE_SOCK_LIB_SERVER) \
 	$(top_builddir)/src/common/libutilities.la \
 	$(top_builddir)/src/sslutils/$(USE_SSL_UTILS_LIB) \
 	$(top_builddir)/src/ac/$(USE_CCATTCERT_LIB) \

@@ -56,7 +56,7 @@ the security policy associated with the targeted object.
 
 ******************************************************************************/
 
-oldgaa_error_code
+oldgaa_error_code PRIVATE
 oldgaa_get_object_policy_info(uint32          *minor_status,/* OUT */
                            oldgaa_data_ptr     object,      /* IN  */
                            oldgaa_data_ptr     policy_db,   /* IN  */
@@ -124,7 +124,7 @@ o  Detailed answer
 ******************************************************************************/
 
                                        
-oldgaa_error_code
+oldgaa_error_code PRIVATE
 oldgaa_check_authorization (uint32                 *minor_status,     /* OUT         */
                          oldgaa_sec_context_ptr     sc,               /* IN&OUT      */
                          oldgaa_policy_ptr          policy_handle,    /* IN          */
@@ -177,7 +177,7 @@ returned.
 
 ******************************************************************************/
                                         
-oldgaa_error_code
+oldgaa_error_code PRIVATE
 oldgaa_inquire_policy_info
        (uint32               *minor_status,  /* OUT    */
         oldgaa_sec_context_ptr   sc,            /* IN&OUT */

@@ -28,7 +28,6 @@ import java.util.Set;
 import org.apache.log4j.Logger;
 import org.glite.voms.PKIVerifier;
 import org.glite.voms.ac.AttributeCertificate;
-import org.globus.gsi.GlobusCredential;
 
 
 /**
@@ -78,14 +77,12 @@ public class VOMSProxyInit {
         
     }
 
-    private VOMSProxyInit(GlobusCredential credentials) {
-        if (credentials == null)
+    private VOMSProxyInit(UserCredentials userCredentials) {
+        if (userCredentials == null)
             throw new VOMSException("Unable to find GlobusCredentials!");
 
         try {
             serverMap = VOMSESFileParser.instance().buildServerMap();
-
-            userCredentials = UserCredentials.instance(credentials);
         } catch ( IOException e ) {        
             log.error( "Error parsing vomses files: "+e.getMessage() );
             if (log.isDebugEnabled())
@@ -103,7 +100,7 @@ public class VOMSProxyInit {
         return new VOMSProxyInit((String)null);
     }
 
-    public static VOMSProxyInit instance(GlobusCredential credentials) {
+    public static VOMSProxyInit instance(UserCredentials credentials) {
         return new VOMSProxyInit(credentials);
     }
 
@@ -207,16 +204,16 @@ public class VOMSProxyInit {
         log.debug("AC Validation ended at: "+ new Date(  ));
         
     }
-    public synchronized GlobusCredential getVomsProxy(){
+    public synchronized UserCredentials getVomsProxy(){
         
         return getVomsProxy( null );
         
     }
     
     
-    protected GlobusCredential getGridProxy(){
+    protected UserCredentials getGridProxy(){
         
-        GlobusCredential proxy = VOMSProxyBuilder.buildProxy( userCredentials, proxyLifetime, proxyType);
+        UserCredentials proxy = VOMSProxyBuilder.buildProxy( userCredentials, proxyLifetime, proxyType);
         
         try{
             
@@ -233,7 +230,8 @@ public class VOMSProxyInit {
         }
         
     }
-    public synchronized GlobusCredential getVomsProxy(Collection listOfReqOptions){
+
+    public synchronized UserCredentials getVomsProxy(Collection listOfReqOptions) {
         
         
         if (listOfReqOptions == null)
@@ -266,18 +264,16 @@ public class VOMSProxyInit {
         
         log.info( "ACs validation succeded." );
         
-        GlobusCredential proxy = VOMSProxyBuilder.buildProxy( userCredentials, 
-                                                              ACs, proxyLifetime, 
-                                                              proxyType, 
-                                                              delegationType,
-                                                              policyType);
+        UserCredentials proxy = VOMSProxyBuilder.buildProxy( userCredentials, 
+                                                             ACs, proxyLifetime, 
+                                                             proxyType, 
+                                                             delegationType,
+                                                             policyType);
         
-        try{
-            
+        try {            
             saveProxy( proxy );
             return proxy;
-            
-        }catch ( FileNotFoundException e ) {
+        } catch ( FileNotFoundException e ) {
             
             log.error("Error saving proxy to file "+proxyOutputFile+":"+e.getMessage());
             if (log.isDebugEnabled())
@@ -289,8 +285,7 @@ public class VOMSProxyInit {
         
     }
     
-    
-    private void saveProxy(GlobusCredential credential) throws FileNotFoundException{
+    private void saveProxy(UserCredentials credential) throws FileNotFoundException{
         
         if (proxyOutputFile != null){
             VOMSProxyBuilder.saveProxy( credential, proxyOutputFile );
@@ -309,6 +304,7 @@ public class VOMSProxyInit {
         
         
     }
+
     protected VOMSResponse contactServer(VOMSServerInfo sInfo, VOMSRequestOptions reqOptions) {
         
         log.info("Contacting server "+sInfo.compactString() );
@@ -356,25 +352,21 @@ public class VOMSProxyInit {
         return response;
            
     }
-
     
     public String getProxyOutputFile() {
     
         return proxyOutputFile;
     }
-
     
     public void setProxyOutputFile( String proxyOutputFile ) {
     
         this.proxyOutputFile = proxyOutputFile;
     }
-
     
     public int getProxyLifetime() {
     
         return proxyLifetime;
     }
-
     
     public void setProxyLifetime( int proxyLifetime ) {
     
@@ -385,13 +377,11 @@ public class VOMSProxyInit {
     
         return proxyType;
     }
-
     
     public void setProxyType( int proxyType ) {
     
         this.proxyType = proxyType;
     }
-
     
     public String getPolicyType() {
         return policyType;
@@ -405,12 +395,9 @@ public class VOMSProxyInit {
     
         return delegationType;
     }
-
     
     public void setDelegationType( int delegationType ) {
     
         this.delegationType = delegationType;
-    }
-    
-    
+    }    
 }

@@ -81,7 +81,7 @@ Returns:
 
 ******************************************************************************/
 
-int
+int PRIVATE
 oldgaa_rfc1779_name_parse(
   char *				rfc1779_string,
   char **				imported_name,
@@ -157,8 +157,8 @@ oldgaa_rfc1779_name_parse(
       {
 	/* Set rfc1779_char to value represented by hex value */
 	rfc1779_char =
-	  xdigit_to_value(*rfc1779_string) << 4 +
-	  xdigit_to_value(*(rfc1779_string + 1));
+	  (xdigit_to_value(*rfc1779_string) << 4) +
+	  (xdigit_to_value(*(rfc1779_string + 1)));
 	
 	rfc1779_string += 2;
       }

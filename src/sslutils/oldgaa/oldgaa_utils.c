@@ -30,6 +30,13 @@ Description:
 #include "globus_oldgaa.h" 
 #include "oldgaa_utils.h"
 
+extern int oldgaa_rfc1779_name_parse(char *rfc1779_string,
+                                     char **imported_name,
+                                     char **errstring);
+
+static
+char *
+oldgaa_to_regex(const char * const glob_regex);
 
 /**********************************************************************
                        Define module specific variables
@@ -58,7 +65,7 @@ Returns:
 
 ******************************************************************************/
 
-void
+void PRIVATE
 oldgaa_handle_error(char       **errstring,
                     const char *const message)
 {
@@ -92,7 +99,7 @@ Returns:
 
 **********************************************************************/
 
-int
+int PRIVATE
 oldgaa_strings_match(
                      const char * const			string1,
                      const char * const 			string2)
@@ -121,7 +128,7 @@ oldgaa_strings_match(
  *     or a NULL pointer.
  *****************************************************************************/
 
-char *
+char PRIVATE *
 oldgaa_strcopy(const char *s, char *r)
 {
   int	slen;
@@ -148,7 +155,7 @@ oldgaa_strcopy(const char *s, char *r)
   Compare elements
 **********************************************************************/
 
-int
+int PRIVATE
 oldgaa_compare_principals(oldgaa_principals_ptr element,
                           oldgaa_principals_ptr new)
 {
@@ -165,7 +172,7 @@ oldgaa_compare_principals(oldgaa_principals_ptr element,
 /****************************************************************************-*/
 
 
-int
+int PRIVATE
 oldgaa_compare_rights(oldgaa_rights_ptr element, oldgaa_rights_ptr new)
 {
   if (element == NULL || new == NULL)
@@ -181,7 +188,7 @@ oldgaa_compare_rights(oldgaa_rights_ptr element, oldgaa_rights_ptr new)
 /****************************************************************************-*/
 
 
-int
+int PRIVATE
 oldgaa_compare_conditions(oldgaa_conditions_ptr element, 
                           oldgaa_conditions_ptr new)
 {
@@ -194,7 +201,7 @@ oldgaa_compare_conditions(oldgaa_conditions_ptr element,
     
 /****************************************************************************-*/
 
-int
+int PRIVATE
 oldgaa_compare_sec_attrbs(oldgaa_sec_attrb_ptr element, 
                           oldgaa_sec_attrb_ptr new)
 {
@@ -209,7 +216,7 @@ oldgaa_compare_sec_attrbs(oldgaa_sec_attrb_ptr element,
   Add new element to a list
 **********************************************************************/
 
-oldgaa_principals_ptr
+oldgaa_principals_ptr PRIVATE
 oldgaa_add_principal(oldgaa_policy_ptr   *list, 
                      oldgaa_principals_ptr new)
 {
@@ -243,7 +250,7 @@ oldgaa_add_principal(oldgaa_policy_ptr   *list,
 
 /*****************************************************************************/
 
-oldgaa_rights_ptr
+oldgaa_rights_ptr PRIVATE
 oldgaa_add_rights(oldgaa_rights_ptr *list, 
                   oldgaa_rights_ptr  new)
 {
@@ -258,7 +265,7 @@ oldgaa_add_rights(oldgaa_rights_ptr *list,
 }  
 
 /*****************************************************************************/
-oldgaa_cond_bindings_ptr
+oldgaa_cond_bindings_ptr PRIVATE
 oldgaa_add_cond_binding(oldgaa_cond_bindings_ptr *list,
                         oldgaa_cond_bindings_ptr  new)
 {
@@ -277,7 +284,7 @@ oldgaa_add_cond_binding(oldgaa_cond_bindings_ptr *list,
 /*****************************************************************************/
 
 
-oldgaa_conditions_ptr
+oldgaa_conditions_ptr PRIVATE
 oldgaa_add_condition(oldgaa_conditions_ptr *list, 
                      oldgaa_conditions_ptr  new)
 {
@@ -312,7 +319,7 @@ oldgaa_add_condition(oldgaa_conditions_ptr *list,
   Add new element to a list
 **********************************************************************/
 
-oldgaa_sec_attrb_ptr
+oldgaa_sec_attrb_ptr PRIVATE
 oldgaa_add_attribute(oldgaa_sec_attrb_ptr *list, oldgaa_sec_attrb_ptr new)
 {
   oldgaa_sec_attrb_ptr element;
@@ -342,7 +349,7 @@ oldgaa_add_attribute(oldgaa_sec_attrb_ptr *list, oldgaa_sec_attrb_ptr new)
 /* oldgaa_duplicate_rights(oldgaa_rights_ptr rights, oldgaa+rights_ptr &new) */
 /* { */
 /* } */
-int
+void PRIVATE
 oldgaa_collapse_policy(oldgaa_policy_ptr *policy)
 {
   oldgaa_principals_ptr element = *policy;
@@ -415,7 +422,7 @@ oldgaa_collapse_policy(oldgaa_policy_ptr *policy)
 
 
 
-int
+int PRIVATE
 oldgaa_bind_rights_to_principals(oldgaa_principals_ptr start, 
                                  oldgaa_rights_ptr     rights)
 {
@@ -465,7 +472,7 @@ oldgaa_duplicate_conditions(oldgaa_conditions_ptr element , oldgaa_conditions_pt
   return OLDGAA_SUCCESS;
 }
 
-void
+void PRIVATE
 oldgaa_bind_rights_to_conditions(oldgaa_rights_ptr        start,
                                  oldgaa_cond_bindings_ptr cond_bind)
 {
@@ -549,7 +556,7 @@ Returns:
 	-1 on error, setting errno.
 
 **********************************************************************/
-int
+int PRIVATE
 oldgaa_check_reg_expr(char  *reg_expr, 
                       char **reg_expr_list)
 { 
@@ -595,7 +602,7 @@ Returns:
 
 **********************************************************************/
 
-int
+int PRIVATE
 oldgaa_regex_matches_string(const char * const  string,
                             const char * const  regex)
 {
@@ -646,7 +653,7 @@ Returns:
 
 **********************************************************************/
 
-char **
+char PRIVATE **
 oldgaa_parse_regex(char * str)
                 
 {

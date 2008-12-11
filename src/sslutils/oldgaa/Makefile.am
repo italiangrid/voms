@@ -17,7 +17,7 @@ liboldgaa_nog_la_CFLAGS = \
 	$(GLOBUS_CFLAGS)
 
 liboldgaa_la_LIBADD = \
-	$(GLOBUS_GSS_LIBS)
+	$(GLOBUS_GSS_API_LIBS)
 
 ###
 
@@ -31,7 +31,7 @@ EXTRA_LTLIBRARIES = \
 	liboldgaa_gcc64pthr.la \
 	liboldgaa_gcc64dbgpthr.la \
 	liboldgaa.la \
-	liboldgaa-nog.la
+	liboldgaa_nog.la
 
 liboldgaa_gcc32_la_SOURCES = \
 	$(SOURCES)
@@ -41,7 +41,7 @@ liboldgaa_gcc32_la_CFLAGS = \
 	-I $(top_srcdir)/src/include
 
 liboldgaa_gcc32_la_LIBADD = \
-	$(GLOBUS_GCC32_GSS_LIBS)
+	$(GLOBUS_GCC32_GSS_API_LIBS)
 
 liboldgaa_gcc32dbg_la_SOURCES = \
 	$(SOURCES)
@@ -51,7 +51,7 @@ liboldgaa_gcc32dbg_la_CFLAGS = \
 	-I $(top_srcdir)/src/include
 
 liboldgaa_gcc32dbg_la_LIBADD = \
-	$(GLOBUS_GCC32DBG_GSS_LIBS)
+	$(GLOBUS_GCC32DBG_GSS_API_LIBS)
 
 liboldgaa_gcc32pthr_la_SOURCES = \
 	$(SOURCES)
@@ -61,7 +61,7 @@ liboldgaa_gcc32pthr_la_CFLAGS = \
 	-I $(top_srcdir)/src/include
 
 liboldgaa_gcc32pthr_la_LIBADD = \
-	$(GLOBUS_GCC32PTHR_GSS_LIBS)
+	$(GLOBUS_GCC32PTHR_GSS_API_LIBS)
 
 liboldgaa_gcc32dbgpthr_la_SOURCES = \
 	$(SOURCES)
@@ -71,7 +71,7 @@ liboldgaa_gcc32dbgpthr_la_CFLAGS = \
 	-I $(top_srcdir)/src/include
 
 liboldgaa_gcc32dbgpthr_la_LIBADD = \
-	$(GLOBUS_GCC32DBGPTHR_GSS_LIBS)
+	$(GLOBUS_GCC32DBGPTHR_GSS_API_LIBS)
 
 liboldgaa_gcc64_la_SOURCES = \
 	$(SOURCES)
@@ -81,7 +81,7 @@ liboldgaa_gcc64_la_CFLAGS = \
 	-I $(top_srcdir)/src/include
 
 liboldgaa_gcc64_la_LIBADD = \
-	$(GLOBUS_GCC64_GSS_LIBS)
+	$(GLOBUS_GCC64_GSS_API_LIBS)
 
 liboldgaa_gcc64dbg_la_SOURCES = \
 	$(SOURCES)
@@ -91,7 +91,7 @@ liboldgaa_gcc64dbg_la_CFLAGS = \
 	-I $(top_srcdir)/src/include
 
 liboldgaa_gcc64dbg_la_LIBADD = \
-	$(GLOBUS_GCC64DBG_GSS_LIBS)
+	$(GLOBUS_GCC64DBG_GSS_API_LIBS)
 
 liboldgaa_gcc64pthr_la_SOURCES = \
 	$(SOURCES)
@@ -101,7 +101,7 @@ liboldgaa_gcc64pthr_la_CFLAGS = \
 	-I $(top_srcdir)/src/include
 
 liboldgaa_gcc64pthr_la_LIBADD = \
-	$(GLOBUS_GCC64PTHR_GSS_LIBS)
+	$(GLOBUS_GCC64PTHR_GSS_API_LIBS)
 
 liboldgaa_gcc64dbgpthr_la_SOURCES = \
 	$(SOURCES)
@@ -111,7 +111,7 @@ liboldgaa_gcc64dbgpthr_la_CFLAGS = \
 	-I $(top_srcdir)/src/include
 
 liboldgaa_gcc64dbgpthr_la_LIBADD = \
-	$(GLOBUS_GCC64DBGPTHR_GSS_LIBS)
+	$(GLOBUS_GCC64DBGPTHR_GSS_API_LIBS)
 
 CLEANFILES = \
 	liboldgaa_gcc64.la \

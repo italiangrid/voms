@@ -13,6 +13,9 @@
  *********************************************************************/
 #include "config.h"
 
+#include <openssl/asn1.h>
+#include <openssl/objects.h>
+
 void declareOIDs(void)
 {
 #define idpkix                "1.3.6.1.5.5.7"
@@ -66,6 +69,8 @@ void declareOIDs(void)
   OBJC(certseq, "certseq");
 
 }
+
+extern int initEx(void);
 
 void InitAC(void)
 {

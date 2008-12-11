@@ -58,6 +58,33 @@ extern "C" {
 extern int sockalarmed;
 static void Error(void *logh);
 
+static X509 *
+decouple_ctx(gss_ctx_id_t context, STACK_OF(X509) **stk)
+{
+  if (!stk || (context == 0L))
+    return NULL;
+
+  *stk = ((gss2_ctx_id_desc *)context)->peer_cred_handle->cred_handle->cert_chain;
+  return ((gss2_ctx_id_desc *)context)->peer_cred_handle->cred_handle->cert;
+}
+
+static int get_peer_data(gss_ctx_id_t context, EVP_PKEY **key, char **issuer, X509 **pcert, STACK_OF(X509) **stk)
+{
+  X509 *cert = NULL;
+
+  if (!context || !key || !issuer || !pcert)
+    return 0;
+
+  cert = decouple_ctx(context, stk);
+  *pcert = get_real_cert(cert, *stk);
+  *key = X509_extract_key(*pcert);
+
+  if (*key && *pcert)
+    return get_issuer(*pcert, issuer);
+  else
+    return 0;
+}
+
 /**
  * Constructor.
  * @param p the secure server port.
@@ -66,7 +93,7 @@ static void Error(void *logh);
 GSISocketServer::GSISocketServer(int p, int v, void *l, int b, bool m) :
   version(v), own_subject(""), own_ca(""), peer_subject(""), 
   peer_ca(""), peer_serial(""), own_key(NULL), peer_key(NULL), own_cert(NULL), 
-  peer_cert(NULL), port(p), opened(false), 
+  peer_cert(NULL), own_stack(NULL), peer_stack(NULL), port(p), opened(false), 
   credential(GSS_C_NO_CREDENTIAL), context(GSS_C_NO_CONTEXT), 
   backlog(b), newopened(false), mustclose(m), conflags(0), logh(l)
 {
@@ -273,15 +300,15 @@ GSISocketServer::AcceptGSIAuthentication()
 
   char *tmp = NULL;
 
-  tmp = get_globusid(credential);
-  if (tmp)
-    own_subject = std::string(tmp);
-  free(tmp);
+//   tmp = get_globusid(credential);
+//   if (tmp)
+//     own_subject = std::string(tmp);
+//   free(tmp);
 
   X509 *rcert = NULL;
   STACK_OF(X509) *stk = NULL;
 
-  rcert = decouple_cred(credential, version, &stk);
+  rcert = decouple_cred(credential, &stk);
   own_stack = stk;
 
   LOGM(VARP, logh, LEV_DEBUG, T_PRE, "Certificate DN: %s",
@@ -289,6 +316,14 @@ GSISocketServer::AcceptGSIAuthentication()
   LOGM(VARP, logh, LEV_DEBUG, T_PRE, "Certificate CA: %s",
        X509_NAME_oneline(X509_get_issuer_name(rcert), NULL, 0));
   LOGM(VARP, logh, LEV_DEBUG, T_PRE, "Stack Size: %d", sk_X509_num(stk));
+
+  X509 *identitycert = get_real_cert(rcert, stk);
+
+  if (identitycert) {
+    char *name = X509_NAME_oneline(X509_get_subject_name(identitycert), NULL, 0);
+    own_subject = std::string(name);
+    OPENSSL_free(name);
+  }
 
   for (int i = 0; i < sk_X509_num(stk); i++) {
     X509 *cert = sk_X509_value(stk, i);
@@ -299,7 +334,7 @@ GSISocketServer::AcceptGSIAuthentication()
   }
 
   tmp = NULL;
-  (void)get_own_data(credential, version, &own_key, &tmp, &own_cert);
+  (void)get_own_data(credential, &own_key, &tmp, &own_cert);
   if (tmp)
     own_ca = std::string(tmp);
   free(tmp);
@@ -307,7 +342,7 @@ GSISocketServer::AcceptGSIAuthentication()
   peer_subject = name; 
 
   tmp = NULL;
-  (void)get_peer_data(context, version, &peer_key, &tmp, &peer_cert);
+  (void)get_peer_data(context, &peer_key, &tmp, &peer_cert, &peer_stack);
   if (tmp)
     peer_ca = std::string(tmp);
   free(tmp);

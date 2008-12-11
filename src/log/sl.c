@@ -29,7 +29,7 @@ const char *level[] = {"LOG_ERROR", "LOG_WARN", "LOG_INFO", "LOG_DEBUG",
 const int   levelvalue[] = { LOG_ERR,
                              LOG_WARNING, LOG_NOTICE, LOG_DEBUG, 0};
 
-static int syslogtrans(char *v)
+static int syslogtrans(const char *v)
 {
   int i = -1;
   int result = LOG_ALERT;
@@ -68,7 +68,7 @@ static int syslogoutputter(void *data, const char *str)
   struct localdata *ld = (struct localdata *)data;
 
   if (!ld)
-    return;
+    return 0;
 
   char *realstr = strdup(str);
 

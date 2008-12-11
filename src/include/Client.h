@@ -33,12 +33,10 @@
 
 
 
-/** Include the secure socket globus definition. */
-#include <globus_gss_assist.h>
-
 /** This super class header file. */
 #include <openssl/evp.h>
 #include <openssl/x509.h>
+#include <openssl/ssl.h>
 
 #include <string>
 
@@ -46,6 +44,10 @@
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <netdb.h>
+
+extern "C" {
+#include "sslutils.h"
+}
 
 /** 
  * The secure Client.
@@ -79,7 +81,7 @@ public:
    * Sets required connection flags.
    * @param flags is a bitwise or of all the flags required.
    */
-  void SetFlags(OM_uint32 flags);
+  void SetFlags(int flags);
 
 
   void SetLogger(void *l);
@@ -94,6 +96,9 @@ public:
    * @return true for successful close, false otehrwise.
    */
   virtual void Close();
+
+  virtual bool post_connection_check(SSL*);
+  virtual bool LoadCredentials(const char *, X509 *, STACK_OF(X509) *, EVP_PKEY *);
 
 protected:
   /**
@@ -113,21 +118,27 @@ private:
   gss_cred_id_t credential;
   std::string _server_contact;
    //bool _do_mutual_authentication;
-  OM_uint32 conflags;
+  int conflags;
   FILE *gsi_logfile;
   bool opened;
   int sck;
 
 public:
-  std::string    own_subject;
-  std::string    own_ca;
-  EVP_PKEY      *own_key;
-  X509          *own_cert;
-  std::string    peer_subject;
-  std::string    peer_ca;
-  EVP_PKEY      *peer_key;
-  X509          *peer_cert;
-  void          *logh;
+  std::string     own_subject;
+  std::string     own_ca;
+  EVP_PKEY       *upkey;
+  X509           *ucert;
+  STACK_OF(X509) *cert_chain;
+  char           *cacertdir;
+  std::string     peer_subject;
+  std::string     peer_ca;
+  EVP_PKEY       *peer_key;
+  X509           *peer_cert;
+  void           *logh;
+  SSL *ssl;
+  SSL_CTX *ctx;
+  BIO *conn;
+  proxy_verify_desc *pvd;
 
   bool Send(std::string s);
   bool Receive(std::string &s);
@@ -136,7 +147,8 @@ private:
   struct sockaddr_in peeraddr_in;	/**< Address for peer socket.*/
   std::string error;
   void SetError(const std::string&);
-  void SetErrorGlobus(const std::string&, OM_uint32, OM_uint32, OM_uint32);
+  void SetErrorGlobus(const std::string&, int, int, int);
+  void SetErrorOpenSSL(const std::string& );
 
 public:
   std::string GetError();

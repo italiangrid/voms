@@ -21,7 +21,9 @@ import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.FileReader;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.math.BigInteger;
 import java.nio.ByteBuffer;
 import java.security.MessageDigest;
@@ -29,6 +31,8 @@ import java.security.NoSuchAlgorithmException;
 import java.security.NoSuchProviderException;
 import java.security.Principal;
 import java.security.Security;
+import java.security.PrivateKey;
+import java.security.KeyPair;
 import java.security.cert.CRLException;
 import java.security.cert.CertificateException;
 import java.security.cert.CertificateFactory;
@@ -67,6 +71,9 @@ import org.bouncycastle.asn1.x509.X509CertificateStructure;
 import org.bouncycastle.jce.X509Principal;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.bouncycastle.jce.provider.X509CertificateObject;
+import org.bouncycastle.openssl.PEMReader;
+import org.bouncycastle.openssl.PasswordFinder;
+
 
 public class PKIUtils {
     private static final Pattern emailPattern = Pattern.compile("/emailaddress", Pattern.CASE_INSENSITIVE);
@@ -209,6 +216,10 @@ public class PKIUtils {
         throw new IllegalArgumentException("Null certificate passed to getHash()");
     }
 
+
+    public static String getOpenSSLFormatPrincipal(Principal principal) {
+        return getOpenSSLFormatPrincipal(principal, false);
+    }
     /**
      * Gets an OpenSSL-style representation of a principal.
      *
@@ -216,41 +227,46 @@ public class PKIUtils {
      *
      * @return a String representing the principal.
      */
-    public static String getOpenSSLFormatPrincipal(Principal principal) {
+    public static String getOpenSSLFormatPrincipal(Principal principal, boolean reverse) {
         X509Name name = new X509Name(principal.getName());
-
         Vector oids   = name.getOIDs();
         Vector values = name.getValues();
 
         ListIterator oids_iter   = oids.listIterator();
         ListIterator values_iter = values.listIterator();
-        String  result = new String();
+        String result = new String();
+        String addition = new String();
 
         while (oids_iter.hasNext()) {
             DERObjectIdentifier oid = (DERObjectIdentifier)oids_iter.next();
             String value = (String)values_iter.next();
             if (oid.equals(X509Name.C))
-                result += "/C=" + value;
+                addition = "/C=" + value;
             else if (oid.equals(X509Name.CN))
-                result += "/CN=" + value;
+                addition = "/CN=" + value;
             else if (oid.equals(X509Name.DC))
-                result += "/DC=" + value;
+                addition = "/DC=" + value;
             else if (oid.equals(X509Name.E))
-                result += "/E=" + value;
+                addition = "/E=" + value;
             else if (oid.equals(X509Name.EmailAddress))
-                result += "/Email=" + value;
+                addition = "/Email=" + value;
             else if (oid.equals(X509Name.L))
-                result += "/L=" + value;
+                addition = "/L=" + value;
             else if (oid.equals(X509Name.O))
-                result += "/O=" + value;
+                addition = "/O=" + value;
             else if (oid.equals(X509Name.OU))
-                result += "/OU=" + value;
+                addition = "/OU=" + value;
             else if (oid.equals(X509Name.ST))
-                result += "/ST=" + value;
+                addition= "/ST=" + value;
             else if (oid.equals(X509Name.UID))
-                result += "/UID=" + value;
+                addition = "/UID=" + value;
             else
-                result += "/" + oid.toString() + "=" + value;
+                addition = "/" + oid.toString() + "=" + value;
+
+            if (reverse)
+                result = addition + result;
+            else
+                result += addition;
         }
 
         logger.debug("SSLFormat: " + result);
@@ -745,6 +761,27 @@ public class PKIUtils {
     }
 
 
+     static public PrivateKey loadPrivateKey(String filename, PasswordFinder finder) {
+         return loadPrivateKey(new File(filename), finder);
+     }
+
+     static public PrivateKey loadPrivateKey(File file, PasswordFinder finder) {
+         PEMReader pem = null;
+         try {
+             logger.debug("finder = " + finder.getPassword());
+             pem = new PEMReader(new FileReader(file), finder);
+             logger.debug("pem = " + pem);
+             Object read = pem.readObject();
+             logger.debug("Object read is: " + read);
+             KeyPair pair = (KeyPair)read;
+             logger.debug("key = " + pair );
+             return pair.getPrivate();
+         }
+         catch (IOException e) {
+             throw new IllegalArgumentException("Not a PEM format file " + file.getName());
+         }
+     }
+
     /**
      * Loads a set of credentials from a file.
      *
@@ -758,6 +795,7 @@ public class PKIUtils {
     static public X509Certificate[] loadCertificates(String filename) throws CertificateException {
         return loadCertificates(new File(filename));
     }
+
 
     /**
      * Loads a set of credentials from a file.
@@ -961,7 +999,6 @@ public class PKIUtils {
         //        return null;
     }
 
-
     /**
      * Prepares a BufferedInputStream to read either a certificate or a CRL
      * from it. Skips everything in front of "-----BEGIN" in the stream.
@@ -1041,3 +1078,4 @@ public class PKIUtils {
     }
 
 }
+

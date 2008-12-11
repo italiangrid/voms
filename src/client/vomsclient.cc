@@ -50,6 +50,7 @@ extern "C" {
 #include "fqan.h"
 #include "contact.hpp"
 
+
 extern "C" 
 {
 #include "myproxycertinfo.h"
@@ -63,9 +64,9 @@ const std::string SUBPACKAGE      = "voms-proxy-init";
 
 /* use name specific to each distribution (defined in configure.in) */
 
-const std::string location = (getenv(LOCATION_ENV) ? getenv(LOCATION_ENV) : LOCATION_DIR);
-const std::string CONFILENAME     = (location + "/etc/vomses");
-const std::string USERCONFILENAME = std::string(USER_DIR) + std::string("/vomses");
+std::string location;
+std::string CONFILENAME;
+std::string USERCONFILENAME;
 
 /* global variable for output control */
 
@@ -139,6 +140,10 @@ public:
 Client::Client(int argc, char ** argv) :
                                            ignorewarn(false),
                                            failonwarn(false),
+                                           cacertfile(NULL),
+                                           certdir(NULL),
+                                           certfile(NULL),
+                                           keyfile(NULL),
                                            confile(CONFILENAME),
                                            userconf(""),
                                            incfile(""),
@@ -159,10 +164,12 @@ Client::Client(int argc, char ** argv) :
                                            class_add_buf_len(0),
 #endif 
                                            dataorder(NULL),
-                                           pcd(NULL),
                                            aclist(NULL),
                                            voID(""),
-                                           listing(false)
+                                           listing(false),
+                                           cert_chain(NULL),
+                                           ucert(NULL),
+                                           private_key(NULL)
 {
   bool progversion = false;
   std::string valid;
@@ -176,6 +183,10 @@ Client::Client(int argc, char ** argv) :
   bool rfc = false;
 
   bool pwstdin = false;
+
+  location = (getenv(LOCATION_ENV) ? getenv(LOCATION_ENV) : LOCATION_DIR);
+  CONFILENAME     = (location + "/etc/vomses");
+  USERCONFILENAME = std::string(USER_DIR) + std::string("/vomses");
 
   if (strrchr(argv[0],'/'))
     program = strrchr(argv[0],'/') + 1;
@@ -587,6 +598,12 @@ Client::Client(int argc, char ** argv) :
 
 Client::~Client() {
 
+  if (cert_chain)
+    sk_X509_pop_free(cert_chain, X509_free);
+  if (ucert)
+    X509_free(ucert);
+  if (private_key)
+    EVP_PKEY_free(private_key);
   if(cacertfile)  
     free(cacertfile);
   if(certdir)  
@@ -598,8 +615,6 @@ Client::~Client() {
   if(outfile)  
     free(outfile);
 
-  if(pcd)
-    proxy_cred_desc_free(pcd);
   if (dataorder)
     BN_free(dataorder);
 
@@ -684,6 +699,8 @@ bool Client::Run() {
 
     std::string buffer;
     int version;
+
+    (void)v.LoadCredentials(ucert, cert_chain, private_key);
 
     /* contact each server until one answers */
     for (std::vector<contactdata>::iterator beg = servers.begin(); beg != servers.end(); beg++) 
@@ -925,7 +942,7 @@ bool Client::CreateProxy(std::string data, std::string filedata, AC ** aclist, i
   fpout = fdopen(fdout, "w");
 
 
-  if (proxy_genreq(pcd->ucert, &req, &npkey, bits, (int (*)())kpcallback, pcd))
+  if (proxy_genreq(ucert, &req, &npkey, bits, (int (*)())kpcallback))
     goto err;
 
   /* Add proxy extensions */
@@ -1051,12 +1068,12 @@ bool Client::CreateProxy(std::string data, std::string filedata, AC ** aclist, i
       PRXYerr(PRXYERR_F_PROXY_SIGN,PRXYERR_R_CLASS_ADD_EXT);
       goto err;
     }
-     
+
     if (!sk_X509_EXTENSION_push(extensions, ex6)) {
       PRXYerr(PRXYERR_F_PROXY_SIGN,PRXYERR_R_CLASS_ADD_EXT);
       goto err;
     }
-     
+
     order = true;
   }
   
@@ -1157,8 +1174,8 @@ bool Client::CreateProxy(std::string data, std::string filedata, AC ** aclist, i
     
   }
   
-  if (proxy_sign(pcd->ucert,
-                 pcd->upkey,
+  if (proxy_sign(ucert,
+                 private_key,
                  req,
                  &ncert,
                  hours*60*60 + minutes*60,
@@ -1171,7 +1188,7 @@ bool Client::CreateProxy(std::string data, std::string filedata, AC ** aclist, i
   if ((bp = BIO_new(BIO_s_file())) != NULL)
     BIO_set_fp(bp, fpout, BIO_NOCLOSE);
   
-  if (proxy_marshal_bp(bp, ncert, npkey, pcd->ucert, pcd->cert_chain))
+  if (proxy_marshal_bp(bp, ncert, npkey, ucert, cert_chain))
     goto err;
   
   if(!quiet) std::cout << " Done" << std::endl;
@@ -1333,16 +1350,18 @@ bool Client::WriteSeparate() {
       BIO_write_filename(out, (char *)separate.c_str());
     else BIO_write_filename(out, (char *)(separate+".ac").c_str());
     
-    while(*aclist)
+    while(*aclist) {
 #ifdef TYPEDEF_I2D_OF
-      if(!PEM_ASN1_write_bio((i2d_of_void *)i2d_AC, "ATTRIBUTE CERTIFICATE", out, (char *)*(aclist++), NULL, NULL, 0, NULL, NULL)) {
+      if(!PEM_ASN1_write_bio((i2d_of_void *)i2d_AC, "ATTRIBUTE CERTIFICATE", out, (char *)*(aclist++), NULL, NULL, 0, NULL, NULL))
 #else
-      if(!PEM_ASN1_write_bio(((int (*)())i2d_AC), "ATTRIBUTE CERTIFICATE", out, (char *)*(aclist++), NULL, NULL, 0, NULL, NULL)) {
+      if(!PEM_ASN1_write_bio(((int (*)())i2d_AC), "ATTRIBUTE CERTIFICATE", out, (char *)*(aclist++), NULL, NULL, 0, NULL, NULL))
 #endif
-        if(!quiet) std::cout << "Unable to write to BIO" << std::endl;
-        return false;;
-      }
-    
+        {
+          if(!quiet) std::cout << "Unable to write to BIO" << std::endl;
+          return false;;
+        }
+    }
+
     BIO_free(out);
   
     if(data.empty())
@@ -1377,6 +1396,7 @@ bool Client::WriteSeparate() {
   return true;
 }
 
+
 bool Client::IncludeFile(std::string& filedata) {
 
   std::ifstream fp;
@@ -1400,7 +1420,7 @@ bool Client::Verify() {
   proxy_verify_ctx_init(&pvxd);
   proxy_verify_init(&pvd, &pvxd);
   pvxd.certdir = this->certdir;
-  if (proxy_verify_cert_chain(pcd->ucert, pcd->cert_chain, &pvd)) {
+  if (proxy_verify_cert_chain(ucert, cert_chain, &pvd)) {
     if(!quiet) std::cout << "verify OK" << std::endl; 
     return true;
   }
@@ -1423,7 +1443,7 @@ bool Client::Test() {
   X509_gmtime_adj(asn1_time, 0);
   time_t time_now = ASN1_UTCTIME_mktime(asn1_time);
   ASN1_UTCTIME_free(asn1_time);
-  time_t time_after = ASN1_UTCTIME_mktime(X509_get_notAfter(pcd->ucert));
+  time_t time_after = ASN1_UTCTIME_mktime(X509_get_notAfter(ucert));
   time_t time_diff = time_after - time_now ;
   
   if (time_diff < 0) {
@@ -1497,6 +1517,27 @@ bool Client::Retrieve(std::string buffer) {
 
 }
 
+static bool checkstats(char *file, int mode, bool debug)
+{
+  struct stat stats;
+
+  if (stat(file, &stats) == -1) {
+    std::cerr << "Unable to find user certificate or key" << std::endl;
+    return false;
+  }
+
+  if (stats.st_mode & mode) {
+    std::cerr << std::endl << "ERROR: Couldn't find valid credentials to generate a proxy." << std::endl 
+              << "Use --debug for further information." << std::endl;
+    if(debug)
+      std::cout << "Wrong permissions on file: " << file << std::endl;
+
+    return false;
+  }
+  return true;
+}
+
+
 bool Client::pcdInit() {
 
   int status = false;
@@ -1504,133 +1545,40 @@ bool Client::pcdInit() {
   ERR_load_prxyerr_strings(0);
   SSLeay_add_ssl_algorithms();
   
-  BIO * bio_err;
-  if ((bio_err = BIO_new(BIO_s_file())) != NULL)
-    BIO_set_fp(bio_err, stderr, BIO_NOCLOSE);
-
-  if ((pcd = proxy_cred_desc_new()) == NULL)
-    goto err;  
-  
-  pcd->type = CRED_TYPE_PERMANENT;
-  
-  if (noregen) {
-
-    std::string oldoutfile = "";
-    if(outfile)
-      oldoutfile = outfile;
-
-    bool modify = false;
-    outfile = NULL;
-    if (certfile == NULL && keyfile == NULL) 
-      modify = true;
-    if (proxy_get_filenames(pcd, 0, &cacertfile, &certdir, &outfile, &certfile, &keyfile))
-      goto err;
-
-    if (modify)
-      certfile = keyfile = outfile;
-    outfile = (oldoutfile.empty() ? NULL : const_cast<char *>(oldoutfile.c_str()));
-    if ( proxy_get_filenames(pcd, 0, &cacertfile, &certdir, &outfile, &certfile, &keyfile))
-      goto err;
-  }
-  else if (proxy_get_filenames(pcd, 0, &cacertfile, &certdir, &outfile, &certfile, &keyfile))
+  if (!determine_filenames(&cacertfile, &certdir, &outfile, &certfile, &keyfile, noregen ? 1 : 0))
     goto err;
   
   // verify that user's certificate and key have the correct permissions
 
-  struct stat stats;
-  
-  if(stat(certfile, &stats) == -1)
-    std::cerr << "Unable to find user certificate."<< std::endl;
-  if (stats.st_mode & S_IXUSR || 
-      stats.st_mode & S_IWGRP ||  
-      stats.st_mode & S_IXGRP ||
-      stats.st_mode & S_IWOTH ||
-      stats.st_mode & S_IXOTH
-      )  
-  {
-    std::cerr << std::endl << "ERROR: Couldn't find valid credentials to generate a proxy." << std::endl 
-              << "Use --debug for further information." << std::endl;
-    if(debug) {
-      std::cout << "Wrong permissions on file: " << certfile << std::endl;
-    }
+  if (!checkstats(certfile, S_IXUSR | S_IWGRP | S_IXGRP | S_IWOTH | S_IXOTH, debug) ||
+      !checkstats(keyfile, S_IXUSR | S_IRGRP | S_IWGRP | S_IXGRP | S_IRGRP |
+                  S_IWOTH | S_IXOTH, debug))
     exit(1);
-  }
-
-  if(stat(keyfile, &stats) == 1)
-    std::cerr << "Unable to find user certificate."<< std::endl;
-  if (stats.st_mode & S_IXUSR || 
-      stats.st_mode & S_IRGRP ||  
-      stats.st_mode & S_IWGRP ||  
-      stats.st_mode & S_IXGRP ||
-      stats.st_mode & S_IRGRP ||  
-      stats.st_mode & S_IWOTH ||
-      stats.st_mode & S_IXOTH)  
-  {
-    std::cerr << std::endl << "ERROR: Couldn't find valid credentials to generate a proxy." << std::endl 
-              << "Use --debug for further information." << std::endl;
-    if(debug) {
-      std::cout << "Wrong permissions on file: " << keyfile << std::endl;
-    }
-    exit(1);
-  }
   
-  if(debug) std::cout << "Files being used:" << std::endl 
-		      << " CA certificate file: " << (cacertfile ? cacertfile : "none") << std::endl
-		      << " Trusted certificates directory : " << (this->certdir ? this->certdir : "none") << std::endl
-		      << " Proxy certificate file : " << (this->outfile ? this->outfile : "none") << std::endl
-		      << " User certificate file: " << (this->certfile ? this->certfile : "none") << std::endl
-		      << " User key file: " << (this->keyfile ? this->keyfile : "none") << std::endl;
+  if(debug) 
+    std::cout << "Files being used:" << std::endl 
+              << " CA certificate file: " << (cacertfile ? cacertfile : "none") << std::endl
+              << " Trusted certificates directory : " << (certdir ? certdir : "none") << std::endl
+              << " Proxy certificate file : " << (outfile ? outfile : "none") << std::endl
+              << " User certificate file: " << (certfile ? certfile : "none") << std::endl
+              << " User key file: " << (keyfile ? keyfile : "none") << std::endl;
   
   if (debug)
     std::cout << "Output to " << outfile << std::endl;
-  
-  if (this->certdir)
-    pcd->certdir = strdup(this->certdir);
 
-  if (!strncmp(this->certfile, "SC:", 3))
-    EVP_set_pw_prompt(const_cast<char *>("Enter card pin:"));
-  else
-    EVP_set_pw_prompt(const_cast<char *>("Enter GRID pass phrase for this identity:"));
-
-  if (strcmp(this->certfile + strlen(this->certfile) - 4, ".p12")) {
-    if(proxy_load_user_cert(pcd, this->certfile, pw_cb, NULL))
-      goto err;
-  
-  
-    EVP_set_pw_prompt(const_cast<char *>("Enter GRID pass phrase:"));
-  
-    if (!strncmp(this->keyfile, "SC:", 3))
-      EVP_set_pw_prompt(const_cast<char *>("Enter card pin:"));
-
-    if (proxy_load_user_key(pcd, this->keyfile, pw_cb, NULL))
-      goto err;
-
-    if (strncmp(this->certfile, "SC:", 3) && !strcmp(this->certfile, this->keyfile)) {
-      if (pcd->cert_chain == NULL)
-        pcd->cert_chain = sk_X509_new_null();
-      if (proxy_load_user_proxy(pcd->cert_chain, this->certfile, NULL) < 0)
-        goto err;
-    } 
-  }
-  else {
-    if (!proxy_load_user_cert_and_key_pkcs12(pcd, this->certfile, NULL))
-      goto err;
-  }
+  if (!load_credentials(certfile, keyfile, &ucert, &cert_chain, &private_key, pw_cb))
+    goto err;
 
   if(!quiet) {
     char * s = NULL;
-    s = X509_NAME_oneline(X509_get_subject_name(pcd->ucert),NULL,0);
+    s = X509_NAME_oneline(X509_get_subject_name(ucert),NULL,0);
     std::cout << "Your identity: " << s << std::endl;
-    free(s);
+    OPENSSL_free(s);
   }
 
-  
   status = true;
   
  err:
-
-  if (bio_err)
-    BIO_free(bio_err);
   Error();
   return status;
   

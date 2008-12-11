@@ -244,7 +244,7 @@ char *XMLEncodeReq(const char *command, const char *order, const char *targets,
   /* count the number of commands -1*/
   tmp = command;
 
-  while (tmp = strchr(tmp, ','))  {
+  while ((tmp = strchr(tmp, ',')))  {
     count ++;
     tmp++;
   }
@@ -369,7 +369,7 @@ char *XMLEncodeAns(struct error **wande, const char *ac, int lenac,
   return NULL;
 }
 
-static void  startans(void *userdata, const char *name, const char **attrs)
+static void  startans(void *userdata, UNUSED(const char *name), UNUSED(const char **attrs))
 {
   struct ans *a = (struct ans *)userdata;
 
@@ -381,7 +381,7 @@ static void  startans(void *userdata, const char *name, const char **attrs)
   }
 }
 
-static void  startreq(void *userdata, const char *name, const char **attrs)
+static void  startreq(void *userdata, UNUSED(const char *name), UNUSED(const char **attrs))
 {
   struct req *d = (struct req *)userdata;
   if (!d || d->error)

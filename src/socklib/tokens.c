@@ -165,11 +165,9 @@ static ssize_t myrecv(int s, void *buf, size_t len, int flags)
  */
 int get_token(void *arg, void **token, size_t *token_length)
 {
-    size_t			num_read = 0;
     ssize_t			n_read;
     int 			fd = *( (int *) arg );
     unsigned char		token_length_buffer[4];
-    int alrm = 0; 
 
 #ifdef HAVE_SIGACTION
     struct sigaction action;
@@ -260,7 +258,7 @@ static ssize_t tls_recv(int fd, unsigned char beginning[4], void **buf, size_t *
   return size+5;
 }
 
-static ssize_t ssl2_recv(int fd, unsigned char beginning[4], void **buf, size_t *len, int flags)
+static ssize_t ssl2_recv(int fd, unsigned char beginning[4], void **buf, size_t *len, UNUSED(int flags))
 {
   ssize_t nread = 0;
   size_t size;
@@ -347,7 +345,7 @@ static ssize_t ssl_globus_recv(int fd, unsigned char beginning[4], void **buf, s
   return size+hashsize+5;
 }
 
-static ssize_t gsi_recv(int fd, unsigned char beginning[4], void **buf, size_t *len, int flags)
+static ssize_t gsi_recv(int fd, unsigned char beginning[4], void **buf, size_t *len, UNUSED(int flags))
 {
   ssize_t nread = 0;
   size_t size = 0;

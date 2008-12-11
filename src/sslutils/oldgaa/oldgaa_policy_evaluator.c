@@ -21,6 +21,43 @@ Description:
 #include "globus_oldgaa_utils.h"
 #include "oldgaa_policy_evaluator.h"
 
+/**********************************************************************
+             Helpers Static Functions         
+ **********************************************************************/
+
+static
+oldgaa_error_code
+evaluate_condition(oldgaa_sec_context_ptr sc, 
+                   oldgaa_conditions_ptr  condition,
+                   oldgaa_options_ptr     options);
+
+static
+char *
+get_day();
+
+static
+char *
+get_hr_24();
+
+static
+char *
+get_minutes();
+
+static
+char *
+get_seconds();
+
+static
+int
+day_to_val(char *str);
+
+static
+int
+check_day(char *str1, char *str2, char *day);
+
+static
+char*
+get_value(int *jj, const char *cond, const char delimiter);
 
 /**********************************************************************
                        Define module specific variables
@@ -46,7 +83,7 @@ Returns:
 **********************************************************************/
 
 
-oldgaa_policy_ptr    
+oldgaa_policy_ptr     PRIVATE
 oldgaa_find_matching_entry(uint32             *minor_status, 
                         oldgaa_principals_ptr  ptr, 
                         oldgaa_policy_ptr      policy)          
@@ -114,7 +151,7 @@ Returns:
 **********************************************************************/
 
 
-oldgaa_error_code
+oldgaa_error_code PRIVATE
 oldgaa_check_access_rights(oldgaa_sec_context_ptr sc,
                     oldgaa_rights_ptr      requested_rights,
                     oldgaa_rights_ptr      rights,
@@ -154,7 +191,7 @@ oldgaa_check_access_rights(oldgaa_sec_context_ptr sc,
 
 /*****************************************************************************/
 
-oldgaa_error_code
+oldgaa_error_code PRIVATE
 oldgaa_get_authorized_principals(oldgaa_sec_attrb_ptr *attributes,
                               oldgaa_policy_ptr     policy,
                               oldgaa_principals_ptr principal,
@@ -162,7 +199,6 @@ oldgaa_get_authorized_principals(oldgaa_sec_attrb_ptr *attributes,
 
 {
   oldgaa_policy_ptr    entry  = policy;
-  oldgaa_error_code    answer = OLDGAA_SUCCESS;
   int               was_anybody    = 0;
   int               was_neg_rights = 0;
   int               number_of_entries = 1;
@@ -247,7 +283,7 @@ Returns:
 
 **********************************************************************/
 
-oldgaa_error_code 
+oldgaa_error_code  PRIVATE
 oldgaa_evaluate_conditions(oldgaa_sec_context_ptr    sc, 
                         oldgaa_cond_bindings_ptr  conditions,
                         oldgaa_options_ptr        options)
@@ -277,9 +313,9 @@ oldgaa_evaluate_conditions(oldgaa_sec_context_ptr    sc,
 
 
 
-oldgaa_error_code
+oldgaa_error_code PRIVATE
 oldgaa_evaluate_day_cond(oldgaa_conditions_ptr condition, 
-                  oldgaa_options_ptr    options)
+                         UNUSED(oldgaa_options_ptr    options))
 
 {
    int            retval, j=0;
@@ -331,7 +367,7 @@ Returns:
 
 **********************************************************************/
 
-oldgaa_error_code
+oldgaa_error_code PRIVATE
 oldgaa_evaluate_regex_cond(oldgaa_conditions_ptr condition, 
                         oldgaa_options_ptr    options)
 {
@@ -356,13 +392,12 @@ return oldgaa_status;
 
 /*****************************************************************************/
 
-oldgaa_error_code
+oldgaa_error_code PRIVATE
 oldgaa_evaluate_time_cond(oldgaa_conditions_ptr condition, 
-                       oldgaa_options_ptr    options)
+                          UNUSED(oldgaa_options_ptr    options))
 
 {
    int   j = 0;
-   oldgaa_error_code oldgaa_status = OLDGAA_NO;
 
    int   hr, min, sec;
    int   cond_hr, cond_min, cond_sec;
@@ -465,10 +500,10 @@ oldgaa_evaluate_time_cond(oldgaa_conditions_ptr condition,
 /*****************************************************************************/
 
 
-oldgaa_error_code
+oldgaa_error_code PRIVATE
 oldgaa_evaluate_sech_mech_cond(oldgaa_principals_ptr  principal,
-                        oldgaa_conditions_ptr  condition, 
-                        oldgaa_options_ptr     options)
+                               oldgaa_conditions_ptr  condition, 
+                               UNUSED(oldgaa_options_ptr     options))
 
 { 
    oldgaa_error_code oldgaa_status = OLDGAA_NO;
@@ -594,24 +629,6 @@ get_hr_24()
   return str; 
 } 
 /*****************************************************************************/
-static
-char *
-get_hr_12()
-{
-  time_t     tt;
-  struct tm *t;
-  char      *str;
-
-  str = malloc(STRING_LENGTH + 1 /* for NUL */);
-  if (!str)
-      out_of_memory();
-
-  time(&tt); 
-  t = localtime(&tt); 
-  strftime(str,STRING_LENGTH,"%I",t);
-
-  return str; 
-}
 
 
 /*****************************************************************************/
@@ -654,25 +671,6 @@ get_seconds()
   return str; 
 } 
 
-/*****************************************************************************/
-static
-char *
-get_am_pm()
-{
-  time_t     tt;
-  struct tm *t;
-  char      *str;
-
-  str = malloc(STRING_LENGTH + 1 /* for NUL */);
-  if (!str)
-      out_of_memory();
-
-  time(&tt); 
-  t = localtime(&tt); 
-  strftime(str,STRING_LENGTH,"%p",t);
-
-  return str; 
-} 
 /*****************************************************************************/
 static
 int

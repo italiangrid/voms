@@ -77,7 +77,9 @@ class Fake {
   size_t             class_add_buf_len = 0;
 #endif
   
-  proxy_cred_desc *        pcd;
+  X509 *ucert;
+  EVP_PKEY *upkey;
+  STACK_OF(X509) *cert_chain;
   proxy_verify_desc        pvd;
   proxy_verify_ctx_desc    pvxd;
 

@@ -30,7 +30,7 @@ import org.glite.voms.contact.VOMSException;
 import org.glite.voms.contact.VOMSProxyBuilder;
 import org.glite.voms.contact.VOMSProxyInit;
 import org.glite.voms.contact.VOMSRequestOptions;
-import org.globus.gsi.GSIConstants;
+import org.glite.voms.contact.VOMSProxyConstants;
 
 /**
  * 
@@ -280,11 +280,11 @@ public class VomsProxyInitClient {
             int type = VOMSProxyBuilder.DEFAULT_DELEGATION_TYPE;
             
             if (delegationType.equals( "NONE" ))
-                type = GSIConstants.DELEGATION_NONE;
+                type = VOMSProxyConstants.DELEGATION_NONE;
             else if (delegationType.equals( "LIMITED" ))
-                type = GSIConstants.DELEGATION_LIMITED;
+                type = VOMSProxyConstants.DELEGATION_LIMITED;
             else if (delegationType.equals( "FULL" ))
-                type = GSIConstants.DELEGATION_FULL;
+                type = VOMSProxyConstants.DELEGATION_FULL;
             else
                 log.warn( "Unsupported delegation type specified! The default value will be used." );
             

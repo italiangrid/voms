@@ -15,10 +15,6 @@
 #ifndef VOMS_CINTERFACE_H
 #define VOMS_CINTERFACE_H
 
-#ifndef NOGLOBUS
-#include <gssapi.h>
-#endif
-
 #include <openssl/x509.h>
 
 #include "newformat.h"

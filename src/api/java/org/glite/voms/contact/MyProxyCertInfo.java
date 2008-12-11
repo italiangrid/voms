@@ -1,10 +1,10 @@
 /*********************************************************************
  *
- * Authors: 
- *      Vincenzo Ciaschini - vincenzo.ciaschini@cnaf.infn.it 
- *          
+ * Authors:
+ *      Vincenzo Ciaschini - vincenzo.ciaschini@cnaf.infn.it
+ *
  * Copyright (c) 2006 INFN-CNAF on behalf of the EGEE project.
- * 
+ *
  * For license conditions see LICENSE
  *
  * Parts of this code may be based upon or even include verbatim pieces,
@@ -19,7 +19,6 @@ import org.bouncycastle.asn1.DEREncodable;
 import org.bouncycastle.asn1.DEREncodableVector;
 import org.bouncycastle.asn1.DERObject;
 import org.bouncycastle.asn1.DERSequence;
-import org.globus.gsi.proxy.ext.ProxyPolicy;
 
 class MyProxyCertInfo implements DEREncodable {
 
@@ -33,7 +32,7 @@ class MyProxyCertInfo implements DEREncodable {
         this.version = version;
     }
 
-    public MyProxyCertInfo(int pathLenConstraint, 
+    public MyProxyCertInfo(int pathLenConstraint,
                            ProxyPolicy policy, int version) {
         this.policy = policy;
         this.pathLen = pathLenConstraint;

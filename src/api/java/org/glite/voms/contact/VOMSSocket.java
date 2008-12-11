@@ -1,13 +1,14 @@
 /*********************************************************************
  *
- * Authors: 
- *      
- *      Andrea Ceccanti - andrea.ceccanti@cnaf.infn.it
- *      Gidon Moont - g.moont@imperial.ac.uk  
- *          
- * Copyright (c) 2002, 2003, 2004, 2005, 2006 INFN-CNAF on behalf 
+ * Authors:
+ *
+ *      Andrea Ceccanti    - andrea.ceccanti@cnaf.infn.it
+ *      Gidon Moont        - g.moont@imperial.ac.uk
+ *      Vincenzo Ciaschini - vincenzo.ciaschini@cnaf.infn.it
+ *
+ * Copyright (c) 2002, 2003, 2004, 2005, 2006 INFN-CNAF on behalf
  * of the EGEE project.
- * 
+ *
  * For license conditions see LICENSE
  *
  * Parts of this code may be based upon or even include verbatim pieces,
@@ -22,139 +23,117 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.security.GeneralSecurityException;
 import java.security.Security;
+import java.security.SecureRandom;
+
+import javax.net.ssl.SSLContext;
+import javax.net.ssl.SSLSocket;
+import javax.net.ssl.SSLSocketFactory;
+import javax.net.ssl.SSLException;
 
 import org.apache.log4j.Logger;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
-import org.globus.gsi.GSIConstants;
-import org.globus.gsi.GlobusCredential;
-import org.globus.gsi.gssapi.GSSConstants;
-import org.globus.gsi.gssapi.GlobusGSSCredentialImpl;
-import org.globus.gsi.gssapi.GlobusGSSManagerImpl;
-import org.globus.gsi.gssapi.auth.Authorization;
-import org.globus.gsi.gssapi.auth.IdentityAuthorization;
-import org.globus.gsi.gssapi.net.GssSocket;
-import org.globus.gsi.gssapi.net.GssSocketFactory;
-import org.gridforum.jgss.ExtendedGSSContext;
-import org.ietf.jgss.GSSContext;
-import org.ietf.jgss.GSSCredential;
-import org.ietf.jgss.GSSException;
-import org.ietf.jgss.GSSManager;
+
+import org.glite.voms.VOMSKeyManager;
+import org.glite.voms.VOMSTrustManager;
 
 /**
  * The {@link VOMSSocket} class is used to manage the creation of the gsi socket used for communication with
- * the VOMS server. 
- *  
+ * the VOMS server.
+ *
  * @author Andrea Ceccanti
- * 
+ * @author Vincenzo Ciaschini
+ *
  *
  */
 public class VOMSSocket {
-    
+
     private static final Logger log = Logger.getLogger( VOMSSocket.class );
-    
+
     UserCredentials cred;
-    
+
     String hostDN;
-    
-    GlobusCredential proxy = null;
-        
-    int proxyType = VOMSProxyBuilder.DEFAULT_PROXY_TYPE;
-    
-    private GssSocket socket = null;
-    
+
     public static VOMSSocket instance(UserCredentials cred, String hostDN, int proxyType){
         return new VOMSSocket(cred, hostDN, proxyType);
-        
+
     }
-    
+
     public static VOMSSocket instance(UserCredentials cred, String hostDN){
-        
+
         return new VOMSSocket(cred, hostDN, VOMSProxyBuilder.DEFAULT_PROXY_TYPE);
-        
+
     }
-    
+
     private VOMSSocket(UserCredentials cred, String hostDN, int proxyType){
-        
+
         this.cred = cred;
         this.hostDN = hostDN;
-        this.proxyType = proxyType;
     }
-    
+
     /**
-     * 
+     *
      * Connects this socket to the voms server identified by the (host,port) passed
      * as arguments.
-     * 
+     *
      * @param host
      * @param port
-     * @throws GSSException
      * @throws IOException
      * @throws GeneralSecurityException
-     * 
+     *
      * @author Andrea Ceccanti
      * @author Gidon Moont
+     * @author Vincenzo Ciaschini
      */
-    protected void connect(String host, int port) throws GSSException, IOException, GeneralSecurityException{
-        
+    private SSLContext context = null;
+    private SSLSocketFactory socketFactory = null;
+    private SSLSocket socket = null;
+
+    protected void connect(String host, int port) throws IOException, GeneralSecurityException{
+
         if (Security.getProvider("BC") == null) {
             Security.addProvider(new BouncyCastleProvider());
         }
-        
-        
-        GSSManager manager = new GlobusGSSManagerImpl();
-        Authorization auth = new IdentityAuthorization(hostDN);
-        log.debug( "hostDN:"+hostDN );
-        GSSCredential clientCreds;
-                
-        proxy = VOMSProxyBuilder.buildProxy( cred, VOMSProxyBuilder.DEFAULT_PROXY_LIFETIME, proxyType);
-        
-        try {
-            
-            clientCreds = (GSSCredential)new GlobusGSSCredentialImpl( proxy , GSSCredential.INITIATE_ONLY ) ;
-            
-        } catch ( GSSException e ) {
-            log.fatal( "Error creating gss credential: "+e.getMessage() );
-            if (log.isDebugEnabled())
-                log.debug( e.getMessage(),e );
-            throw e;
-        }
-        
-        ExtendedGSSContext context = (ExtendedGSSContext) manager.createContext(null, 
-                GSSConstants.MECH_OID,
-                clientCreds, 
-                86400); 
-        
-        context.requestMutualAuth( true ) ;
-        context.requestCredDeleg( false ) ;
-        context.requestConf( true ) ;
-        context.requestAnonymity( false ) ;
 
-        context.setOption( GSSConstants.GSS_MODE , GSIConstants.MODE_GSI ) ;
-        context.setOption( GSSConstants.REJECT_LIMITED_PROXY , new Boolean( false ) ) ;
-                
+        log.debug("Initting CONNECCTION");
         try {
-            socket = (GssSocket) GssSocketFactory.getDefault().createSocket( host , port , context );
-            socket.setWrapMode( GssSocket.GSI_MODE ) ;
-            socket.setAuthorization( auth ) ;
+            context = SSLContext.getInstance("SSLv3");
+            log.debug("CONTEXT CREATED: "+context.getProtocol());
+            log.debug("Context: " + context);
+            context.init(new VOMSKeyManager[] {new VOMSKeyManager(cred)}, new VOMSTrustManager[] {new VOMSTrustManager("")}, SecureRandom.getInstance("SHA1PRNG"));
+
+            socketFactory = context.getSocketFactory();
+            log.debug("Factory Created");
+            log.debug(socketFactory.toString());
+            log.debug("ABOUT to open CONNECTION");
+            socket = (SSLSocket)socketFactory.createSocket(host, port);
+            log.debug("CONNECTION OPEN");
+            String[] protocols = { "SSLv3"};
+            socket.setEnabledProtocols(protocols);
+        } catch (SSLException e) {
+            log.fatal( "Error opening SSL socket: "+e.getMessage() );
+
+            if (log.isDebugEnabled())
+                log.debug( e.getMessage(),e );
+            throw e;
         } catch ( IOException e ) {
-            
-            log.fatal( "Error opening GSS socket: "+e.getMessage() );
-            
+
+            log.fatal( "Error opening SSL socket: "+e.getMessage() );
+
             if (log.isDebugEnabled())
                 log.debug( e.getMessage(),e );
             throw e;
         }
-        
+
     }
-    
+
     public void close() throws IOException {
 
         socket.close();
     }
 
-    public GSSContext getContext() {
+    public SSLContext getContext() {
 
-        return socket.getContext();
+        return context;
     }
 
     public boolean isClosed() {
@@ -181,28 +160,28 @@ public class VOMSSocket {
         try {
             return socket.getOutputStream();
         } catch ( IOException e ) {
-            
+
             log.error( "Error getting output stream from underlying socket:"+e.getMessage() );
             if (log.isDebugEnabled())
                 log.error(e.getMessage(),e);
-            
+
             throw e;
         }
     }
-    
+
     public InputStream getInputStream() throws IOException{
-        
+
         try {
-            
+
             return socket.getInputStream();
-            
+
         } catch ( IOException e ) {
             log.error( "Error getting input stream from underlying socket:"+e.getMessage() );
             if (log.isDebugEnabled())
                 log.error(e.getMessage(),e);
-            
+
             throw e;
-            
+
         }
     }
 

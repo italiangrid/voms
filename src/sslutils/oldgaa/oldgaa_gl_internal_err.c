@@ -8,7 +8,7 @@
 #include "oldgaa_gl_internal_err.h"
 #include <stdio.h>
 
-void
+void PRIVATE
 oldgaa_gl__function_internal_error_helper(const char file[], int line, const char msg[])
 {
     if (internal_error_handler)   
@@ -35,7 +35,7 @@ int oldgaa_gl__is_out_of_memory = 0;
 void (*oldgaa_gl_out_of_memory_handler)(const char file[], int line) = NULL;
 
 
-void
+void PRIVATE
 oldgaa_gl__fout_of_memory(const char file[], int line) 
 {
     if (oldgaa_gl_out_of_memory_handler)

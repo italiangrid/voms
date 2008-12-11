@@ -164,7 +164,7 @@ void AC_TARGET_free(AC_TARGET *a)
 
 int i2d_AC_CERTS(AC_CERTS *a, unsigned char **pp)
 {
-  int v1=0, v2=0, v3=0;
+  //  int v1=0, v2=0, v3=0;
 
   M_ASN1_I2D_vars(a);
   M_ASN1_I2D_len_SEQUENCE(a->stackcert, i2d_X509);
@@ -354,32 +354,32 @@ static char *norep()
   return buffer;
 }
 
-char *acseq_i2s(struct v3_ext_method *method, void *ext)
+char *acseq_i2s(UNUSED(struct v3_ext_method *method), UNUSED(void *ext))
 {
   return norep();
 }
   
-char *targets_i2s(struct v3_ext_method *method, void *ext)
+char *targets_i2s(UNUSED(struct v3_ext_method *method), UNUSED(void *ext))
 {
   return norep();
 }
 
-char *certs_i2s(struct v3_ext_method *method, void *ext)
+char *certs_i2s(UNUSED(struct v3_ext_method *method), UNUSED(void *ext))
 {
   return norep();
 }
 
-char *null_i2s(struct v3_ext_method *method, void *ext)
+char *null_i2s(UNUSED(struct v3_ext_method *method), UNUSED(void *ext))
 {
   return norep();
 }
 
-char *attributes_i2s(struct v3_ext_method *method, void *ext)
+char *attributes_i2s(UNUSED(struct v3_ext_method *method), UNUSED(void *ext))
 {
   return norep();
 }
 
-void *acseq_s2i(struct v3_ext_method *method, struct v3_ext_ctx *ctx, char *data)
+void *acseq_s2i(UNUSED(struct v3_ext_method *method), UNUSED(struct v3_ext_ctx *ctx), char *data)
 {
   AC **list = (AC **)data;
   AC_SEQ *a;
@@ -394,7 +394,7 @@ void *acseq_s2i(struct v3_ext_method *method, struct v3_ext_ctx *ctx, char *data
   return (void *)a;
 }
 
-void *targets_s2i(struct v3_ext_method *method, struct v3_ext_ctx *ctx, char *data)
+void *targets_s2i(UNUSED(struct v3_ext_method *method), UNUSED(struct v3_ext_ctx *ctx), char *data)
 {
   char *pos;
   char *list = strdup(data);
@@ -435,7 +435,7 @@ void *targets_s2i(struct v3_ext_method *method, struct v3_ext_ctx *ctx, char *da
 
 }
 
-void *certs_s2i(struct v3_ext_method *method, struct v3_ext_ctx *ctx, char *data)
+void *certs_s2i(UNUSED(struct v3_ext_method *method), UNUSED(struct v3_ext_ctx *ctx), char *data)
 {
   STACK_OF(X509) *certs =
     (STACK_OF(X509) *)data;
@@ -457,7 +457,7 @@ void *certs_s2i(struct v3_ext_method *method, struct v3_ext_ctx *ctx, char *data
   return NULL;    
 }
 
-void *attributes_s2i(struct v3_ext_method *method, struct v3_ext_ctx *ctx, char *data)
+void *attributes_s2i(UNUSED(struct v3_ext_method *method), UNUSED(struct v3_ext_ctx *ctx), char *data)
 {
   int i = 0;
 
@@ -481,17 +481,17 @@ void *attributes_s2i(struct v3_ext_method *method, struct v3_ext_ctx *ctx, char 
   return NULL;
 }
 
-void *null_s2i(struct v3_ext_method *method, struct v3_ext_ctx *ctx, char *data)
+void *null_s2i(UNUSED(struct v3_ext_method *method), UNUSED(struct v3_ext_ctx *ctx), UNUSED(char *data))
 {
   return ASN1_NULL_new();
 }
 
-char *authkey_i2s(struct v3_ext_method *method, void *ext)
+char *authkey_i2s(UNUSED(struct v3_ext_method *method), UNUSED(void *ext))
 {
   return norep();
 }
 
-void *authkey_s2i(struct v3_ext_method *method, struct v3_ext_ctx *ctx, char *data)
+void *authkey_s2i(UNUSED(struct v3_ext_method *method), UNUSED(struct v3_ext_ctx *ctx), char *data)
 {
   X509       *cert = (X509 *)data;
   unsigned char digest[21];
