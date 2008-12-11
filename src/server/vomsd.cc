@@ -718,12 +718,9 @@ VOMSServer::Execute(EVP_PKEY *key, X509 *issuer, X509 *holder, gss_ctx_id_t cont
 
   sqliface::interface *newdb = db->getSession();
 
-  if (!newdb->operation(OPERATION_GET_USER, &uid, holder)) {
-    LOG(logh, LEV_ERROR, T_PRE, "Error in executing request!");
-    LOG(logh, LEV_ERROR, T_PRE, newdb->errorMessage());
-    db->releaseSession(newdb);
-    err.num = ERR_NOT_MEMBER;
-    err.message = voname + ": User unknown to this VO.";
+  if (!newdb) {
+    err.num = ERR_WITH_DB;
+    err.message = voname + ": Problems in DB communication.";
 
     LOG(logh, LEV_ERROR, T_PRE, err.message.c_str());
     errs.push_back(err);
@@ -731,7 +728,31 @@ VOMSServer::Execute(EVP_PKEY *key, X509 *issuer, X509 *holder, gss_ctx_id_t cont
     LOGM(VARP, logh, LEV_DEBUG, T_PRE, "Sending: %s", ret.c_str());
     sock.Send(ret);
     return false;
+  }
 
+  if (!newdb->operation(OPERATION_GET_USER, &uid, holder)) {
+    int code;
+    LOG(logh, LEV_ERROR, T_PRE, "Error in executing request!");
+    LOG(logh, LEV_ERROR, T_PRE, newdb->errorMessage());
+    code = newdb->error();
+    db->releaseSession(newdb);
+
+    if (code != ERR_NO_DB) {
+      err.num = ERR_NOT_MEMBER;
+      err.message = voname + ": User unknown to this VO.";
+    }
+    else {
+      err.num = ERR_WITH_DB;
+      err.message = voname + ": Problems in DB communication.";
+    }
+
+
+    LOG(logh, LEV_ERROR, T_PRE, err.message.c_str());
+    errs.push_back(err);
+    std::string ret = XML_Ans_Encode("A", errs, dobase64);
+    LOGM(VARP, logh, LEV_DEBUG, T_PRE, "Sending: %s", ret.c_str());
+    sock.Send(ret);
+    return false;
   }
 
   LOGM(VARP, logh, LEV_INFO, T_PRE, "Userid = \"%ld\"", uid);
@@ -774,8 +795,12 @@ VOMSServer::Execute(EVP_PKEY *key, X509 *issuer, X509 *holder, gss_ctx_id_t cont
         break;
 
       case 'G':
-        if (result = newdb->operation(OPERATION_GET_GROUPS, &fqans, uid))
-          result2 = newdb->operation(OPERATION_GET_GROUPS_ATTRIBS, &attribs, uid);
+        if (result = newdb->operation(OPERATION_GET_GROUPS, &fqans, uid)) {
+          if (not_in(std::string(group), fqans))
+            result = false;
+          else
+            result2 = newdb->operation(OPERATION_GET_GROUPS_ATTRIBS, &attribs, uid);
+        }
 
         if (setuporder) {
           if (!r.order.empty())

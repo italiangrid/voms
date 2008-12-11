@@ -30,6 +30,7 @@ JAVA_CLASSES = org/glite/voms/BasicVOMSTrustStore.class \
 							 org/glite/voms/ac/AttributeHolder.class \
 							 org/glite/voms/ac/FullAttributes.class \
 							 org/glite/voms/ac/VOMSTrustStore.class \
+							 org/glite/voms/ac/V2Form.class \
 							 org/glite/voms/contact/cli/VomsProxyInitClient.class \
 							 org/glite/voms/contact/PathNamingScheme.class \
 							 org/glite/voms/contact/Test.class \

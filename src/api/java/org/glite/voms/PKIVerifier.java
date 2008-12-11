@@ -301,8 +301,16 @@ public class PKIVerifier {
 
             if ( success == true ) {
                 // LSC found. Now verifying certificate
+                logger.debug("LSC Verification step.");
                 certificates = (X509Certificate[]) certList.getCerts().toArray(
                         new X509Certificate[] {} );
+                if (!ac.verifyCert(certificates[0])) {
+                    certificates = null;
+                    logger.debug( "Signature Verification false (from LSC)." );
+                }
+                else {
+                    logger.debug( "Signature Verification OK (from LSC)." );
+                }
             }
         }
 

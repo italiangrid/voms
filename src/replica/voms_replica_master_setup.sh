@@ -133,12 +133,18 @@ else
 fi
 
 MYSQLDUMP=$MYSQL_HOME/bin/mysqldump
-MYSQLINIT=/etc/rc.d/init.d/mysql
+MYSQLINIT=""
+if test -e /etc/rc.d/init.d/mysqld ; then
+    MYSQLINIT=/etc/rc.d/init.d/mysqld
+elif test -e /etc/rc.d/init.d/mysql ; then
+    MYSQLINIT=/etc/rc.d/init.d/mysql
+fi
 
 if test "x$require_ssl" = "xy" ; then
    $MYSQL -e "GRANT REPLICATION SLAVE ON *.* TO '$mysql_replica_user'@'$slave_host' IDENTIFIED BY '$mysql_replica_user_pwd' REQUIRE SSL; GRANT SELECT ON $master_db.* TO '$mysql_replica_user'@'$slave_host' IDENTIFIED BY '$mysql_replica_user_pwd' REQUIRE SSL; FLUSH PRIVILEGES;"
 else
-   $MYSQL -e "GRANT REPLICATION SLAVE ON *.* TO '$mysql_replica_user'@'$slave_host' IDENTIFIED BY '$mysql_replica_user_pwd' REQUIRE SSL; GRANT SELECT ON $master_db.* TO '$mysql_replica_user'@'$slave_host' IDENTIFIED BY '$mysql_replica_user_pwd'; FLUSH PRIVILEGES;"
+
+   $MYSQL -e "GRANT REPLICATION SLAVE ON *.* TO '$mysql_replica_user'@'$slave_host' IDENTIFIED BY '$mysql_replica_user_pwd'; GRANT SELECT ON $master_db.* TO '$mysql_replica_user'@'$slave_host' IDENTIFIED BY '$mysql_replica_user_pwd'; FLUSH PRIVILEGES;"
 fi
 
 if test "x$mysql_version" = "x5" ; then
@@ -151,10 +157,10 @@ else
 if test "x$mysql_password_admin" = "x" ; then
     $MYSQL -e "FLUSH TABLES WITH READ LOCK; SHOW MASTER STATUS; SYSTEM $MYSQLDUMP -u$mysql_username_admin -B $master_db >$master_db.dump;" >/tmp/outfile
 else
-#GET REPLICATION DATA
-$MYSQL -e "FLUSH TABLES WITH READ LOCK; SHOW MASTER STATUS; SYSTEM $MYSQLDUMP -u$mysql_username_admin -p$mysql_password_admin -B $master_db >$master_db.dump;" >/tmp/outfile
+    $MYSQL -e "FLUSH TABLES WITH READ LOCK; SHOW MASTER STATUS; SYSTEM $MYSQLDUMP -u$mysql_username_admin -p$mysql_password_admin -B $master_db >$master_db.dump;" > /tmp/outfile
 fi
 fi
+
 
 master_log_file=`cat /tmp/outfile | awk 'NR==2 {print $1}'`
 master_log_pos=`cat /tmp/outfile  | awk 'NR==2 {print $2}'`
@@ -172,9 +178,9 @@ if test "x$dryrun" = "xn" ; then
 
 #GET MUST PRESERVE DATA
 
-    set datadir=`cat $mysql_conf_file|grep 'datadir='`
-    set socket=`cat $mysql_conf_file|grep 'socket='`
-    set oldpass=`cat $mysql_conf_file|grep 'old_passwords='`
+    set datadir=`cat $mysql_conf_file|grep -E '[\t ]*datadir[\t ]*='`
+    set socket=`cat $mysql_conf_file|grep -E '[\t ]*socket[\t ]*='`
+    set oldpass=`cat $mysql_conf_file|grep -E '[\t ]*old_passwords[\t ]*='`
     cat >$mysql_conf_file <<EOF
 [mysqld]
 $datadir
@@ -188,7 +194,7 @@ sync_binlog=1
 EOF
 
 if test "z$mysql_version" = "z4"; then
-    cat >$mysql_conf_file <<EOF
+    cat >>$mysql_conf_file <<EOF
 innodb-safe-binlog
 innodb_flush_log_at_trx_commit=1
 EOF
@@ -207,6 +213,7 @@ fi
 
 fi
 
+
 echo "Send these informations to the administrator of the slave server:"
 echo "Log File    : $master_log_file"
 echo "Log Position: $master_log_pos"
@@ -216,4 +223,5 @@ echo "DB name     : $master_db"
 echo "Ignore      : $ignoretables"
 
 echo "Also, send this file: $master_db.dump"
+
 

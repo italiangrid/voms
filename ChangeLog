@@ -1,7 +1,38 @@
 ------------------------------------------------------------------------
+r983 | marotta | 2008-09-05 11:53:37 +0200 (Fri, 05 Sep 2008) | 1 line
+Changed paths:
+   A /voms/branches/voms-1-8-series/testsuite/voms/voms/voms064.exp
+   A /voms/branches/voms-1-8-series/testsuite/voms/voms/voms065.exp
+
+Added missing tests.
+------------------------------------------------------------------------
+r982 | marotta | 2008-09-05 11:49:35 +0200 (Fri, 05 Sep 2008) | 1 line
+Changed paths:
+   M /voms/branches/voms-1-8-series/ChangeLog
+
+--noregen bug was bug #41116
+------------------------------------------------------------------------
+r978 | marotta | 2008-09-05 11:33:28 +0200 (Fri, 05 Sep 2008) | 1 line
+Changed paths:
+   M /voms/branches/voms-1-8-series/configure
+   M /voms/branches/voms-1-8-series/configure.ac
+   M /voms/branches/voms-1-8-series/project/version.properties
+
+Bumped version to 1.8.6
+------------------------------------------------------------------------
+r977 | marotta | 2008-09-05 11:13:26 +0200 (Fri, 05 Sep 2008) | 1 line
+Changed paths:
+   M /voms/branches/voms-1-8-series/ChangeLog
+   M /voms/branches/voms-1-8-series/src/server/vomsd.cc
+   M /voms/branches/voms-1-8-series/testsuite/voms/voms/voms059.exp
+   M /voms/branches/voms-1-8-series/testsuite/voms/voms/voms061.exp
+   M /voms/branches/voms-1-8-series/testsuite/voms/vomsapi-c/vomsapi-c005.exp
+
+Fixes for bugs #41095, #41094, and --noregen bug (number will follow)
+------------------------------------------------------------------------
 r976 | marotta | 2008-08-01 15:13:00 +0200 (Fri, 01 Aug 2008) | 1 line
 Changed paths:
-   M /voms/branches/voms-1-8-series/src/server/vomsd.cc 
+   M /voms/branches/voms-1-8-series/src/server/vomsd.cc
 
 Fixed memory problem.
 ------------------------------------------------------------------------

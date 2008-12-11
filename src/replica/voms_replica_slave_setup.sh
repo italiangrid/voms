@@ -121,14 +121,14 @@ if test "x$mysql_replica_user_pwd" = "x" ; then
     exit 1;
 fi
 
-if test "x$log_file" = "x" ; then
-    echo "Did not specify the mater log file name.";
-    exit 1;
-fi
-
 if test "x$log_file_pos" = "x" ; then
     echo "Did not specify the mater log file position.";
-    exit 1;
+    echo "is this intentional?  Type YES if it is so"
+    read answer
+
+    if test "z$answer" != "zYES" ; then
+        exit 1;
+    fi
 fi
 
 if test "x$master_db" = "x" ; then 
@@ -162,11 +162,12 @@ if test "x$dryrun" = "xn" ; then
 
 #GET MUST PRESERVE DATA
 
-    set datadir=`cat $mysql_conf_file|grep 'datadir='`
-    set socket=`cat $mysql_conf_file|grep 'socket='`
-    set oldpass=`cat $mysql_conf_file|grep 'old_passwords='`
-    set replicate=`cat $mysql_conf_file|grep 'replicate-do-db'`
-    set ignore=`cat $mysql_conf_file|grep 'replicate-ignore-table'`
+    set datadir=`cat $mysql_conf_file|grep -E '[\t ]*datadir[\t ]*='`
+    set socket=`cat $mysql_conf_file|grep -E '[\t ]*socket[\t ]*='`
+    set oldpass=`cat $mysql_conf_file|grep -E '[\t ]*old_passwords[\t ]*='`
+    set replicate=`cat $mysql_conf_file|grep -E '[\t ]*replicate-do-db'`
+    set ignore=`cat $mysql_conf_file|grep -E '[\t ]*replicate-ignore-table'`
+
     cat >$mysql_conf_file <<EOF
 [mysqld]
 $datadir
