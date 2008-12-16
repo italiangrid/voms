@@ -1010,10 +1010,48 @@ bool vomsdata::LoadCredentials(X509 *cert, STACK_OF(X509) *chain, EVP_PKEY *pkey
   if (cert)
     ucert = X509_dup(cert);
 
-  if (chain)
-    cert_chain = sk_X509_dup(chain);
-
   if (pkey)
     upkey = EVP_PKEY_dup(pkey);
+
+
+  /* sk_dup does *not* duplicate the stack content.  Only the
+     stack itself. */
+#if 0
+  if (chain)
+    cert_chain = sk_X509_dup(chain);
+#endif
+
+  /* So, do the duplicatio by hand. */
+  if (chain) {
+    cert_chain = sk_X509_new_null();
+
+    if (cert_chain) {
+      for (int i =0; i < sk_X509_num(chain); i++) {
+        X509 *newcert = X509_dup(sk_X509_value(chain, i));
+        if (!newcert) {
+          sk_X509_pop_free(cert_chain, X509_free);
+          cert_chain = NULL;
+          break;
+        }
+        
+        sk_X509_push(cert_chain, newcert);
+      }
+    }
+  }
+
+  if ((cert && !ucert) || (pkey && !upkey) || 
+      (chain && !cert_chain)) {
+    X509_free(cert);
+    EVP_PKEY_free(pkey);
+    sk_X509_pop_free(cert_chain, X509_free);
+    
+    ucert = NULL;
+    cert_chain = NULL;
+    upkey = NULL;
+
+    return false;
+  }
+
+  return true;
 }
 
