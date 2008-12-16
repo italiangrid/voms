@@ -283,7 +283,6 @@ GSISocketClient::Open()
   if (BIO_do_connect(conn) <= 0) {
     goto err;
   }
-  opened = true;
 
   ssl = SSL_new(ctx);
   pvd = setup_initializers();
@@ -291,7 +290,7 @@ GSISocketClient::Open()
 
   SSL_set_ex_data(ssl, PVD_SSL_EX_DATA_IDX, pvd);
   SSL_set_bio(ssl, conn, conn);
-
+  conn = NULL;
   if (SSL_connect(ssl) <= 0) {
     goto err;
   }

@@ -44,6 +44,8 @@ import javax.security.auth.x500.X500Principal;
 
 import org.apache.log4j.Logger;
 import org.bouncycastle.asn1.DERObjectIdentifier;
+import org.bouncycastle.asn1.ASN1Sequence;
+import org.bouncycastle.asn1.ASN1Object;
 import org.bouncycastle.asn1.x509.X509Extension;
 import org.bouncycastle.asn1.x509.X509Extensions;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
@@ -52,6 +54,7 @@ import org.glite.voms.ac.ACTargets;
 import org.glite.voms.ac.AttributeCertificate;
 import org.glite.voms.ac.AttributeCertificateInfo;
 import org.glite.voms.ac.VOMSTrustStore;
+import org.glite.voms.contact.MyProxyCertInfo;
 
 public class PKIVerifier {
 
@@ -426,6 +429,39 @@ public class PKIVerifier {
         return true;
     }
 
+    private boolean checkProxyCertInfo(X509Certificate cert, int posInChain, int chainSize) {
+        byte[] payload = cert.getExtensionValue(PROXYCERTINFO);
+        if (payload == null) {
+            payload = cert.getExtensionValue(PROXYCERTINFO_OLD);
+            if (payload == null) {
+                logger.debug("No ProxyCertInfo extension found.");
+                return true;
+            }
+        }
+
+        ASN1Object seq = null;
+
+        try {
+            seq = ASN1Object.fromByteArray(payload);
+        } 
+        catch (IOException e) {
+            return false;
+        }
+
+        if (seq instanceof ASN1Sequence) {
+            MyProxyCertInfo pci = new MyProxyCertInfo((ASN1Sequence)seq);
+
+            logger.info("Constraint: " + pci.getPathLenConstraint() + 
+                        "   Size: " + chainSize + "   Current: " + posInChain);
+
+            if (pci.getPathLenConstraint() < chainSize - posInChain) {
+                return false;
+            }
+            return true;
+        }
+        return false;
+    }
+
     /**
      * Verifies an certificate chain according to RFC 3280.
      * 
@@ -572,13 +608,20 @@ public class PKIVerifier {
         }
 
         // now verifies it
+        int stackSize = certStack.size();
+        int stackPos = stackSize+1;
         while ( !certStack.isEmpty() ) {
             currentCert = (X509Certificate) certStack.pop();
+            stackPos = stackPos -1;
 
             if ( logger.isDebugEnabled() )
                 logger.debug( "VERIFYING : "
                         + currentCert.getSubjectDN().getName() );
 
+            if (!checkProxyCertInfo(currentCert, stackPos, stackSize)) {
+                logger.error("ProxyCertInfo extension violated.");
+                return false;
+            }
             if ( PKIUtils.selfIssued( currentCert ) ) {
                 if ( currentLength != 0 ) {
                     logger

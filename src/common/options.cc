@@ -254,6 +254,9 @@ getopts_real(int argc, char * const argv[], struct option *longopts, struct opti
 
     c = getopt_long_only(argc, argv, "+", opts, &index);
 
+    //    if (c == '?' || c == '+')
+    //      break;
+
     if (c != -1 && c != '?')
     {
       if (longopts[index].flag == NULL && 

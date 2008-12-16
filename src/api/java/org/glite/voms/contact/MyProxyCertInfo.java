@@ -19,8 +19,9 @@ import org.bouncycastle.asn1.DEREncodable;
 import org.bouncycastle.asn1.DEREncodableVector;
 import org.bouncycastle.asn1.DERObject;
 import org.bouncycastle.asn1.DERSequence;
+import org.bouncycastle.asn1.ASN1Sequence;
 
-class MyProxyCertInfo implements DEREncodable {
+public class MyProxyCertInfo implements DEREncodable {
 
     private int pathLen;
     private ProxyPolicy policy;
@@ -37,6 +38,36 @@ class MyProxyCertInfo implements DEREncodable {
         this.policy = policy;
         this.pathLen = pathLenConstraint;
         this.version = version;
+    }
+
+    public int getPathLenConstraint() {
+        return pathLen;
+    }
+
+    public ProxyPolicy getProxyPolicy() {
+        return policy;
+    }
+
+    public MyProxyCertInfo(ASN1Sequence seq) {
+        if (seq.size() == 1) {
+            // Only one element.  Must be a ProxyPolicy
+            this.pathLen = -1;
+            this.policy = new ProxyPolicy((ASN1Sequence)(seq.getObjectAt(0)));
+        }
+        else {
+            // Two elements.  Which one is the first?
+            DEREncodable obj = seq.getObjectAt(0);
+            if (obj instanceof DERInteger) {
+                this.pathLen = ((DERInteger)obj).getValue().intValue();
+                this.policy  = new ProxyPolicy((ASN1Sequence)(seq.getObjectAt(0)));
+                this.version = VOMSProxyBuilder.GT3_PROXY;
+            }
+            else {
+                this.policy  = new ProxyPolicy((ASN1Sequence)(seq.getObjectAt(0)));
+                this.pathLen = ((DERInteger)obj).getValue().intValue();
+                this.version = VOMSProxyBuilder.GT4_PROXY;
+            }
+        }
     }
 
     public DERObject getDERObject() {

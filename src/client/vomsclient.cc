@@ -640,7 +640,7 @@ bool Client::Run() {
   
   /* vomsdata */
   
-  vomsdata v;
+  vomsdata v(certdir);
 
   for (std::vector<std::string>::iterator i = confiles.begin(); i != confiles.end(); i++) {
     if(debug)
