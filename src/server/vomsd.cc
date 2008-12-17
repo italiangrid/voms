@@ -260,7 +260,8 @@ VOMSServer::VOMSServer(int argc, char *argv[]) : sock(0,0,NULL,50,false),
                                                  insecure(false),
                                                  shortfqans(false),
                                                  do_syslog(false),
-                                                 base64encoding(false)
+                                                 base64encoding(false),
+                                                 nologfile(false)
 {
   struct stat statbuf;
 
@@ -326,6 +327,7 @@ VOMSServer::VOMSServer(int argc, char *argv[]) : sock(0,0,NULL,50,false),
     {"shortfqans",      0, (int *)&shortfqans,        OPT_BOOL},
     {"syslog",          0, (int *)&do_syslog,         OPT_BOOL},
     {"base64",          0, (int *)&base64encoding,    OPT_BOOL},
+    {"nologfile",       0, (int *)&nologfile,         OPT_BOOL},
     {0, 0, 0, 0}
   };
 
@@ -391,7 +393,8 @@ VOMSServer::VOMSServer(int argc, char *argv[]) : sock(0,0,NULL,50,false),
       (void)LogFormat(logh, logf.c_str());
       //      (void)LogDateFormat(logh, logdf.c_str());
       (void)StartLogger(logh, code);
-      (void)LogActivate(logh, "FILE");
+      if (!nologfile)
+        (void)LogActivate(logh, "FILE");
       if (do_syslog)
         (void)LogActivate(logh, "SYSLOG");
 

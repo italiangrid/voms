@@ -87,5 +87,6 @@ private:
   bool            shortfqans;
   bool            do_syslog;
   bool            base64encoding;
+  bool            nologfile;
 };
 #endif
