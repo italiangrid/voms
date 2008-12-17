@@ -3151,27 +3151,23 @@ proxy_get_filenames(
  
     status = 0;
 err:
-    if (p_cert_file && cert_file)
-    {
+    if (!status) {
+      if (p_cert_file && cert_file) {
         *p_cert_file = strdup(cert_file);
-    }
-    if (p_cert_dir && cert_dir)
-    {
+      }
+      if (p_cert_dir && cert_dir) {
         *p_cert_dir = strdup(cert_dir);
-    }
-    if (p_user_proxy && user_proxy)
-    {
+      }
+      if (p_user_proxy && user_proxy) {
         *p_user_proxy = strdup(user_proxy);
-    }
-    if (p_user_cert && user_cert)
-    {
+      }
+      if (p_user_cert && user_cert) {
         *p_user_cert = strdup(user_cert);
-    }
-    if (p_user_key && user_key)
-    {
+      }
+      if (p_user_key && user_key) {
         *p_user_key = strdup(user_key);
+      }
     }
-        
 #ifdef WIN32
     if (hkDir)
     {
