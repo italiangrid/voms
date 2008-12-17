@@ -274,8 +274,7 @@ static int logfile_rotate(const char * name)
         sprintf(s, "%d", i);
         strcat(oldname, s);
     
-        if (rename(oldname, newname) == -1)
-          res = 0;
+        (void)rename(oldname, newname);
       }
     }
 /*     // rename the main file to .1  */
