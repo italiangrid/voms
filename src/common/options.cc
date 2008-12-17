@@ -344,11 +344,12 @@ getopts_real(int argc, char * const argv[], struct option *longopts, struct opti
       break;
       
       case OPT_HELP:
-        c = '?';
+        usage(argv[0]);
+        exit(1);
         break;
       
       default:
-        c = '?';
+        c = -2;
         break;
       }
     }
@@ -362,8 +363,7 @@ getopts_real(int argc, char * const argv[], struct option *longopts, struct opti
 
   if (c == '?')
   {
-    usage(argv[0]);
-    exit(0);
+    exit(1);
   }
   else if (optind < argc && argv[optind][0] != '#' ) {
     std::cerr << "Found non option element " << argv[optind] << " in command line." << std::endl;

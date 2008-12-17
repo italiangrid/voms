@@ -181,7 +181,7 @@ Client::Client(int argc, char ** argv) :
   std::vector<std::string> order;
   std::vector<std::string> targets;
   bool rfc = false;
-
+  bool old = false;
   bool pwstdin = false;
 
   location = (getenv(LOCATION_ENV) ? getenv(LOCATION_ENV) : LOCATION_DIR);
@@ -243,6 +243,7 @@ Client::Client(int argc, char ** argv) :
       "    -failonwarn                    Treat warnings as errors.\n" \
       "    -list                          Show all available attributes.\n" \
       "    -rfc                           Creates RFC 3820 compliant proxy (synonymous with -proxyver 4)\n" \
+      "    -old                           Creates GT2 compliant proxy (synonymous with -proxyver 2)\n"
       "\n";
 
     set_usage(LONG_USAGE);
@@ -287,6 +288,7 @@ Client::Client(int argc, char ** argv) :
       {"failonwarn",      0, (int *)&failonwarn,  OPT_BOOL},
       {"list",            0, (int *)&listing,     OPT_BOOL},
       {"rfc",             0, (int *)&rfc,         OPT_BOOL},
+      {"old",             0, (int *)&old,         OPT_BOOL},
 #ifdef CLASS_ADD
       {"classadd",        1, (int *)class_add_buf,OPT_STRING},
 #endif
@@ -400,6 +402,9 @@ Client::Client(int argc, char ** argv) :
   /* set proxy version */
   if (rfc)
     proxyver = 4;
+
+  if (old)
+    proxyver = 2;
 
   if(proxyver!=2 && proxyver!=3 && proxyver != 4 && proxyver!=0) {
     std::cerr << "Error: proxyver must be 2, 3 or 4" << std::endl;
