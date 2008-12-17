@@ -1,0 +1,49 @@
+load_lib vomstest.exp
+
+testheader "See if data can be retrieved from an RFC proxy."
+_activateCert mycert2
+
+_vomsStart voms1
+set outname [exec mktemp $::SCRATCHDIR/voms-api-c-XXXXXX]
+set res [catch {set out [exec $::INSTALLDIR/bin/voms-proxy-init -rfc --voms voms1 >& $outname]}]
+_vomsStop voms1
+
+if $res then {
+    set LOGOUTS "$LOGOUTS $outname"
+    fail "voms-proxy-init failed."
+} else {
+    set ::_buildout [exec mktemp $::SCRATCHDIR/voms-api-c-XXXXXX]
+    set res [_exeC parsetest.c -useproxy]
+
+    set LOGOUTS "$LOGOUTS $::_buildout"
+
+    if $res then {
+        fail "parsing failed."
+    } else {
+        set correct "voname1: voms1
+user1: /C=IT/CN=001
+userca1: /C=IT/O=INFN/CN=CAFromthisCN
+server1: /C=IT/CN=003
+serverca1: /C=IT/O=INFN/CN=CAFromthisCN
+uri1: $HOSTNAME:33334
+begdate1: .*
+enddate1: .*
+fqan1: /voms1
+fqan1: /voms1/group1
+version1: 1"
+
+        set out [exec cat $::_buildout]
+        if [regexp $correct $out] then {
+            pass "output correct"
+        } else {
+            set outname2 [exec mktemp $::SCRATCHDIR/voms-api-c-XXXXXX]
+            set id [open $outname2 "w+"]
+            puts $id $correct
+            close $id
+
+            set LOGOUTS "$LOGOUTS $outname2"
+            fail "output wrong"
+        }
+    }
+
+}

@@ -38,6 +38,8 @@ extern "C" {
 #include <openssl/bio.h>
 #include <openssl/x509.h>
 #include <openssl/pem.h>
+#include <openssl/objects.h>
+#include <openssl/asn1.h>
 #include "credentials.h"
 #include "sslutils.h"
 
@@ -162,6 +164,16 @@ vomsdata::Initializer::Initializer()
   ERR_load_crypto_strings();
 
   (void)AC_Init();
+#define PROXYCERTINFO_V3      "1.3.6.1.4.1.3536.1.222"
+#define PROXYCERTINFO_V4      "1.3.6.1.5.5.7.1.14"
+#define OBJC(c,n) OBJ_create(c,n,#c)
+
+  if (OBJ_txt2nid("PROXYCERTINFO_V3") == 0)
+    OBJC(PROXYCERTINFO_V3, "PROXYCERTINFO_V3");
+
+  if (OBJ_txt2nid("PROXYCERTINFO_V4") == 0)
+    OBJC(PROXYCERTINFO_V4, "PROXYCERTINFO_V4");
+
 #endif
 }
 
