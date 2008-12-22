@@ -69,15 +69,16 @@ static int fileoutputter(void *data, const char *s)
 
   off_t position = lseek(ld->fd, 0, SEEK_CUR);
 
-  if (position > ld->maxlog) {
-    if (logfile_rotate(ld->name)) {
-      if (!filereopen(ld))
+  if (ld->maxlog) {
+    if (position > ld->maxlog) {
+      if (logfile_rotate(ld->name)) {
+        if (!filereopen(ld))
+          write(ld->fd, "VOMS: LOGGING ROTATION ERROR\n", 29);
+      }
+      else
         write(ld->fd, "VOMS: LOGGING ROTATION ERROR\n", 29);
     }
-    else
-      write(ld->fd, "VOMS: LOGGING ROTATION ERROR\n", 29);
   }
-
   output = strdup(s);
 
   if (ld->dateformat) {

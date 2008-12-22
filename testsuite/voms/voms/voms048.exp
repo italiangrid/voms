@@ -4,7 +4,7 @@ testheader "See if voms-proxy-init --conf works."
 _activateCert mycert2
 
 set id [open "$::SCRATCHDIR/vconf" "w"]
-puts $id "--voms voms1"
+puts $id "--voms=voms1"
 close $id
 
 _vomsStart voms1

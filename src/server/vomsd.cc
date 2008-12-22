@@ -368,6 +368,28 @@ VOMSServer::VOMSServer(int argc, char *argv[]) : sock(0,0,NULL,50,false),
     exit(0);
   }
 
+  /* Test if logging can start. */
+  if (!do_syslog) {
+    struct stat statbuf;
+    int dounlink = 1;
+    int res = stat(logfile.c_str(), &statbuf);
+    if (!res) {
+      /* It exists. Must not be unlinked. */
+      dounlink = 0;
+    }
+
+    int newfd = open(logfile.c_str(), O_WRONLY|O_CREAT|O_APPEND, S_IRUSR|S_IWUSR);
+      
+    if (newfd == -1) {
+      fprintf(stderr, "logging could not start!  Logfile %s could not be opened, and syslogging is disabled.", logfile.c_str());
+      exit(1);
+    }
+    if (dounlink)
+      unlink(logfile.c_str());
+
+    close(newfd);
+  }
+
   if ((logh = LogInit())) {
     //    if ((logger = FileNameStreamerAdd(logh, logfile.c_str(), logmax, code, 0))) {
       loglevels lev;
@@ -398,14 +420,6 @@ VOMSServer::VOMSServer(int argc, char *argv[]) : sock(0,0,NULL,50,false),
       if (do_syslog)
         (void)LogActivate(logh, "SYSLOG");
 
-      /* Test if logging actually started. */
-      if (!do_syslog) {
-        struct stat filestats;
-        if (stat(logfile.c_str(), &filestats)) {
-          fprintf(stderr, "logging could not start!  Logfile could not be opened, and syslogging is disabled.");
-          exit(1);
-        }
-      }
       (void)LogOption(logh, "NAME", logfile.c_str());
       (void)LogOptionInt(logh, "MAXSIZE", logmax);
       (void)LogOption(logh, "DATEFORMAT", logdf.c_str());

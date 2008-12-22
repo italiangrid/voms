@@ -6,8 +6,8 @@ _activateCert mycert2
 _backupVOMS voms1
 _removeVOMSOption voms1 syslog
 file delete -force $::INSTALLDIR/var/log
-file mkdir $::INSTALLDIR/var/log
 set out [catch { _vomsStart voms1 } var]
+file mkdir $::INSTALLDIR/var/log
 catch { _vomsStop voms1 }
 _restoreVOMS voms1
 
