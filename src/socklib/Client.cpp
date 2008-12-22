@@ -201,6 +201,7 @@ static proxy_verify_desc *setup_initializers()
 
   pvd  = (proxy_verify_desc*)     malloc(sizeof(proxy_verify_desc));
   pvxd = (proxy_verify_ctx_desc *)malloc(sizeof(proxy_verify_ctx_desc));
+  pvd->cert_store = NULL;
 
   if (!pvd || !pvxd) {
     free(pvd);
@@ -221,7 +222,12 @@ static void destroy_initializers(proxy_verify_desc *pvd)
     if (pvd->pvxd)
       proxy_verify_ctx_release(pvd->pvxd);
     free(pvd->pvxd);
+    pvd->pvxd = NULL;
     proxy_verify_release(pvd);
+    if (pvd->cert_store) {
+      X509_STORE_CTX_free(pvd->cert_store);
+      pvd->cert_store = NULL;
+    }
     free(pvd);
   }
 }

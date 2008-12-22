@@ -15,8 +15,10 @@
 #ifndef VOMS_APIC_H
 #define VOMS_APIC_H
 
+#ifndef GSSAPI_H_
 typedef void * gss_cred_id_t;
 typedef void * gss_ctx_id_t;
+#endif
 
 #include <openssl/x509.h>
 #include <time.h>
