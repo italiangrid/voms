@@ -1,28 +1,36 @@
 load_lib vomstest.exp
 
-testheader "See if voms-proxy-destroy works."
-_activateCert mycert2
+proc mytest {} {
+    testheader "See if voms-proxy-destroy works."
+    _activateCert mycert2
 
-_vomsStart voms1
-set outname [exec mktemp $::SCRATCHDIR/voms-proxy-init-XXXXXX]
-set res [catch {set out [exec $::INSTALLDIR/bin/voms-proxy-init --voms voms1 >& $outname]}]
-_vomsStop voms1
+    _vomsStart voms1
+    set outname [exec mktemp $::SCRATCHDIR/voms-proxy-init-XXXXXX]
+    set res [catch {set out [exec $::INSTALLDIR/bin/voms-proxy-init --voms voms1 >& $outname]}]
+    _vomsStop voms1
 
-if $res then {
-    set LOGOUTS "$LOGOUTS $outname"
-    fail "voms-proxy-init failed."
-} else {
+    if $res then {
+        addlog $outname
+        testmessage "voms-proxy-init failed."
+        return $::FAILTEST
+    }
+
     set outname [exec mktemp $::SCRATCHDIR/voms-proxy-info-XXXXXX]
     set res [catch {set out [exec $::INSTALLDIR/bin/voms-proxy-destroy >& $outname]}]
 
     if $res then {
-        set LOGOUTS "$LOGOUTS $outname"
-        fail "voms proxy destroy failed."
+        addlog $outname
+        testmessage "voms proxy destroy failed."
+        return $::FAILTEST
     } else {
         if [file exists /tmp/x509up_u[exec id -u]] then {
-            fail "proxy exists."
+            testmessage "proxy exists."
+            return $::FAILTEST
         } else {
-            pass "proxy deleted."
+            testmessage "proxy deleted."
+            return $::PASSTEST
         }
     }
 }
+
+do_test

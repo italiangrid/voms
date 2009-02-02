@@ -1,24 +1,37 @@
 load_lib vomstest.exp
 
-testheader "See if an VOMS_RetrieveFromFile() works."
-_activateCert mycert2
+proc mytest {} {
+    testheader "See if an VOMS_RetrieveFromFile() works."
 
-_vomsStart voms1
-set outname [exec mktemp $::SCRATCHDIR/voms-proxy-init-XXXXXX]
-set res [catch {set out [exec $::INSTALLDIR/bin/voms-proxy-init --voms voms1 -out $::SCRATCHDIR/proxy >& $outname]}]
-_vomsStop voms1
+    if {[info exists ::NOCLIB] != 0} then {
+        testmessage "Either libraries are not present, or the executables cannot be compiled, or the test was disabled."
+        return $::UNDECIDEDTEST
+    }
 
-if $res then {
-    set LOGOUTS "$LOGOUTS $outname"
-    fail "voms-proxy-init failed."
-} else {
+    _activateCert mycert2
+
+    _vomsStart voms1
+    set outname [exec mktemp $::SCRATCHDIR/voms-proxy-init-XXXXXX]
+    set res [catch {set out [exec $::INSTALLDIR/bin/voms-proxy-init --voms voms1 -out $::SCRATCHDIR/proxy >& $outname]}]
+    _vomsStop voms1
+
+    if $res then {
+        addlog $outname
+        testmessage "voms-proxy-init failed."
+        return $::FAILTEST
+    }
+
     set ::_buildout [exec mktemp $::SCRATCHDIR/voms-api-c-XXXXXX]
     set res [_exeC proxyfromfile.c $::SCRATCHDIR/proxy]
 
     if $res then {
-        set LOGOUTS "$LOGOUTS $::_buildout"
-        fail "cannot read credentials from file."
+        addlog $::_buildout
+        testmessage "cannot read credentials from file."
+        return $::FAILTEST
     } else {
-        pass "read from file correct"
+        testmessage "read from file correct"
+        return $::PASSTEST
     }
 }
+
+do_test

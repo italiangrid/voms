@@ -19,8 +19,9 @@ AC_DEFUN([AC_EXPAT],
     ac_save_CFLAGS=$CFLAGS
     ac_save_LIBS=$LIBS
     if test -n "$with_expat_prefix" -a "$with_expat_prefix" != "/usr" ; then
-	EXPAT_CFLAGS="-I$with_expat_prefix/include"
+  EXPAT_CFLAGS="-I$with_expat_prefix/include"
 	EXPAT_LIBS="-L$with_expat_prefix/lib"
+  EXPAT_LIBS64="-L$with_expat_prefix/lib64"
     else
 	EXPAT_CFLAGS=""
 	EXPAT_LIBS=""
@@ -34,16 +35,26 @@ AC_DEFUN([AC_EXPAT],
     		   [ ac_cv_expat_valid=yes ], [ ac_cv_expat_valid=no ])
     CFLAGS=$ac_save_CFLAGS
     LIBS=$ac_save_LIBS	
-    AC_MSG_RESULT([$ac_cv_expat_valid])
+    LIBS="$EXPAT_LIBS64 $LIBS"
+    AC_TRY_COMPILE([ #include <expat.h> ],
+    		   [ const XML_LChar *ev = XML_ExpatVersion() ],
+    		   [ ac_cv_expat_valid64=yes ], [ ac_cv_expat_valid64=no ])
 
     if test x$ac_cv_expat_valid = xyes ; then
-        EXPAT_INSTALL_PATH=$with_expat_prefix
-	EXPAT_STATIC_LIBS="$with_expat_prefix/lib/libexpat.a"
-	ifelse([$2], , :, [$2])
+      EXPAT_INSTALL_PATH=$with_expat_prefix
+    	EXPAT_STATIC_LIBS="$with_expat_prefix/lib/libexpat.a"
+      AC_MSG_RESULT([$ac_cv_expat_valid])
+    	ifelse([$2], , :, [$2])
+    elif test x$ac_cv_expat_valid64 = xyes ; then
+      EXPAT_INSTALL_PATH=$with_expat_prefix
+    	EXPAT_STATIC_LIBS="$with_expat_prefix/lib/libexpat.a"
+      EXPAT_LIBS="-L$with_expat_prefix/lib64"
+      AC_MSG_RESULT([$ac_cv_expat_valid64])
+    	ifelse([$2], , :, [$2])
     else
-	EXPAT_CFLAGS=""
-	EXPAT_LIBS=""
-	ifelse([$3], , :, [$3])
+    	EXPAT_CFLAGS=""
+    	EXPAT_LIBS=""
+    	ifelse([$3], , :, [$3])
     fi
 
     AC_SUBST(EXPAT_INSTALL_PATH)

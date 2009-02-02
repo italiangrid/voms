@@ -1,26 +1,37 @@
 load_lib vomstest.exp
 
-testheader "See if -acexists works."
-_activateCert mycert2
+proc mytest {} {
+    testheader "See if -acexists works."
+    _activateCert mycert2
 
-_vomsStart voms1
-set outname [exec mktemp $::SCRATCHDIR/voms-proxy-init-XXXXXX]
-set res [catch {set out [exec $::INSTALLDIR/bin/voms-proxy-init --voms voms1 >& $outname]}]
-_vomsStop voms1
+    _vomsStart voms1
+    set outname [exec mktemp $::SCRATCHDIR/voms-proxy-init-XXXXXX]
+    set res [catch {set out [exec $::INSTALLDIR/bin/voms-proxy-init --voms voms1 >& $outname]}]
+    _vomsStop voms1
 
-if $res then {
-    set LOGOUTS "$LOGOUTS $outname"
-    fail "voms-proxy-init failed."
-} else {
+    if $res then {
+        addlog $outname
+        testmessage "voms-proxy-init failed."
+        return $::FAILTEST
+    }
+
     set outname [exec mktemp $::SCRATCHDIR/voms-proxy-info-XXXXXX]
-    if [catch {set out2 [exec $::INSTALLDIR/bin/voms-proxy-info --acexists voms1 >& $outname]}] then {
-        set LOGOUTS "$LOGOUTS $outname"
-        fail "expected AC does not exists."
+    set res [catch {set out2 [exec $::INSTALLDIR/bin/voms-proxy-info --acexists voms1 >& $outname]}]
+
+    if $res then {
+        addlog $outname
+        testmessage "expected AC does not exists."
+        return $::FAILTEST
     } else {
         if [catch {set out2 [exec $::INSTALLDIR/bin/voms-proxy-info --acexists voms2 >& $outname]}] then {
-            fail "unexpected ac found!"
+            addlog $outname
+            testmessage "unexpected ac found!"
+            return $::FAILTEST
         } else {
-            pass "expected AC verified to exist."
+            testmessage "expected AC verified to exist."
+            return $::PASSTEST
         }
     }
 }
+
+do_test

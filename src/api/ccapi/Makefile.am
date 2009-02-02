@@ -42,9 +42,9 @@ libvomsapi_la_SOURCES = \
 	$(CCSOURCES)
 
 libvomsapi_la_CPPFLAGS = \
-	-I$(top_srcdir)/src/include \
-	$(API_INCLUDES) \
-	$(GLOBUS_CFLAGS)
+	$(NO_GLOBUS_FLAGS) \
+	-DNOGLOBUS \
+	$(API_INCLUDES)
 
 libvomsapi_la_LDFLAGS = \
 	-rpath $(libdir)
@@ -58,9 +58,8 @@ CCLIBADD = \
 #	$(top_builddir)/src/sslutils/$(USE_SSL_UTILS_LIB)
 
 libvomsapi_la_LIBADD = \
-	$(CCLIBADD) \
-	$(top_builddir)/src/socklib/libsock.la \
-	$(top_builddir)/src/ac/libccattcert.la
+	$(NOGLIBADD) \
+	$(top_builddir)/src/ac/libattributes_nog.la
 
 CSOURCES = \
 	api_util.cc \

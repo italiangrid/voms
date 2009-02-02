@@ -1,16 +1,22 @@
 load_lib vomstest.exp
 
-testheader "See if voms-proxy-init --ignorewarn works."
-_activateCert mycert2
+proc mytest {} {
+    testheader "See if voms-proxy-init --ignorewarn works."
+    _activateCert mycert2
 
-_vomsStart voms1
-set outname [exec mktemp $::SCRATCHDIR/voms-proxy-init-XXXXXX]
-set res [catch {set out [exec $::INSTALLDIR/bin/voms-proxy-init --voms voms1 --vomslife 1000:00  --ignorewarn >& $outname]}]
-_vomsStop voms1
+    _vomsStart voms1
+    set outname [exec mktemp $::SCRATCHDIR/voms-proxy-init-XXXXXX]
+    set res [catch {set out [exec $::INSTALLDIR/bin/voms-proxy-init --voms voms1 --vomslife 1000:00  --ignorewarn >& $outname]}]
+    _vomsStop voms1
 
-if $res then {
-    set LOGOUTS "$LOGOUTS $outname"
-    fail "voms-proxy-init failed."
-} else {
-    pass "voms-proxy-init succeeded."
+    if $res then {
+        addlog $outname
+        testmessage "voms-proxy-init failed."
+        return $::FAILTEST
+    } else {
+        testmessage "voms-proxy-init succeeded."
+        return $::PASSTEST
+    }
 }
+
+do_test

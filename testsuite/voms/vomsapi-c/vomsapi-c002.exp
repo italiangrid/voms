@@ -1,14 +1,25 @@
 load_lib vomstest.exp
 
-testheader "See if the library can be linked."
+proc mytest {} {
+    testheader "See if the library can be linked."
 
-set ::_buildout [exec mktemp $::SCRATCHDIR/program-out-XXXXXX]
-set res [_buildC basictest.c]
+    if {[info exists ::NOCLIB] != 0} then {
+        testmessage "Either libraries are not present, or the executables cannot be compiled, or the test was disabled."
+        return $::UNDECIDEDTEST
+    }
 
-if $res then {
-    set LOGOUTS "$LOGOUTS $::_buildout"
-    fail "library cannot be linked."
-} else {
-    pass "library can be linked"
+    set ::_buildout [exec mktemp $::SCRATCHDIR/program-out-XXXXXX]
+    set res [_buildC basictest.c]
+
+    if $res then {
+        addlog $::_buildout
+        set ::NOCLIB  "no"
+        testmessage "library cannot be linked or compiled. All other C API tests moved to unsupported status"
+        return $::FAILTEST
+    } else {
+        testmessage "library can be linked"
+        return $::PASSTEST
+    }
 }
 
+do_test

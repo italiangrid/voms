@@ -1,35 +1,41 @@
 load_lib vomstest.exp
 
-testheader "See if voms --logmax works."
-_activateCert mycert2
+proc mytest {} {
+    testheader "See if voms --logmax works."
+    _activateCert mycert2
 
-_backupVOMS voms1
-_addVOMSOption voms1 logmax 200
-_vomsStart voms1
-set outname [exec mktemp $::SCRATCHDIR/voms-proxy-init-XXXXXX]
-set res [catch {set out [exec $::INSTALLDIR/bin/voms-proxy-init --voms voms1 >& $outname]}]
-_vomsStop voms1
-_restoreVOMS voms1
+    _addVOMSOption voms1 logmax 200
+    _vomsStart voms1
+    set outname [exec mktemp $::SCRATCHDIR/voms-proxy-init-XXXXXX]
+    set res [catch {set out [exec $::INSTALLDIR/bin/voms-proxy-init --voms voms1 >& $outname]}]
+    _vomsStop voms1
 
-set LOGOUTS "$LOGOUTS $::INSTALLDIR/etc/voms/voms1/voms.conf"
+    addlog $::INSTALLDIR/etc/voms/voms1/voms.conf
 
-if $res then {
-    set LOGOUTS "$LOGOUTS $outname"
-    fail "voms-proxy-init failed."
-} else {
+    if $res then {
+        addlog $outname
+        testmessage "voms-proxy-init failed."
+        return $::FAILTEST
+    }
+
     if [file exists $::INSTALLDIR/var/log/voms.voms1.1] then {
         if {[file size $::INSTALLDIR/var/log/voms.voms1.1] <= 400} then {
-            pass "--logmax works."
+            testmessage "--logmax works."
+            return $::PASSTEST
         } else {
             set outname1 [exec mktemp $::SCRATCHDIR/voms-proxy-init-XXXXXX]            
             set res [catch {set out [exec ls -l $::INSTALLDIR/var/log >& $outname1]}]
-            set LOGOUTS "$LOGOUTS $outname1"
-            fail "file too long"
+            addlog $outname1
+            testmessage "file too long"
+            return $::FAILTEST
         }
     } else {
         set outname1 [exec mktemp $::SCRATCHDIR/voms-proxy-init-XXXXXX]            
         set res [catch {set out [exec ls -l $::INSTALLDIR/var/log >& $outname1]}]
-        set LOGOUTS "$LOGOUTS $outname1"
-        fail "log did not split"
+        addlog $outname1
+        testmessage "log did not split"
+        return $::FAILTEST
     }
 }
+
+do_test

@@ -208,8 +208,11 @@ proc _doVOMSDB { name script } {
 
         set options "$options -ss -e\"$script\""
         # build command line
-
-        return [_doScript "mysql ${options}"]
+        if [expr [string equal $::MYSQLCONF ""]] then {
+            return [_doScript "mysql ${options}"]
+        } else {
+            return [_doScript "mysql --defaults-file=${::MYSQLCONF} ${options}"]
+        }
     } else {
         if [expr [string equal $dbtype "oracle"]] then {
             set id [open "$::_vomsdefinitions/$name/options/db"]

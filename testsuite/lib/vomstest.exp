@@ -52,11 +52,14 @@ proc _inittests {} {
         }
 
         puts -nonewline "."
-        if [file exists $::SCRATCHDIR/suitefiles] then {
-            file delete -force $::SCRATCHDIR/suitefiles
-        }
-        file mkdir $::SCRATCHDIR/suitefiles
-        set ::SCRATCHDIR "$::SCRATCHDIR/suitefiles"
+
+#        if [file exists $::SCRATCHDIR/suitefiles] then {
+#            file delete -force $::SCRATCHDIR/suitefiles
+#        }
+#        file mkdir $::SCRATCHDIR/suitefiles
+#        set ::SCRATCHDIR "$::SCRATCHDIR/suitefiles"
+        set outname [exec mktemp -d $::SCRATCHDIR/suitefiles-XXXXXX]
+        set ::SCRATCHDIR "$outname"
 
         puts -nonewline "."
         if [catch {set ::_logdescriptor [open $::REPORTDIR/index.html w+]}] then {
@@ -98,6 +101,15 @@ proc _inittests {} {
         set ::vomsproxyinfo    $::INSTALLDIR/bin/voms-proxy-info
         set ::vomsproxydestroy $::INSTALLDIR/bin/voms-proxy-destroy
         set HOSTNAME [exec hostname]
+        if [info exists ::env(NOCLIB)] then {
+            set ::NOCLIB "no"
+        }
+        if [info exists ::env(NOCCLIB)] then {
+            set ::NOCCLIB "no"
+        }
+        if [info exists ::env(NOJAVALIB)] then {
+            set ::NOJAVALIB "no"
+        }
         puts ". Done!"
     }
 }

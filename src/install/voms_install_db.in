@@ -33,7 +33,7 @@ db_password_admin=""
 voms_username_query=""
 voms_password_query=""
 
-ECHO=`which echo`
+ECHO=echo
 
 # Default path
 basepath=$@LOCATION_ENV@

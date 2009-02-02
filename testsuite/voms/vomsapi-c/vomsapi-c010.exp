@@ -1,25 +1,38 @@
 load_lib vomstest.exp
 
-testheader "See if an VOMS_Copy() works."
-_activateCert mycert2
+proc mytest {} {
+    testheader "See if an VOMS_Copy() works."
 
-_vomsStart voms1
-set outname [exec mktemp $::SCRATCHDIR/voms-proxy-init-XXXXXX]
-set res [catch {set out [exec $::INSTALLDIR/bin/voms-proxy-init --voms voms1 >& $outname]}]
-_vomsStop voms1
+    if {[info exists ::NOCLIB] != 0} then {
+        testmessage "Either libraries are not present, or the executables cannot be compiled, or the test was disabled."
+        return $::UNDECIDEDTEST
+    }
+
+    _activateCert mycert2
+
+    _vomsStart voms1
+    set outname [exec mktemp $::SCRATCHDIR/voms-proxy-init-XXXXXX]
+    set res [catch {set out [exec $::INSTALLDIR/bin/voms-proxy-init --voms voms1 >& $outname]}]
+    _vomsStop voms1
 
 
-if $res then {
-    set LOGOUTS "$LOGOUTS $outname"
-    fail "voms-proxy-init failed."
-} else {
+    if $res then {
+        addlog $outname
+        testmessage "voms-proxy-init failed."
+        return $::FAILTEST
+    }
+
     set ::_buildout [exec mktemp $::SCRATCHDIR/voms-api-c-XXXXXX]
     set res [_exeC copydata3.c -useproxy]
 
     if $res then {
-        set LOGOUTS "$LOGOUTS $::_buildout"
-        fail "VOMS_Copy() failed."
+        addlog $::_buildout
+        testmessage "VOMS_Copy() failed."
+        return $::FAILTEST
     } else {
-        pass "copy correct"
+        testmessage "copy correct"
+        return $::PASSTEST
     }
 }
+
+do_test

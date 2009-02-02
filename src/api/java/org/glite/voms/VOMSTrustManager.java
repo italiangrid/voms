@@ -1,3 +1,17 @@
+/*********************************************************************
+ *
+ * Authors: Vincenzo Ciaschini - Vincenzo.Ciaschini@cnaf.infn.it
+ *
+ * Copyright (c) 2006 INFN-CNAF on behalf of the 
+ * EGEE project.
+ * For license conditions see LICENSE
+ *
+ * Parts of this code may be based upon or even include verbatim pieces,
+ * originally written by other people, in which case the original header
+ * follows.
+ *
+ *********************************************************************/
+
 package org.glite.voms;
 
 import javax.net.ssl.X509TrustManager;

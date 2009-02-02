@@ -1,18 +1,24 @@
 load_lib vomstest.exp
 
-testheader "See if the log file permissions are 600."
-_activateCert mycert2
+proc mytest {} {
+    testheader "See if the log file permissions are 600."
+    _activateCert mycert2
 
-_vomsStart voms1
-_vomsStop voms1
+    _vomsStart voms1
+    _vomsStop voms1
 
-set attrs [file attributes $::INSTALLDIR/var/log/voms.voms1 -permissions]
+    set attrs [file attributes $::INSTALLDIR/var/log/voms.voms1 -permissions]
 
-if [expr $attrs == 0600] then {
-    pass "Attributes on log file are ok."
-} else {
-    set outname [exec mktemp $::SCRATCHDIR/voms-XXXXXX]
-    exec ls -l $::INSTALLDIR/var/log/voms.voms1 > $outname
-    set LOGOUTS "$LOGOUTS $outname"
-    fail "Log file permissions incorrect."
+    if [expr $attrs == 0600] then {
+        testmessage "Attributes on log file are ok."
+        return $::PASSTEST
+    } else {
+        set outname [exec mktemp $::SCRATCHDIR/voms-XXXXXX]
+        exec ls -l $::INSTALLDIR/var/log/voms.voms1 > $outname
+        addlog $outname
+        testmessage "Log file permissions incorrect."
+        return $::FAILTEST
+    }
 }
+
+do_test

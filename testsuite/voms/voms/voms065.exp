@@ -1,16 +1,22 @@
 load_lib vomstest.exp
 
-testheader "Requesting a non-existent role should fail."
-_activateCert mycert2
+proc mytest {} {
+    testheader "Requesting a non-existent role should fail."
+    _activateCert mycert2
 
-_vomsStart voms1
-set outname [exec mktemp $::SCRATCHDIR/voms-proxy-init-XXXXXX]
-set res [catch {set out [exec $::INSTALLDIR/bin/voms-proxy-init --voms voms1:/Role=product >& $outname]}]
-_vomsStop voms1
+    _vomsStart voms1
+    set outname [exec mktemp $::SCRATCHDIR/voms-proxy-init-XXXXXX]
+    set res [catch {set out [exec $::INSTALLDIR/bin/voms-proxy-init --voms voms1:/Role=product >& $outname]}]
+    _vomsStop voms1
 
-if $res then {
-    pass "Failed as expected."
-} else {
-    set LOGOUTS "$LOGOUTS $outname"
-    fail "voms proxy init succeeded with a non-existent role."
+    if $res then {
+        testmessage "Failed as expected."
+        return $::PASSTEST
+    } else {
+        addlog $outname
+        testmessage "voms proxy init succeeded with a non-existent role."
+        return $::FAILTEST
+    }
 }
+
+do_test

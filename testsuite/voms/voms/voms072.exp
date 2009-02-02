@@ -1,18 +1,22 @@
 load_lib vomstest.exp
 
-testheader "See if voms starts when it cannot log."
-_activateCert mycert2
+proc mytest {} {
+    testheader "See if voms starts when it cannot log."
+    _activateCert mycert2
 
-_backupVOMS voms1
-_removeVOMSOption voms1 syslog
-file delete -force $::INSTALLDIR/var/log
-set out [catch { _vomsStart voms1 } var]
-file mkdir $::INSTALLDIR/var/log
-catch { _vomsStop voms1 }
-_restoreVOMS voms1
+    _removeVOMSOption voms1 syslog
+    file delete -force $::INSTALLDIR/var/log
+    set out [catch { _vomsStart voms1 } var]
+    file mkdir $::INSTALLDIR/var/log
+    catch { _vomsStop voms1 }
 
-if {$out == 1 } then {
-    pass "Voms correctly refused to start"
-} else {
-    fail "VOMS Start without errors while it could not log."
+    if {$out == 1 } then {
+        testmessage "Voms correctly refused to start"
+        return $::PASSTEST
+    } else {
+        testmessage "VOMS Start without errors while it could not log."
+        return $::FAILTEST
+    }
 }
+
+do_test

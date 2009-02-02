@@ -1,23 +1,33 @@
 load_lib vomstest.exp
 
-testheader "See if an VOMS_GetTargetsList() works."
-_activateCert mycert2
+proc mytest {} {
+    testheader "See if an VOMS_GetTargetsList() works."
 
-_vomsStart voms1
-set outname [exec mktemp $::SCRATCHDIR/voms-proxy-init-XXXXXX]
-set res [catch {set out [exec $::INSTALLDIR/bin/voms-proxy-init --target testbed.cnaf.infn.it --target prova.cnaf.infn.it --voms voms1 >& $outname]}]
-_vomsStop voms1
+    if {[info exists ::NOCLIB] != 0} then {
+        testmessage "Either libraries are not present, or the executables cannot be compiled, or the test was disabled."
+        return $::UNDECIDEDTEST
+    }
 
-if $res then {
-    set LOGOUTS "$LOGOUTS $outname"
-    fail "voms-proxy-init failed."
-} else {
+    _activateCert mycert2
+
+    _vomsStart voms1
+    set outname [exec mktemp $::SCRATCHDIR/voms-proxy-init-XXXXXX]
+    set res [catch {set out [exec $::INSTALLDIR/bin/voms-proxy-init --target testbed.cnaf.infn.it --target prova.cnaf.infn.it --voms voms1 >& $outname]}]
+    _vomsStop voms1
+
+    if $res then {
+        addlog $outname
+        testmessage "voms-proxy-init failed."
+        return $::FAILTEST
+    }
+
     set ::_buildout [exec mktemp $::SCRATCHDIR/voms-api-c-XXXXXX]
     set res [_exeC printtargets.c -useproxy]
 
     if $res then {
-        set LOGOUTS "$LOGOUTS $::_buildout"
-        fail "cannot read credentials from file."
+        addlog $::_buildout
+        testmessage "cannot read credentials from file."
+        return $::FAILTEST
     } else {
         set out [exec cat $::_buildout]
 
@@ -25,15 +35,20 @@ if $res then {
 Target: prova.cnaf.infn.it"
 
         if [regexp $correct $out] then {
-            pass "targets successfully set"
+            testmessage "targets successfully set"
+            return $::PASSTEST
         } else {
             set outname2 [exec mktemp $::SCRATCHDIR/voms-proxy-info-XXXXXX]
             set id [open $outname2 "w+"]
             puts $id $correct
             close $id
-            set LOGOUTS "$LOGOUTS $::_buildout $outname2"
+            addlog $::_buildout 
+            addlog $outname2
 
-            fail "read from file incorrect"
+            testmessage "read from file incorrect"
+            reurn $::FAILTEST
         }
     }
 }
+
+do_test

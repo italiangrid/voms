@@ -1,16 +1,19 @@
 load_lib vomstest.exp
 
-testheader "See if requesting a too long ac length fails."
-_activateCert mycert2
+proc mytest {} {
+    testheader "See if requesting a too long ac length fails."
+    _activateCert mycert2
 
-_vomsStart voms1
-set outname [exec mktemp $::SCRATCHDIR/voms-proxy-init-XXXXXX]
-set res [catch {set out [exec $::INSTALLDIR/bin/voms-proxy-init --voms voms1 --vomslife 100:00 >& $outname]}]
-_vomsStop voms1
+    _vomsStart voms1
+    set outname [exec mktemp $::SCRATCHDIR/voms-proxy-init-XXXXXX]
+    set res [catch {set out [exec $::INSTALLDIR/bin/voms-proxy-init --voms voms1 --vomslife 100:00 >& $outname]}]
+    _vomsStop voms1
 
-if $res then {
-    pass "voms-proxy-init correctly failed."
-} else {
+    if $res then {
+        testmessage "voms-proxy-init correctly failed."
+        return $::PASSTEST
+    }
+
     set correct "Your identity: /C=IT/CN=001
 Creating temporary proxy \.* Done
 Contacting  localhost:33334 \\\[/C=IT/CN=003\\\] \"voms1\" Done
@@ -22,9 +25,13 @@ Warning: .* 86400 seconds.*
     set out2 [exec cat $outname]
 
     if [regexp $correct $out2] then {
-        pass "voms-proxy-init correctly returned a warning."
+        testmessage "voms-proxy-init correctly returned a warning."
+        return $::PASSTEST
     } else {
-        set LOGOUTS "$LOGOUTS $outname"
-        fail "voms-proxy-init incorrectly suceeded."
+        addlog $outname
+        testmessage "voms-proxy-init incorrectly suceeded."
+        return $::FAILTEST
     }
 }
+
+do_test

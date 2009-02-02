@@ -1,4 +1,9 @@
 load_lib vomstest.exp
 
-testheader "See if the testsuite starts."
-pass "noerror"
+proc mytest {} {
+    testheader "See if the testsuite starts."
+    testmessage "noerror"
+    return $::PASSTEST
+}
+
+do_test

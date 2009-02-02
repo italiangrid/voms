@@ -1,5 +1,15 @@
 load_lib vomstest.exp
 
-testheader "See if the Java API testsuite starts."
-pass "noerror"
+proc mytest {} {
+    testheader "See if the Java API testsuite starts."
 
+    if {[info exists ::NOJAVALIB] != 0} then {
+        testmessage "Either the jars are not present, or the sources cannot be compiled, or the test was disabled."
+        return $::UNDECIDEDTEST
+    }
+
+    testmessage "noerror"
+    return $::PASSTEST
+}
+
+do_test

@@ -1,5 +1,5 @@
 
-AC_INIT([GLite Security VOMS], [1.8.9])
+AC_INIT([GLite Security VOMS], [1.9.0])
 AC_PREREQ(2.59)
 AC_CONFIG_AUX_DIR([./project])
 AM_INIT_AUTOMAKE
@@ -139,6 +139,7 @@ AC_CONFIG_FILES([Makefile
                  src/sslutils/oldgaa/Makefile
                  src/utils/Makefile
                  doc/Makefile
+                 project/Makefile
                  testsuite/Makefile
                  testsuite/SuiteConfig
                  test/Makefile

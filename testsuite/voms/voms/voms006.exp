@@ -1,22 +1,31 @@
 load_lib vomstest.exp
 
-testheader "See if a voms-proxy-info works."
-_activateCert mycert2
-_vomsStart voms1
+proc mytest {} {
+    testheader "See if a voms-proxy-info works."
+    _activateCert mycert2
 
-set outname [exec mktemp $::SCRATCHDIR/voms-proxy-init-XXXXXX]
+    _vomsStart voms1
+    set outname [exec mktemp $::SCRATCHDIR/voms-proxy-init-XXXXXX]
+    set res [catch {set out [exec $::INSTALLDIR/bin/voms-proxy-init --voms voms1 >& $outname]}]
+    _vomsStop voms1
 
-if [catch {set out [exec $::INSTALLDIR/bin/voms-proxy-init --voms voms1 >& $outname]}] then {
-    _vomsStop voms1
-    set LOGOUTS "$LOGOUTS $outname"
-    fail "voms-proxy-init failed."
-} else {
-    _vomsStop voms1
+    if $res then {
+        addlog $outname
+        testmessage "voms-proxy-init failed."
+        return $::FAILTEST
+    }
+
     set outname [exec mktemp $::SCRATCHDIR/voms-proxy-info-XXXXXX]
-    if [catch {set out2 [exec $::INSTALLDIR/bin/voms-proxy-info --all >& $outname]}] then {
-        set LOGOUTS "$LOGOUTS $outname"
-        fail "voms-proxy-info execution failed."
+    set res [catch {set out2 [exec $::INSTALLDIR/bin/voms-proxy-info --all >& $outname]}]
+
+    if $res then {
+        addlog $outname
+        testmessage "voms-proxy-info execution failed."
+        return $::FAILTEST
     } else {
-        pass "voms-proxy-info succeeded."
+        testmessage "voms-proxy-info succeeded."
+        return $::PASSTEST
     }
 }
+
+do_test

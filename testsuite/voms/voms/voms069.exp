@@ -1,29 +1,33 @@
 load_lib vomstest.exp
 
-testheader "See if voms --logmax works."
-_activateCert mycert2
+proc mytest {} {
+    testheader "See if voms --logmax works."
+    _activateCert mycert2
 
-_backupVOMS voms1
-_addVOMSOption voms1 logmax 200
-_vomsStart voms1
-set outname [exec mktemp $::SCRATCHDIR/voms-proxy-init-XXXXXX]
-set res [catch {set out [exec $::INSTALLDIR/bin/voms-proxy-init --voms voms1 >& $outname]}]
-set res [catch {set out [exec $::INSTALLDIR/bin/voms-proxy-init --voms voms1 >& $outname]}]
-set res [catch {set out [exec $::INSTALLDIR/bin/voms-proxy-init --voms voms1 >& $outname]}]
-file delete $::INSTALLDIR/var/log/voms.voms1.2
-set res [catch {set out [exec $::INSTALLDIR/bin/voms-proxy-init --voms voms1 >& $outname]}]
-set res [catch {set out [exec $::INSTALLDIR/bin/voms-proxy-init --voms voms1 >& $outname]}]
-_vomsStop voms1
-_restoreVOMS voms1
+    _addVOMSOption voms1 logmax 200
+    set outname [exec mktemp $::SCRATCHDIR/voms-proxy-init-XXXXXX]
+    _vomsStart voms1
+    set res [catch {set out [exec $::INSTALLDIR/bin/voms-proxy-init --voms voms1 >>& $outname]}]
+    set res [expr $res + [catch {set out [exec $::INSTALLDIR/bin/voms-proxy-init --voms voms1 >>& $outname]}]]
+    set res [expr $res + [catch {set out [exec $::INSTALLDIR/bin/voms-proxy-init --voms voms1 >>& $outname]}]]
+    file delete $::INSTALLDIR/var/log/voms.voms1.2
+    set res [expr $res + [catch {set out [exec $::INSTALLDIR/bin/voms-proxy-init --voms voms1 >>& $outname]}]]
+    set res [expr $res + [catch {set out [exec $::INSTALLDIR/bin/voms-proxy-init --voms voms1 >>& $outname]}]]
+    _vomsStop voms1
 
-if [file exists $::INSTALLDIR/var/log/voms.voms1] then {
-    pass "Making rotation less sensible to missing files worked."
-} else {
-    set outname1 [exec mktemp $::SCRATCHDIR/voms-proxy-init-XXXXXX]
-    exec ls $::INSTALLDIR/var/log >& $outname1
-    set LOGOUTS "$LOGOUTS $outname1"
-    file delete -force $::INSTALLDIR/var/log
-    file mkdir $::INSTALLDIR/var/log
-    fail "State of logs is inconsistent."
+    if [file exists $::INSTALLDIR/var/log/voms.voms1] then {
+        testmessage "Making rotation less sensible to missing files worked."
+        return $::PASSTEST
+    } else {
+        set outname1 [exec mktemp $::SCRATCHDIR/voms-proxy-init-XXXXXX]
+        exec ls $::INSTALLDIR/var/log >& $outname1
+
+        file delete -force $::INSTALLDIR/var/log
+        file mkdir $::INSTALLDIR/var/log
+        addlog $outname1
+        testmessage "State of logs is inconsistent."
+        return $::FAILTEST
+    }
 }
 
+do_test

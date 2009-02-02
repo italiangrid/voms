@@ -1,17 +1,24 @@
 load_lib vomstest.exp
 
-testheader "See if voms-proxy-init detects fake arguments ."
-_activateCert mycert2
+proc mytest {} {
+    testheader "See if voms-proxy-init detects fake arguments ."
+    _activateCert mycert2
 
-_vomsStart voms1
-set outname [exec mktemp $::SCRATCHDIR/voms-proxy-init-XXXXXX]
-set res [catch {set out [exec $::INSTALLDIR/bin/voms-proxy-init --voms voms1 junk >& $outname]}]
-_vomsStop voms1
+    _vomsStart voms1
+    set outname [exec mktemp $::SCRATCHDIR/voms-proxy-init-XXXXXX]
+    set res [catch {set out [exec $::INSTALLDIR/bin/voms-proxy-init --voms voms1 junk >& $outname]}]
+    _vomsStop voms1
 
-if $res then {
-    set LOGOUTS "$LOGOUTS $outname"
-    pass "voms-proxy-init failed correctly."
-} else {
-    set LOGOUTS "$LOGOUTS $outname"
-    fail "voms-proxy-init did not detect fake arguments."
+    if $res then {
+        addlog $outname
+        testmessage "voms-proxy-init failed correctly."
+        return $::PASSTEST
+    } else {
+        addlog $outname
+        testmessage "voms-proxy-init did not detect fake arguments."
+        return $::FAILTEST
+    }
 }
+
+do_test
+

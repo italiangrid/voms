@@ -1,14 +1,26 @@
 load_lib vomstest.exp
 
-testheader "See if voms --socktimeout works."
-_activateCert mycert2
+proc mytest {} {
+    testheader "See if voms --socktimeout works."
+    _activateCert mycert2
 
-_vomsStart voms1
+    _vomsStart voms1
 
-set timeout 100
-spawn telnet localhost 33334
-expect {
-    eof { pass "pass" }
-    timeout { fail "fail" }
+    set timeout 100
+    spawn telnet localhost 33334
+    expect {
+        eof { set dopass 1 }
+        timeout { set dopass 0 }
+    }
+    _vomsStop voms1
+
+    if $dopass then {
+        testmessage "Timeout worked"
+        return $::PASSTEST
+    } else {
+        testmessage "Timeout did not work"
+        reurn $::FAILTEST
+    }
 }
-_vomsStop voms1
+
+do_test

@@ -78,7 +78,8 @@ extern char *Encode(const char *, int, int *, int);
 
 extern int AC_Init(void);
 
-#ifdef NOGLOBUS
+#if 0
+
 static pthread_mutex_t *mut_pool = NULL;
 
 static void locking_cb(int mode, int type, const char *file, int line)
@@ -139,6 +140,7 @@ static void openssl_initialize(void)
 }
 
 #else
+#if 0
 /* ndef NOGLOBUS */
 
 static globus_thread_once_t l_globus_once_control = GLOBUS_THREAD_ONCE_INIT;
@@ -152,14 +154,14 @@ static void l_init_globus_once_func(void) {
     ERR_load_crypto_strings();
     (void)AC_Init();
 }
-
+#endif
 #endif
 
 vomsdata::Initializer::Initializer(Initializer &) {}
 vomsdata::Initializer::Initializer()
 {
 #ifdef NOGLOBUS
-  openssl_initialize();
+  //  openssl_initialize();
   SSLeay_add_all_algorithms();
   ERR_load_crypto_strings();
 

@@ -4,6 +4,10 @@ rename xfail _xfail
 rename load_lib _load_lib
 rename clone_output _clone_output
 rename cleanup _cleanup
+rename unsupported _unsupported
+set _test_prolog ""
+set _test_epilog ""
+set LOGOUTS ""
 
 proc load_lib {file} {
     global loaded_libs
@@ -24,7 +28,7 @@ proc fail message {
     global REPORTDIR
     global _logdescriptor
 
-    puts $_logdescriptor "<td align=\"left\" bgcolor=\"red\">failed</td><td></td>"
+    puts $_logdescriptor "<td align=\"left\" bgcolor=\"red\">failed</td><td>$message</td>"
     puts $_logdescriptor "<td>"
 
     set scriptname [file normalize [uplevel info script]]
@@ -61,11 +65,17 @@ proc xfail message {
     _xfail $message
 }
 
+proc unsupported message {
+    global _logdescriptor
+    puts $_logdescriptor "<td align=\"left\" bgcolor=\"orange\">unsupported</td><td></td>"
+    puts $_logdescriptor "<td></td><tr>"
+    _unsupported $message
+}
+
 proc clone_output {message} {
     set value [string compare -length 25 "ERROR: tcl error sourcing" $message]
     if [expr ! $value] then {
         fail "$message"
-        puts "CALLED"
     }
 
     set msg [_clone_output "$message"]
@@ -80,6 +90,7 @@ proc cleanup {} {
     flush $::_logdescriptor
     close $::_logdescriptor
 #    catch {exec rm -rf $::INSTALLDIR/ca}
+    catch {exec rm -rf $::SCRATCHDIR}
 }
 
 proc testheader {description {testname ""}} {
@@ -89,5 +100,98 @@ proc testheader {description {testname ""}} {
     set realname [string range $scriptname [string length $$fname] end]
     puts $::_logdescriptor "<tr><td align=\"left\">$realname</td><td align=\"left\">$description</td>"
     set ::LOGOUTS ""
+    set ::_testmessage ""
+}
+
+#Error codes should be > 6 to avoid conflicting with TCL own codes
+set ::PASSTEST 1000
+set ::FAILTEST 1100
+set ::UNDECIDEDTEST 1200
+
+
+proc testmessage { {message "" } } {
+    global _testmessage
+    set _testmessage $message
+}
+
+proc addlog { name } {
+    global LOGOUTS
+    set LOGOUTS "$LOGOUTS $name"
+}
+
+proc test_set_prolog { name } {
+    set ::_test_prolog $name
+}
+
+proc test_set_epilog { name } {
+    set ::_test_epilog $name
+}
+
+proc do_test { {name ""} } {
+    global _testmessage
+
+    set res $::UNDECIDEDTEST
+    set res2 0
+
+    _backupVOMS voms1
+    if [expr ![string equal $::_test_prolog ""]] then {
+        set res2 [catch {set out [$::_test_prolog]} out]
+        set $_testmessage "Failure during prolog execution."
+    }
+
+    if { $res2 == 0 } then {
+        if [expr ! [string equal $name "" ]] then {
+            set res [catch {set out [$name]} out]
+        } else {
+            set res [catch {set out [mytest]} out]
+        }
+
+        if [expr ! [ string equal $::_test_epilog ""]] then {
+            set res2 [catch {set out [$::_test_epilog]} out]
+        }
+        # Ensures that an eventual failure from the epilog
+        # is considered a failure for the whole test
+        if { $res2 != 0 } then {
+            set res $res2
+            set $_testmessage "Failure during epilog execution."
+        }
+    } else {
+        set res $res2
+    }
+    _restoreVOMS voms1
+
+    set ::_test_prolog ""
+    set ::_test_epilog ""
+
+    if {$res == 0} then {
+        if {$out == $::PASSTEST } then {
+            if [expr [string equal $_testmessage ""]] then {
+                pass "test succeeded"
+            } else {
+                pass $_testmessage
+            }
+        } elseif {$out == $::FAILTEST } then {
+            if [expr [string equal $_testmessage ""]] then {
+                fail "test failed"
+            } else {
+                fail $_testmessage
+            }
+        } elseif {$out == $::UNDECIDEDTEST } then {
+            if [expr [string equal $_testmessage ""]] then {
+                unsupported "test undecided"
+            } else {
+                unsupported $_testmessage
+            }
+        }
+    } else {
+        if {[info exists out] != 0} then {
+            set outname [exec mktemp $::SCRATCHDIR/voms-proxy-init-XXXXXX]
+            set id [open $outname "w+"]
+            puts $id $out
+            close $id
+            addlog $outname
+        }
+        fail "test could not be executed correctly."
+    }
 }
 

@@ -1,25 +1,33 @@
 load_lib vomstest.exp
 
-testheader "Checking if -+option works."
-_activateCert mycert2
+proc mytest {} {
+    testheader "Checking if -+option works."
+    _activateCert mycert2
 
-_vomsStart voms1
-set outname [exec mktemp $::SCRATCHDIR/voms-proxy-init-XXXXXX]
-set res [catch {set out [exec $::INSTALLDIR/bin/voms-proxy-init -cert $::env(HOME)/.globus2/usercert.pem -key $::env(HOME)/.globus2/userkey.pem -+debug >& $outname]}]
-_vomsStop voms1
+    _vomsStart voms1
+    set outname [exec mktemp $::SCRATCHDIR/voms-proxy-init-XXXXXX]
+    set res [catch {set out [exec $::INSTALLDIR/bin/voms-proxy-init -cert $::env(HOME)/.globus2/usercert.pem -key $::env(HOME)/.globus2/userkey.pem -+debug >& $outname]}]
+    _vomsStop voms1
 
-if $res then {
-    if {[info exists outname] == 0} then {
-        set LOGOUTS "$LOGOUTS $outname"
-        fail "Did a core dump."
-    } elseif {[file size $outname] == "0" } then {
-        set LOGOUTS "$LOGOUTS $outname"
-        fail "Did have empty output (possibly core dump)."
+    if $res then {
+        if {[info exists outname] == 0} then {
+            addlog $outname
+            testmessage "Did a core dump."
+            return $::FAILTEST
+        } elseif {[file size $outname] == "0" } then {
+            addlog $outname
+            testmessage "Did have empty output (possibly core dump)."
+            return $::FAILTEST
+        } else {
+            testmessage "Did have output and error return."
+            return $::PASSTEST
+        }
     } else {
-        pass "Did have output and error return."
+        addlog $outname 
+        addlog $out
+        testmessage "voms proxy init succeeded with a non-existent role."
+        return $::FAILTEST
     }
-
-} else {
-    set LOGOUTS "$LOGOUTS $outname $out"
-    fail "voms proxy init succeeded with a non-existent role."
 }
+
+do_test

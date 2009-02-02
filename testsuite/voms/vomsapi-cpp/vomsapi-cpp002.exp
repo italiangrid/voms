@@ -1,14 +1,26 @@
 load_lib vomstest.exp
 
-testheader "See if the c++ library can be linked."
+proc mytest {} {
+    testheader "See if the c++ library can be linked."
 
-set ::_buildout [exec mktemp $::SCRATCHDIR/program-out-XXXXXX]
-set res [_buildCC basictest.cc]
+    if {[info exists ::NOCCLIB] != 0} then {
+        testmessage "Either libraries are not present, or the executables cannot be compiled, or the test was disabled."
+        return $::UNDECIDEDTEST
+    }
 
-if $res then {
-    set LOGOUTS "$LOGOUTS $::_buildout"
-    fail "library cannot be linked."
-} else {
-    pass "library can be linked"
+    set ::_buildout [exec mktemp $::SCRATCHDIR/program-out-XXXXXX]
+    set res [_buildCC basictest.cc]
+
+    if $res then {
+        addlog $::_buildout
+        set ::NOCCLIB "no"
+        testmessage "library cannot be linked."
+        return $::FAILTEST
+    } else {
+        testmessage "library can be linked"
+        return $::PASSTEST
+    }
 }
+
+do_test
 

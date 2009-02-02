@@ -1,35 +1,44 @@
 load_lib vomstest.exp
 
-testheader "See if voms-proxy-info --path works."
-_activateCert mycert2
+proc mytest {} {
+    testheader "See if voms-proxy-info --path works."
+    _activateCert mycert2
 
-_vomsStart voms1
-set outname [exec mktemp $::SCRATCHDIR/voms-proxy-init-XXXXXX]
-set res [catch {set out [exec $::INSTALLDIR/bin/voms-proxy-init --voms voms1 --out $::SCRATCHDIR/prp >& $outname]}]
-_vomsStop voms1
+    _vomsStart voms1
+    set outname [exec mktemp $::SCRATCHDIR/voms-proxy-init-XXXXXX]
+    set res [catch {set out [exec $::INSTALLDIR/bin/voms-proxy-init --voms voms1 --out $::SCRATCHDIR/prp >& $outname]}]
+    _vomsStop voms1
+    
+    if $res then {
+        addlog $outname
+        testmessage "voms-proxy-init failed."
+        return $::FAILTEST
+    }
 
-if $res then {
-    set LOGOUTS "$LOGOUTS $outname"
-    fail "voms-proxy-init failed."
-} else {
     set outname [exec mktemp $::SCRATCHDIR/voms-proxy-info-XXXXXX]
     if [catch {set out2 [exec $::INSTALLDIR/bin/voms-proxy-info --path --file $::SCRATCHDIR/prp >& $outname]}] then {
-        set LOGOUTS "$LOGOUTS $outname"
-        fail "voms proxy info failed."
+        addlog $outname
+        testmessage "voms-proxy-info failed."
+        return $::FAILTEST
     } else {
         #match against known (correct) output
         set correct "$::SCRATCHDIR/prp"
 
         set out2 [exec cat  $outname]
         if [regexp $correct $out2] then {
-            pass "path correctly reported."
+            testmessage "path correctly reported."
+            return $::PASSTEST
         } else {
             set outname2 [exec mktemp $::SCRATCHDIR/voms-proxy-info-XXXXXX]
             set id [open $outname2 "w+"]
             puts $id $correct
             close $id
-            set LOGOUTS "$LOGOUTS $outname $outname2"
-            fail "Unexpected output in voms-proxy-info"
+            addlog $outname 
+            addlog $outname2
+            testmessage "Unexpected output in voms-proxy-info"
+            return $::FAILTEST
         }
     }
 }
+
+do_test

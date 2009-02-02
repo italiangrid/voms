@@ -1,3 +1,39 @@
+AC_DEFUN([AC_VOMS_LIBRARY],
+[
+    globus_flavor=$1
+    candidatepath=$2
+
+    if test "x$candidatepath" = "x" ; then
+      libpath=$GLOBUS_LOCATION/lib
+    else
+      libpath=$candidatepath/lib
+    fi
+
+    if test "x$globus_flavor" = "x" ; then
+      globus_flavor="none"
+    fi
+
+    AC_MSG_CHECKING([for library to use with globus library: $globus_flavor])
+
+    if test "x$globus_flavor" = "xnone" ; then
+      AC_MSG_RESULT([libvomsapi])
+      VOMS_LIBRARY="-lvomsapi"
+    elif test -e $libpath/libglobus_gssapi_gsi_$globus_flavor.so ; then 
+      if ( (ldd $libpath/libglobus_gssapi_gsi_$globus_flavor.so|grep crypto|cut -d'=' -f2|grep $globus_flavor) >/dev/null 2>&1 ); then
+        AC_MSG_RESULT([libvomsapi_$globus_flavor])
+        VOMS_LIBRARY="-lvomsapi_$globus_flavor"
+      else
+        AC_MSG_RESULT([libvomsapi])
+        VOMS_LIBRARY="-lvomsapi"
+      fi
+    else
+      AC_MSG_ERROR([flavor $globus_flavor is unknown])
+    fi
+
+    AC_SUBST(VOMS_LIBRARY)
+])
+
+
 # AC_OPENSSL checks system openssl availability
 # ---------------------------------------------
 AC_DEFUN([AC_OPENSSL],
@@ -200,51 +236,57 @@ AC_DEFUN([AC_GLOBUS],
     fi
 
     for flavor in $GLOBUS_FLAVORS ; do
+      if ( ( ldd $with_globus_prefix/lib/libglobus_gssapi_gsi_$flavor.so |grep crypto_$flavor >/dev/null 2>&1) ); then
+        FLVR="_$flavor"
+      else
+        FLVR=""
+      fi
+      AC_MSG_RESULT([found flavor=$FLVR])
       if test "x$flavor" = "x$with_globus_flavor" ; then
       	GLOBUS_CFLAGS="-I$with_globus_prefix/include/$flavor"
         GLOBUS_GSS_LIBS="$ac_globus_ldlib -lglobus_gssapi_gsi_$flavor -lglobus_gss_assist_$flavor"
-        GLOBUS_GSS_API_LIBS="$ac_globus_ldlib -lcrypto_$flavor -lssl_$flavor"
+        GLOBUS_GSS_API_LIBS="$ac_globus_ldlib -lcrypto$FLVR -lssl$FLVR"
       fi
       if test "x$flavor" = "xgcc32" ; then
 	      GLOBUS_GCC32_CFLAGS="-I$with_globus_prefix/include/$flavor"
         GLOBUS_GCC32_GSS_LIBS="$ac_globus_ldlib -lglobus_gssapi_gsi_$flavor -lglobus_gss_assist_$flavor"
-        GLOBUS_GCC32_GSS_API_LIBS="$ac_globus_ldlib -lcrypto_$flavor -lssl_$flavor"
+        GLOBUS_GCC32_GSS_API_LIBS="$ac_globus_ldlib -lcrypto$FLVR -lssl$FLVR"
       fi
       if test "x$flavor" = "xgcc32dbg" ; then
         GLOBUS_GCC32DBG_CFLAGS="-I$with_globus_prefix/include/$flavor"
         GLOBUS_GCC32DBG_GSS_LIBS="$ac_globus_ldlib -lglobus_gssapi_gsi_$flavor -lglobus_gss_assist_$flavor"
-        GLOBUS_GCC32DBG_GSS_API_LIBS="$ac_globus_ldlib -lcrypto_$flavor -lssl_$flavor"
+        GLOBUS_GCC32DBG_GSS_API_LIBS="$ac_globus_ldlib -lcrypto$FLVR -lssl$FLVR"
       fi
       if test "x$flavor" = "xgcc32dbgpthr" ; then
         GLOBUS_GCC32DBGPTHR_CFLAGS="-I$with_globus_prefix/include/$flavor"
         GLOBUS_GCC32DBGPTHR_GSS_LIBS="$ac_globus_ldlib -lglobus_gssapi_gsi_$flavor -lglobus_gss_assist_$flavor"
-        GLOBUS_GCC32DPBPTHR_GSS_API_LIBS="$ac_globus_ldlib -lcrypto_$flavor -lssl_$flavor"
+        GLOBUS_GCC32DPBPTHR_GSS_API_LIBS="$ac_globus_ldlib -lcrypto$FLVR -lssl$FLVR"
       fi
       if test "x$flavor" = "xgcc32pthr" ; then
         GLOBUS_GCC32PTHR_CFLAGS="-I$with_globus_prefix/include/$flavor"
         GLOBUS_GCC32PTHR_GSS_LIBS="$ac_globus_ldlib -lglobus_gssapi_gsi_$flavor -lglobus_gss_assist_$flavor"
-        GLOBUS_GCC32PTHR_GSS_API_LIBS="$ac_globus_ldlib -lcrypto_$flavor -lssl_$flavor"
+        GLOBUS_GCC32PTHR_GSS_API_LIBS="$ac_globus_ldlib -lcrypto$FLVR -lssl$FLVR"
       fi
 
       if test "x$flavor" = "xgcc64" ; then
 	      GLOBUS_GCC64_CFLAGS="-I$with_globus_prefix/include/$flavor"
         GLOBUS_GCC64_GSS_LIBS="$ac_globus_ldlib -lglobus_gssapi_gsi_$flavor -lglobus_gss_assist_$flavor"
-        GLOBUS_GCC64_GSS_API_LIBS="$ac_globus_ldlib -lcrypto_$flavor -lssl_$flavor"
+        GLOBUS_GCC64_GSS_API_LIBS="$ac_globus_ldlib -lcrypto$FLVR -lssl$FLVR"
       fi
       if test "x$flavor" = "xgcc64dbg" ; then
         GLOBUS_GCC64DBG_CFLAGS="-I$with_globus_prefix/include/$flavor"
         GLOBUS_GCC64DBG_GSS_LIBS="$ac_globus_ldlib -lglobus_gssapi_gsi_$flavor -lglobus_gss_assist_$flavor"
-        GLOBUS_GCC64DBG_GSS_API_LIBS="$ac_globus_ldlib -lcrypto_$flavor -lssl_$flavor"
+        GLOBUS_GCC64DBG_GSS_API_LIBS="$ac_globus_ldlib -lcrypto$FLVR -lssl$FLVR"
       fi
       if test "x$flavor" = "xgcc64dbgpthr" ; then
         GLOBUS_GCC64DBGPTHR_CFLAGS="-I$with_globus_prefix/include/$flavor"
         GLOBUS_GCC64DBGPTHR_GSS_LIBS="$ac_globus_ldlib -lglobus_gssapi_gsi_$flavor -lglobus_gss_assist_$flavor"
-        GLOBUS_GCC64DBGPTHR_GSS_API_LIBS="$ac_globus_ldlib -lcrypto_$flavor -lssl_$flavor"
+        GLOBUS_GCC64DBGPTHR_GSS_API_LIBS="$ac_globus_ldlib -lcrypto$FLVR -lssl$FLVR"
       fi
       if test "x$flavor" = "xgcc64pthr" ; then
         GLOBUS_GCC64PTHR_CFLAGS="-I$with_globus_prefix/include/$flavor"
         GLOBUS_GCC64PTHR_GSS_LIBS="$ac_globus_ldlib -lglobus_gssapi_gsi_$flavor -lglobus_gss_assist_$flavor"
-        GLOBUS_GCC64PTHR_GSS_API_LIBS="$ac_globus_ldlib -lcrypto_$flavor -lssl_$flavor"
+        GLOBUS_GCC64PTHR_GSS_API_LIBS="$ac_globus_ldlib -lcrypto$FLVR -lssl$FLVR"
       fi
     done
 
@@ -393,8 +435,19 @@ AC_DEFUN([AC_JAVA],
     if test "x$have_java" = "xyes"; then
       AC_MSG_RESULT([hope it is in $CLASSPATH])
     fi
-  else
+  elif test -e "$wbc" -a `basename "$wbc"` == "bcprov.jar" ; then
     AC_MSG_RESULT([specified: $wbc])
+  else
+    if test `basename "$wbc"` == "bcprov.jar" ; then
+      wbc=`dirname "$wbc"`
+    fi
+    candidatebc=`find $wbc -name bcprov.jar`
+    if test "$candidatebc" != "x" ; then
+      wbc="$candidatebc"
+      AC_MSG_RESULT([found: $wbc])
+    else
+      AC_MSG_RESULT([hope it is in $CLASSPATH])
+    fi
   fi
 
   if test "x$have_java" = "xyes"; then
@@ -978,6 +1031,11 @@ AC_DEFUN([AC_TESTSUITE],
     [with_dbpwd="$withval"],
     [with_dbpwd=""])
 
+  AC_ARG_WITH(mysqlconf,
+    [  --with-mysqlconf     Set DB password for testsuite],
+    [with_mysqlconf="$withval"],
+    [with_mysqlconf=""])
+
   AC_ARG_ENABLE(oracle-tests,
     [  --enable-oracle-tests  Do tests against Oracle DB],
     [ case "$enableval" in
@@ -998,10 +1056,12 @@ AC_DEFUN([AC_TESTSUITE],
     ],
     [ enable_mysqltests="yes"])
 
+
   AC_SUBST(with_reportdir)
   AC_SUBST(with_scratchdir)
   AC_SUBST(with_dbuser)
   AC_SUBST(with_dbpwd)
+  AC_SUBST(with_mysqlconf)
   AC_SUBST(enable_oracletests)
   AC_SUBST(enable_mysqltests)
 ])

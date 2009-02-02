@@ -1,17 +1,23 @@
 load_lib vomstest.exp
 
-testheader "See if a voms proxy can be created."
-_activateCert mycert2
+proc mytest {} {
+    testheader "See if a voms proxy can be created."
+    _activateCert mycert2
 
-_vomsStart voms1
-set outname [exec mktemp $::SCRATCHDIR/voms-proxy-init-XXXXXX]
-set res [catch {set out [exec $::INSTALLDIR/bin/voms-proxy-init --voms voms1 >& $outname]}]
-_vomsStop voms1
+    _vomsStart voms1
+    set outname [exec mktemp $::SCRATCHDIR/voms-proxy-init-XXXXXX]
+    set res [catch {set out [exec $::INSTALLDIR/bin/voms-proxy-init --voms voms1 >& $outname]}]
+    _vomsStop voms1
 
-if $res then {
-    set LOGOUTS "$LOGOUTS $outname $::INSTALLDIR/var/log/voms.voms1"
-    fail "voms proxy init returned error message."
-} else {
-    pass "proxy successfully created."
+    if $res then {
+        addlog $LOGOUTS $outname 
+        addlog $::INSTALLDIR/var/log/voms.voms1
+        testmessage "voms proxy init returned error message."
+        return $::FAILTEST
+    } else {
+        testmessage "proxy successfully created."
+        return $::PASSTEST
+    }
 }
 
+do_test

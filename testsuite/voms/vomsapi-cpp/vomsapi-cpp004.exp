@@ -1,44 +1,56 @@
 load_lib vomstest.exp
 
-testheader "See if error messages for dates can be distinguished."
-_activateCert mycert2
+proc mytest {} {
+    testheader "See if error messages for dates can be distinguished."
 
-_backupVOMS voms1
-_addVOMSOption voms1 timeout 1
-_vomsStart voms1
-set outname [exec mktemp $::SCRATCHDIR/voms-api-cpp-XXXXXX]
-set res [catch {set out [exec $::INSTALLDIR/bin/voms-proxy-init --voms voms1 >& $outname]}]
-_vomsStop voms1
-_restoreVOMS voms1
+    if {[info exists ::NOCCLIB] != 0} then {
+        testmessage "Either libraries are not present, or the executables cannot be compiled, or the test was disabled."
+        return $::UNDECIDEDTEST
+    }
 
-if $res then {
-    set LOGOUTS "$LOGOUTS $outname"
-    fail "voms-proxy-init failed."
-} else {
-    set ::_buildout [exec mktemp $::SCRATCHDIR/voms-api-cpp-XXXXXX]
-    set res [_exeCC verifier.cc -useproxy  1000]
-    set id [open $outname "w+"]
-    puts $id [exec cat $::_buildout]
-    close $id
+    _activateCert mycert2
 
-    set res [_exeCC verifier.cc -useproxy -1000]
-    set id [open $outname "a+"]
-    puts $id [exec cat $::_buildout]
-    close $id
+    _addVOMSOption voms1 timeout 1
+    _vomsStart voms1
+    set outname [exec mktemp $::SCRATCHDIR/voms-api-cpp-XXXXXX]
+    set res [catch {set out [exec $::INSTALLDIR/bin/voms-proxy-init --voms voms1 >& $outname]}]
+    _vomsStop voms1
 
-    set LOGOUTS "$LOGOUTS $outname"
-
-    set numlines [exec uniq $outname | wc -l]
-
-    if [expr $numlines == 1] then {
-        fail "cannot distinguish values."
+    if $res then {
+        addlog $outname
+        testmessage "voms-proxy-init failed."
+        return $::FAILTEST
     } else {
+        set ::_buildout [exec mktemp $::SCRATCHDIR/voms-api-cpp-XXXXXX]
+        set res [_exeCC verifier.cc -useproxy  1000]
+        set id [open $outname "w+"]
+        puts $id [exec cat $::_buildout]
+        close $id
+
+        set res [_exeCC verifier.cc -useproxy -1000]
+        set id [open $outname "a+"]
+        puts $id [exec cat $::_buildout]
+        close $id
+
+        addlog $outname
+
+        set numlines [exec uniq $outname | wc -l]
+
+        if [expr $numlines == 1] then {
+            testmessage "cannot distinguish values."
+            return $::FAILTEST
+        }
+
         set numlines [exec grep Error $outname | wc -l]
 
         if [expr $numlines != 2] then {
-            fail "Validation succeeded (shouls have failed)"
+            testmessage "Validation succeeded (shouls have failed)"
+            return $::FAILTEST
         } else {
-            pass "different failure messages."
+            testmessage "different failure messages."
+            return $::PASSTEST
         }
     }
 }
+
+do_test

@@ -1,21 +1,26 @@
 load_lib vomstest.exp
 
-testheader "See if two --voms options work."
-_activateCert mycert2
-_vomsStart voms1
-set outname [exec mktemp $::SCRATCHDIR/voms-proxy-init-XXXXXX]
-set res [catch {set out [exec $::INSTALLDIR/bin/voms-proxy-init --voms voms1 --voms voms1:/voms1/group1/Role=TestRole  >& $outname]}]
-_vomsStop voms1
+proc mytest {} {
+    testheader "See if two --voms options work."
+    _activateCert mycert2
 
-if $res then {
-    set LOGOUTS "$LOGOUTS $outname"
-    fail "voms proxy init failed."
-} else {
+    _vomsStart voms1
+    set outname [exec mktemp $::SCRATCHDIR/voms-proxy-init-XXXXXX]
+    set res [catch {set out [exec $::INSTALLDIR/bin/voms-proxy-init --voms voms1 --voms voms1:/voms1/group1/Role=TestRole  >& $outname]}]
+    _vomsStop voms1
+
+    if $res then {
+        addlog $outname
+        testmessage "voms proxy init failed."
+        return $::FAILTEST
+    }
+
     set outname [exec mktemp $::SCRATCHDIR/voms-proxy-info-XXXXXX]
 
     if [catch {set out2 [exec $::INSTALLDIR/bin/voms-proxy-info --all >& $outname]}] then {
-        set LOGOUTS "$LOGOUTS $outname"
-        fail "voms proxy info failed."
+        addlog $outname
+        testmessage "voms-proxy-info failed."
+        return $::FAILTEST
     } else {
         #match against known (correct) output
         set correct "subject   : /C=IT/CN=001/CN=proxy
@@ -38,14 +43,19 @@ attribute : shortid = mycert2 \\\(voms1\\\)
 timeleft  : \[0-9\]*:\[0-9\]*:\[0-9\]*"
         set out2 [exec cat  $outname]
         if [regexp $correct $out2] then {
-            pass "two --voms options work."
+            testmessage "two --voms options work."
+            return $::PASSTEST
         } else {
             set outname2 [exec mktemp $::SCRATCHDIR/voms-proxy-info-XXXXXX]
             set id [open $outname2 "w+"]
             puts $id $correct
             close $id
-            set LOGOUTS "$LOGOUTS $outname $outname2"
-            fail "Two --voms options do not work."
+            addlog $outname 
+            addlog $outname2
+            testmessage "Two --voms options do not work."
+            return $::FAILTEST
         }
     }
 }
+
+do_test

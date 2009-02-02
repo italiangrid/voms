@@ -1,29 +1,33 @@
 load_lib vomstest.exp
 
-testheader "See if voms --logmax 0 stops rotation."
-_activateCert mycert2
+proc mytest {} {
+    testheader "See if voms --logmax 0 stops rotation."
+    _activateCert mycert2
 
-_backupVOMS voms1
-_addVOMSOption voms1 logmax 0
-file delete -force $::INSTALLDIR/var/log
-file mkdir $::INSTALLDIR/var/log
-exec dd if=/dev/zero of=$::INSTALLDIR/var/log/voms.voms1 count=21K >&/dev/null
-_vomsStart voms1
-set outname [exec mktemp $::SCRATCHDIR/voms-proxy-init-XXXXXX]
-set res [catch {set out [exec $::INSTALLDIR/bin/voms-proxy-init --voms voms1 >& $outname]}]
-_vomsStop voms1
-_restoreVOMS voms1
-
-if [file exists $::INSTALLDIR/var/log/voms.voms1.1] then {
-    set outname1 [exec mktemp $::SCRATCHDIR/voms-proxy-init-XXXXXX]
-    exec ls $::INSTALLDIR/var/log >& $outname1
+    _addVOMSOption voms1 logmax 0
     file delete -force $::INSTALLDIR/var/log
     file mkdir $::INSTALLDIR/var/log
-    set LOGOUTS "$LOGOUTS $outname1"
-    fail "Rotation happened anyway."
-} else {
-    file delete -force $::INSTALLDIR/var/log
-    file mkdir $::INSTALLDIR/var/log
-    pass "Rotation stopped as expected."
+    exec dd if=/dev/zero of=$::INSTALLDIR/var/log/voms.voms1 count=21K >&/dev/null
+
+    _vomsStart voms1
+    set outname [exec mktemp $::SCRATCHDIR/voms-proxy-init-XXXXXX]
+    set res [catch {set out [exec $::INSTALLDIR/bin/voms-proxy-init --voms voms1 >& $outname]}]
+    _vomsStop voms1
+
+    if [file exists $::INSTALLDIR/var/log/voms.voms1.1] then {
+        set outname1 [exec mktemp $::SCRATCHDIR/voms-proxy-init-XXXXXX]
+        exec ls $::INSTALLDIR/var/log >& $outname1
+        file delete -force $::INSTALLDIR/var/log
+        file mkdir $::INSTALLDIR/var/log
+        addlog $outname1
+        testmessage "Rotation happened anyway."
+        return $::FAILTEST
+    } else {
+        file delete -force $::INSTALLDIR/var/log
+        file mkdir $::INSTALLDIR/var/log
+        testmessage "Rotation stopped as expected."
+        return $::PASSTEST
+    }
 }
 
+do_test

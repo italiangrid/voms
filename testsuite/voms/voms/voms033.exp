@@ -1,21 +1,25 @@
 load_lib vomstest.exp
 
-testheader "See if voms-proxy-info --fqan works."
-_activateCert mycert2
+proc mytest {} {
+    testheader "See if voms-proxy-info --fqan works."
+    _activateCert mycert2
 
-_vomsStart voms1
-set outname [exec mktemp $::SCRATCHDIR/voms-proxy-init-XXXXXX]
-set res [catch {set out [exec $::INSTALLDIR/bin/voms-proxy-init --voms voms1 >& $outname]}]
-_vomsStop voms1
+    _vomsStart voms1
+    set outname [exec mktemp $::SCRATCHDIR/voms-proxy-init-XXXXXX]
+    set res [catch {set out [exec $::INSTALLDIR/bin/voms-proxy-init --voms voms1 >& $outname]}]
+    _vomsStop voms1
 
-if $res then {
-    set LOGOUTS "$LOGOUTS $outname"
-    fail "voms-proxy-init failed."
-} else {
+    if $res then {
+        addlog $outname
+        testmessage "voms-proxy-init failed."
+        return $::FAILTEST
+    }
+
     set outname [exec mktemp $::SCRATCHDIR/voms-proxy-info-XXXXXX]
     if [catch {set out2 [exec $::INSTALLDIR/bin/voms-proxy-info --fqan >& $outname]}] then {
-        set LOGOUTS "$LOGOUTS $outname"
-        fail "voms proxy info failed."
+        addlog $outname
+        testmessage "voms-proxy-info failed."
+        return $::FAILTEST
     } else {
         #match against known (correct) output
         set correct "/voms1
@@ -23,14 +27,19 @@ if $res then {
 
         set out2 [exec cat  $outname]
         if [regexp $correct $out2] then {
-            pass "fqans correctly reported."
+            testmessage "fqans correctly reported."
+            return $::PASSTEST
         } else {
             set outname2 [exec mktemp $::SCRATCHDIR/voms-proxy-info-XXXXXX]
             set id [open $outname2 "w+"]
             puts $id $correct
             close $id
-            set LOGOUTS "$LOGOUTS $outname $outname2"
-            fail "Unexpected output in voms-proxy-info"
+            addlog $outname 
+            addlog $outname2
+            testmessage "Unexpected output in voms-proxy-info"
+            return $::FAILTEST
         }
     }
 }
+
+do_test

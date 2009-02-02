@@ -5,3 +5,4 @@ HAVEMYSQL  @enable_mysqltests@
 DBUSERNAME @with_dbuser@
 SCRATCHDIR @with_scratchdir@
 DBPASSWORD @with_dbpwd@
+MYSQLCONF  @with_mysqlconf@

@@ -1,4 +1,4 @@
-SUBDIRS = src doc testsuite
+SUBDIRS = src doc project testsuite
 
 EXTRA_DIST = build.xml autogen.sh LICENSE project/build.number project/build.properties \
   project/configure.properties.xml project/properties.xml project/version.properties

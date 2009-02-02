@@ -1,14 +1,25 @@
 load_lib vomstest.exp
 
-testheader "See if the library can be linked."
+proc mytest {} {
+    testheader "See if the library can be linked."
 
-set ::_buildout [exec mktemp $::SCRATCHDIR/program-out-XXXXXX]
-set res [_buildJava basictest.java]
+    if {[info exists ::NOJAVALIB] != 0} then {
+        testmessage "Either the jars are not present, or the sources cannot be compiled, or the test was disabled."
+        return $::UNDECIDEDTEST
+    }
 
-if $res then {
-    set LOGOUTS "$LOGOUTS $::_buildout"
-    fail "library cannot be linked."
-} else {
-    pass "library can be linked"
+    set ::_buildout [exec mktemp $::SCRATCHDIR/program-out-XXXXXX]
+    set res [_buildJava basictest.java]
+
+    if $res then {
+        addlog $::_buildout
+        set NOJAVALIB "no"
+        testmessage "library cannot be linked."
+        return $::FAILTEST
+    }
+
+    testmessage "library can be linked"
+    return $::PASSTEST
 }
 
+do_test

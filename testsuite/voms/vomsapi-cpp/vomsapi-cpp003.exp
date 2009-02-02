@@ -1,31 +1,41 @@
 load_lib vomstest.exp
 
-testheader "See if data can be retrieved."
-_activateCert mycert2
+proc mytest {} {
+    testheader "See if data can be retrieved."
 
-_vomsStart voms1
-set outname [exec mktemp $::SCRATCHDIR/voms-api-c-XXXXXX]
-set res [catch {set out [exec $::INSTALLDIR/bin/voms-proxy-init --voms voms1 >& $outname]}]
-_vomsStop voms1
+    if {[info exists ::NOCCLIB] != 0} then {
+        testmessage "Either libraries are not present, or the executables cannot be compiled, or the test was disabled."
+        return $::UNDECIDEDTEST
+    }
 
-if $res then {
-    set LOGOUTS "$LOGOUTS $outname"
-    fail "voms-proxy-init failed."
-} else {
+    _activateCert mycert2
+
+    _vomsStart voms1
+    set outname [exec mktemp $::SCRATCHDIR/voms-api-c-XXXXXX]
+    set res [catch {set out [exec $::INSTALLDIR/bin/voms-proxy-init --voms voms1 >& $outname]}]
+    _vomsStop voms1
+
+    if $res then {
+        addlog $outname
+        testmessage "voms-proxy-init failed."
+        return $::FAILTEST
+    }
+
     set ::_buildout [exec mktemp $::SCRATCHDIR/voms-api-c-XXXXXX]
     set res [_exeCC parsertest.cc -useproxy]
 
-    set LOGOUTS "$LOGOUTS $::_buildout"
+    addlog $::_buildout
 
     if $res then {
-        fail "parsing failed."
+        testmessage "parsing failed."
+        return $::FAILTEST
     } else {
         set correct "voname1: voms1
 user1: /C=IT/CN=001
 userca1: /C=IT/O=INFN/CN=CAFromthisCN
 server1: /C=IT/CN=003
 serverca1: /C=IT/O=INFN/CN=CAFromthisCN
-uri1: $HOSTNAME:33334
+uri1: $::HOSTNAME:33334
 begdate1: .*
 enddate1: .*
 fqan1: /voms1
@@ -34,16 +44,19 @@ version1: 1"
 
         set out [exec cat $::_buildout]
         if [regexp $correct $out] then {
-            pass "output correct"
+            testmessage "output correct"
+            return $::PASSTEST
         } else {
             set outname2 [exec mktemp $::SCRATCHDIR/voms-api-c-XXXXXX]
             set id [open $outname2 "w+"]
             puts $id $correct
             close $id
 
-            set LOGOUTS "$LOGOUTS $outname2"
-            fail "output wrong"
+            addlog $outname2
+            testmessage "output wrong"
+            return $::FAILTEST
         }
     }
-
 }
+
+do_test

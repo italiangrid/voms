@@ -1,27 +1,39 @@
 load_lib vomstest.exp
 
-testheader "See if server data can be retrieved (one server, by vo)."
+proc mytest {} {
+    testheader "See if server data can be retrieved (one server, by vo)."
 
-set ::_buildout [exec mktemp $::SCRATCHDIR/voms-api-c-XXXXXX]
-set res [_exeC loadbyvo.c]
+    if {[info exists ::NOCLIB] != 0} then {
+        testmessage "Either libraries are not present, or the executables cannot be compiled, or the test was disabled."
+        return $::UNDECIDEDTEST
+    }
 
-set LOGOUTS "$LOGOUTS $::_buildout"
+    set ::_buildout [exec mktemp $::SCRATCHDIR/voms-api-c-XXXXXX]
+    set res [_exeC loadbyvo.c]
 
-if $res then {
-    fail "execution failed."
-} else {
+    addlog $::_buildout
+
+    if $res then {
+        testmessage "execution failed."
+        return $::FAILTEST
+    }
+
     set correct "\"voms1\" \"localhost\" \"/C=IT/CN=003\" \"voms1\" \"33334\" \"-1\""
 
     set out [exec cat $::_buildout]
     if [regexp $correct $out] then {
-        pass "output correct"
+        testmessage "output correct"
+        return $::PASSTEST
     } else {
         set outname2 [exec mktemp $::SCRATCHDIR/voms-api-c-XXXXXX]
         set id [open $outname2 "w+"]
         puts $id $correct
         close $id
 
-        set LOGOUTS "$LOGOUTS $outname2"
-        fail "output wrong"
+        addlog$outname2
+        testmessage "output wrong"
+        return $::FAILTEST
     }
 }
+
+do_test

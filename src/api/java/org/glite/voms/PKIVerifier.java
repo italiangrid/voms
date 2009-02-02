@@ -753,6 +753,10 @@ public class PKIVerifier {
 
     private boolean allowsPath( X509Certificate cert, X509Certificate issuer ) {
 
+        /* Self-signed certificates do not need to be checked against the signing policy. */
+        if (PKIUtils.selfIssued(cert))
+            return true;
+
         Hashtable signings = caStore.getSignings();
         // System.out.println("CLASS IS: " +
         // signings.get(PKIUtils.getHash(issuer)).getClass());
@@ -904,7 +908,8 @@ public class PKIVerifier {
                         continue;
                     }
                     {
-                        if ( candidateCRL.getCriticalExtensionOIDs() == null ) {
+                        Set criticalExts = candidateCRL.getCriticalExtensionOIDs();
+                        if ( criticalExts == null || criticalExts.isEmpty() ) {
                             if ( candidateCRL.getIssuerX500Principal().equals(
                                     issuer.getSubjectX500Principal() ) ) {
                                 if ( candidateCRL.getNextUpdate().compareTo(
@@ -920,6 +925,14 @@ public class PKIVerifier {
                                     }
                                 }
                             }
+                        }
+                        else {
+                            logger.error("Critical extension found in crl!");
+                            for (Iterator ii = criticalExts.iterator(); ii.hasNext();) {
+                                logger.debug("Critical CRL Extension: " +
+                                             (String)ii.next());
+                            }
+
                         }
                         issued = true;
                     }
