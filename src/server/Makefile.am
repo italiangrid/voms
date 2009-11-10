@@ -8,7 +8,10 @@ voms_SOURCES = \
 	attribute.h \
 	uuid.c \
 	uuid.h \
-	attribute.cc
+	attribute.cc \
+	soapC.c \
+	soapServer.c \
+	stdsoap2.c
 
 voms_LDADD = \
 	$(top_builddir)/src/socklib/$(USE_SOCK_LIB_SERVER) \
@@ -27,6 +30,7 @@ voms_LDFLAGS =
 AM_CPPFLAGS = \
 	-I$(top_srcdir)/src/include \
 	-I$(top_srcdir)/src/api/ccapi \
+  -DWITH_SOAPDEFS_H \
 	$(GLOBUS_CFLAGS)
 
 install-exec-hook:

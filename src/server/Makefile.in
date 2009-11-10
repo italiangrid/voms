@@ -48,9 +48,11 @@ am__installdirs = "$(DESTDIR)$(sbindir)"
 sbinPROGRAMS_INSTALL = $(INSTALL_PROGRAM)
 PROGRAMS = $(sbin_PROGRAMS)
 am__voms_SOURCES_DIST = main.cc vomsd.cc VOMSServer.h attribute.h \
-	uuid.c uuid.h attribute.cc
+	uuid.c uuid.h attribute.cc soapC.c soapServer.c stdsoap2.c
 @BUILD_SERVER_TRUE@am_voms_OBJECTS = main.$(OBJEXT) vomsd.$(OBJEXT) \
-@BUILD_SERVER_TRUE@	uuid.$(OBJEXT) attribute.$(OBJEXT)
+@BUILD_SERVER_TRUE@	uuid.$(OBJEXT) attribute.$(OBJEXT) \
+@BUILD_SERVER_TRUE@	soapC.$(OBJEXT) soapServer.$(OBJEXT) \
+@BUILD_SERVER_TRUE@	stdsoap2.$(OBJEXT)
 voms_OBJECTS = $(am_voms_OBJECTS)
 am__DEPENDENCIES_1 =
 @BUILD_SERVER_TRUE@voms_DEPENDENCIES = $(top_builddir)/src/socklib/$(USE_SOCK_LIB_SERVER) \
@@ -283,7 +285,10 @@ with_scratchdir = @with_scratchdir@
 @BUILD_SERVER_TRUE@	attribute.h \
 @BUILD_SERVER_TRUE@	uuid.c \
 @BUILD_SERVER_TRUE@	uuid.h \
-@BUILD_SERVER_TRUE@	attribute.cc
+@BUILD_SERVER_TRUE@	attribute.cc \
+@BUILD_SERVER_TRUE@	soapC.c \
+@BUILD_SERVER_TRUE@	soapServer.c \
+@BUILD_SERVER_TRUE@	stdsoap2.c
 
 @BUILD_SERVER_TRUE@voms_LDADD = \
 @BUILD_SERVER_TRUE@	$(top_builddir)/src/socklib/$(USE_SOCK_LIB_SERVER) \
@@ -301,6 +306,7 @@ with_scratchdir = @with_scratchdir@
 @BUILD_SERVER_TRUE@AM_CPPFLAGS = \
 @BUILD_SERVER_TRUE@	-I$(top_srcdir)/src/include \
 @BUILD_SERVER_TRUE@	-I$(top_srcdir)/src/api/ccapi \
+@BUILD_SERVER_TRUE@  -DWITH_SOAPDEFS_H \
 @BUILD_SERVER_TRUE@	$(GLOBUS_CFLAGS)
 
 all: all-am
@@ -376,6 +382,9 @@ distclean-compile:
 
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/attribute.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/main.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/soapC.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/soapServer.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/stdsoap2.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/uuid.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/vomsd.Po@am__quote@
 

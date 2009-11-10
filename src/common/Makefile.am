@@ -12,12 +12,14 @@ libutilities_la_SOURCES = \
 	data.cc \
 	options.cc \
 	pass.cc \
+	fqan.cc \
 	xmlcc.cc
 
 libutilities_nog_la_SOURCES = \
 	data.cc \
 	options.cc \
 	pass.cc \
+	fqan.cc \
 	xmlcc.cc
 
 libutilities_nog_la_CFLAGS = \

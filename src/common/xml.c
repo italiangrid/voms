@@ -52,7 +52,7 @@ static char trans2[128] = { 0,   0,  0,  0,  0,  0,  0,  0,
 static char *MyEncode(const char *data, int size, int *j);
 static char *MyDecode(const char *data, int size, int *j);
 
-static char *base64Encode(const char *data, int size, int *j)
+char *base64Encode(const char *data, int size, int *j)
 {
   BIO *in = NULL;
   BIO *b64 = NULL;

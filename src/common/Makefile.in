@@ -53,10 +53,12 @@ am_libutilc_nog_la_OBJECTS = libutilc_nog_la-list.lo \
 	libutilc_nog_la-credentials.lo
 libutilc_nog_la_OBJECTS = $(am_libutilc_nog_la_OBJECTS)
 libutilities_la_LIBADD =
-am_libutilities_la_OBJECTS = data.lo options.lo pass.lo xmlcc.lo
+am_libutilities_la_OBJECTS = data.lo options.lo pass.lo fqan.lo \
+	xmlcc.lo
 libutilities_la_OBJECTS = $(am_libutilities_la_OBJECTS)
 libutilities_nog_la_LIBADD =
-am_libutilities_nog_la_OBJECTS = data.lo options.lo pass.lo xmlcc.lo
+am_libutilities_nog_la_OBJECTS = data.lo options.lo pass.lo fqan.lo \
+	xmlcc.lo
 libutilities_nog_la_OBJECTS = $(am_libutilities_nog_la_OBJECTS)
 DEFAULT_INCLUDES = -I.@am__isrc@ -I$(top_builddir)/src/autogen
 depcomp = $(SHELL) $(top_srcdir)/./project/depcomp
@@ -283,12 +285,14 @@ libutilities_la_SOURCES = \
 	data.cc \
 	options.cc \
 	pass.cc \
+	fqan.cc \
 	xmlcc.cc
 
 libutilities_nog_la_SOURCES = \
 	data.cc \
 	options.cc \
 	pass.cc \
+	fqan.cc \
 	xmlcc.cc
 
 libutilities_nog_la_CFLAGS = \
@@ -385,6 +389,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/credentials.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/data.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/error.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/fqan.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libutilc_nog_la-credentials.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libutilc_nog_la-error.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libutilc_nog_la-list.Plo@am__quote@

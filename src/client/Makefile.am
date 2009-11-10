@@ -5,9 +5,7 @@ voms_proxy_init_SOURCES = \
 	main.cc \
 	vomsclient.cc \
 	vomsclient.h \
-	contact.hpp \
-	fqan.h \
-	fqan.cc
+	contact.hpp
 
 voms_proxy_init_LDADD = \
   $(top_builddir)/src/api/ccapi/libvomsapi_nog.la \

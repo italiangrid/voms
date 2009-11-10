@@ -182,6 +182,11 @@ bool GSISocketClient::LoadCredentials(const char *cadir, X509 *cert, STACK_OF(X5
   return true;
 }
 
+extern "C" {
+ extern int proxy_app_verify_callback(X509_STORE_CTX *, void *);
+}
+
+
 static proxy_verify_desc *setup_initializers(char *cadir) 
 {
   proxy_verify_ctx_desc *pvxd = NULL;

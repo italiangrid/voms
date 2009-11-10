@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<wsdl:definitions targetNamespace="http://www.example.org/voms/"
+	xmlns:tns="http://www.example.org/voms/"
+	xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" 
+	xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/"
+	xmlns:xsd="http://www.w3.org/2001/XMLSchema" name="voms">
+	
+	<wsdl:types>
+		<xsd:schema targetNamespace="http://www.example.org/voms/">
+			
+			<xsd:element name="GetAttributeCertificate">
+				<xsd:complexType>
+					<xsd:sequence>
+						<xsd:element ref="tns:FQAN" minOccurs="0" maxOccurs="unbounded"></xsd:element>
+						<xsd:element ref="tns:Target" minOccurs="0" maxOccurs="unbounded"></xsd:element>
+						<xsd:element ref="tns:Lifetime" minOccurs="0" maxOccurs="1"></xsd:element>
+					</xsd:sequence>
+				</xsd:complexType>
+			</xsd:element>
+			
+			<xsd:element name="GetAttributeCertificateResponse">
+				<xsd:complexType>
+					<xsd:sequence>
+                        <xsd:element name="Status" type="tns:StatusType">
+						</xsd:element>
+                        <xsd:element name="AttributeCertificate"
+							type="xsd:string" minOccurs="0" maxOccurs="1" />
+					</xsd:sequence>
+				</xsd:complexType>
+			</xsd:element>
+		
+            <xsd:element name="StatusCode" type="tns:StatusCodeType"></xsd:element>
+            <xsd:complexType name="StatusCodeType">
+            	<xsd:attribute name="Value" type="xsd:anyURI"></xsd:attribute>
+            </xsd:complexType>
+
+            <xsd:element name="StatusMessage" type="xsd:string"></xsd:element>
+
+			<xsd:complexType name="StatusType">
+				<xsd:sequence>
+					<xsd:element ref="tns:StatusCode"></xsd:element>
+					<xsd:element ref="tns:StatusMessage"></xsd:element>
+				</xsd:sequence>
+			</xsd:complexType>
+		
+            <xsd:element name="FQAN" type="xsd:string"></xsd:element>            
+		
+            <xsd:element name="Target" type="xsd:string"></xsd:element>
+        
+            <xsd:element name="Lifetime" type="xsd:int"></xsd:element>
+		
+		</xsd:schema>
+	</wsdl:types>
+	
+	<wsdl:message name="GetAttributeCertificateRequest">
+		<wsdl:part element="tns:GetAttributeCertificate" name="parameters" />
+	</wsdl:message>
+	
+	<wsdl:message name="GetAttributeCertificateResponse">
+		<wsdl:part element="tns:GetAttributeCertificateResponse" name="parameters" />
+	</wsdl:message>
+	
+	<wsdl:portType name="voms">
+		<wsdl:operation name="GetAttributeCertificate">
+			<wsdl:input message="tns:GetAttributeCertificateRequest" />
+			<wsdl:output message="tns:GetAttributeCertificateResponse" />
+		</wsdl:operation>
+	</wsdl:portType>
+	
+	<wsdl:binding name="vomsSOAP" type="tns:voms">
+		<soap:binding style="document"
+			transport="http://schemas.xmlsoap.org/soap/http" />
+		<wsdl:operation name="GetAttributeCertificate">
+			<soap:operation soapAction="http://www.example.org/voms/GetAttributeCertificate" />
+			<wsdl:input>
+				<soap:body use="literal" />
+			</wsdl:input>
+			<wsdl:output>
+				<soap:body use="literal" />
+			</wsdl:output>
+		</wsdl:operation>
+	</wsdl:binding>
+	
+	<wsdl:service name="voms">
+		<wsdl:port binding="tns:vomsSOAP" name="vomsSOAP">
+			<soap:address location="http://www.example.org/" />
+		</wsdl:port>
+	</wsdl:service>
+	
+</wsdl:definitions>

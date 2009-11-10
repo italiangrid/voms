@@ -29,34 +29,10 @@ std::string parse_fqan(const std::vector<std::string>& fqans)
   
   for(std::vector<std::string>::const_iterator i = fqans.begin(); i != fqans.end(); ++i)
   {
-    /* check whether fqan is all */
-    if(*i == "all" || *i == "ALL")
-      return "A";
-    
-    /* check for presence of capability selection */
-    std::string::size_type cap_pos = i->find("/Capability=");
-    if(cap_pos!=std::string::npos)
-    {
-      std::cerr << "capability selection not supported" << std::endl;
-      exit(1);
-    }
-  
-    /* check for role selection */
-    std::string::size_type role_pos = i->find("/Role=");
-    if (role_pos != std::string::npos && role_pos > 0)
-      parsed += "B" + i->substr(0, role_pos) + ":" + i->substr(role_pos+6);
-    else if (role_pos == 0)
-      parsed += "R" + i->substr(role_pos+6);
-    else if ((*i)[0] == '/')
-      parsed += "G" + i->substr(0);
-    else {
-      std::cerr << "Unable to parse command to voms: " << *i <<    std::endl;
-      exit(1);
-    }
+    parsed += FQANParse(*i);
     if(i != (fqans.end() - 1))
       parsed += ",";
   }
-
 
   return parsed;
 }

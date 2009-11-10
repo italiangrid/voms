@@ -128,7 +128,7 @@ public:
   STACK_OF(X509) *own_stack;
   STACK_OF(X509) *peer_stack;
 
-private:
+public:
   int port;
   bool opened;
   gss_cred_id_t credential;

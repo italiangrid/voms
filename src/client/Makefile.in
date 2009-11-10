@@ -48,9 +48,9 @@ am__installdirs = "$(DESTDIR)$(bindir)"
 binPROGRAMS_INSTALL = $(INSTALL_PROGRAM)
 PROGRAMS = $(bin_PROGRAMS)
 am__voms_proxy_init_SOURCES_DIST = main.cc vomsclient.cc vomsclient.h \
-	contact.hpp fqan.h fqan.cc
+	contact.hpp
 @BUILD_CLIENTS_TRUE@am_voms_proxy_init_OBJECTS = main.$(OBJEXT) \
-@BUILD_CLIENTS_TRUE@	vomsclient.$(OBJEXT) fqan.$(OBJEXT)
+@BUILD_CLIENTS_TRUE@	vomsclient.$(OBJEXT)
 voms_proxy_init_OBJECTS = $(am_voms_proxy_init_OBJECTS)
 am__DEPENDENCIES_1 =
 @BUILD_CLIENTS_TRUE@voms_proxy_init_DEPENDENCIES = $(top_builddir)/src/api/ccapi/libvomsapi_nog.la \
@@ -270,9 +270,7 @@ with_scratchdir = @with_scratchdir@
 @BUILD_CLIENTS_TRUE@	main.cc \
 @BUILD_CLIENTS_TRUE@	vomsclient.cc \
 @BUILD_CLIENTS_TRUE@	vomsclient.h \
-@BUILD_CLIENTS_TRUE@	contact.hpp \
-@BUILD_CLIENTS_TRUE@	fqan.h \
-@BUILD_CLIENTS_TRUE@	fqan.cc
+@BUILD_CLIENTS_TRUE@	contact.hpp
 
 @BUILD_CLIENTS_TRUE@voms_proxy_init_LDADD = \
 @BUILD_CLIENTS_TRUE@  $(top_builddir)/src/api/ccapi/libvomsapi_nog.la \
@@ -356,7 +354,6 @@ mostlyclean-compile:
 distclean-compile:
 	-rm -f *.tab.c
 
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/fqan.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/main.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/vomsclient.Po@am__quote@
 
