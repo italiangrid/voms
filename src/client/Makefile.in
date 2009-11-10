@@ -37,7 +37,6 @@ subdir = src/client
 DIST_COMMON = $(srcdir)/Makefile.am $(srcdir)/Makefile.in
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 am__aclocal_m4_deps = $(top_srcdir)/project/acinclude.m4 \
-	$(top_srcdir)/project/cppunit.m4 \
 	$(top_srcdir)/project/expat.m4 $(top_srcdir)/project/glite.m4 \
 	$(top_srcdir)/configure.ac
 am__configure_deps = $(am__aclocal_m4_deps) $(CONFIGURE_DEPENDENCIES) \
@@ -95,8 +94,6 @@ CCDEPMODE = @CCDEPMODE@
 CFLAGS = @CFLAGS@
 CPP = @CPP@
 CPPFLAGS = @CPPFLAGS@
-CPPUNIT_CFLAGS = @CPPUNIT_CFLAGS@
-CPPUNIT_LIBS = @CPPUNIT_LIBS@
 CXX = @CXX@
 CXXCPP = @CXXCPP@
 CXXDEPMODE = @CXXDEPMODE@

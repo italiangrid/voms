@@ -8891,6 +8891,5 @@ AC_SUBST([am__untar])
 ]) # _AM_PROG_TAR
 
 m4_include([project/acinclude.m4])
-m4_include([project/cppunit.m4])
 m4_include([project/expat.m4])
 m4_include([project/glite.m4])

@@ -36,7 +36,6 @@ subdir = src/sslutils
 DIST_COMMON = $(srcdir)/Makefile.am $(srcdir)/Makefile.in
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 am__aclocal_m4_deps = $(top_srcdir)/project/acinclude.m4 \
-	$(top_srcdir)/project/cppunit.m4 \
 	$(top_srcdir)/project/expat.m4 $(top_srcdir)/project/glite.m4 \
 	$(top_srcdir)/configure.ac
 am__configure_deps = $(am__aclocal_m4_deps) $(CONFIGURE_DEPENDENCIES) \
@@ -46,31 +45,41 @@ CONFIG_HEADER = $(top_builddir)/src/autogen/config.h
 CONFIG_CLEAN_FILES =
 LTLIBRARIES = $(noinst_LTLIBRARIES)
 am__DEPENDENCIES_1 =
-libssl_utils_la_DEPENDENCIES = ./oldgaa/liboldgaa.la \
-	$(am__DEPENDENCIES_1)
+libssl_utils_la_DEPENDENCIES = $(am__DEPENDENCIES_1)
 am__objects_1 = libssl_utils_la-scutils.lo libssl_utils_la-sslutils.lo \
-	libssl_utils_la-proxycertinfo.lo
+	libssl_utils_la-proxycertinfo.lo \
+	libssl_utils_la-signing_policy.lo \
+	libssl_utils_la-lex.signing.lo libssl_utils_la-namespaces.lo \
+	libssl_utils_la-lex.namespaces.lo libssl_utils_la-evaluate.lo
 am_libssl_utils_la_OBJECTS = $(am__objects_1)
 libssl_utils_la_OBJECTS = $(am_libssl_utils_la_OBJECTS)
 libssl_utils_la_LINK = $(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) \
 	$(LIBTOOLFLAGS) --mode=link $(CCLD) $(libssl_utils_la_CFLAGS) \
 	$(CFLAGS) $(AM_LDFLAGS) $(LDFLAGS) -o $@
-libssl_utils_gcc32_la_DEPENDENCIES = ./oldgaa/liboldgaa_gcc32.la \
-	$(am__DEPENDENCIES_1)
+libssl_utils_gcc32_la_DEPENDENCIES = $(am__DEPENDENCIES_1)
 am__objects_2 = libssl_utils_gcc32_la-scutils.lo \
 	libssl_utils_gcc32_la-sslutils.lo \
-	libssl_utils_gcc32_la-proxycertinfo.lo
+	libssl_utils_gcc32_la-proxycertinfo.lo \
+	libssl_utils_gcc32_la-signing_policy.lo \
+	libssl_utils_gcc32_la-lex.signing.lo \
+	libssl_utils_gcc32_la-namespaces.lo \
+	libssl_utils_gcc32_la-lex.namespaces.lo \
+	libssl_utils_gcc32_la-evaluate.lo
 am_libssl_utils_gcc32_la_OBJECTS = $(am__objects_2)
 libssl_utils_gcc32_la_OBJECTS = $(am_libssl_utils_gcc32_la_OBJECTS)
 libssl_utils_gcc32_la_LINK = $(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) \
 	$(LIBTOOLFLAGS) --mode=link $(CCLD) \
 	$(libssl_utils_gcc32_la_CFLAGS) $(CFLAGS) $(AM_LDFLAGS) \
 	$(LDFLAGS) -o $@
-libssl_utils_gcc32dbg_la_DEPENDENCIES =  \
-	./oldgaa/liboldgaa_gcc32dbg.la $(am__DEPENDENCIES_1)
+libssl_utils_gcc32dbg_la_DEPENDENCIES = $(am__DEPENDENCIES_1)
 am__objects_3 = libssl_utils_gcc32dbg_la-scutils.lo \
 	libssl_utils_gcc32dbg_la-sslutils.lo \
-	libssl_utils_gcc32dbg_la-proxycertinfo.lo
+	libssl_utils_gcc32dbg_la-proxycertinfo.lo \
+	libssl_utils_gcc32dbg_la-signing_policy.lo \
+	libssl_utils_gcc32dbg_la-lex.signing.lo \
+	libssl_utils_gcc32dbg_la-namespaces.lo \
+	libssl_utils_gcc32dbg_la-lex.namespaces.lo \
+	libssl_utils_gcc32dbg_la-evaluate.lo
 am_libssl_utils_gcc32dbg_la_OBJECTS = $(am__objects_3)
 libssl_utils_gcc32dbg_la_OBJECTS =  \
 	$(am_libssl_utils_gcc32dbg_la_OBJECTS)
@@ -78,11 +87,15 @@ libssl_utils_gcc32dbg_la_LINK = $(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) \
 	$(LIBTOOLFLAGS) --mode=link $(CCLD) \
 	$(libssl_utils_gcc32dbg_la_CFLAGS) $(CFLAGS) $(AM_LDFLAGS) \
 	$(LDFLAGS) -o $@
-libssl_utils_gcc32dbgpthr_la_DEPENDENCIES =  \
-	./oldgaa/liboldgaa_gcc32dbgpthr.la $(am__DEPENDENCIES_1)
+libssl_utils_gcc32dbgpthr_la_DEPENDENCIES = $(am__DEPENDENCIES_1)
 am__objects_4 = libssl_utils_gcc32dbgpthr_la-scutils.lo \
 	libssl_utils_gcc32dbgpthr_la-sslutils.lo \
-	libssl_utils_gcc32dbgpthr_la-proxycertinfo.lo
+	libssl_utils_gcc32dbgpthr_la-proxycertinfo.lo \
+	libssl_utils_gcc32dbgpthr_la-signing_policy.lo \
+	libssl_utils_gcc32dbgpthr_la-lex.signing.lo \
+	libssl_utils_gcc32dbgpthr_la-namespaces.lo \
+	libssl_utils_gcc32dbgpthr_la-lex.namespaces.lo \
+	libssl_utils_gcc32dbgpthr_la-evaluate.lo
 am_libssl_utils_gcc32dbgpthr_la_OBJECTS = $(am__objects_4)
 libssl_utils_gcc32dbgpthr_la_OBJECTS =  \
 	$(am_libssl_utils_gcc32dbgpthr_la_OBJECTS)
@@ -90,11 +103,15 @@ libssl_utils_gcc32dbgpthr_la_LINK = $(LIBTOOL) --tag=CC \
 	$(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=link $(CCLD) \
 	$(libssl_utils_gcc32dbgpthr_la_CFLAGS) $(CFLAGS) $(AM_LDFLAGS) \
 	$(LDFLAGS) -o $@
-libssl_utils_gcc32pthr_la_DEPENDENCIES =  \
-	./oldgaa/liboldgaa_gcc32pthr.la $(am__DEPENDENCIES_1)
+libssl_utils_gcc32pthr_la_DEPENDENCIES = $(am__DEPENDENCIES_1)
 am__objects_5 = libssl_utils_gcc32pthr_la-scutils.lo \
 	libssl_utils_gcc32pthr_la-sslutils.lo \
-	libssl_utils_gcc32pthr_la-proxycertinfo.lo
+	libssl_utils_gcc32pthr_la-proxycertinfo.lo \
+	libssl_utils_gcc32pthr_la-signing_policy.lo \
+	libssl_utils_gcc32pthr_la-lex.signing.lo \
+	libssl_utils_gcc32pthr_la-namespaces.lo \
+	libssl_utils_gcc32pthr_la-lex.namespaces.lo \
+	libssl_utils_gcc32pthr_la-evaluate.lo
 am_libssl_utils_gcc32pthr_la_OBJECTS = $(am__objects_5)
 libssl_utils_gcc32pthr_la_OBJECTS =  \
 	$(am_libssl_utils_gcc32pthr_la_OBJECTS)
@@ -102,22 +119,30 @@ libssl_utils_gcc32pthr_la_LINK = $(LIBTOOL) --tag=CC \
 	$(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=link $(CCLD) \
 	$(libssl_utils_gcc32pthr_la_CFLAGS) $(CFLAGS) $(AM_LDFLAGS) \
 	$(LDFLAGS) -o $@
-libssl_utils_gcc64_la_DEPENDENCIES = ./oldgaa/liboldgaa_gcc64.la \
-	$(am__DEPENDENCIES_1)
+libssl_utils_gcc64_la_DEPENDENCIES = $(am__DEPENDENCIES_1)
 am__objects_6 = libssl_utils_gcc64_la-scutils.lo \
 	libssl_utils_gcc64_la-sslutils.lo \
-	libssl_utils_gcc64_la-proxycertinfo.lo
+	libssl_utils_gcc64_la-proxycertinfo.lo \
+	libssl_utils_gcc64_la-signing_policy.lo \
+	libssl_utils_gcc64_la-lex.signing.lo \
+	libssl_utils_gcc64_la-namespaces.lo \
+	libssl_utils_gcc64_la-lex.namespaces.lo \
+	libssl_utils_gcc64_la-evaluate.lo
 am_libssl_utils_gcc64_la_OBJECTS = $(am__objects_6)
 libssl_utils_gcc64_la_OBJECTS = $(am_libssl_utils_gcc64_la_OBJECTS)
 libssl_utils_gcc64_la_LINK = $(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) \
 	$(LIBTOOLFLAGS) --mode=link $(CCLD) \
 	$(libssl_utils_gcc64_la_CFLAGS) $(CFLAGS) $(AM_LDFLAGS) \
 	$(LDFLAGS) -o $@
-libssl_utils_gcc64dbg_la_DEPENDENCIES =  \
-	./oldgaa/liboldgaa_gcc64dbg.la $(am__DEPENDENCIES_1)
+libssl_utils_gcc64dbg_la_DEPENDENCIES = $(am__DEPENDENCIES_1)
 am__objects_7 = libssl_utils_gcc64dbg_la-scutils.lo \
 	libssl_utils_gcc64dbg_la-sslutils.lo \
-	libssl_utils_gcc64dbg_la-proxycertinfo.lo
+	libssl_utils_gcc64dbg_la-proxycertinfo.lo \
+	libssl_utils_gcc64dbg_la-signing_policy.lo \
+	libssl_utils_gcc64dbg_la-lex.signing.lo \
+	libssl_utils_gcc64dbg_la-namespaces.lo \
+	libssl_utils_gcc64dbg_la-lex.namespaces.lo \
+	libssl_utils_gcc64dbg_la-evaluate.lo
 am_libssl_utils_gcc64dbg_la_OBJECTS = $(am__objects_7)
 libssl_utils_gcc64dbg_la_OBJECTS =  \
 	$(am_libssl_utils_gcc64dbg_la_OBJECTS)
@@ -125,11 +150,15 @@ libssl_utils_gcc64dbg_la_LINK = $(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) \
 	$(LIBTOOLFLAGS) --mode=link $(CCLD) \
 	$(libssl_utils_gcc64dbg_la_CFLAGS) $(CFLAGS) $(AM_LDFLAGS) \
 	$(LDFLAGS) -o $@
-libssl_utils_gcc64dbgpthr_la_DEPENDENCIES =  \
-	./oldgaa/liboldgaa_gcc64dbgpthr.la $(am__DEPENDENCIES_1)
+libssl_utils_gcc64dbgpthr_la_DEPENDENCIES = $(am__DEPENDENCIES_1)
 am__objects_8 = libssl_utils_gcc64dbgpthr_la-scutils.lo \
 	libssl_utils_gcc64dbgpthr_la-sslutils.lo \
-	libssl_utils_gcc64dbgpthr_la-proxycertinfo.lo
+	libssl_utils_gcc64dbgpthr_la-proxycertinfo.lo \
+	libssl_utils_gcc64dbgpthr_la-signing_policy.lo \
+	libssl_utils_gcc64dbgpthr_la-lex.signing.lo \
+	libssl_utils_gcc64dbgpthr_la-namespaces.lo \
+	libssl_utils_gcc64dbgpthr_la-lex.namespaces.lo \
+	libssl_utils_gcc64dbgpthr_la-evaluate.lo
 am_libssl_utils_gcc64dbgpthr_la_OBJECTS = $(am__objects_8)
 libssl_utils_gcc64dbgpthr_la_OBJECTS =  \
 	$(am_libssl_utils_gcc64dbgpthr_la_OBJECTS)
@@ -137,11 +166,15 @@ libssl_utils_gcc64dbgpthr_la_LINK = $(LIBTOOL) --tag=CC \
 	$(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=link $(CCLD) \
 	$(libssl_utils_gcc64dbgpthr_la_CFLAGS) $(CFLAGS) $(AM_LDFLAGS) \
 	$(LDFLAGS) -o $@
-libssl_utils_gcc64pthr_la_DEPENDENCIES =  \
-	./oldgaa/liboldgaa_gcc64pthr.la $(am__DEPENDENCIES_1)
+libssl_utils_gcc64pthr_la_DEPENDENCIES = $(am__DEPENDENCIES_1)
 am__objects_9 = libssl_utils_gcc64pthr_la-scutils.lo \
 	libssl_utils_gcc64pthr_la-sslutils.lo \
-	libssl_utils_gcc64pthr_la-proxycertinfo.lo
+	libssl_utils_gcc64pthr_la-proxycertinfo.lo \
+	libssl_utils_gcc64pthr_la-signing_policy.lo \
+	libssl_utils_gcc64pthr_la-lex.signing.lo \
+	libssl_utils_gcc64pthr_la-namespaces.lo \
+	libssl_utils_gcc64pthr_la-lex.namespaces.lo \
+	libssl_utils_gcc64pthr_la-evaluate.lo
 am_libssl_utils_gcc64pthr_la_OBJECTS = $(am__objects_9)
 libssl_utils_gcc64pthr_la_OBJECTS =  \
 	$(am_libssl_utils_gcc64pthr_la_OBJECTS)
@@ -149,10 +182,15 @@ libssl_utils_gcc64pthr_la_LINK = $(LIBTOOL) --tag=CC \
 	$(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=link $(CCLD) \
 	$(libssl_utils_gcc64pthr_la_CFLAGS) $(CFLAGS) $(AM_LDFLAGS) \
 	$(LDFLAGS) -o $@
-libssl_utils_nog_la_DEPENDENCIES = ./oldgaa/liboldgaa_nog.la
+libssl_utils_nog_la_LIBADD =
 am__objects_10 = libssl_utils_nog_la-scutils.lo \
 	libssl_utils_nog_la-sslutils.lo \
-	libssl_utils_nog_la-proxycertinfo.lo
+	libssl_utils_nog_la-proxycertinfo.lo \
+	libssl_utils_nog_la-signing_policy.lo \
+	libssl_utils_nog_la-lex.signing.lo \
+	libssl_utils_nog_la-namespaces.lo \
+	libssl_utils_nog_la-lex.namespaces.lo \
+	libssl_utils_nog_la-evaluate.lo
 am_libssl_utils_nog_la_OBJECTS = $(am__objects_10)
 libssl_utils_nog_la_OBJECTS = $(am_libssl_utils_nog_la_OBJECTS)
 libssl_utils_nog_la_LINK = $(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) \
@@ -181,18 +219,8 @@ DIST_SOURCES = $(libssl_utils_la_SOURCES) \
 	$(libssl_utils_gcc64dbgpthr_la_SOURCES) \
 	$(libssl_utils_gcc64pthr_la_SOURCES) \
 	$(libssl_utils_nog_la_SOURCES)
-RECURSIVE_TARGETS = all-recursive check-recursive dvi-recursive \
-	html-recursive info-recursive install-data-recursive \
-	install-dvi-recursive install-exec-recursive \
-	install-html-recursive install-info-recursive \
-	install-pdf-recursive install-ps-recursive install-recursive \
-	installcheck-recursive installdirs-recursive pdf-recursive \
-	ps-recursive uninstall-recursive
-RECURSIVE_CLEAN_TARGETS = mostlyclean-recursive clean-recursive	\
-  distclean-recursive maintainer-clean-recursive
 ETAGS = etags
 CTAGS = ctags
-DIST_SUBDIRS = $(SUBDIRS)
 DISTFILES = $(DIST_COMMON) $(DIST_SOURCES) $(TEXINFOS) $(EXTRA_DIST)
 ACLOCAL = @ACLOCAL@
 ALLOCA = @ALLOCA@
@@ -207,8 +235,6 @@ CCDEPMODE = @CCDEPMODE@
 CFLAGS = @CFLAGS@
 CPP = @CPP@
 CPPFLAGS = @CPPFLAGS@
-CPPUNIT_CFLAGS = @CPPUNIT_CFLAGS@
-CPPUNIT_LIBS = @CPPUNIT_LIBS@
 CXX = @CXX@
 CXXCPP = @CXXCPP@
 CXXDEPMODE = @CXXDEPMODE@
@@ -380,30 +406,26 @@ with_dbuser = @with_dbuser@
 with_mysqlconf = @with_mysqlconf@
 with_reportdir = @with_reportdir@
 with_scratchdir = @with_scratchdir@
-SUBDIRS = oldgaa
 noinst_LTLIBRARIES = \
 	$(WANTED_SSL_UTILS_LIBS) # may add the libraries defined in EXTRA_LTLIBRARIES
 
-SOURCES = scutils.c scutils.h sslutils.c sslutils.h proxycertinfo.c
+SOURCES = scutils.c scutils.h sslutils.c sslutils.h proxycertinfo.c \
+	signing_policy.c lex.signing.c namespaces.c lex.namespaces.c \
+	evaluate.c
+
 libssl_utils_la_SOURCES = $(SOURCES)
 libssl_utils_nog_la_SOURCES = $(SOURCES)
 libssl_utils_la_CFLAGS = \
-	-I $(top_srcdir)/src/sslutils/oldgaa \
 	-I $(top_srcdir)/src/include \
 	$(GLOBUS_CFLAGS)
 
 libssl_utils_la_LIBADD = \
-	./oldgaa/liboldgaa.la \
 	$(GLOBUS_GSS_API_LIBS)
 
 libssl_utils_nog_la_CFLAGS = \
 	$(NO_GLOBUS_FLAGS) \
-	-I $(top_srcdir)/src/sslutils/oldgaa \
 	-I $(top_srcdir)/src/include \
 	$(GLOBUS_CFLAGS)
-
-libssl_utils_nog_la_LIBADD = \
-	./oldgaa/liboldgaa_nog.la
 
 
 ###
@@ -423,96 +445,80 @@ libssl_utils_gcc32_la_SOURCES = \
 	$(SOURCES)
 
 libssl_utils_gcc32_la_CFLAGS = \
-	-I $(top_srcdir)/src/sslutils/oldgaa \
 	-I $(top_srcdir)/src/include \
 	$(GLOBUS_GCC32_CFLAGS)
 
 libssl_utils_gcc32_la_LIBADD = \
-	./oldgaa/liboldgaa_gcc32.la \
 	$(GLOBUS_GCC32_GSS_API_LIBS)
 
 libssl_utils_gcc32dbg_la_SOURCES = \
 	$(SOURCES)
 
 libssl_utils_gcc32dbg_la_CFLAGS = \
-	-I $(top_srcdir)/src/sslutils/oldgaa \
 	-I $(top_srcdir)/src/include \
 	$(GLOBUS_GCC32DBG_CFLAGS)
 
 libssl_utils_gcc32dbg_la_LIBADD = \
-	./oldgaa/liboldgaa_gcc32dbg.la \
 	$(GLOBUS_GCC32DBG_GSS_API_LIBS)
 
 libssl_utils_gcc32pthr_la_SOURCES = \
 	$(SOURCES)
 
 libssl_utils_gcc32pthr_la_CFLAGS = \
-	-I $(top_srcdir)/src/sslutils/oldgaa \
 	-I $(top_srcdir)/src/include \
 	$(GLOBUS_GCC32PTHR_CFLAGS)
 
 libssl_utils_gcc32pthr_la_LIBADD = \
-	./oldgaa/liboldgaa_gcc32pthr.la \
 	$(GLOBUS_GCC32PTHR_GSS_API_LIBS)
 
 libssl_utils_gcc32dbgpthr_la_SOURCES = \
 	$(SOURCES)
 
 libssl_utils_gcc32dbgpthr_la_CFLAGS = \
-	-I $(top_srcdir)/src/sslutils/oldgaa \
 	-I $(top_srcdir)/src/include \
 	$(GLOBUS_GCC32DBGPTHR_CFLAGS)
 
 libssl_utils_gcc32dbgpthr_la_LIBADD = \
-	./oldgaa/liboldgaa_gcc32dbgpthr.la \
 	$(GLOBUS_GCC32DBGPTHR_GSS_API_LIBS)
 
 libssl_utils_gcc64_la_SOURCES = \
 	$(SOURCES)
 
 libssl_utils_gcc64_la_CFLAGS = \
-	-I $(top_srcdir)/src/sslutils/oldgaa \
 	-I $(top_srcdir)/src/include \
 	$(GLOBUS_GCC64_CFLAGS)
 
 libssl_utils_gcc64_la_LIBADD = \
-	./oldgaa/liboldgaa_gcc64.la \
 	$(GLOBUS_GCC64_GSS_API_LIBS)
 
 libssl_utils_gcc64dbg_la_SOURCES = \
 	$(SOURCES)
 
 libssl_utils_gcc64dbg_la_CFLAGS = \
-	-I $(top_srcdir)/src/sslutils/oldgaa \
 	-I $(top_srcdir)/src/include \
 	$(GLOBUS_GCC64DBG_CFLAGS)
 
 libssl_utils_gcc64dbg_la_LIBADD = \
-	./oldgaa/liboldgaa_gcc64dbg.la \
 	$(GLOBUS_GCC64DBG_GSS_API_LIBS)
 
 libssl_utils_gcc64pthr_la_SOURCES = \
 	$(SOURCES)
 
 libssl_utils_gcc64pthr_la_CFLAGS = \
-	-I $(top_srcdir)/src/sslutils/oldgaa \
 	-I $(top_srcdir)/src/include \
 	$(GLOBUS_GCC64PTHR_CFLAGS)
 
 libssl_utils_gcc64pthr_la_LIBADD = \
-	./oldgaa/liboldgaa_gcc64pthr.la \
 	$(GLOBUS_GCC64PTHR_GSS_API_LIBS)
 
 libssl_utils_gcc64dbgpthr_la_SOURCES = \
 	$(SOURCES)
 
 libssl_utils_gcc64dbgpthr_la_CFLAGS = \
-	-I $(top_srcdir)/src/sslutils/oldgaa \
 	-I $(top_srcdir)/src/include \
 	$(GLOBUS_GCC64DBGPTHR_CFLAGS)
 
 libssl_utils_gcc64dbgpthr_la_LIBADD = \
-	./oldgaa/liboldgaa_gcc64dbgpthr.la \
 	$(GLOBUS_GCC64DBGPTHR_GSS_API_LIBS)
 
 CLEANFILES = \
@@ -525,7 +531,7 @@ CLEANFILES = \
 	libssl_utils_gcc32pthr.la \
 	libssl_utils_gcc32dbgpthr.la
 
-all: all-recursive
+all: all-am
 
 .SUFFIXES:
 .SUFFIXES: .c .lo .o .obj
@@ -594,35 +600,85 @@ mostlyclean-compile:
 distclean-compile:
 	-rm -f *.tab.c
 
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libssl_utils_gcc32_la-evaluate.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libssl_utils_gcc32_la-lex.namespaces.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libssl_utils_gcc32_la-lex.signing.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libssl_utils_gcc32_la-namespaces.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libssl_utils_gcc32_la-proxycertinfo.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libssl_utils_gcc32_la-scutils.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libssl_utils_gcc32_la-signing_policy.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libssl_utils_gcc32_la-sslutils.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libssl_utils_gcc32dbg_la-evaluate.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libssl_utils_gcc32dbg_la-lex.namespaces.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libssl_utils_gcc32dbg_la-lex.signing.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libssl_utils_gcc32dbg_la-namespaces.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libssl_utils_gcc32dbg_la-proxycertinfo.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libssl_utils_gcc32dbg_la-scutils.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libssl_utils_gcc32dbg_la-signing_policy.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libssl_utils_gcc32dbg_la-sslutils.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libssl_utils_gcc32dbgpthr_la-evaluate.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libssl_utils_gcc32dbgpthr_la-lex.namespaces.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libssl_utils_gcc32dbgpthr_la-lex.signing.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libssl_utils_gcc32dbgpthr_la-namespaces.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libssl_utils_gcc32dbgpthr_la-proxycertinfo.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libssl_utils_gcc32dbgpthr_la-scutils.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libssl_utils_gcc32dbgpthr_la-signing_policy.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libssl_utils_gcc32dbgpthr_la-sslutils.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libssl_utils_gcc32pthr_la-evaluate.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libssl_utils_gcc32pthr_la-lex.namespaces.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libssl_utils_gcc32pthr_la-lex.signing.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libssl_utils_gcc32pthr_la-namespaces.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libssl_utils_gcc32pthr_la-proxycertinfo.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libssl_utils_gcc32pthr_la-scutils.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libssl_utils_gcc32pthr_la-signing_policy.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libssl_utils_gcc32pthr_la-sslutils.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libssl_utils_gcc64_la-evaluate.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libssl_utils_gcc64_la-lex.namespaces.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libssl_utils_gcc64_la-lex.signing.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libssl_utils_gcc64_la-namespaces.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libssl_utils_gcc64_la-proxycertinfo.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libssl_utils_gcc64_la-scutils.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libssl_utils_gcc64_la-signing_policy.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libssl_utils_gcc64_la-sslutils.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libssl_utils_gcc64dbg_la-evaluate.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libssl_utils_gcc64dbg_la-lex.namespaces.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libssl_utils_gcc64dbg_la-lex.signing.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libssl_utils_gcc64dbg_la-namespaces.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libssl_utils_gcc64dbg_la-proxycertinfo.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libssl_utils_gcc64dbg_la-scutils.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libssl_utils_gcc64dbg_la-signing_policy.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libssl_utils_gcc64dbg_la-sslutils.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libssl_utils_gcc64dbgpthr_la-evaluate.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libssl_utils_gcc64dbgpthr_la-lex.namespaces.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libssl_utils_gcc64dbgpthr_la-lex.signing.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libssl_utils_gcc64dbgpthr_la-namespaces.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libssl_utils_gcc64dbgpthr_la-proxycertinfo.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libssl_utils_gcc64dbgpthr_la-scutils.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libssl_utils_gcc64dbgpthr_la-signing_policy.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libssl_utils_gcc64dbgpthr_la-sslutils.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libssl_utils_gcc64pthr_la-evaluate.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libssl_utils_gcc64pthr_la-lex.namespaces.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libssl_utils_gcc64pthr_la-lex.signing.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libssl_utils_gcc64pthr_la-namespaces.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libssl_utils_gcc64pthr_la-proxycertinfo.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libssl_utils_gcc64pthr_la-scutils.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libssl_utils_gcc64pthr_la-signing_policy.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libssl_utils_gcc64pthr_la-sslutils.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libssl_utils_la-evaluate.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libssl_utils_la-lex.namespaces.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libssl_utils_la-lex.signing.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libssl_utils_la-namespaces.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libssl_utils_la-proxycertinfo.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libssl_utils_la-scutils.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libssl_utils_la-signing_policy.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libssl_utils_la-sslutils.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libssl_utils_nog_la-evaluate.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libssl_utils_nog_la-lex.namespaces.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libssl_utils_nog_la-lex.signing.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libssl_utils_nog_la-namespaces.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libssl_utils_nog_la-proxycertinfo.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libssl_utils_nog_la-scutils.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libssl_utils_nog_la-signing_policy.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libssl_utils_nog_la-sslutils.Plo@am__quote@
 
 .c.o:
@@ -667,6 +723,41 @@ libssl_utils_la-proxycertinfo.lo: proxycertinfo.c
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libssl_utils_la_CFLAGS) $(CFLAGS) -c -o libssl_utils_la-proxycertinfo.lo `test -f 'proxycertinfo.c' || echo '$(srcdir)/'`proxycertinfo.c
 
+libssl_utils_la-signing_policy.lo: signing_policy.c
+@am__fastdepCC_TRUE@	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libssl_utils_la_CFLAGS) $(CFLAGS) -MT libssl_utils_la-signing_policy.lo -MD -MP -MF $(DEPDIR)/libssl_utils_la-signing_policy.Tpo -c -o libssl_utils_la-signing_policy.lo `test -f 'signing_policy.c' || echo '$(srcdir)/'`signing_policy.c
+@am__fastdepCC_TRUE@	mv -f $(DEPDIR)/libssl_utils_la-signing_policy.Tpo $(DEPDIR)/libssl_utils_la-signing_policy.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='signing_policy.c' object='libssl_utils_la-signing_policy.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libssl_utils_la_CFLAGS) $(CFLAGS) -c -o libssl_utils_la-signing_policy.lo `test -f 'signing_policy.c' || echo '$(srcdir)/'`signing_policy.c
+
+libssl_utils_la-lex.signing.lo: lex.signing.c
+@am__fastdepCC_TRUE@	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libssl_utils_la_CFLAGS) $(CFLAGS) -MT libssl_utils_la-lex.signing.lo -MD -MP -MF $(DEPDIR)/libssl_utils_la-lex.signing.Tpo -c -o libssl_utils_la-lex.signing.lo `test -f 'lex.signing.c' || echo '$(srcdir)/'`lex.signing.c
+@am__fastdepCC_TRUE@	mv -f $(DEPDIR)/libssl_utils_la-lex.signing.Tpo $(DEPDIR)/libssl_utils_la-lex.signing.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='lex.signing.c' object='libssl_utils_la-lex.signing.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libssl_utils_la_CFLAGS) $(CFLAGS) -c -o libssl_utils_la-lex.signing.lo `test -f 'lex.signing.c' || echo '$(srcdir)/'`lex.signing.c
+
+libssl_utils_la-namespaces.lo: namespaces.c
+@am__fastdepCC_TRUE@	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libssl_utils_la_CFLAGS) $(CFLAGS) -MT libssl_utils_la-namespaces.lo -MD -MP -MF $(DEPDIR)/libssl_utils_la-namespaces.Tpo -c -o libssl_utils_la-namespaces.lo `test -f 'namespaces.c' || echo '$(srcdir)/'`namespaces.c
+@am__fastdepCC_TRUE@	mv -f $(DEPDIR)/libssl_utils_la-namespaces.Tpo $(DEPDIR)/libssl_utils_la-namespaces.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='namespaces.c' object='libssl_utils_la-namespaces.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libssl_utils_la_CFLAGS) $(CFLAGS) -c -o libssl_utils_la-namespaces.lo `test -f 'namespaces.c' || echo '$(srcdir)/'`namespaces.c
+
+libssl_utils_la-lex.namespaces.lo: lex.namespaces.c
+@am__fastdepCC_TRUE@	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libssl_utils_la_CFLAGS) $(CFLAGS) -MT libssl_utils_la-lex.namespaces.lo -MD -MP -MF $(DEPDIR)/libssl_utils_la-lex.namespaces.Tpo -c -o libssl_utils_la-lex.namespaces.lo `test -f 'lex.namespaces.c' || echo '$(srcdir)/'`lex.namespaces.c
+@am__fastdepCC_TRUE@	mv -f $(DEPDIR)/libssl_utils_la-lex.namespaces.Tpo $(DEPDIR)/libssl_utils_la-lex.namespaces.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='lex.namespaces.c' object='libssl_utils_la-lex.namespaces.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libssl_utils_la_CFLAGS) $(CFLAGS) -c -o libssl_utils_la-lex.namespaces.lo `test -f 'lex.namespaces.c' || echo '$(srcdir)/'`lex.namespaces.c
+
+libssl_utils_la-evaluate.lo: evaluate.c
+@am__fastdepCC_TRUE@	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libssl_utils_la_CFLAGS) $(CFLAGS) -MT libssl_utils_la-evaluate.lo -MD -MP -MF $(DEPDIR)/libssl_utils_la-evaluate.Tpo -c -o libssl_utils_la-evaluate.lo `test -f 'evaluate.c' || echo '$(srcdir)/'`evaluate.c
+@am__fastdepCC_TRUE@	mv -f $(DEPDIR)/libssl_utils_la-evaluate.Tpo $(DEPDIR)/libssl_utils_la-evaluate.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='evaluate.c' object='libssl_utils_la-evaluate.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libssl_utils_la_CFLAGS) $(CFLAGS) -c -o libssl_utils_la-evaluate.lo `test -f 'evaluate.c' || echo '$(srcdir)/'`evaluate.c
+
 libssl_utils_gcc32_la-scutils.lo: scutils.c
 @am__fastdepCC_TRUE@	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libssl_utils_gcc32_la_CFLAGS) $(CFLAGS) -MT libssl_utils_gcc32_la-scutils.lo -MD -MP -MF $(DEPDIR)/libssl_utils_gcc32_la-scutils.Tpo -c -o libssl_utils_gcc32_la-scutils.lo `test -f 'scutils.c' || echo '$(srcdir)/'`scutils.c
 @am__fastdepCC_TRUE@	mv -f $(DEPDIR)/libssl_utils_gcc32_la-scutils.Tpo $(DEPDIR)/libssl_utils_gcc32_la-scutils.Plo
@@ -687,6 +778,41 @@ libssl_utils_gcc32_la-proxycertinfo.lo: proxycertinfo.c
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	source='proxycertinfo.c' object='libssl_utils_gcc32_la-proxycertinfo.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libssl_utils_gcc32_la_CFLAGS) $(CFLAGS) -c -o libssl_utils_gcc32_la-proxycertinfo.lo `test -f 'proxycertinfo.c' || echo '$(srcdir)/'`proxycertinfo.c
+
+libssl_utils_gcc32_la-signing_policy.lo: signing_policy.c
+@am__fastdepCC_TRUE@	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libssl_utils_gcc32_la_CFLAGS) $(CFLAGS) -MT libssl_utils_gcc32_la-signing_policy.lo -MD -MP -MF $(DEPDIR)/libssl_utils_gcc32_la-signing_policy.Tpo -c -o libssl_utils_gcc32_la-signing_policy.lo `test -f 'signing_policy.c' || echo '$(srcdir)/'`signing_policy.c
+@am__fastdepCC_TRUE@	mv -f $(DEPDIR)/libssl_utils_gcc32_la-signing_policy.Tpo $(DEPDIR)/libssl_utils_gcc32_la-signing_policy.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='signing_policy.c' object='libssl_utils_gcc32_la-signing_policy.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libssl_utils_gcc32_la_CFLAGS) $(CFLAGS) -c -o libssl_utils_gcc32_la-signing_policy.lo `test -f 'signing_policy.c' || echo '$(srcdir)/'`signing_policy.c
+
+libssl_utils_gcc32_la-lex.signing.lo: lex.signing.c
+@am__fastdepCC_TRUE@	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libssl_utils_gcc32_la_CFLAGS) $(CFLAGS) -MT libssl_utils_gcc32_la-lex.signing.lo -MD -MP -MF $(DEPDIR)/libssl_utils_gcc32_la-lex.signing.Tpo -c -o libssl_utils_gcc32_la-lex.signing.lo `test -f 'lex.signing.c' || echo '$(srcdir)/'`lex.signing.c
+@am__fastdepCC_TRUE@	mv -f $(DEPDIR)/libssl_utils_gcc32_la-lex.signing.Tpo $(DEPDIR)/libssl_utils_gcc32_la-lex.signing.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='lex.signing.c' object='libssl_utils_gcc32_la-lex.signing.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libssl_utils_gcc32_la_CFLAGS) $(CFLAGS) -c -o libssl_utils_gcc32_la-lex.signing.lo `test -f 'lex.signing.c' || echo '$(srcdir)/'`lex.signing.c
+
+libssl_utils_gcc32_la-namespaces.lo: namespaces.c
+@am__fastdepCC_TRUE@	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libssl_utils_gcc32_la_CFLAGS) $(CFLAGS) -MT libssl_utils_gcc32_la-namespaces.lo -MD -MP -MF $(DEPDIR)/libssl_utils_gcc32_la-namespaces.Tpo -c -o libssl_utils_gcc32_la-namespaces.lo `test -f 'namespaces.c' || echo '$(srcdir)/'`namespaces.c
+@am__fastdepCC_TRUE@	mv -f $(DEPDIR)/libssl_utils_gcc32_la-namespaces.Tpo $(DEPDIR)/libssl_utils_gcc32_la-namespaces.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='namespaces.c' object='libssl_utils_gcc32_la-namespaces.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libssl_utils_gcc32_la_CFLAGS) $(CFLAGS) -c -o libssl_utils_gcc32_la-namespaces.lo `test -f 'namespaces.c' || echo '$(srcdir)/'`namespaces.c
+
+libssl_utils_gcc32_la-lex.namespaces.lo: lex.namespaces.c
+@am__fastdepCC_TRUE@	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libssl_utils_gcc32_la_CFLAGS) $(CFLAGS) -MT libssl_utils_gcc32_la-lex.namespaces.lo -MD -MP -MF $(DEPDIR)/libssl_utils_gcc32_la-lex.namespaces.Tpo -c -o libssl_utils_gcc32_la-lex.namespaces.lo `test -f 'lex.namespaces.c' || echo '$(srcdir)/'`lex.namespaces.c
+@am__fastdepCC_TRUE@	mv -f $(DEPDIR)/libssl_utils_gcc32_la-lex.namespaces.Tpo $(DEPDIR)/libssl_utils_gcc32_la-lex.namespaces.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='lex.namespaces.c' object='libssl_utils_gcc32_la-lex.namespaces.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libssl_utils_gcc32_la_CFLAGS) $(CFLAGS) -c -o libssl_utils_gcc32_la-lex.namespaces.lo `test -f 'lex.namespaces.c' || echo '$(srcdir)/'`lex.namespaces.c
+
+libssl_utils_gcc32_la-evaluate.lo: evaluate.c
+@am__fastdepCC_TRUE@	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libssl_utils_gcc32_la_CFLAGS) $(CFLAGS) -MT libssl_utils_gcc32_la-evaluate.lo -MD -MP -MF $(DEPDIR)/libssl_utils_gcc32_la-evaluate.Tpo -c -o libssl_utils_gcc32_la-evaluate.lo `test -f 'evaluate.c' || echo '$(srcdir)/'`evaluate.c
+@am__fastdepCC_TRUE@	mv -f $(DEPDIR)/libssl_utils_gcc32_la-evaluate.Tpo $(DEPDIR)/libssl_utils_gcc32_la-evaluate.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='evaluate.c' object='libssl_utils_gcc32_la-evaluate.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libssl_utils_gcc32_la_CFLAGS) $(CFLAGS) -c -o libssl_utils_gcc32_la-evaluate.lo `test -f 'evaluate.c' || echo '$(srcdir)/'`evaluate.c
 
 libssl_utils_gcc32dbg_la-scutils.lo: scutils.c
 @am__fastdepCC_TRUE@	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libssl_utils_gcc32dbg_la_CFLAGS) $(CFLAGS) -MT libssl_utils_gcc32dbg_la-scutils.lo -MD -MP -MF $(DEPDIR)/libssl_utils_gcc32dbg_la-scutils.Tpo -c -o libssl_utils_gcc32dbg_la-scutils.lo `test -f 'scutils.c' || echo '$(srcdir)/'`scutils.c
@@ -709,6 +835,41 @@ libssl_utils_gcc32dbg_la-proxycertinfo.lo: proxycertinfo.c
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libssl_utils_gcc32dbg_la_CFLAGS) $(CFLAGS) -c -o libssl_utils_gcc32dbg_la-proxycertinfo.lo `test -f 'proxycertinfo.c' || echo '$(srcdir)/'`proxycertinfo.c
 
+libssl_utils_gcc32dbg_la-signing_policy.lo: signing_policy.c
+@am__fastdepCC_TRUE@	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libssl_utils_gcc32dbg_la_CFLAGS) $(CFLAGS) -MT libssl_utils_gcc32dbg_la-signing_policy.lo -MD -MP -MF $(DEPDIR)/libssl_utils_gcc32dbg_la-signing_policy.Tpo -c -o libssl_utils_gcc32dbg_la-signing_policy.lo `test -f 'signing_policy.c' || echo '$(srcdir)/'`signing_policy.c
+@am__fastdepCC_TRUE@	mv -f $(DEPDIR)/libssl_utils_gcc32dbg_la-signing_policy.Tpo $(DEPDIR)/libssl_utils_gcc32dbg_la-signing_policy.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='signing_policy.c' object='libssl_utils_gcc32dbg_la-signing_policy.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libssl_utils_gcc32dbg_la_CFLAGS) $(CFLAGS) -c -o libssl_utils_gcc32dbg_la-signing_policy.lo `test -f 'signing_policy.c' || echo '$(srcdir)/'`signing_policy.c
+
+libssl_utils_gcc32dbg_la-lex.signing.lo: lex.signing.c
+@am__fastdepCC_TRUE@	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libssl_utils_gcc32dbg_la_CFLAGS) $(CFLAGS) -MT libssl_utils_gcc32dbg_la-lex.signing.lo -MD -MP -MF $(DEPDIR)/libssl_utils_gcc32dbg_la-lex.signing.Tpo -c -o libssl_utils_gcc32dbg_la-lex.signing.lo `test -f 'lex.signing.c' || echo '$(srcdir)/'`lex.signing.c
+@am__fastdepCC_TRUE@	mv -f $(DEPDIR)/libssl_utils_gcc32dbg_la-lex.signing.Tpo $(DEPDIR)/libssl_utils_gcc32dbg_la-lex.signing.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='lex.signing.c' object='libssl_utils_gcc32dbg_la-lex.signing.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libssl_utils_gcc32dbg_la_CFLAGS) $(CFLAGS) -c -o libssl_utils_gcc32dbg_la-lex.signing.lo `test -f 'lex.signing.c' || echo '$(srcdir)/'`lex.signing.c
+
+libssl_utils_gcc32dbg_la-namespaces.lo: namespaces.c
+@am__fastdepCC_TRUE@	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libssl_utils_gcc32dbg_la_CFLAGS) $(CFLAGS) -MT libssl_utils_gcc32dbg_la-namespaces.lo -MD -MP -MF $(DEPDIR)/libssl_utils_gcc32dbg_la-namespaces.Tpo -c -o libssl_utils_gcc32dbg_la-namespaces.lo `test -f 'namespaces.c' || echo '$(srcdir)/'`namespaces.c
+@am__fastdepCC_TRUE@	mv -f $(DEPDIR)/libssl_utils_gcc32dbg_la-namespaces.Tpo $(DEPDIR)/libssl_utils_gcc32dbg_la-namespaces.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='namespaces.c' object='libssl_utils_gcc32dbg_la-namespaces.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libssl_utils_gcc32dbg_la_CFLAGS) $(CFLAGS) -c -o libssl_utils_gcc32dbg_la-namespaces.lo `test -f 'namespaces.c' || echo '$(srcdir)/'`namespaces.c
+
+libssl_utils_gcc32dbg_la-lex.namespaces.lo: lex.namespaces.c
+@am__fastdepCC_TRUE@	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libssl_utils_gcc32dbg_la_CFLAGS) $(CFLAGS) -MT libssl_utils_gcc32dbg_la-lex.namespaces.lo -MD -MP -MF $(DEPDIR)/libssl_utils_gcc32dbg_la-lex.namespaces.Tpo -c -o libssl_utils_gcc32dbg_la-lex.namespaces.lo `test -f 'lex.namespaces.c' || echo '$(srcdir)/'`lex.namespaces.c
+@am__fastdepCC_TRUE@	mv -f $(DEPDIR)/libssl_utils_gcc32dbg_la-lex.namespaces.Tpo $(DEPDIR)/libssl_utils_gcc32dbg_la-lex.namespaces.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='lex.namespaces.c' object='libssl_utils_gcc32dbg_la-lex.namespaces.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libssl_utils_gcc32dbg_la_CFLAGS) $(CFLAGS) -c -o libssl_utils_gcc32dbg_la-lex.namespaces.lo `test -f 'lex.namespaces.c' || echo '$(srcdir)/'`lex.namespaces.c
+
+libssl_utils_gcc32dbg_la-evaluate.lo: evaluate.c
+@am__fastdepCC_TRUE@	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libssl_utils_gcc32dbg_la_CFLAGS) $(CFLAGS) -MT libssl_utils_gcc32dbg_la-evaluate.lo -MD -MP -MF $(DEPDIR)/libssl_utils_gcc32dbg_la-evaluate.Tpo -c -o libssl_utils_gcc32dbg_la-evaluate.lo `test -f 'evaluate.c' || echo '$(srcdir)/'`evaluate.c
+@am__fastdepCC_TRUE@	mv -f $(DEPDIR)/libssl_utils_gcc32dbg_la-evaluate.Tpo $(DEPDIR)/libssl_utils_gcc32dbg_la-evaluate.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='evaluate.c' object='libssl_utils_gcc32dbg_la-evaluate.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libssl_utils_gcc32dbg_la_CFLAGS) $(CFLAGS) -c -o libssl_utils_gcc32dbg_la-evaluate.lo `test -f 'evaluate.c' || echo '$(srcdir)/'`evaluate.c
+
 libssl_utils_gcc32dbgpthr_la-scutils.lo: scutils.c
 @am__fastdepCC_TRUE@	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libssl_utils_gcc32dbgpthr_la_CFLAGS) $(CFLAGS) -MT libssl_utils_gcc32dbgpthr_la-scutils.lo -MD -MP -MF $(DEPDIR)/libssl_utils_gcc32dbgpthr_la-scutils.Tpo -c -o libssl_utils_gcc32dbgpthr_la-scutils.lo `test -f 'scutils.c' || echo '$(srcdir)/'`scutils.c
 @am__fastdepCC_TRUE@	mv -f $(DEPDIR)/libssl_utils_gcc32dbgpthr_la-scutils.Tpo $(DEPDIR)/libssl_utils_gcc32dbgpthr_la-scutils.Plo
@@ -729,6 +890,41 @@ libssl_utils_gcc32dbgpthr_la-proxycertinfo.lo: proxycertinfo.c
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	source='proxycertinfo.c' object='libssl_utils_gcc32dbgpthr_la-proxycertinfo.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libssl_utils_gcc32dbgpthr_la_CFLAGS) $(CFLAGS) -c -o libssl_utils_gcc32dbgpthr_la-proxycertinfo.lo `test -f 'proxycertinfo.c' || echo '$(srcdir)/'`proxycertinfo.c
+
+libssl_utils_gcc32dbgpthr_la-signing_policy.lo: signing_policy.c
+@am__fastdepCC_TRUE@	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libssl_utils_gcc32dbgpthr_la_CFLAGS) $(CFLAGS) -MT libssl_utils_gcc32dbgpthr_la-signing_policy.lo -MD -MP -MF $(DEPDIR)/libssl_utils_gcc32dbgpthr_la-signing_policy.Tpo -c -o libssl_utils_gcc32dbgpthr_la-signing_policy.lo `test -f 'signing_policy.c' || echo '$(srcdir)/'`signing_policy.c
+@am__fastdepCC_TRUE@	mv -f $(DEPDIR)/libssl_utils_gcc32dbgpthr_la-signing_policy.Tpo $(DEPDIR)/libssl_utils_gcc32dbgpthr_la-signing_policy.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='signing_policy.c' object='libssl_utils_gcc32dbgpthr_la-signing_policy.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libssl_utils_gcc32dbgpthr_la_CFLAGS) $(CFLAGS) -c -o libssl_utils_gcc32dbgpthr_la-signing_policy.lo `test -f 'signing_policy.c' || echo '$(srcdir)/'`signing_policy.c
+
+libssl_utils_gcc32dbgpthr_la-lex.signing.lo: lex.signing.c
+@am__fastdepCC_TRUE@	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libssl_utils_gcc32dbgpthr_la_CFLAGS) $(CFLAGS) -MT libssl_utils_gcc32dbgpthr_la-lex.signing.lo -MD -MP -MF $(DEPDIR)/libssl_utils_gcc32dbgpthr_la-lex.signing.Tpo -c -o libssl_utils_gcc32dbgpthr_la-lex.signing.lo `test -f 'lex.signing.c' || echo '$(srcdir)/'`lex.signing.c
+@am__fastdepCC_TRUE@	mv -f $(DEPDIR)/libssl_utils_gcc32dbgpthr_la-lex.signing.Tpo $(DEPDIR)/libssl_utils_gcc32dbgpthr_la-lex.signing.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='lex.signing.c' object='libssl_utils_gcc32dbgpthr_la-lex.signing.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libssl_utils_gcc32dbgpthr_la_CFLAGS) $(CFLAGS) -c -o libssl_utils_gcc32dbgpthr_la-lex.signing.lo `test -f 'lex.signing.c' || echo '$(srcdir)/'`lex.signing.c
+
+libssl_utils_gcc32dbgpthr_la-namespaces.lo: namespaces.c
+@am__fastdepCC_TRUE@	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libssl_utils_gcc32dbgpthr_la_CFLAGS) $(CFLAGS) -MT libssl_utils_gcc32dbgpthr_la-namespaces.lo -MD -MP -MF $(DEPDIR)/libssl_utils_gcc32dbgpthr_la-namespaces.Tpo -c -o libssl_utils_gcc32dbgpthr_la-namespaces.lo `test -f 'namespaces.c' || echo '$(srcdir)/'`namespaces.c
+@am__fastdepCC_TRUE@	mv -f $(DEPDIR)/libssl_utils_gcc32dbgpthr_la-namespaces.Tpo $(DEPDIR)/libssl_utils_gcc32dbgpthr_la-namespaces.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='namespaces.c' object='libssl_utils_gcc32dbgpthr_la-namespaces.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libssl_utils_gcc32dbgpthr_la_CFLAGS) $(CFLAGS) -c -o libssl_utils_gcc32dbgpthr_la-namespaces.lo `test -f 'namespaces.c' || echo '$(srcdir)/'`namespaces.c
+
+libssl_utils_gcc32dbgpthr_la-lex.namespaces.lo: lex.namespaces.c
+@am__fastdepCC_TRUE@	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libssl_utils_gcc32dbgpthr_la_CFLAGS) $(CFLAGS) -MT libssl_utils_gcc32dbgpthr_la-lex.namespaces.lo -MD -MP -MF $(DEPDIR)/libssl_utils_gcc32dbgpthr_la-lex.namespaces.Tpo -c -o libssl_utils_gcc32dbgpthr_la-lex.namespaces.lo `test -f 'lex.namespaces.c' || echo '$(srcdir)/'`lex.namespaces.c
+@am__fastdepCC_TRUE@	mv -f $(DEPDIR)/libssl_utils_gcc32dbgpthr_la-lex.namespaces.Tpo $(DEPDIR)/libssl_utils_gcc32dbgpthr_la-lex.namespaces.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='lex.namespaces.c' object='libssl_utils_gcc32dbgpthr_la-lex.namespaces.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libssl_utils_gcc32dbgpthr_la_CFLAGS) $(CFLAGS) -c -o libssl_utils_gcc32dbgpthr_la-lex.namespaces.lo `test -f 'lex.namespaces.c' || echo '$(srcdir)/'`lex.namespaces.c
+
+libssl_utils_gcc32dbgpthr_la-evaluate.lo: evaluate.c
+@am__fastdepCC_TRUE@	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libssl_utils_gcc32dbgpthr_la_CFLAGS) $(CFLAGS) -MT libssl_utils_gcc32dbgpthr_la-evaluate.lo -MD -MP -MF $(DEPDIR)/libssl_utils_gcc32dbgpthr_la-evaluate.Tpo -c -o libssl_utils_gcc32dbgpthr_la-evaluate.lo `test -f 'evaluate.c' || echo '$(srcdir)/'`evaluate.c
+@am__fastdepCC_TRUE@	mv -f $(DEPDIR)/libssl_utils_gcc32dbgpthr_la-evaluate.Tpo $(DEPDIR)/libssl_utils_gcc32dbgpthr_la-evaluate.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='evaluate.c' object='libssl_utils_gcc32dbgpthr_la-evaluate.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libssl_utils_gcc32dbgpthr_la_CFLAGS) $(CFLAGS) -c -o libssl_utils_gcc32dbgpthr_la-evaluate.lo `test -f 'evaluate.c' || echo '$(srcdir)/'`evaluate.c
 
 libssl_utils_gcc32pthr_la-scutils.lo: scutils.c
 @am__fastdepCC_TRUE@	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libssl_utils_gcc32pthr_la_CFLAGS) $(CFLAGS) -MT libssl_utils_gcc32pthr_la-scutils.lo -MD -MP -MF $(DEPDIR)/libssl_utils_gcc32pthr_la-scutils.Tpo -c -o libssl_utils_gcc32pthr_la-scutils.lo `test -f 'scutils.c' || echo '$(srcdir)/'`scutils.c
@@ -751,6 +947,41 @@ libssl_utils_gcc32pthr_la-proxycertinfo.lo: proxycertinfo.c
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libssl_utils_gcc32pthr_la_CFLAGS) $(CFLAGS) -c -o libssl_utils_gcc32pthr_la-proxycertinfo.lo `test -f 'proxycertinfo.c' || echo '$(srcdir)/'`proxycertinfo.c
 
+libssl_utils_gcc32pthr_la-signing_policy.lo: signing_policy.c
+@am__fastdepCC_TRUE@	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libssl_utils_gcc32pthr_la_CFLAGS) $(CFLAGS) -MT libssl_utils_gcc32pthr_la-signing_policy.lo -MD -MP -MF $(DEPDIR)/libssl_utils_gcc32pthr_la-signing_policy.Tpo -c -o libssl_utils_gcc32pthr_la-signing_policy.lo `test -f 'signing_policy.c' || echo '$(srcdir)/'`signing_policy.c
+@am__fastdepCC_TRUE@	mv -f $(DEPDIR)/libssl_utils_gcc32pthr_la-signing_policy.Tpo $(DEPDIR)/libssl_utils_gcc32pthr_la-signing_policy.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='signing_policy.c' object='libssl_utils_gcc32pthr_la-signing_policy.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libssl_utils_gcc32pthr_la_CFLAGS) $(CFLAGS) -c -o libssl_utils_gcc32pthr_la-signing_policy.lo `test -f 'signing_policy.c' || echo '$(srcdir)/'`signing_policy.c
+
+libssl_utils_gcc32pthr_la-lex.signing.lo: lex.signing.c
+@am__fastdepCC_TRUE@	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libssl_utils_gcc32pthr_la_CFLAGS) $(CFLAGS) -MT libssl_utils_gcc32pthr_la-lex.signing.lo -MD -MP -MF $(DEPDIR)/libssl_utils_gcc32pthr_la-lex.signing.Tpo -c -o libssl_utils_gcc32pthr_la-lex.signing.lo `test -f 'lex.signing.c' || echo '$(srcdir)/'`lex.signing.c
+@am__fastdepCC_TRUE@	mv -f $(DEPDIR)/libssl_utils_gcc32pthr_la-lex.signing.Tpo $(DEPDIR)/libssl_utils_gcc32pthr_la-lex.signing.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='lex.signing.c' object='libssl_utils_gcc32pthr_la-lex.signing.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libssl_utils_gcc32pthr_la_CFLAGS) $(CFLAGS) -c -o libssl_utils_gcc32pthr_la-lex.signing.lo `test -f 'lex.signing.c' || echo '$(srcdir)/'`lex.signing.c
+
+libssl_utils_gcc32pthr_la-namespaces.lo: namespaces.c
+@am__fastdepCC_TRUE@	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libssl_utils_gcc32pthr_la_CFLAGS) $(CFLAGS) -MT libssl_utils_gcc32pthr_la-namespaces.lo -MD -MP -MF $(DEPDIR)/libssl_utils_gcc32pthr_la-namespaces.Tpo -c -o libssl_utils_gcc32pthr_la-namespaces.lo `test -f 'namespaces.c' || echo '$(srcdir)/'`namespaces.c
+@am__fastdepCC_TRUE@	mv -f $(DEPDIR)/libssl_utils_gcc32pthr_la-namespaces.Tpo $(DEPDIR)/libssl_utils_gcc32pthr_la-namespaces.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='namespaces.c' object='libssl_utils_gcc32pthr_la-namespaces.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libssl_utils_gcc32pthr_la_CFLAGS) $(CFLAGS) -c -o libssl_utils_gcc32pthr_la-namespaces.lo `test -f 'namespaces.c' || echo '$(srcdir)/'`namespaces.c
+
+libssl_utils_gcc32pthr_la-lex.namespaces.lo: lex.namespaces.c
+@am__fastdepCC_TRUE@	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libssl_utils_gcc32pthr_la_CFLAGS) $(CFLAGS) -MT libssl_utils_gcc32pthr_la-lex.namespaces.lo -MD -MP -MF $(DEPDIR)/libssl_utils_gcc32pthr_la-lex.namespaces.Tpo -c -o libssl_utils_gcc32pthr_la-lex.namespaces.lo `test -f 'lex.namespaces.c' || echo '$(srcdir)/'`lex.namespaces.c
+@am__fastdepCC_TRUE@	mv -f $(DEPDIR)/libssl_utils_gcc32pthr_la-lex.namespaces.Tpo $(DEPDIR)/libssl_utils_gcc32pthr_la-lex.namespaces.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='lex.namespaces.c' object='libssl_utils_gcc32pthr_la-lex.namespaces.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libssl_utils_gcc32pthr_la_CFLAGS) $(CFLAGS) -c -o libssl_utils_gcc32pthr_la-lex.namespaces.lo `test -f 'lex.namespaces.c' || echo '$(srcdir)/'`lex.namespaces.c
+
+libssl_utils_gcc32pthr_la-evaluate.lo: evaluate.c
+@am__fastdepCC_TRUE@	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libssl_utils_gcc32pthr_la_CFLAGS) $(CFLAGS) -MT libssl_utils_gcc32pthr_la-evaluate.lo -MD -MP -MF $(DEPDIR)/libssl_utils_gcc32pthr_la-evaluate.Tpo -c -o libssl_utils_gcc32pthr_la-evaluate.lo `test -f 'evaluate.c' || echo '$(srcdir)/'`evaluate.c
+@am__fastdepCC_TRUE@	mv -f $(DEPDIR)/libssl_utils_gcc32pthr_la-evaluate.Tpo $(DEPDIR)/libssl_utils_gcc32pthr_la-evaluate.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='evaluate.c' object='libssl_utils_gcc32pthr_la-evaluate.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libssl_utils_gcc32pthr_la_CFLAGS) $(CFLAGS) -c -o libssl_utils_gcc32pthr_la-evaluate.lo `test -f 'evaluate.c' || echo '$(srcdir)/'`evaluate.c
+
 libssl_utils_gcc64_la-scutils.lo: scutils.c
 @am__fastdepCC_TRUE@	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libssl_utils_gcc64_la_CFLAGS) $(CFLAGS) -MT libssl_utils_gcc64_la-scutils.lo -MD -MP -MF $(DEPDIR)/libssl_utils_gcc64_la-scutils.Tpo -c -o libssl_utils_gcc64_la-scutils.lo `test -f 'scutils.c' || echo '$(srcdir)/'`scutils.c
 @am__fastdepCC_TRUE@	mv -f $(DEPDIR)/libssl_utils_gcc64_la-scutils.Tpo $(DEPDIR)/libssl_utils_gcc64_la-scutils.Plo
@@ -771,6 +1002,41 @@ libssl_utils_gcc64_la-proxycertinfo.lo: proxycertinfo.c
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	source='proxycertinfo.c' object='libssl_utils_gcc64_la-proxycertinfo.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libssl_utils_gcc64_la_CFLAGS) $(CFLAGS) -c -o libssl_utils_gcc64_la-proxycertinfo.lo `test -f 'proxycertinfo.c' || echo '$(srcdir)/'`proxycertinfo.c
+
+libssl_utils_gcc64_la-signing_policy.lo: signing_policy.c
+@am__fastdepCC_TRUE@	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libssl_utils_gcc64_la_CFLAGS) $(CFLAGS) -MT libssl_utils_gcc64_la-signing_policy.lo -MD -MP -MF $(DEPDIR)/libssl_utils_gcc64_la-signing_policy.Tpo -c -o libssl_utils_gcc64_la-signing_policy.lo `test -f 'signing_policy.c' || echo '$(srcdir)/'`signing_policy.c
+@am__fastdepCC_TRUE@	mv -f $(DEPDIR)/libssl_utils_gcc64_la-signing_policy.Tpo $(DEPDIR)/libssl_utils_gcc64_la-signing_policy.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='signing_policy.c' object='libssl_utils_gcc64_la-signing_policy.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libssl_utils_gcc64_la_CFLAGS) $(CFLAGS) -c -o libssl_utils_gcc64_la-signing_policy.lo `test -f 'signing_policy.c' || echo '$(srcdir)/'`signing_policy.c
+
+libssl_utils_gcc64_la-lex.signing.lo: lex.signing.c
+@am__fastdepCC_TRUE@	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libssl_utils_gcc64_la_CFLAGS) $(CFLAGS) -MT libssl_utils_gcc64_la-lex.signing.lo -MD -MP -MF $(DEPDIR)/libssl_utils_gcc64_la-lex.signing.Tpo -c -o libssl_utils_gcc64_la-lex.signing.lo `test -f 'lex.signing.c' || echo '$(srcdir)/'`lex.signing.c
+@am__fastdepCC_TRUE@	mv -f $(DEPDIR)/libssl_utils_gcc64_la-lex.signing.Tpo $(DEPDIR)/libssl_utils_gcc64_la-lex.signing.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='lex.signing.c' object='libssl_utils_gcc64_la-lex.signing.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libssl_utils_gcc64_la_CFLAGS) $(CFLAGS) -c -o libssl_utils_gcc64_la-lex.signing.lo `test -f 'lex.signing.c' || echo '$(srcdir)/'`lex.signing.c
+
+libssl_utils_gcc64_la-namespaces.lo: namespaces.c
+@am__fastdepCC_TRUE@	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libssl_utils_gcc64_la_CFLAGS) $(CFLAGS) -MT libssl_utils_gcc64_la-namespaces.lo -MD -MP -MF $(DEPDIR)/libssl_utils_gcc64_la-namespaces.Tpo -c -o libssl_utils_gcc64_la-namespaces.lo `test -f 'namespaces.c' || echo '$(srcdir)/'`namespaces.c
+@am__fastdepCC_TRUE@	mv -f $(DEPDIR)/libssl_utils_gcc64_la-namespaces.Tpo $(DEPDIR)/libssl_utils_gcc64_la-namespaces.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='namespaces.c' object='libssl_utils_gcc64_la-namespaces.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libssl_utils_gcc64_la_CFLAGS) $(CFLAGS) -c -o libssl_utils_gcc64_la-namespaces.lo `test -f 'namespaces.c' || echo '$(srcdir)/'`namespaces.c
+
+libssl_utils_gcc64_la-lex.namespaces.lo: lex.namespaces.c
+@am__fastdepCC_TRUE@	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libssl_utils_gcc64_la_CFLAGS) $(CFLAGS) -MT libssl_utils_gcc64_la-lex.namespaces.lo -MD -MP -MF $(DEPDIR)/libssl_utils_gcc64_la-lex.namespaces.Tpo -c -o libssl_utils_gcc64_la-lex.namespaces.lo `test -f 'lex.namespaces.c' || echo '$(srcdir)/'`lex.namespaces.c
+@am__fastdepCC_TRUE@	mv -f $(DEPDIR)/libssl_utils_gcc64_la-lex.namespaces.Tpo $(DEPDIR)/libssl_utils_gcc64_la-lex.namespaces.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='lex.namespaces.c' object='libssl_utils_gcc64_la-lex.namespaces.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libssl_utils_gcc64_la_CFLAGS) $(CFLAGS) -c -o libssl_utils_gcc64_la-lex.namespaces.lo `test -f 'lex.namespaces.c' || echo '$(srcdir)/'`lex.namespaces.c
+
+libssl_utils_gcc64_la-evaluate.lo: evaluate.c
+@am__fastdepCC_TRUE@	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libssl_utils_gcc64_la_CFLAGS) $(CFLAGS) -MT libssl_utils_gcc64_la-evaluate.lo -MD -MP -MF $(DEPDIR)/libssl_utils_gcc64_la-evaluate.Tpo -c -o libssl_utils_gcc64_la-evaluate.lo `test -f 'evaluate.c' || echo '$(srcdir)/'`evaluate.c
+@am__fastdepCC_TRUE@	mv -f $(DEPDIR)/libssl_utils_gcc64_la-evaluate.Tpo $(DEPDIR)/libssl_utils_gcc64_la-evaluate.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='evaluate.c' object='libssl_utils_gcc64_la-evaluate.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libssl_utils_gcc64_la_CFLAGS) $(CFLAGS) -c -o libssl_utils_gcc64_la-evaluate.lo `test -f 'evaluate.c' || echo '$(srcdir)/'`evaluate.c
 
 libssl_utils_gcc64dbg_la-scutils.lo: scutils.c
 @am__fastdepCC_TRUE@	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libssl_utils_gcc64dbg_la_CFLAGS) $(CFLAGS) -MT libssl_utils_gcc64dbg_la-scutils.lo -MD -MP -MF $(DEPDIR)/libssl_utils_gcc64dbg_la-scutils.Tpo -c -o libssl_utils_gcc64dbg_la-scutils.lo `test -f 'scutils.c' || echo '$(srcdir)/'`scutils.c
@@ -793,6 +1059,41 @@ libssl_utils_gcc64dbg_la-proxycertinfo.lo: proxycertinfo.c
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libssl_utils_gcc64dbg_la_CFLAGS) $(CFLAGS) -c -o libssl_utils_gcc64dbg_la-proxycertinfo.lo `test -f 'proxycertinfo.c' || echo '$(srcdir)/'`proxycertinfo.c
 
+libssl_utils_gcc64dbg_la-signing_policy.lo: signing_policy.c
+@am__fastdepCC_TRUE@	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libssl_utils_gcc64dbg_la_CFLAGS) $(CFLAGS) -MT libssl_utils_gcc64dbg_la-signing_policy.lo -MD -MP -MF $(DEPDIR)/libssl_utils_gcc64dbg_la-signing_policy.Tpo -c -o libssl_utils_gcc64dbg_la-signing_policy.lo `test -f 'signing_policy.c' || echo '$(srcdir)/'`signing_policy.c
+@am__fastdepCC_TRUE@	mv -f $(DEPDIR)/libssl_utils_gcc64dbg_la-signing_policy.Tpo $(DEPDIR)/libssl_utils_gcc64dbg_la-signing_policy.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='signing_policy.c' object='libssl_utils_gcc64dbg_la-signing_policy.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libssl_utils_gcc64dbg_la_CFLAGS) $(CFLAGS) -c -o libssl_utils_gcc64dbg_la-signing_policy.lo `test -f 'signing_policy.c' || echo '$(srcdir)/'`signing_policy.c
+
+libssl_utils_gcc64dbg_la-lex.signing.lo: lex.signing.c
+@am__fastdepCC_TRUE@	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libssl_utils_gcc64dbg_la_CFLAGS) $(CFLAGS) -MT libssl_utils_gcc64dbg_la-lex.signing.lo -MD -MP -MF $(DEPDIR)/libssl_utils_gcc64dbg_la-lex.signing.Tpo -c -o libssl_utils_gcc64dbg_la-lex.signing.lo `test -f 'lex.signing.c' || echo '$(srcdir)/'`lex.signing.c
+@am__fastdepCC_TRUE@	mv -f $(DEPDIR)/libssl_utils_gcc64dbg_la-lex.signing.Tpo $(DEPDIR)/libssl_utils_gcc64dbg_la-lex.signing.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='lex.signing.c' object='libssl_utils_gcc64dbg_la-lex.signing.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libssl_utils_gcc64dbg_la_CFLAGS) $(CFLAGS) -c -o libssl_utils_gcc64dbg_la-lex.signing.lo `test -f 'lex.signing.c' || echo '$(srcdir)/'`lex.signing.c
+
+libssl_utils_gcc64dbg_la-namespaces.lo: namespaces.c
+@am__fastdepCC_TRUE@	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libssl_utils_gcc64dbg_la_CFLAGS) $(CFLAGS) -MT libssl_utils_gcc64dbg_la-namespaces.lo -MD -MP -MF $(DEPDIR)/libssl_utils_gcc64dbg_la-namespaces.Tpo -c -o libssl_utils_gcc64dbg_la-namespaces.lo `test -f 'namespaces.c' || echo '$(srcdir)/'`namespaces.c
+@am__fastdepCC_TRUE@	mv -f $(DEPDIR)/libssl_utils_gcc64dbg_la-namespaces.Tpo $(DEPDIR)/libssl_utils_gcc64dbg_la-namespaces.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='namespaces.c' object='libssl_utils_gcc64dbg_la-namespaces.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libssl_utils_gcc64dbg_la_CFLAGS) $(CFLAGS) -c -o libssl_utils_gcc64dbg_la-namespaces.lo `test -f 'namespaces.c' || echo '$(srcdir)/'`namespaces.c
+
+libssl_utils_gcc64dbg_la-lex.namespaces.lo: lex.namespaces.c
+@am__fastdepCC_TRUE@	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libssl_utils_gcc64dbg_la_CFLAGS) $(CFLAGS) -MT libssl_utils_gcc64dbg_la-lex.namespaces.lo -MD -MP -MF $(DEPDIR)/libssl_utils_gcc64dbg_la-lex.namespaces.Tpo -c -o libssl_utils_gcc64dbg_la-lex.namespaces.lo `test -f 'lex.namespaces.c' || echo '$(srcdir)/'`lex.namespaces.c
+@am__fastdepCC_TRUE@	mv -f $(DEPDIR)/libssl_utils_gcc64dbg_la-lex.namespaces.Tpo $(DEPDIR)/libssl_utils_gcc64dbg_la-lex.namespaces.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='lex.namespaces.c' object='libssl_utils_gcc64dbg_la-lex.namespaces.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libssl_utils_gcc64dbg_la_CFLAGS) $(CFLAGS) -c -o libssl_utils_gcc64dbg_la-lex.namespaces.lo `test -f 'lex.namespaces.c' || echo '$(srcdir)/'`lex.namespaces.c
+
+libssl_utils_gcc64dbg_la-evaluate.lo: evaluate.c
+@am__fastdepCC_TRUE@	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libssl_utils_gcc64dbg_la_CFLAGS) $(CFLAGS) -MT libssl_utils_gcc64dbg_la-evaluate.lo -MD -MP -MF $(DEPDIR)/libssl_utils_gcc64dbg_la-evaluate.Tpo -c -o libssl_utils_gcc64dbg_la-evaluate.lo `test -f 'evaluate.c' || echo '$(srcdir)/'`evaluate.c
+@am__fastdepCC_TRUE@	mv -f $(DEPDIR)/libssl_utils_gcc64dbg_la-evaluate.Tpo $(DEPDIR)/libssl_utils_gcc64dbg_la-evaluate.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='evaluate.c' object='libssl_utils_gcc64dbg_la-evaluate.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libssl_utils_gcc64dbg_la_CFLAGS) $(CFLAGS) -c -o libssl_utils_gcc64dbg_la-evaluate.lo `test -f 'evaluate.c' || echo '$(srcdir)/'`evaluate.c
+
 libssl_utils_gcc64dbgpthr_la-scutils.lo: scutils.c
 @am__fastdepCC_TRUE@	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libssl_utils_gcc64dbgpthr_la_CFLAGS) $(CFLAGS) -MT libssl_utils_gcc64dbgpthr_la-scutils.lo -MD -MP -MF $(DEPDIR)/libssl_utils_gcc64dbgpthr_la-scutils.Tpo -c -o libssl_utils_gcc64dbgpthr_la-scutils.lo `test -f 'scutils.c' || echo '$(srcdir)/'`scutils.c
 @am__fastdepCC_TRUE@	mv -f $(DEPDIR)/libssl_utils_gcc64dbgpthr_la-scutils.Tpo $(DEPDIR)/libssl_utils_gcc64dbgpthr_la-scutils.Plo
@@ -813,6 +1114,41 @@ libssl_utils_gcc64dbgpthr_la-proxycertinfo.lo: proxycertinfo.c
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	source='proxycertinfo.c' object='libssl_utils_gcc64dbgpthr_la-proxycertinfo.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libssl_utils_gcc64dbgpthr_la_CFLAGS) $(CFLAGS) -c -o libssl_utils_gcc64dbgpthr_la-proxycertinfo.lo `test -f 'proxycertinfo.c' || echo '$(srcdir)/'`proxycertinfo.c
+
+libssl_utils_gcc64dbgpthr_la-signing_policy.lo: signing_policy.c
+@am__fastdepCC_TRUE@	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libssl_utils_gcc64dbgpthr_la_CFLAGS) $(CFLAGS) -MT libssl_utils_gcc64dbgpthr_la-signing_policy.lo -MD -MP -MF $(DEPDIR)/libssl_utils_gcc64dbgpthr_la-signing_policy.Tpo -c -o libssl_utils_gcc64dbgpthr_la-signing_policy.lo `test -f 'signing_policy.c' || echo '$(srcdir)/'`signing_policy.c
+@am__fastdepCC_TRUE@	mv -f $(DEPDIR)/libssl_utils_gcc64dbgpthr_la-signing_policy.Tpo $(DEPDIR)/libssl_utils_gcc64dbgpthr_la-signing_policy.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='signing_policy.c' object='libssl_utils_gcc64dbgpthr_la-signing_policy.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libssl_utils_gcc64dbgpthr_la_CFLAGS) $(CFLAGS) -c -o libssl_utils_gcc64dbgpthr_la-signing_policy.lo `test -f 'signing_policy.c' || echo '$(srcdir)/'`signing_policy.c
+
+libssl_utils_gcc64dbgpthr_la-lex.signing.lo: lex.signing.c
+@am__fastdepCC_TRUE@	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libssl_utils_gcc64dbgpthr_la_CFLAGS) $(CFLAGS) -MT libssl_utils_gcc64dbgpthr_la-lex.signing.lo -MD -MP -MF $(DEPDIR)/libssl_utils_gcc64dbgpthr_la-lex.signing.Tpo -c -o libssl_utils_gcc64dbgpthr_la-lex.signing.lo `test -f 'lex.signing.c' || echo '$(srcdir)/'`lex.signing.c
+@am__fastdepCC_TRUE@	mv -f $(DEPDIR)/libssl_utils_gcc64dbgpthr_la-lex.signing.Tpo $(DEPDIR)/libssl_utils_gcc64dbgpthr_la-lex.signing.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='lex.signing.c' object='libssl_utils_gcc64dbgpthr_la-lex.signing.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libssl_utils_gcc64dbgpthr_la_CFLAGS) $(CFLAGS) -c -o libssl_utils_gcc64dbgpthr_la-lex.signing.lo `test -f 'lex.signing.c' || echo '$(srcdir)/'`lex.signing.c
+
+libssl_utils_gcc64dbgpthr_la-namespaces.lo: namespaces.c
+@am__fastdepCC_TRUE@	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libssl_utils_gcc64dbgpthr_la_CFLAGS) $(CFLAGS) -MT libssl_utils_gcc64dbgpthr_la-namespaces.lo -MD -MP -MF $(DEPDIR)/libssl_utils_gcc64dbgpthr_la-namespaces.Tpo -c -o libssl_utils_gcc64dbgpthr_la-namespaces.lo `test -f 'namespaces.c' || echo '$(srcdir)/'`namespaces.c
+@am__fastdepCC_TRUE@	mv -f $(DEPDIR)/libssl_utils_gcc64dbgpthr_la-namespaces.Tpo $(DEPDIR)/libssl_utils_gcc64dbgpthr_la-namespaces.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='namespaces.c' object='libssl_utils_gcc64dbgpthr_la-namespaces.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libssl_utils_gcc64dbgpthr_la_CFLAGS) $(CFLAGS) -c -o libssl_utils_gcc64dbgpthr_la-namespaces.lo `test -f 'namespaces.c' || echo '$(srcdir)/'`namespaces.c
+
+libssl_utils_gcc64dbgpthr_la-lex.namespaces.lo: lex.namespaces.c
+@am__fastdepCC_TRUE@	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libssl_utils_gcc64dbgpthr_la_CFLAGS) $(CFLAGS) -MT libssl_utils_gcc64dbgpthr_la-lex.namespaces.lo -MD -MP -MF $(DEPDIR)/libssl_utils_gcc64dbgpthr_la-lex.namespaces.Tpo -c -o libssl_utils_gcc64dbgpthr_la-lex.namespaces.lo `test -f 'lex.namespaces.c' || echo '$(srcdir)/'`lex.namespaces.c
+@am__fastdepCC_TRUE@	mv -f $(DEPDIR)/libssl_utils_gcc64dbgpthr_la-lex.namespaces.Tpo $(DEPDIR)/libssl_utils_gcc64dbgpthr_la-lex.namespaces.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='lex.namespaces.c' object='libssl_utils_gcc64dbgpthr_la-lex.namespaces.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libssl_utils_gcc64dbgpthr_la_CFLAGS) $(CFLAGS) -c -o libssl_utils_gcc64dbgpthr_la-lex.namespaces.lo `test -f 'lex.namespaces.c' || echo '$(srcdir)/'`lex.namespaces.c
+
+libssl_utils_gcc64dbgpthr_la-evaluate.lo: evaluate.c
+@am__fastdepCC_TRUE@	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libssl_utils_gcc64dbgpthr_la_CFLAGS) $(CFLAGS) -MT libssl_utils_gcc64dbgpthr_la-evaluate.lo -MD -MP -MF $(DEPDIR)/libssl_utils_gcc64dbgpthr_la-evaluate.Tpo -c -o libssl_utils_gcc64dbgpthr_la-evaluate.lo `test -f 'evaluate.c' || echo '$(srcdir)/'`evaluate.c
+@am__fastdepCC_TRUE@	mv -f $(DEPDIR)/libssl_utils_gcc64dbgpthr_la-evaluate.Tpo $(DEPDIR)/libssl_utils_gcc64dbgpthr_la-evaluate.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='evaluate.c' object='libssl_utils_gcc64dbgpthr_la-evaluate.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libssl_utils_gcc64dbgpthr_la_CFLAGS) $(CFLAGS) -c -o libssl_utils_gcc64dbgpthr_la-evaluate.lo `test -f 'evaluate.c' || echo '$(srcdir)/'`evaluate.c
 
 libssl_utils_gcc64pthr_la-scutils.lo: scutils.c
 @am__fastdepCC_TRUE@	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libssl_utils_gcc64pthr_la_CFLAGS) $(CFLAGS) -MT libssl_utils_gcc64pthr_la-scutils.lo -MD -MP -MF $(DEPDIR)/libssl_utils_gcc64pthr_la-scutils.Tpo -c -o libssl_utils_gcc64pthr_la-scutils.lo `test -f 'scutils.c' || echo '$(srcdir)/'`scutils.c
@@ -835,6 +1171,41 @@ libssl_utils_gcc64pthr_la-proxycertinfo.lo: proxycertinfo.c
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libssl_utils_gcc64pthr_la_CFLAGS) $(CFLAGS) -c -o libssl_utils_gcc64pthr_la-proxycertinfo.lo `test -f 'proxycertinfo.c' || echo '$(srcdir)/'`proxycertinfo.c
 
+libssl_utils_gcc64pthr_la-signing_policy.lo: signing_policy.c
+@am__fastdepCC_TRUE@	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libssl_utils_gcc64pthr_la_CFLAGS) $(CFLAGS) -MT libssl_utils_gcc64pthr_la-signing_policy.lo -MD -MP -MF $(DEPDIR)/libssl_utils_gcc64pthr_la-signing_policy.Tpo -c -o libssl_utils_gcc64pthr_la-signing_policy.lo `test -f 'signing_policy.c' || echo '$(srcdir)/'`signing_policy.c
+@am__fastdepCC_TRUE@	mv -f $(DEPDIR)/libssl_utils_gcc64pthr_la-signing_policy.Tpo $(DEPDIR)/libssl_utils_gcc64pthr_la-signing_policy.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='signing_policy.c' object='libssl_utils_gcc64pthr_la-signing_policy.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libssl_utils_gcc64pthr_la_CFLAGS) $(CFLAGS) -c -o libssl_utils_gcc64pthr_la-signing_policy.lo `test -f 'signing_policy.c' || echo '$(srcdir)/'`signing_policy.c
+
+libssl_utils_gcc64pthr_la-lex.signing.lo: lex.signing.c
+@am__fastdepCC_TRUE@	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libssl_utils_gcc64pthr_la_CFLAGS) $(CFLAGS) -MT libssl_utils_gcc64pthr_la-lex.signing.lo -MD -MP -MF $(DEPDIR)/libssl_utils_gcc64pthr_la-lex.signing.Tpo -c -o libssl_utils_gcc64pthr_la-lex.signing.lo `test -f 'lex.signing.c' || echo '$(srcdir)/'`lex.signing.c
+@am__fastdepCC_TRUE@	mv -f $(DEPDIR)/libssl_utils_gcc64pthr_la-lex.signing.Tpo $(DEPDIR)/libssl_utils_gcc64pthr_la-lex.signing.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='lex.signing.c' object='libssl_utils_gcc64pthr_la-lex.signing.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libssl_utils_gcc64pthr_la_CFLAGS) $(CFLAGS) -c -o libssl_utils_gcc64pthr_la-lex.signing.lo `test -f 'lex.signing.c' || echo '$(srcdir)/'`lex.signing.c
+
+libssl_utils_gcc64pthr_la-namespaces.lo: namespaces.c
+@am__fastdepCC_TRUE@	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libssl_utils_gcc64pthr_la_CFLAGS) $(CFLAGS) -MT libssl_utils_gcc64pthr_la-namespaces.lo -MD -MP -MF $(DEPDIR)/libssl_utils_gcc64pthr_la-namespaces.Tpo -c -o libssl_utils_gcc64pthr_la-namespaces.lo `test -f 'namespaces.c' || echo '$(srcdir)/'`namespaces.c
+@am__fastdepCC_TRUE@	mv -f $(DEPDIR)/libssl_utils_gcc64pthr_la-namespaces.Tpo $(DEPDIR)/libssl_utils_gcc64pthr_la-namespaces.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='namespaces.c' object='libssl_utils_gcc64pthr_la-namespaces.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libssl_utils_gcc64pthr_la_CFLAGS) $(CFLAGS) -c -o libssl_utils_gcc64pthr_la-namespaces.lo `test -f 'namespaces.c' || echo '$(srcdir)/'`namespaces.c
+
+libssl_utils_gcc64pthr_la-lex.namespaces.lo: lex.namespaces.c
+@am__fastdepCC_TRUE@	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libssl_utils_gcc64pthr_la_CFLAGS) $(CFLAGS) -MT libssl_utils_gcc64pthr_la-lex.namespaces.lo -MD -MP -MF $(DEPDIR)/libssl_utils_gcc64pthr_la-lex.namespaces.Tpo -c -o libssl_utils_gcc64pthr_la-lex.namespaces.lo `test -f 'lex.namespaces.c' || echo '$(srcdir)/'`lex.namespaces.c
+@am__fastdepCC_TRUE@	mv -f $(DEPDIR)/libssl_utils_gcc64pthr_la-lex.namespaces.Tpo $(DEPDIR)/libssl_utils_gcc64pthr_la-lex.namespaces.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='lex.namespaces.c' object='libssl_utils_gcc64pthr_la-lex.namespaces.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libssl_utils_gcc64pthr_la_CFLAGS) $(CFLAGS) -c -o libssl_utils_gcc64pthr_la-lex.namespaces.lo `test -f 'lex.namespaces.c' || echo '$(srcdir)/'`lex.namespaces.c
+
+libssl_utils_gcc64pthr_la-evaluate.lo: evaluate.c
+@am__fastdepCC_TRUE@	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libssl_utils_gcc64pthr_la_CFLAGS) $(CFLAGS) -MT libssl_utils_gcc64pthr_la-evaluate.lo -MD -MP -MF $(DEPDIR)/libssl_utils_gcc64pthr_la-evaluate.Tpo -c -o libssl_utils_gcc64pthr_la-evaluate.lo `test -f 'evaluate.c' || echo '$(srcdir)/'`evaluate.c
+@am__fastdepCC_TRUE@	mv -f $(DEPDIR)/libssl_utils_gcc64pthr_la-evaluate.Tpo $(DEPDIR)/libssl_utils_gcc64pthr_la-evaluate.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='evaluate.c' object='libssl_utils_gcc64pthr_la-evaluate.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libssl_utils_gcc64pthr_la_CFLAGS) $(CFLAGS) -c -o libssl_utils_gcc64pthr_la-evaluate.lo `test -f 'evaluate.c' || echo '$(srcdir)/'`evaluate.c
+
 libssl_utils_nog_la-scutils.lo: scutils.c
 @am__fastdepCC_TRUE@	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libssl_utils_nog_la_CFLAGS) $(CFLAGS) -MT libssl_utils_nog_la-scutils.lo -MD -MP -MF $(DEPDIR)/libssl_utils_nog_la-scutils.Tpo -c -o libssl_utils_nog_la-scutils.lo `test -f 'scutils.c' || echo '$(srcdir)/'`scutils.c
 @am__fastdepCC_TRUE@	mv -f $(DEPDIR)/libssl_utils_nog_la-scutils.Tpo $(DEPDIR)/libssl_utils_nog_la-scutils.Plo
@@ -856,81 +1227,46 @@ libssl_utils_nog_la-proxycertinfo.lo: proxycertinfo.c
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libssl_utils_nog_la_CFLAGS) $(CFLAGS) -c -o libssl_utils_nog_la-proxycertinfo.lo `test -f 'proxycertinfo.c' || echo '$(srcdir)/'`proxycertinfo.c
 
+libssl_utils_nog_la-signing_policy.lo: signing_policy.c
+@am__fastdepCC_TRUE@	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libssl_utils_nog_la_CFLAGS) $(CFLAGS) -MT libssl_utils_nog_la-signing_policy.lo -MD -MP -MF $(DEPDIR)/libssl_utils_nog_la-signing_policy.Tpo -c -o libssl_utils_nog_la-signing_policy.lo `test -f 'signing_policy.c' || echo '$(srcdir)/'`signing_policy.c
+@am__fastdepCC_TRUE@	mv -f $(DEPDIR)/libssl_utils_nog_la-signing_policy.Tpo $(DEPDIR)/libssl_utils_nog_la-signing_policy.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='signing_policy.c' object='libssl_utils_nog_la-signing_policy.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libssl_utils_nog_la_CFLAGS) $(CFLAGS) -c -o libssl_utils_nog_la-signing_policy.lo `test -f 'signing_policy.c' || echo '$(srcdir)/'`signing_policy.c
+
+libssl_utils_nog_la-lex.signing.lo: lex.signing.c
+@am__fastdepCC_TRUE@	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libssl_utils_nog_la_CFLAGS) $(CFLAGS) -MT libssl_utils_nog_la-lex.signing.lo -MD -MP -MF $(DEPDIR)/libssl_utils_nog_la-lex.signing.Tpo -c -o libssl_utils_nog_la-lex.signing.lo `test -f 'lex.signing.c' || echo '$(srcdir)/'`lex.signing.c
+@am__fastdepCC_TRUE@	mv -f $(DEPDIR)/libssl_utils_nog_la-lex.signing.Tpo $(DEPDIR)/libssl_utils_nog_la-lex.signing.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='lex.signing.c' object='libssl_utils_nog_la-lex.signing.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libssl_utils_nog_la_CFLAGS) $(CFLAGS) -c -o libssl_utils_nog_la-lex.signing.lo `test -f 'lex.signing.c' || echo '$(srcdir)/'`lex.signing.c
+
+libssl_utils_nog_la-namespaces.lo: namespaces.c
+@am__fastdepCC_TRUE@	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libssl_utils_nog_la_CFLAGS) $(CFLAGS) -MT libssl_utils_nog_la-namespaces.lo -MD -MP -MF $(DEPDIR)/libssl_utils_nog_la-namespaces.Tpo -c -o libssl_utils_nog_la-namespaces.lo `test -f 'namespaces.c' || echo '$(srcdir)/'`namespaces.c
+@am__fastdepCC_TRUE@	mv -f $(DEPDIR)/libssl_utils_nog_la-namespaces.Tpo $(DEPDIR)/libssl_utils_nog_la-namespaces.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='namespaces.c' object='libssl_utils_nog_la-namespaces.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libssl_utils_nog_la_CFLAGS) $(CFLAGS) -c -o libssl_utils_nog_la-namespaces.lo `test -f 'namespaces.c' || echo '$(srcdir)/'`namespaces.c
+
+libssl_utils_nog_la-lex.namespaces.lo: lex.namespaces.c
+@am__fastdepCC_TRUE@	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libssl_utils_nog_la_CFLAGS) $(CFLAGS) -MT libssl_utils_nog_la-lex.namespaces.lo -MD -MP -MF $(DEPDIR)/libssl_utils_nog_la-lex.namespaces.Tpo -c -o libssl_utils_nog_la-lex.namespaces.lo `test -f 'lex.namespaces.c' || echo '$(srcdir)/'`lex.namespaces.c
+@am__fastdepCC_TRUE@	mv -f $(DEPDIR)/libssl_utils_nog_la-lex.namespaces.Tpo $(DEPDIR)/libssl_utils_nog_la-lex.namespaces.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='lex.namespaces.c' object='libssl_utils_nog_la-lex.namespaces.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libssl_utils_nog_la_CFLAGS) $(CFLAGS) -c -o libssl_utils_nog_la-lex.namespaces.lo `test -f 'lex.namespaces.c' || echo '$(srcdir)/'`lex.namespaces.c
+
+libssl_utils_nog_la-evaluate.lo: evaluate.c
+@am__fastdepCC_TRUE@	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libssl_utils_nog_la_CFLAGS) $(CFLAGS) -MT libssl_utils_nog_la-evaluate.lo -MD -MP -MF $(DEPDIR)/libssl_utils_nog_la-evaluate.Tpo -c -o libssl_utils_nog_la-evaluate.lo `test -f 'evaluate.c' || echo '$(srcdir)/'`evaluate.c
+@am__fastdepCC_TRUE@	mv -f $(DEPDIR)/libssl_utils_nog_la-evaluate.Tpo $(DEPDIR)/libssl_utils_nog_la-evaluate.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='evaluate.c' object='libssl_utils_nog_la-evaluate.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libssl_utils_nog_la_CFLAGS) $(CFLAGS) -c -o libssl_utils_nog_la-evaluate.lo `test -f 'evaluate.c' || echo '$(srcdir)/'`evaluate.c
+
 mostlyclean-libtool:
 	-rm -f *.lo
 
 clean-libtool:
 	-rm -rf .libs _libs
-
-# This directory's subdirectories are mostly independent; you can cd
-# into them and run `make' without going through this Makefile.
-# To change the values of `make' variables: instead of editing Makefiles,
-# (1) if the variable is set in `config.status', edit `config.status'
-#     (which will cause the Makefiles to be regenerated when you run `make');
-# (2) otherwise, pass the desired values on the `make' command line.
-$(RECURSIVE_TARGETS):
-	@failcom='exit 1'; \
-	for f in x $$MAKEFLAGS; do \
-	  case $$f in \
-	    *=* | --[!k]*);; \
-	    *k*) failcom='fail=yes';; \
-	  esac; \
-	done; \
-	dot_seen=no; \
-	target=`echo $@ | sed s/-recursive//`; \
-	list='$(SUBDIRS)'; for subdir in $$list; do \
-	  echo "Making $$target in $$subdir"; \
-	  if test "$$subdir" = "."; then \
-	    dot_seen=yes; \
-	    local_target="$$target-am"; \
-	  else \
-	    local_target="$$target"; \
-	  fi; \
-	  (cd $$subdir && $(MAKE) $(AM_MAKEFLAGS) $$local_target) \
-	  || eval $$failcom; \
-	done; \
-	if test "$$dot_seen" = "no"; then \
-	  $(MAKE) $(AM_MAKEFLAGS) "$$target-am" || exit 1; \
-	fi; test -z "$$fail"
-
-$(RECURSIVE_CLEAN_TARGETS):
-	@failcom='exit 1'; \
-	for f in x $$MAKEFLAGS; do \
-	  case $$f in \
-	    *=* | --[!k]*);; \
-	    *k*) failcom='fail=yes';; \
-	  esac; \
-	done; \
-	dot_seen=no; \
-	case "$@" in \
-	  distclean-* | maintainer-clean-*) list='$(DIST_SUBDIRS)' ;; \
-	  *) list='$(SUBDIRS)' ;; \
-	esac; \
-	rev=''; for subdir in $$list; do \
-	  if test "$$subdir" = "."; then :; else \
-	    rev="$$subdir $$rev"; \
-	  fi; \
-	done; \
-	rev="$$rev ."; \
-	target=`echo $@ | sed s/-recursive//`; \
-	for subdir in $$rev; do \
-	  echo "Making $$target in $$subdir"; \
-	  if test "$$subdir" = "."; then \
-	    local_target="$$target-am"; \
-	  else \
-	    local_target="$$target"; \
-	  fi; \
-	  (cd $$subdir && $(MAKE) $(AM_MAKEFLAGS) $$local_target) \
-	  || eval $$failcom; \
-	done && test -z "$$fail"
-tags-recursive:
-	list='$(SUBDIRS)'; for subdir in $$list; do \
-	  test "$$subdir" = . || (cd $$subdir && $(MAKE) $(AM_MAKEFLAGS) tags); \
-	done
-ctags-recursive:
-	list='$(SUBDIRS)'; for subdir in $$list; do \
-	  test "$$subdir" = . || (cd $$subdir && $(MAKE) $(AM_MAKEFLAGS) ctags); \
-	done
 
 ID: $(HEADERS) $(SOURCES) $(LISP) $(TAGS_FILES)
 	list='$(SOURCES) $(HEADERS) $(LISP) $(TAGS_FILES)'; \
@@ -942,23 +1278,10 @@ ID: $(HEADERS) $(SOURCES) $(LISP) $(TAGS_FILES)
 	mkid -fID $$unique
 tags: TAGS
 
-TAGS: tags-recursive $(HEADERS) $(SOURCES)  $(TAGS_DEPENDENCIES) \
+TAGS:  $(HEADERS) $(SOURCES)  $(TAGS_DEPENDENCIES) \
 		$(TAGS_FILES) $(LISP)
 	tags=; \
 	here=`pwd`; \
-	if ($(ETAGS) --etags-include --version) >/dev/null 2>&1; then \
-	  include_option=--etags-include; \
-	  empty_fix=.; \
-	else \
-	  include_option=--include; \
-	  empty_fix=; \
-	fi; \
-	list='$(SUBDIRS)'; for subdir in $$list; do \
-	  if test "$$subdir" = .; then :; else \
-	    test ! -f $$subdir/TAGS || \
-	      tags="$$tags $$include_option=$$here/$$subdir/TAGS"; \
-	  fi; \
-	done; \
 	list='$(SOURCES) $(HEADERS)  $(LISP) $(TAGS_FILES)'; \
 	unique=`for i in $$list; do \
 	    if test -f "$$i"; then echo $$i; else echo $(srcdir)/$$i; fi; \
@@ -971,7 +1294,7 @@ TAGS: tags-recursive $(HEADERS) $(SOURCES)  $(TAGS_DEPENDENCIES) \
 	    $$tags $$unique; \
 	fi
 ctags: CTAGS
-CTAGS: ctags-recursive $(HEADERS) $(SOURCES)  $(TAGS_DEPENDENCIES) \
+CTAGS:  $(HEADERS) $(SOURCES)  $(TAGS_DEPENDENCIES) \
 		$(TAGS_FILES) $(LISP)
 	tags=; \
 	list='$(SOURCES) $(HEADERS)  $(LISP) $(TAGS_FILES)'; \
@@ -1018,37 +1341,19 @@ distdir: $(DISTFILES)
 	    || exit 1; \
 	  fi; \
 	done
-	list='$(DIST_SUBDIRS)'; for subdir in $$list; do \
-	  if test "$$subdir" = .; then :; else \
-	    test -d "$(distdir)/$$subdir" \
-	    || $(MKDIR_P) "$(distdir)/$$subdir" \
-	    || exit 1; \
-	    distdir=`$(am__cd) $(distdir) && pwd`; \
-	    top_distdir=`$(am__cd) $(top_distdir) && pwd`; \
-	    (cd $$subdir && \
-	      $(MAKE) $(AM_MAKEFLAGS) \
-	        top_distdir="$$top_distdir" \
-	        distdir="$$distdir/$$subdir" \
-		am__remove_distdir=: \
-		am__skip_length_check=: \
-	        distdir) \
-	      || exit 1; \
-	  fi; \
-	done
 check-am: all-am
-check: check-recursive
+check: check-am
 all-am: Makefile $(LTLIBRARIES)
-installdirs: installdirs-recursive
-installdirs-am:
-install: install-recursive
-install-exec: install-exec-recursive
-install-data: install-data-recursive
-uninstall: uninstall-recursive
+installdirs:
+install: install-am
+install-exec: install-exec-am
+install-data: install-data-am
+uninstall: uninstall-am
 
 install-am: all-am
 	@$(MAKE) $(AM_MAKEFLAGS) install-exec-am install-data-am
 
-installcheck: installcheck-recursive
+installcheck: installcheck-am
 install-strip:
 	$(MAKE) $(AM_MAKEFLAGS) INSTALL_PROGRAM="$(INSTALL_STRIP_PROGRAM)" \
 	  install_sh_PROGRAM="$(INSTALL_STRIP_PROGRAM)" INSTALL_STRIP_FLAG=-s \
@@ -1065,71 +1370,69 @@ distclean-generic:
 maintainer-clean-generic:
 	@echo "This command is intended for maintainers to use"
 	@echo "it deletes files that may require special tools to rebuild."
-clean: clean-recursive
+clean: clean-am
 
 clean-am: clean-generic clean-libtool clean-noinstLTLIBRARIES \
 	mostlyclean-am
 
-distclean: distclean-recursive
+distclean: distclean-am
 	-rm -rf ./$(DEPDIR)
 	-rm -f Makefile
 distclean-am: clean-am distclean-compile distclean-generic \
 	distclean-tags
 
-dvi: dvi-recursive
+dvi: dvi-am
 
 dvi-am:
 
-html: html-recursive
+html: html-am
 
-info: info-recursive
+info: info-am
 
 info-am:
 
 install-data-am:
 
-install-dvi: install-dvi-recursive
+install-dvi: install-dvi-am
 
 install-exec-am:
 
-install-html: install-html-recursive
+install-html: install-html-am
 
-install-info: install-info-recursive
+install-info: install-info-am
 
 install-man:
 
-install-pdf: install-pdf-recursive
+install-pdf: install-pdf-am
 
-install-ps: install-ps-recursive
+install-ps: install-ps-am
 
 installcheck-am:
 
-maintainer-clean: maintainer-clean-recursive
+maintainer-clean: maintainer-clean-am
 	-rm -rf ./$(DEPDIR)
 	-rm -f Makefile
 maintainer-clean-am: distclean-am maintainer-clean-generic
 
-mostlyclean: mostlyclean-recursive
+mostlyclean: mostlyclean-am
 
 mostlyclean-am: mostlyclean-compile mostlyclean-generic \
 	mostlyclean-libtool
 
-pdf: pdf-recursive
+pdf: pdf-am
 
 pdf-am:
 
-ps: ps-recursive
+ps: ps-am
 
 ps-am:
 
 uninstall-am:
 
-.MAKE: $(RECURSIVE_CLEAN_TARGETS) $(RECURSIVE_TARGETS) install-am \
-	install-strip
+.MAKE: install-am install-strip
 
-.PHONY: $(RECURSIVE_CLEAN_TARGETS) $(RECURSIVE_TARGETS) CTAGS GTAGS \
-	all all-am check check-am clean clean-generic clean-libtool \
-	clean-noinstLTLIBRARIES ctags ctags-recursive distclean \
+.PHONY: CTAGS GTAGS all all-am check check-am clean clean-generic \
+	clean-libtool clean-noinstLTLIBRARIES ctags distclean \
 	distclean-compile distclean-generic distclean-libtool \
 	distclean-tags distdir dvi dvi-am html html-am info info-am \
 	install install-am install-data install-data-am install-dvi \
@@ -1137,11 +1440,22 @@ uninstall-am:
 	install-html-am install-info install-info-am install-man \
 	install-pdf install-pdf-am install-ps install-ps-am \
 	install-strip installcheck installcheck-am installdirs \
-	installdirs-am maintainer-clean maintainer-clean-generic \
-	mostlyclean mostlyclean-compile mostlyclean-generic \
-	mostlyclean-libtool pdf pdf-am ps ps-am tags tags-recursive \
-	uninstall uninstall-am
+	maintainer-clean maintainer-clean-generic mostlyclean \
+	mostlyclean-compile mostlyclean-generic mostlyclean-libtool \
+	pdf pdf-am ps ps-am tags uninstall uninstall-am
 
+
+signing_policy.c: signing_policy.y
+	bison -t -d -o signing_policy.c signing_policy.y
+
+lex.signing.c: signing_policy.l signing_policy.h signing_policy.c
+	flex -b -f -d signing_policy.l
+
+namespaces.c: namespaces.y
+	bison -t -d -o namespaces.c namespaces.y
+
+lex.namespaces.c: namespaces.l namespaces.h namespaces.c
+	flex -b -f -d namespaces.l
 # Tell versions [3.59,3.63) of GNU make to not export all variables.
 # Otherwise a system limit (for SysV at least) may be exceeded.
 .NOEXPORT:

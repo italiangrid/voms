@@ -20,6 +20,7 @@ Description:
 #include "replace.h"
 #include "myproxycertinfo.h"
 #include "sslutils.h"
+#include "parsertypes.h"
 
 #ifdef HAVE_UNISTD_H
 #include <unistd.h>
@@ -100,6 +101,13 @@ static int fix_add_entry_asn1_set_param = 0;
 
 
 static STACK_OF(X509) *load_chain(BIO *in);
+
+extern int restriction_evaluate(STACK_OF(X509) *chain, struct policy **namespaces,
+                                struct policy **signings);
+extern void free_policies(struct policy **policies);
+extern int read_pathrestriction(STACK_OF(X509) *chain, char *path,
+                                struct policy **namespaces, 
+                                struct policy **signings);
 
 /**********************************************************************
                                Type definitions
@@ -2166,150 +2174,23 @@ proxy_verify_callback(
             cert_dir = pvd->pvxd->certdir ? pvd->pvxd->certdir :
                 getenv(X509_CERT_DIR);
 
-            ca_policy_file_path =
-                get_ca_signing_policy_path(
-                    cert_dir,
-                    X509_get_issuer_name(ctx->current_cert));
-                
-            if (ca_policy_file_path == NULL)
-            {
-                PRXYerr(PRXYERR_F_VERIFY_CB, PRXYERR_R_CA_NOPATH);
-                ctx->error =  X509_V_ERR_APPLICATION_VERIFICATION; 
-                goto fail_verify;
-            }
-
-            /*
-             * XXX - make sure policy file exists. We get a segfault later
-             * if it doesn't.
-             */
-            if (checkstat(ca_policy_file_path) == 1)
-            {
-                PRXYerr(PRXYERR_F_VERIFY_CB, PRXYERR_R_CA_NOFILE);
-                ctx->error = X509_V_ERR_APPLICATION_VERIFICATION;
-                ERR_set_continue_needed();
-                goto fail_verify;
-            }
-
             {
                 char * error_string = NULL;
-                char * issuer_name;
-                char * subject_name;
-#ifndef NO_OLDGAA_API
-                oldgaa_rights_ptr            rights          = NULL;
-                oldgaa_policy_ptr            policy_handle   = NULL;
-                oldgaa_answer_ptr            detailed_answer = NULL;
-                oldgaa_sec_context_ptr       oldgaa_sc          = NULL;
-                oldgaa_options_ptr           options         = NULL;
-                oldgaa_error_code            result;
-                oldgaa_data_ptr              policy_db       = OLDGAA_NO_DATA;
-                uint32                       minor_status;
-#else /* Von's code */
-                int result;
+                struct policy **signings   = NULL;
+                struct policy **namespaces = NULL;
+                int result = SUCCESS_UNDECIDED;
 
-#endif /* #ifndef NO_OLDGAA_API */
+                fprintf(stderr, "Calling read_pathrestriction\n");
+                read_pathrestriction(ctx->chain, cert_dir, &namespaces, &signings);
 
-
-                subject_name = X509_NAME_oneline(
-                    X509_get_subject_name(ctx->current_cert),
-                    NULL,
-                    0);
-                issuer_name = X509_NAME_oneline(
-                    X509_get_issuer_name(ctx->current_cert),
-                    NULL,
-                    0);
-
-#ifndef NO_OLDGAA_API
- 
-                if(oldgaa_globus_initialize(&oldgaa_sc,
-                                            &rights,
-                                            &options,
-                                            &policy_db,
-                                            issuer_name,
-                                            subject_name,
-                                            ca_policy_file_path  
-                       )!= OLDGAA_SUCCESS) 
-
-                {
-                    char buf[256];
-                    sprintf(buf,"Minor status=%d", policy_db->error_code);
-                    PRXYerr(PRXYERR_F_VERIFY_CB, PRXYERR_R_CA_POLICY_RETRIEVE);
-                    ERR_add_error_data(3,buf,"\n        ",
-                                       policy_db->error_str);
-                    ctx->error=X509_V_ERR_APPLICATION_VERIFICATION;
-                    ERR_set_continue_needed();
-                    goto fail_verify;
-                }
-
-
-                if(oldgaa_get_object_policy_info(
-                       &minor_status,  
-                       OLDGAA_NO_DATA,
-                       policy_db,
-                       oldgaa_globus_policy_retrieve,
-                       &policy_handle) != OLDGAA_SUCCESS)
-                {
-                    char buf[256];
-                    sprintf(buf,"Minor status=%d", minor_status);
-                    PRXYerr(PRXYERR_F_VERIFY_CB, PRXYERR_R_CA_POLICY_PARSE);
-                    ERR_add_error_data(3,buf,"\n        ",
-                                       policy_db->error_str);
-                    ctx->error =  X509_V_ERR_APPLICATION_VERIFICATION;
-                    ERR_set_continue_needed(); 
-                    goto fail_verify;
-                }
-
-                result = oldgaa_check_authorization (&minor_status,   
-                                                     oldgaa_sc,   
-                                                     policy_handle,     
-                                                     rights, 
-                                                     options,
-                                                     &detailed_answer);
+                result = restriction_evaluate(ctx->chain, namespaces, signings);
                 
-                if (!detailed_answer)
-                {
-                    PRXYerr(PRXYERR_F_VERIFY_CB, PRXYERR_R_CA_POLICY_ERR);
-                    ctx->error = X509_V_ERR_INVALID_PURPOSE; 
-                    ERR_set_continue_needed(); 
-                    if (subject_name) free(subject_name);
-                    if (issuer_name) free(issuer_name);     
-                    
-                    oldgaa_globus_cleanup(&oldgaa_sc,
-                                          &rights,
-                                          options,
-                                          &detailed_answer,  
-                                          policy_db,
-                                          NULL);
-                    goto fail_verify;
-                }
+                fprintf(stderr, "Freeing namesSPACES\n");
+                free_policies(namespaces);
+                fprintf(stderr, "Freeing SIGNIGS\n");
+                free_policies(signings);
 
-                if (policy_handle)
-                {
-                    oldgaa_release_principals(&minor_status, &policy_handle);
-                }
-                
-
-                oldgaa_globus_cleanup(&oldgaa_sc,
-                                      &rights,
-                                      options,
-                                      &detailed_answer,  
-                                      policy_db,
-                                      NULL);
-
-                
-#else /* Von's code */
-
-                result = ca_policy_file_check_signature(issuer_name,
-                                                        subject_name,
-                                                        &error_string,
-                                                        pvd->certdir);
-
-#endif /* #ifndef NO_OLDGAA_API */
-
-
-                free(subject_name);
-                free(issuer_name);
-
-                if (result != 0)
+                if (result != SUCCESS_PERMIT)
                 {
                     PRXYerr(PRXYERR_F_VERIFY_CB, PRXYERR_R_CA_POLICY_VIOLATION);
 

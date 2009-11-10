@@ -27,8 +27,6 @@ AC_PROG_MAKE_SET
 AC_PROG_LIBTOOL
 
 AC_COMPILER
-AC_CPPUNIT
-AC_UTEST
 
 # Checks for libraries.
 AC_OPENSSL
@@ -42,7 +40,6 @@ if test "x$host_cpu" = "xx86_64"; then
 fi
 
 AC_EXPAT([], have_expat=yes, have_expat=no)        # taken from org.glite
-AC_CPPUNIT([], have_cppunit=yes, have_cppunit=no)  # taken from org.glite
 AC_GLOBUS([], have_globus=yes, have_globus=no)
 
 #AC_CHECK_FUNCS(globus_module_activate)
@@ -136,14 +133,11 @@ AC_CONFIG_FILES([Makefile
                  src/server/Makefile
                  src/socklib/Makefile
                  src/sslutils/Makefile
-                 src/sslutils/oldgaa/Makefile
                  src/utils/Makefile
                  doc/Makefile
                  project/Makefile
                  testsuite/Makefile
-                 testsuite/SuiteConfig
-                 test/Makefile
-                 test/utest/Makefile])
+                 testsuite/SuiteConfig])
 AC_CONFIG_FILES([src/install/voms_install_db
                  src/install/voms.start
                  src/replica/voms_install_replica
