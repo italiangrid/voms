@@ -1,0 +1,36 @@
+load_lib vomstest.exp
+testheader "See if java voms-proxy-init gets the right FQANs."
+
+proc mytest {} {
+    _activateCert mycert2
+
+    # Create a proxy to validate.
+    _vomsStart voms1
+
+    set ::_buildout [exec mktemp $::SCRATCHDIR/program-out-XXXXXX]
+    set res [_execJava contactvoms2.java $::_certdir/mycert2-cert.pem $::_certdir/mycert2-key.pem]
+
+    _vomsStop voms1
+
+    addlog $::_buildout
+
+    if $res then {
+        testmessage "voms-proxy-init failed."
+        return $::FAILTEST
+    }
+
+    set correct "FQAN:/voms1
+FQAN:/voms1/group1"
+
+    set out [exec cat $::_buildout]
+
+    if [regexp $correct $out] then {
+        testmessage "Obtained list of FQANs."
+        return $::PASSTEST
+    } else {
+        testmessage "Unexepected output."
+        return $::FAILTEST
+    }
+}
+
+do_test

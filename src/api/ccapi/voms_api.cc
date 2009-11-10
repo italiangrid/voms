@@ -2,9 +2,10 @@
  *
  * Authors: Vincenzo Ciaschini - Vincenzo.Ciaschini@cnaf.infn.it 
  *
- * Copyright (c) 2002, 2003 INFN-CNAF on behalf of the EU DataGrid.
+ * Copyright (c) 2002-2009 INFN-CNAF on behalf of the EU DataGrid
+ * and EGEE I, II and III
  * For license conditions see LICENSE file or
- * http://www.edg.org/license.html
+ * http://www.apache.org/licenses/LICENSE-2.0.txt
  *
  * Parts of this code may be based upon or even include verbatim pieces,
  * originally written by other people, in which case the original header
@@ -40,6 +41,7 @@ extern "C" {
 #include <openssl/pem.h>
 #include <openssl/objects.h>
 #include <openssl/asn1.h>
+#include <openssl/evp.h>
 #include "credentials.h"
 #include "sslutils.h"
 
@@ -51,10 +53,13 @@ extern "C" {
 #else
 #include <openssl/crypto.h>
 #endif
+extern int InitProxyCertInfoExtension(int);
 }
 
+#include <cstring>
 #include <fstream>
 #include <iostream>
+#include <map>
 
 #include <voms_api.h>
 #include "data.h"
@@ -62,15 +67,11 @@ extern "C" {
 
 #include "realdata.h"
 
+#include "internal.h"
+
 extern bool retrieve(X509 *cert, STACK_OF(X509) *chain, recurse_type how, 
 		     std::string &buffer, std::string &vo, std::string &file, 
 		     std::string &subject, std::string &ca, verror_type &error);
-/*
-extern bool verify(std::string message, vomsdata &voms, verror_type &error, 
-		   std::string vdir, std::string cdir, std::string subject, 
-		   std::string ca);
-*/
-
 extern "C" {
 extern char *Decode(const char *, int, int *);
 extern char *Encode(const char *, int, int *, int);
@@ -78,109 +79,22 @@ extern char *Encode(const char *, int, int *, int);
 
 extern int AC_Init(void);
 
-#if 0
+std::map<vomsdata*, vomsspace::internal*> privatedata;
 
-static pthread_mutex_t *mut_pool = NULL;
-
-static void locking_cb(int mode, int type, const char *file, int line)
-{
-  if (pthread_mutex_lock)
-    if (mode & CRYPTO_LOCK)
-      pthread_mutex_lock(&(mut_pool[type]));
-    else
-      pthread_mutex_unlock(&(mut_pool[type]));
-}
-
-
-/**
- * OpenSSL thread id callback
- *
- */
-static unsigned long thread_id(void)
-{
-  if (pthread_self)
-    return (unsigned long) pthread_self();
-  else
-    return 0;
-}
-
-static void openssl_initialize(void)
-{
-  mut_pool = (pthread_mutex_t *)malloc(CRYPTO_num_locks() * sizeof(pthread_mutex_t));
-
-  if (pthread_mutex_init)
-    for(int i = 0; i < CRYPTO_num_locks(); i++)
-      pthread_mutex_init(&(mut_pool[i]),NULL);
-
-  CRYPTO_set_locking_callback(locking_cb);
-  CRYPTO_set_id_callback(thread_id);
-
-  OBJ_create("0.9.2342.19200300.100.1.1","USERID","userId");
-
-#if 0
-  OBJ_create("1.3.6.1.5.5.7.21.1", "IMPERSONATION_PROXY",
-             "GSI Impersonation Proxy");
-
-  OBJ_create("1.3.6.1.5.5.7.21.2", "INDEPENDENT_PROXY",
-             "GSI Independent Proxy");
-
-  OBJ_create("1.3.6.1.4.1.3536.1.1.1.9", "LIMITED_PROXY",
-             "GSI Limited Proxy");
-    
-  int pci_NID = OBJ_create("1.3.6.1.4.1.3536.1.222", "PROXYCERTINFO",
-                           "Proxy Certificate Info Extension");
-
-  X509V3_EXT_METHOD *pci_x509v3_ext_meth = PROXYCERTINFO_x509v3_ext_meth();
-
-  /* this sets the pci NID in the static X509V3_EXT_METHOD struct */
-  pci_x509v3_ext_meth->ext_nid = pci_NID;
-    
-  X509V3_EXT_add(pci_x509v3_ext_meth);
-#endif
-}
-
-#else
-#if 0
-/* ndef NOGLOBUS */
-
-static globus_thread_once_t l_globus_once_control = GLOBUS_THREAD_ONCE_INIT;
-
-static void l_init_globus_once_func(void) {
-#ifdef HAVE_GLOBUS_MODULE_ACTIVATE
-    (void)globus_module_activate(GLOBUS_GSI_GSS_ASSIST_MODULE);
-    (void)globus_module_activate(GLOBUS_OPENSSL_MODULE);
-#endif
-    SSLeay_add_all_algorithms();
-    ERR_load_crypto_strings();
-    (void)AC_Init();
-}
-#endif
-#endif
 
 vomsdata::Initializer::Initializer(Initializer &) {}
 vomsdata::Initializer::Initializer()
 {
 #ifdef NOGLOBUS
-  //  openssl_initialize();
   SSLeay_add_all_algorithms();
   ERR_load_crypto_strings();
 
   (void)AC_Init();
-#define PROXYCERTINFO_V3      "1.3.6.1.4.1.3536.1.222"
-#define PROXYCERTINFO_V4      "1.3.6.1.5.5.7.1.14"
-#define OBJC(c,n) OBJ_create(c,n,#c)
-
-  if (OBJ_txt2nid("PROXYCERTINFO_V3") == 0)
-    OBJC(PROXYCERTINFO_V3, "PROXYCERTINFO_V3");
-
-  if (OBJ_txt2nid("PROXYCERTINFO_V4") == 0)
-    OBJC(PROXYCERTINFO_V4, "PROXYCERTINFO_V4");
-
+  InitProxyCertInfoExtension(1);
 #endif
 }
 
-vomsdata::Initializer vomsdata::init;
-//bool vomsdata::initialized = false;
+static bool initialized = false;
 
 void vomsdata::seterror(verror_type err, std::string message)
 {
@@ -202,14 +116,24 @@ vomsdata::vomsdata(std::string voms_dir, std::string cert_dir) :  ca_cert_dir(ce
                                                                   extra_data(""),
                                                                   ver_type(VERIFY_FULL),
                                                                   retry_count(1),
-                                                                  verificationtime(0),
-                                                                  ucert(NULL),
-                                                                  cert_chain(NULL),
-                                                                  upkey(NULL)
+                                                                  verificationtime(0)
 {
 #ifndef NOGLOBUS
    (void)globus_thread_once(&l_globus_once_control, l_init_globus_once_func);
 #endif
+
+   if (!initialized) {
+     initialized = 1;
+#ifdef NOGLOBUS
+     SSL_library_init();
+     SSLeay_add_all_algorithms();
+     ERR_load_crypto_strings();
+     OpenSSL_add_all_ciphers();
+
+     (void)AC_Init();
+     InitProxyCertInfoExtension(1);
+#endif
+   }
 
   if (voms_cert_dir.empty()) {
     char *v;
@@ -243,25 +167,17 @@ vomsdata::vomsdata(std::string voms_dir, std::string cert_dir) :  ca_cert_dir(ce
     (void)closedir(vdir);
 
   duration = 0;
+
+  vomsspace::internal *data = new vomsspace::internal();
+  privatedata[this] = data;
 }
+
 
 vomsdata::~vomsdata()
 {
-#ifndef NOGLOBUS
-  //#ifdef HAVE_GLOBUS_MODULE_ACTIVATE
-#if 0
-  if (!noglobus) {
-    globus_module_deactivate(GLOBUS_GSI_GSS_ASSIST_MODULE);
-    globus_module_deactivate(GLOBUS_OPENSSL_MODULE);
-  }
-#endif
-#endif
-  if (ucert)
-    X509_free(ucert);
-  if (cert_chain)
-    sk_X509_pop_free(cert_chain, X509_free);
-  if (upkey)
-    EVP_PKEY_free(upkey);
+  vomsspace::internal *data = privatedata[this];
+  (void)privatedata.erase(this);
+  delete data;
 }
 
 std::string vomsdata::ServerErrors(void)
@@ -304,20 +220,14 @@ void vomsdata::ResetOrder(void)
 
 void vomsdata::Order(std::string att)
 {
-  /*
-  std::string::size_type position = att.find("/Role=");
-  if (position == std::string::npos)
-  */  
   ordering += (ordering.empty() ? ""  : ",") + att;
-  /*
-  else {
-    std::string temp = att.substr(0, position) + ":" + att.substr(position+6);
-    ordering += (ordering.empty() ? ""  : ",") + temp;
-  }
-  */
 }
 
-bool vomsdata::ContactRaw(std::string hostname, int port, std::string servsubject, std::string command, std::string &raw, int& version)
+bool vomsdata::ContactRaw(std::string hostname, int port, std::string servsubject, std::string command, std::string &raw, int& version) {
+  return ContactRaw(hostname, port, servsubject, command, raw, version, -1);
+}
+
+bool vomsdata::ContactRaw(std::string hostname, int port, std::string servsubject, std::string command, std::string &raw, int& version, int timeout)
 {
   std::string buffer;
   std::string subject, ca;
@@ -326,26 +236,6 @@ bool vomsdata::ContactRaw(std::string hostname, int port, std::string servsubjec
   std::string comm;
   std::string targs;
   answer a;
-
-  if (!ucert) {
-    char *cacert = NULL;
-    char *certdir = NULL;
-    char *outfile = NULL;
-    char *certfile = NULL;
-    char *keyfile = NULL;
-    bool noregen = false;
-
-    if (determine_filenames(&cacert, &certdir, &outfile, &certfile, &keyfile, noregen)) {
-      if (!load_credentials(certfile, keyfile, &ucert, &cert_chain, &upkey, NULL)) {
-        seterror(VERR_NOIDENT, "Cannot load credentials.");
-        return false;
-      }
-    }
-    else {
-      seterror(VERR_NOIDENT, "Cannot discover credentials.");
-      return false;
-    }
-  }
 
   for (std::vector<std::string>::iterator i = targets.begin(); 
        i != targets.end(); i++) {
@@ -357,7 +247,7 @@ bool vomsdata::ContactRaw(std::string hostname, int port, std::string servsubjec
 
   comm = XML_Req_Encode(command, ordering, targs, duration);
 
-  if (!contact(hostname, port, servsubject, comm, buffer, subject, ca))
+  if (!contact(hostname, port, servsubject, comm, buffer, subject, ca, timeout))
     return false;
   
   if (XML_Ans_Decode(buffer, a)) {
@@ -408,7 +298,11 @@ static X509 *get_own_cert()
 }
 
 
-bool vomsdata::Contact(std::string hostname, int port, std::string servsubject, std::string command)
+bool vomsdata::Contact(std::string hostname, int port, std::string servsubject, std::string command) {
+  return Contact(hostname, port, servsubject, command, -1);
+}
+
+bool vomsdata::Contact(std::string hostname, int port, std::string servsubject, std::string command, int timeout)
 {
   std::string subject, ca;
   char *s = NULL, *c = NULL;
@@ -419,7 +313,7 @@ bool vomsdata::Contact(std::string hostname, int port, std::string servsubject, 
 
   for (int i=0; i < retry_count; ++i)
   {
-    if (ContactRaw(hostname, port, servsubject, command, message, version)) {
+    if (ContactRaw(hostname, port, servsubject, command, message, version, timeout)) {
 
       X509 *holder = get_own_cert();
 
@@ -431,7 +325,6 @@ bool vomsdata::Contact(std::string hostname, int port, std::string servsubject, 
         if (c && s) {
           ca = std::string(c);
           subject = std::string(s);
-    
           voms v;
           
           result = verifydata(message, subject, ca, holder, v);
@@ -471,11 +364,8 @@ bool vomsdata::Retrieve(FILE *file, recurse_type how)
   else
     seterror(VERR_PARAM, "File parameter invalid.");
 
-  if (chain)
-    sk_X509_pop_free(chain, X509_free);
-
-  if (x)
-    X509_free(x);
+  sk_X509_pop_free(chain, X509_free);
+  X509_free(x);
 
   return res;
 }
@@ -490,21 +380,13 @@ bool vomsdata::RetrieveFromCred(gss_cred_id_t cred, recurse_type how)
   return Retrieve(cert, chain, how);
 }
 
-bool vomsdata::RetrieveFromCtx(gss_ctx_id_t cred, recurse_type how)
+bool vomsdata::RetrieveFromCtx(UNUSED(gss_ctx_id_t cred), UNUSED(recurse_type how))
 {
-//   X509 *cert;
-//   STACK_OF(X509) *chain;
-
-//   cert = decouple_ctx(cred, &chain);
-
-//   return Retrieve(cert, chain, how);
   return false;
 }
 
 bool vomsdata::RetrieveFromProxy(recurse_type how)
 {
-  gss_cred_id_t cred = 0L;
-
   char *outfile = NULL;
 
   if (determine_filenames(NULL, NULL, &outfile, NULL, NULL, 0)) {
@@ -544,10 +426,8 @@ bool vomsdata::Retrieve(X509 *cert, STACK_OF(X509) *chain, recurse_type how)
     ok = evaluate(acs, subject, ca, holder);
   }
 
-  if (acs)
-    AC_SEQ_free(acs);
-  if (holder)
-    X509_free(holder);
+  AC_SEQ_free(acs);
+  X509_free(holder);
 
   return ok;
 }
@@ -589,6 +469,7 @@ bool vomsdata::Import(std::string buffer)
       if (buf) 
         subject = std::string(buf);
       OPENSSL_free(buf);
+
       buf = X509_NAME_oneline(X509_get_issuer_name(holder), NULL, 0);
       if (buf)
         ca = std::string(buf);
@@ -679,7 +560,7 @@ bool vomsdata::DefaultData(voms &d)
   return true;
 }
 
-bool vomsdata::loadfile(std::string filename, uid_t uid, gid_t gid)
+bool vomsdata::loadfile(std::string filename, UNUSED(uid_t uid), UNUSED(gid_t gid))
 {
   struct stat stats;
 
@@ -694,12 +575,6 @@ bool vomsdata::loadfile(std::string filename, uid_t uid, gid_t gid)
 
   if (stat(filename.c_str(), &stats) == -1) {
     seterror(VERR_DIR, "Cannot find file or dir: " + filename);
-    return false;
-  }
-
-  if (stats.st_mode & (S_IWGRP | S_IWOTH)) {
-    seterror(VERR_DIR, std::string("Wrong permissions on file: ") + filename + 
-             "\nWriting permissions are allowed only for the owner\n");
     return false;
   }
 
@@ -750,10 +625,11 @@ static bool empty(std::string c)
   for (unsigned int i = 0; i < c.size(); i++)
     if (!isspace(c[i]))
       return false;
+
   return true;
 }
 
-bool vomsdata::loadfile0(std::string filename, uid_t uid, gid_t gid)
+bool vomsdata::loadfile0(std::string filename, UNUSED(uid_t uid), UNUSED(gid_t gid))
 {
   struct contactdata data;
 
@@ -900,7 +776,6 @@ voms::voms(const voms &orig)
     new std::vector<attributelist>(*(((struct realdata *)orig.realdata)->attributes));
 }
 
-
 voms::voms(): version(0), siglen(0), holder(NULL)
 {
   realdata = (void *)calloc(1, sizeof(struct realdata));
@@ -927,8 +802,8 @@ voms &voms::operator=(const voms &orig)
   custom    = orig.custom;
   fqan      = orig.fqan;
   serial    = orig.serial;
-  if (((struct realdata *)realdata)->ac)
-    AC_free(((struct realdata *)realdata)->ac);
+  AC_free(((struct realdata *)realdata)->ac);
+
   ((struct realdata *)realdata)->ac = AC_dup(((struct realdata *)orig.realdata)->ac);
   holder = X509_dup(orig.holder);
   delete ((struct realdata *)realdata)->attributes;
@@ -973,8 +848,8 @@ vomsdata::vomsdata(const vomsdata &orig) : ca_cert_dir(orig.ca_cert_dir),
 {}
 
 int getMajorVersionNumber(void) {return 1;}
-int getMinorVersionNumber(void) {return 8;}
-int getPatchVersionNumber(void) {return 0;}
+int getMinorVersionNumber(void) {return 9;}
+int getPatchVersionNumber(void) {return 14;}
 
 void vomsdata::SetRetryCount(int retryCount)
 {
@@ -994,11 +869,11 @@ std::vector<std::string> voms::GetTargets()
 
   STACK_OF(X509_EXTENSION) *exts = ac->acinfo->exts;
 
-  int nid3 = OBJ_txt2nid("idceTargets");
-  int pos4 = X509v3_get_ext_by_NID(exts, nid3, -1);
+  int nid = OBJ_txt2nid("idceTargets");
+  int pos = X509v3_get_ext_by_NID(exts, nid, -1);
 
-  if (pos4 >= 0) {
-    X509_EXTENSION *ex = sk_X509_EXTENSION_value(exts, pos4);
+  if (pos >= 0) {
+    X509_EXTENSION *ex = sk_X509_EXTENSION_value(exts, pos);
     AC_TARGETS *target = (AC_TARGETS *)X509V3_EXT_d2i(ex);
 
     if (target != NULL) {
@@ -1015,57 +890,57 @@ std::vector<std::string> voms::GetTargets()
   return targets;
 }
 
-bool vomsdata::LoadCredentials(X509 *cert, STACK_OF(X509) *chain, EVP_PKEY *pkey)
+bool vomsdata::LoadCredentials(X509 *cert, EVP_PKEY *pkey, STACK_OF(X509) *chain)
 {
-  ucert = NULL;
-  cert_chain = NULL;
-  upkey = NULL;
+  X509           *ucert = NULL;
+  STACK_OF(X509) *cert_chain = NULL;
+  EVP_PKEY       *upkey = NULL;
+
+  vomsspace::internal *data = privatedata[this];
+
+  /* The condition below should never be true. */
+  if (!data)
+    return false;
 
   if (cert)
-    ucert = X509_dup(cert);
+    data->cert = X509_dup(cert);
 
   if (pkey)
-    upkey = EVP_PKEY_dup(pkey);
+    data->key = EVP_PKEY_dup(pkey);
 
 
   /* sk_dup does *not* duplicate the stack content.  Only the
      stack itself. */
-#if 0
-  if (chain)
-    cert_chain = sk_X509_dup(chain);
-#endif
-
-  /* So, do the duplicatio by hand. */
+  /* So, do the duplication by hand. */
   if (chain) {
-    cert_chain = sk_X509_new_null();
+    data->chain = sk_X509_new_null();
 
-    if (cert_chain) {
+    if (data->chain) {
       for (int i =0; i < sk_X509_num(chain); i++) {
         X509 *newcert = X509_dup(sk_X509_value(chain, i));
+
         if (!newcert) {
-          sk_X509_pop_free(cert_chain, X509_free);
-          cert_chain = NULL;
+          sk_X509_pop_free(data->chain, X509_free);
+          data->chain = NULL;
           break;
         }
         
-        sk_X509_push(cert_chain, newcert);
+        sk_X509_push(data->chain, newcert);
       }
     }
   }
 
-  if ((cert && !ucert) || (pkey && !upkey) || 
-      (chain && !cert_chain)) {
+  if ((cert && !data->cert) || (pkey && !data->key) || 
+      (chain && !data->chain)) {
     X509_free(cert);
     EVP_PKEY_free(pkey);
-    sk_X509_pop_free(cert_chain, X509_free);
-    
-    ucert = NULL;
-    cert_chain = NULL;
-    upkey = NULL;
+    sk_X509_pop_free(data->chain, X509_free);
+
+    data->cert = NULL;
+    data->chain = NULL;
+    data->key = NULL;
 
     return false;
   }
-
   return true;
 }
-

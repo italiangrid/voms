@@ -38,6 +38,8 @@ static
 char *
 oldgaa_to_regex(const char * const glob_regex);
 
+static char *normalize(char * name);
+
 /**********************************************************************
                        Define module specific variables
 **********************************************************************/
@@ -133,18 +135,20 @@ oldgaa_strcopy(const char *s, char *r)
 {
   int	slen;
  
-  if(!s && r) {
+  if (!s && r) {
     free(r);
     return(NULL);
   }
-  else if (!s) return(NULL);
+  else if (!s) 
+    return(NULL);
 
-  if(r) free(r);
+  free(r);
 
   slen = strlen(s) + 1;
    
   r = (char *) malloc(slen);
-  if (!r) out_of_memory();
+  if (!r) 
+    out_of_memory();
    
   strcpy(r,s);
   return(r);
@@ -160,6 +164,9 @@ oldgaa_compare_principals(oldgaa_principals_ptr element,
                           oldgaa_principals_ptr new)
 {
   /* Do the principal's names match? */
+
+  element->value = normalize(element->value);
+  new->value     = normalize(new->value);
 
   if(oldgaa_strings_match(element->type,      new->type)     &&
      oldgaa_strings_match(element->authority, new->authority) &&
@@ -813,3 +820,31 @@ oldgaa_to_regex(const char * const glob_regex)
 
 
 /**********************************************************************/
+
+static char *substitute(char *string, char *from, char *to)
+{
+  char *pointer = strstr(string, from);
+  char *newstring = NULL;
+
+  if (!pointer)
+    return string;
+
+  newstring = (char*)malloc(strlen(string)+strlen(to)-strlen(from)+1);
+
+  if (!newstring)
+    return string;
+
+  *pointer='\0';
+  strcpy(newstring, string);
+  strcat(newstring, to);
+  strcat(newstring, pointer+strlen(from));
+  free(string);
+  return newstring;
+}
+
+static char *normalize(char * name)
+{
+  name = substitute(name, "/emailAddress=", "/Email=");
+  name = substitute(name, "/E=", "/Email=");
+  return substitute(name, "/USERID=", "/UID=");
+}

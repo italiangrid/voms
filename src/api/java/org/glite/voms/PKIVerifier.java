@@ -2,9 +2,10 @@
  *
  * Authors: Vincenzo Ciaschini - Vincenzo.Ciaschini@cnaf.infn.it
  *
- * Copyright (c) 2006 INFN-CNAF on behalf of the 
- * EGEE project.
- * For license conditions see LICENSE
+ * Copyright (c) 2002-2009 INFN-CNAF on behalf of the EU DataGrid
+ * and EGEE I, II and III
+ * For license conditions see LICENSE file or
+ * http://www.apache.org/licenses/LICENSE-2.0.txt
  *
  * Parts of this code may be based upon or even include verbatim pieces,
  * originally written by other people, in which case the original header
@@ -15,6 +16,8 @@
 package org.glite.voms;
 
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.ByteArrayInputStream;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.security.PublicKey;
@@ -23,17 +26,14 @@ import java.security.cert.CRLException;
 import java.security.cert.CertificateException;
 import java.security.cert.CertificateExpiredException;
 import java.security.cert.CertificateNotYetValidException;
-import java.security.cert.CertificateParsingException;
 import java.security.cert.X509CRL;
 import java.security.cert.X509CRLEntry;
 import java.security.cert.X509Certificate;
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.Date;
 import java.util.Enumeration;
 import java.util.Hashtable;
 import java.util.Iterator;
-import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Set;
 import java.util.Stack;
@@ -46,6 +46,9 @@ import org.apache.log4j.Logger;
 import org.bouncycastle.asn1.DERObjectIdentifier;
 import org.bouncycastle.asn1.ASN1Sequence;
 import org.bouncycastle.asn1.ASN1Object;
+import org.bouncycastle.asn1.DERObject;
+import org.bouncycastle.asn1.DERInputStream;
+import org.bouncycastle.asn1.DEROctetString;
 import org.bouncycastle.asn1.x509.X509Extension;
 import org.bouncycastle.asn1.x509.X509Extensions;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
@@ -55,6 +58,16 @@ import org.glite.voms.ac.AttributeCertificate;
 import org.glite.voms.ac.AttributeCertificateInfo;
 import org.glite.voms.ac.VOMSTrustStore;
 import org.glite.voms.contact.MyProxyCertInfo;
+
+class MyDERInputStream extends DERInputStream {
+    public MyDERInputStream(InputStream is) {
+        super(is);
+    }
+
+    public int readLength() throws IOException {
+        return super.readLength();
+    }
+}
 
 public class PKIVerifier {
 
@@ -126,10 +139,9 @@ public class PKIVerifier {
      */
     public PKIVerifier( VOMSTrustStore vomsStore ) throws IOException,
             CertificateException, CRLException {
+        this.vomsStore = vomsStore;
 
-        
-        this( vomsStore, new PKIStore( PKIStore.DEFAULT_CADIR,
-                PKIStore.TYPE_CADIR, true ) );
+        this.caStore = PKIStoreFactory.getStore(PKIStore.TYPE_CADIR);
     }
 
     /**
@@ -154,22 +166,8 @@ public class PKIVerifier {
      */
     public PKIVerifier() throws IOException, CertificateException, CRLException {
 
-        String vomsDir = System.getProperty( "VOMSDIR" );
-        String caDir = System.getProperty( "CADIR");
-        
-        
-        
-        if (vomsDir != null)
-            vomsStore = new PKIStore(vomsDir,PKIStore.TYPE_VOMSDIR,true);
-        else
-            vomsStore = new PKIStore(PKIStore.DEFAULT_VOMSDIR,PKIStore.TYPE_VOMSDIR,true);
-        
-        if (caDir != null)
-            caStore = new PKIStore(
-                    caDir, PKIStore.TYPE_CADIR, true );
-        else
-            caStore = new PKIStore(
-                    PKIStore.DEFAULT_CADIR, PKIStore.TYPE_CADIR, true );
+        vomsStore = PKIStoreFactory.getStore(PKIStore.TYPE_VOMSDIR);
+        caStore   = PKIStoreFactory.getStore(PKIStore.TYPE_CADIR);
     }
 
     /**
@@ -287,14 +285,22 @@ public class PKIVerifier {
                         String candidateIs = PKIUtils
                             .getOpenSSLFormatPrincipal( cert.getIssuerDN() );
 
-                        logger.debug("dn is : " + dn);
-                        logger.debug("is is : " + is);
                         logger.debug("canddn is : " + candidateDN);
                         logger.debug("candis is : " + candidateIs);
-                        logger.debug("dn == canddn is " + dn.equals(candidateDN));
-                        logger.debug("is == candis is " + is.equals(candidateIs));
-                        if ( !dn.equals( candidateDN ) || !is.equals( candidateIs ) )
-                            doBreak = true;
+
+                        if (dn != null) {
+                            logger.debug("dn is : " + dn);
+                            logger.debug("dn == canddn is " + dn.equals(candidateDN));
+                        }
+
+                        if (is != null) {
+                            logger.debug("is is : " + is);
+                            logger.debug("is == candis is " + is.equals(candidateIs));
+                        }
+
+                        if ( dn != null && is != null)
+                            if (!dn.equals(candidateDN) || !is.equals(candidateIs))
+                                doBreak = true;
                     }
 
                     if ( !doBreak && !realDNsIter.hasNext() && !certIter.hasNext() )
@@ -320,11 +326,13 @@ public class PKIVerifier {
         if ( certificates == null ) {
             // lsc check failed
             logger.debug("lsc check failed.");
-            // System.out.println("Looking for certificates.");
-            if ( logger.isDebugEnabled() )
+
+            if ( logger.isDebugEnabled() ) {
+                X500Principal issuer = ac.getIssuer();
                 logger.debug( "Looking for hash: "
-                        + PKIUtils.getHash( ac.getIssuer() )
-                        + " for certificate: " + ac.getIssuer().getName() );
+                        + PKIUtils.getHash(issuer)
+                        + " for certificate: " + issuer.getName() );
+            }
 
             X509Certificate[] candidates = vomsStore.getAACandidate( ac
                     .getIssuer(), voName );
@@ -343,12 +351,15 @@ public class PKIVerifier {
                         logger.debug( "Key class: " + key.getClass() );
                         logger.debug( "Key: " + key );
                         byte[] data = key.getEncoded();
-                        String str = "Key: ";
+                        StringBuffer str = new StringBuffer();
+                        str.append("Key: ");
 
-                        for ( int j = 0; j < data.length; j++ )
-                            str += Integer.toHexString( data[j] ) + " ";
+                        for ( int j = 0; j < data.length; j++ ) {
+                            str.append(Integer.toHexString( data[j] ));
+                            str.append(' ');
+                        }
 
-                        logger.debug( str );
+                        logger.debug(str.toString());
                     }
 
                     if ( ac.verifyCert( currentCert ) ) {
@@ -430,6 +441,7 @@ public class PKIVerifier {
     }
 
     private boolean checkProxyCertInfo(X509Certificate cert, int posInChain, int chainSize) {
+        X509Extension ext = null;
         byte[] payload = cert.getExtensionValue(PROXYCERTINFO);
         if (payload == null) {
             payload = cert.getExtensionValue(PROXYCERTINFO_OLD);
@@ -437,29 +449,37 @@ public class PKIVerifier {
                 logger.debug("No ProxyCertInfo extension found.");
                 return true;
             }
+            else {
+                ext = new X509Extension(false, new DEROctetString(payload));
+            }
         }
+        else
+            ext = new X509Extension(true, new DEROctetString(payload));
 
-        ASN1Object seq = null;
+        DERObject obj = null;
 
         try {
-            seq = ASN1Object.fromByteArray(payload);
-        } 
+            obj = new DERInputStream(new ByteArrayInputStream(ext.getValue().getOctets())).readObject();
+            MyDERInputStream str = new MyDERInputStream(((DEROctetString)obj).getOctetStream());
+            int len = 0;
+            int res = 0;
+            str.read();
+            len = str.readLength();
+            res  = str.read(payload, 0, len);
+        }
         catch (IOException e) {
+            throw new IllegalArgumentException("Cannot read DERObject from source data:"+ e.getMessage());
+        }
+
+        MyProxyCertInfo pci = new MyProxyCertInfo(payload);
+
+        logger.info("Constraint: " + pci.getPathLenConstraint() + 
+                    "   Size: " + chainSize + "   Current: " + posInChain);
+        if (pci.getPathLenConstraint() != -1 && (pci.getPathLenConstraint() < chainSize - posInChain)) {
             return false;
         }
 
-        if (seq instanceof ASN1Sequence) {
-            MyProxyCertInfo pci = new MyProxyCertInfo((ASN1Sequence)seq);
-
-            logger.info("Constraint: " + pci.getPathLenConstraint() + 
-                        "   Size: " + chainSize + "   Current: " + posInChain);
-
-            if (pci.getPathLenConstraint() < chainSize - posInChain) {
-                return false;
-            }
-            return true;
-        }
-        return false;
+        return true;
     }
 
     /**
@@ -541,10 +561,7 @@ public class PKIVerifier {
                     logger.debug( "ELEMENT: "
                             + candidate.getSubjectDN().getName() );
             } else {
-                logger
-                        .error( "Certificate verification: self-signed certificate '"
-                                + candidate.getSubjectDN().getName()
-                                + "' not found among trusted certificates." );
+                logger.error("Cannot find issuer candidate for: " +currentCert.getSubjectDN().getName());
                 return false;
             }
         } else {
@@ -758,8 +775,7 @@ public class PKIVerifier {
             return true;
 
         Hashtable signings = caStore.getSignings();
-        // System.out.println("CLASS IS: " +
-        // signings.get(PKIUtils.getHash(issuer)).getClass());
+
         SigningPolicy signCandidate = (SigningPolicy) signings.get( PKIUtils
                 .getHash( issuer ) );
 
@@ -773,7 +789,6 @@ public class PKIVerifier {
             String issuerSubj = PKIUtils.getOpenSSLFormatPrincipal( issuer
                     .getSubjectDN() );
             logger.debug("Subject is : " + issuerSubj);
-            //            if (true) return true;
 
             Vector nameVector = getAllNames( cert );
 
@@ -789,7 +804,14 @@ public class PKIVerifier {
                 logger.debug( "Examining: " + certSubj);
                 logger.debug( "Looking for " + issuerSubj );
                 int index = signCandidate.findIssuer( issuerSubj );
-
+                if (index == -1) {
+                    /* Work around different sources of certificates not 
+                       agreeing on order of X500Name components. */
+                    issuerSubj = PKIUtils.getOpenSSLFormatPrincipal(issuer
+                                .getSubjectDN(), true);
+                    index = signCandidate.findIssuer(issuerSubj);
+                }
+                                                                    
                 while ( index != -1 ) {
                     logger.debug( "Inside index" );
                     signCandidate.setCurrent( index );
@@ -844,43 +866,6 @@ public class PKIVerifier {
             /* Sometime the format of the DN gets reversed. */
             v.add( PKIUtils.getOpenSSLFormatPrincipal( cert.getSubjectDN() , true));
 
-//             Collection c;
-//             try {
-//                 c = cert.getSubjectAlternativeNames();
-//             }
-//             catch (CertificateParsingException e) {
-//                 logger.error("Error in encoding Subject Alternative Names extension! " + e.getMessage());
-//                 v.clear();
-//                 return null;
-//             }
-
-//             Iterator i = c.iterator();
-
-//             while (i.hasNext()) {
-//                 List l = (List)i.next();
-
-//                 int type = ((Integer)l.get(0)).intValue();
-//                 switch (type) {
-//                 case 1: case 2: case 6:
-//                 case 7: case 8:
-//                     v.add((String)l.get(1));
-//                     break;
-
-//                 case 4:
-//                     String dn = (String)l.get(1);
-//                     X500Principal principal = new X500Principal(dn);
-//                     v.add(PKIUtils.getOpenSSLFormatPrincipal(principal));
-//                     break;
-
-//                 case 0: case 3: case 5:
-//                     v.clear();
-//                     return null;
-
-//                 default:
-//                     break;
-//                 }
-//             }
-
             return v;
         }
 
@@ -923,6 +908,9 @@ public class PKIVerifier {
                                     if ( entry == null ) {
                                         return false;
                                     }
+                                }
+                                else {
+                                    logger.error( "CRL for CA '"+issuer.getSubjectDN().toString()+"' has expired!" );
                                 }
                             }
                         }

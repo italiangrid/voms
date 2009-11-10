@@ -2,9 +2,10 @@
  *
  * Authors: Vincenzo Ciaschini - Vincenzo.Ciaschini@cnaf.infn.it 
  *
- * Copyright (c) 2002, 2003 INFN-CNAF on behalf of the EU DataGrid.
+ * Copyright (c) 2002-2009 INFN-CNAF on behalf of the EU DataGrid
+ * and EGEE I, II and III
  * For license conditions see LICENSE file or
- * http://www.edg.org/license.html
+ * http://www.apache.org/licenses/LICENSE-2.0.txt
  *
  * Parts of this code may be based upon or even include verbatim pieces,
  * originally written by other people, in which case the original header
@@ -164,8 +165,6 @@ void AC_TARGET_free(AC_TARGET *a)
 
 int i2d_AC_CERTS(AC_CERTS *a, unsigned char **pp)
 {
-  //  int v1=0, v2=0, v3=0;
-
   M_ASN1_I2D_vars(a);
   M_ASN1_I2D_len_SEQUENCE(a->stackcert, i2d_X509);
   M_ASN1_I2D_seq_total();
@@ -339,10 +338,13 @@ void AC_FULL_ATTRIBUTES_free(AC_FULL_ATTRIBUTES *a)
   OPENSSL_free(a);
 }
 
+#if 0
 IMPL_STACK(AC_ATTRIBUTE)
 IMPL_STACK(AC_ATT_HOLDER)
+/*
 IMPL_STACK(AC_FULL_ATTRIBUTES)
-
+*/
+#endif
 
 static char *norep()
 {

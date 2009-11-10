@@ -2,9 +2,10 @@
  *
  * Authors: Vincenzo Ciaschini - Vincenzo.Ciaschini@cnaf.infn.it
  *
- * Copyright (c) 2006 INFN-CNAF on behalf of the 
- * EGEE project.
- * For license conditions see LICENSE
+ * Copyright (c) 2008-2009 INFN-CNAF on behalf of the 
+ * EGEE I, II and III
+ * For license conditions see LICENSE file or
+ * http://www.apache.org/licenses/LICENSE-2.0.txt
  *
  * Parts of this code may be based upon or even include verbatim pieces,
  * originally written by other people, in which case the original header
@@ -28,8 +29,9 @@ import org.bouncycastle.jce.provider.BouncyCastleProvider;
 public class VOMSTrustManager implements X509TrustManager {
     private PKIStore store = null;
     private PKIVerifier verifier = null;
+    boolean stopcalled = false;
 
-    private static Logger logger = Logger.getLogger( PKIVerifier.class
+    private static Logger logger = Logger.getLogger( VOMSTrustManager.class
             .getName() );
 
     static {
@@ -40,12 +42,22 @@ public class VOMSTrustManager implements X509TrustManager {
 
     public VOMSTrustManager(String dir) throws IOException, CertificateException, CRLException  {
         verifier = new PKIVerifier();
-        store = new PKIStore(dir, PKIStore.TYPE_CADIR);
+        store = PKIStoreFactory.getStore(dir, PKIStore.TYPE_CADIR);
         verifier.setCAStore(store);
+        stopcalled = false;
     }
 
-    public void stop() {
-        verifier.cleanup();
+    public VOMSTrustManager(PKIStore castore) throws IOException, CertificateException, CRLException {
+        verifier = new PKIVerifier(null, castore);
+        store = castore;
+        stopcalled = false;
+    }
+
+    public synchronized void stop() {
+        if (!stopcalled) {
+            verifier.cleanup();
+            stopcalled = true;
+        }
     }
 
     public void checkClientTrusted(X509Certificate[] chain, String authType) throws CertificateException {

@@ -1,13 +1,7 @@
 load_lib vomstest.exp
+testheader "See if server data can be retrieved (one server, by alias)."
 
 proc mytest {} {
-    testheader "See if server data can be retrieved (one server, by alias)."
-
-    if {[info exists ::NOCLIB] != 0} then {
-        testmessage "Either libraries are not present, or the executables cannot be compiled, or the test was disabled."
-        return $::UNDECIDEDTEST
-    }
-
     set ::_buildout [exec mktemp $::SCRATCHDIR/voms-api-c-XXXXXX]
     set res [_exeC loadbyalias.c]
     

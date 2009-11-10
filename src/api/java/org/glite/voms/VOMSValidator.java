@@ -1,3 +1,19 @@
+/*********************************************************************
+ *
+ * Authors: Olle Mulmo
+ *          Vincenzo Ciaschini - Vincenzo.Ciaschini@cnaf.infn.it 
+ *          Valerio Venturi    - Valerio.Venturi@cnaf.infn.it
+ *
+ * Copyright (c) 2002-2009 INFN-CNAF on behalf of the EU DataGrid
+ * and EGEE I, II and III
+ * For license conditions see LICENSE file or
+ * http://www.apache.org/licenses/LICENSE-2.0.txt
+ *
+ * Parts of this code may be based upon or even include verbatim pieces,
+ * originally written by other people, in which case the original header
+ * follows.
+ *
+ *********************************************************************/
 /*
  * Copyright (c) Members of the EGEE Collaboration. 2004.
  * See http://eu-egee.org/partners/ for details on the copyright holders.
@@ -100,9 +116,7 @@ public class VOMSValidator {
     protected Vector myVomsAttributes = new Vector();
     protected boolean isParsed = false;
     protected boolean isValidated = false;
-    //    protected boolean isPreValidated = false;
     protected FQANTree myFQANTree = null;
-    //    private VomsdataPeer vp = null;
     protected static VOMSTrustStore vomsStore = null;
 
     static {
@@ -142,36 +156,45 @@ public class VOMSValidator {
      * @see BasicVOMSTrustStore
      */
     public VOMSValidator(X509Certificate[] validatedChain, ACValidator acValidator) {
-        myValidatedChain = validatedChain; // allow null
+        if (validatedChain == null)
+            myValidatedChain = null; // allow null
+        else
+            myValidatedChain = validatedChain.clone(); // allow null
 
-
-        if (theTrustStore == null) {
-            if (vomsStore == null) {
-                try {
-                    vomsStore = new PKIStore("/etc/grid-security/vomsdir", PKIStore.TYPE_VOMSDIR, true);
+        if (acValidator == null) {
+            if (theTrustStore == null) {
+                if (vomsStore == null) {
+                    try {
+                        String vomsDir = System.getProperty( "VOMSDIR" );
+                        
+                        if (vomsDir == null )
+                            vomsStore = PKIStoreFactory.getStore(PKIStore.DEFAULT_VOMSDIR, PKIStore.TYPE_VOMSDIR, true);
+                        else
+                            vomsStore = PKIStoreFactory.getStore(vomsDir, PKIStore.TYPE_VOMSDIR, true);
+                    }
+                    catch(IOException e) {}
+                    catch(CertificateException e) {}
+                    catch(CRLException e) {}
                 }
-                catch(IOException e) {}
-                catch(CertificateException e) {}
-                catch(CRLException e) {}
             }
-        }
-        else if (theTrustStore instanceof BasicVOMSTrustStore) {
-            BasicVOMSTrustStore store = (BasicVOMSTrustStore)theTrustStore;
-            store.stopRefresh();
-            if (vomsStore == null) {
-                String directory = store.getDirList();
+            else if (theTrustStore instanceof BasicVOMSTrustStore) {
+                BasicVOMSTrustStore store = (BasicVOMSTrustStore)theTrustStore;
+                store.stopRefresh();
+                if (vomsStore == null) {
+                    String directory = store.getDirList();
                 
-                try {
-                    vomsStore = new PKIStore(directory, PKIStore.TYPE_VOMSDIR, true);
+                    try {
+                        vomsStore = PKIStoreFactory.getStore(directory, PKIStore.TYPE_VOMSDIR, true);
+                    }
+                    catch(IOException e) {}
+                    catch(CertificateException e) {}
+                    catch(CRLException e) {}
                 }
-                catch(IOException e) {}
-                catch(CertificateException e) {}
-                catch(CRLException e) {}
             }
-        }
-        else if (vomsStore == null)
-            log.error("Cannot replace passed truststore.  Validation may not be complete.");
+            else if (vomsStore == null)
+                log.error("Cannot replace passed truststore.  Validation may not be complete.");
 
+        }
         if (vomsStore != null)
             myValidator = (acValidator == null) ? new ACValidator(vomsStore) : acValidator;
         else
@@ -193,7 +216,7 @@ public class VOMSValidator {
             BasicVOMSTrustStore store = (BasicVOMSTrustStore)trustStore;
             String directory = store.getDirList();
             try {
-                setTrustStore(new PKIStore(directory, PKIStore.TYPE_VOMSDIR, true));
+                setTrustStore(PKIStoreFactory.getStore(directory, PKIStore.TYPE_VOMSDIR, true));
                 store.stopRefresh();
             }
             catch(Exception e) {
@@ -266,17 +289,14 @@ public class VOMSValidator {
      * @return the object itself
      */
     public VOMSValidator setClientChain(X509Certificate[] validatedChain) {
-        myValidatedChain = validatedChain;
+        if (validatedChain == null) 
+            myValidatedChain = null;
+        else
+            myValidatedChain = validatedChain.clone();
         myVomsAttributes = new Vector();
         myFQANTree = null;
         isParsed = false;
         isValidated = false;
-
-        //        if (vp != null)
-        //            vp = null;
-
-        //        vp = new VomsdataPeer();
-        //        isPreValidated = vp.Retrieve(validatedChain[0], validatedChain, VomsdataPeer.RECURSIVE);
 
         return this;
     }
@@ -294,7 +314,7 @@ public class VOMSValidator {
      * @see #validate()
      */
     public static Vector parse(X509Certificate[] myValidatedChain) {
-        //        System.out.println("WRONG");
+
         if (log.isDebugEnabled()) {
             log.debug("VOMSValidator : parsing cert chain");
         }
@@ -311,9 +331,6 @@ public class VOMSValidator {
             log.debug("Parsing VOMS attributes for subject " +
                 myValidatedChain[clientIdx].getSubjectX500Principal().getName());
         }
-
-        //        VomsdataPeer vp = new VomsdataPeer("","");
-        //        vp.Retrieve(myValidatedChain[0], myValidatedChain, VomsdataPeer.RECURSIVE);
 
         Vector myVomsAttributes = new Vector();
 
@@ -369,6 +386,7 @@ public class VOMSValidator {
                 throw new IllegalArgumentException("Error parsing VOMS extension in certificate issued to " +
                         myValidatedChain[i].getSubjectX500Principal().getName() + "error was:" + e.getMessage());
             }
+            break;
         }
 
         return myVomsAttributes;
@@ -391,7 +409,6 @@ public class VOMSValidator {
      * @deprecated use the parse(X509Certificate[]) instead
      */
     public VOMSValidator parse() {
-        //        System.out.println("CORRECT");
         if (log.isDebugEnabled()) {
             log.debug("VOMSValidator : parsing cert chain");
         }
@@ -399,8 +416,6 @@ public class VOMSValidator {
         if (isParsed) {
             return this;
         }
-
-        int aclen = -1;
 
         int clientIdx = CertUtil.findClientCert(myValidatedChain);
 
@@ -412,6 +427,8 @@ public class VOMSValidator {
             log.debug("Parsing VOMS attributes for subject " +
                 myValidatedChain[clientIdx].getSubjectX500Principal().getName());
         }
+
+        myVomsAttributes.clear();
 
         for (int i = 0; i < myValidatedChain.length; i++) {
             byte[] payload = myValidatedChain[i].getExtensionValue(VOMS_EXT_OID);
@@ -442,7 +459,7 @@ public class VOMSValidator {
 
                         for (int j = clientIdx; j < myValidatedChain.length; j++) {
                             if (ac.getHolder().isHolder(myValidatedChain[j])) {
-                                aclen++;
+
                                 VOMSAttribute va = new VOMSAttribute(ac);
 
                                 if (log.isDebugEnabled()) {
@@ -461,7 +478,11 @@ public class VOMSValidator {
             } catch (Exception e) {
                 log.info("Error parsing VOMS extension in certificate issued to " +
                     myValidatedChain[i].getSubjectX500Principal().getName(), e);
+                throw new IllegalArgumentException("Error parsing VOMS extension in certificate issued to " +
+                    myValidatedChain[i].getSubjectX500Principal().getName() + "error was:" + e.getMessage());
             }
+            /* Found ACs in a certificate.  Do not check underlying levels. */
+            break;
         }
 
         isParsed = true;
@@ -493,15 +514,13 @@ public class VOMSValidator {
             isParsed = true;
         }
 
-        //        if (!isPreValidated) {
-            for (ListIterator i = myVomsAttributes.listIterator(); i.hasNext();) {
-                AttributeCertificate ac = ((VOMSAttribute) i.next()).privateGetAC();
+        for (ListIterator i = myVomsAttributes.listIterator(); i.hasNext();) {
+            AttributeCertificate ac = ((VOMSAttribute) i.next()).privateGetAC();
 
-                if (!myValidator.validate(ac)) {
-                    i.remove();
-                }
+            if (!myValidator.validate(ac)) {
+                i.remove();
             }
-            //        }
+        }
 
         isValidated = true;
 

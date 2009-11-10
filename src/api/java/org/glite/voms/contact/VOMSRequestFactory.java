@@ -1,11 +1,12 @@
 /*********************************************************************
  *
  * Authors: 
- *      Andrea Ceccanti - andrea.ceccanti@cnaf.infn.it 
+ *      Andrea Ceccanti    - andrea.ceccanti@cnaf.infn.it 
+ *      Vincenzo Ciaschini - vincenzo.ciaschini@cnaf.infn.it
  *          
- * Copyright (c) 2006 INFN-CNAF on behalf of the EGEE project.
- * 
- * For license conditions see LICENSE
+ * Copyright (c) 2006-2009 INFN-CNAF on behalf of the EGEE I, II and III
+ * For license conditions see LICENSE file or
+ * http://www.apache.org/licenses/LICENSE-2.0.txt
  *
  * Parts of this code may be based upon or even include verbatim pieces,
  * originally written by other people, in which case the original header
@@ -143,6 +144,13 @@ public class VOMSRequestFactory {
         Document request = docBuilder.newDocument();
         VOMSRequestFragment frag = new VOMSRequestFragment(request);
         
+        if (options.isRequestList()) {
+            frag.listCommand();
+            setOptionsForRequest(frag);
+            request.appendChild(frag.getFragment());
+            return request;
+        }
+
         if (options.getRequestedFQANs().isEmpty()){
             
             if (options.getVoName() == null)
@@ -167,7 +175,10 @@ public class VOMSRequestFactory {
             
             String FQAN = (String)fqanIter.next();
             
-            if (PathNamingScheme.isGroup( FQAN )){
+            if (FQAN.equals("all")) {
+                frag.allCommand();
+            }
+            else if (PathNamingScheme.isGroup( FQAN )){
             
                 frag.groupCommand( FQAN );
                 
@@ -320,5 +331,8 @@ class VOMSRequestFragment{
         
         buildCommandElement( "A" );
     }
-    
+
+    public void listCommand() {
+        buildCommandElement( "N" );
+    }
 }

@@ -1,13 +1,7 @@
 load_lib vomstest.exp
+testheader "See if error messages for dates can be distinguished."
 
 proc mytest {} {
-    testheader "See if error messages for dates can be distinguished."
-
-    if {[info exists ::NOCCLIB] != 0} then {
-        testmessage "Either libraries are not present, or the executables cannot be compiled, or the test was disabled."
-        return $::UNDECIDEDTEST
-    }
-
     _activateCert mycert2
 
     _addVOMSOption voms1 timeout 1

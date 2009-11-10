@@ -1,0 +1,19 @@
+load_lib vomstest.exp
+testheader "See if voms-proxy-fake works."
+
+proc mytest {} {
+    _activateCert mycert2
+    _cleanproxy
+    set outname [exec mktemp $::SCRATCHDIR/voms-proxy-fake-XXXXXX]
+    set res [catch {set out [exec $::INSTALLDIR/bin/voms-proxy-fake >& $outname]}]
+
+    if $res then {
+        addlog $outname
+        testmessage "voms-proxy-fake failed."
+        return $::FAILTEST
+    }
+
+    return $::PASSTEST
+}
+
+do_test

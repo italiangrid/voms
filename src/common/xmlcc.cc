@@ -2,9 +2,10 @@
  *
  * Authors: Vincenzo Ciaschini - Vincenzo.Ciaschini@cnaf.infn.it 
  *
- * Copyright (c) 2002, 2003 INFN-CNAF on behalf of the EU DataGrid.
+ * Copyright (c) 2002-2009 INFN-CNAF on behalf of the EU DataGrid
+ * and EGEE I, II and III
  * For license conditions see LICENSE file or
- * http://www.edg.org/license.html
+ * http://www.apache.org/licenses/LICENSE-2.0.txt
  *
  * Parts of this code may be based upon or even include verbatim pieces,
  * originally written by other people, in which case the original header
@@ -22,8 +23,8 @@ extern "C" {
 #include "vomsxml.h"
 #include "errors.h"
 
-std::string XML_Req_Encode(const std::string command, const std::string order,
-                          const std::string targets, const int lifetime)
+std::string XML_Req_Encode(const std::string &command, const std::string &order,
+                          const std::string &targets, const int lifetime)
 {
   char *ret = XMLEncodeReq(command.c_str(), order.c_str(),
                           targets.c_str(), lifetime);
@@ -36,11 +37,6 @@ std::string XML_Req_Encode(const std::string command, const std::string order,
   return res;
 }
 
-std::string XML_Ans_Encode(const answer &a)
-{
-  return XML_Ans_Encode(a.ac, a.errs, a.base64);
-}
-
 std::string XML_Ans_Encode(const std::string &ac, const std::vector<errorp> e, bool base64)
 {
   return XML_Ans_Encode(ac, "", e, base64);
@@ -49,6 +45,7 @@ std::string XML_Ans_Encode(const std::string &ac, const std::vector<errorp> e, b
 std::string XML_Ans_Encode(const std::string &ac, const std::string &data, const std::vector<errorp> e, bool base64)
 {
   struct error **vect = NULL, **tmp;
+  char *ret = NULL;
 
   for (std::vector<errorp>::const_iterator i = e.begin(); i != e.end(); i++) {
     error *t = alloc_error((*i).num, (*i).message.c_str());
@@ -58,28 +55,28 @@ std::string XML_Ans_Encode(const std::string &ac, const std::string &data, const
         vect = tmp;
       else {
         free(t);
-        listfree((char **)vect, (freefn)free_error);
-        return "";
+        goto err;
       }
     }
-    else {
-      listfree((char **)vect, (freefn)free_error);
-      return "";
-    }
+    else
+      goto err;
   }
 
-  char *ret = XMLEncodeAns(vect, ac.data(), ac.size(), data.data(), data.size(), base64);
+  ret = XMLEncodeAns(vect, ac.data(), ac.size(), data.data(), data.size(), base64);
   listfree((char **)vect, (freefn)free);
+  vect = NULL;
   if (ret) {
     std::string s = std::string(ret);
     free(ret);
     return s;
   }
-  else
-    return "";
+
+ err:
+  listfree((char **)vect, (freefn)free_error);
+  return "";
 }
 
-bool XML_Req_Decode(const std::string message, request &r)
+bool XML_Req_Decode(const std::string &message, request &r)
 {
   struct req d;
 
@@ -115,7 +112,7 @@ bool XML_Req_Decode(const std::string message, request &r)
 
 }
 
-bool XML_Ans_Decode(const std::string message, answer &a)
+bool XML_Ans_Decode(const std::string &message, answer &a)
 {
   struct ans d;
   d.depth = d.error = 0;
@@ -143,15 +140,4 @@ bool XML_Ans_Decode(const std::string message, answer &a)
   free(d.ac);
 
   return (ret != 0);
-}
-
-bool XML_Ans_Decode(const std::string message,
-		    std::string &ac, std::vector<errorp> &errs)
-{
-  struct answer a;
-  bool ret = XML_Ans_Decode(message, a);
-
-  ac   = a.ac;
-  errs = a.errs;
-  return ret;
 }

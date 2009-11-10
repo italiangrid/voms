@@ -2,9 +2,10 @@
  *
  * Authors: Vincenzo Ciaschini - Vincenzo.Ciaschini@cnaf.infn.it 
  *
- * Copyright (c) 2002, 2003 INFN-CNAF on behalf of the EU DataGrid.
+ * Copyright (c) 2002-2009 INFN-CNAF on behalf of the EU DataGrid
+ * and EGEE I, II and III
  * For license conditions see LICENSE file or
- * http://www.edg.org/license.html
+ * http://www.apache.org/licenses/LICENSE-2.0.txt
  *
  * Parts of this code may be based upon or even include verbatim pieces,
  * originally written by other people, in which case the original header
@@ -70,7 +71,7 @@ struct contactdata {   /*!< You must never allocate directly this structure.
   std::string  host;    /*!< The hostname of the server */
   std::string  contact; /*!< The subject of the server's certificate */
   std::string  vo;      /*!< The VO served by this server */
-  int          port;	       /*!< The port on which the server is listening */
+  int          port;	  /*!< The port on which the server is listening */
 
   int          version; /*!< The version of globus under which the server is running */ 
 };
@@ -273,12 +274,39 @@ struct vomsdata {
                                     \param command the command sent to the server
                                     \return failure (F) or success (T)
                                      */
+  bool Contact(std::string hostname, int port, 
+               std::string servsubject, 
+               std::string command,
+               int timeout); /*!< Contacts a VOMS server to get a certificate
+
+                                    It is the equivalent of the voms_proxy_init command, but 
+                                    without the --include functionality.
+                                    \param hostname FQDN of the VOMS server
+                                    \param port the port on which the VOMS server is listening
+                                    \param servsubject the subject of the server's certificate
+                                    \param command the command sent to the server
+                                    \return failure (F) or success (T)
+                                     */
 
   bool ContactRaw(std::string hostname, int port, 
 		  std::string servsubject, 
 		  std::string command,
 		  std::string &raw,
       int& version);  /*!< Same as Contact, however it does not start the
+                           verification process, and the message receviedfrom the server is not parsed.
+                         \param hostname FQDN of the VOMS server
+                         \param port the port on which the VOMS server is listening
+                         \param servsubject the subject of the server's certificate
+                         \param command the command sent to the server
+                         \param raw OUTPUT PARAMETER the answer from the server
+                         \param version OUTPUT PARAMETER the version of the answer
+                         \return failure (F) or success (T) */
+  bool ContactRaw(std::string hostname, int port, 
+		  std::string servsubject, 
+		  std::string command,
+		  std::string &raw,
+      int& version,
+      int timeout);  /*!< Same as Contact, however it does not start the
                            verification process, and the message receviedfrom the server is not parsed.
                          \param hostname FQDN of the VOMS server
                          \param port the port on which the VOMS server is listening
@@ -352,6 +380,12 @@ private:
   bool contact(const std::string&, int, const std::string&,
                const std::string&, std::string&, std::string&,
                std::string&);
+  bool my_conn(const std::string&, int, const std::string&, int,
+               const std::string&, std::string&, std::string&,
+               std::string&, int timeout);
+  bool contact(const std::string&, int, const std::string&,
+               const std::string&, std::string&, std::string&,
+               std::string&, int timeout);
   bool verifydata(AC *ac, const std::string& subject, const std::string& ca, 
                   X509 *holder, voms &v);
   bool evaluate(AC_SEQ *, const std::string&, const std::string&, X509*);
@@ -379,7 +413,7 @@ public:
              \return failure (F) or success (T)*/
 
   bool Retrieve(FILE *file, recurse_type how); /*!< Gets VOMS information from a proxy saved as a file.
-                               \param the file
+                               \param file the file name
                                \param how Recursion type
                                \return failure (F) or success (T)
 
@@ -411,12 +445,7 @@ private:
   bool verifyac(X509 *, X509 *, AC*, time_t, voms&);
 
 public:
-  bool LoadCredentials(X509 *cert, STACK_OF(X509) *chain, EVP_PKEY *key);
-
-private:
-  X509           *ucert;
-  STACK_OF(X509) *cert_chain;
-  EVP_PKEY        *upkey;
+  bool LoadCredentials(X509*, EVP_PKEY *, STACK_OF(X509) *);
 };
 
 

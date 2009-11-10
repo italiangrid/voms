@@ -1,5 +1,6 @@
 variable _vomsdefinitions
 variable _buildout
+variable _javaProperty
 
 proc _doScript {command} {
     set id [open "$::SCRATCHDIR/script.sh" w+]
@@ -97,6 +98,18 @@ proc _backupVOMS {name} {
 
 proc _restoreVOMS {name} {
     file copy -force $::INSTALLDIR/etc/voms/$name/voms.conf.back $::INSTALLDIR/etc/voms/$name/voms.conf
+}
+
+proc _vomsReload { name } {
+    set saved ""
+    catch {set saved $::env(GLITE_LOCATION)}
+    set ::env(GLITE_LOCATION) $::INSTALLDIR
+    exec $::INSTALLDIR/etc/init.d/voms reload [exec cat $::_vomsdefinitions/$name/options/voms-vo] >/dev/null
+    if [expr ! [string equal $saved ""]] then {
+        set ::env(GLITE_LOCATION) $saved
+    } else {
+        unset ::env(GLITE_LOCATION)
+    }
 }
 
 proc _vomsStart {name } {
@@ -308,7 +321,7 @@ proc _buildC { name } {
     set realname "[file dirname [info script]]/$name"
     set realout  "$::SCRATCHDIR/a.out"
     if [file exists $realname] then {
-        return [catch {set out [ exec gcc -g -O0 @GLOBUS_CFLAGS@ -o $realout -I$::INSTALLDIR/include/glite/security/voms $realname -L $::INSTALLDIR/lib -lvomsc >& $::_buildout ]}]
+        return [catch {set out [ exec gcc -g -O0 @GLOBUS_CFLAGS@ -o $realout -I$::INSTALLDIR/include/glite/security/voms $realname -L $::INSTALLDIR/lib64 -L $::INSTALLDIR/lib -lvomsc >& $::_buildout ]}]
     } else {
         fail "File does not exists!"
     }
@@ -318,10 +331,18 @@ proc _buildCC { name } {
     set realname "[file dirname [info script]]/$name"
     set realout  "$::SCRATCHDIR/a.out"
     if [file exists $realname] then {
-        return [catch {set out [ exec g++ -g -O0 @GLOBUS_CFLAGS@ -o $realout -I$::INSTALLDIR/include/glite/security/voms $realname -L $::INSTALLDIR/lib -lvomsapi >& $::_buildout ]}]
+        return [catch {set out [ exec g++ -g -O0 @GLOBUS_CFLAGS@ -o $realout -I$::INSTALLDIR/include/glite/security/voms $realname -L $::INSTALLDIR/lib64 -L $::INSTALLDIR/lib -lvomsapi >& $::_buildout ]}]
     } else {
         fail "File does not exists!"
     }
+}
+
+proc _setJavaProperty { name value } {
+    set ::_javaProperty($name) "$value"
+}
+
+proc _unsetJavaProperty { name } {
+    unset ::_javaProperty($name)
 }
 
 proc _buildJava { name } {
@@ -334,17 +355,31 @@ proc _buildJava { name } {
     }
 }
 
-proc _execJava { name {arg1 ""} } {
+proc _execJava { name {arg1 ""} {arg2 ""} {arg3 ""}} {
     set res [_buildJava $name]
-    set classname [string range $name 0 [string last .java $name]]
+    set classname [string range $name 0 [expr [string last .java $name] -1]]
     if $res then {
         return $res
     } else {
-        if [string equal $arg1 ""] then {
-            set res [catch {exec java -classpath .:$::INSTALLDIR/share/java/vomsapi.jar:@JAVA_CLASSPATH@:$::env(CLASSPATH) $classname >& $::_buildout }]
+        set PROPERTIES ""
+        #build property list
+        if {[array size ::_javaProperty] == 0} then {
+            set PROPERTIES ""
         } else {
-            set res [catch {exec java -classpath .:$::INSTALLDIR/share/java/vomsapi.jar:@JAVA_CLASSPATH@:$::env(CLASSPATH) $classname $arg >& $::_buildout }]
+            foreach {name value} [array get ::_javaProperty] {
+                set PROPERTIES "$PROPERTIES -D$name=\"$value\""
+            }
         }
+
+        set DIRNAME "[file dirname [info script]]"
+        set VALUE "java [format %s $PROPERTIES] -classpath .:$::INSTALLDIR/share/java/vomsjapi.jar:@JAVA_CLASSPATH2@:@JAVA_CLASSPATH@:$::env(CLASSPATH):$DIRNAME $classname"
+        if [string equal $arg1 ""] then {
+            set VALUE "$VALUE"
+        } else {
+            set VALUE "$VALUE $arg1 $arg2 $arg3"
+        }
+        set res [catch {exec /bin/sh -c $VALUE >& $::_buildout }]
+
         return $res
     }
 }

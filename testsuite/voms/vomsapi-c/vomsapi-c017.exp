@@ -1,0 +1,56 @@
+load_lib vomstest.exp
+testheader "See if VOMS_DefaultData() works."
+
+proc mytest {} {
+    _activateCert mycert2
+
+    _vomsStart voms1
+    set outname [exec mktemp $::SCRATCHDIR/voms-api-c-XXXXXX]
+    set res [catch {set out [exec $::INSTALLDIR/bin/voms-proxy-init --voms voms1 >& $outname]}]
+    _vomsStop voms1
+
+    if $res then {
+        addlog $outname
+        testmessage "voms-proxy-init failed."
+        return $::FAILTEST
+    }
+
+    set ::_buildout [exec mktemp $::SCRATCHDIR/voms-api-c-XXXXXX]
+    set res [_exeC ddtest.c -useproxy]
+
+    addlog $::_buildout
+
+    if $res then {
+        testmessage "parsing failed."
+        return $::FAILTEST
+    } else {
+        set correct "voname1: voms1
+user1: /C=IT/CN=001
+userca1: /C=IT/O=INFN/CN=CAFromthisCN
+server1: /C=IT/CN=003
+serverca1: /C=IT/O=INFN/CN=CAFromthisCN
+uri1: $::HOSTNAME:33334
+begdate1: .*
+enddate1: .*
+fqan1: /voms1
+fqan1: /voms1/group1
+version1: 1"
+
+        set out [exec cat $::_buildout]
+        if [regexp $correct $out] then {
+            testmessage "output correct"
+            return $::PASSTEST
+        } else {
+            set outname2 [exec mktemp $::SCRATCHDIR/voms-api-c-XXXXXX]
+            set id [open $outname2 "w+"]
+            puts $id $correct
+            close $id
+
+            addlog $outname2
+            testmessage "output wrong"
+            return $::FAILTEST
+        }
+    }
+}
+
+do_test

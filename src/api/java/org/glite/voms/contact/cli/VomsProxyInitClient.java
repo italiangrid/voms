@@ -1,11 +1,12 @@
 /*********************************************************************
  *
  * Authors: 
- *      Andrea Ceccanti - andrea.ceccanti@cnaf.infn.it 
+ *      Andrea Ceccanti    - andrea.ceccanti@cnaf.infn.it 
+ *      Vincenzo Ciaschini - vincenzo.ciaschini@cnaf.infn.it
  *          
- * Copyright (c) 2006 INFN-CNAF on behalf of the EGEE project.
- * 
- * For license conditions see LICENSE
+ * Copyright (c) 2006-2009 INFN-CNAF on behalf of the EGEE I, II and III
+ * For license conditions see LICENSE file or
+ * http://www.apache.org/licenses/LICENSE-2.0.txt
  *
  * Parts of this code may be based upon or even include verbatim pieces,
  * originally written by other people, in which case the original header
@@ -60,7 +61,7 @@ public class VomsProxyInitClient {
     String proxyType;
     String delegationType;
     String policyType;
-    
+    int bits = 1024;
     
     protected void setupUserCredentials(String userCert,String userKey){
         System.setProperty( "X509_USER_CERT", userCert);
@@ -171,7 +172,10 @@ public class VomsProxyInitClient {
                 .hasArg()
                 .create("delegationType") );
         
-        
+        options.addOption( OptionBuilder.withLongOpt( "bits" )
+                .withDescription("Specifies the key size of the created proxy. Possible values are 512, 1024, 2048.  The default alue is 1024" )
+                .hasArg()
+                .create("bits") );
     }
     
     protected void printHelpMessageAndExit(int exitStatus){
@@ -233,6 +237,10 @@ public class VomsProxyInitClient {
 
             if (line.hasOption( "delegationType" ))
                 delegationType = line.getOptionValue( "delegationType" );
+            
+            if (line.hasOption( "bits" ))
+                bits = Integer.parseInt(line.getOptionValue("bits"));
+
         } catch ( ParseException e ) {
          
             System.err.println(e.getMessage());
@@ -272,6 +280,13 @@ public class VomsProxyInitClient {
             proxyInit.setProxyType( type );
             
         }
+
+        if (bits != 512 && bits != 1024 && bits != 2048) {
+            log.warn( "Unsupported bit size specified! The default value will be used." );
+            bits = 1024;
+        }
+
+        proxyInit.setProxyKeySize(bits);
 
         if (policyType != null)
             proxyInit.setPolicyType( policyType );

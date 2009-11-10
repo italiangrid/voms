@@ -2,9 +2,10 @@
  *
  * Authors: Vincenzo Ciaschini - Vincenzo.Ciaschini@cnaf.infn.it 
  *
- * Copyright (c) 2002, 2003 INFN-CNAF on behalf of the EU DataGrid.
+ * Copyright (c) 2002-2009 INFN-CNAF on behalf of the EU DataGrid
+ * and EGEE I, II and III
  * For license conditions see LICENSE file or
- * http://www.edg.org/license.html
+ * http://www.apache.org/licenses/LICENSE-2.0.txt
  *
  * Parts of this code may be based upon or even include verbatim pieces,
  * originally written by other people, in which case the original header
@@ -22,15 +23,12 @@
 #include "config.h"
 #include "replace.h"
 
-//const std::string VERSION         = "0.1";
-
 extern "C" {
 #include <sys/types.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
-  //#include <getopt.h>
 #include <sys/time.h>
 #include <sys/resource.h>
 #include <sys/mman.h>
@@ -84,9 +82,9 @@ const std::string SUBPACKAGE      = "voms-proxy-info";
 static bool test_proxy();
 
 static bool print(X509 *cert, STACK_OF(X509) *chain, vomsdata &vd);
-static STACK_OF(X509) *load_chain(char *certfile);
+static STACK_OF(X509) *load_chain_from_file(char *certfile);
 static time_t stillvalid(ASN1_TIME *ctm);
-static char *proxy_type(X509 *cert);
+static const char *proxy_type(X509 *cert);
 
 std::string program;
 
@@ -131,25 +129,20 @@ static bool        targets = false;
 static bool        included = false;
 static bool        printuri = false;
 
-static int InitProxyCertInfoExtension(void);
-static void *myproxycertinfo_s2i(struct v3_ext_method *method, struct v3_ext_ctx *ctx, char *data);
-static char *myproxycertinfo_i2s(struct v3_ext_method *method, void *ext);
-static char *norep();
-
 int
 main(int argc, char **argv)
 {
 
-  (void)InitProxyCertInfoExtension();
+  InitProxyCertInfoExtension(1);
 
   if (strrchr(argv[0],'/'))
     program = strrchr(argv[0],'/') + 1;
   else
     program = argv[0];
 
-  static char *LONG_USAGE = 
+  static std::string LONG_USAGE = 
     "\n\n"
-    "Syntax: voms-proxy-info [-help][-file proxyfile][-subject][...][-exists [-hours H][-bits B]]\n\n"
+    "Syntax: voms-proxy-info [-help][-file proxyfile][-subject][...][-exists [-hours H][-bits B][-valid H:M]]\n\n"
     "   Options\n"
     "   -help, -usage             Displays usage\n"
     "   -version                  Displays version\n"
@@ -221,9 +214,9 @@ main(int argc, char **argv)
     {"hours",       1, &hours,              OPT_NUM},
 
     {"dont-verify-ac", 0, (int *)&dont_verify_ac, OPT_BOOL},
-    {"targets",     0, (int*)&targets,      OPT_BOOL},
-    {"included-file",  0, (int *)&included,  OPT_BOOL},
-    {"uri",         0, (int*)&printuri,     OPT_BOOL},
+    {"targets",        0, (int *)&targets,        OPT_BOOL},
+    {"included-file",  0, (int *)&included,       OPT_BOOL},
+    {"uri",            0, (int *)&printuri,       OPT_BOOL},
     {0, 0, 0, 0}
   };
 
@@ -292,7 +285,7 @@ int numbits(X509 *cert)
   return bits;
 }
 
-static char *proxy_type(X509 *cert)
+static const char *proxy_type(X509 *cert)
 {
   char *buffer = X509_NAME_oneline(X509_get_subject_name(cert), NULL, 0);
   char *point1 = strstr(buffer,"CN=proxy");
@@ -324,8 +317,8 @@ static char *proxy_type(X509 *cert)
     if (len == ((point2 - buffer) + 16))
       return "limited proxy";
 
-  int nidv3 = OBJ_txt2nid("PROXYCERTINFO_V3");
-  int nidv4 = OBJ_txt2nid("PROXYCERTINFO_V4");
+  int nidv3 = OBJ_txt2nid(PROXYCERTINFO_V3);
+  int nidv4 = OBJ_txt2nid(PROXYCERTINFO_V4);
 
   int indexv3 = X509_get_ext_by_NID(cert, nidv3, -1);
   int indexv4 = X509_get_ext_by_NID(cert, nidv4, -1);
@@ -443,24 +436,27 @@ test_proxy()
         std::cerr << "Couldn't find a valid proxy." << std::endl;
         goto err;
       }
-      chain = load_chain(of);
+      chain = load_chain_from_file(of);
       vomsdata d("","");
       if (!dont_verify_ac) {
           d.SetVerificationType((verify_type)(VERIFY_SIGN | VERIFY_KEY));
           res = d.Retrieve(x, chain, RECURSE_CHAIN);
       }
-      if (dont_verify_ac || !res) {
+      if (dont_verify_ac || !res || d.error == VERR_NOEXT) {
         d.data.clear();
         d.SetVerificationType((verify_type)(VERIFY_NONE));
-        (void)d.Retrieve(x, chain, RECURSE_CHAIN);
-        if (dont_verify_ac) {
-            res = 1;
-        }
-        else {
-            std::cerr << "WARNING: Unable to verify signature! Server certificate possibly not installed.\n" 
-                      << "Error: " << d.ErrorMessage() << std::endl;
+        res = d.Retrieve(x, chain, RECURSE_CHAIN);
+        if ( dont_verify_ac || d.error == VERR_NOEXT ) {
+            res = true;
         }
       }
+
+      if (!res) {
+        std::cerr << "WARNING: Unable to verify signature! Server certificate possibly not installed.\n" 
+                  << "Error: " << d.ErrorMessage() << std::endl;
+
+      }
+
       bool print_res = print(x, chain, d);
       if (print_res == false) {
           res = false;
@@ -479,54 +475,22 @@ test_proxy()
   return res;
 }
 
-static STACK_OF(X509) *load_chain(char *certfile)
+static STACK_OF(X509) *load_chain_from_file(char *certfile)
 {
-  STACK_OF(X509_INFO) *sk=NULL;
-  STACK_OF(X509) *stack=NULL, *ret=NULL;
-  BIO *in=NULL;
-  X509_INFO *xi;
-  int first = 1;
+  BIO *bio = NULL;
+  STACK_OF(X509) *stack = NULL;
 
-  if(!(stack = sk_X509_new_null())) {
-    printf("memory allocation failure\n");
-    goto end;
+  bio = BIO_new_file(certfile, "r");
+
+  if (bio) {
+    stack = load_chain(bio, certfile);
+    BIO_free(bio);
   }
-
-  if(!(in=BIO_new_file(certfile, "r"))) {
+  else {
     printf("error opening the file, %s\n",certfile);
-    goto end;
   }
 
-  /* This loads from a file, a stack of x509/crl/pkey sets */
-  if(!(sk=PEM_X509_INFO_read_bio(in,NULL,NULL,NULL))) {
-    printf("error reading the file, %s\n",certfile);
-    goto end;
-  }
-
-  /* scan over it and pull out the certs */
-  while (sk_X509_INFO_num(sk)) {
-    /* skip first cert */
-    if (first) {
-      first = 0;
-      continue;
-    }
-    xi=sk_X509_INFO_shift(sk);
-    if (xi->x509 != NULL) {
-      sk_X509_push(stack,xi->x509);
-      xi->x509=NULL;
-    }
-    X509_INFO_free(xi);
-  }
-  if(!sk_X509_num(stack)) {
-    printf("no certificates in file, %s\n",certfile);
-    sk_X509_free(stack);
-    goto end;
-  }
-  ret=stack;
-end:
-  BIO_free(in);
-  sk_X509_INFO_free(sk);
-  return(ret);
+  return stack;
 }
 
 
@@ -571,7 +535,6 @@ static bool print(X509 *cert, STACK_OF(X509) *chain, vomsdata &vd)
       std::cout << "=== Proxy Chain Information ===" << std::endl;
 
       for (start = sk_X509_num(chain)-1; start >= 1; start--) {
-        char *type = NULL;
         int totbits = 0;
         time_t leftcert = 0;
 
@@ -579,13 +542,14 @@ static bool print(X509 *cert, STACK_OF(X509) *chain, vomsdata &vd)
         totbits = numbits(cert);
         leftcert = stillvalid(X509_get_notAfter(cert)) - now;
         leftcert = (leftcert < 0) ? 0 : leftcert;
-        type = proxy_type(cert);
+
+        const char *type = proxy_type(cert);
 
         std::cout << "subject   : " << X509_NAME_oneline(X509_get_subject_name(cert), NULL, 0) << "\n";
         std::cout << "issuer    : " << X509_NAME_oneline(X509_get_issuer_name(cert), NULL, 0) << "\n";
         
         if (strcmp(type, "unknown") != 0)
-          std::cout << "type      : " << proxy_type(cert) << "\n";
+          std::cout << "type      : " << type << "\n";
         
         std::cout << "strength  : " << totbits << " bits" << "\n";
         std::cout << "timeleft  : " << leftcert/3600 << ":" << std::setw(2) << std::setfill('0') 
@@ -729,11 +693,11 @@ static bool print(X509 *cert, STACK_OF(X509) *chain, vomsdata &vd)
   
   /* -acexists */
 
-  if(!res) {
+  if(res) {
     for (std::vector<std::string>::iterator i = acexists.begin(); i != acexists.end(); ++i) {
       bool found = false;
 
-      if(!res) {
+      if(res) {
         for (std::vector<voms>::iterator v = vd.data.begin(); v != vd.data.end(); ++v) {
           if(v->voname == *i) {
             found = true;
@@ -743,7 +707,6 @@ static bool print(X509 *cert, STACK_OF(X509) *chain, vomsdata &vd)
       }
       if (!found)
         res = false;
-      found = true;
     }
   }
   
@@ -760,7 +723,7 @@ static time_t stillvalid(ASN1_TIME *ctm)
   char     *p;
   int       i;
   struct tm tm;
-  int       size;
+  int       size = 0;
 
   switch (ctm->type) {
   case V_ASN1_UTCTIME:
@@ -853,129 +816,4 @@ static time_t stillvalid(ASN1_TIME *ctm)
 #endif
 
   return newtime;
-}
-
-static int InitProxyCertInfoExtension(void)
-{
-
-#define PROXYCERTINFO_V3      "1.3.6.1.4.1.3536.1.222"
-#define PROXYCERTINFO_V4      "1.3.6.1.5.5.7.1.14"
-#define OBJC(c,n) OBJ_create(c,n,#c)
-#define IMPERSONATION_PROXY_OID         "1.3.6.1.5.5.7.21.1"
-#define INDEPENDENT_PROXY_OID           "1.3.6.1.5.5.7.21.2"
-#define GLOBUS_GSI_PROXY_GENERIC_POLICY_OID "1.3.6.1.4.1.3536.1.1.1.8"
-#define LIMITED_PROXY_OID               "1.3.6.1.4.1.3536.1.1.1.9"
-
-  X509V3_EXT_METHOD *pcert;
-
-  /* Proxy Certificate Extension's related objects */
-//   OBJC(myPROXYCERTINFO_V3, "myPROXYCERTINFO_V3");
-//   OBJC(myPROXYCERTINFO_V4, "myPROXYCERTINFO_V4");
-//   OBJC(IMPERSONATION_PROXY_OID, "IMPERSONATION_PROXY_OID");
-//   OBJC(INDEPENDENT_PROXY_OID, "INDEPENDENT PROXY_OID");
-//   OBJC(GLOBUS_GSI_PROXY_GENERIC_POLICY_OID, "GLOBUS_GSI_PROXY_GENERIC_POLICY_OID");
-//   OBJC(LIMITED_PROXY_OID, "LIMITED_PROXY_OID");
-
-  if (OBJ_txt2nid("PROXYCERTINFO_V3") == 0)
-    OBJC(PROXYCERTINFO_V3, "PROXYCERTINFO_V3");
-
-  if (OBJ_txt2nid("PROXYCERTINFO_V4") == 0)
-    OBJC(PROXYCERTINFO_V4, "PROXYCERTINFO_V4");
-
-  pcert = (X509V3_EXT_METHOD *)OPENSSL_malloc(sizeof(X509V3_EXT_METHOD));
-
-  if (pcert) {
-    memset(pcert, 0, sizeof(*pcert));
-    pcert->ext_nid = OBJ_txt2nid("PROXYCERTINFO_V3");
-    pcert->ext_flags = 0;
-    pcert->ext_new  = (X509V3_EXT_NEW) myPROXYCERTINFO_new;
-    pcert->ext_free = (X509V3_EXT_FREE)myPROXYCERTINFO_free;
-    pcert->d2i      = (X509V3_EXT_D2I) d2i_myPROXYCERTINFO;
-    pcert->i2d      = (X509V3_EXT_I2D) i2d_myPROXYCERTINFO;
-    pcert->i2s      = (X509V3_EXT_I2S) myproxycertinfo_i2s;
-    pcert->s2i      = (X509V3_EXT_S2I) myproxycertinfo_s2i;
-    pcert->v2i      = (X509V3_EXT_V2I) NULL;
-    pcert->r2i      = (X509V3_EXT_R2I) NULL;
-    pcert->i2v      = (X509V3_EXT_I2V) NULL;
-    pcert->i2r      = (X509V3_EXT_I2R) NULL;
-
-    X509V3_EXT_add(pcert);
-  }
-
-  pcert = (X509V3_EXT_METHOD *)OPENSSL_malloc(sizeof(X509V3_EXT_METHOD));
-
-  if (pcert) {
-    memset(pcert, 0, sizeof(*pcert));
-    pcert->ext_nid = OBJ_txt2nid("PROXYCERTINFO_V4");
-    pcert->ext_flags = 0;
-    pcert->ext_new  = (X509V3_EXT_NEW) myPROXYCERTINFO_new;
-    pcert->ext_free = (X509V3_EXT_FREE)myPROXYCERTINFO_free;
-    pcert->d2i      = (X509V3_EXT_D2I) d2i_myPROXYCERTINFO;
-    pcert->i2d      = (X509V3_EXT_I2D) i2d_myPROXYCERTINFO;
-    pcert->i2s      = (X509V3_EXT_I2S) myproxycertinfo_i2s;
-    pcert->s2i      = (X509V3_EXT_S2I) myproxycertinfo_s2i;
-    pcert->v2i      = (X509V3_EXT_V2I) NULL;
-    pcert->r2i      = (X509V3_EXT_R2I) NULL;
-    pcert->i2v      = (X509V3_EXT_I2V) NULL;
-    pcert->i2r      = (X509V3_EXT_I2R) NULL;
-
-    X509V3_EXT_add(pcert);
-  }
-}
-
-static void *myproxycertinfo_s2i(struct v3_ext_method *method, struct v3_ext_ctx *ctx, char *data)
-{
-  return (myPROXYCERTINFO*)data;
-}
-
-static char *myproxycertinfo_i2s(struct v3_ext_method *method, void *ext)
-{
-  myPROXYCERTINFO *pci = NULL;
-
-  pci = (myPROXYCERTINFO *)ext;
- 
-  if (!pci)
-    return norep();
-
-  std::string encoding = "Path Length: ";
-  if (pci->path_length) {
-    int j = ASN1_INTEGER_get(pci->path_length);
-
-    char buffer[100];
-    snprintf(buffer, 100, "%ld\n", j);
-
-    encoding += std::string(buffer) + "\n";
-  }
-  else
-    encoding += "unlimited\n";
-
-  myPROXYPOLICY *pp = pci->proxypolicy;
-
-  if (pci) {
-    encoding += "Policy Language: ";
-    char oid[256];
-
-    if (i2t_ASN1_OBJECT(oid, 256, pp->policy_language)) {
-      encoding += std::string(oid) + "\n";
-
-      if (pp->policy) {
-        unsigned char *data = ASN1_STRING_data(pp->policy);
-
-        if (data)
-          encoding += "Policy: " + std::string((char *)data) +"\n";
-      }
-    }
-  }
-
-  encoding += "\n";
-
-  return strdup(encoding.c_str());
-}
-
-static char *norep()
-{
-  static char *buffer = (char *) malloc(1);
-  if (buffer)
-    buffer='\0';
-  return buffer;
 }

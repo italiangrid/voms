@@ -1,5 +1,5 @@
 
-includedir = $(prefix)/include/glite/security/voms
+includedir = @includedir@/glite/security/voms
 
 include_HEADERS = \
 	newformat.h \

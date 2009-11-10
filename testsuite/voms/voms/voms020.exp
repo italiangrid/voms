@@ -1,7 +1,7 @@
 load_lib vomstest.exp
+testheader "See if voms defaults to long FQANs."
 
 proc mytest {} {
-    testheader "See if voms defaults to long FQANs."
     _activateCert mycert2
 
     _removeVOMSOption voms1 shortfqans

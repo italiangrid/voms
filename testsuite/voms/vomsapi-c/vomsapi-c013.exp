@@ -1,18 +1,12 @@
 load_lib vomstest.exp
+testheader "See if an VOMS_GetTargetsList() works."
 
 proc mytest {} {
-    testheader "See if an VOMS_GetTargetsList() works."
-
-    if {[info exists ::NOCLIB] != 0} then {
-        testmessage "Either libraries are not present, or the executables cannot be compiled, or the test was disabled."
-        return $::UNDECIDEDTEST
-    }
-
     _activateCert mycert2
 
     _vomsStart voms1
     set outname [exec mktemp $::SCRATCHDIR/voms-proxy-init-XXXXXX]
-    set res [catch {set out [exec $::INSTALLDIR/bin/voms-proxy-init --target testbed.cnaf.infn.it --target prova.cnaf.infn.it --voms voms1 >& $outname]}]
+    set res [catch {set out [exec $::INSTALLDIR/bin/voms-proxy-init --target testbed.cnaf.infn.it --target prova.cnaf.infn.it --target [exec hostname] --voms voms1 >& $outname]}]
     _vomsStop voms1
 
     if $res then {
@@ -32,7 +26,8 @@ proc mytest {} {
         set out [exec cat $::_buildout]
 
         set correct "Target: testbed.cnaf.infn.it
-Target: prova.cnaf.infn.it"
+Target: prova.cnaf.infn.it
+Target: [exec hostname]"
 
         if [regexp $correct $out] then {
             testmessage "targets successfully set"

@@ -1,7 +1,7 @@
 load_lib vomstest.exp
+testheader "See if voms-proxy-init --include works."
 
 proc mytest {} {
-    testheader "See if voms-proxy-init --include works."
     _activateCert mycert2
 
     set id [open $::SCRATCHDIR/testfile "w"]
@@ -24,7 +24,7 @@ proc mytest {} {
     set outname [exec mktemp $::SCRATCHDIR/voms-proxy-info-XXXXXX]
     if [catch {set out2 [exec $::INSTALLDIR/bin/voms-proxy-info >& $outname]}] then {
         addlog $outname
-        testmessage "voms proxy info failed."
+        testmessage "voms-proxy-info failed."
         return $::FAILTEST
     } else {
         #match against known (correct) output

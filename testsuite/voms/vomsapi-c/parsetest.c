@@ -1,6 +1,7 @@
 #include "voms_apic.h"
 #include <stdlib.h>
 #include <stdio.h>
+#include <string.h>
 
 int main(int argc, char *argv[]) {
   struct vomsdata *vd = VOMS_Init(NULL, NULL);

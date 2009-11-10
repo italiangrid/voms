@@ -53,7 +53,7 @@ Enables extra debug output</para>
 Quiet mode, minimal output</para>
 
 <para><option>-verify</option>
-Verifies certificate to make proxy for</para>
+Verifies proxy</para>
 
 <para><option>-pwstdin</option>
 Allows passphrase from stdin</para>
@@ -62,12 +62,18 @@ Allows passphrase from stdin</para>
 Creates a limited proxy</para>
 
 <para><option>-hours</option> <replaceable>H</replaceable>
-Proxy is valid for <emphasis remap='I'>H</emphasis> hours (default:12)</para>
+Proxy is valid for <emphasis remap='I'>H</emphasis> hours (default:12) This option is deprecated and is only present for compatibility with grid-proxy-init, since this option does not set the validity of the credentials returned by VOMS.  Use -valid instead.</para>
 
 <para><option>-vomslife</option> <replaceable>H</replaceable>
 Tries to get a pseudo cert with information valid for <emphasis remap='I'>H</emphasis> hours. The
 default is "as long as the proxy certificate". The special value <literal>0</literal> means
-as long as the server will allow.</para>
+as long as the server will allow.
+
+This option is deprecated, since it does not set the validity of the generated proxy.  Use -valid instead.</para>
+
+<para><option>-valid</option> <replaceable>HH:MM</replaceable>This option attempts to set the validity for both the proxy and the credentials returned by the VOMS server.  The latter validity may however be shortened due to server policy.
+
+This option obsoletes both -hours and -vomslife, and should be used in preference to both</para>
 
 <para><option>-bits</option> <replaceable>B</replaceable>
 Number of bits in key {512|1024|2048|4096}</para>

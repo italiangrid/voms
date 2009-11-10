@@ -1,13 +1,7 @@
 load_lib vomstest.exp
+testheader "See if the C++ library can be linked."
 
 proc mytest {} {
-    testheader "See if the c++ library can be linked."
-
-    if {[info exists ::NOCCLIB] != 0} then {
-        testmessage "Either libraries are not present, or the executables cannot be compiled, or the test was disabled."
-        return $::UNDECIDEDTEST
-    }
-
     set ::_buildout [exec mktemp $::SCRATCHDIR/program-out-XXXXXX]
     set res [_buildCC basictest.cc]
 

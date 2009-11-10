@@ -2,9 +2,10 @@
  *
  * Authors: Vincenzo Ciaschini - Vincenzo.Ciaschini@cnaf.infn.it
  *
- * Copyright (c) 2006 INFN-CNAF on behalf of the 
- * EGEE project.
- * For license conditions see LICENSE
+ * Copyright (c) 2002-2009 INFN-CNAF on behalf of the EU DataGrid
+ * and EGEE I, II and III
+ * For license conditions see LICENSE file or
+ * http://www.apache.org/licenses/LICENSE-2.0.txt
  *
  * Parts of this code may be based upon or even include verbatim pieces,
  * originally written by other people, in which case the original header
@@ -23,7 +24,6 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.math.BigInteger;
 import java.nio.ByteBuffer;
 import java.security.MessageDigest;
@@ -38,7 +38,6 @@ import java.security.cert.CertificateException;
 import java.security.cert.CertificateFactory;
 import java.security.cert.X509CRL;
 import java.security.cert.X509Certificate;
-import java.security.cert.Certificate;
 import java.util.Arrays;
 import java.util.List;
 import java.util.ListIterator;
@@ -60,17 +59,14 @@ import org.bouncycastle.asn1.DERObject;
 import org.bouncycastle.asn1.DERObjectIdentifier;
 import org.bouncycastle.asn1.DEROctetString;
 import org.bouncycastle.asn1.DERTaggedObject;
-import org.bouncycastle.asn1.DERInputStream;
 import org.bouncycastle.asn1.x509.AuthorityKeyIdentifier;
 import org.bouncycastle.asn1.x509.BasicConstraints;
 import org.bouncycastle.asn1.x509.GeneralName;
 import org.bouncycastle.asn1.x509.GeneralNames;
 import org.bouncycastle.asn1.x509.SubjectKeyIdentifier;
 import org.bouncycastle.asn1.x509.X509Name;
-import org.bouncycastle.asn1.x509.X509CertificateStructure;
 import org.bouncycastle.jce.X509Principal;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
-import org.bouncycastle.jce.provider.X509CertificateObject;
 import org.bouncycastle.openssl.PEMReader;
 import org.bouncycastle.openssl.PasswordFinder;
 
@@ -158,7 +154,7 @@ public class PKIUtils {
      */
     public static String getHash(X509Principal principal) {
         if (principal != null) {
-            byte[] array = principal.getEncoded();
+            final byte[] array = principal.getEncoded();
             return getHash(array);
         }
         throw new IllegalArgumentException("Null name passed to getHash()");
@@ -175,9 +171,10 @@ public class PKIUtils {
      * @throws InvalidStateException if the MD5 algorithm is not supported.
      */
     public static String getHash(X500Principal principal) {
-        logger.debug("Examining: " + principal.getName());
         if (principal != null) {
-            byte[] array = principal.getEncoded();
+            logger.debug("Examining: " + principal.getName());
+            final byte[] array = principal.getEncoded();
+            logger.debug("Hash is: " + getHash(array));
             return getHash(array);
         }
         throw new IllegalArgumentException("Null name passed to getHash()");
@@ -211,7 +208,8 @@ public class PKIUtils {
             ByteBuffer bb = ByteBuffer.wrap(digest).order(java.nio.ByteOrder.LITTLE_ENDIAN);
             bb.rewind();
 
-            return Integer.toHexString(bb.getInt());
+            String initial = "00000000" + Integer.toHexString(bb.getInt());
+            return initial.substring(initial.length()-8);
         }
         throw new IllegalArgumentException("Null certificate passed to getHash()");
     }
@@ -234,8 +232,8 @@ public class PKIUtils {
 
         ListIterator oids_iter   = oids.listIterator();
         ListIterator values_iter = values.listIterator();
-        String result = new String();
-        String addition = new String();
+        String result = "";
+        String addition = "";
 
         while (oids_iter.hasNext()) {
             DERObjectIdentifier oid = (DERObjectIdentifier)oids_iter.next();
@@ -247,7 +245,7 @@ public class PKIUtils {
             else if (oid.equals(X509Name.DC))
                 addition = "/DC=" + value;
             else if (oid.equals(X509Name.E))
-                addition = "/E=" + value;
+                addition = "/Email=" + value;
             else if (oid.equals(X509Name.EmailAddress))
                 addition = "/Email=" + value;
             else if (oid.equals(X509Name.L))
@@ -282,14 +280,15 @@ public class PKIUtils {
      *
      * @return true if dn1 and dn2 are equal, false otherwise.
      */
+
+    public static String Normalize(String dn) {
+        String newdn = emailPattern.matcher(dn).replaceAll("/Email");
+        newdn = uidPattern.matcher(newdn).replaceAll("/UID");
+        return newdn;
+    }
+
     public static boolean DNCompare(String dn1, String dn2) {
-        String newdn1 = emailPattern.matcher(dn1).replaceAll("/Email");
-        newdn1 = uidPattern.matcher(newdn1).replaceAll("/UID");
-
-        String newdn2 = emailPattern.matcher(dn2).replaceAll("/Email");
-        newdn2 = uidPattern.matcher(newdn2).replaceAll("/UID");
-
-        if (newdn1.equals(newdn2))
+        if (Normalize(dn1).equals(Normalize(dn2)))
             return true;
         return false;
     }
@@ -352,10 +351,6 @@ public class PKIUtils {
             if ((o instanceof ASN1TaggedObject) &&
                 (((ASN1TaggedObject)o).getTagNo() == 1)) {
                 return GeneralNames.getInstance(((DERTaggedObject)o), false);
-                //                DERObject realObject = ((ASN1TaggedObject)o).getObject();
-                //                if (realObject instanceof GeneralNames) {
-                //                    return ((GeneralNames)realObject);
-                //                }
             }
         }
         return null;
@@ -368,21 +363,9 @@ public class PKIUtils {
         ASN1Sequence seq = (ASN1Sequence)obj;
 
         int size = seq.size();
-        //        System.out.println("Size = " + size);
-        for (int i = 0; i < size; i++) {
-            //            System.out.println("Adding element:");
-            //            System.out.println("Class is: " + ((DERTaggedObject)seq.getObjectAt(i)).getObject().getClass());
-            //            ASN1Sequence dseq = (ASN1Sequence)((DERTaggedObject)seq.getObjectAt(i)).getObject();
-//             int size2 = dseq.size();
-//             for (int j = 0; j < size; j++) {
-//                 System.out.println("2Adding element:");
-//                 System.out.println("2Class is: " + dseq.getObjectAt(j));
-//                 System.out.println("Class is: " + ((DERTaggedObject)dseq.getObjectAt(j)).getObject().getClass());
-//                 //                ASN1Sequence dseq = (ASN1Sequence)((DERTaggedObject)seq.getObjectAt(i)).getObject();
-//                 //                int size2 = dseq.size();
 
+        for (int i = 0; i < size; i++) {
             v.add(GeneralName.getInstance(seq.getObjectAt(i)));
-//             }
         }
         return (GeneralName[])v.toArray(new GeneralName[0]);
     }
@@ -409,127 +392,66 @@ public class PKIUtils {
                          " issued by " + issuer.getSubjectDN().getName());
             logger.debug("[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[");
         }
-        //        try {
-            boolean b = issuerSubject.equals(issuedIssuer);
-            //        }
-        //        catch(Exception e) {
-            //            System.out.println("Caught: " + e.getMessage() + " " + e.getClass());
-        //        }
 
         if (issuerSubject.equals(issuedIssuer)) {
             logger.debug("================================");
             logger.debug("issuersSubject = issuedIssuer");
 
-            AuthorityKeyIdentifier akid = PKIUtils.getAKID(issued);
-            if (logger.isDebugEnabled())
-                logger.debug("akid = " + akid);
+            //            String buggySwissSignCA="EMAILADDRESS=ca@SwissSign.com, CN=SwissSign CA (RSA IK May 6 1999 18:00:58), O=SwissSign, C=CH";
+            String buggySwissSignCA="1.2.840.113549.1.9.1=#161063614053776973735369676e2e636f6d,CN=SwissSign CA (RSA IK May 6 1999 18:00:58),O=SwissSign,C=CH";
 
-            if (akid != null) {
-                logger.debug("Authority Key Identifier extension found in issued certificate.");
+            logger.debug("--"+buggySwissSignCA+"--");
+            logger.debug("--"+issuerSubject.getName()+"--"+issuerSubject.getName().getClass().getName());
+            if (!buggySwissSignCA.equals(issuerSubject.getName())) {
+                /* Skip check due to bugs in bc and SwissSign */ 
+                AuthorityKeyIdentifier akid = PKIUtils.getAKID(issued);
 
-                logger.debug("Entered.");
-                SubjectKeyIdentifier skid = PKIUtils.getSKID(issuer);
+                if (akid != null) {
+                    if (logger.isDebugEnabled())
+                        logger.debug("akid = " + akid);
+                
+                    logger.debug("Authority Key Identifier extension found in issued certificate.");
 
-                if (logger.isDebugEnabled())
-                    logger.debug("sid = " + skid);
+                    logger.debug("Entered.");
+                    SubjectKeyIdentifier skid = PKIUtils.getSKID(issuer);
 
-                if (skid != null) {
-                    logger.debug("subject Key Identifier extensions found in issuer certificate.");
-                    logger.debug("comparing skid to akid");
+                    if (logger.isDebugEnabled())
+                        logger.debug("sid = " + skid);
 
-                    byte[] skidValue = skid.getKeyIdentifier();
-                    if (logger.isDebugEnabled()) {
-                        logger.debug("skid");
+                    if (skid != null) {
+                        logger.debug("subject Key Identifier extensions found in issuer certificate.");
+                        logger.debug("comparing skid to akid");
 
-                        String str = "";
-                        for (int i = 0; i < skidValue.length; i++)
-                            str += Integer.toHexString(skidValue[i]) + " ";
-                        logger.debug(str);
-                    }
+                        byte[] skidValue = skid.getKeyIdentifier();
+                        if (logger.isDebugEnabled()) {
+                            logger.debug("skid");
 
-                    byte[] akidValue = akid.getKeyIdentifier();
-                    if (logger.isDebugEnabled()) {
-                        logger.debug("akid");
-
-                        String str = "";
-                        for (int i = 0; i < akidValue.length; i++)
-                            str += Integer.toHexString(akidValue[i]) + " ";
-                        logger.debug(str);
-                    }
-
-                    logger.debug("skid/akid checking.");
-                    if (!Arrays.equals(skidValue, akidValue))
-                        return false;
-
-                    logger.debug("skid/akid check passed.");
-                }
-
-                if (false) {
-                    // The following should be skipped if the previous check passed.
-                    // And code cannot reach here unless the previous step passed.
-                BigInteger sn = getAuthorityCertificateSerialNumber(akid);
-//
-//                if (sn == null) {
-//                    logger.error("Serial number missing from Authority Key Identifier");
-//                    return false;
-//                }
-//
-//                if (!sn.equals(issuer.getSerialNumber())) {
-//                    logger.error("Serial number in Authority Key Identifier and in issuer certificate do not match");
-//                    logger.error("From akid              : " + sn.toString());
-//                    logger.error("From issuer certificate: " + issuer.getSerialNumber());
-//                    return false;
-//                }
-
-                if (sn != null && !sn.equals(issuer.getSerialNumber())) {
-                    logger.error("Serial number in Authority Key Identifier and in issuer certificate do not match");
-                    logger.error("From akid              : " + sn.toString());
-                    logger.error("From issuer certificate: " + issuer.getSerialNumber());
-                    return false;
-                }
-
-                GeneralNames gns = getAuthorityCertIssuer(akid);
-
-                if (gns != null) {
-                    GeneralName names[] = getNames(gns);
-
-                    //                System.out.println("GOT CERTISSUER");
-
-                    int i = 0;
-                    //                System.out.println("SIZE = " + names.length);
-                    while (i < names.length) {
-                        //                    System.out.println("NAME = " + names[i].getName());
-                        //                    System.out.println("TAG IS: " + names[i].getTagNo());
-                        if (names[i].getTagNo() == 4) {
-                            DERObject dobj = names[i].getName().getDERObject();
-                            ByteArrayOutputStream baos = null;
-                            ASN1OutputStream aos = null;
-                            //                        System.out.println("Inside tag 4");
-                            try {
-                                baos = new ByteArrayOutputStream();
-                                aos = new ASN1OutputStream(baos);
-                                aos.writeObject(dobj);
-                                aos.flush();
+                            StringBuffer str = new StringBuffer();
+                            for (int i = 0; i < skidValue.length; i++) {
+                                str.append(Integer.toHexString(skidValue[i]));
+                                str.append(' ');
                             }
-                            catch (IOException e) {
-                                logger.error("Error in encoding of Authority Key Identifier." + e.getMessage());
-                                return false;
-                            }
-                            X500Principal principal = new X500Principal(baos.toByteArray());
-                            //                        System.out.println("PRINCIPAL: " + principal);
-                            X500Principal issuerIssuer  = issuer.getIssuerX500Principal();
-
-                            if (issuerIssuer.equals(principal)) {
-                                logger.debug("PASSED");
-                                break;
-                            }
-                            else {
-                                logger.error("Issuer Issuer not found among Authority Key Identifier's Certifiacte Issuers.");
-                                return false;
-                            }
+                            logger.debug(str.toString());
                         }
+
+                        byte[] akidValue = akid.getKeyIdentifier();
+                        if (logger.isDebugEnabled()) {
+                            logger.debug("akid");
+
+                            StringBuffer str = new StringBuffer();
+                            for (int i = 0; i < akidValue.length; i++) {
+                                str.append(Integer.toHexString(akidValue[i]));
+                                str.append(' ');
+                            }
+                            logger.debug(str.toString());
+                        }
+
+                        logger.debug("skid/akid checking.");
+                        if (!Arrays.equals(skidValue, akidValue))
+                            return false;
+
+                        logger.debug("skid/akid check passed.");
                     }
-                }
                 }
             }
             logger.debug("]]]]]]]]]]]]]]]]]]]]]]]]");
@@ -570,31 +492,31 @@ public class PKIUtils {
 
         if (logger.isDebugEnabled()) {
             if (keybytes != null) {
-                String str = "Real value : ";
-                for (int j =0; j < keybytes.length; j++)
-                    str += Integer.toHexString(keybytes[j]) + " ";
-                logger.debug(str);
-            }
+                StringBuffer str = new StringBuffer();
+                str.append("Real value : ");
+                for (int j =0; j < keybytes.length; j++) {
+                    str.append(Integer.toHexString(keybytes[j]));
+                    str.append(' ');
+                }
+                logger.debug(str.toString());
+        
+                DERObject dobj = null;
+                try {
+                    dobj = new ASN1InputStream(new ByteArrayInputStream(keybytes)).readObject();
+                    logger.debug("Class = " + dobj.getClass());
+                    dobj = new ASN1InputStream(new ByteArrayInputStream(((DEROctetString)dobj).getOctets())).readObject();
+                    logger.debug("Class = " + dobj.getClass());
+                    DERBitString bitstr = (DERBitString)dobj;
+                    logger.debug("pad bits  : " + bitstr.getPadBits());
+                }
+                catch(Exception e) {}
 
-            DERObject dobj = null;
-            try {
-                dobj = new ASN1InputStream(new ByteArrayInputStream(keybytes)).readObject();
-                logger.debug("Class = " + dobj.getClass());
-                dobj = new ASN1InputStream(new ByteArrayInputStream(((DEROctetString)dobj).getOctets())).readObject();
-                logger.debug("Class = " + dobj.getClass());
-                DERBitString bitstr = (DERBitString)dobj;
-                //                logger.debug("as int    : " + bitstr.intValue());
-                //                logger.debug("as binary : " + Integer.toBinaryString(bitstr.intValue()));
-                logger.debug("pad bits  : " + bitstr.getPadBits());
             }
-            catch(Exception e) {}
-        }
-
-        if (logger.isDebugEnabled()) {
             if (keyUsage != null)
                 for (int i = 0; i < keyUsage.length ; i++)
                     logger.debug("Keyusage[" +i + "] = " + keyUsage[i]);
         }
+
 
         if (keyUsage != null && !keyUsage[keyCertSign]) {
             logger.error("keyUsage extension present, but CertSign bit not active.");
@@ -666,22 +588,10 @@ public class PKIUtils {
             
             byte[] akid = cert.getExtensionValue(AUTHORITY_KEY_IDENTIFIER);
             int i = 0;
-            //            if (akid != null)
-            //                for (i = 0; i < akid.length; i++)
-            //                    System.out.print(akid[i] + " ");
-            //            System.out.println("");
+
             if (akid != null) {
                 ASN1OctetString string = new DEROctetString(akid);
-                org.bouncycastle.asn1.x509.X509Extension ex = new org.bouncycastle.asn1.x509.X509Extension(false, string);
-//                 byte[] list = ex.getValue().getOctets();
-//                 for (i = 0; i < list.length; i++)
-//                     System.out.print(list[i] + " ");
-
-//                System.out.println("EXAMINED");
                 byte[] llist2 = string.getOctets();
-                //                for (i = 0; i < llist2.length; i++)
-                //                    System.out.print(llist2[i] + " ");
-                //                System.out.println("");
                         
                 DERObject dobj = null;
                 try {
@@ -695,13 +605,6 @@ public class PKIUtils {
                     throw new IllegalArgumentException("While extracting Authority Key Identifier " + e.getMessage());
                 }
                 
-                //                System.out.println("dobj is: " + dobj.getClass());
-                //                System.out.println("dobj is also: " + dobj);
-//                 byte[] list2 = ((DEROctetString)dobj).getOctets();
-//                 for (i = 0; i < list2.length; i++)
-//                     System.out.print(list2[i] + " ");
-//                 System.out.println("");
-
                 return new AuthorityKeyIdentifier(ASN1Sequence.getInstance(dobj));
             }
         }
@@ -727,10 +630,8 @@ public class PKIUtils {
                 catch (Exception e) {
                     throw new IllegalArgumentException("While extracting Subject Key Identifier " + e.getMessage());
                 }
-                //                System.out.println("SKID CLASS IS: " + dobj.getClass());
 
                 return SubjectKeyIdentifier.getInstance(dobj);
-                //                return SubjectKeyIdentifier(dobj.getDEREncoded());
             }
         }
         return null;
@@ -768,17 +669,19 @@ public class PKIUtils {
      static public PrivateKey loadPrivateKey(File file, PasswordFinder finder) {
          PEMReader pem = null;
          try {
-             logger.debug("finder = " + finder.getPassword());
              pem = new PEMReader(new FileReader(file), finder);
              logger.debug("pem = " + pem);
-             Object read = pem.readObject();
-             logger.debug("Object read is: " + read);
+             Object read = null;
+             do {
+                 read = pem.readObject();
+                 logger.debug("Object read is: " + read);
+             } while (!(read instanceof KeyPair));
              KeyPair pair = (KeyPair)read;
              logger.debug("key = " + pair );
              return pair.getPrivate();
          }
          catch (IOException e) {
-             throw new IllegalArgumentException("Not a PEM format file " + file.getName());
+             throw new IllegalArgumentException("Not a PEM format file " + file.getName(), e);
          }
      }
 
@@ -856,23 +759,12 @@ public class PKIUtils {
 
         while ((type = skipToCertBeginning(bis)) != -1) {
             if (type == CERT) {
-//                 Certificate cert = factory.generateCertificate(bis);
-//                 byte[] data = cert.getEncoded();
-//                 ASN1Sequence seq = (ASN1Sequence) new DERInputStream(new ByteArrayInputStream(data)).readObject();
-//                 data = new X509CertificateObject(X509CertificateStructure.getInstance(seq)).getEncoded();
-//                 certificates.add((X509Certificate)factory.generateCertificate(new ByteArrayInputStream(data)));
                 certificates.add(factory.generateCertificate(bis));
             }
         }
 
-        // Object[] arr = certificates.toArray();
-        //        System.out.println("CLASS: " + arr[0].getClass());
-        //        System.out.println("CLASS: " + arr.getClass());
-
         X509Certificate[] arr = new X509Certificate[0];
 
-        //        System.out.println("SIZE = " + certificates.size());
-        //        System.out.println("SIZE = " + certificates.get(0));
         return (X509Certificate[])certificates.toArray(arr);
     }
 
@@ -980,15 +872,12 @@ public class PKIUtils {
                 bis = null;
                 return o;
             case CERT:
-                //            System.out.println("++++++++++++++++++++++++++++");
                 Vector result = new Vector(Arrays.asList(loadCertificates(bis)));
-                //            System.out.println("++++++++++++++++++++++++++++");
-                //            System.out.println("COPY: = " + result.get(0));
                 bis.close();
                 bis = null;
                 return result;
             default:
-                return null;
+                break;
             }
         }
         finally {
@@ -996,7 +885,7 @@ public class PKIUtils {
                 bis.close();
         }
 
-        //        return null;
+        return null;
     }
 
     /**
@@ -1026,11 +915,7 @@ public class PKIUtils {
             int index  = buffer.indexOf("----BEGIN CERTIFICATE"); // check if the certificate beginning is in the chars read this time
             int index2 = buffer.indexOf("----BEGIN X509 CRL");
 
-            //            System.out.println("BUFFER: " + buffer);
-            //            System.out.println("INDEX :  " + index);
-            //            System.out.println("INDEX2:  " + index2);
             if (index == -1 && index2 == -1) { // not found
-                //                System.out.println("skipping:" + buffer);
                 stream.reset(); // rewind the file to the beginning of the last read
                 stream.skip(BUF_LEN - 100); // skip only part of the way as the "----BEGIN" can be in the transition of two 1000 char block
                 stream.mark(BUF_LEN + 2); // mark the new position
@@ -1046,7 +931,6 @@ public class PKIUtils {
                         }
                     }
 
-                    //                System.out.println("Last skip:" + buffer.substring(0, index));
                     stream.reset(); // rewind to the beginning of the last read
                     stream.skip(index); // skip to the beginning of the tag
                     stream.mark(10000); // mark the position
@@ -1063,12 +947,10 @@ public class PKIUtils {
                         }
                     }
 
-                    //                System.out.println("Last skip:" + buffer.substring(0, index));
                     stream.reset(); // rewind to the beginning of the last read
                     stream.skip(index2); // skip to the beginning of the tag
                     stream.mark(10000); // mark the position
                         
-                    //                    System.out.println("RETURNING CRL");
                     return CRL;
                     
                 }

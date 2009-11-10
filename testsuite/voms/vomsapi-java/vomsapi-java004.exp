@@ -1,0 +1,38 @@
+load_lib vomstest.exp
+testheader "See if java voms-proxy-list succeeds."
+
+proc mytest {} {
+    _activateCert mycert2
+
+    # Create a proxy to validate.
+    _vomsStart voms1
+
+    set ::_buildout [exec mktemp $::SCRATCHDIR/program-out-XXXXXX]
+    set res [_execJava contactvoms1.java $::_certdir/mycert2-cert.pem $::_certdir/mycert2-key.pem voms1]
+
+    _vomsStop voms1
+
+    addlog $::_buildout
+
+    if $res then {
+        addlog $::INSTALLDIR/var/log/voms.voms1
+        testmessage "voms-proxy-list failed."
+        return $::FAILTEST
+    }
+
+    set correct "/voms1
+/voms1/group1
+/voms1/group1/Role=TestRole"
+
+    set out [exec cat $::_buildout]
+
+    if [regexp $correct $out] then {
+        testmessage "Obtained list of FQANs."
+        return $::PASSTEST
+    } else {
+        testmessage "Unexepected output."
+        return $::FAILTEST
+    }
+}
+
+do_test

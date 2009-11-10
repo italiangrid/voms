@@ -1,0 +1,32 @@
+load_lib vomstest.exp
+testheader "See if missing certificate implies an error."
+
+proc myprolog {} {
+    _activateCert mycert2
+    file delete -force $::env(HOME)/.globus2/usercert.pem
+}
+
+proc myepilog {} {
+    _activateCert mycert2
+}
+
+proc mytest {} {
+    _vomsStart voms1
+    set outname [exec mktemp $::SCRATCHDIR/voms-proxy-init-XXXXXX]
+    set res [catch {set out [exec $::INSTALLDIR/bin/voms-proxy-init --voms voms1 >& $outname]}]
+    _vomsStop voms1
+    
+    if  $res then {
+        addlog $outname
+        testmessage "voms-proxy-init correctly returned an error."
+        return $::PASSTEST
+    } else {
+        testmessage "voms-proxy-init incorrectly returned a success."
+        return $::FAILTEST
+    }
+}
+
+test_set_prolog myprolog
+test_set_epilog myepilog
+
+do_test

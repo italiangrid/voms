@@ -1,3 +1,0 @@
-set tool voms
-set srcdir .
-set objdir /home/marotta/sources/ee/org.glite.security.voms/testsuite

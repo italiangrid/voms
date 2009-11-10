@@ -1,3 +1,18 @@
+/*********************************************************************
+ *
+ * Authors: Vincenzo Ciaschini - Vincenzo.Ciaschini@cnaf.infn.it 
+ *          Valerio Venturi    - Valerio.Venturi@cnaf.infn.it
+ *
+ * Copyright (c) 2002-2009 INFN-CNAF on behalf of the EU DataGrid
+ * and EGEE I, II and III
+ * For license conditions see LICENSE file or
+ * http://www.apache.org/licenses/LICENSE-2.0.txt
+ *
+ * Parts of this code may be based upon or even include verbatim pieces,
+ * originally written by other people, in which case the original header
+ * follows.
+ *
+ *********************************************************************/
 /**********************************************************************
 sslutils.h:
 
@@ -434,6 +449,7 @@ proxy_genreq(
     X509_REQ **                         reqp,
     EVP_PKEY **                         pkeyp,
     int                                 bits,
+    const char *                        newdn,
     int                                 (*callback)());
 
 int
@@ -445,7 +461,9 @@ proxy_sign(
     int                                 seconds,
     STACK_OF(X509_EXTENSION) *          extensions,
     int                                 limited_proxy,
-    int                                 proxyver);
+    int                                 proxyver,
+    const char *                        newdn
+);
 
 int
 proxy_sign_ext(
@@ -458,7 +476,8 @@ proxy_sign_ext(
     X509_NAME *                         issuer_name,    
     int                                 seconds,
     int                                 serial_num,
-    STACK_OF(X509_EXTENSION) *          extensions);
+    STACK_OF(X509_EXTENSION) *          extensions,
+    int proxyver);
 
 int
 proxy_check_subject_name(
@@ -516,21 +535,6 @@ time_t
 ASN1_UTCTIME_mktime(
     ASN1_UTCTIME *                     ctm);
 
-/*
- * Functions similar to {i2d,d2i}_X509_bio which write/read a integer
- * (ASN.1 representation) to/from a bio
- */
-
-int
-i2d_integer_bio(
-    BIO *                               bp,
-    long                                v);
-
-long
-d2i_integer_bio(
-    BIO *                               bp,
-    long *                              v);
-
 int PRIVATE determine_filenames(char **cacert, char **certdir, char **outfile,
                                 char **certfile, char **keyfile, int noregen);
 int PRIVATE load_credentials(const char *certname, const char *keyname,
@@ -539,7 +543,11 @@ int PRIVATE load_credentials(const char *certname, const char *keyname,
 int PRIVATE load_certificate_from_file(FILE *file, X509 **cert, 
                                        STACK_OF(X509) **stack);
 
+int PRIVATE
+proxy_app_verify_callback(X509_STORE_CTX *ctx, UNUSED(void *empty));
+
 EXTERN_C_END
 
+STACK_OF(X509) *load_chain(BIO *in, char*);
 
 #endif /* _SSLUTILS_H */

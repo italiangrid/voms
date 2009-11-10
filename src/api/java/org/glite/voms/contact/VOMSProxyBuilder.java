@@ -7,11 +7,12 @@
  *
  * Uses some code originally developed by:
  *      Gidon Moont - g.moont@imperial.ac.uk
+ *      Joni Hahkala - joni.hahkala@cern.ch
  *
- * Copyright (c) 2002, 2003, 2004, 2005, 2006 INFN-CNAF on behalf
- * of the EGEE project.
- *
- * For license conditions see LICENSE
+ * Copyright (c) 2002-2009 INFN-CNAF on behalf
+ * of the EGEE I, II and III
+ * For license conditions see LICENSE file or
+ * http://www.apache.org/licenses/LICENSE-2.0.txt
  *
  * Parts of this code may be based upon or even include verbatim pieces,
  * originally written by other people, in which case the original header
@@ -31,7 +32,6 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 
-import java.security.GeneralSecurityException;
 import java.security.NoSuchAlgorithmException;
 import java.security.NoSuchProviderException;
 import java.security.SignatureException;
@@ -46,20 +46,25 @@ import java.security.cert.X509Certificate;
 import java.util.Iterator;
 import java.util.List;
 import java.util.HashMap;
+import java.util.Enumeration;
 import java.util.Random;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
 import java.util.TimeZone;
-import java.util.Vector;
 
 import java.math.BigInteger;
 
 import org.apache.log4j.Logger;
 
 import org.bouncycastle.asn1.DEREncodableVector;
+import org.bouncycastle.asn1.ASN1EncodableVector;
 import org.bouncycastle.asn1.DERSequence;
+import org.bouncycastle.asn1.ASN1Sequence;
 import org.bouncycastle.asn1.DERObject;
+import org.bouncycastle.asn1.DERSet;
+
 import org.bouncycastle.asn1.DERObjectIdentifier;
+import org.bouncycastle.asn1.DERPrintableString;
 
 import org.bouncycastle.asn1.x509.X509Name;
 import org.bouncycastle.asn1.x509.KeyUsage;
@@ -105,6 +110,7 @@ class ExtensionData {
     }
 }
 
+
 /**
  *
  * This class implements VOMS X509 proxy certificates creation.
@@ -131,7 +137,7 @@ public class VOMSProxyBuilder {
 
     /**
      *
-     * This methods buils an {@link AttributeCertificate} (AC) object starting from an array of bytes.
+     * This methods builds an {@link AttributeCertificate} (AC) object starting from an array of bytes.
      *
      * @param acBytes, the byte array containing the attribute certificate.
      * @return the {@link AttributeCertificate} object
@@ -143,8 +149,7 @@ public class VOMSProxyBuilder {
         AttributeCertificate ac;
 
         try {
-            ac = AttributeCertificate.getInstance( bai );
-            return ac;
+            return AttributeCertificate.getInstance( bai );
 
         } catch ( IOException e ) {
             log.error("Error parsing attribute certificate:"+e.getMessage());
@@ -179,6 +184,14 @@ public class VOMSProxyBuilder {
     public static UserCredentials buildProxy( UserCredentials cred,
             List ACs, int lifetime, int gtVersion, int delegType,
             String policyType) {
+        return buildProxy(cred, ACs, lifetime, gtVersion, delegType,
+                          policyType, 1024);
+    }
+
+
+    public static UserCredentials buildProxy( UserCredentials cred,
+            List ACs, int lifetime, int gtVersion, int delegType,
+            String policyType, int bits) {
 
         if (ACs.isEmpty())
             throw new VOMSException("Please specify a non-empty list of attribute certificate to build a voms-proxy.");
@@ -192,7 +205,7 @@ public class VOMSProxyBuilder {
 
         HashMap extensions = new HashMap();
 
-        if (ACs.size() != 0) {
+        if (!ACs.isEmpty()) {
             DERSequence seqac = new DERSequence( acVector );
             DERSequence seqacwrap = new DERSequence( seqac );
             extensions.put("1.3.6.1.4.1.8005.100.100.5",
@@ -202,33 +215,23 @@ public class VOMSProxyBuilder {
 
         KeyUsage keyUsage = new KeyUsage( KeyUsage.digitalSignature
                 | KeyUsage.keyEncipherment | KeyUsage.dataEncipherment );
-        extensions.put("2.5.29.15", ExtensionData.creator("2.5.29.15",
+        extensions.put("2.5.29.15", ExtensionData.creator("2.5.29.15", true,
                                                           keyUsage.getDERObject()));
 
-        //        try {
-            UserCredentials proxy = myCreateCredential(
-                               cred.getUserChain(),
-                               cred.getUserKey(), 512, lifetime,
-                               delegType, gtVersion, extensions, policyType );
-
-            return proxy;
-
-//         } catch ( GeneralSecurityException e ) {
-
-//             log.error( "Error generating voms proxy: " + e.getMessage() );
-
-//             if ( log.isDebugEnabled() )
-//                 log.error( e.getMessage(), e );
-
-//             throw new VOMSException( e );
-
-//         }
+        return myCreateCredential(
+                  cred.getUserChain(),
+                  cred.getUserKey(), bits, lifetime,
+                  delegType, gtVersion, extensions, policyType );
 
     }
 
     public static UserCredentials buildProxy(UserCredentials cred, int lifetime, int proxy_type) {
+        return buildProxy(cred, lifetime, proxy_type, 1024);
+    }
+
+    public static UserCredentials buildProxy(UserCredentials cred, int lifetime, int proxy_type, int bits) {
         return myCreateCredential(cred.getUserChain(),
-                                  cred.getUserKey(), 1024, lifetime,
+                                  cred.getUserKey(), bits, lifetime,
                                   proxy_type, GT2_PROXY, new HashMap(), "");
     }
 
@@ -314,7 +317,7 @@ public class VOMSProxyBuilder {
         case GT3_PROXY:
         case GT4_PROXY:
             Random rand = new Random();
-            int number = Math.abs(rand.nextInt());
+            int number = Math.abs(rand.nextInt(Integer.MAX_VALUE));
             cnValue = String.valueOf(number);
             serialNum = new BigInteger(String.valueOf(number));
 
@@ -370,12 +373,24 @@ public class VOMSProxyBuilder {
         for (int i = 0; i <  exts.length; i++)
             certGen.addExtension(exts[i].getOID(), exts[i].getCritical(), exts[i].getObj());
 
+        /* Workaround for bouncycastle inadequacies. */
+        /* Shamelessly taken from Joni's code. */
         X509Name issuerDN = (X509Name)cert.getSubjectDN();
-        Vector oids   = issuerDN.getOIDs();
-        Vector values = issuerDN.getValues();
-        oids.add(X509Name.CN);
-        values.add(cnValue);
-        X509Name subjectDN = new X509Name(oids, values);
+
+        ASN1EncodableVector vec = new ASN1EncodableVector();
+        vec.add(X509Name.CN);
+        vec.add(new DERPrintableString(cnValue));
+            
+        Enumeration DNComponents = ((ASN1Sequence)issuerDN.getDERObject()).getObjects();
+        ASN1EncodableVector subject = new ASN1EncodableVector();
+
+        while (DNComponents.hasMoreElements())
+            subject.add(((DERObject)DNComponents.nextElement()));
+        
+        subject.add(new DERSet(new DERSequence(vec)));
+
+        X509Name subjectDN = new X509Name(new DERSequence(subject));
+
 
         certGen.setSubjectDN(subjectDN);
         certGen.setIssuerDN(issuerDN);
@@ -390,7 +405,7 @@ public class VOMSProxyBuilder {
         date.add(Calendar.MINUTE, -5);
         certGen.setNotBefore(date.getTime());
 
-        /* If hours = 0, then cert lifetime is set to user cert */
+        /* If hours == 0, then cert lifetime is set to user cert */
         if (lifetime <= 0) {
             certGen.setNotAfter(cert.getNotAfter());
         } else {

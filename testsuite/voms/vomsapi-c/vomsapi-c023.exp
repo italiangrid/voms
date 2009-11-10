@@ -1,0 +1,41 @@
+load_lib vomstest.exp
+testheader "See if VOMS_ListTargets() works."
+
+proc mytest {} {
+    _activateCert mycert2
+
+    set ::_buildout [exec mktemp $::SCRATCHDIR/voms-api-c-XXXXXX]
+    set res [_exeC listtarg.c [exec hostname]]
+
+    if $res then {
+        addlog $::_buildout
+        testmessage "compile/execution failed."
+        return $::FAILTEST
+    }
+
+    addlog $::_buildout
+
+    if $res then {
+        testmessage "parsing failed."
+        return $::FAILTEST
+    } else {
+        set correct "targets: prova.it,prova.com"
+
+        set out [exec cat $::_buildout]
+        if [regexp $correct $out] then {
+            testmessage "output correct"
+            return $::PASSTEST
+        } else {
+            set outname2 [exec mktemp $::SCRATCHDIR/voms-api-c-XXXXXX]
+            set id [open $outname2 "w+"]
+            puts $id $correct
+            close $id
+
+            addlog $outname2
+            testmessage "output wrong"
+            return $::FAILTEST
+        }
+    }
+}
+
+do_test

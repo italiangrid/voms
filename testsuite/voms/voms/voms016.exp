@@ -1,7 +1,7 @@
 load_lib vomstest.exp
+testheader "Can AC validity be limited?"
 
-proc mytesty {} {
-    testheader "Can AC validity be limited?"
+proc mytest {} {
     _activateCert mycert2
 
     _vomsStart voms1

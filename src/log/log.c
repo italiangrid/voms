@@ -2,9 +2,10 @@
  *
  * Authors: Vincenzo Ciaschini - Vincenzo.Ciaschini@cnaf.infn.it 
  *
- * Copyright (c) 2002, 2003 INFN-CNAF on behalf of the EU DataGrid.
+ * Copyright (c) 2002-2009 INFN-CNAF on behalf of the EU DataGrid
+ * and EGEE I, II and III
  * For license conditions see LICENSE file or
- * http://www.edg.org/license.html
+ * http://www.apache.org/licenses/LICENSE-2.0.txt
  *
  * Parts of this code may be based upon or even include verbatim pieces,
  * originally written by other people, in which case the original header
@@ -31,8 +32,10 @@
 #include <errno.h>
 #include <signal.h>
 #include <stdio.h>
+#include <signal.h>
 
 #include "log.h"
+#include "streamers.h"
 
 #define LOG_COMMAND       'L'
 #define SET_OPTION        'O'
@@ -231,6 +234,8 @@ void StartLogger(void *data, int code)
       close(in);
   }
   else {
+    signal(SIGHUP,SIG_IGN);
+
     if (out != -1)
       close(out);
     if (in == -1)
@@ -320,8 +325,10 @@ void LogOptionInt(void *data, const char *name, int value)
 {
 #define INTSIZE (((sizeof(int)*CHAR_BIT)/3)+2)
   static char val[INTSIZE];
+
+  memset(val, 0, INTSIZE);
 #undef INTSIZE
-  sprintf(val, "%d\0", value);
+  sprintf(val, "%d", value);
 
   LogOption(data, name, val);
 }
@@ -531,7 +538,7 @@ const char *LogFormat(void *data, const char *format)
   return oldfmt;
 }
 
-static int LogOutput(void *data, loglevels lev, const char *str)
+static int LogOutput(void *data, const char *str)
 {
 
   struct LogInfo *li=(struct LogInfo *)data;
@@ -639,7 +646,7 @@ static signed int GetLen(const char **message)
 int LogMessage(void *data, loglevels lev, logtypes type, const char *message, const char *func, int line, const char *file)
 {
   struct LogInfo *li=(struct LogInfo *)data;
-  signed int len;
+  signed int len = 0;
   char *msgcopy = NULL;
 
   if (!data)
@@ -843,7 +850,7 @@ int LogMessage(void *data, loglevels lev, logtypes type, const char *message, co
         format++;
       }
       str = StringAdd(str, "\n", -1);
-      LogOutput(data, lev, str);
+      LogOutput(data, str);
       free(str);
     }
   }

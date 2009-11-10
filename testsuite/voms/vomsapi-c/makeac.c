@@ -1,6 +1,7 @@
 #include "voms_apic.h"
 #include <stdlib.h>
 #include <stdio.h>
+#include <string.h>
 
 int main(int argc, char *argv[]) {
   struct vomsdata *vd = VOMS_Init(NULL, NULL);
@@ -36,7 +37,7 @@ int main(int argc, char *argv[]) {
           while (vomsarray[0]->fqan[index]) 
             printf("fqan1: %s\n", vomsarray[0]->fqan[index++]);
 
-          printf("version1: %ld\n", vomsarray[0]->version);
+          printf("version1: %d\n", vomsarray[0]->version);
 
           exit(0);
         }

@@ -2,9 +2,10 @@
  *
  * Authors: Vincenzo Ciaschini - Vincenzo.Ciaschini@cnaf.infn.it 
  *
- * Copyright (c) 2002, 2003 INFN-CNAF on behalf of the EU DataGrid.
+ * Copyright (c) 2002-2009 INFN-CNAF on behalf of the EU DataGrid
+ * and EGEE I, II and III
  * For license conditions see LICENSE file or
- * http://www.edg.org/license.html
+ * http://www.apache.org/licenses/LICENSE-2.0.txt
  *
  * Parts of this code may be based upon or even include verbatim pieces,
  * originally written by other people, in which case the original header
@@ -81,7 +82,7 @@ typedef struct ACATTR {
   ASN1_OBJECT * type;
   int get_type;
   STACK_OF(AC_IETFATTR) *ietfattr;
-  STACK_OF(AC_FULL_ATTRIBUTES) *fullattributes; // attenzione forse c'e' un livello di troppo, AC_FULL_ATTRIBUTES era come AC_ATTR
+  STACK_OF(AC_FULL_ATTRIBUTES) *fullattributes;
 } AC_ATTR;
 #define GET_TYPE_FQAN 1
 #define GET_TYPE_ATTRIBUTES 2

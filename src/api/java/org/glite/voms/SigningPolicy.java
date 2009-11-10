@@ -2,9 +2,10 @@
  *
  * Authors: Vincenzo Ciaschini - Vincenzo.Ciaschini@cnaf.infn.it
  *
- * Copyright (c) 2006 INFN-CNAF on behalf of the 
- * EGEE project.
- * For license conditions see LICENSE
+ * Copyright (c) 2006-2009 INFN-CNAF on behalf of the 
+ * EGEE I, II and III
+ * For license conditions see LICENSE file or
+ * http://www.apache.org/licenses/LICENSE-2.0.txt
  *
  * Parts of this code may be based upon or even include verbatim pieces,
  * originally written by other people, in which case the original header
@@ -14,10 +15,6 @@
 
 package org.glite.voms;
 
-//import org.apache.log4j.Logger;
-
-//import org.bouncycastle.jce.provider.BouncyCastleProvider;
-
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
@@ -25,6 +22,7 @@ import java.io.IOException;
 import java.util.Vector;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import org.apache.log4j.Logger;
 
 /**
  * The purpose of this class is to represent a *.signing_policy file.
@@ -53,6 +51,9 @@ public class SigningPolicy {
     private int current = -1;
 
     private int mode = ACCESS_ID_CA;
+
+    private static Logger logger = Logger.getLogger( SigningPolicy.class
+            .getName() );
 
     /**
      * Loads a *.signing_policy file.
@@ -96,18 +97,8 @@ public class SigningPolicy {
      * @return the record number, or -1 if none is found.
      */
     public int findIssuer(String issuer, int previous) {
-        //        System.out.println("previous = " + previous);
         if (previous < -1)
             return -1;
-
-        //        System.out.println("findIssuer in");
-        //        Iterator i = access_id_ca_list.iterator();
-
-        //        System.out.println("Contentsize = " + access_id_ca_list.size());
-
-        //        while (i.hasNext()) {
-        //            System.out.println("Has: " + (String)i.next());
-        //        }
 
         return access_id_ca_list.indexOf(issuer, previous+1);
     }
@@ -169,24 +160,19 @@ public class SigningPolicy {
 
     private String parseAccessIDCA(String line) {
         String access_id_ca = null;
-        //                        System.out.println("Evaluating Access_id_ca");
         Matcher m = access_id_ca_pattern.matcher(line);
 
         if (m.matches()) {
-            //                            System.out.println("found.");
             String match = m.group(1);
-            //                            System.out.println("found: " + match);
             Matcher m2 = null;
             switch(match.charAt(0)) {
             case '\'':
-                //                                System.out.println("single quotes");
                 m2 = remove_single_quotes.matcher(match);
                 if (m2.matches()) {
                     access_id_ca = m2.group(1);
                 }
                 break;
             case '"':
-                //                                System.out.println("double quotes");
                 m2 = remove_double_quotes.matcher(match);
                 if (m2.matches()) {
                     access_id_ca = m2.group(1);
@@ -196,14 +182,14 @@ public class SigningPolicy {
                 access_id_ca = match;
             }
         }
-        return access_id_ca;
+        logger.debug("Access_id_CA="+PKIUtils.Normalize(access_id_ca));
+        return PKIUtils.Normalize(access_id_ca);
     }
 
     private String parsePosRights(String line) {
         String pos_rights = null;
         Matcher m = pos_rights_pattern.matcher(line);
 
-        //                        System.out.println("Evaluating pos_rights");
         if (m.matches())
             pos_rights = m.group(1);
 
@@ -217,15 +203,11 @@ public class SigningPolicy {
 
         while (subjects.find()){
             String substring = subjects.group(2);
-            //            System.out.println("Subfind: " + substring);
             Matcher subject_it = get_subject_pattern.matcher(substring);
 
             while(subject_it.find()){
                 String subject = subject_it.group(2);
-                //                System.out.println("Candidate: " + subject);
                 if (subject.length() != 0) {
-                    //                    System.out.println("subsubfind: " + subject);
-                    //                    System.out.println("subsubfindlen: " + subject.length());
                     subjectList.add(subject);
                 }
             }
@@ -252,9 +234,8 @@ public class SigningPolicy {
         s = theBuffer.readLine();
 
         while (s != null) {
-            //            System.out.println("FOUND STRING: " + s);
             s = s.trim();
-            if (!(s.length() == 0 || s.startsWith("#"))) {
+            if (!(s.length() == 0 || s.charAt(0) == '#')) {
                 switch(mode) {
                 case ACCESS_ID_CA:
                     {
@@ -262,7 +243,6 @@ public class SigningPolicy {
                             if (access_id_ca != null &&
                                 pos_rights != null &&
                                 subjects != null) {
-                                //                                System.out.println("Inserting " + access_id_ca);
                                 access_id_ca_list.add(access_id_ca);
                                 pos_rights_list.add(pos_rights);
                                 subjects_list.add(subjects);
@@ -292,7 +272,6 @@ public class SigningPolicy {
                 case COND_SUBJECTS:
                     {
                         subjects = parseCondSubjects(s);
-                        //                        System.out.println("SIZE = " + subjects.size());
                         if (subjects.size() == 0)
                             error = true;
 
@@ -311,7 +290,6 @@ public class SigningPolicy {
         if (access_id_ca != null &&
             pos_rights != null &&
             subjects != null && !error) {
-            //            System.out.println("Inserting " + access_id_ca);
             access_id_ca_list.add(access_id_ca);
             pos_rights_list.add(pos_rights);
             subjects_list.add(subjects);

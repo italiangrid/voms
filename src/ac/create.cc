@@ -3,9 +3,10 @@
  *
  * Authors: Vincenzo Ciaschini - Vincenzo.Ciaschini@cnaf.infn.it 
  *
- * Copyright (c) 2002, 2003 INFN-CNAF on behalf of the EU DataGrid.
+ * Copyright (c) 2002-2009 INFN-CNAF on behalf of the EU DataGrid
+ * and EGEE I, II and III
  * For license conditions see LICENSE file or
- * http://www.edg.org/license.html
+ * http://www.apache.org/licenses/LICENSE-2.0.txt
  *
  * Parts of this code may be based upon or even include verbatim pieces,
  * originally written by other people, in which case the original header
@@ -33,6 +34,24 @@ extern char *Encode(const char *, int, int *);
 extern char *Decode(const char *, int, int *);
 
 }
+#include <cstring>
+
+static void deallocate(char **v1, int s1, char **v2, int s2) 
+{
+  if (v1) {
+    int i =0;
+    while (i < s1)
+      free(v1[i++]);
+    free(v1);
+  }
+
+  if (v2) {
+    int i =0;
+    while (i < s2)
+      free(v2[i++]);
+    free(v2);
+  }
+}
 
 int createac(X509 *issuerc, STACK_OF(X509) *issuerstack, X509 *holder, EVP_PKEY *pkey, BIGNUM *serial,
              std::vector<std::string> &fqan, std::vector<std::string> &targets, std::vector<std::string>& attributes,
@@ -40,57 +59,28 @@ int createac(X509 *issuerc, STACK_OF(X509) *issuerstack, X509 *holder, EVP_PKEY 
 {
   int size = fqan.size();
   char **array = NULL;
-  bool error = false;
   char **array2 = NULL;
 
   // convert vector of strings to char**
-  if ((array = (char **)malloc(sizeof(char *)*(size+1))) && (array2 = (char **)malloc(sizeof(char *)*(attributes.size() +1))))
-  {
+  if ((array = (char **)calloc(size + 1, sizeof(char *))) && 
+      (array2 = (char **)calloc(attributes.size() + 1, sizeof(char *)))) {
     int j = 0;
-    for (std::vector<std::string>::iterator i = fqan.begin(); i != fqan.end(); i++)
-    {
+    for (std::vector<std::string>::iterator i = fqan.begin(); i != fqan.end(); i++) {
       array[j] = strdup((*i).c_str());
-      if (!array[j])
-      {
-        error = true;
-        break;
+      if (!array[j]) {
+        goto err;
       }
       j++;
     }
-    if (error)
-    {
-      for (int i=0; i < j; i++)
-        free(array[j]);
-      free(array);
-      return false;
-    }
-    array[j]=NULL;
 
     j = 0;
-    for (std::vector<std::string>::iterator i = attributes.begin(); i != attributes.end(); i++)
-    {
+    for (std::vector<std::string>::iterator i = attributes.begin(); i != attributes.end(); i++) {
       array2[j] = strdup((*i).c_str());
-      if (!array2[j])
-      {
-        error = true;
-        break;
+      if (!array2[j]) {
+        goto err;
       }
       j++;
     }
-    if (error)
-    {
-      for (int i=0; i < j; i++)
-        free(array2[j]);
-      free(array2);
-
-      int i = 0;
-      while (array[i])
-        free(array[i++]);
-      free(array);
-
-      return false;
-    }
-    array2[j]=NULL;
 
     std::string complete;
     for (std::vector<std::string>::iterator i = targets.begin(); i != targets.end(); i++)
@@ -103,16 +93,12 @@ int createac(X509 *issuerc, STACK_OF(X509) *issuerstack, X509 *holder, EVP_PKEY 
                       (complete.empty() ? NULL : const_cast<char *>(complete.c_str())), array2, 
                       ac, const_cast<char *>(vo.c_str()), const_cast<char *>(uri.c_str()), valid, (old ? 1 : 0));
 
-    for (int i = 0; i < size; i++)
-      free(array[i]);
-    free(array);
-
-    for (int i = 0; i < attributes.size(); i++)
-      free(array2[i]);
-    free(array2);
+    deallocate(array, size+1, array2, attributes.size() + 1);
     
     return res;
   }
 
-  return AC_ERR_MEMORY;
+ err:
+  deallocate(array, size+1, array2, attributes.size() + 1);
+  return false;
 }

@@ -1,0 +1,88 @@
+load_lib vomstest.exp
+testheader "See if voms-proxy-fake --voinfo works."
+
+proc mytest {} {
+    _activateCert mycert2
+    _cleanproxy
+    set outname [exec mktemp $::SCRATCHDIR/voms-proxy-fake-XXXXXX]
+    set outinfo [exec mktemp $::SCRATCHDIR/vo-info-XXXXXX]
+    set id [open $outinfo "w+"]
+    puts $id "\[voms1\]"
+    puts $id "-hostcert = $::INSTALLDIR/certs/hostcert.pem"
+    puts $id "-hostkey = $::INSTALLDIR/certs/hostkey.pem"
+    puts $id "-fqan = /voms1"
+    puts $id "-uri = testmachine.cnaf.infn.it"
+    puts $id "\[voms2\]"
+    puts $id "-hostcert = $::INSTALLDIR/certs/hostcert.pem"
+    puts $id "-hostkey = $::INSTALLDIR/certs/hostkey.pem"
+    puts $id "-fqan = /voms3"
+    puts $id "-uri = testmachine.cnaf.infn.it:5000"
+    puts $id "-ga = nome = \"prova di prova\""
+    puts $id "-ga = nome = prova"
+    puts $id "-ga = \"non lo so\" = boh (/vom3)"
+    puts $id "-target = r.f.c.it"
+    puts $id "-target = r.f.s.it"
+    puts $id "-vomslife = 10"
+    close $id
+    set res [catch {set out [exec $::INSTALLDIR/bin/voms-proxy-fake --voinfo $outinfo >& $outname]}]
+
+    if $res then {
+        addlog $outname
+        addlog $outinfo
+        testmessage "voms-proxy-fake failed."
+        return $::FAILTEST
+    }
+
+    if [catch {set out2 [exec $::INSTALLDIR/bin/voms-proxy-info -all >& $outname]}] then {
+        addlog $outname
+        addlog $outinfo
+        testmessage "voms-proxy-info failed."
+        return $::FAILTEST
+    }
+
+        set correct "subject   : /C=IT/CN=001/CN=proxy
+issuer    : /C=IT/CN=001
+identity  : /C=IT/CN=001
+type      : proxy
+strength  : 1024 bits
+path      : /tmp/x509up_u\[0-9\]*
+timeleft  : \[0-9\]*:\[0-9\]*:\[0-9\]*
+=== VO voms1 extension information ===
+VO        : voms1
+subject   : /C=IT/CN=001
+issuer    : /C=IT/CN=003
+attribute : /voms1
+timeleft  : \[0-9\]*:\[0-9\]*:\[0-9\]*
+uri       : testmachine.cnaf.infn.it
+=== VO voms2 extension information ===
+VO        : voms2
+subject   : /C=IT/CN=001
+issuer    : /C=IT/CN=003
+attribute : /voms3
+attribute : nome = prova di prova \\(voms2\\)
+attribute : nome = prova \\(voms2\\)
+attribute : non lo so = boh \\(/vom3\\)
+timeleft  : \[0-9\]*:\[0-9\]*:\[0-9\]*
+target    : r.f.c.it
+target    : r.f.s.it
+uri       : testmachine.cnaf.infn.it:5000"
+
+    set out2 [exec cat $outname]
+
+    if [regexp $correct $out2] then {
+        testmessage "File voinfo read correctly"
+        return $::PASSTEST
+    }
+
+    set outname2 [exec mktemp $::SCRATCHDIR/voms-proxy-info-XXXXXX]
+    set id [open $outname2 "w+"]
+    puts $id $correct
+    close $id
+    addlog $outname
+    addlog $outname2
+
+    testmessage "proxy and specification in voinfo do not match"
+    return $::FAILTEST
+}
+
+do_test

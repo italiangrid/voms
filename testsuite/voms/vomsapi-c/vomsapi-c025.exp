@@ -1,0 +1,44 @@
+load_lib vomstest.exp
+testheader "See if VOMS_ResetOrder() works."
+
+proc mytest {} {
+    _activateCert mycert2
+
+    _vomsStart voms1
+    set ::_buildout [exec mktemp $::SCRATCHDIR/voms-api-c-XXXXXX]
+    set res [_exeC resetorder.c [exec hostname]]
+    _vomsStop voms1
+
+    if $res then {
+        addlog $::_buildout
+        testmessage "compile/execution failed."
+        return $::FAILTEST
+    }
+
+    addlog $::_buildout
+
+    if $res then {
+        testmessage "parsing failed."
+        return $::FAILTEST
+    } else {
+        set correct "fqan: /voms1
+fqan: /voms1/group1"
+
+        set out [exec cat $::_buildout]
+        if [regexp $correct $out] then {
+            testmessage "output correct"
+            return $::PASSTEST
+        } else {
+            set outname2 [exec mktemp $::SCRATCHDIR/voms-api-c-XXXXXX]
+            set id [open $outname2 "w+"]
+            puts $id $correct
+            close $id
+
+            addlog $outname2
+            testmessage "output wrong"
+            return $::FAILTEST
+        }
+    }
+}
+
+do_test

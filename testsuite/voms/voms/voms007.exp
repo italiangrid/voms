@@ -1,7 +1,7 @@
 load_lib vomstest.exp
+testheader "See if a voms proxy has the right attributes."
 
 proc mytest {} {
-    testheader "See if a voms proxy has the right attributes."
     _activateCert mycert2
 
     _vomsStart voms1
@@ -11,7 +11,7 @@ proc mytest {} {
 
     if $res then {
         addlog $outname
-        testmessage "voms proxy init failed."
+        testmessage "voms-proxy-init failed."
         return $::FAILTEST
     }
 
@@ -20,7 +20,7 @@ proc mytest {} {
 
     if $res then {
         addlog $outname
-        testmessage "voms proxy info failed."
+        testmessage "voms-proxy-info failed."
         return $::FAILTEST
     } else {
         #match against known (correct) output
@@ -51,7 +51,7 @@ timeleft  : \[0-9\]*:\[0-9\]*:\[0-9\]*"
             close $id
             addlog $outname 
             addlog $outname2
-            testmesasge "Unexpected output in voms-proxy-info"
+            testmessage "Unexpected output in voms-proxy-info"
             return $::FAILTEST
         }
     }

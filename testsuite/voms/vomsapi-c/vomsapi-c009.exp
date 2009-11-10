@@ -1,0 +1,36 @@
+load_lib vomstest.exp
+testheader "See if an AddTarget() with other host fails verification."
+
+proc mytest {} {
+    _activateCert mycert2
+
+    _vomsStart voms1
+    set ::_buildout [exec mktemp $::SCRATCHDIR/voms-api-c-XXXXXX]
+    set res [_exeC target.c nofrtcju.fdrfgeg.com]
+    _vomsStop voms1
+
+    if $res then {
+        set correct "Cannot find match among allowed hosts."
+        set out [exec cat $::_buildout]
+        if [regexp $correct $out] then {
+            testmessage "validation correctly failed"
+            return $::PASSTEST
+        } else {
+            set outname2 [exec mktemp $::SCRATCHDIR/voms-api-c-XXXXXX]
+            set id [open $outname2 "w+"]
+            puts $id $correct
+            close $id
+
+            addlog $outname2
+            addlog $::_buildout
+            testmessage "wrong error message"
+            return $::FAILTEST
+        }
+    }
+
+    addlog $::_buildout
+    testmessage "compile/execution failed."
+    return $::FAILTEST
+}
+
+do_test

@@ -2,9 +2,10 @@
  *
  * Authors: Vincenzo Ciaschini - Vincenzo.Ciaschini@cnaf.infn.it 
  *
- * Copyright (c) 2002, 2003 INFN-CNAF on behalf of the EU DataGrid.
+ * Copyright (c) 2002-2009 INFN-CNAF on behalf of the EU DataGrid
+ * and EGEE I, II and III
  * For license conditions see LICENSE file or
- * http://www.edg.org/license.html
+ * http://www.apache.org/licenses/LICENSE-2.0.txt
  *
  * Parts of this code may be based upon or even include verbatim pieces,
  * originally written by other people, in which case the original header
@@ -15,6 +16,7 @@
 
 #include <openssl/asn1.h>
 #include <openssl/objects.h>
+#include "extensions.h"
 
 void declareOIDs(void)
 {
@@ -70,13 +72,3 @@ void declareOIDs(void)
 
 }
 
-extern int initEx(void);
-
-void InitAC(void)
-{
-  static int i = 0;
-  if (i) return;
-  i=1;
-  (void)declareOIDs();
-  (void)initEx();
-}

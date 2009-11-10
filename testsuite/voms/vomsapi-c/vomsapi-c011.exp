@@ -1,13 +1,7 @@
 load_lib vomstest.exp
+testheader "See if an VOMS_RetrieveFromFile() works."
 
 proc mytest {} {
-    testheader "See if an VOMS_RetrieveFromFile() works."
-
-    if {[info exists ::NOCLIB] != 0} then {
-        testmessage "Either libraries are not present, or the executables cannot be compiled, or the test was disabled."
-        return $::UNDECIDEDTEST
-    }
-
     _activateCert mycert2
 
     _vomsStart voms1

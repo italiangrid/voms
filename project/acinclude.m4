@@ -1,3 +1,31 @@
+AC_DEFUN([AC_BUILD_PARTS],
+[
+  AC_ARG_WITH(clients,
+    [  --with-clients   Enable compilation of the clients (yes)],
+    [
+      case "$withval" in
+        yes) build_clients="yes" ;;
+        no)  build_clients="no" ;;
+        *) AC_MSG_ERROR([bad value $(withval) for --with-client]) ;;
+      esac
+    ],
+    [ build_clients="yes" ])
+
+  AC_ARG_WITH(server,
+    [  --with-server   Enable compilation of the server (yes)],
+    [
+      case "$withval" in
+        yes) build_server="yes" ;;
+        no)  build_server="no" ;;
+        *) AC_MSG_ERROR([bad value $(withval) for --with-server]) ;;
+      esac
+    ],
+    [ build_server="yes" ])
+
+  AM_CONDITIONAL(BUILD_CLIENTS, test x$build_clients = xyes)
+  AM_CONDITIONAL(BUILD_SERVER, test x$build_server = xyes)
+])
+
 AC_DEFUN([AC_VOMS_LIBRARY],
 [
     globus_flavor=$1
@@ -220,7 +248,7 @@ AC_DEFUN([AC_GLOBUS],
       fi
       WANTED_OLDGAA_LIBS="$WANTED_OLDGAA_LIBS liboldgaa_$flavor.la"
       WANTED_SSL_UTILS_LIBS="$WANTED_SSL_UTILS_LIBS libssl_utils_"$flavor".la"
-      WANTED_SOCK_LIBS="$WANTED_SOCK_LIBS libsock_$flavor.la"
+      WANTED_SOCK_LIBS="$WANTED_SOCK_LIBS libsock_$flavor.la libsock_server_$flavor.la"
       WANTED_CCAPI_LIBS="$WANTED_CCAPI_LIBS libvomsapi_"$flavor".la"
       WANTED_CAPI_LIBS="$WANTED_CAPI_LIBS libvomsc_"$flavor".la"
       WANTED_ATTCERT_LIBS="$WANTED_ATTCERT_LIBS libattcert_"$flavor".la libccattcert_"$flavor".la"
@@ -361,8 +389,8 @@ AC_DEFUN([AC_COMPILER],
       [ac_with_debug="no"])
     
     if test "x$ac_with_debug" = "xyes" ; then
-      CFLAGS="-g -O0"
-      CXXFLAGS="-g -O0"
+      CFLAGS="-g -O0 -fprofile-arcs -ftest-coverage"
+      CXXFLAGS="-g -O0 -fprofile-arcs -ftest-coverage"
     fi
 
     AC_ARG_WITH(warnings,
@@ -371,8 +399,8 @@ AC_DEFUN([AC_COMPILER],
       [ac_with_warnings="no"])
 
     if test "x$ac_with_warnings" = "xyes" ; then
-      CFLAGS="-O -Wall -W $CFLAGS"
-      CXXFLAGS="-O -Wall -w $CXXFLAGS"
+      CFLAGS="-g -O0 -Wall -ansi -W $CFLAGS"
+      CXXFLAGS="-g -O0 -Wall -ansi -W $CXXFLAGS"
     fi
 ])
 
@@ -467,22 +495,6 @@ AC_DEFUN([AC_JAVA],
   fi
 
   if test "x$have_java" = "xyes"; then
-    AC_MSG_CHECKING([for cog])
-  fi
-
-  AC_ARG_WITH(cog,
-    [  --with-cog=jars         Colon-separated list of cog jars, default = $CLASSPATH],
-    [  wcog="$withval"],
-    [  wcog=""])
-  if test "x$wcog" = "x"; then
-    if test "x$have_java" = "xyes"; then
-      AC_MSG_RESULT([hope it is in $CLASSPATH])
-    fi
-  else
-    AC_MSG_RESULT([specified: $wcog])
-  fi
-
-  if test "x$have_java" = "xyes"; then
     AC_MSG_CHECKING([for commons-cli])
   fi
 
@@ -521,7 +533,7 @@ AC_DEFUN([AC_JAVA],
 
   AM_CONDITIONAL(BUILD_JAVA_ONLY, test x$wjavaall = xyes)
           
-  JAVA_CLASSPATH=".:$wbc:$wlog4j:$wcog:$wcomcli:$wcomlang"
+  JAVA_CLASSPATH=".:$wbc:$wlog4j:$wcomcli:$wcomlang"
   JAVA_CLASSPATH2=""
 
 #  JAVA_CLASSPATH2='.:/data/marotta/cog-1.1/lib/cog-jglobus.jar:${top_srcdir}/jars/commons-cli-1.0.jar:${top_srcdir}/jars/commons-lang-2.2.jar:/data/marotta/cog-1.1/lib/cryptix32.jar:/data/marotta/cog-1.1/lib/cryptix-asn1.jar:/data/marotta/cog-1.1/lib/cryptix.jar:/data/marotta/cog-1.1/lib/jgss.jar:/data/marotta/cog-1.1/lib/puretls.jar'
@@ -567,7 +579,6 @@ AC_DEFUN([AC_ENABLE_GLITE],
     if test "x$ac_enable_glite" = "xno"; then
     	DISTTAR=$WORKDIR
     	AC_SUBST(DISTTAR)
-#	EDG_SET_RPM_TOPDIR
     	AC_SUBST(LOCATION_ENV, "VOMS_LOCATION")
     	AC_SUBST(LOCATION_DIR, "${prefix}")
     	AC_SUBST(VAR_LOCATION_ENV, "VOMS_LOCATION_VAR")
@@ -584,27 +595,6 @@ AC_DEFUN([AC_ENABLE_GLITE],
     	AC_DEFINE(LOCATION_DIR, "/opt/glite", [Location of system directory])
     	AC_DEFINE(USER_DIR, ".glite", [Location of user directory])
     fi
-])
-
-# EDG_SET_RPM_TOPDIR(DIRECTORY)
-# -----------------------------
-AC_DEFUN([EDG_SET_RPM_TOPDIR],
-[
-    AC_MSG_CHECKING([for rpm topdir])
-    
-    AC_ARG_WITH([rpm-dir],
-            [  --with-rpm-dir=DIR      rpm topdir in DIR [`pwd`]],
-            [ac_with_rpm_topdir=$withval],
-            [ac_with_rpm_topdir=`pwd`])
-
-    if test -d $ac_with_rpm_topdir ; then
-      AC_MSG_RESULT([$ac_with_rpm_topdir found])
-    else
-      AC_MSG_RESULT([$ac_with_rpm_topdir not found])
-    fi
-
-    RPM_TOPDIR=$ac_with_rpm_topdir
-    AC_SUBST(RPM_TOPDIR)
 ])
 
 # AC_VOMS_TIME_T_TIMEZONE test whether time_t timezone is present

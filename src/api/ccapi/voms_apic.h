@@ -2,9 +2,10 @@
  *
  * Authors: Vincenzo Ciaschini - Vincenzo.Ciaschini@cnaf.infn.it 
  *
- * Copyright (c) 2002, 2003 INFN-CNAF on behalf of the EU DataGrid.
+ * Copyright (c) 2002-2009 INFN-CNAF on behalf of the EU DataGrid
+ * and EGEE I, II and III
  * For license conditions see LICENSE file or
- * http://www.edg.org/license.html
+ * http://www.apache.org/licenses/LICENSE-2.0.txt
  *
  * Parts of this code may be based upon or even include verbatim pieces,
  * originally written by other people, in which case the original header
@@ -392,14 +393,15 @@ extern int VOMS_GetAttribute(struct voms *v, int handle, int num, struct attribu
 extern struct vomsdata *VOMS_Duplicate(struct vomsdata *vd);
 extern AC *VOMS_GetAC(struct voms *v);
 
-int getMajorVersionNumber(void);
-int getMinorVersionNumber(void);
-int getPatchVersionNumber(void);
+extern int getMajorVersionNumber(void);
+extern int getMinorVersionNumber(void);
+extern int getPatchVersionNumber(void);
 
 extern int VOMS_SetVerificationTime(time_t verificationtime, struct vomsdata *vd, int *error);
 extern char **VOMS_GetTargetsList(struct voms *v, struct vomsdata *vd, int *error);
 extern void VOMS_FreeTargetsList(char **);
 
+extern int VOMS_SetTimeout(int t, struct vomsdata *vd, int *error);
 #endif
 
 

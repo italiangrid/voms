@@ -1,0 +1,37 @@
+load_lib vomstest.exp
+testheader "See if voms-proxy-init does timeout during negotiation (2)."
+
+proc mytest {} {
+    _activateCert mycert2
+
+    set outname [exec mktemp $::SCRATCHDIR/voms-proxy-init-XXXXXX]
+    set ::_buildout [exec mktemp $::SCRATCHDIR/voms-api-c-XXXXXX]
+    set res [_buildC server2.c]
+
+    exec /bin/sh -c "$::SCRATCHDIR/a.out '$::INSTALLDIR/etc/grid-security/certificates;$::INSTALLDIR/certs/hostcert.pem;$::INSTALLDIR/certs/hostkey.pem;start' >/dev/null &"
+
+    set timeout 40
+    spawn $::INSTALLDIR/bin/voms-proxy-init --voms voms1 -timeout 30
+    expect {
+        stuck { set dopass 1 }
+        Answer { set dopass 0 }
+        eof { set dopass 1 }
+        timeout { set dopass 0 }
+    }
+
+#    close -i $spawn_id
+    set res [catch {set out [exec killall a.out]}]
+    set out2 [exec cat $outname]
+
+    if $dopass then {
+        testmessage "Timeout worked"
+        return $::PASSTEST
+    } else {
+        addlog $outname
+        testmessage "Timeout did not work after handshake"
+        return $::FAILTEST
+    }
+
+}
+
+do_test

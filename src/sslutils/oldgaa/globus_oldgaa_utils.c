@@ -67,10 +67,10 @@ oldgaa_globus_cleanup(oldgaa_sec_context_ptr *oldgaa_sc,
                    oldgaa_data_ptr         policy_db, 
                    oldgaa_sec_attrb_ptr   *attributes)
 {
-  oldgaa_error_code oldgaa_status;
+  oldgaa_error_code oldgaa_status = OLDGAA_SUCCESS;
   uint32         minor_status;
         
- if(oldgaa_sc)    oldgaa_status = oldgaa_release_sec_context(&minor_status, oldgaa_sc); 
+ if(oldgaa_sc) oldgaa_status = oldgaa_release_sec_context(&minor_status, oldgaa_sc); 
  if(rights)    oldgaa_status = oldgaa_release_rights(&minor_status, rights);   
  if(options)   oldgaa_status = oldgaa_release_options(&minor_status, options);  
  if(answer)    oldgaa_status = oldgaa_release_answer(&minor_status, answer);
@@ -830,14 +830,14 @@ do
                          "parse_principals: Missing principal defining authority"))
       return OLDGAA_RETRIEVE_ERROR;
         
-      if (str) /* expecting defining authority */ 
+      /* expecting defining authority */ 
       principal->authority = oldgaa_strcopy(str, principal->authority);     
 
       if (oldgaa_globus_help_read_string(pcontext, str,
                          "parse_principals: Missing principals value"))
       return OLDGAA_RETRIEVE_ERROR;
         
-      if (str) /* expecting value */ 
+      /* expecting value */ 
       principal->value = oldgaa_strcopy(str, principal->value);
        
    
@@ -912,21 +912,21 @@ do{
     /* allocate fill in the oldgaa_rights structure */
 
     oldgaa_allocate_rights(&rights);
-    if (str)
+
     rights->type = oldgaa_strcopy(str, rights->type);
       
     if (oldgaa_globus_help_read_string(pcontext, str,
                         "parse_rights: Missing right authority"))
     return OLDGAA_RETRIEVE_ERROR;  
  
-    if (str) /* expecting defining authority */ 
+    /* expecting defining authority */ 
     rights->authority = oldgaa_strcopy(str, rights->authority);
      
     if(oldgaa_globus_help_read_string(pcontext, str,
                         "parse_rights: Missing right value"))
     return OLDGAA_RETRIEVE_ERROR;  
   
-    if (str)/* expecting value */      
+    /* expecting value */      
     rights->value = oldgaa_strcopy(str, rights->value);
        
     if(first == TRUE){ *start = rights; first = FALSE; } 
@@ -1003,19 +1003,19 @@ do
  /* allocate fill in the oldgaa_conditions structure */
 
    oldgaa_allocate_conditions(&cond);
-   if (str) cond->type = oldgaa_strcopy(str,cond->type) ;
+   cond->type = oldgaa_strcopy(str,cond->type) ;
     
    if (oldgaa_globus_help_read_string(pcontext, str,
                         "parse_conditions: Missing condition authority"))
    return OLDGAA_RETRIEVE_ERROR;
 
-   if (str) cond->authority = oldgaa_strcopy(str, cond->authority);
+   cond->authority = oldgaa_strcopy(str, cond->authority);
 
    if (oldgaa_globus_help_read_string(pcontext, str,
                        "parse_conditions: Missing condition value"))
    return OLDGAA_RETRIEVE_ERROR;
 
-   if (str) cond->value = oldgaa_strcopy(str, cond->value);
+   cond->value = oldgaa_strcopy(str, cond->value);
     
    oldgaa_allocate_cond_bindings(&cond_bind);
 

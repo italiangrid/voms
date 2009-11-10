@@ -2,9 +2,10 @@
  *
  * Authors: Vincenzo Ciaschini - Vincenzo.Ciaschini@cnaf.infn.it 
  *
- * Copyright (c) 2002, 2003 INFN-CNAF on behalf of the EU DataGrid.
+ * Copyright (c) 2002-2009 INFN-CNAF on behalf of the EU DataGrid
+ * and EGEE I, II and III
  * For license conditions see LICENSE file or
- * http://www.edg.org/license.html
+ * http://www.apache.org/licenses/LICENSE-2.0.txt
  *
  * Parts of this code may be based upon or even include verbatim pieces,
  * originally written by other people, in which case the original header
@@ -25,9 +26,10 @@ extern "C" {
 
 #include "realdata.h"
 
+#include <cstring>
+#include <cstdlib>
 
-#if 1
-int TranslateVOMS(struct vomsdatar *vd, std::vector<voms> &v, int *error)
+int TranslateVOMS(struct vomsdatar *vd, std::vector<voms> &v, UNUSED(int *error))
 {
   if (vd->data) {
     /* Delete old store */
@@ -56,7 +58,6 @@ int TranslateVOMS(struct vomsdatar *vd, std::vector<voms> &v, int *error)
   free(arr2);
   return 0;
 }
-#endif
 
 static char *
 mystrdup(const char *str, int len = 0)
@@ -102,7 +103,7 @@ struct vomsdatar *VOMS_Init(char *voms, char *cert)
 #define GetPointer(v) (((struct realdata *)(((struct vomsdatar *)((v)->my2))->real->data[v->mydata].realdata)))
 #define GetV(v) (((struct vomsdatar *)((v)->my2))->real->data[v->mydata])
 
-int VOMS_GetAttributeSourcesNumber(struct vomsr *v, struct vomsdatar *vd, int *error)
+int VOMS_GetAttributeSourcesNumber(struct vomsr *v, UNUSED(struct vomsdatar *vd), int *error)
 {
   try {
     return GetV(v).GetAttributes().size();
@@ -125,7 +126,7 @@ int VOMS_GetAttributeSourceHandle(struct vomsr *v, int num, struct vomsdatar *vd
   return -1;
 }
 
-const char *VOMS_GetAttributeGrantor(struct vomsr *v, int handle, struct vomsdatar *vd, int *error)
+const char *VOMS_GetAttributeGrantor(struct vomsr *v, int handle, UNUSED(struct vomsdatar *vd), int *error)
 {
   try {
     return ((GetV(v).GetAttributes())[handle].grantor.c_str());
@@ -136,7 +137,7 @@ const char *VOMS_GetAttributeGrantor(struct vomsr *v, int handle, struct vomsdat
   }
 }
 
-int VOMS_GetAttributesNumber(struct vomsr *v, int handle, struct vomsdatar *vd, int *error)
+int VOMS_GetAttributesNumber(struct vomsr *v, int handle, UNUSED(struct vomsdatar *vd), int *error)
 {
   try {
     return ((GetV(v).GetAttributes())[handle].attributes.size());
@@ -147,7 +148,7 @@ int VOMS_GetAttributesNumber(struct vomsr *v, int handle, struct vomsdatar *vd, 
   }
 }
 
-int VOMS_GetAttribute(struct vomsr *v, int handle, int num, struct attributer *at, struct vomsdatar *vd, int *error)
+int VOMS_GetAttribute(struct vomsr *v, int handle, int num, struct attributer *at, UNUSED(struct vomsdatar *vd), int *error)
 {
   try {
     struct attribute a = ((GetV(v).GetAttributes())[handle]).attributes[num];
@@ -282,7 +283,7 @@ struct vomsr *voms::translate()
       dst->ac     = AC_dup((((struct realdata *)realdata)->ac));
       dst->holder = X509_dup(holder);
 
-      if (!dst->holder || !dst->ac)
+      if ((!dst->holder && holder) || !dst->ac)
         throw 3;
 
       dst->fqan = (char **)calloc(1, sizeof(char *)*(fqan.size()+1));
@@ -436,6 +437,7 @@ char *VOMS_ListTargets(struct vomsdatar *vd, int *error)
     if (cur != list.begin())
       total += ",";
     total += *cur;
+    cur++;
   }
 
   char *res = mystrdup(total.c_str());
@@ -484,6 +486,17 @@ int VOMS_SetLifetime(int length, struct vomsdatar *vd, int *error)
   return 1;
 }
 
+int VOMS_SetTimeout(int t, struct vomsdatar *vd, int *error)
+{
+  if (!vd || !vd->real || !error) {
+    *error = VERR_PARAM;
+    return 0;
+  }
+
+  vd->timeout = t;
+  return 1;
+}
+
 int VOMS_Ordering(char *order, struct vomsdatar *vd, int *error)
 {
   if (!vd || !vd->real || !error) {
@@ -520,7 +533,7 @@ int VOMS_Contact(char *host, int port, char *servsub, char *comm, struct vomsdat
   }
 
   vomsdata *v = vd->real;
-  if (v->Contact(std::string(host), port, std::string(servsub), std::string(comm))) {
+  if (v->Contact(std::string(host), port, std::string(servsub), std::string(comm), vd->timeout)) {
     return TranslateVOMS(vd, v->data, error);
   }
 
@@ -542,7 +555,7 @@ int VOMS_ContactRaw(char *host, int port, char *servsub, char *comm, void **data
   std::string output;
   
   if (v->ContactRaw(std::string(host), port, std::string(servsub),
-                    std::string(comm), output, *version)) {
+                    std::string(comm), output, *version, vd->timeout)) {
     *datalen = output.size();
     char *d = (char *)malloc(output.size());
     if (d) {
@@ -852,6 +865,7 @@ vomsdatar *VOMS_Duplicate(vomsdatar *orig)
       vd->workvo = (orig->workvo ? strdup(orig->workvo) : NULL);
       vd->volen = orig->volen;
       vd->extralen = orig->extralen;
+      vd->timeout = orig->timeout;
       vd->real = v;
 
       if (!TranslateVOMS(vd, v->data, &error)) {
@@ -861,7 +875,7 @@ vomsdatar *VOMS_Duplicate(vomsdatar *orig)
     }
   }
   catch(...) {}
-  
+
   return vd;
 }
 

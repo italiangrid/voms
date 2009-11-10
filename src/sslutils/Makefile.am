@@ -3,7 +3,7 @@ noinst_LTLIBRARIES = \
 
 SOURCES= scutils.c scutils.h sslutils.c sslutils.h proxycertinfo.c \
 	signing_policy.c lex.signing.c namespaces.c lex.namespaces.c \
-	evaluate.c
+	evaluate.c proxy.c proxy.h
 
 signing_policy.c: signing_policy.y
 	bison -t -d -o signing_policy.c signing_policy.y

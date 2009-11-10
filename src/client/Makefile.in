@@ -32,7 +32,7 @@ PRE_UNINSTALL = :
 POST_UNINSTALL = :
 build_triplet = @build@
 host_triplet = @host@
-bin_PROGRAMS = voms-proxy-init$(EXEEXT)
+@BUILD_CLIENTS_TRUE@bin_PROGRAMS = voms-proxy-init$(EXEEXT)
 subdir = src/client
 DIST_COMMON = $(srcdir)/Makefile.am $(srcdir)/Makefile.in
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
@@ -47,14 +47,15 @@ CONFIG_CLEAN_FILES =
 am__installdirs = "$(DESTDIR)$(bindir)"
 binPROGRAMS_INSTALL = $(INSTALL_PROGRAM)
 PROGRAMS = $(bin_PROGRAMS)
-am_voms_proxy_init_OBJECTS = main.$(OBJEXT) vomsclient.$(OBJEXT) \
-	fqan.$(OBJEXT)
+am__voms_proxy_init_SOURCES_DIST = main.cc vomsclient.cc vomsclient.h \
+	contact.hpp fqan.h fqan.cc
+@BUILD_CLIENTS_TRUE@am_voms_proxy_init_OBJECTS = main.$(OBJEXT) \
+@BUILD_CLIENTS_TRUE@	vomsclient.$(OBJEXT) fqan.$(OBJEXT)
 voms_proxy_init_OBJECTS = $(am_voms_proxy_init_OBJECTS)
 am__DEPENDENCIES_1 =
-voms_proxy_init_DEPENDENCIES =  \
-	$(top_builddir)/src/api/ccapi/libvomsapi.la \
-	$(top_builddir)/src/sslutils/libssl_utils_nog.la \
-	$(am__DEPENDENCIES_1)
+@BUILD_CLIENTS_TRUE@voms_proxy_init_DEPENDENCIES = $(top_builddir)/src/api/ccapi/libvomsapi_nog.la \
+@BUILD_CLIENTS_TRUE@	$(top_builddir)/src/sslutils/libssl_utils_nog.la \
+@BUILD_CLIENTS_TRUE@	$(am__DEPENDENCIES_1)
 DEFAULT_INCLUDES = -I.@am__isrc@ -I$(top_builddir)/src/autogen
 depcomp = $(SHELL) $(top_srcdir)/./project/depcomp
 am__depfiles_maybe = depfiles
@@ -77,7 +78,7 @@ LINK = $(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) \
 	--mode=link $(CCLD) $(AM_CFLAGS) $(CFLAGS) $(AM_LDFLAGS) \
 	$(LDFLAGS) -o $@
 SOURCES = $(voms_proxy_init_SOURCES)
-DIST_SOURCES = $(voms_proxy_init_SOURCES)
+DIST_SOURCES = $(am__voms_proxy_init_SOURCES_DIST)
 ETAGS = etags
 CTAGS = ctags
 DISTFILES = $(DIST_COMMON) $(DIST_SOURCES) $(TEXINFOS) $(EXTRA_DIST)
@@ -265,24 +266,24 @@ with_dbuser = @with_dbuser@
 with_mysqlconf = @with_mysqlconf@
 with_reportdir = @with_reportdir@
 with_scratchdir = @with_scratchdir@
-voms_proxy_init_SOURCES = \
-	main.cc \
-	vomsclient.cc \
-	vomsclient.h \
-	contact.hpp \
-	fqan.h \
-	fqan.cc
+@BUILD_CLIENTS_TRUE@voms_proxy_init_SOURCES = \
+@BUILD_CLIENTS_TRUE@	main.cc \
+@BUILD_CLIENTS_TRUE@	vomsclient.cc \
+@BUILD_CLIENTS_TRUE@	vomsclient.h \
+@BUILD_CLIENTS_TRUE@	contact.hpp \
+@BUILD_CLIENTS_TRUE@	fqan.h \
+@BUILD_CLIENTS_TRUE@	fqan.cc
 
-voms_proxy_init_LDADD = \
-  $(top_builddir)/src/api/ccapi/libvomsapi.la \
-  $(top_builddir)/src/sslutils/libssl_utils_nog.la \
-	$(EXPAT_LIBS)
+@BUILD_CLIENTS_TRUE@voms_proxy_init_LDADD = \
+@BUILD_CLIENTS_TRUE@  $(top_builddir)/src/api/ccapi/libvomsapi_nog.la \
+@BUILD_CLIENTS_TRUE@  $(top_builddir)/src/sslutils/libssl_utils_nog.la \
+@BUILD_CLIENTS_TRUE@	$(EXPAT_LIBS)
 
-AM_CPPFLAGS = -I$(top_srcdir)/src/api/ccapi \
-	-I$(top_srcdir)/src/include \
-	-I$(top_srcdir)/src/sslutils \
-	$(GLOBUS_CFLAGS) \
-	$(EXPAT_CFLAGS)
+@BUILD_CLIENTS_TRUE@AM_CPPFLAGS = -I$(top_srcdir)/src/api/ccapi \
+@BUILD_CLIENTS_TRUE@	-I$(top_srcdir)/src/include \
+@BUILD_CLIENTS_TRUE@	-I$(top_srcdir)/src/sslutils \
+@BUILD_CLIENTS_TRUE@	$(GLOBUS_CFLAGS) \
+@BUILD_CLIENTS_TRUE@	$(EXPAT_CFLAGS)
 
 all: all-am
 
@@ -490,6 +491,7 @@ distclean-generic:
 maintainer-clean-generic:
 	@echo "This command is intended for maintainers to use"
 	@echo "it deletes files that may require special tools to rebuild."
+@BUILD_CLIENTS_FALSE@install-exec-hook:
 clean: clean-am
 
 clean-am: clean-binPROGRAMS clean-generic clean-libtool mostlyclean-am
@@ -567,12 +569,12 @@ uninstall-am: uninstall-binPROGRAMS
 	uninstall-am uninstall-binPROGRAMS
 
 
-install-exec-hook:
-	-ln -s voms-proxy-init $(DESTDIR)$(bindir)/edg-voms-proxy-init
-	-ln -s voms-proxy-init $(DESTDIR)$(bindir)/voms-proxy-list
-	-ln -s voms-proxy-init $(DESTDIR)$(bindir)/edg-voms-proxy-list
-@ENABLE_GLITE_TRUE@	-ln -s voms-proxy-init $(DESTDIR)$(bindir)/glite-voms-proxy-init
-@ENABLE_GLITE_TRUE@	-ln -s voms-proxy-init $(DESTDIR)$(bindir)/glite-voms-proxy-list
+@BUILD_CLIENTS_TRUE@install-exec-hook:
+@BUILD_CLIENTS_TRUE@	-ln -s voms-proxy-init $(DESTDIR)$(bindir)/edg-voms-proxy-init
+@BUILD_CLIENTS_TRUE@	-ln -s voms-proxy-init $(DESTDIR)$(bindir)/voms-proxy-list
+@BUILD_CLIENTS_TRUE@	-ln -s voms-proxy-init $(DESTDIR)$(bindir)/edg-voms-proxy-list
+@BUILD_CLIENTS_TRUE@@ENABLE_GLITE_TRUE@	-ln -s voms-proxy-init $(DESTDIR)$(bindir)/glite-voms-proxy-init
+@BUILD_CLIENTS_TRUE@@ENABLE_GLITE_TRUE@	-ln -s voms-proxy-init $(DESTDIR)$(bindir)/glite-voms-proxy-list
 # Tell versions [3.59,3.63) of GNU make to not export all variables.
 # Otherwise a system limit (for SysV at least) may be exceeded.
 .NOEXPORT:

@@ -1,0 +1,38 @@
+load_lib vomstest.exp
+testheader "See if voms-proxy-init --version works."
+
+proc mytest {} {
+    _activateCert mycert2
+
+    _vomsStart voms1
+    set outname [exec mktemp $::SCRATCHDIR/voms-proxy-init-XXXXXX]
+    set res [catch {set out [exec $::INSTALLDIR/bin/voms-proxy-init --version >& $outname]}]
+    _vomsStop voms1
+
+    if $res then {
+        addlog $outname
+        testmessage "voms-proxy-init failed."
+        return $::FAILTEST
+    }
+    #match against known (correct) output
+    set correct "voms-proxy-init
+Version: .*
+Compiled: .*"
+
+    set out2 [exec cat  $outname]
+    if [regexp $correct $out2] then {
+        testmessage "--version worked."
+        return $::PASSTEST
+    } else {
+        set outname2 [exec mktemp $::SCRATCHDIR/voms-proxy-info-XXXXXX]
+        set id [open $outname2 "w+"]
+        puts $id $correct
+        close $id
+        addlog $outname 
+        addlog $outname2
+        testmessage "Unexpected output in voms-proxy-init"
+        return $::FAILTEST
+    }
+}
+
+do_test

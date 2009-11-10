@@ -32,8 +32,9 @@ PRE_UNINSTALL = :
 POST_UNINSTALL = :
 build_triplet = @build@
 host_triplet = @host@
-bin_PROGRAMS = voms-proxy-info$(EXEEXT) voms-proxy-destroy$(EXEEXT) \
-	voms-proxy-fake$(EXEEXT)
+@BUILD_CLIENTS_TRUE@bin_PROGRAMS = voms-proxy-info$(EXEEXT) \
+@BUILD_CLIENTS_TRUE@	voms-proxy-destroy$(EXEEXT) \
+@BUILD_CLIENTS_TRUE@	voms-proxy-fake$(EXEEXT)
 subdir = src/utils
 DIST_COMMON = $(srcdir)/Makefile.am $(srcdir)/Makefile.in
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
@@ -48,42 +49,38 @@ CONFIG_CLEAN_FILES =
 am__installdirs = "$(DESTDIR)$(bindir)"
 binPROGRAMS_INSTALL = $(INSTALL_PROGRAM)
 PROGRAMS = $(bin_PROGRAMS)
-am_voms_proxy_destroy_OBJECTS = voms_proxy_destroy.$(OBJEXT)
+am__voms_proxy_destroy_SOURCES_DIST = voms_proxy_destroy.cc
+@BUILD_CLIENTS_TRUE@am_voms_proxy_destroy_OBJECTS =  \
+@BUILD_CLIENTS_TRUE@	voms_proxy_destroy.$(OBJEXT)
 voms_proxy_destroy_OBJECTS = $(am_voms_proxy_destroy_OBJECTS)
 am__DEPENDENCIES_1 =
-voms_proxy_destroy_DEPENDENCIES =  \
-	$(top_builddir)/src/api/ccapi/libvomsapi.la \
-	$(top_builddir)/src/sslutils/libssl_utils_nog.la \
-	$(top_builddir)/src/replib/librep.la \
-	$(top_builddir)/src/log/liblog.la $(am__DEPENDENCIES_1)
-am_voms_proxy_fake_OBJECTS = vomsfake.$(OBJEXT)
+@BUILD_CLIENTS_TRUE@voms_proxy_destroy_DEPENDENCIES = $(top_builddir)/src/api/ccapi/libvomsapi_nog.la \
+@BUILD_CLIENTS_TRUE@	$(top_builddir)/src/sslutils/libssl_utils_nog.la \
+@BUILD_CLIENTS_TRUE@	$(top_builddir)/src/replib/librep.la \
+@BUILD_CLIENTS_TRUE@	$(top_builddir)/src/log/liblog.la \
+@BUILD_CLIENTS_TRUE@	$(am__DEPENDENCIES_1)
+am__voms_proxy_fake_SOURCES_DIST = vomsfake.h vomsfake.cc vomsparser.c \
+	lex.yy.c
+@BUILD_CLIENTS_TRUE@am_voms_proxy_fake_OBJECTS = vomsfake.$(OBJEXT) \
+@BUILD_CLIENTS_TRUE@	vomsparser.$(OBJEXT) lex.yy.$(OBJEXT)
 voms_proxy_fake_OBJECTS = $(am_voms_proxy_fake_OBJECTS)
-voms_proxy_fake_DEPENDENCIES =  \
-	$(top_builddir)/src/common/libutilities.la \
-	$(top_builddir)/src/ac/libattributes_nog.la \
-	$(top_builddir)/src/common/libutilc.la \
-	$(top_builddir)/src/replib/librep.la \
-	$(top_builddir)/src/sslutils/libssl_utils_nog.la
-am_voms_proxy_info_OBJECTS = voms_proxy_info.$(OBJEXT)
+@BUILD_CLIENTS_TRUE@voms_proxy_fake_DEPENDENCIES = $(top_builddir)/src/common/libutilities_nog.la \
+@BUILD_CLIENTS_TRUE@	$(top_builddir)/src/ac/libattributes_nog.la \
+@BUILD_CLIENTS_TRUE@	$(top_builddir)/src/common/libutilc_nog.la \
+@BUILD_CLIENTS_TRUE@	$(top_builddir)/src/replib/librep.la \
+@BUILD_CLIENTS_TRUE@	$(top_builddir)/src/sslutils/libssl_utils_nog.la
+am__voms_proxy_info_SOURCES_DIST = voms_proxy_info.cc
+@BUILD_CLIENTS_TRUE@am_voms_proxy_info_OBJECTS =  \
+@BUILD_CLIENTS_TRUE@	voms_proxy_info.$(OBJEXT)
 voms_proxy_info_OBJECTS = $(am_voms_proxy_info_OBJECTS)
-voms_proxy_info_DEPENDENCIES =  \
-	$(top_builddir)/src/api/ccapi/libvomsapi.la \
-	$(top_builddir)/src/replib/librep.la \
-	$(top_builddir)/src/log/liblog.la \
-	$(top_builddir)/src/sslutils/libssl_utils_nog.la \
-	$(am__DEPENDENCIES_1)
+@BUILD_CLIENTS_TRUE@voms_proxy_info_DEPENDENCIES = $(top_builddir)/src/api/ccapi/libvomsapi_nog.la \
+@BUILD_CLIENTS_TRUE@	$(top_builddir)/src/replib/librep.la \
+@BUILD_CLIENTS_TRUE@	$(top_builddir)/src/log/liblog.la \
+@BUILD_CLIENTS_TRUE@	$(top_builddir)/src/sslutils/libssl_utils_nog.la \
+@BUILD_CLIENTS_TRUE@	$(am__DEPENDENCIES_1)
 DEFAULT_INCLUDES = -I.@am__isrc@ -I$(top_builddir)/src/autogen
 depcomp = $(SHELL) $(top_srcdir)/./project/depcomp
 am__depfiles_maybe = depfiles
-CXXCOMPILE = $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) \
-	$(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS)
-LTCXXCOMPILE = $(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) \
-	--mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) \
-	$(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS)
-CXXLD = $(CXX)
-CXXLINK = $(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) \
-	--mode=link $(CXXLD) $(AM_CXXFLAGS) $(CXXFLAGS) $(AM_LDFLAGS) \
-	$(LDFLAGS) -o $@
 COMPILE = $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) \
 	$(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS)
 LTCOMPILE = $(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) \
@@ -93,10 +90,20 @@ CCLD = $(CC)
 LINK = $(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) \
 	--mode=link $(CCLD) $(AM_CFLAGS) $(CFLAGS) $(AM_LDFLAGS) \
 	$(LDFLAGS) -o $@
+CXXCOMPILE = $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) \
+	$(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS)
+LTCXXCOMPILE = $(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) \
+	--mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) \
+	$(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS)
+CXXLD = $(CXX)
+CXXLINK = $(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) \
+	--mode=link $(CXXLD) $(AM_CXXFLAGS) $(CXXFLAGS) $(AM_LDFLAGS) \
+	$(LDFLAGS) -o $@
 SOURCES = $(voms_proxy_destroy_SOURCES) $(voms_proxy_fake_SOURCES) \
 	$(voms_proxy_info_SOURCES)
-DIST_SOURCES = $(voms_proxy_destroy_SOURCES) \
-	$(voms_proxy_fake_SOURCES) $(voms_proxy_info_SOURCES)
+DIST_SOURCES = $(am__voms_proxy_destroy_SOURCES_DIST) \
+	$(am__voms_proxy_fake_SOURCES_DIST) \
+	$(am__voms_proxy_info_SOURCES_DIST)
 ETAGS = etags
 CTAGS = ctags
 DISTFILES = $(DIST_COMMON) $(DIST_SOURCES) $(TEXINFOS) $(EXTRA_DIST)
@@ -284,47 +291,49 @@ with_dbuser = @with_dbuser@
 with_mysqlconf = @with_mysqlconf@
 with_reportdir = @with_reportdir@
 with_scratchdir = @with_scratchdir@
-voms_proxy_info_SOURCES = \
-	voms_proxy_info.cc
+@BUILD_CLIENTS_TRUE@voms_proxy_info_SOURCES = \
+@BUILD_CLIENTS_TRUE@	voms_proxy_info.cc
 
-voms_proxy_info_LDADD = \
-	$(top_builddir)/src/api/ccapi/libvomsapi.la  \
-	$(top_builddir)/src/replib/librep.la \
-	$(top_builddir)/src/log/liblog.la \
-	$(top_builddir)/src/sslutils/libssl_utils_nog.la \
-	$(EXPAT_LIBS)
+@BUILD_CLIENTS_TRUE@voms_proxy_info_LDADD = \
+@BUILD_CLIENTS_TRUE@	$(top_builddir)/src/api/ccapi/libvomsapi_nog.la  \
+@BUILD_CLIENTS_TRUE@	$(top_builddir)/src/replib/librep.la \
+@BUILD_CLIENTS_TRUE@	$(top_builddir)/src/log/liblog.la \
+@BUILD_CLIENTS_TRUE@	$(top_builddir)/src/sslutils/libssl_utils_nog.la \
+@BUILD_CLIENTS_TRUE@	$(EXPAT_LIBS)
 
-voms_proxy_destroy_SOURCES = \
-	voms_proxy_destroy.cc
+@BUILD_CLIENTS_TRUE@voms_proxy_destroy_SOURCES = \
+@BUILD_CLIENTS_TRUE@	voms_proxy_destroy.cc
 
-voms_proxy_destroy_LDADD = \
-	$(top_builddir)/src/api/ccapi/libvomsapi.la  \
-	$(top_builddir)/src/sslutils/libssl_utils_nog.la \
-	$(top_builddir)/src/replib/librep.la \
-	$(top_builddir)/src/log/liblog.la \
-	$(EXPAT_LIBS)
+@BUILD_CLIENTS_TRUE@voms_proxy_destroy_LDADD = \
+@BUILD_CLIENTS_TRUE@	$(top_builddir)/src/api/ccapi/libvomsapi_nog.la  \
+@BUILD_CLIENTS_TRUE@	$(top_builddir)/src/sslutils/libssl_utils_nog.la \
+@BUILD_CLIENTS_TRUE@	$(top_builddir)/src/replib/librep.la \
+@BUILD_CLIENTS_TRUE@	$(top_builddir)/src/log/liblog.la \
+@BUILD_CLIENTS_TRUE@	$(EXPAT_LIBS)
 
-voms_proxy_fake_SOURCES = \
-	vomsfake.h \
-	vomsfake.cc
+@BUILD_CLIENTS_TRUE@voms_proxy_fake_SOURCES = \
+@BUILD_CLIENTS_TRUE@	vomsfake.h \
+@BUILD_CLIENTS_TRUE@	vomsfake.cc \
+@BUILD_CLIENTS_TRUE@	vomsparser.c \
+@BUILD_CLIENTS_TRUE@	lex.yy.c 
 
-voms_proxy_fake_LDADD = \
-	$(top_builddir)/src/common/libutilities.la \
-	$(top_builddir)/src/ac/libattributes_nog.la \
-	$(top_builddir)/src/common/libutilc.la \
-	$(top_builddir)/src/replib/librep.la \
-	$(top_builddir)/src/sslutils/libssl_utils_nog.la
+@BUILD_CLIENTS_TRUE@voms_proxy_fake_LDADD = \
+@BUILD_CLIENTS_TRUE@	$(top_builddir)/src/common/libutilities_nog.la \
+@BUILD_CLIENTS_TRUE@	$(top_builddir)/src/ac/libattributes_nog.la \
+@BUILD_CLIENTS_TRUE@	$(top_builddir)/src/common/libutilc_nog.la \
+@BUILD_CLIENTS_TRUE@	$(top_builddir)/src/replib/librep.la \
+@BUILD_CLIENTS_TRUE@	$(top_builddir)/src/sslutils/libssl_utils_nog.la
 
-AM_CPPFLAGS = \
-	-I$(top_srcdir)/src/api/ccapi \
-	-I$(top_srcdir)/src/include \
-	-I$(top_srcdir)/src/sslutils \
-	$(GLOBUS_CFLAGS)
+@BUILD_CLIENTS_TRUE@AM_CPPFLAGS = \
+@BUILD_CLIENTS_TRUE@	-I$(top_srcdir)/src/api/ccapi \
+@BUILD_CLIENTS_TRUE@	-I$(top_srcdir)/src/include \
+@BUILD_CLIENTS_TRUE@	-I$(top_srcdir)/src/sslutils \
+@BUILD_CLIENTS_TRUE@	$(GLOBUS_CFLAGS)
 
 all: all-am
 
 .SUFFIXES:
-.SUFFIXES: .cc .lo .o .obj
+.SUFFIXES: .c .cc .lo .o .obj
 $(srcdir)/Makefile.in: @MAINTAINER_MODE_TRUE@ $(srcdir)/Makefile.am  $(am__configure_deps)
 	@for dep in $?; do \
 	  case '$(am__configure_deps)' in \
@@ -398,9 +407,32 @@ mostlyclean-compile:
 distclean-compile:
 	-rm -f *.tab.c
 
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/lex.yy.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/voms_proxy_destroy.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/voms_proxy_info.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/vomsfake.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/vomsparser.Po@am__quote@
+
+.c.o:
+@am__fastdepCC_TRUE@	$(COMPILE) -MT $@ -MD -MP -MF $(DEPDIR)/$*.Tpo -c -o $@ $<
+@am__fastdepCC_TRUE@	mv -f $(DEPDIR)/$*.Tpo $(DEPDIR)/$*.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='$<' object='$@' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(COMPILE) -c $<
+
+.c.obj:
+@am__fastdepCC_TRUE@	$(COMPILE) -MT $@ -MD -MP -MF $(DEPDIR)/$*.Tpo -c -o $@ `$(CYGPATH_W) '$<'`
+@am__fastdepCC_TRUE@	mv -f $(DEPDIR)/$*.Tpo $(DEPDIR)/$*.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='$<' object='$@' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(COMPILE) -c `$(CYGPATH_W) '$<'`
+
+.c.lo:
+@am__fastdepCC_TRUE@	$(LTCOMPILE) -MT $@ -MD -MP -MF $(DEPDIR)/$*.Tpo -c -o $@ $<
+@am__fastdepCC_TRUE@	mv -f $(DEPDIR)/$*.Tpo $(DEPDIR)/$*.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='$<' object='$@' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(LTCOMPILE) -c -o $@ $<
 
 .cc.o:
 @am__fastdepCXX_TRUE@	$(CXXCOMPILE) -MT $@ -MD -MP -MF $(DEPDIR)/$*.Tpo -c -o $@ $<
@@ -533,6 +565,7 @@ distclean-generic:
 maintainer-clean-generic:
 	@echo "This command is intended for maintainers to use"
 	@echo "it deletes files that may require special tools to rebuild."
+@BUILD_CLIENTS_FALSE@install-exec-hook:
 clean: clean-am
 
 clean-am: clean-binPROGRAMS clean-generic clean-libtool mostlyclean-am
@@ -610,13 +643,19 @@ uninstall-am: uninstall-binPROGRAMS
 	uninstall-am uninstall-binPROGRAMS
 
 
-install-exec-hook:
-	-ln -s voms-proxy-info $(DESTDIR)$(bindir)/edg-voms-proxy-info
-	-ln -s voms-proxy-destroy $(DESTDIR)$(bindir)/edg-voms-proxy-destroy
-	-ln -s voms-proxy-fake $(DESTDIR)$(bindir)/edg-voms-proxy-fake
-@ENABLE_GLITE_TRUE@	-ln -s voms-proxy-info $(DESTDIR)$(bindir)/glite-voms-proxy-info
-@ENABLE_GLITE_TRUE@	-ln -s voms-proxy-destroy $(DESTDIR)$(bindir)/glite-voms-proxy-destroy
-@ENABLE_GLITE_TRUE@	-ln -s voms-proxy-fake $(DESTDIR)$(bindir)/glite-voms-proxy-fake
+@BUILD_CLIENTS_TRUE@vomsparser.h vomsparser.c: vomsfake.y
+@BUILD_CLIENTS_TRUE@	bison -t -d -o vomsparser.c vomsfake.y
+
+@BUILD_CLIENTS_TRUE@lex.yy.c: vomsparser.l vomsparser.h
+@BUILD_CLIENTS_TRUE@	flex vomsparser.l
+
+@BUILD_CLIENTS_TRUE@install-exec-hook:
+@BUILD_CLIENTS_TRUE@	-ln -s voms-proxy-info $(DESTDIR)$(bindir)/edg-voms-proxy-info
+@BUILD_CLIENTS_TRUE@	-ln -s voms-proxy-destroy $(DESTDIR)$(bindir)/edg-voms-proxy-destroy
+@BUILD_CLIENTS_TRUE@	-ln -s voms-proxy-fake $(DESTDIR)$(bindir)/edg-voms-proxy-fake
+@BUILD_CLIENTS_TRUE@@ENABLE_GLITE_TRUE@	-ln -s voms-proxy-info $(DESTDIR)$(bindir)/glite-voms-proxy-info
+@BUILD_CLIENTS_TRUE@@ENABLE_GLITE_TRUE@	-ln -s voms-proxy-destroy $(DESTDIR)$(bindir)/glite-voms-proxy-destroy
+@BUILD_CLIENTS_TRUE@@ENABLE_GLITE_TRUE@	-ln -s voms-proxy-fake $(DESTDIR)$(bindir)/glite-voms-proxy-fake
 # Tell versions [3.59,3.63) of GNU make to not export all variables.
 # Otherwise a system limit (for SysV at least) may be exceeded.
 .NOEXPORT:

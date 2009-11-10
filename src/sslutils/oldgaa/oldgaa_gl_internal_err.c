@@ -19,7 +19,7 @@ oldgaa_gl__function_internal_error_helper(const char file[], int line, const cha
         fprintf(stderr, "Internal error in file %s (line %d): %s\n",
                 file, line, msg);
     } else {
-        fprintf(stderr, msg);
+      fprintf(stderr, "%s\n", msg);
     }
     /* internal_error() must never return; should break.
      */

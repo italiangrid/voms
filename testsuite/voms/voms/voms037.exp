@@ -1,7 +1,7 @@
 load_lib vomstest.exp
+testheader "See if voms-proxy-info --serial works."
 
 proc mytest {} {
-    testheader "See if voms-proxy-info --serial works."
     _activateCert mycert2
 
     _vomsStart voms1

@@ -2,9 +2,10 @@
  *
  * Authors: Vincenzo Ciaschini - Vincenzo.Ciaschini@cnaf.infn.it
  *
- * Copyright (c) 2002, 2003 INFN-CNAF on behalf of the EU DataGrid.
+ * Copyright (c) 2002-2009 INFN-CNAF on behalf of the EU DataGrid
+ * and EGEE I, II and III
  * For license conditions see LICENSE file or
- * http://www.edg.org/license.html
+ * http://www.apache.org/licenses/LICENSE-2.0.txt
  *
  * Parts of this code may be based upon or even include verbatim pieces,
  * originally written by other people, in which case the original header
@@ -38,6 +39,7 @@ extern "C" {
 static int reload = 0;
 
 void *logh = NULL;
+#include "myproxycertinfo.h"
 }
 
 
@@ -100,9 +102,10 @@ bool short_flags = false;
 
 static bool determine_group_and_role(std::string command, char *comm, char **group,
                                      char **role);
+static bool checkinside(gattrib g, std::vector<std::string> list);
 
 static void
-sigchld_handler(int sig)
+sigchld_handler(UNUSED(int sig))
 {
   int save_errno = errno;
   pid_t pid;
@@ -118,9 +121,15 @@ sigchld_handler(int sig)
 static BIGNUM *get_serial();
 
 static void
-sighup_handler(int sig)
+sighup_handler(UNUSED(int sig))
 {
   reload = 1;
+}
+
+static void
+sigterm_handler(UNUSED(int sig))
+{
+  exit(0);
 }
 
 static bool compare(const std::string &lhs, const std::string &rhs)
@@ -266,20 +275,14 @@ VOMSServer::VOMSServer(int argc, char *argv[]) : sock(0,0,NULL,50,false),
   struct stat statbuf;
 
   signal(SIGCHLD, sigchld_handler);
+  signal(SIGTERM, sigterm_handler);
   ac = argc;
   av = argv;
 
   if ((stat("/etc/nologin", &statbuf)) == 0)
     throw VOMSInitException("/etc/nologin present\n");
 
-#define PROXYCERTINFO_V3      "1.3.6.1.4.1.3536.1.222"
-#define PROXYCERTINFO_V4      "1.3.6.1.5.5.7.1.14"
-#define OBJC(c,n) OBJ_create(c,n,#c)
-
-  /* Proxy Certificate Extension's related objects */
-  OBJC(PROXYCERTINFO_V3, "PROXYCERTINFO_V3");
-  OBJC(PROXYCERTINFO_V4, "PROXYCERTINFO_V4");
-
+  InitProxyCertInfoExtension(1);
 
   std::string fakeuri = "";
   bool progversion = false;
@@ -443,7 +446,11 @@ VOMSServer::VOMSServer(int argc, char *argv[]) : sock(0,0,NULL,50,false),
     if(!library) {
       LOG(logh, LEV_ERROR, T_PRE, ((std::string)("Cannot load library: " + sqllib)).c_str());
       std::cout << "Cannot load library: "<< sqllib << std::endl;
-      std::cout << dlerror() << std::endl;
+      char *message = dlerror();
+      if (message) {
+        LOG(logh, LEV_ERROR, T_PRE, message);
+        std::cout << dlerror() << std::endl;
+      }
       exit(1);
     }
 
@@ -648,7 +655,7 @@ void VOMSServer::Run()
             LOGM(VARP, logh, LEV_INFO, T_PRE, " serial: %s", sock.peer_serial.c_str());
 
             LOG(logh, LEV_DEBUG, T_PRE, "Starting Execution.");
-            value = Execute(sock.own_key, sock.own_cert, sock.peer_cert, sock.GetContext());
+            value = Execute(sock.own_key, sock.own_cert, sock.peer_cert, sock.actual_cert, sock.GetContext());
           }
           else {
             LOGM(VARP, logh, LEV_INFO, T_PRE, "Failed to authenticate peer");
@@ -674,7 +681,8 @@ void VOMSServer::Run()
 }
 
 bool
-VOMSServer::Execute(EVP_PKEY *key, X509 *issuer, X509 *holder, gss_ctx_id_t context)
+
+VOMSServer::Execute(EVP_PKEY *key, X509 *issuer, X509 *holder, X509 *peer_cert, gss_ctx_id_t context)
 {
   std::string message;
 
@@ -788,7 +796,7 @@ VOMSServer::Execute(EVP_PKEY *key, X509 *issuer, X509 *holder, gss_ctx_id_t cont
     setuporder = true;
 
   int k = 0;
-  for(std::vector<std::string>::iterator i = comm.begin(); i < comm.end(); ++i)
+  for(std::vector<std::string>::iterator i = comm.begin(); i != comm.end(); ++i)
   {
     char commletter = '\0';
     command = comm[k++];
@@ -803,12 +811,12 @@ VOMSServer::Execute(EVP_PKEY *key, X509 *issuer, X509 *holder, gss_ctx_id_t cont
       /* Interpret request by first character */
       switch (commletter) {
       case 'A':
-        if (result = newdb->operation(OPERATION_GET_ALL, &fqans, uid))
+        if ((result = newdb->operation(OPERATION_GET_ALL, &fqans, uid)))
           result2 = newdb->operation(OPERATION_GET_ALL_ATTRIBS, &attribs, uid);
         break;
 
       case 'R':
-        if (result = newdb->operation(OPERATION_GET_ROLE, &fqans, uid, role))
+        if ((result = newdb->operation(OPERATION_GET_ROLE, &fqans, uid, role)))
           result2 = newdb->operation(OPERATION_GET_ROLE_ATTRIBS, &attribs, uid, role);
         result2 |= newdb->operation(OPERATION_GET_GROUPS_ATTRIBS, &attribs, uid);
 
@@ -820,7 +828,7 @@ VOMSServer::Execute(EVP_PKEY *key, X509 *issuer, X509 *holder, gss_ctx_id_t cont
         break;
 
       case 'G':
-        if (result = newdb->operation(OPERATION_GET_GROUPS, &fqans, uid)) {
+        if ((result = newdb->operation(OPERATION_GET_GROUPS, &fqans, uid))) {
           if (not_in(std::string(group), fqans))
             result = false;
           else
@@ -836,7 +844,7 @@ VOMSServer::Execute(EVP_PKEY *key, X509 *issuer, X509 *holder, gss_ctx_id_t cont
         break;
 
       case 'B':
-        if (result = newdb->operation(OPERATION_GET_GROUPS_AND_ROLE, &fqans, uid, group, role))
+        if ((result = newdb->operation(OPERATION_GET_GROUPS_AND_ROLE, &fqans, uid, group, role)))
           result2 = newdb->operation(OPERATION_GET_GROUPS_AND_ROLE_ATTRIBS, &attribs, uid, group, role);
         result2 |= newdb->operation(OPERATION_GET_GROUPS_ATTRIBS, &attribs, uid);
 
@@ -919,29 +927,12 @@ VOMSServer::Execute(EVP_PKEY *key, X509 *issuer, X509 *holder, gss_ctx_id_t cont
     }
   }
 
-  // Adjust for long/short format
-  if (!short_flags) {
-    std::vector<std::string> newfqans(fqans);
-    fqans.clear();
-    std::vector<std::string>::iterator i = newfqans.begin();
-    while (i != newfqans.end()) {
-      std::string fqan = *i;
-      LOGM(VARP, logh, LEV_DEBUG, T_PRE, "Initial FQAN: %s", fqan.c_str());
-      if (fqan.find("/Role=") != std::string::npos)
-	fqan += "/Capability=NULL";
-      else
-	fqan += "/Role=NULL/Capability=NULL";
-      LOGM(VARP, logh, LEV_DEBUG, T_PRE, "Processed FQAN: %s", fqan.c_str());
-      fqans.push_back(fqan);
-      i++;
-    }
-  }
 
   if(!fqans.empty()) {
     /* check whether the user is allowed to requests those attributes */
     vomsdata v("", "");
     v.SetVerificationType((verify_type)(VERIFY_SIGN));
-    v.Retrieve(sock.peer_cert, sock.peer_stack, RECURSE_DEEP);
+    v.Retrieve(sock.actual_cert, sock.peer_stack, RECURSE_DEEP);
 
     /* find the attributes corresponding to the vo */
     std::vector<std::string> existing;
@@ -951,16 +942,43 @@ VOMSServer::Execute(EVP_PKEY *key, X509 *issuer, X509 *holder, gss_ctx_id_t cont
                      index->fqan.begin(),
                      index->fqan.end());
     }
-
+  
     /* if attributes were found, only release an intersection beetween the requested and the owned */
     std::vector<std::string>::iterator end = fqans.end();
     bool subset = false;
+
+    int oldsize = fqans.size();
     if (!existing.empty())
-      if ((fqans.erase(remove_if(fqans.begin(),
-                                 fqans.end(),
-                                 bind2nd(std::ptr_fun(not_in), existing)),
-                       fqans.end()) != end))
+      if (fqans.erase(remove_if(fqans.begin(),
+                                fqans.end(),
+                                bind2nd(std::ptr_fun(not_in), existing)),
+                      fqans.end()) != end)
         subset = true;
+
+    if (subset) {
+      // remove attributes for qualifier which had been removed
+      attribs.erase(remove_if(attribs.begin(), attribs.end(),
+                              bind2nd(ptr_fun(checkinside), fqans)),
+                    attribs.end());
+    }
+
+    // Adjust for long/short format
+    if (!short_flags && !fqans.empty()) {
+      std::vector<std::string> newfqans(fqans);
+      fqans.clear();
+      std::vector<std::string>::iterator i = newfqans.begin();
+      while (i != newfqans.end()) {
+        std::string fqan = *i;
+        LOGM(VARP, logh, LEV_DEBUG, T_PRE, "Initial FQAN: %s", fqan.c_str());
+        if (fqan.find("/Role=") != std::string::npos)
+          fqan += "/Capability=NULL";
+        else
+          fqan += "/Role=NULL/Capability=NULL";
+        LOGM(VARP, logh, LEV_DEBUG, T_PRE, "Processed FQAN: %s", fqan.c_str());
+        fqans.push_back(fqan);
+        i++;
+      }
+    }
 
     // no attributes can be send
     if (fqans.empty()) {
@@ -996,8 +1014,7 @@ VOMSServer::Execute(EVP_PKEY *key, X509 *issuer, X509 *holder, gss_ctx_id_t cont
     }
     else
       LOGM(VARP, logh, LEV_DEBUG, T_PRE,  "User got no attributes or something went wrong searching for them.");
-
-    // convert to string
+  
     std::vector<std::string> attributes_compact;
     for(std::vector<gattrib>::iterator i = attribs.begin(); i != attribs.end(); ++i)
       attributes_compact.push_back(i->str());
@@ -1021,9 +1038,6 @@ VOMSServer::Execute(EVP_PKEY *key, X509 *issuer, X509 *holder, gss_ctx_id_t cont
         if (a)
           res = createac(issuer, sock.own_stack, holder, key, serial,
                          fqans, targs, attributes_compact, &a, voname, uri, requested, !newformat);
-
-        LOGM(VARP, logh, LEV_DEBUG, T_PRE, "length = %d", i2d_AC(a, NULL));
-        //        BN_free(serial);
 
         if (!res) {
           unsigned int len = i2d_AC(a, NULL);
@@ -1138,6 +1152,9 @@ void VOMSServer::UpdateOpts(void)
     {"newformat",       0, (int *)&newformat,         OPT_BOOL},
     {"skipcacheck",     0, (int *)&insecure,          OPT_BOOL},
     {"shortfqans",      0, (int *)&shortfqans,        OPT_BOOL},
+    {"syslog",          0, (int *)&do_syslog,         OPT_BOOL},
+    {"base64",          0, (int *)&base64encoding,    OPT_BOOL},
+    {"nologfile",       0, (int *)&nologfile,         OPT_BOOL},
     {0, 0, 0, 0}
   };
 
@@ -1346,3 +1363,6 @@ static bool determine_group_and_role(std::string command, char *comm, char **gro
   return true;
 }
 
+static bool checkinside(gattrib g, std::vector<std::string> list) {
+  return !g.qualifier.empty() && (find(list.begin(), list.end(), g.qualifier) == list.end());
+}

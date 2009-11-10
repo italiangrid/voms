@@ -1,7 +1,7 @@
 load_lib vomstest.exp
+testheader "See if voms certificates are distinguished by CA."
 
 proc mytest {} {
-    testheader "See if voms certificates are distinguished by CA."
     _activateCert mycertsameasmycert2
 
     _vomsStart voms1

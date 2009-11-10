@@ -1,3 +1,20 @@
+/*********************************************************************
+ *
+ * Authors: Olle Mulmo
+ *          Joni Hahkala
+ *          Vincenzo Ciaschini - Vincenzo.Ciaschini@cnaf.infn.it 
+ *          Valerio Venturi    - Valerio.Venturi@cnaf.infn.it
+ *
+ * Copyright (c) 2002-2009 INFN-CNAF on behalf of the EU DataGrid
+ * and EGEE I, II and III
+ * For license conditions see LICENSE file or
+ * http://www.apache.org/licenses/LICENSE-2.0.txt
+ *
+ * Parts of this code may be based upon or even include verbatim pieces,
+ * originally written by other people, in which case the original header
+ * follows.
+ *
+ *********************************************************************/
 /*
  * Copyright (c) Members of the EGEE Collaboration. 2004.
  * See http://eu-egee.org/partners/ for details on the copyright holders.
@@ -55,7 +72,7 @@ import org.glite.voms.PKIUtils;
  * @author Joni Hahkala, Olle Mulmo
  */
 public class AttributeCertificate implements DEREncodable {
-    protected static Logger logger = Logger.getLogger(AttributeCertificate.class);
+    protected static final Logger logger = Logger.getLogger(AttributeCertificate.class);
     AttributeCertificateInfo acInfo;
     AlgorithmIdentifier signatureAlgorithm;
     DERBitString signatureValue;
@@ -228,7 +245,7 @@ public class AttributeCertificate implements DEREncodable {
         ASN1Sequence seq = (ASN1Sequence) acInfo.getIssuer().getIssuerName().getDERObject();
 
         for (Enumeration e = seq.getObjects(); e.hasMoreElements();) {
-            GeneralName gn = GeneralName.getInstance((ASN1TaggedObject) e.nextElement());
+            GeneralName gn = GeneralName.getInstance(e.nextElement());
 
             if (gn.getTagNo() == 4) {
                 return Util.generalNameToX509Name(gn);
@@ -248,9 +265,9 @@ public class AttributeCertificate implements DEREncodable {
         }
 
         ASN1Sequence seq = (ASN1Sequence) acInfo.getIssuer().getIssuerName().getDERObject();
-
         for (Enumeration e = seq.getObjects(); e.hasMoreElements();) {
-            GeneralName gn = GeneralName.getInstance((ASN1TaggedObject) e.nextElement());
+            Object o = e.nextElement();
+            GeneralName gn = GeneralName.getInstance( o);
 
             if (gn.getTagNo() == 4) {
                 return Util.generalNameToX500Name(gn);
@@ -379,33 +396,10 @@ public class AttributeCertificate implements DEREncodable {
             ByteArrayOutputStream b = new ByteArrayOutputStream();
             new DEROutputStream(b).writeObject(acInfo);
 
-            //            System.out.println("Algorithm name: " + signatureAlgorithm.getObjectId().getId());
-            //            System.out.println("Algorithm name: " + signatureAlgorithm.getObjectId().toString());
-            //            System.out.print("Verifying: ");
             byte[] data = null; //signedObj.getDEREncoded();
-            //            for (int i= 0; i <data.length; i++)
-            //                System.out.print(Integer.toHexString(data[i]) + " ");
-            //            System.out.println("");
-
-
-            //            System.out.print("\n\nsignature: ");
-            data = signatureValue.getBytes();
-            //            for (int i= 0; i <data.length; i++)
-            //                System.out.print(Integer.toHexString(data[i]) + " ");
-            //            System.out.println("");
-
             Signature sig = Signature.getInstance(signatureAlgorithm.getObjectId().getId());
-            //            System.out.println("Key is: " + key.getClass());
-            //            System.out.println("Key is: " + key.toString());
             sig.initVerify(key);
 
-//             System.out.print("\n\n computedsignature: ");
-//             data = sig.sign();
-//             for (int i= 0; i <data.length; i++)
-//                 System.out.print(Integer.toHexString(data[i]) + " ");
-//             System.out.println("");
-
-            //            sig.update(b.toByteArray());
             sig.update(b.toByteArray());
 
             return sig.verify(signatureValue.getBytes());
@@ -426,33 +420,9 @@ public class AttributeCertificate implements DEREncodable {
             ByteArrayOutputStream b = new ByteArrayOutputStream();
             new DEROutputStream(b).writeObject(acInfo);
 
-//             System.out.println("Algorithm name: " + signatureAlgorithm.getObjectId().getId());
-//             System.out.println("Algorithm name: " + signatureAlgorithm.getObjectId().toString());
-//             System.out.print("Verifying: ");
-//             byte[] data = signedObj.getDEREncoded();
-//             for (int i= 0; i <data.length; i++)
-//                 System.out.print(Integer.toHexString(data[i]) + " ");
-//             System.out.println("");
-
-
-//             System.out.print("\n\nsignature: ");
-//             data = signatureValue.getBytes();
-//             for (int i= 0; i <data.length; i++)
-//                 System.out.print(Integer.toHexString(data[i]) + " ");
-//             System.out.println("");
-
             Signature sig = Signature.getInstance(signatureAlgorithm.getObjectId().getId());
-//             System.out.println("Key is: " + key.getClass());
-//             System.out.println("Key is: " + key.toString());
             sig.initVerify(cert);
 
-//             System.out.print("\n\n computedsignature: ");
-//             data = sig.sign();
-//             for (int i= 0; i <data.length; i++)
-//                 System.out.print(Integer.toHexString(data[i]) + " ");
-//             System.out.println("");
-
-            //            sig.update(b.toByteArray());
             sig.update(b.toByteArray());
 
             return sig.verify(signatureValue.getBytes());

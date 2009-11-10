@@ -1,7 +1,7 @@
 load_lib vomstest.exp
+testheader "See if voms-proxy-destroy works."
 
 proc mytest {} {
-    testheader "See if voms-proxy-destroy works."
     _activateCert mycert2
 
     _vomsStart voms1
@@ -20,7 +20,7 @@ proc mytest {} {
 
     if $res then {
         addlog $outname
-        testmessage "voms proxy destroy failed."
+        testmessage "voms-proxy-destroy failed."
         return $::FAILTEST
     } else {
         if [file exists /tmp/x509up_u[exec id -u]] then {

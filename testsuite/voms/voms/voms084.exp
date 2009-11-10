@@ -1,0 +1,32 @@
+load_lib vomstest.exp
+testheader "See if voms-proxy-init returns an error message when the server certificate is absent."
+
+proc myprolog {} {
+    file rename $::env(X509_VOMS_DIR)/voms1.pem $::SCRATCHDIR/voms1.pem
+}
+
+proc myepilog {} {
+    file rename $::SCRATCHDIR/voms1.pem $::env(X509_VOMS_DIR)/voms1.pem
+}
+
+proc mytest {} {
+    _activateCert mycert2
+
+    _vomsStart voms1
+    set outname [exec mktemp $::SCRATCHDIR/voms-proxy-init-XXXXXX]
+    set res [catch {set out [exec $::INSTALLDIR/bin/voms-proxy-init --voms voms1 --verify >& $outname]}]
+    _vomsStop voms1
+
+    if $res then {
+        testmessage "voms-proxy-init correctly failed."
+        return $::PASSTEST
+    } else {
+        addlog $outname 
+        testmessage "voms-proxy-init unexpectedly succeeded."
+        return $::FAILTEST
+    }         
+}
+
+test_set_prolog myprolog
+test_set_epilog myepilog
+do_test

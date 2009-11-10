@@ -2,9 +2,10 @@
  *
  * Authors: Vincenzo Ciaschini - Vincenzo.Ciaschini@cnaf.infn.it 
  *
- * Copyright (c) 2002, 2003 INFN-CNAF on behalf of the EU DataGrid.
+ * Copyright (c) 2002-2009 INFN-CNAF on behalf of the EU DataGrid
+ * and EGEE I, II and III
  * For license conditions see LICENSE file or
- * http://www.edg.org/license.html
+ * http://www.apache.org/licenses/LICENSE-2.0.txt
  *
  * Parts of this code may be based upon or even include verbatim pieces,
  * originally written by other people, in which case the original header
@@ -53,31 +54,6 @@ static bool getopts_real(int argc, char * const argv[],
 			 struct option *longopts, struct option *opts);
 
 static std::string usage_string = "";
-
-#if 0
-static bool    onoff = false;
-static int     value = 0;
-static std::string  str = "default";
-vector<char *> v;
-
-int main(int argc, char *argv[])
-{
-  struct option opts[] = {
-    {"bool",       1, (int *)&onoff, OPT_BOOL},
-    {"int",        1, &value,        OPT_NUM},
-    {"std::string",     1, (int *)&str,   OPT_STD::STRING},
-    {"conf",       1, NULL,          OPT_CONFIG},
-    {"multi",      1, (int *)&v,     OPT_MULTI},
-    { 0, 0, 0, 0}
-  };
-
-  getopts(argc,argv,opts);
-  cerr << "bool: " << onoff << "\nint: " << value << "\nstr: " << str << endl;
-
-  for (int i = 0; i < v.size(); i++)
-    cerr << "multi: " << v[i] << endl;
-}
-#endif
 
 /*
  * Function:
@@ -221,11 +197,11 @@ getopts(int argc, char * const argv[], struct option *longopts)
     opts[i].flag = 0;
     opts[i].val  = longopts[i].val;
     switch (longopts[i].val) {
-    case OPT_NONE: case OPT_BOOL: case OPT_HELP: case OPT_FUNCTION0:
+    case OPT_NONE: case OPT_BOOL: case OPT_HELP:
       opts[i].has_arg = 0;
       break;
     case OPT_STRING: case OPT_NUM: case OPT_CONFIG:
-    case OPT_FUNCTION1: case OPT_MULTI:
+    case OPT_MULTI:
       opts[i].has_arg = 1;
       break;
     default:
@@ -286,23 +262,6 @@ getopts_real(int argc, char * const argv[], struct option *longopts, struct opti
         *((std::string *)(longopts[index].flag)) = optarg;
         break;
       
-      case OPT_FUNCTION0:
-      {
-          bool (*zero)(void)  = (bool (*)(void))(longopts[index].flag);
-          if (!zero())
-            c = '?';
-      }
-      break;
-      
-      case OPT_FUNCTION1:
-      {
-        bool (*one)(char *)  = (bool (*)(char *))(longopts[index].flag);
-          
-        if (!one(optarg))
-          c = '?';
-      }
-      break;
-      
       case OPT_MULTI: 
       {
         std::vector<std::string> *v =((std::vector<std::string> *)(longopts[index].flag));
@@ -345,7 +304,7 @@ getopts_real(int argc, char * const argv[], struct option *longopts, struct opti
       
       case OPT_HELP:
         usage(argv[0]);
-        exit(1);
+        exit(0);
         break;
       
       default:

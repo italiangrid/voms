@@ -3,9 +3,9 @@
  * Authors:
  *      Andrea Ceccanti - andrea.ceccanti@cnaf.infn.it
  *
- * Copyright (c) 2006 INFN-CNAF on behalf of the EGEE project.
- *
- * For license conditions see LICENSE
+ * Copyright (c) 2006-2009 INFN-CNAF on behalf of the EGEE I, II and III
+ * For license conditions see LICENSE file or
+ * http://www.apache.org/licenses/LICENSE-2.0.txt
  *
  * Parts of this code may be based upon or even include verbatim pieces,
  * originally written by other people, in which case the original header
@@ -16,12 +16,9 @@ package org.glite.voms.contact;
 
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
-import java.security.GeneralSecurityException;
-import java.security.InvalidKeyException;
 import java.security.KeyStore;
 import java.security.PrivateKey;
 import java.security.Security;
@@ -82,7 +79,7 @@ public class UserCredentials {
         log.debug("Cert is: " + userCert.getSubjectDN());
         writer.writeObject(userCert);
         writer.writeObject(userKey);
-        for (int i=0; i < userChain.length; i++) {
+        for (int i=1; i < userChain.length; i++) {
             log.debug("Chain["+i+"] is: " + userChain[i].getSubjectDN());
             writer.writeObject(userChain[i]);
         }
@@ -148,7 +145,7 @@ public class UserCredentials {
 
     }
 
-    class PFinder implements PasswordFinder {
+    private static class PFinder implements PasswordFinder {
         private String pwd;
 
         public PFinder(String password) {
@@ -156,7 +153,10 @@ public class UserCredentials {
         }
 
         public char [] getPassword() {
-            return pwd.toCharArray();
+            if (pwd != null)
+                return pwd.toCharArray();
+            else
+                return "".toCharArray();
         }
     }
     /**
@@ -166,33 +166,9 @@ public class UserCredentials {
      * @param password the password needed to decrypt the key.
      */
     private void loadKey(File userKeyFile, String password) {
-//         try {
             log.debug("File is: " + userKeyFile.getName());
 
             userKey = PKIUtils.loadPrivateKey(userKeyFile, new PFinder(password));
-//         } catch ( IOException e ) {
-//             log.error( "Error loading user private key:"
-//                     + e.getMessage() );
-
-//             if ( log.isDebugEnabled() ) {
-//                 log.error( e.getMessage(), e );
-//             }
-
-//             throw new VOMSException( e );
-
-//         } catch ( GeneralSecurityException e ) {
-
-//             log.error( "Error parsing user private key: "
-//                     + e.getMessage() );
-
-//             if ( log.isDebugEnabled() ) {
-//                 log.error( e.getMessage(), e );
-//             }
-
-//             throw new VOMSException( e );
-
-//         }
-
     }
 
     private void loadCredentials(File userCertFile, File userKeyFile, String keyPassword){
@@ -203,11 +179,12 @@ public class UserCredentials {
     }
 
     private void loadPKCS12Credentials(File pkcs12File, String keyPassword){
-
+        FileInputStream stream = null;
         try {
 
             KeyStore ks = KeyStore.getInstance( "PKCS12", "BC" );
-            ks.load(new FileInputStream(pkcs12File), keyPassword.toCharArray());
+            stream = new FileInputStream(pkcs12File);
+            ks.load(stream, keyPassword.toCharArray());
             Enumeration aliases = ks.aliases();
 
             if (!aliases.hasMoreElements())
@@ -229,6 +206,15 @@ public class UserCredentials {
                 log.error( "Error importing pkcs12 certificate: "+e.getMessage(),e );
 
             throw new VOMSException(e);
+        }
+        finally {
+            try {
+                if (stream != null)
+                    stream.close();
+            }
+            catch (IOException e) {
+                /* do nothing */
+            }
         }
 
     }

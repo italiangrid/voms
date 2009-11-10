@@ -3,9 +3,10 @@
  * Authors: Vincenzo Ciaschini - Vincenzo.Ciaschini@cnaf.infn.it 
  *          Valerio Venturi    - valerio.venturi@cnaf.infn.it
  *
- * Copyright (c) 2002, 2003 INFN-CNAF on behalf of the EU DataGrid.
+ * Copyright (c) 2002-2009 INFN-CNAF on behalf of the EU DataGrid
+ * and EGEE I, II and III
  * For license conditions see LICENSE file or
- * http://www.edg.org/license.html
+ * http://www.apache.org/licenses/LICENSE-2.0.txt
  *
  * Parts of this code may be based upon or even include verbatim pieces,
  * originally written by other people, in which case the original header
@@ -35,6 +36,9 @@
 #define LIMITED_PROXY_SN                "LIMITED_PROXY"
 #define LIMITED_PROXY_LN                "GSI limited proxy"
 
+#define PROXYCERTINFO_V3                "1.3.6.1.4.1.3536.1.222"
+#define PROXYCERTINFO_V4                "1.3.6.1.5.5.7.1.14"
+
 /* error handling */
 #define ASN1_F_PROXYPOLICY_NEW          450
 #define ASN1_F_D2I_PROXYPOLICY          451
@@ -61,53 +65,57 @@ typedef struct myPROXYCERTINFO_st {
 /* myPROXYPOLICY function */
 
 /* allocating and free memory */
-myPROXYPOLICY * myPROXYPOLICY_new();
-void myPROXYPOLICY_free(myPROXYPOLICY * proxypolicy);
+extern myPROXYPOLICY * myPROXYPOLICY_new();
+extern void myPROXYPOLICY_free(myPROXYPOLICY * proxypolicy);
 
 /* duplicate */
-myPROXYPOLICY * myPROXYPOLICY_dup(myPROXYPOLICY * policy);
+extern myPROXYPOLICY * myPROXYPOLICY_dup(myPROXYPOLICY * policy);
 
 /* set policy language */
-int myPROXYPOLICY_set_policy_language(myPROXYPOLICY * policy, ASN1_OBJECT * policy_language);
+extern int myPROXYPOLICY_set_policy_language(myPROXYPOLICY * policy, ASN1_OBJECT * policy_language);
 
 /* get policy language */
-ASN1_OBJECT * myPROXYPOLICY_get_policy_language(myPROXYPOLICY * policy);
+extern ASN1_OBJECT * myPROXYPOLICY_get_policy_language(myPROXYPOLICY * policy);
 
 /* set policy contents */
-int myPROXYPOLICY_set_policy(myPROXYPOLICY * proxypolicy, unsigned char * policy, int length);
+extern int myPROXYPOLICY_set_policy(myPROXYPOLICY * proxypolicy, unsigned char * policy, int length);
 
 /* get policy contents */
-unsigned char * myPROXYPOLICY_get_policy(myPROXYPOLICY * policy, int * length);
+extern unsigned char * myPROXYPOLICY_get_policy(myPROXYPOLICY * policy, int * length);
 
 /* internal to der conversion */
-int i2d_myPROXYPOLICY(myPROXYPOLICY * policy, unsigned char ** pp);
+extern int i2d_myPROXYPOLICY(myPROXYPOLICY * policy, unsigned char ** pp);
 
 /* der to internal conversion */
-myPROXYPOLICY * d2i_myPROXYPOLICY(myPROXYPOLICY ** policy, unsigned char ** pp, long length);
+extern myPROXYPOLICY * d2i_myPROXYPOLICY(myPROXYPOLICY ** policy, unsigned char ** pp, long length);
 
 /*myPROXYCERTINFO function */
 
 /* allocating and free memory */
-myPROXYCERTINFO * myPROXYCERTINFO_new();
-void myPROXYCERTINFO_free(myPROXYCERTINFO * proxycertinfo);
+extern myPROXYCERTINFO * myPROXYCERTINFO_new();
+extern void myPROXYCERTINFO_free(myPROXYCERTINFO * proxycertinfo);
 
 /* set path_length */
-int myPROXYCERTINFO_set_path_length(myPROXYCERTINFO * proxycertinfo, long path_length);
+extern int myPROXYCERTINFO_set_path_length(myPROXYCERTINFO * proxycertinfo, long path_length);
 
 /* get ptah length */
-long myPROXYCERTINFO_get_path_length(myPROXYCERTINFO * proxycertinfo);
+extern long myPROXYCERTINFO_get_path_length(myPROXYCERTINFO * proxycertinfo);
 
 /* set proxypolicy */
-int myPROXYCERTINFO_set_proxypolicy(myPROXYCERTINFO * proxycertinfo, myPROXYPOLICY * proxypolicy);
+extern int myPROXYCERTINFO_set_proxypolicy(myPROXYCERTINFO * proxycertinfo, myPROXYPOLICY * proxypolicy);
 
 /* get proxypolicy */
-myPROXYPOLICY * myPROXYCERTINFO_get_proxypolicy(myPROXYCERTINFO * proxycertinfo);
+extern myPROXYPOLICY * myPROXYCERTINFO_get_proxypolicy(myPROXYCERTINFO * proxycertinfo);
 
 /* internal to der conversion */
-int i2d_myPROXYCERTINFO(myPROXYCERTINFO * proxycertinfo, unsigned char ** pp);
+extern int i2d_myPROXYCERTINFO(myPROXYCERTINFO * proxycertinfo, unsigned char ** pp);
 
 /* der to internal conversion */
-myPROXYCERTINFO * d2i_myPROXYCERTINFO(myPROXYCERTINFO ** cert_info, unsigned char ** a, long length);
+extern myPROXYCERTINFO * d2i_myPROXYCERTINFO(myPROXYCERTINFO ** cert_info, unsigned char ** a, long length);
 
-int myPROXYCERTINFO_set_version(myPROXYCERTINFO *cert_info, int version);
+extern int myPROXYCERTINFO_set_version(myPROXYCERTINFO *cert_info, int version);
+
+extern int proxynative(void);
+extern void InitProxyCertInfoExtension(int full);
+
 #endif

@@ -1,8 +1,12 @@
+includedir = @includedir@/glite/security/voms
+
+include_HEADERS = \
+	vomsssl.h
 
 noinst_LTLIBRARIES = \
 	$(WANTED_SOCK_LIBS) # may add the libraries defined in EXTRA_LTLIBRARIES
 
-SOURCES = Client.cpp Server.cpp tokens.c globuswrap.c
+SOURCES = Client.cpp
 
 libsock_la_SOURCES = 	Client.cpp
 libsock_server_la_SOURCES = Server.cpp tokens.c globuswrap.c
@@ -37,7 +41,7 @@ libsock_la_LIBADD = \
 	$(top_builddir)/src/common/libutilc.la \
 	$(GLOBUS_GSS_API_LIBS)
 
-EXTRA_DIST = globuswrap.h
+EXTRA_DIST = globuswrap.h vomsssl.h
 
 ###
 
@@ -62,8 +66,7 @@ EXTRA_LTLIBRARIES = \
 	libsock.la \
 	libsock_nog.la
 
-libsock_server_gcc32_la_SOURCES = \
-	$(SOURCES)
+libsock_server_gcc32_la_SOURCES = Server.cpp tokens.c globuswrap.c
 
 libsock_server_gcc32_la_CPPFLAGS = \
 	-I $(top_srcdir)/src/include \
@@ -75,8 +78,7 @@ libsock_server_gcc32_la_LIBADD = \
 	$(top_builddir)/src/common/libutilc.la \
 	$(GLOBUS_GCC32_GSS_LIBS)
 
-libsock_server_gcc32dbg_la_SOURCES = \
-	$(SOURCES)
+libsock_server_gcc32dbg_la_SOURCES = Server.cpp tokens.c globuswrap.c
 
 libsock_server_gcc32dbg_la_CPPFLAGS = \
 	-I $(top_srcdir)/src/include \
@@ -88,8 +90,7 @@ libsock_server_gcc32dbg_la_LIBADD = \
 	$(top_builddir)/src/common/libutilc.la \
 	$(GLOBUS_GCC32DBG_GSS_LIBS)
 
-libsock_server_gcc32pthr_la_SOURCES = \
-	$(SOURCES)
+libsock_server_gcc32pthr_la_SOURCES = Server.cpp tokens.c globuswrap.c
 
 libsock_server_gcc32pthr_la_CPPFLAGS = \
 	-I $(top_srcdir)/src/include \
@@ -101,8 +102,7 @@ libsock_server_gcc32pthr_la_LIBADD = \
 	$(top_builddir)/src/common/libutilc.la \
 	$(GLOBUS_GCC32PTHR_GSS_LIBS)
 
-libsock_server_gcc32dbgpthr_la_SOURCES = \
-	$(SOURCES)
+libsock_server_gcc32dbgpthr_la_SOURCES = Server.cpp tokens.c globuswrap.c
 
 libsock_server_gcc32dbgpthr_la_CPPFLAGS = \
 	-I $(top_srcdir)/src/include \
@@ -114,8 +114,7 @@ libsock_server_gcc32dbgpthr_la_LIBADD = \
 	$(top_builddir)/src/common/libutilc.la \
 	$(GLOBUS_GCC32DBGPTHR_GSS_LIBS)
 
-libsock_server_gcc64_la_SOURCES = \
-	$(SOURCES)
+libsock_server_gcc64_la_SOURCES = Server.cpp tokens.c globuswrap.c
 
 libsock_server_gcc64_la_CPPFLAGS = \
 	-I $(top_srcdir)/src/include \
@@ -127,8 +126,7 @@ libsock_server_gcc64_la_LIBADD = \
 	$(top_builddir)/src/common/libutilc.la \
 	$(GLOBUS_GCC64_GSS_LIBS)
 
-libsock_server_gcc64dbg_la_SOURCES = \
-	$(SOURCES)
+libsock_server_gcc64dbg_la_SOURCES = Server.cpp tokens.c globuswrap.c
 
 libsock_server_gcc64dbg_la_CPPFLAGS = \
 	-I $(top_srcdir)/src/include \
@@ -140,8 +138,7 @@ libsock_server_gcc64dbg_la_LIBADD = \
 	$(top_builddir)/src/common/libutilc.la \
 	$(GLOBUS_GCC64DBG_GSS_LIBS)
 
-libsock_server_gcc64pthr_la_SOURCES = \
-	$(SOURCES)
+libsock_server_gcc64pthr_la_SOURCES = Server.cpp tokens.c globuswrap.c
 
 libsock_server_gcc64pthr_la_CPPFLAGS = \
 	-I $(top_srcdir)/src/include \
@@ -153,8 +150,7 @@ libsock_server_gcc64pthr_la_LIBADD = \
 	$(top_builddir)/src/common/libutilc.la \
 	$(GLOBUS_GCC64PTHR_GSS_LIBS)
 
-libsock_server_gcc64dbgpthr_la_SOURCES = \
-	$(SOURCES)
+libsock_server_gcc64dbgpthr_la_SOURCES = Server.cpp tokens.c globuswrap.c
 
 libsock_server_gcc64dbgpthr_la_CPPFLAGS = \
 	-I $(top_srcdir)/src/include \

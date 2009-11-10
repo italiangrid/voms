@@ -6,6 +6,7 @@ JAVA_CLASSES = org/glite/voms/BasicVOMSTrustStore.class \
 							 org/glite/voms/LSCFile.class \
 							 org/glite/voms/SigningPolicy.class \
 							 org/glite/voms/PKIStore.class \
+							 org/glite/voms/PKIStoreFactory.class \
 							 org/glite/voms/PKIUtils.class \
 							 org/glite/voms/PKIVerifier.class \
 							 org/glite/voms/SigningPolicy.class \
@@ -36,7 +37,9 @@ JAVA_CLASSES = org/glite/voms/BasicVOMSTrustStore.class \
 							 org/glite/voms/contact/Test.class \
 							 org/glite/voms/contact/UserCredentials.class \
 							 org/glite/voms/contact/VOMSDecoder.class \
+							 org/glite/voms/contact/VOMSMessage.class \
 							 org/glite/voms/contact/VOMSErrorMessage.class \
+							 org/glite/voms/contact/VOMSWarningMessage.class \
 							 org/glite/voms/contact/VOMSESFileParser.class \
 							 org/glite/voms/contact/VOMSException.class \
 							 org/glite/voms/contact/VOMSParser.class \
@@ -71,7 +74,7 @@ install-exec-hook:
 	$(INSTALL) $(top_builddir)/src/api/java/vomsjapi.jar $(DESTDIR)/$(datadir)/java
 
 clean:
-	rm -f $(top_builddir)/src/api/java/vomsapi.jar
+	rm -f $(top_builddir)/src/api/java/vomsjapi.jar
 	find $(top_builddir)/src/api/java -name '*.class' -exec rm -f '{}' ';'
 
 #java_JAVA =  privateinternal.java

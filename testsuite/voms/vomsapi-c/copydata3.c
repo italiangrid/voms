@@ -1,6 +1,7 @@
 #include "voms_apic.h"
 #include <stdlib.h>
 #include <stdio.h>
+#include <string.h>
 
 static void errorp(char *message)
 {

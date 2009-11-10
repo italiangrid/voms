@@ -1,0 +1,32 @@
+load_lib vomstest.exp
+testheader "See if an VOMS_Delete() works."
+
+proc mytest {} {
+    _activateCert mycert2
+
+    _vomsStart voms1
+    set outname [exec mktemp $::SCRATCHDIR/voms-proxy-init-XXXXXX]
+    set res [catch {set out [exec $::INSTALLDIR/bin/voms-proxy-init --voms voms1 >& $outname]}]
+    _vomsStop voms1
+
+
+    if $res then {
+        addlog $outname
+        testmessage "voms-proxy-init failed."
+        return $::FAILTEST
+    }
+
+    set ::_buildout [exec mktemp $::SCRATCHDIR/voms-api-c-XXXXXX]
+    set res [_exeC delete.c -useproxy]
+
+    if $res then {
+        addlog $::_buildout
+        testmessage "VOMS_Delete() failed."
+        return $::FAILTEST
+    } else {
+        testmessage "VOMS_Delete() works correct"
+        return $::PASSTEST
+    }
+}
+
+do_test

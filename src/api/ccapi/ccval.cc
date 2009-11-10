@@ -2,9 +2,10 @@
  *
  * Authors: Vincenzo Ciaschini - Vincenzo.Ciaschini@cnaf.infn.it 
  *
- * Copyright (c) 2002, 2003 INFN-CNAF on behalf of the EU DataGrid.
+ * Copyright (c) 2002-2009 INFN-CNAF on behalf of the EU DataGrid
+ * and EGEE I, II and III
  * For license conditions see LICENSE file or
- * http://www.edg.org/license.html
+ * http://www.apache.org/licenses/LICENSE-2.0.txt
  *
  * Parts of this code may be based upon or even include verbatim pieces,
  * originally written by other people, in which case the original header
@@ -96,7 +97,7 @@ struct col {
   char *date2;       /*!< End of validity of the user info */
   int   type;        /*!< The type of data returned */
   struct d **std;    /*!< User's characteristics */
-  char *custom;      /*!< The data returned by an S command */
+  char *custom;
   int datalen;
   int version;
   char **fqan;    /*!< User's attributes in compact format */
@@ -108,6 +109,7 @@ struct col {
   int structtype;
   char *buffer;
   int buflen;
+
 };
 
 
@@ -167,8 +169,8 @@ bool vomsdata::verifyac(X509 *cert, X509 *issuer, AC *ac, time_t verificationtim
   if (!result) {
     v.siglen    = vv->siglen;
     v.signature = std::string(vv->signature, vv->siglen);
-    v.user      = vv->user;
-    v.userca    = vv->userca;
+    v.user      = vv->user ? vv->user : "";
+    v.userca    = vv->userca ? vv->userca : "";
     v.server    = vv->server;
     v.serverca  = vv->serverca;
     v.voname    = vv->voname;
@@ -199,8 +201,6 @@ bool vomsdata::verifyac(X509 *cert, X509 *issuer, AC *ac, time_t verificationtim
         d.cap   = dat->cap ? dat->cap : "";
         v.std.push_back(d);
         free(dat->group);
-        //free(dat->role);
-        //free(dat->cap);
         free(dat);
         datap++;
       }

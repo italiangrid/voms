@@ -1,7 +1,7 @@
 load_lib vomstest.exp
+testheader "See if a voms proxy can be created."
 
 proc mytest {} {
-    testheader "See if a voms proxy can be created."
     _activateCert mycert2
 
     _vomsStart voms1
@@ -10,9 +10,9 @@ proc mytest {} {
     _vomsStop voms1
 
     if $res then {
-        addlog $LOGOUTS $outname 
+        addlog $outname 
         addlog $::INSTALLDIR/var/log/voms.voms1
-        testmessage "voms proxy init returned error message."
+        testmessage "voms-proxy-init returned error message."
         return $::FAILTEST
     } else {
         testmessage "proxy successfully created."

@@ -1,13 +1,7 @@
 load_lib vomstest.exp
+testheader "See if the library can be linked."
 
 proc mytest {} {
-    testheader "See if the library can be linked."
-
-    if {[info exists ::NOJAVALIB] != 0} then {
-        testmessage "Either the jars are not present, or the sources cannot be compiled, or the test was disabled."
-        return $::UNDECIDEDTEST
-    }
-
     set ::_buildout [exec mktemp $::SCRATCHDIR/program-out-XXXXXX]
     set res [_buildJava basictest.java]
 

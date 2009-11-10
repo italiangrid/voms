@@ -1,7 +1,7 @@
 load_lib vomstest.exp
+testheader "See if voms-proxy-init --quiet works."
 
 proc mytest {} {
-    testheader "See if voms-proxy-init --quiet works."
     _activateCert mycert2
 
     _vomsStart voms1

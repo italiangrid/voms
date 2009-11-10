@@ -1,7 +1,7 @@
 load_lib vomstest.exp
+testheader "Checking if wrong X509_CERT_DIR is reported as an error."
 
 proc mytest {} {
-    testheader "Checking if wrong X509_CERT_DIR is reported as an error."
     _activateCert mycert2
 
     _vomsStart voms1

@@ -14,6 +14,7 @@
 
 @SET_MAKE@
 
+
 VPATH = @srcdir@
 pkgdatadir = $(datadir)/@PACKAGE@
 pkglibdir = $(libdir)/@PACKAGE@
@@ -33,7 +34,8 @@ POST_UNINSTALL = :
 build_triplet = @build@
 host_triplet = @host@
 subdir = src/socklib
-DIST_COMMON = $(srcdir)/Makefile.am $(srcdir)/Makefile.in
+DIST_COMMON = $(include_HEADERS) $(srcdir)/Makefile.am \
+	$(srcdir)/Makefile.in
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 am__aclocal_m4_deps = $(top_srcdir)/project/acinclude.m4 \
 	$(top_srcdir)/project/expat.m4 $(top_srcdir)/project/glite.m4 \
@@ -53,67 +55,51 @@ libsock_la_OBJECTS = $(am_libsock_la_OBJECTS)
 libsock_gcc32_la_DEPENDENCIES =  \
 	$(top_builddir)/src/sslutils/libssl_utils_gcc32.la \
 	$(top_builddir)/src/common/libutilc.la $(am__DEPENDENCIES_1)
-am__objects_1 = libsock_gcc32_la-Client.lo libsock_gcc32_la-Server.lo \
-	libsock_gcc32_la-tokens.lo libsock_gcc32_la-globuswrap.lo
+am__objects_1 = libsock_gcc32_la-Client.lo
 am_libsock_gcc32_la_OBJECTS = $(am__objects_1)
 libsock_gcc32_la_OBJECTS = $(am_libsock_gcc32_la_OBJECTS)
 libsock_gcc32dbg_la_DEPENDENCIES =  \
 	$(top_builddir)/src/sslutils/libssl_utils_gcc32dbg.la \
 	$(top_builddir)/src/common/libutilc.la $(am__DEPENDENCIES_1)
-am__objects_2 = libsock_gcc32dbg_la-Client.lo \
-	libsock_gcc32dbg_la-Server.lo libsock_gcc32dbg_la-tokens.lo \
-	libsock_gcc32dbg_la-globuswrap.lo
+am__objects_2 = libsock_gcc32dbg_la-Client.lo
 am_libsock_gcc32dbg_la_OBJECTS = $(am__objects_2)
 libsock_gcc32dbg_la_OBJECTS = $(am_libsock_gcc32dbg_la_OBJECTS)
 libsock_gcc32dbgpthr_la_DEPENDENCIES =  \
 	$(top_builddir)/src/sslutils/libssl_utils_gcc32dbgpthr.la \
 	$(top_builddir)/src/common/libutilc.la $(am__DEPENDENCIES_1)
-am__objects_3 = libsock_gcc32dbgpthr_la-Client.lo \
-	libsock_gcc32dbgpthr_la-Server.lo \
-	libsock_gcc32dbgpthr_la-tokens.lo \
-	libsock_gcc32dbgpthr_la-globuswrap.lo
+am__objects_3 = libsock_gcc32dbgpthr_la-Client.lo
 am_libsock_gcc32dbgpthr_la_OBJECTS = $(am__objects_3)
 libsock_gcc32dbgpthr_la_OBJECTS =  \
 	$(am_libsock_gcc32dbgpthr_la_OBJECTS)
 libsock_gcc32pthr_la_DEPENDENCIES =  \
 	$(top_builddir)/src/sslutils/libssl_utils_gcc32pthr.la \
 	$(top_builddir)/src/common/libutilc.la $(am__DEPENDENCIES_1)
-am__objects_4 = libsock_gcc32pthr_la-Client.lo \
-	libsock_gcc32pthr_la-Server.lo libsock_gcc32pthr_la-tokens.lo \
-	libsock_gcc32pthr_la-globuswrap.lo
+am__objects_4 = libsock_gcc32pthr_la-Client.lo
 am_libsock_gcc32pthr_la_OBJECTS = $(am__objects_4)
 libsock_gcc32pthr_la_OBJECTS = $(am_libsock_gcc32pthr_la_OBJECTS)
 libsock_gcc64_la_DEPENDENCIES =  \
 	$(top_builddir)/src/sslutils/libssl_utils_gcc64.la \
 	$(top_builddir)/src/common/libutilc.la $(am__DEPENDENCIES_1)
-am__objects_5 = libsock_gcc64_la-Client.lo libsock_gcc64_la-Server.lo \
-	libsock_gcc64_la-tokens.lo libsock_gcc64_la-globuswrap.lo
+am__objects_5 = libsock_gcc64_la-Client.lo
 am_libsock_gcc64_la_OBJECTS = $(am__objects_5)
 libsock_gcc64_la_OBJECTS = $(am_libsock_gcc64_la_OBJECTS)
 libsock_gcc64dbg_la_DEPENDENCIES =  \
 	$(top_builddir)/src/sslutils/libssl_utils_gcc64dbg.la \
 	$(top_builddir)/src/common/libutilc.la $(am__DEPENDENCIES_1)
-am__objects_6 = libsock_gcc64dbg_la-Client.lo \
-	libsock_gcc64dbg_la-Server.lo libsock_gcc64dbg_la-tokens.lo \
-	libsock_gcc64dbg_la-globuswrap.lo
+am__objects_6 = libsock_gcc64dbg_la-Client.lo
 am_libsock_gcc64dbg_la_OBJECTS = $(am__objects_6)
 libsock_gcc64dbg_la_OBJECTS = $(am_libsock_gcc64dbg_la_OBJECTS)
 libsock_gcc64dbgpthr_la_DEPENDENCIES =  \
 	$(top_builddir)/src/sslutils/libssl_utils_gcc64dbgpthr.la \
 	$(top_builddir)/src/common/libutilc.la $(am__DEPENDENCIES_1)
-am__objects_7 = libsock_gcc64dbgpthr_la-Client.lo \
-	libsock_gcc64dbgpthr_la-Server.lo \
-	libsock_gcc64dbgpthr_la-tokens.lo \
-	libsock_gcc64dbgpthr_la-globuswrap.lo
+am__objects_7 = libsock_gcc64dbgpthr_la-Client.lo
 am_libsock_gcc64dbgpthr_la_OBJECTS = $(am__objects_7)
 libsock_gcc64dbgpthr_la_OBJECTS =  \
 	$(am_libsock_gcc64dbgpthr_la_OBJECTS)
 libsock_gcc64pthr_la_DEPENDENCIES =  \
 	$(top_builddir)/src/sslutils/libssl_utils_gcc64pthr.la \
 	$(top_builddir)/src/common/libutilc.la $(am__DEPENDENCIES_1)
-am__objects_8 = libsock_gcc64pthr_la-Client.lo \
-	libsock_gcc64pthr_la-Server.lo libsock_gcc64pthr_la-tokens.lo \
-	libsock_gcc64pthr_la-globuswrap.lo
+am__objects_8 = libsock_gcc64pthr_la-Client.lo
 am_libsock_gcc64pthr_la_OBJECTS = $(am__objects_8)
 libsock_gcc64pthr_la_OBJECTS = $(am_libsock_gcc64pthr_la_OBJECTS)
 libsock_nog_la_DEPENDENCIES =
@@ -128,81 +114,73 @@ libsock_server_la_OBJECTS = $(am_libsock_server_la_OBJECTS)
 libsock_server_gcc32_la_DEPENDENCIES =  \
 	$(top_builddir)/src/sslutils/libssl_utils_gcc32.la \
 	$(top_builddir)/src/common/libutilc.la $(am__DEPENDENCIES_1)
-am__objects_9 = libsock_server_gcc32_la-Client.lo \
+am_libsock_server_gcc32_la_OBJECTS =  \
 	libsock_server_gcc32_la-Server.lo \
 	libsock_server_gcc32_la-tokens.lo \
 	libsock_server_gcc32_la-globuswrap.lo
-am_libsock_server_gcc32_la_OBJECTS = $(am__objects_9)
 libsock_server_gcc32_la_OBJECTS =  \
 	$(am_libsock_server_gcc32_la_OBJECTS)
 libsock_server_gcc32dbg_la_DEPENDENCIES =  \
 	$(top_builddir)/src/sslutils/libssl_utils_gcc32dbg.la \
 	$(top_builddir)/src/common/libutilc.la $(am__DEPENDENCIES_1)
-am__objects_10 = libsock_server_gcc32dbg_la-Client.lo \
+am_libsock_server_gcc32dbg_la_OBJECTS =  \
 	libsock_server_gcc32dbg_la-Server.lo \
 	libsock_server_gcc32dbg_la-tokens.lo \
 	libsock_server_gcc32dbg_la-globuswrap.lo
-am_libsock_server_gcc32dbg_la_OBJECTS = $(am__objects_10)
 libsock_server_gcc32dbg_la_OBJECTS =  \
 	$(am_libsock_server_gcc32dbg_la_OBJECTS)
 libsock_server_gcc32dbgpthr_la_DEPENDENCIES =  \
 	$(top_builddir)/src/sslutils/libssl_utils_gcc32dbgpthr.la \
 	$(top_builddir)/src/common/libutilc.la $(am__DEPENDENCIES_1)
-am__objects_11 = libsock_server_gcc32dbgpthr_la-Client.lo \
+am_libsock_server_gcc32dbgpthr_la_OBJECTS =  \
 	libsock_server_gcc32dbgpthr_la-Server.lo \
 	libsock_server_gcc32dbgpthr_la-tokens.lo \
 	libsock_server_gcc32dbgpthr_la-globuswrap.lo
-am_libsock_server_gcc32dbgpthr_la_OBJECTS = $(am__objects_11)
 libsock_server_gcc32dbgpthr_la_OBJECTS =  \
 	$(am_libsock_server_gcc32dbgpthr_la_OBJECTS)
 libsock_server_gcc32pthr_la_DEPENDENCIES =  \
 	$(top_builddir)/src/sslutils/libssl_utils_gcc32pthr.la \
 	$(top_builddir)/src/common/libutilc.la $(am__DEPENDENCIES_1)
-am__objects_12 = libsock_server_gcc32pthr_la-Client.lo \
+am_libsock_server_gcc32pthr_la_OBJECTS =  \
 	libsock_server_gcc32pthr_la-Server.lo \
 	libsock_server_gcc32pthr_la-tokens.lo \
 	libsock_server_gcc32pthr_la-globuswrap.lo
-am_libsock_server_gcc32pthr_la_OBJECTS = $(am__objects_12)
 libsock_server_gcc32pthr_la_OBJECTS =  \
 	$(am_libsock_server_gcc32pthr_la_OBJECTS)
 libsock_server_gcc64_la_DEPENDENCIES =  \
 	$(top_builddir)/src/sslutils/libssl_utils_gcc64.la \
 	$(top_builddir)/src/common/libutilc.la $(am__DEPENDENCIES_1)
-am__objects_13 = libsock_server_gcc64_la-Client.lo \
+am_libsock_server_gcc64_la_OBJECTS =  \
 	libsock_server_gcc64_la-Server.lo \
 	libsock_server_gcc64_la-tokens.lo \
 	libsock_server_gcc64_la-globuswrap.lo
-am_libsock_server_gcc64_la_OBJECTS = $(am__objects_13)
 libsock_server_gcc64_la_OBJECTS =  \
 	$(am_libsock_server_gcc64_la_OBJECTS)
 libsock_server_gcc64dbg_la_DEPENDENCIES =  \
 	$(top_builddir)/src/sslutils/libssl_utils_gcc64dbg.la \
 	$(top_builddir)/src/common/libutilc.la $(am__DEPENDENCIES_1)
-am__objects_14 = libsock_server_gcc64dbg_la-Client.lo \
+am_libsock_server_gcc64dbg_la_OBJECTS =  \
 	libsock_server_gcc64dbg_la-Server.lo \
 	libsock_server_gcc64dbg_la-tokens.lo \
 	libsock_server_gcc64dbg_la-globuswrap.lo
-am_libsock_server_gcc64dbg_la_OBJECTS = $(am__objects_14)
 libsock_server_gcc64dbg_la_OBJECTS =  \
 	$(am_libsock_server_gcc64dbg_la_OBJECTS)
 libsock_server_gcc64dbgpthr_la_DEPENDENCIES =  \
 	$(top_builddir)/src/sslutils/libssl_utils_gcc64dbgpthr.la \
 	$(top_builddir)/src/common/libutilc.la $(am__DEPENDENCIES_1)
-am__objects_15 = libsock_server_gcc64dbgpthr_la-Client.lo \
+am_libsock_server_gcc64dbgpthr_la_OBJECTS =  \
 	libsock_server_gcc64dbgpthr_la-Server.lo \
 	libsock_server_gcc64dbgpthr_la-tokens.lo \
 	libsock_server_gcc64dbgpthr_la-globuswrap.lo
-am_libsock_server_gcc64dbgpthr_la_OBJECTS = $(am__objects_15)
 libsock_server_gcc64dbgpthr_la_OBJECTS =  \
 	$(am_libsock_server_gcc64dbgpthr_la_OBJECTS)
 libsock_server_gcc64pthr_la_DEPENDENCIES =  \
 	$(top_builddir)/src/sslutils/libssl_utils_gcc64pthr.la \
 	$(top_builddir)/src/common/libutilc.la $(am__DEPENDENCIES_1)
-am__objects_16 = libsock_server_gcc64pthr_la-Client.lo \
+am_libsock_server_gcc64pthr_la_OBJECTS =  \
 	libsock_server_gcc64pthr_la-Server.lo \
 	libsock_server_gcc64pthr_la-tokens.lo \
 	libsock_server_gcc64pthr_la-globuswrap.lo
-am_libsock_server_gcc64pthr_la_OBJECTS = $(am__objects_16)
 libsock_server_gcc64pthr_la_OBJECTS =  \
 	$(am_libsock_server_gcc64pthr_la_OBJECTS)
 DEFAULT_INCLUDES = -I.@am__isrc@ -I$(top_builddir)/src/autogen
@@ -242,6 +220,15 @@ DIST_SOURCES = $(libsock_la_SOURCES) $(libsock_gcc32_la_SOURCES) \
 	$(libsock_server_gcc64dbg_la_SOURCES) \
 	$(libsock_server_gcc64dbgpthr_la_SOURCES) \
 	$(libsock_server_gcc64pthr_la_SOURCES)
+am__vpath_adj_setup = srcdirstrip=`echo "$(srcdir)" | sed 's|.|.|g'`;
+am__vpath_adj = case $$p in \
+    $(srcdir)/*) f=`echo "$$p" | sed "s|^$$srcdirstrip/||"`;; \
+    *) f=$$p;; \
+  esac;
+am__strip_dir = `echo $$p | sed -e 's|^.*/||'`;
+am__installdirs = "$(DESTDIR)$(includedir)"
+includeHEADERS_INSTALL = $(INSTALL_HEADER)
+HEADERS = $(include_HEADERS)
 ETAGS = etags
 CTAGS = ctags
 DISTFILES = $(DIST_COMMON) $(DIST_SOURCES) $(TEXINFOS) $(EXTRA_DIST)
@@ -401,7 +388,7 @@ host_cpu = @host_cpu@
 host_os = @host_os@
 host_vendor = @host_vendor@
 htmldir = @htmldir@
-includedir = @includedir@
+includedir = @includedir@/glite/security/voms
 infodir = @infodir@
 install_sh = @install_sh@
 libdir = @libdir@
@@ -429,10 +416,13 @@ with_dbuser = @with_dbuser@
 with_mysqlconf = @with_mysqlconf@
 with_reportdir = @with_reportdir@
 with_scratchdir = @with_scratchdir@
+include_HEADERS = \
+	vomsssl.h
+
 noinst_LTLIBRARIES = \
 	$(WANTED_SOCK_LIBS) # may add the libraries defined in EXTRA_LTLIBRARIES
 
-SOURCES = Client.cpp Server.cpp tokens.c globuswrap.c
+SOURCES = Client.cpp
 libsock_la_SOURCES = Client.cpp
 libsock_server_la_SOURCES = Server.cpp tokens.c globuswrap.c
 libsock_nog_la_SOURCES = Client.cpp
@@ -465,7 +455,7 @@ libsock_la_LIBADD = \
 	$(top_builddir)/src/common/libutilc.la \
 	$(GLOBUS_GSS_API_LIBS)
 
-EXTRA_DIST = globuswrap.h
+EXTRA_DIST = globuswrap.h vomsssl.h
 
 ###
 EXTRA_LTLIBRARIES = \
@@ -489,9 +479,7 @@ EXTRA_LTLIBRARIES = \
 	libsock.la \
 	libsock_nog.la
 
-libsock_server_gcc32_la_SOURCES = \
-	$(SOURCES)
-
+libsock_server_gcc32_la_SOURCES = Server.cpp tokens.c globuswrap.c
 libsock_server_gcc32_la_CPPFLAGS = \
 	-I $(top_srcdir)/src/include \
 	-I $(top_srcdir)/src/sslutils \
@@ -502,9 +490,7 @@ libsock_server_gcc32_la_LIBADD = \
 	$(top_builddir)/src/common/libutilc.la \
 	$(GLOBUS_GCC32_GSS_LIBS)
 
-libsock_server_gcc32dbg_la_SOURCES = \
-	$(SOURCES)
-
+libsock_server_gcc32dbg_la_SOURCES = Server.cpp tokens.c globuswrap.c
 libsock_server_gcc32dbg_la_CPPFLAGS = \
 	-I $(top_srcdir)/src/include \
 	-I $(top_srcdir)/src/sslutils \
@@ -515,9 +501,7 @@ libsock_server_gcc32dbg_la_LIBADD = \
 	$(top_builddir)/src/common/libutilc.la \
 	$(GLOBUS_GCC32DBG_GSS_LIBS)
 
-libsock_server_gcc32pthr_la_SOURCES = \
-	$(SOURCES)
-
+libsock_server_gcc32pthr_la_SOURCES = Server.cpp tokens.c globuswrap.c
 libsock_server_gcc32pthr_la_CPPFLAGS = \
 	-I $(top_srcdir)/src/include \
 	-I $(top_srcdir)/src/sslutils \
@@ -528,9 +512,7 @@ libsock_server_gcc32pthr_la_LIBADD = \
 	$(top_builddir)/src/common/libutilc.la \
 	$(GLOBUS_GCC32PTHR_GSS_LIBS)
 
-libsock_server_gcc32dbgpthr_la_SOURCES = \
-	$(SOURCES)
-
+libsock_server_gcc32dbgpthr_la_SOURCES = Server.cpp tokens.c globuswrap.c
 libsock_server_gcc32dbgpthr_la_CPPFLAGS = \
 	-I $(top_srcdir)/src/include \
 	-I $(top_srcdir)/src/sslutils \
@@ -541,9 +523,7 @@ libsock_server_gcc32dbgpthr_la_LIBADD = \
 	$(top_builddir)/src/common/libutilc.la \
 	$(GLOBUS_GCC32DBGPTHR_GSS_LIBS)
 
-libsock_server_gcc64_la_SOURCES = \
-	$(SOURCES)
-
+libsock_server_gcc64_la_SOURCES = Server.cpp tokens.c globuswrap.c
 libsock_server_gcc64_la_CPPFLAGS = \
 	-I $(top_srcdir)/src/include \
 	-I $(top_srcdir)/src/sslutils \
@@ -554,9 +534,7 @@ libsock_server_gcc64_la_LIBADD = \
 	$(top_builddir)/src/common/libutilc.la \
 	$(GLOBUS_GCC64_GSS_LIBS)
 
-libsock_server_gcc64dbg_la_SOURCES = \
-	$(SOURCES)
-
+libsock_server_gcc64dbg_la_SOURCES = Server.cpp tokens.c globuswrap.c
 libsock_server_gcc64dbg_la_CPPFLAGS = \
 	-I $(top_srcdir)/src/include \
 	-I $(top_srcdir)/src/sslutils \
@@ -567,9 +545,7 @@ libsock_server_gcc64dbg_la_LIBADD = \
 	$(top_builddir)/src/common/libutilc.la \
 	$(GLOBUS_GCC64DBG_GSS_LIBS)
 
-libsock_server_gcc64pthr_la_SOURCES = \
-	$(SOURCES)
-
+libsock_server_gcc64pthr_la_SOURCES = Server.cpp tokens.c globuswrap.c
 libsock_server_gcc64pthr_la_CPPFLAGS = \
 	-I $(top_srcdir)/src/include \
 	-I $(top_srcdir)/src/sslutils \
@@ -580,9 +556,7 @@ libsock_server_gcc64pthr_la_LIBADD = \
 	$(top_builddir)/src/common/libutilc.la \
 	$(GLOBUS_GCC64PTHR_GSS_LIBS)
 
-libsock_server_gcc64dbgpthr_la_SOURCES = \
-	$(SOURCES)
-
+libsock_server_gcc64dbgpthr_la_SOURCES = Server.cpp tokens.c globuswrap.c
 libsock_server_gcc64dbgpthr_la_CPPFLAGS = \
 	-I $(top_srcdir)/src/include \
 	-I $(top_srcdir)/src/sslutils \
@@ -807,68 +781,36 @@ distclean-compile:
 	-rm -f *.tab.c
 
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libsock_gcc32_la-Client.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libsock_gcc32_la-Server.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libsock_gcc32_la-globuswrap.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libsock_gcc32_la-tokens.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libsock_gcc32dbg_la-Client.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libsock_gcc32dbg_la-Server.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libsock_gcc32dbg_la-globuswrap.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libsock_gcc32dbg_la-tokens.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libsock_gcc32dbgpthr_la-Client.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libsock_gcc32dbgpthr_la-Server.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libsock_gcc32dbgpthr_la-globuswrap.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libsock_gcc32dbgpthr_la-tokens.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libsock_gcc32pthr_la-Client.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libsock_gcc32pthr_la-Server.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libsock_gcc32pthr_la-globuswrap.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libsock_gcc32pthr_la-tokens.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libsock_gcc64_la-Client.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libsock_gcc64_la-Server.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libsock_gcc64_la-globuswrap.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libsock_gcc64_la-tokens.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libsock_gcc64dbg_la-Client.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libsock_gcc64dbg_la-Server.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libsock_gcc64dbg_la-globuswrap.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libsock_gcc64dbg_la-tokens.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libsock_gcc64dbgpthr_la-Client.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libsock_gcc64dbgpthr_la-Server.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libsock_gcc64dbgpthr_la-globuswrap.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libsock_gcc64dbgpthr_la-tokens.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libsock_gcc64pthr_la-Client.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libsock_gcc64pthr_la-Server.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libsock_gcc64pthr_la-globuswrap.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libsock_gcc64pthr_la-tokens.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libsock_la-Client.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libsock_nog_la-Client.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libsock_server_gcc32_la-Client.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libsock_server_gcc32_la-Server.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libsock_server_gcc32_la-globuswrap.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libsock_server_gcc32_la-tokens.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libsock_server_gcc32dbg_la-Client.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libsock_server_gcc32dbg_la-Server.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libsock_server_gcc32dbg_la-globuswrap.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libsock_server_gcc32dbg_la-tokens.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libsock_server_gcc32dbgpthr_la-Client.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libsock_server_gcc32dbgpthr_la-Server.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libsock_server_gcc32dbgpthr_la-globuswrap.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libsock_server_gcc32dbgpthr_la-tokens.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libsock_server_gcc32pthr_la-Client.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libsock_server_gcc32pthr_la-Server.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libsock_server_gcc32pthr_la-globuswrap.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libsock_server_gcc32pthr_la-tokens.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libsock_server_gcc64_la-Client.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libsock_server_gcc64_la-Server.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libsock_server_gcc64_la-globuswrap.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libsock_server_gcc64_la-tokens.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libsock_server_gcc64dbg_la-Client.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libsock_server_gcc64dbg_la-Server.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libsock_server_gcc64dbg_la-globuswrap.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libsock_server_gcc64dbg_la-tokens.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libsock_server_gcc64dbgpthr_la-Client.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libsock_server_gcc64dbgpthr_la-Server.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libsock_server_gcc64dbgpthr_la-globuswrap.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libsock_server_gcc64dbgpthr_la-tokens.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libsock_server_gcc64pthr_la-Client.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libsock_server_gcc64pthr_la-Server.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libsock_server_gcc64pthr_la-globuswrap.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libsock_server_gcc64pthr_la-tokens.Plo@am__quote@
@@ -896,118 +838,6 @@ distclean-compile:
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	source='$<' object='$@' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(LTCOMPILE) -c -o $@ $<
-
-libsock_gcc32_la-tokens.lo: tokens.c
-@am__fastdepCC_TRUE@	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libsock_gcc32_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT libsock_gcc32_la-tokens.lo -MD -MP -MF $(DEPDIR)/libsock_gcc32_la-tokens.Tpo -c -o libsock_gcc32_la-tokens.lo `test -f 'tokens.c' || echo '$(srcdir)/'`tokens.c
-@am__fastdepCC_TRUE@	mv -f $(DEPDIR)/libsock_gcc32_la-tokens.Tpo $(DEPDIR)/libsock_gcc32_la-tokens.Plo
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='tokens.c' object='libsock_gcc32_la-tokens.lo' libtool=yes @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libsock_gcc32_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o libsock_gcc32_la-tokens.lo `test -f 'tokens.c' || echo '$(srcdir)/'`tokens.c
-
-libsock_gcc32_la-globuswrap.lo: globuswrap.c
-@am__fastdepCC_TRUE@	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libsock_gcc32_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT libsock_gcc32_la-globuswrap.lo -MD -MP -MF $(DEPDIR)/libsock_gcc32_la-globuswrap.Tpo -c -o libsock_gcc32_la-globuswrap.lo `test -f 'globuswrap.c' || echo '$(srcdir)/'`globuswrap.c
-@am__fastdepCC_TRUE@	mv -f $(DEPDIR)/libsock_gcc32_la-globuswrap.Tpo $(DEPDIR)/libsock_gcc32_la-globuswrap.Plo
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='globuswrap.c' object='libsock_gcc32_la-globuswrap.lo' libtool=yes @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libsock_gcc32_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o libsock_gcc32_la-globuswrap.lo `test -f 'globuswrap.c' || echo '$(srcdir)/'`globuswrap.c
-
-libsock_gcc32dbg_la-tokens.lo: tokens.c
-@am__fastdepCC_TRUE@	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libsock_gcc32dbg_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT libsock_gcc32dbg_la-tokens.lo -MD -MP -MF $(DEPDIR)/libsock_gcc32dbg_la-tokens.Tpo -c -o libsock_gcc32dbg_la-tokens.lo `test -f 'tokens.c' || echo '$(srcdir)/'`tokens.c
-@am__fastdepCC_TRUE@	mv -f $(DEPDIR)/libsock_gcc32dbg_la-tokens.Tpo $(DEPDIR)/libsock_gcc32dbg_la-tokens.Plo
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='tokens.c' object='libsock_gcc32dbg_la-tokens.lo' libtool=yes @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libsock_gcc32dbg_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o libsock_gcc32dbg_la-tokens.lo `test -f 'tokens.c' || echo '$(srcdir)/'`tokens.c
-
-libsock_gcc32dbg_la-globuswrap.lo: globuswrap.c
-@am__fastdepCC_TRUE@	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libsock_gcc32dbg_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT libsock_gcc32dbg_la-globuswrap.lo -MD -MP -MF $(DEPDIR)/libsock_gcc32dbg_la-globuswrap.Tpo -c -o libsock_gcc32dbg_la-globuswrap.lo `test -f 'globuswrap.c' || echo '$(srcdir)/'`globuswrap.c
-@am__fastdepCC_TRUE@	mv -f $(DEPDIR)/libsock_gcc32dbg_la-globuswrap.Tpo $(DEPDIR)/libsock_gcc32dbg_la-globuswrap.Plo
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='globuswrap.c' object='libsock_gcc32dbg_la-globuswrap.lo' libtool=yes @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libsock_gcc32dbg_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o libsock_gcc32dbg_la-globuswrap.lo `test -f 'globuswrap.c' || echo '$(srcdir)/'`globuswrap.c
-
-libsock_gcc32dbgpthr_la-tokens.lo: tokens.c
-@am__fastdepCC_TRUE@	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libsock_gcc32dbgpthr_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT libsock_gcc32dbgpthr_la-tokens.lo -MD -MP -MF $(DEPDIR)/libsock_gcc32dbgpthr_la-tokens.Tpo -c -o libsock_gcc32dbgpthr_la-tokens.lo `test -f 'tokens.c' || echo '$(srcdir)/'`tokens.c
-@am__fastdepCC_TRUE@	mv -f $(DEPDIR)/libsock_gcc32dbgpthr_la-tokens.Tpo $(DEPDIR)/libsock_gcc32dbgpthr_la-tokens.Plo
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='tokens.c' object='libsock_gcc32dbgpthr_la-tokens.lo' libtool=yes @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libsock_gcc32dbgpthr_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o libsock_gcc32dbgpthr_la-tokens.lo `test -f 'tokens.c' || echo '$(srcdir)/'`tokens.c
-
-libsock_gcc32dbgpthr_la-globuswrap.lo: globuswrap.c
-@am__fastdepCC_TRUE@	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libsock_gcc32dbgpthr_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT libsock_gcc32dbgpthr_la-globuswrap.lo -MD -MP -MF $(DEPDIR)/libsock_gcc32dbgpthr_la-globuswrap.Tpo -c -o libsock_gcc32dbgpthr_la-globuswrap.lo `test -f 'globuswrap.c' || echo '$(srcdir)/'`globuswrap.c
-@am__fastdepCC_TRUE@	mv -f $(DEPDIR)/libsock_gcc32dbgpthr_la-globuswrap.Tpo $(DEPDIR)/libsock_gcc32dbgpthr_la-globuswrap.Plo
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='globuswrap.c' object='libsock_gcc32dbgpthr_la-globuswrap.lo' libtool=yes @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libsock_gcc32dbgpthr_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o libsock_gcc32dbgpthr_la-globuswrap.lo `test -f 'globuswrap.c' || echo '$(srcdir)/'`globuswrap.c
-
-libsock_gcc32pthr_la-tokens.lo: tokens.c
-@am__fastdepCC_TRUE@	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libsock_gcc32pthr_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT libsock_gcc32pthr_la-tokens.lo -MD -MP -MF $(DEPDIR)/libsock_gcc32pthr_la-tokens.Tpo -c -o libsock_gcc32pthr_la-tokens.lo `test -f 'tokens.c' || echo '$(srcdir)/'`tokens.c
-@am__fastdepCC_TRUE@	mv -f $(DEPDIR)/libsock_gcc32pthr_la-tokens.Tpo $(DEPDIR)/libsock_gcc32pthr_la-tokens.Plo
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='tokens.c' object='libsock_gcc32pthr_la-tokens.lo' libtool=yes @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libsock_gcc32pthr_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o libsock_gcc32pthr_la-tokens.lo `test -f 'tokens.c' || echo '$(srcdir)/'`tokens.c
-
-libsock_gcc32pthr_la-globuswrap.lo: globuswrap.c
-@am__fastdepCC_TRUE@	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libsock_gcc32pthr_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT libsock_gcc32pthr_la-globuswrap.lo -MD -MP -MF $(DEPDIR)/libsock_gcc32pthr_la-globuswrap.Tpo -c -o libsock_gcc32pthr_la-globuswrap.lo `test -f 'globuswrap.c' || echo '$(srcdir)/'`globuswrap.c
-@am__fastdepCC_TRUE@	mv -f $(DEPDIR)/libsock_gcc32pthr_la-globuswrap.Tpo $(DEPDIR)/libsock_gcc32pthr_la-globuswrap.Plo
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='globuswrap.c' object='libsock_gcc32pthr_la-globuswrap.lo' libtool=yes @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libsock_gcc32pthr_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o libsock_gcc32pthr_la-globuswrap.lo `test -f 'globuswrap.c' || echo '$(srcdir)/'`globuswrap.c
-
-libsock_gcc64_la-tokens.lo: tokens.c
-@am__fastdepCC_TRUE@	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libsock_gcc64_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT libsock_gcc64_la-tokens.lo -MD -MP -MF $(DEPDIR)/libsock_gcc64_la-tokens.Tpo -c -o libsock_gcc64_la-tokens.lo `test -f 'tokens.c' || echo '$(srcdir)/'`tokens.c
-@am__fastdepCC_TRUE@	mv -f $(DEPDIR)/libsock_gcc64_la-tokens.Tpo $(DEPDIR)/libsock_gcc64_la-tokens.Plo
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='tokens.c' object='libsock_gcc64_la-tokens.lo' libtool=yes @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libsock_gcc64_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o libsock_gcc64_la-tokens.lo `test -f 'tokens.c' || echo '$(srcdir)/'`tokens.c
-
-libsock_gcc64_la-globuswrap.lo: globuswrap.c
-@am__fastdepCC_TRUE@	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libsock_gcc64_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT libsock_gcc64_la-globuswrap.lo -MD -MP -MF $(DEPDIR)/libsock_gcc64_la-globuswrap.Tpo -c -o libsock_gcc64_la-globuswrap.lo `test -f 'globuswrap.c' || echo '$(srcdir)/'`globuswrap.c
-@am__fastdepCC_TRUE@	mv -f $(DEPDIR)/libsock_gcc64_la-globuswrap.Tpo $(DEPDIR)/libsock_gcc64_la-globuswrap.Plo
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='globuswrap.c' object='libsock_gcc64_la-globuswrap.lo' libtool=yes @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libsock_gcc64_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o libsock_gcc64_la-globuswrap.lo `test -f 'globuswrap.c' || echo '$(srcdir)/'`globuswrap.c
-
-libsock_gcc64dbg_la-tokens.lo: tokens.c
-@am__fastdepCC_TRUE@	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libsock_gcc64dbg_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT libsock_gcc64dbg_la-tokens.lo -MD -MP -MF $(DEPDIR)/libsock_gcc64dbg_la-tokens.Tpo -c -o libsock_gcc64dbg_la-tokens.lo `test -f 'tokens.c' || echo '$(srcdir)/'`tokens.c
-@am__fastdepCC_TRUE@	mv -f $(DEPDIR)/libsock_gcc64dbg_la-tokens.Tpo $(DEPDIR)/libsock_gcc64dbg_la-tokens.Plo
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='tokens.c' object='libsock_gcc64dbg_la-tokens.lo' libtool=yes @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libsock_gcc64dbg_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o libsock_gcc64dbg_la-tokens.lo `test -f 'tokens.c' || echo '$(srcdir)/'`tokens.c
-
-libsock_gcc64dbg_la-globuswrap.lo: globuswrap.c
-@am__fastdepCC_TRUE@	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libsock_gcc64dbg_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT libsock_gcc64dbg_la-globuswrap.lo -MD -MP -MF $(DEPDIR)/libsock_gcc64dbg_la-globuswrap.Tpo -c -o libsock_gcc64dbg_la-globuswrap.lo `test -f 'globuswrap.c' || echo '$(srcdir)/'`globuswrap.c
-@am__fastdepCC_TRUE@	mv -f $(DEPDIR)/libsock_gcc64dbg_la-globuswrap.Tpo $(DEPDIR)/libsock_gcc64dbg_la-globuswrap.Plo
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='globuswrap.c' object='libsock_gcc64dbg_la-globuswrap.lo' libtool=yes @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libsock_gcc64dbg_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o libsock_gcc64dbg_la-globuswrap.lo `test -f 'globuswrap.c' || echo '$(srcdir)/'`globuswrap.c
-
-libsock_gcc64dbgpthr_la-tokens.lo: tokens.c
-@am__fastdepCC_TRUE@	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libsock_gcc64dbgpthr_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT libsock_gcc64dbgpthr_la-tokens.lo -MD -MP -MF $(DEPDIR)/libsock_gcc64dbgpthr_la-tokens.Tpo -c -o libsock_gcc64dbgpthr_la-tokens.lo `test -f 'tokens.c' || echo '$(srcdir)/'`tokens.c
-@am__fastdepCC_TRUE@	mv -f $(DEPDIR)/libsock_gcc64dbgpthr_la-tokens.Tpo $(DEPDIR)/libsock_gcc64dbgpthr_la-tokens.Plo
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='tokens.c' object='libsock_gcc64dbgpthr_la-tokens.lo' libtool=yes @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libsock_gcc64dbgpthr_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o libsock_gcc64dbgpthr_la-tokens.lo `test -f 'tokens.c' || echo '$(srcdir)/'`tokens.c
-
-libsock_gcc64dbgpthr_la-globuswrap.lo: globuswrap.c
-@am__fastdepCC_TRUE@	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libsock_gcc64dbgpthr_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT libsock_gcc64dbgpthr_la-globuswrap.lo -MD -MP -MF $(DEPDIR)/libsock_gcc64dbgpthr_la-globuswrap.Tpo -c -o libsock_gcc64dbgpthr_la-globuswrap.lo `test -f 'globuswrap.c' || echo '$(srcdir)/'`globuswrap.c
-@am__fastdepCC_TRUE@	mv -f $(DEPDIR)/libsock_gcc64dbgpthr_la-globuswrap.Tpo $(DEPDIR)/libsock_gcc64dbgpthr_la-globuswrap.Plo
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='globuswrap.c' object='libsock_gcc64dbgpthr_la-globuswrap.lo' libtool=yes @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libsock_gcc64dbgpthr_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o libsock_gcc64dbgpthr_la-globuswrap.lo `test -f 'globuswrap.c' || echo '$(srcdir)/'`globuswrap.c
-
-libsock_gcc64pthr_la-tokens.lo: tokens.c
-@am__fastdepCC_TRUE@	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libsock_gcc64pthr_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT libsock_gcc64pthr_la-tokens.lo -MD -MP -MF $(DEPDIR)/libsock_gcc64pthr_la-tokens.Tpo -c -o libsock_gcc64pthr_la-tokens.lo `test -f 'tokens.c' || echo '$(srcdir)/'`tokens.c
-@am__fastdepCC_TRUE@	mv -f $(DEPDIR)/libsock_gcc64pthr_la-tokens.Tpo $(DEPDIR)/libsock_gcc64pthr_la-tokens.Plo
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='tokens.c' object='libsock_gcc64pthr_la-tokens.lo' libtool=yes @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libsock_gcc64pthr_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o libsock_gcc64pthr_la-tokens.lo `test -f 'tokens.c' || echo '$(srcdir)/'`tokens.c
-
-libsock_gcc64pthr_la-globuswrap.lo: globuswrap.c
-@am__fastdepCC_TRUE@	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libsock_gcc64pthr_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT libsock_gcc64pthr_la-globuswrap.lo -MD -MP -MF $(DEPDIR)/libsock_gcc64pthr_la-globuswrap.Tpo -c -o libsock_gcc64pthr_la-globuswrap.lo `test -f 'globuswrap.c' || echo '$(srcdir)/'`globuswrap.c
-@am__fastdepCC_TRUE@	mv -f $(DEPDIR)/libsock_gcc64pthr_la-globuswrap.Tpo $(DEPDIR)/libsock_gcc64pthr_la-globuswrap.Plo
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='globuswrap.c' object='libsock_gcc64pthr_la-globuswrap.lo' libtool=yes @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libsock_gcc64pthr_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o libsock_gcc64pthr_la-globuswrap.lo `test -f 'globuswrap.c' || echo '$(srcdir)/'`globuswrap.c
 
 libsock_server_la-tokens.lo: tokens.c
 @am__fastdepCC_TRUE@	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libsock_server_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT libsock_server_la-tokens.lo -MD -MP -MF $(DEPDIR)/libsock_server_la-tokens.Tpo -c -o libsock_server_la-tokens.lo `test -f 'tokens.c' || echo '$(srcdir)/'`tokens.c
@@ -1170,26 +1000,12 @@ libsock_gcc32_la-Client.lo: Client.cpp
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libsock_gcc32_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o libsock_gcc32_la-Client.lo `test -f 'Client.cpp' || echo '$(srcdir)/'`Client.cpp
 
-libsock_gcc32_la-Server.lo: Server.cpp
-@am__fastdepCXX_TRUE@	$(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libsock_gcc32_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT libsock_gcc32_la-Server.lo -MD -MP -MF $(DEPDIR)/libsock_gcc32_la-Server.Tpo -c -o libsock_gcc32_la-Server.lo `test -f 'Server.cpp' || echo '$(srcdir)/'`Server.cpp
-@am__fastdepCXX_TRUE@	mv -f $(DEPDIR)/libsock_gcc32_la-Server.Tpo $(DEPDIR)/libsock_gcc32_la-Server.Plo
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='Server.cpp' object='libsock_gcc32_la-Server.lo' libtool=yes @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libsock_gcc32_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o libsock_gcc32_la-Server.lo `test -f 'Server.cpp' || echo '$(srcdir)/'`Server.cpp
-
 libsock_gcc32dbg_la-Client.lo: Client.cpp
 @am__fastdepCXX_TRUE@	$(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libsock_gcc32dbg_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT libsock_gcc32dbg_la-Client.lo -MD -MP -MF $(DEPDIR)/libsock_gcc32dbg_la-Client.Tpo -c -o libsock_gcc32dbg_la-Client.lo `test -f 'Client.cpp' || echo '$(srcdir)/'`Client.cpp
 @am__fastdepCXX_TRUE@	mv -f $(DEPDIR)/libsock_gcc32dbg_la-Client.Tpo $(DEPDIR)/libsock_gcc32dbg_la-Client.Plo
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='Client.cpp' object='libsock_gcc32dbg_la-Client.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libsock_gcc32dbg_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o libsock_gcc32dbg_la-Client.lo `test -f 'Client.cpp' || echo '$(srcdir)/'`Client.cpp
-
-libsock_gcc32dbg_la-Server.lo: Server.cpp
-@am__fastdepCXX_TRUE@	$(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libsock_gcc32dbg_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT libsock_gcc32dbg_la-Server.lo -MD -MP -MF $(DEPDIR)/libsock_gcc32dbg_la-Server.Tpo -c -o libsock_gcc32dbg_la-Server.lo `test -f 'Server.cpp' || echo '$(srcdir)/'`Server.cpp
-@am__fastdepCXX_TRUE@	mv -f $(DEPDIR)/libsock_gcc32dbg_la-Server.Tpo $(DEPDIR)/libsock_gcc32dbg_la-Server.Plo
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='Server.cpp' object='libsock_gcc32dbg_la-Server.lo' libtool=yes @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libsock_gcc32dbg_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o libsock_gcc32dbg_la-Server.lo `test -f 'Server.cpp' || echo '$(srcdir)/'`Server.cpp
 
 libsock_gcc32dbgpthr_la-Client.lo: Client.cpp
 @am__fastdepCXX_TRUE@	$(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libsock_gcc32dbgpthr_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT libsock_gcc32dbgpthr_la-Client.lo -MD -MP -MF $(DEPDIR)/libsock_gcc32dbgpthr_la-Client.Tpo -c -o libsock_gcc32dbgpthr_la-Client.lo `test -f 'Client.cpp' || echo '$(srcdir)/'`Client.cpp
@@ -1198,26 +1014,12 @@ libsock_gcc32dbgpthr_la-Client.lo: Client.cpp
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libsock_gcc32dbgpthr_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o libsock_gcc32dbgpthr_la-Client.lo `test -f 'Client.cpp' || echo '$(srcdir)/'`Client.cpp
 
-libsock_gcc32dbgpthr_la-Server.lo: Server.cpp
-@am__fastdepCXX_TRUE@	$(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libsock_gcc32dbgpthr_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT libsock_gcc32dbgpthr_la-Server.lo -MD -MP -MF $(DEPDIR)/libsock_gcc32dbgpthr_la-Server.Tpo -c -o libsock_gcc32dbgpthr_la-Server.lo `test -f 'Server.cpp' || echo '$(srcdir)/'`Server.cpp
-@am__fastdepCXX_TRUE@	mv -f $(DEPDIR)/libsock_gcc32dbgpthr_la-Server.Tpo $(DEPDIR)/libsock_gcc32dbgpthr_la-Server.Plo
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='Server.cpp' object='libsock_gcc32dbgpthr_la-Server.lo' libtool=yes @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libsock_gcc32dbgpthr_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o libsock_gcc32dbgpthr_la-Server.lo `test -f 'Server.cpp' || echo '$(srcdir)/'`Server.cpp
-
 libsock_gcc32pthr_la-Client.lo: Client.cpp
 @am__fastdepCXX_TRUE@	$(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libsock_gcc32pthr_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT libsock_gcc32pthr_la-Client.lo -MD -MP -MF $(DEPDIR)/libsock_gcc32pthr_la-Client.Tpo -c -o libsock_gcc32pthr_la-Client.lo `test -f 'Client.cpp' || echo '$(srcdir)/'`Client.cpp
 @am__fastdepCXX_TRUE@	mv -f $(DEPDIR)/libsock_gcc32pthr_la-Client.Tpo $(DEPDIR)/libsock_gcc32pthr_la-Client.Plo
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='Client.cpp' object='libsock_gcc32pthr_la-Client.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libsock_gcc32pthr_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o libsock_gcc32pthr_la-Client.lo `test -f 'Client.cpp' || echo '$(srcdir)/'`Client.cpp
-
-libsock_gcc32pthr_la-Server.lo: Server.cpp
-@am__fastdepCXX_TRUE@	$(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libsock_gcc32pthr_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT libsock_gcc32pthr_la-Server.lo -MD -MP -MF $(DEPDIR)/libsock_gcc32pthr_la-Server.Tpo -c -o libsock_gcc32pthr_la-Server.lo `test -f 'Server.cpp' || echo '$(srcdir)/'`Server.cpp
-@am__fastdepCXX_TRUE@	mv -f $(DEPDIR)/libsock_gcc32pthr_la-Server.Tpo $(DEPDIR)/libsock_gcc32pthr_la-Server.Plo
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='Server.cpp' object='libsock_gcc32pthr_la-Server.lo' libtool=yes @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libsock_gcc32pthr_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o libsock_gcc32pthr_la-Server.lo `test -f 'Server.cpp' || echo '$(srcdir)/'`Server.cpp
 
 libsock_gcc64_la-Client.lo: Client.cpp
 @am__fastdepCXX_TRUE@	$(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libsock_gcc64_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT libsock_gcc64_la-Client.lo -MD -MP -MF $(DEPDIR)/libsock_gcc64_la-Client.Tpo -c -o libsock_gcc64_la-Client.lo `test -f 'Client.cpp' || echo '$(srcdir)/'`Client.cpp
@@ -1226,26 +1028,12 @@ libsock_gcc64_la-Client.lo: Client.cpp
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libsock_gcc64_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o libsock_gcc64_la-Client.lo `test -f 'Client.cpp' || echo '$(srcdir)/'`Client.cpp
 
-libsock_gcc64_la-Server.lo: Server.cpp
-@am__fastdepCXX_TRUE@	$(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libsock_gcc64_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT libsock_gcc64_la-Server.lo -MD -MP -MF $(DEPDIR)/libsock_gcc64_la-Server.Tpo -c -o libsock_gcc64_la-Server.lo `test -f 'Server.cpp' || echo '$(srcdir)/'`Server.cpp
-@am__fastdepCXX_TRUE@	mv -f $(DEPDIR)/libsock_gcc64_la-Server.Tpo $(DEPDIR)/libsock_gcc64_la-Server.Plo
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='Server.cpp' object='libsock_gcc64_la-Server.lo' libtool=yes @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libsock_gcc64_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o libsock_gcc64_la-Server.lo `test -f 'Server.cpp' || echo '$(srcdir)/'`Server.cpp
-
 libsock_gcc64dbg_la-Client.lo: Client.cpp
 @am__fastdepCXX_TRUE@	$(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libsock_gcc64dbg_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT libsock_gcc64dbg_la-Client.lo -MD -MP -MF $(DEPDIR)/libsock_gcc64dbg_la-Client.Tpo -c -o libsock_gcc64dbg_la-Client.lo `test -f 'Client.cpp' || echo '$(srcdir)/'`Client.cpp
 @am__fastdepCXX_TRUE@	mv -f $(DEPDIR)/libsock_gcc64dbg_la-Client.Tpo $(DEPDIR)/libsock_gcc64dbg_la-Client.Plo
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='Client.cpp' object='libsock_gcc64dbg_la-Client.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libsock_gcc64dbg_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o libsock_gcc64dbg_la-Client.lo `test -f 'Client.cpp' || echo '$(srcdir)/'`Client.cpp
-
-libsock_gcc64dbg_la-Server.lo: Server.cpp
-@am__fastdepCXX_TRUE@	$(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libsock_gcc64dbg_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT libsock_gcc64dbg_la-Server.lo -MD -MP -MF $(DEPDIR)/libsock_gcc64dbg_la-Server.Tpo -c -o libsock_gcc64dbg_la-Server.lo `test -f 'Server.cpp' || echo '$(srcdir)/'`Server.cpp
-@am__fastdepCXX_TRUE@	mv -f $(DEPDIR)/libsock_gcc64dbg_la-Server.Tpo $(DEPDIR)/libsock_gcc64dbg_la-Server.Plo
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='Server.cpp' object='libsock_gcc64dbg_la-Server.lo' libtool=yes @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libsock_gcc64dbg_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o libsock_gcc64dbg_la-Server.lo `test -f 'Server.cpp' || echo '$(srcdir)/'`Server.cpp
 
 libsock_gcc64dbgpthr_la-Client.lo: Client.cpp
 @am__fastdepCXX_TRUE@	$(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libsock_gcc64dbgpthr_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT libsock_gcc64dbgpthr_la-Client.lo -MD -MP -MF $(DEPDIR)/libsock_gcc64dbgpthr_la-Client.Tpo -c -o libsock_gcc64dbgpthr_la-Client.lo `test -f 'Client.cpp' || echo '$(srcdir)/'`Client.cpp
@@ -1254,26 +1042,12 @@ libsock_gcc64dbgpthr_la-Client.lo: Client.cpp
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libsock_gcc64dbgpthr_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o libsock_gcc64dbgpthr_la-Client.lo `test -f 'Client.cpp' || echo '$(srcdir)/'`Client.cpp
 
-libsock_gcc64dbgpthr_la-Server.lo: Server.cpp
-@am__fastdepCXX_TRUE@	$(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libsock_gcc64dbgpthr_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT libsock_gcc64dbgpthr_la-Server.lo -MD -MP -MF $(DEPDIR)/libsock_gcc64dbgpthr_la-Server.Tpo -c -o libsock_gcc64dbgpthr_la-Server.lo `test -f 'Server.cpp' || echo '$(srcdir)/'`Server.cpp
-@am__fastdepCXX_TRUE@	mv -f $(DEPDIR)/libsock_gcc64dbgpthr_la-Server.Tpo $(DEPDIR)/libsock_gcc64dbgpthr_la-Server.Plo
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='Server.cpp' object='libsock_gcc64dbgpthr_la-Server.lo' libtool=yes @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libsock_gcc64dbgpthr_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o libsock_gcc64dbgpthr_la-Server.lo `test -f 'Server.cpp' || echo '$(srcdir)/'`Server.cpp
-
 libsock_gcc64pthr_la-Client.lo: Client.cpp
 @am__fastdepCXX_TRUE@	$(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libsock_gcc64pthr_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT libsock_gcc64pthr_la-Client.lo -MD -MP -MF $(DEPDIR)/libsock_gcc64pthr_la-Client.Tpo -c -o libsock_gcc64pthr_la-Client.lo `test -f 'Client.cpp' || echo '$(srcdir)/'`Client.cpp
 @am__fastdepCXX_TRUE@	mv -f $(DEPDIR)/libsock_gcc64pthr_la-Client.Tpo $(DEPDIR)/libsock_gcc64pthr_la-Client.Plo
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='Client.cpp' object='libsock_gcc64pthr_la-Client.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libsock_gcc64pthr_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o libsock_gcc64pthr_la-Client.lo `test -f 'Client.cpp' || echo '$(srcdir)/'`Client.cpp
-
-libsock_gcc64pthr_la-Server.lo: Server.cpp
-@am__fastdepCXX_TRUE@	$(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libsock_gcc64pthr_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT libsock_gcc64pthr_la-Server.lo -MD -MP -MF $(DEPDIR)/libsock_gcc64pthr_la-Server.Tpo -c -o libsock_gcc64pthr_la-Server.lo `test -f 'Server.cpp' || echo '$(srcdir)/'`Server.cpp
-@am__fastdepCXX_TRUE@	mv -f $(DEPDIR)/libsock_gcc64pthr_la-Server.Tpo $(DEPDIR)/libsock_gcc64pthr_la-Server.Plo
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='Server.cpp' object='libsock_gcc64pthr_la-Server.lo' libtool=yes @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libsock_gcc64pthr_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o libsock_gcc64pthr_la-Server.lo `test -f 'Server.cpp' || echo '$(srcdir)/'`Server.cpp
 
 libsock_nog_la-Client.lo: Client.cpp
 @am__fastdepCXX_TRUE@	$(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libsock_nog_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT libsock_nog_la-Client.lo -MD -MP -MF $(DEPDIR)/libsock_nog_la-Client.Tpo -c -o libsock_nog_la-Client.lo `test -f 'Client.cpp' || echo '$(srcdir)/'`Client.cpp
@@ -1289,26 +1063,12 @@ libsock_server_la-Server.lo: Server.cpp
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libsock_server_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o libsock_server_la-Server.lo `test -f 'Server.cpp' || echo '$(srcdir)/'`Server.cpp
 
-libsock_server_gcc32_la-Client.lo: Client.cpp
-@am__fastdepCXX_TRUE@	$(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libsock_server_gcc32_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT libsock_server_gcc32_la-Client.lo -MD -MP -MF $(DEPDIR)/libsock_server_gcc32_la-Client.Tpo -c -o libsock_server_gcc32_la-Client.lo `test -f 'Client.cpp' || echo '$(srcdir)/'`Client.cpp
-@am__fastdepCXX_TRUE@	mv -f $(DEPDIR)/libsock_server_gcc32_la-Client.Tpo $(DEPDIR)/libsock_server_gcc32_la-Client.Plo
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='Client.cpp' object='libsock_server_gcc32_la-Client.lo' libtool=yes @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libsock_server_gcc32_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o libsock_server_gcc32_la-Client.lo `test -f 'Client.cpp' || echo '$(srcdir)/'`Client.cpp
-
 libsock_server_gcc32_la-Server.lo: Server.cpp
 @am__fastdepCXX_TRUE@	$(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libsock_server_gcc32_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT libsock_server_gcc32_la-Server.lo -MD -MP -MF $(DEPDIR)/libsock_server_gcc32_la-Server.Tpo -c -o libsock_server_gcc32_la-Server.lo `test -f 'Server.cpp' || echo '$(srcdir)/'`Server.cpp
 @am__fastdepCXX_TRUE@	mv -f $(DEPDIR)/libsock_server_gcc32_la-Server.Tpo $(DEPDIR)/libsock_server_gcc32_la-Server.Plo
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='Server.cpp' object='libsock_server_gcc32_la-Server.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libsock_server_gcc32_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o libsock_server_gcc32_la-Server.lo `test -f 'Server.cpp' || echo '$(srcdir)/'`Server.cpp
-
-libsock_server_gcc32dbg_la-Client.lo: Client.cpp
-@am__fastdepCXX_TRUE@	$(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libsock_server_gcc32dbg_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT libsock_server_gcc32dbg_la-Client.lo -MD -MP -MF $(DEPDIR)/libsock_server_gcc32dbg_la-Client.Tpo -c -o libsock_server_gcc32dbg_la-Client.lo `test -f 'Client.cpp' || echo '$(srcdir)/'`Client.cpp
-@am__fastdepCXX_TRUE@	mv -f $(DEPDIR)/libsock_server_gcc32dbg_la-Client.Tpo $(DEPDIR)/libsock_server_gcc32dbg_la-Client.Plo
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='Client.cpp' object='libsock_server_gcc32dbg_la-Client.lo' libtool=yes @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libsock_server_gcc32dbg_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o libsock_server_gcc32dbg_la-Client.lo `test -f 'Client.cpp' || echo '$(srcdir)/'`Client.cpp
 
 libsock_server_gcc32dbg_la-Server.lo: Server.cpp
 @am__fastdepCXX_TRUE@	$(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libsock_server_gcc32dbg_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT libsock_server_gcc32dbg_la-Server.lo -MD -MP -MF $(DEPDIR)/libsock_server_gcc32dbg_la-Server.Tpo -c -o libsock_server_gcc32dbg_la-Server.lo `test -f 'Server.cpp' || echo '$(srcdir)/'`Server.cpp
@@ -1317,26 +1077,12 @@ libsock_server_gcc32dbg_la-Server.lo: Server.cpp
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libsock_server_gcc32dbg_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o libsock_server_gcc32dbg_la-Server.lo `test -f 'Server.cpp' || echo '$(srcdir)/'`Server.cpp
 
-libsock_server_gcc32dbgpthr_la-Client.lo: Client.cpp
-@am__fastdepCXX_TRUE@	$(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libsock_server_gcc32dbgpthr_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT libsock_server_gcc32dbgpthr_la-Client.lo -MD -MP -MF $(DEPDIR)/libsock_server_gcc32dbgpthr_la-Client.Tpo -c -o libsock_server_gcc32dbgpthr_la-Client.lo `test -f 'Client.cpp' || echo '$(srcdir)/'`Client.cpp
-@am__fastdepCXX_TRUE@	mv -f $(DEPDIR)/libsock_server_gcc32dbgpthr_la-Client.Tpo $(DEPDIR)/libsock_server_gcc32dbgpthr_la-Client.Plo
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='Client.cpp' object='libsock_server_gcc32dbgpthr_la-Client.lo' libtool=yes @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libsock_server_gcc32dbgpthr_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o libsock_server_gcc32dbgpthr_la-Client.lo `test -f 'Client.cpp' || echo '$(srcdir)/'`Client.cpp
-
 libsock_server_gcc32dbgpthr_la-Server.lo: Server.cpp
 @am__fastdepCXX_TRUE@	$(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libsock_server_gcc32dbgpthr_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT libsock_server_gcc32dbgpthr_la-Server.lo -MD -MP -MF $(DEPDIR)/libsock_server_gcc32dbgpthr_la-Server.Tpo -c -o libsock_server_gcc32dbgpthr_la-Server.lo `test -f 'Server.cpp' || echo '$(srcdir)/'`Server.cpp
 @am__fastdepCXX_TRUE@	mv -f $(DEPDIR)/libsock_server_gcc32dbgpthr_la-Server.Tpo $(DEPDIR)/libsock_server_gcc32dbgpthr_la-Server.Plo
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='Server.cpp' object='libsock_server_gcc32dbgpthr_la-Server.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libsock_server_gcc32dbgpthr_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o libsock_server_gcc32dbgpthr_la-Server.lo `test -f 'Server.cpp' || echo '$(srcdir)/'`Server.cpp
-
-libsock_server_gcc32pthr_la-Client.lo: Client.cpp
-@am__fastdepCXX_TRUE@	$(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libsock_server_gcc32pthr_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT libsock_server_gcc32pthr_la-Client.lo -MD -MP -MF $(DEPDIR)/libsock_server_gcc32pthr_la-Client.Tpo -c -o libsock_server_gcc32pthr_la-Client.lo `test -f 'Client.cpp' || echo '$(srcdir)/'`Client.cpp
-@am__fastdepCXX_TRUE@	mv -f $(DEPDIR)/libsock_server_gcc32pthr_la-Client.Tpo $(DEPDIR)/libsock_server_gcc32pthr_la-Client.Plo
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='Client.cpp' object='libsock_server_gcc32pthr_la-Client.lo' libtool=yes @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libsock_server_gcc32pthr_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o libsock_server_gcc32pthr_la-Client.lo `test -f 'Client.cpp' || echo '$(srcdir)/'`Client.cpp
 
 libsock_server_gcc32pthr_la-Server.lo: Server.cpp
 @am__fastdepCXX_TRUE@	$(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libsock_server_gcc32pthr_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT libsock_server_gcc32pthr_la-Server.lo -MD -MP -MF $(DEPDIR)/libsock_server_gcc32pthr_la-Server.Tpo -c -o libsock_server_gcc32pthr_la-Server.lo `test -f 'Server.cpp' || echo '$(srcdir)/'`Server.cpp
@@ -1345,26 +1091,12 @@ libsock_server_gcc32pthr_la-Server.lo: Server.cpp
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libsock_server_gcc32pthr_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o libsock_server_gcc32pthr_la-Server.lo `test -f 'Server.cpp' || echo '$(srcdir)/'`Server.cpp
 
-libsock_server_gcc64_la-Client.lo: Client.cpp
-@am__fastdepCXX_TRUE@	$(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libsock_server_gcc64_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT libsock_server_gcc64_la-Client.lo -MD -MP -MF $(DEPDIR)/libsock_server_gcc64_la-Client.Tpo -c -o libsock_server_gcc64_la-Client.lo `test -f 'Client.cpp' || echo '$(srcdir)/'`Client.cpp
-@am__fastdepCXX_TRUE@	mv -f $(DEPDIR)/libsock_server_gcc64_la-Client.Tpo $(DEPDIR)/libsock_server_gcc64_la-Client.Plo
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='Client.cpp' object='libsock_server_gcc64_la-Client.lo' libtool=yes @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libsock_server_gcc64_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o libsock_server_gcc64_la-Client.lo `test -f 'Client.cpp' || echo '$(srcdir)/'`Client.cpp
-
 libsock_server_gcc64_la-Server.lo: Server.cpp
 @am__fastdepCXX_TRUE@	$(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libsock_server_gcc64_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT libsock_server_gcc64_la-Server.lo -MD -MP -MF $(DEPDIR)/libsock_server_gcc64_la-Server.Tpo -c -o libsock_server_gcc64_la-Server.lo `test -f 'Server.cpp' || echo '$(srcdir)/'`Server.cpp
 @am__fastdepCXX_TRUE@	mv -f $(DEPDIR)/libsock_server_gcc64_la-Server.Tpo $(DEPDIR)/libsock_server_gcc64_la-Server.Plo
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='Server.cpp' object='libsock_server_gcc64_la-Server.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libsock_server_gcc64_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o libsock_server_gcc64_la-Server.lo `test -f 'Server.cpp' || echo '$(srcdir)/'`Server.cpp
-
-libsock_server_gcc64dbg_la-Client.lo: Client.cpp
-@am__fastdepCXX_TRUE@	$(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libsock_server_gcc64dbg_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT libsock_server_gcc64dbg_la-Client.lo -MD -MP -MF $(DEPDIR)/libsock_server_gcc64dbg_la-Client.Tpo -c -o libsock_server_gcc64dbg_la-Client.lo `test -f 'Client.cpp' || echo '$(srcdir)/'`Client.cpp
-@am__fastdepCXX_TRUE@	mv -f $(DEPDIR)/libsock_server_gcc64dbg_la-Client.Tpo $(DEPDIR)/libsock_server_gcc64dbg_la-Client.Plo
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='Client.cpp' object='libsock_server_gcc64dbg_la-Client.lo' libtool=yes @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libsock_server_gcc64dbg_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o libsock_server_gcc64dbg_la-Client.lo `test -f 'Client.cpp' || echo '$(srcdir)/'`Client.cpp
 
 libsock_server_gcc64dbg_la-Server.lo: Server.cpp
 @am__fastdepCXX_TRUE@	$(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libsock_server_gcc64dbg_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT libsock_server_gcc64dbg_la-Server.lo -MD -MP -MF $(DEPDIR)/libsock_server_gcc64dbg_la-Server.Tpo -c -o libsock_server_gcc64dbg_la-Server.lo `test -f 'Server.cpp' || echo '$(srcdir)/'`Server.cpp
@@ -1373,26 +1105,12 @@ libsock_server_gcc64dbg_la-Server.lo: Server.cpp
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libsock_server_gcc64dbg_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o libsock_server_gcc64dbg_la-Server.lo `test -f 'Server.cpp' || echo '$(srcdir)/'`Server.cpp
 
-libsock_server_gcc64dbgpthr_la-Client.lo: Client.cpp
-@am__fastdepCXX_TRUE@	$(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libsock_server_gcc64dbgpthr_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT libsock_server_gcc64dbgpthr_la-Client.lo -MD -MP -MF $(DEPDIR)/libsock_server_gcc64dbgpthr_la-Client.Tpo -c -o libsock_server_gcc64dbgpthr_la-Client.lo `test -f 'Client.cpp' || echo '$(srcdir)/'`Client.cpp
-@am__fastdepCXX_TRUE@	mv -f $(DEPDIR)/libsock_server_gcc64dbgpthr_la-Client.Tpo $(DEPDIR)/libsock_server_gcc64dbgpthr_la-Client.Plo
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='Client.cpp' object='libsock_server_gcc64dbgpthr_la-Client.lo' libtool=yes @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libsock_server_gcc64dbgpthr_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o libsock_server_gcc64dbgpthr_la-Client.lo `test -f 'Client.cpp' || echo '$(srcdir)/'`Client.cpp
-
 libsock_server_gcc64dbgpthr_la-Server.lo: Server.cpp
 @am__fastdepCXX_TRUE@	$(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libsock_server_gcc64dbgpthr_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT libsock_server_gcc64dbgpthr_la-Server.lo -MD -MP -MF $(DEPDIR)/libsock_server_gcc64dbgpthr_la-Server.Tpo -c -o libsock_server_gcc64dbgpthr_la-Server.lo `test -f 'Server.cpp' || echo '$(srcdir)/'`Server.cpp
 @am__fastdepCXX_TRUE@	mv -f $(DEPDIR)/libsock_server_gcc64dbgpthr_la-Server.Tpo $(DEPDIR)/libsock_server_gcc64dbgpthr_la-Server.Plo
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='Server.cpp' object='libsock_server_gcc64dbgpthr_la-Server.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libsock_server_gcc64dbgpthr_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o libsock_server_gcc64dbgpthr_la-Server.lo `test -f 'Server.cpp' || echo '$(srcdir)/'`Server.cpp
-
-libsock_server_gcc64pthr_la-Client.lo: Client.cpp
-@am__fastdepCXX_TRUE@	$(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libsock_server_gcc64pthr_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT libsock_server_gcc64pthr_la-Client.lo -MD -MP -MF $(DEPDIR)/libsock_server_gcc64pthr_la-Client.Tpo -c -o libsock_server_gcc64pthr_la-Client.lo `test -f 'Client.cpp' || echo '$(srcdir)/'`Client.cpp
-@am__fastdepCXX_TRUE@	mv -f $(DEPDIR)/libsock_server_gcc64pthr_la-Client.Tpo $(DEPDIR)/libsock_server_gcc64pthr_la-Client.Plo
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='Client.cpp' object='libsock_server_gcc64pthr_la-Client.lo' libtool=yes @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libsock_server_gcc64pthr_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o libsock_server_gcc64pthr_la-Client.lo `test -f 'Client.cpp' || echo '$(srcdir)/'`Client.cpp
 
 libsock_server_gcc64pthr_la-Server.lo: Server.cpp
 @am__fastdepCXX_TRUE@	$(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libsock_server_gcc64pthr_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT libsock_server_gcc64pthr_la-Server.lo -MD -MP -MF $(DEPDIR)/libsock_server_gcc64pthr_la-Server.Tpo -c -o libsock_server_gcc64pthr_la-Server.lo `test -f 'Server.cpp' || echo '$(srcdir)/'`Server.cpp
@@ -1406,6 +1124,23 @@ mostlyclean-libtool:
 
 clean-libtool:
 	-rm -rf .libs _libs
+install-includeHEADERS: $(include_HEADERS)
+	@$(NORMAL_INSTALL)
+	test -z "$(includedir)" || $(MKDIR_P) "$(DESTDIR)$(includedir)"
+	@list='$(include_HEADERS)'; for p in $$list; do \
+	  if test -f "$$p"; then d=; else d="$(srcdir)/"; fi; \
+	  f=$(am__strip_dir) \
+	  echo " $(includeHEADERS_INSTALL) '$$d$$p' '$(DESTDIR)$(includedir)/$$f'"; \
+	  $(includeHEADERS_INSTALL) "$$d$$p" "$(DESTDIR)$(includedir)/$$f"; \
+	done
+
+uninstall-includeHEADERS:
+	@$(NORMAL_UNINSTALL)
+	@list='$(include_HEADERS)'; for p in $$list; do \
+	  f=$(am__strip_dir) \
+	  echo " rm -f '$(DESTDIR)$(includedir)/$$f'"; \
+	  rm -f "$(DESTDIR)$(includedir)/$$f"; \
+	done
 
 ID: $(HEADERS) $(SOURCES) $(LISP) $(TAGS_FILES)
 	list='$(SOURCES) $(HEADERS) $(LISP) $(TAGS_FILES)'; \
@@ -1482,8 +1217,11 @@ distdir: $(DISTFILES)
 	done
 check-am: all-am
 check: check-am
-all-am: Makefile $(LTLIBRARIES)
+all-am: Makefile $(LTLIBRARIES) $(HEADERS)
 installdirs:
+	for dir in "$(DESTDIR)$(includedir)"; do \
+	  test -z "$$dir" || $(MKDIR_P) "$$dir"; \
+	done
 install: install-am
 install-exec: install-exec-am
 install-data: install-data-am
@@ -1530,7 +1268,7 @@ info: info-am
 
 info-am:
 
-install-data-am:
+install-data-am: install-includeHEADERS
 
 install-dvi: install-dvi-am
 
@@ -1566,7 +1304,7 @@ ps: ps-am
 
 ps-am:
 
-uninstall-am:
+uninstall-am: uninstall-includeHEADERS
 
 .MAKE: install-am install-strip
 
@@ -1576,12 +1314,13 @@ uninstall-am:
 	distclean-tags distdir dvi dvi-am html html-am info info-am \
 	install install-am install-data install-data-am install-dvi \
 	install-dvi-am install-exec install-exec-am install-html \
-	install-html-am install-info install-info-am install-man \
-	install-pdf install-pdf-am install-ps install-ps-am \
-	install-strip installcheck installcheck-am installdirs \
-	maintainer-clean maintainer-clean-generic mostlyclean \
-	mostlyclean-compile mostlyclean-generic mostlyclean-libtool \
-	pdf pdf-am ps ps-am tags uninstall uninstall-am
+	install-html-am install-includeHEADERS install-info \
+	install-info-am install-man install-pdf install-pdf-am \
+	install-ps install-ps-am install-strip installcheck \
+	installcheck-am installdirs maintainer-clean \
+	maintainer-clean-generic mostlyclean mostlyclean-compile \
+	mostlyclean-generic mostlyclean-libtool pdf pdf-am ps ps-am \
+	tags uninstall uninstall-am uninstall-includeHEADERS
 
 # Tell versions [3.59,3.63) of GNU make to not export all variables.
 # Otherwise a system limit (for SysV at least) may be exceeded.

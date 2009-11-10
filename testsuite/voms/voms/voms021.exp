@@ -1,12 +1,12 @@
 load_lib vomstest.exp
+testheader "See if a targets can be added to a proxy."
 
 proc mytest {} {
-    testheader "See if a targets can be added to a proxy."
     _activateCert mycert2
 
     _vomsStart voms1
     set outname [exec mktemp $::SCRATCHDIR/voms-proxy-init-XXXXXX]
-    set res [catch {set out [exec $::INSTALLDIR/bin/voms-proxy-init --target testbed.cnaf.infn.it --target prova.cnaf.infn.it --voms voms1 >& $outname]}]
+    set res [catch {set out [exec $::INSTALLDIR/bin/voms-proxy-init --target testbed.cnaf.infn.it --target prova.cnaf.infn.it --target [exec hostname] --voms voms1 >& $outname]}]
     _vomsStop voms1
 
     if $res then {
@@ -20,7 +20,7 @@ proc mytest {} {
 
     if $res then {
         addlog $outname
-        testmessage "voms proxy info failed."
+        testmessage "voms-proxy-info failed."
         return $::FAILTEST
     } else {
         #match against known (correct) output
@@ -41,7 +41,8 @@ attribute : shortid = mycert2-g \\\(/voms1/group1\\\)
 attribute : shortid = mycert2 \\\(voms1\\\)
 timeleft  : \[0-9\]*:\[0-9\]*:\[0-9\]*
 target    : testbed.cnaf.infn.it
-target    : prova.cnaf.infn.it"
+target    : prova.cnaf.infn.it
+target    : [exec hostname]"
         set out2 [exec cat  $outname]
         if [regexp $correct $out2] then {
             testmessage "targets correctly reported."

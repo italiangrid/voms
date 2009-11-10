@@ -77,13 +77,14 @@ proc _inittests {} {
                 <th align=\"left\">result</th>
                 <th align=\"left\">comment</th>
                 <th align=\"left\">artifacts</th><tr>"
-
+        exec lcov --directory ../src/common --directory ../src/ac --directory ../src/sslutils --directory ../src/sslutils/oldgaa --directory ../src/socklib --directory ../src/server --directory ../src/client --directory ../src/api/ccapi --directory ../src/utils -z -q
+        exec lcov --directory ../src/common --directory ../src/ac --directory ../src/sslutils --directory ../src/sslutils/oldgaa --directory ../src/socklib --directory ../src/server --directory ../src/client --directory ../src/api/ccapi --directory ../src/utils -i --capture -o zero.info -q
         puts -nonewline "."
         _setupPKI
         puts -nonewline "."
         _activateHostCertificate mycert3
         puts -nonewline "."
-        set ::env(CERTDIR) "$:INSTALLDIR/etc/grid-security/certificates"
+        set ::env(CERTDIR) "$::INSTALLDIR/etc/grid-security/certificates"
         _vomsServersInit
         puts -nonewline "."
         set ::env(X509_USER_CERT) $::env(HOME)/.globus2/usercert.pem
@@ -92,10 +93,16 @@ proc _inittests {} {
         set ::env(X509_CERT_DIR)  $::_cadir
         set ::env(X509_VOMS_DIR)  $::_vomsdir
         set ::env(VOMS_USERCONF)  $::INSTALLDIR/etc/vomses
-        if [catch {set ::env(LD_LIBRARY_PATH) "$::INSTALLDIR/lib:$::env(LD_LIBRARY_PATH)"}] then {
-            set ::env(LD_LIBRARY_PATH) "$::INSTALLDIR/lib"
+
+        if [catch {set ::env(LD_LIBRARY_PATH) "$::INSTALLDIR/lib64:$::INSTALLDIR/lib:$::env(LD_LIBRARY_PATH)"}] then {
+            set ::env(LD_LIBRARY_PATH) "$::INSTALLDIR/lib64:$::INSTALLDIR/lib"
         }
 
+        puts -nonewline "."
+        _setJavaProperty CADIR   $::INSTALLDIR/etc/grid-security/certificates
+        _setJavaProperty VOMSDIR $::INSTALLDIR/vomsdir
+        _setJavaProperty VOMSES_LOCATION $::INSTALLDIR/etc
+        puts -nonewline "."
 
         set ::vomsproxyinit    $::INSTALLDIR/bin/voms-proxy-init
         set ::vomsproxyinfo    $::INSTALLDIR/bin/voms-proxy-info
@@ -130,8 +137,10 @@ proc _vomsServersInit {} {
     puts -nonewline "."
     _vomscreaterole  voms1 TestRole
     _vomscreateuser  voms1 mycert2
+    _vomscreateuser  voms1 passcert
     puts -nonewline "."
     _vomsaddusertogroup voms1 mycert2 "/voms1"
+    _vomsaddusertogroup voms1 passcert "/voms1"
     _vomsaddusertogroup voms1 mycert2 "/voms1/group1"
     _vomsaddusertogroupandrole voms1 mycert2 "/voms1/group1" TestRole
     _vomscreatega voms1 shortid
@@ -182,10 +191,13 @@ proc _setupPKI {} {
     _make_cert_from_ca "/C=IT/CN=001" caFromTestCA mycert2
     _make_cert_from_ca "/C=IT/CN=003" caFromTestCA mycert3
     _make_cert_from_ca "/C=IT/CN=004" caFromTestCA mycert4
+    _make_cert_from_ca "/C=IT/emailAddress=this@email.com/CN=005" caFromTestCA mycert5
     _make_cert_from_ca "/C=IT/CN=  005  " caFromTestCA mycertwithspaces
     _make_cert_from_ca "/C=IT/CN=expired" caFromTestCA mycertexpired -2
     _make_cert_from_ca "/C=IT/CN=revoked" caFromTestCA mycertrevoked
     _make_cert_from_ca "/C=IT/CN=001" testCA mycertsameasmycert2
+    _make_cert_from_ca "/C=IT/CN=passcert" testCA passcert
+    _protect_key passcert
     puts -nonewline "."
     _revoke_cert mycertrevoked caFromTestCA
     puts -nonewline "."
@@ -208,7 +220,11 @@ proc _setupNormalVomsMysql {} {
     }
     _defineVOMSOption voms1 db-admin  $::DBUSERNAME
     _defineVOMSOption voms1 voms-vo   voms1
-    _defineVOMSOption voms1 sqlloc    $::INSTALLDIR/lib/libvomsmysql.so
+    if [file exists $::INSTALLDIR/lib64/libvomsmysql.so] then {
+        _defineVOMSOption voms1 sqlloc    $::INSTALLDIR/lib64/libvomsmysql.so
+    } else {
+        _defineVOMSOption voms1 sqlloc    $::INSTALLDIR/lib/libvomsmysql.so
+    }
     _defineVOMSOption voms1 voms-name user_test1
     _defineVOMSOption voms1 voms-pwd  passwd
     _defineVOMSOption voms1 loglevel  5
@@ -219,6 +235,7 @@ proc _setupNormalVomsMysql {} {
     _addVOMSOption voms1 x509_user_cert $::INSTALLDIR/certs/hostcert.pem
     _addVOMSOption voms1 x509_user_key $::INSTALLDIR/certs/hostkey.pem
     _addVOMSOption voms1 shortfqans
+    _addVOMSOption voms1 syslog
     _makeVomses voms1
     set ::_vomsdir $::INSTALLDIR/vomsdir
     file mkdir $::_vomsdir
@@ -235,7 +252,11 @@ proc _setupNormalVomsOracle {} {
     }
     _defineVOMSOption voms2 db-admin  $::ORACLEDBUSERNAME
     _defineVOMSOption voms2 voms-vo   voms2
-    _defineVOMSOption voms2 sqlloc    $::INSTALLDIR/lib/libvomsoracle.so
+    if [file exists $::INSTALLDIR/lib64/libvomsoracle.so] then {
+        _defineVOMSOption voms1 sqlloc    $::INSTALLDIR/lib64/libvomsoracle.so
+    } else {
+        _defineVOMSOption voms1 sqlloc    $::INSTALLDIR/lib/libvomsoracle.so
+    }
     _defineVOMSOption voms2 voms-name $::ORACLEDBUSERNAME
     _defineVOMSOption voms2 loglevel  5
     _defineVOMSOption voms2 port 33333

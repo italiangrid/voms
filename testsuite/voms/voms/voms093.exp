@@ -1,0 +1,40 @@
+load_lib vomstest.exp
+testheader "See if voms-proxy-init works with a server certificate containing email."
+
+proc myprolog {} {
+    _activateHostCertificate mycert5
+    file copy -force $::INSTALLDIR/certs/hostcert.pem $::_vomsdir/voms1.pem
+    _makeVomses voms1
+    file copy -force "$::_certdir/mycert5-cert.pem" $::_vomsdir/voms1.pem
+
+}
+
+proc myepilog {} {
+    _activateHostCertificate mycert3
+    file copy -force $::INSTALLDIR/certs/hostcert.pem $::_vomsdir/voms1.pem
+    _makeVomses voms1
+    file copy -force "$::_certdir/mycert3-cert.pem" $::_vomsdir/voms1.pem
+}
+
+proc mytest {} {
+    _activateCert mycert2
+
+    _vomsStart voms1
+    set outname [exec mktemp $::SCRATCHDIR/voms-proxy-init-XXXXXX]
+    set res [catch {set out [exec $::INSTALLDIR/bin/voms-proxy-init --voms voms1 --limited >& $outname]}]
+    _vomsStop voms1
+    
+    if  $res then {
+        addlog $outname
+        testmessage "voms-proxy-init did not work."
+        return $::FAILTEST
+    }
+
+    testmessage "voms-proxy-init did work."
+    return $::PASSTEST
+}
+
+test_set_prolog myprolog
+test_set_epilog myepilog
+
+do_test

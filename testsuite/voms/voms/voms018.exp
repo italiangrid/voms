@@ -1,7 +1,7 @@
 load_lib vomstest.exp
+testheader "See if the log file permissions are 600."
 
 proc mytest {} {
-    testheader "See if the log file permissions are 600."
     _activateCert mycert2
 
     _vomsStart voms1

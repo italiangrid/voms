@@ -2,9 +2,10 @@
  *
  * Authors: Vincenzo Ciaschini - Vincenzo.Ciaschini@cnaf.infn.it 
  *
- * Copyright (c) 2002, 2003 INFN-CNAF on behalf of the EU DataGrid.
+ * Copyright (c) 2002-2009 INFN-CNAF on behalf of the EU DataGrid
+ * and EGEE I, II and III
  * For license conditions see LICENSE file or
- * http://www.edg.org/license.html
+ * http://www.apache.org/licenses/LICENSE-2.0.txt
  *
  * Parts of this code may be based upon or even include verbatim pieces,
  * originally written by other people, in which case the original header
@@ -51,7 +52,7 @@ extern "C" {
 
 /** Functionalities for transmitting and receiveing tokens. */
 #include "tokens.h"
-//#include "newca.h"
+
 /** This class header file. */
 #include "Server.h"
 
@@ -68,15 +69,13 @@ decouple_ctx(gss_ctx_id_t context, STACK_OF(X509) **stk)
   return ((gss2_ctx_id_desc *)context)->peer_cred_handle->cred_handle->cert;
 }
 
-static int get_peer_data(gss_ctx_id_t context, EVP_PKEY **key, char **issuer, X509 **pcert, STACK_OF(X509) **stk)
+static int get_peer_data(gss_ctx_id_t context, EVP_PKEY **key, char **issuer, X509 **pcert, X509 **acert, STACK_OF(X509) **stk)
 {
-  X509 *cert = NULL;
-
   if (!context || !key || !issuer || !pcert)
     return 0;
 
-  cert = decouple_ctx(context, stk);
-  *pcert = get_real_cert(cert, *stk);
+  *acert = decouple_ctx(context, stk);
+  *pcert = get_real_cert(*acert, *stk);
   *key = X509_extract_key(*pcert);
 
   if (*key && *pcert)
@@ -97,8 +96,6 @@ GSISocketServer::GSISocketServer(int p, int v, void *l, int b, bool m) :
   credential(GSS_C_NO_CREDENTIAL), context(GSS_C_NO_CONTEXT), 
   backlog(b), newopened(false), mustclose(m), conflags(0), logh(l)
 {
-  int nid;
-
   if (OBJ_txt2nid("UID") == NID_undef)
     OBJ_create("0.9.2342.19200300.100.1.1","USERID","userId");
 }
@@ -111,11 +108,6 @@ void GSISocketServer::SetTimeout(int sec)
 int GSISocketServer::GetTimeout()
 {
   return sockalarmed;
-}
-
-gss_ctx_id_t GSISocketServer::GetContext()
-{
-  return context;
 }
 
 bool
@@ -165,7 +157,8 @@ GSISocketServer::Open()
 
 void GSISocketServer::AdjustBacklog(int n)
 {
-  listen(sck, backlog);
+  backlog = n;
+  listen(sck, n);
 }
 
 /**
@@ -197,17 +190,21 @@ GSISocketServer::Close()
   if (context != GSS_C_NO_CONTEXT)
     gss_delete_sec_context(&status, &context, GSS_C_NO_BUFFER);
   context = GSS_C_NO_CONTEXT;
+
   if (credential != GSS_C_NO_CREDENTIAL)
     gss_release_cred(&status, &credential);
   credential = GSS_C_NO_CREDENTIAL;
+
   if (newopened)
     close(newsck);
   newopened=false;
+
   if (opened)
     close(sck);
   opened = false;
-  if (peer_key)
-    EVP_PKEY_free(peer_key);
+
+  EVP_PKEY_free(peer_key);
+
   own_key = peer_key = NULL;
   own_cert = peer_cert = NULL;
 
@@ -219,6 +216,11 @@ void GSISocketServer::CloseListener(void)
   if (opened)
     close(sck);
   opened = false;
+}
+
+gss_ctx_id_t GSISocketServer::GetContext() 
+{
+  return context;
 }
 
 void GSISocketServer::CloseListened(void)
@@ -255,6 +257,7 @@ GSISocketServer::AcceptGSIAuthentication()
   if (context != GSS_C_NO_CONTEXT)
     gss_delete_sec_context(&status, &context, GSS_C_NO_BUFFER);
   context = GSS_C_NO_CONTEXT;
+
   if (credential != GSS_C_NO_CREDENTIAL)
     gss_release_cred(&status, &credential);
   credential = GSS_C_NO_CREDENTIAL;
@@ -265,7 +268,7 @@ GSISocketServer::AcceptGSIAuthentication()
   if(GSS_ERROR(major_status)) {
     char *str = NULL;
     globus_gss_assist_display_status_str(&str,
-					 "Failed to acquire credentials:",
+					 const_cast<char*>("Failed to acquire credentials:"),
 					 major_status, minor_status, 0);
     LOG(logh, LEV_ERROR, T_PRE, str);
     free(str);
@@ -284,7 +287,7 @@ GSISocketServer::AcceptGSIAuthentication()
     char *str = NULL;
     LOGM(VARP, logh, LEV_DEBUG, T_PRE, "Major: %x, minor: %x\n", major_status, minor_status); 
     globus_gss_assist_display_status_str(&str,
-                                         "Failed to establish security context (accept):",
+                                         const_cast<char*>("Failed to establish security context (accept):"),
                                          major_status, minor_status, token_status);
     LOG(logh, LEV_ERROR, T_PRE, str);
     Error(logh);
@@ -300,21 +303,18 @@ GSISocketServer::AcceptGSIAuthentication()
 
   char *tmp = NULL;
 
-//   tmp = get_globusid(credential);
-//   if (tmp)
-//     own_subject = std::string(tmp);
-//   free(tmp);
-
   X509 *rcert = NULL;
   STACK_OF(X509) *stk = NULL;
 
   rcert = decouple_cred(credential, &stk);
   own_stack = stk;
 
+  char buffer[1000];
+
   LOGM(VARP, logh, LEV_DEBUG, T_PRE, "Certificate DN: %s",
-       X509_NAME_oneline(X509_get_subject_name(rcert), NULL, 0));
+       X509_NAME_oneline(X509_get_subject_name(rcert), buffer, 999));
   LOGM(VARP, logh, LEV_DEBUG, T_PRE, "Certificate CA: %s",
-       X509_NAME_oneline(X509_get_issuer_name(rcert), NULL, 0));
+       X509_NAME_oneline(X509_get_issuer_name(rcert), buffer, 999));
   LOGM(VARP, logh, LEV_DEBUG, T_PRE, "Stack Size: %d", sk_X509_num(stk));
 
   X509 *identitycert = get_real_cert(rcert, stk);
@@ -328,9 +328,9 @@ GSISocketServer::AcceptGSIAuthentication()
   for (int i = 0; i < sk_X509_num(stk); i++) {
     X509 *cert = sk_X509_value(stk, i);
     LOGM(VARP, logh, LEV_DEBUG, T_PRE, "Certificate DN: %s",
-         X509_NAME_oneline(X509_get_subject_name(cert), NULL, 0));
+         X509_NAME_oneline(X509_get_subject_name(cert), buffer, 999));
     LOGM(VARP, logh, LEV_DEBUG, T_PRE, "Certificate CA: %s",
-         X509_NAME_oneline(X509_get_issuer_name(cert), NULL, 0));
+         X509_NAME_oneline(X509_get_issuer_name(cert), buffer, 999));
   }
 
   tmp = NULL;
@@ -342,12 +342,13 @@ GSISocketServer::AcceptGSIAuthentication()
   peer_subject = name; 
 
   tmp = NULL;
-  (void)get_peer_data(context, &peer_key, &tmp, &peer_cert, &peer_stack);
+  (void)get_peer_data(context, &peer_key, &tmp, &peer_cert, &actual_cert, &peer_stack);
+
   if (tmp)
     peer_ca = std::string(tmp);
   free(tmp);
 
-  char *serial = get_peer_serial(peer_cert);
+  char *serial = get_peer_serial(actual_cert);
 
   peer_serial = std::string(serial ? serial : "");
   free(serial);
@@ -409,10 +410,10 @@ GSISocketServer::Listen()
  * @return true on success, false otherwise.
  */ 
 bool 
-GSISocketServer::Send(const std::string s)
+GSISocketServer::Send(const std::string &s)
 {
   if (!(context == GSS_C_NO_CONTEXT)) {
-    OM_uint32        min_stat;
+    OM_uint32 min_stat;
      
     int token_status;
     return (1 == my_send(&min_stat, context, const_cast<char *>(s.c_str()),
@@ -431,7 +432,7 @@ GSISocketServer::Send(const std::string s)
 bool 
 GSISocketServer::Receive(std::string& s)
 {
-  OM_uint32 maj_stat, min_stat;
+  OM_uint32 min_stat;
 
   char  *message = NULL;
   size_t length;
@@ -448,7 +449,7 @@ GSISocketServer::Receive(std::string& s)
   else {
     char *str = NULL;
     globus_gss_assist_display_status_str(&str, 
-					 "GSS authentication failure ",
+					 const_cast<char*>("GSS authentication failure "),
                                          ret, min_stat, token_status); 
     LOG(logh, LEV_ERROR, T_PRE, str);
     free(str);
@@ -487,9 +488,8 @@ static void Error(void *logh)
       dat = strdup(es->err_data[i]);
     if (dat) {
       l = ERR_get_error_line(&file, &line);
-      //      if (debug)
+
         LOGM(VARP, logh, LEV_ERROR, T_PRE, "%s:%s:%d:%s\n", ERR_error_string(l, buf), file, line, dat);
-        //      else
         LOGM(VARP, logh, LEV_ERROR, T_PRE, "%s:%s\nFunction: %s\n", ERR_reason_error_string(l), dat, ERR_func_error_string(l));
     }
     

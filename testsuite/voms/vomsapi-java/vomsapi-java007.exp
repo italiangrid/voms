@@ -1,0 +1,36 @@
+load_lib vomstest.exp
+testheader "See proxies can be created when server certificate contains \"Email\""
+
+proc myprolog {} {
+    _activateHostCertificate mycert5
+    _makeVomses voms1
+}
+
+proc myepilog {} {
+    _activateHostCertificate mycert3
+    _makeVomses voms1
+}
+
+proc mytest {} {
+    _activateCert mycert2
+
+    # Create a proxy to validate.
+    _vomsStart voms1
+
+    set ::_buildout [exec mktemp $::SCRATCHDIR/program-out-XXXXXX]
+    set outfile [exec mktemp $::SCRATCHDIR/thisproxy-XXXXXX]
+    set res [_execJava contactvoms3.java $::_certdir/mycert2-cert.pem $::_certdir/mycert2-key.pem $outfile]
+
+    _vomsStop voms1
+
+    if $res then {
+        addlog $::_buildout
+        addlog $outfile
+        testmessage "proxy creation failed."
+        return $::FAILTEST
+    }
+
+    return $::PASSTEST
+}
+
+do_test

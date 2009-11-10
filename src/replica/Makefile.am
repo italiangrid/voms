@@ -1,5 +1,5 @@
 
-libexecdir = $(prefix)/libexec/voms
+libexecdir = @libexecdir@/voms
 
 libexec_SCRIPTS = voms_replica_master_setup.sh voms_replica_slave_setup.sh
 

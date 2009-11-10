@@ -2,9 +2,10 @@
  *
  * Authors: Vincenzo Ciaschini - Vincenzo.Ciaschini@cnaf.infn.it 
  *
- * Copyright (c) 2002, 2003 INFN-CNAF on behalf of the EU DataGrid.
+ * Copyright (c) 2002-2009 INFN-CNAF on behalf of the EU DataGrid
+ * and EGEE I, II and III
  * For license conditions see LICENSE file or
- * http://www.edg.org/license.html
+ * http://www.apache.org/licenses/LICENSE-2.0.txt
  *
  * Parts of this code may be based upon or even include verbatim pieces,
  * originally written by other people, in which case the original header
@@ -25,14 +26,12 @@
 #include <string>
 
 const std::string SUBPACKAGE      = "voms-proxy-destroy";
-//const std::string VERSION         = "0.1";
 
 extern "C" {
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
-  //#include <getopt.h>
 #include <sys/time.h>
 #include <sys/resource.h>
 #include <sys/mman.h>
@@ -76,7 +75,7 @@ main(int argc, char **argv)
     else
 	program = argv[0];
 
-    static char *LONG_USAGE = \
+    static std::string LONG_USAGE =		\
       "\n" \
       "    Options\n" \
       "    -help, -usage       Displays usage\n" \
@@ -155,17 +154,32 @@ delete_proxy(void)
   return destroy_proxy(of, dryrun);
 }
 
+static int real_write(int fd, char *buffer, int size)
+{
+  int written = 0;
+  int current = 0;
+
+  do {
+    written = write(fd, buffer + current, size - current);
+    if (written >= 0) {
+      current += written;
+    }
+  } while ((written > 0) && (current != size));
+
+  return (current == size ? size : -1);
+}
+
 int destroy_proxy(char *file, bool dry)
 {
-  char *delblock[100];
+  char delblock[100];
   
   if (dry)
     std::cerr << "Would remove " << file << std::endl;
   else {
-    for (int i = 0; i <100; i++)
-      delblock[i] = '\0';
+    memset(delblock, 0, 100);
 
     int fd = open(file, O_RDWR);
+
     if (fd != -1) {
       int size = lseek(fd, 0L, SEEK_END);
       lseek(fd, 0L, SEEK_SET);
@@ -173,10 +187,12 @@ int destroy_proxy(char *file, bool dry)
         int num = size / 100;
         int rem = size % 100;
 
-        while (num--) 
-          write(fd,delblock,100);
+        while (num--) {
+	  (void)real_write(fd, delblock, 100);
+	}
+
         if (rem)
-          write(fd, delblock, rem);
+	  (void)real_write(fd, delblock, rem);
       }
       close(fd);
       remove(file);

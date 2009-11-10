@@ -1,0 +1,29 @@
+load_lib vomstest.exp
+
+proc mytest {} {
+    testheader "See if -pwstdin works with a voms server."
+    _activateCert passcert
+
+    _vomsStart voms1
+    set timeout 100
+    set dopass 0
+
+    spawn $::INSTALLDIR/bin/voms-proxy-init --voms voms1 --pwstdin
+    send "password\r"
+    expect {
+        eof { set dopass 1 }
+        timeout { set dopass 0 }
+    }
+    _vomsStop voms1
+
+    if $dopass then {
+        testmessage "proxy successfully created."
+        return $::PASSTEST
+    } else {
+        addlog $::INSTALLDIR/var/log/voms.voms1
+        testmessage "voms proxy init returned error message."
+        return $::FAILTEST
+    }
+}
+
+do_test

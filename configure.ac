@@ -1,5 +1,4 @@
-
-AC_INIT([GLite Security VOMS], [1.9.0])
+AC_INIT([GLite Security VOMS], [1.9.14])
 AC_PREREQ(2.59)
 AC_CONFIG_AUX_DIR([./project])
 AM_INIT_AUTOMAKE
@@ -37,6 +36,14 @@ AC_ENABLE_GLITE([], have_glite=yes, have_glite=no) # embed AC_GLITE
 
 if test "x$host_cpu" = "xx86_64"; then
     AC_SUBST([libdir], ['${exec_prefix}/lib64'])
+fi
+
+if test -h /usr/lib64 ; then
+    libdir='${exec_prefix}/lib'
+fi
+
+if ! test -e /usr/lib64 ; then
+    libdir='${exec_prefix}/lib'
 fi
 
 AC_EXPAT([], have_expat=yes, have_expat=no)        # taken from org.glite
@@ -107,6 +114,7 @@ AC_VOMS_FIND_FUNC
 AC_VOMS_LONG_LONG
 AC_VOMS_STRNDUP
 AC_BUILD_API_ONLY
+AC_BUILD_PARTS
 
 GLITE_DOCBOOK_MAN
 

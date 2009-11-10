@@ -2,9 +2,10 @@
  *
  * Authors: Vincenzo Ciaschini - Vincenzo.Ciaschini@cnaf.infn.it 
  *
- * Copyright (c) 2002, 2003 INFN-CNAF on behalf of the EU DataGrid.
+ * Copyright (c) 2002-2009 INFN-CNAF on behalf of the EU DataGrid
+ * and EGEE I, II and III
  * For license conditions see LICENSE file or
- * http://www.edg.org/license.html
+ * http://www.apache.org/licenses/LICENSE-2.0.txt
  *
  * Parts of this code may be based upon or even include verbatim pieces,
  * originally written by other people, in which case the original header
@@ -65,7 +66,7 @@ public:
    * @param p the secure server port.
    * @param b the backlog, that is the maximum number of outstanding connection requests.
    */
-  GSISocketClient(const std::string, int, int, void* = NULL);
+  GSISocketClient(const std::string&, int, int);
   /**
    * Destructor.
    */  
@@ -81,10 +82,8 @@ public:
    * Sets required connection flags.
    * @param flags is a bitwise or of all the flags required.
    */
-  void SetFlags(int flags);
+  //  void SetFlags(int flags);
 
-
-  void SetLogger(void *l);
 
   /**
    * Open the connection.
@@ -118,7 +117,6 @@ private:
   gss_cred_id_t credential;
   std::string _server_contact;
    //bool _do_mutual_authentication;
-  int conflags;
   FILE *gsi_logfile;
   bool opened;
   int sck;
@@ -134,13 +132,12 @@ public:
   std::string     peer_ca;
   EVP_PKEY       *peer_key;
   X509           *peer_cert;
-  void           *logh;
   SSL *ssl;
   SSL_CTX *ctx;
   BIO *conn;
-  proxy_verify_desc *pvd;
+  void *pvd;
 
-  bool Send(std::string s);
+  bool Send(const std::string &s);
   bool Receive(std::string &s);
 
 private:
@@ -152,6 +149,10 @@ private:
 
 public:
   std::string GetError();
+  void SetTimeout(int t);
+
+private:
+  int timeout;
 };
 
 #endif

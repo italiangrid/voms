@@ -1,3 +1,20 @@
+/*********************************************************************
+ *
+ * Authors: Olle Mulmo
+ *          Joni Hahkala
+ *          Vincenzo Ciaschini - Vincenzo.Ciaschini@cnaf.infn.it 
+ *          Valerio Venturi    - Valerio.Venturi@cnaf.infn.it
+ *
+ * Copyright (c) 2002-2009 INFN-CNAF on behalf of the EU DataGrid
+ * and EGEE I, II and III
+ * For license conditions see LICENSE file or
+ * http://www.apache.org/licenses/LICENSE-2.0.txt
+ *
+ * Parts of this code may be based upon or even include verbatim pieces,
+ * originally written by other people, in which case the original header
+ * follows.
+ *
+ *********************************************************************/
 /*
  * Copyright (c) Members of the EGEE Collaboration. 2004.
  * See http://eu-egee.org/partners/ for details on the copyright holders.
@@ -99,20 +116,9 @@ public class AttributeCertificateInfo implements DEREncodable {
         attributes = (ASN1Sequence) seq.getObjectAt(6);
 
         // getting FQANs
-        //        System.out.println("Getting FQANs");
+
         if (attributes != null && attributes.size() != 0) {
             for (Enumeration e = attributes.getObjects(); e.hasMoreElements();) {
-//                 DERObject o = (DERObject)e.nextElement();
-//                 byte[] value = null;
-//                 try {
-//                     value = o.getEncoded();
-//                 }
-//                 catch(Exception ex) {}
-//                 System.out.println("Class is: " + o.getClass());
-//                 System.out.print("Value is: ");
-//                 for (int i =0; i < value.length; i++)
-//                     System.out.print(Integer.toHexString(value[i]) + " ");
-//                 System.out.println();
 
                 ASN1Sequence attribute = (ASN1Sequence) e.nextElement();
 
@@ -133,14 +139,14 @@ public class AttributeCertificateInfo implements DEREncodable {
                         myVo = url.substring(0, idx);
                         myHostPort = url.substring(idx + 3);
 
-                        idx = myHostPort.lastIndexOf(":");
+                        idx = myHostPort.lastIndexOf(':');
 
                         if ((idx < 0) || (idx == (myHostPort.length() - 1))) {
                             throw new IllegalArgumentException("Bad encoding of VOMS policyAuthority : [" + url + "]");
                         }
 
                         myHost = myHostPort.substring(0, idx);
-                        myPort  = Integer.valueOf(myHostPort.substring(idx+1)).intValue();
+                        myPort  = Integer.parseInt(myHostPort.substring(idx+1));
 
                         if (attr.getValueType() != IetfAttrSyntax.VALUE_OCTETS) {
                             throw new IllegalArgumentException(
@@ -172,41 +178,34 @@ public class AttributeCertificateInfo implements DEREncodable {
         }
 
         // start parsing of known extensions
-        //        System.out.println("Getting AC_TARGET");
         if (extensions.getExtension(AC_TARGET_OID_DER) != null) {
             byte[] data = (extensions.getExtension(AC_TARGET_OID_DER).getValue().getOctets());
             DERObject dobj = null;
             try {
                 dobj = new ASN1InputStream(new ByteArrayInputStream(data)).readObject();
-
-                //            System.out.println("DOBJ Class: " + dobj.getClass());
                 acTargets = new ACTargets(ASN1Sequence.getInstance(dobj));
             } catch (Exception e) {
                 throw new IllegalArgumentException("DERO: " + e.getMessage());
             }
         }
 
-        //        System.out.println("Getting AC_CERTS");
         if (extensions.getExtension(AC_CERTS_OID_DER) != null) {
             byte[] data = (extensions.getExtension(AC_CERTS_OID_DER).getValue().getOctets());
             DERObject dobj = null;
             try {
                 dobj = new ASN1InputStream(new ByteArrayInputStream(data)).readObject();
-                //             System.out.println("DOBJ Class: " + dobj.getClass());
                 acCerts = new ACCerts(ASN1Sequence.getInstance(dobj));
             } catch (Exception e) {
                 throw new IllegalArgumentException("DERO: " + e.getMessage());
             }
         }
 
-        //        System.out.println("Getting FULL_ATTRIBUTES");
         if (extensions.getExtension(AC_FULL_ATTRIBUTES_OID_DER) != null) {
             byte[] data = (extensions.getExtension(AC_FULL_ATTRIBUTES_OID_DER).getValue().getOctets());
             DERObject dobj = null;
             try {
                 dobj = new ASN1InputStream(new ByteArrayInputStream(data)).readObject();
 
-                //             System.out.println("DOBJ Class: " + dobj.getClass());
                 fullAttributes = new FullAttributes(ASN1Sequence.getInstance(dobj));
             } catch (Exception e) {
                 throw new IllegalArgumentException("DERO: " + e.getMessage());

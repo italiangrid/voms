@@ -1,7 +1,7 @@
 load_lib vomstest.exp
+testheader "Check message in case of user not registered (basic request)."
 
 proc mytest {} {
-    testheader "Check message in case of user not registered (basic request)."
     _activateCert mycert3
 
     _vomsStart voms1

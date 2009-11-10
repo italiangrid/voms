@@ -2,9 +2,10 @@
  *
  * Authors: Vincenzo Ciaschini - Vincenzo.Ciaschini@cnaf.infn.it 
  *
- * Copyright (c) 2002, 2003 INFN-CNAF on behalf of the EU DataGrid.
+ * Copyright (c) 2002-2009 INFN-CNAF on behalf of the EU DataGrid
+ * and EGEE I, II and III
  * For license conditions see LICENSE file or
- * http://www.edg.org/license.html
+ * http://www.apache.org/licenses/LICENSE-2.0.txt
  *
  * Parts of this code may be based upon or even include verbatim pieces,
  * originally written by other people, in which case the original header
@@ -37,16 +38,13 @@ struct answer {
 };
 
 std::string XML_Req_Encode(const request &);
-std::string XML_Req_Encode(const std::string, const std::string, 
-                           const std::string, const int);
-std::string XML_Ans_Encode(const answer &);
+std::string XML_Req_Encode(const std::string&, const std::string&, 
+                           const std::string&, const int);
 std::string XML_Ans_Encode(const std::string&, 
                            const std::vector<errorp>, bool);
 std::string XML_Ans_Encode(const std::string&,  const std::string&,
                            const std::vector<errorp>, bool);
-bool XML_Req_Decode(const std::string, request &);
-bool XML_Req_Decode(const std::string, std::string &, std::string &, int &);
-bool XML_Ans_Decode(const std::string, answer &);
-bool XML_Ans_Decode(const std::string, std::string &,
-                    std::vector<errorp> &);
+bool XML_Req_Decode(const std::string&, request &);
+bool XML_Req_Decode(const std::string&, std::string &, std::string &, int &);
+bool XML_Ans_Decode(const std::string&, answer &);
 #endif

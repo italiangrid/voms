@@ -3,9 +3,10 @@
  * Authors: Vincenzo Ciaschini - Vincenzo.Ciaschini@cnaf.infn.it 
  *          Valerio Venturi - Valerio.Venturi@cnaf.infn.it 
  *
- * Copyright (c) 2002, 2003 INFN-CNAF on behalf of the EU DataGrid.
+ * Copyright (c) 2002-2009 INFN-CNAF on behalf of the EU DataGrid
+ * and EGEE I, II and III
  * For license conditions see LICENSE file or
- * http://www.edg.org/license.html
+ * http://www.apache.org/licenses/LICENSE-2.0.txt
  *
  * Parts of this code may be based upon or even include verbatim pieces,
  * originally written by other people, in which case the original header
@@ -17,6 +18,7 @@
 
 #include <string>
 #include <vector>
+#include <ostream>
 #include <exception>
 #include "voms_api.h"
 
@@ -29,7 +31,7 @@ extern "C" {
   
 }
 
-
+enum message_type {FORCED, INFO, WARN, ERROR, DEBUG};
 
 class VOMSException : public std::exception 
 {
@@ -93,8 +95,8 @@ class Client {
   std::string              targetlist;
   std::vector<std::string> confiles;
 #ifdef CLASS_ADD
-  void *                   class_add_buf = NULL;
-  size_t                   class_add_buf_len = 0;
+  void *                   class_add_buf;
+  size_t                   class_add_buf_len;
 #endif
 
   BIGNUM *                 dataorder;
@@ -112,6 +114,8 @@ class Client {
   STACK_OF(X509)           *cert_chain;
   X509                     *ucert;
   EVP_PKEY                 *private_key;
+  int                       timeout;
+  vomsdata                 *v;
 
  public:
   
@@ -121,16 +125,12 @@ class Client {
 
  private:
   
-  bool CreateProxy(std::string data, std::string filedata, AC ** aclist, int version);
-  X509_EXTENSION * CreateProxyExtension(std::string name, std::string data, bool crit = false);
+  bool CreateProxy(std::string data, AC ** aclist, int version);
 
-  bool Retrieve(std::string buffer);
+  bool AddToList(AC *ac);
   
   // write AC and data retrieved form server to file
   bool WriteSeparate();
-  
-  // include a file in a non critical extension
-  bool IncludeFile(std::string& filedata);
   
   // test if certificate used for signing is expired
   bool Test();
@@ -138,11 +138,14 @@ class Client {
   bool pcdInit();
   
   // verify the certificate is signed by a trusted CA
-  bool Verify();
+  bool Verify(bool doproxy);
   
   // get openssl error */
   void Error();
 
-  bool LoadVomses(vomsdata &, bool);
+  bool LoadVomses();
+  std::ostream& Print(message_type type);
+  bool checkstats(char *file, int mode);
+  void ProxyCreationError(int, void *);
 };
 #endif

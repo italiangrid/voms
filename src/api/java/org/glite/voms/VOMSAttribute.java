@@ -1,3 +1,19 @@
+/*********************************************************************
+ *
+ * Authors: Olle Mulmo
+ *          Vincenzo Ciaschini - Vincenzo.Ciaschini@cnaf.infn.it 
+ *          Valerio Venturi    - Valerio.Venturi@cnaf.infn.it
+ *
+ * Copyright (c) 2002-2009 INFN-CNAF on behalf of the EU DataGrid
+ * and EGEE I, II and III
+ * For license conditions see LICENSE file or
+ * http://www.apache.org/licenses/LICENSE-2.0.txt
+ *
+ * Parts of this code may be based upon or even include verbatim pieces,
+ * originally written by other people, in which case the original header
+ * follows.
+ *
+ *********************************************************************/
 /*
  * Copyright (c) Members of the EGEE Collaboration. 2004.
  * See http://eu-egee.org/partners/ for details on the copyright holders.
@@ -16,7 +32,6 @@ import java.util.Date;
 import java.util.Enumeration;
 import java.util.List;
 import java.util.SimpleTimeZone;
-import java.util.Vector;
 
 import javax.security.auth.x500.X500Principal;
 
@@ -40,15 +55,11 @@ import org.glite.voms.ac.FullAttributes;
  * @author Vincenzo Ciaschini
  */
 public class VOMSAttribute {
-    private static Logger logger = Logger.getLogger(VOMSAttribute.class);
-
     /**
      * The ASN.1 object identifier for VOMS attributes
      */
     private static final String VOMS_ATTR_OID = "1.3.6.1.4.1.8005.100.100.4";
     private AttributeCertificate myAC;
-    private Vector myStringList = new Vector();
-    private Vector myFQANs = new Vector();
 
     /**
      * Returns the signature of the AC.
@@ -286,57 +297,10 @@ public class VOMSAttribute {
         }
 
         myAC = ac;
-
-        List l = ac.getAttributes(VOMS_ATTR_OID);
-
-        if ((l == null) || (l.size() == 0)) {
-            return;
-        }
-
-//         try {
-//             for (Iterator i = l.iterator(); i.hasNext();) {
-//                 ASN1Sequence seq = (ASN1Sequence) i.next();
-//                 IetfAttrSyntax attr = new IetfAttrSyntax(seq);
-
-//                 // policyAuthority is on the format <vo>/<host>:<port>
-//                 String url = ((DERIA5String) GeneralName.getInstance(((ASN1Sequence) attr.getPolicyAuthority()
-//                                                                                          .getDERObject()).getObjectAt(0))
-//                                                         .getName()).getString();
-//                 int idx = url.indexOf("://");
-
-//                 if ((idx < 0) || (idx == (url.length() - 1))) {
-//                     throw new IllegalArgumentException("Bad encoding of VOMS policyAuthority : [" + url + "]");
-//                 }
-
-//                 myVo = url.substring(0, idx);
-//                 myHostPort = url.substring(idx + 3);
-
-//                 if (attr.getValueType() != IetfAttrSyntax.VALUE_OCTETS) {
-//                     throw new IllegalArgumentException(
-//                         "VOMS attribute values are not encoded as octet strings, policyAuthority = " + url);
-//                 }
-
-//                 for (Iterator j = attr.getValues().iterator(); j.hasNext();) {
-//                     String fqan = new String(((ASN1OctetString) j.next()).getOctets());
-//                     FQAN f = new FQAN(fqan);
-
-//                     // maybe requiring that the attributes start with vo is too much?
-//                     if (!myStringList.contains(fqan) && (fqan.startsWith("/" + myVo + "/") || fqan.equals("/" + myVo))) {
-//                         myStringList.add(fqan);
-//                         myFQANs.add(f);
-//                     }
-//                 }
-//             }
-//         } catch (IllegalArgumentException ie) {
-//             throw ie;
-//         } catch (Exception e) {
-//             throw new IllegalArgumentException("Badly encoded VOMS extension in AC issued by " +
-//                 ac.getIssuer().getName());
-//         }
     }
 
     /**
-     * @deprecated Direct access to the Attribute Certificate is going to
+     * Direct access to the Attribute Certificate is going to
      *             be removed. Use the getXXX methods in this same classe
      *             instead.
      *

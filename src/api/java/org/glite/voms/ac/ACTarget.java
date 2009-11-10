@@ -2,9 +2,10 @@
  *
  * Authors: Vincenzo Ciaschini - Vincenzo.Ciaschini@cnaf.infn.it
  *
- * Copyright (c) 2002, 2003, 2004, 2005, 2006 INFN-CNAF on behalf of the 
- * EGEE project.
- * For license conditions see LICENSE
+ * Copyright (c) 2002-2009 INFN-CNAF on behalf of the 
+ * EGEE I, II and III
+ * For license conditions see LICENSE file or
+ * http://www.apache.org/licenses/LICENSE-2.0.txt
  *
  * Parts of this code may be based upon or even include verbatim pieces,
  * originally written by other people, in which case the original header
@@ -24,18 +25,13 @@ import org.bouncycastle.asn1.DERTaggedObject;
 import org.bouncycastle.asn1.x509.GeneralName;
 import org.bouncycastle.asn1.x509.IssuerSerial;
 
-//import java.lang.String;
-
 class NameConverter {
-    private GeneralName name;
     private String      value;
 
     public NameConverter(GeneralName gn) {
-        name = gn;
-
         switch (gn.getTagNo()) {
         case 6:
-            value = DERIA5String.getInstance(name.getName()).getString();
+            value = DERIA5String.getInstance(gn.getName()).getString();
             break;
         default:
             throw new IllegalArgumentException("Erroneous encoding of Targets");
@@ -84,7 +80,7 @@ public class ACTarget implements DEREncodable {
         if (cert != null)
             return getIssuerSerialString();
 
-        return null;
+        return "";
     }
 
 
@@ -94,7 +90,7 @@ public class ACTarget implements DEREncodable {
      * @return the name.
      */
     public String getName() {
-        return new String(NameConverter.getInstance(name).getAsString());
+        return NameConverter.getInstance(name).getAsString();
     }
 
     /**
@@ -103,7 +99,7 @@ public class ACTarget implements DEREncodable {
      * @return the group.
      */
     public String getGroup() {
-        return new String(NameConverter.getInstance(group).getAsString());
+        return NameConverter.getInstance(group).getAsString();
     }
 
     /**
@@ -124,8 +120,8 @@ public class ACTarget implements DEREncodable {
         ASN1Sequence seq = ASN1Sequence.getInstance(cert.getIssuer().getDERObject());
         GeneralName  name  = GeneralName.getInstance(seq.getObjectAt(0));
 
-        return new String(NameConverter.getInstance(name).getAsString() + ":" + 
-                          (cert.getSerial().toString()));
+        return NameConverter.getInstance(name).getAsString() + ":" + 
+                          (cert.getSerial().toString());
     }
 
     /**
@@ -182,9 +178,7 @@ public class ACTarget implements DEREncodable {
     public void setIssuerSerial(String s) {
         int ch = s.lastIndexOf(':');
         if (ch != -1) {
-            String iss, ser;
-            iss = s.substring(0, ch);
-            ser = s.substring(ch+1);
+            String iss = s.substring(0, ch);
             GeneralName nm = new GeneralName(new DERIA5String(iss), 6);
             ASN1Sequence seq = ASN1Sequence.getInstance(name.getDERObject());
 

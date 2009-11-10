@@ -2,9 +2,10 @@
  *
  * Authors: Vincenzo Ciaschini - Vincenzo.Ciaschini@cnaf.infn.it 
  *
- * Copyright (c) 2002, 2003 INFN-CNAF on behalf of the EU DataGrid.
+ * Copyright (c) 2002-2009 INFN-CNAF on behalf of the EU DataGrid
+ * and EGEE I, II and III
  * For license conditions see LICENSE file or
- * http://www.edg.org/license.html
+ * http://www.apache.org/licenses/LICENSE-2.0.txt
  *
  * Parts of this code may be based upon or even include verbatim pieces,
  * originally written by other people, in which case the original header
@@ -92,12 +93,6 @@ acceptable(const char *str)
   return true;
 }
 
-bool 
-acceptable(std::string s)
-{
-  return acceptable(s.c_str());
-}
-
 std::string
 timestamp(void)
 {
@@ -116,7 +111,10 @@ stringify(int i, std::string &s)
 #define INTSIZE (((sizeof(int)*CHAR_BIT)/3)+2)
   static char val[INTSIZE];
 
-  sprintf(val, "%d\0", i);
+  memset(val, 0, INTSIZE);
+#undef INTSIZE
+
+  sprintf(val, "%d", i);
 
   s = val;
 

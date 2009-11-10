@@ -209,8 +209,7 @@ oldgaa_rfc1779_name_parse(
 
  error_return:
 
-  if (buffer)
-    free(buffer);
+  free(buffer);
 
   return -1;
 } /* globus_ssleay_rfc1779_name_parse() */

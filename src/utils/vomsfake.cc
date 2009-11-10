@@ -3,9 +3,10 @@
  * Authors: Vincenzo Ciaschini - Vincenzo.Ciaschini@cnaf.infn.it 
  *          Valerio Venturi - Valerio.Venturi@cnaf.infn.it 
  *
- * Copyright (c) 2002, 2003 INFN-CNAF on behalf of the EU DataGrid.
+ * Copyright (c) 2002-2009 INFN-CNAF on behalf of the EU DataGrid
+ * and EGEE I, II and III
  * For license conditions see LICENSE file or
- * http://www.edg.org/license.html
+ * http://www.apache.org/licenses/LICENSE-2.0.txt
  *
  * Parts of this code may be based upon or even include verbatim pieces,
  * originally written by other people, in which case the original header
@@ -38,6 +39,13 @@ extern "C" {
 
 #include "listfunc.h"
 #include "credentials.h"
+#include "parsertypes.h"
+#include "vomsparser.h"
+#include "proxy.h"
+
+VOLIST *volist = NULL;
+  extern int yyparse();
+  extern FILE *yyin;
 }
 
 #include <voms_api.h>
@@ -48,7 +56,10 @@ extern "C" {
 extern "C" {
 
 #include "myproxycertinfo.h"
-
+extern int writeac(const X509 *issuerc, const STACK_OF(X509) *certstack, const X509 *holder, 
+		   const EVP_PKEY *pkey, BIGNUM *s, char **c, 
+		   const char *t, char **attributes, AC **ac, const char *voname, 
+		   const char *uri, int valid, int old);
 }
 
 extern int AC_Init();
@@ -72,8 +83,8 @@ extern "C" {
   
 static int (*pw_cb)() = NULL;
 
-static int pwstdin_callback(char * buf, int num, int w) {
-  
+static int pwstdin_callback(char * buf, int num, UNUSED(int w)) 
+{
   int i;
   
   if (!(fgets(buf, num, stdin))) {
@@ -89,11 +100,11 @@ static int pwstdin_callback(char * buf, int num, int w) {
   return i;
 }
   
-static void kpcallback(int p, int n) {
-    
+static int kpcallback(int p, int UNUSED(n)) 
+{
   char c='B';
     
-  if (quiet) return;
+  if (quiet) return 0;
     
   if (p == 0) c='.';
   if (p == 1) c='+';
@@ -101,7 +112,8 @@ static void kpcallback(int p, int n) {
   if (p == 3) c='\n';
   if (!debug) c = '.';
   fputc(c,stderr);
-  
+
+  return 0;
 }
   
 extern int proxy_verify_cert_chain(X509 * ucert, STACK_OF(X509) * cert_chain, proxy_verify_desc * pvd);
@@ -111,13 +123,15 @@ extern void proxy_verify_ctx_init(proxy_verify_ctx_desc * pvxd);
 std::vector<std::string> targets;
 
 
-int main(int argc, char** argv) {
-
+int main(int argc, char** argv) 
+{
   struct rlimit newlimit = {0,0};
+
   if (setrlimit(RLIMIT_CORE, &newlimit) != 0)
     exit(1);
 
   if (AC_Init()) {
+    InitProxyCertInfoExtension(1);
     Fake v(argc, argv);
     v.Run();
 
@@ -126,19 +140,22 @@ int main(int argc, char** argv) {
   return 1;
 }
 
+extern int yydebug;
 Fake::Fake(int argc, char ** argv) :   confile(CONFILENAME), 
-                                       separate(""), uri(""),bits(512),
+                                       separate(""), uri(""),bits(1024),
                                        hours(12), limit_proxy(false),
                                        vomslife(-1), proxyver(0),
-                                       pathlength(1), verify(false), version(0),
+                                       pathlength(1), verify(false), 
+                                       noregen(false), version(0),
 #ifdef CLASS_ADD
-                                       classs_add_buf(NULL),
+                                       class_add_buf(NULL),
                                        class_add_buf_len(0),
 #endif					   
                                        ucert(NULL), upkey(NULL), cert_chain(NULL),
                                        aclist(NULL), voID(""),
                                        hostcert(""), hostkey(""),
-                                       newformat(false)
+                                       newformat(false), newsubject(""),
+                                       rfc(false)
 {
   
   bool progversion = false;
@@ -149,6 +166,8 @@ Fake::Fake(int argc, char ** argv) :   confile(CONFILENAME),
   std::vector<std::string> order;
   bool pwstdin = false;
 
+  yydebug = 0;
+
   if (strrchr(argv[0],'/'))
     program = strrchr(argv[0],'/') + 1;
   else
@@ -156,7 +175,7 @@ Fake::Fake(int argc, char ** argv) :   confile(CONFILENAME),
   
   /* usage message */
 
-  static char *LONG_USAGE = \
+  static std::string LONG_USAGE =		\
     "\n" \
     "    Options\n" \
     "    -help, -usage                  Displays usage\n" \
@@ -167,7 +186,7 @@ Fake::Fake(int argc, char ** argv) :   confile(CONFILENAME),
     "    -pwstdin                       Allows passphrase from stdin\n" \
     "    -limited                       Creates a limited proxy\n" \
     "    -hours H                       Proxy is valid for H hours (default:12)\n" \
-    "    -bits                          Number of bits in key {512|1024|2048|4096}\n" \
+    "    -bits                          Number of bits in key {512|1024|2048|4096} (default:1024)\n" \
     "    -cert     <certfile>           Non-standard location of user certificate\n" \
     "    -key      <keyfile>            Non-standard location of user key\n" \
     "    -certdir  <certdir>            Non-standard location of trusted cert dir\n" \
@@ -176,25 +195,29 @@ Fake::Fake(int argc, char ** argv) :   confile(CONFILENAME),
     "    -uri <uri>                     Specifies the <hostname>:<port> of the fake server.\n" \
     "    -target <hostname>             Targets the AC against a specific hostname.\n" \
     "    -vomslife <H>                  Try to get a VOMS pseudocert valid for H hours.\n" \
+    "    -voinfo <file>                 Gets AC information from <file>\n" \
     "    -include <file>                Include the contents of the specified file.\n" \
     "    -conf <file>                   Read options from <file>.\n" \
     "    -policy <policyfile>           File containing policy to store in the ProxyCertInfo extension.\n" \
     "    -pl, -policy-language <oid>    OID string for the policy language.\n" \
-    "    -policy-language <oid>         OID string for the policy language.\n" \
     "    -path-length <l>               Allow a chain of at most l proxies to be generated from this ones.\n" \
     "    -globus                        Globus version.\n" \
-    "    -proxyver                      Version of proxy certificate.\n" \
+    "    -proxyver <n>                  Version of proxy certificate.\n" \
+    "    -rfc                           Create RFC-conforming proxies (synonim of --proxyver 4)\n"             
     "    -noregen                       Doesn't regenerate a new proxy for the connection.\n" \
     "    -separate <file>               Saves the informations returned by the server on file <file>.\n" \
     "    -hostcert <file>               Fake host certificate.\n" \
     "    -hostkey <file>                Fake host private key.\n" \
     "    -fqan <string>                 String to include in the AC as the granted FQAN.\n" \
     "    -newformat                     Creates ACs according to the new format.\n" \
+    "    -newsubject <string>           Subject of the new certificate.\n" \
     "\n";
 
   set_usage(LONG_USAGE);
 
   /* parse command-line option */
+
+  std::string voinfo;
 
   struct option opts[] = {
     {"help",            0, NULL,                OPT_HELP},
@@ -219,6 +242,7 @@ Fake::Fake(int argc, char ** argv) :   confile(CONFILENAME),
     {"target",          1, (int *)&targets,     OPT_MULTI},
     {"globus",          1,        &version,     OPT_NUM},
     {"proxyver",        1,        &proxyver,    OPT_NUM},
+    {"rfc",             0, (int *)&rfc,         OPT_BOOL},
     {"policy",          1, (int *)&policyfile,  OPT_STRING},
     {"policy-language", 1, (int *)&policylang,  OPT_STRING},
     {"pl",              1, (int *)&policylang,  OPT_STRING},
@@ -229,6 +253,8 @@ Fake::Fake(int argc, char ** argv) :   confile(CONFILENAME),
     {"hostkey",         1, (int *)&hostkey,     OPT_STRING},
     {"fqan",            1, (int *)&fqans,       OPT_MULTI},
     {"newformat",       1, (int *)&newformat,   OPT_BOOL},
+    {"newsubject",      1, (int *)&newsubject,  OPT_STRING},
+    {"voinfo",          1, (int *)&voinfo,      OPT_STRING},
 #ifdef CLASS_ADD
     {"classadd",        1, (int *)class_add_buf,OPT_STRING},
 #endif
@@ -238,120 +264,84 @@ Fake::Fake(int argc, char ** argv) :   confile(CONFILENAME),
   if (!getopts(argc, argv, opts))
     exit(1);
   
-  
-  if(debug)
+  if(debug) {
     quiet = false;
+    yydebug = 1;
+  }
   
+  if (!voinfo.empty()) {
+    FILE *file = fopen(voinfo.c_str(), "rb");
+    if (file) {
+      yyin = file;
+      if (yyparse()) {
+        Print(ERROR) << "Error: Cannot parse voinfo file: " << voinfo << std::endl;
+        exit(1);
+      }
+    }
+    else {
+      Print(ERROR) << "Error opening voinfo file: " << voinfo << std::endl;
+      exit(1);
+    }
+  }
+
   /* show version and exit */
   
   if (progversion) {
-    std::cout << SUBPACKAGE << "\nVersion: " << VERSION << std::endl;
-    std::cout << "Compiled: " << __DATE__ << " " << __TIME__ << std::endl;
+    Print(FORCED) << SUBPACKAGE << "\nVersion: " << VERSION << std::endl;
+    Print(FORCED) << "Compiled: " << __DATE__ << " " << __TIME__ << std::endl;
     exit(0);
   }
 
-  if (hostcert.empty() || hostkey.empty()) {
-    std::cout  << "You must specify an host certificate!" << std::endl;
-    exit(1);
-  }
-
-  /* set globus version */
-
-  version = globus(version);
-  if (version == 0) {
-    version = 22;
-    if (debug) 
-      std::cout << "Unable to discover Globus version: trying for 2.2" << std::endl;
-  }
-  else 
-    if (debug) 
-      std::cout << "Detected Globus version: " << version << std::endl;
-  
-  /* set proxy version */
-  
-  if (proxyver!=2 && proxyver!=3 && proxyver!=0) {
-    std::cerr << "Error: proxyver must be 2 or 3" << std::endl;
-    exit(1);
-  }
-  else if (proxyver==0) {
-    if (debug)
-      std::cout << "Unspecified proxy version, settling on Globus version: ";
-    if (version<30)
-      proxyver = 2;
-    else 
-      proxyver = 3;
-    if (debug)
-      std::cout << proxyver << std::endl;
-  }
-  
-  /* PCI extension option */ 
-  
-  if (proxyver==3) {
-    if (!policylang.empty())
-      if (policyfile.empty()) {
-        std::cerr << "Error: if you specify a policy language you also need to specify a policy file" << std::endl;
-        exit(1);
-      }
-  }
-  
-  if (proxyver==3) {
-    if(debug) 
-      std::cout << "PCI extension info: " << std::endl << " Path length: " << pathlength << std::endl;
-
-    if (policylang.empty()) {
-      if (debug) 
-        std::cout << " Policy language not specified." << policylang << std::endl;
-    }
-    else if (debug) 
-      std::cout << " Policy language: " << policylang << std::endl;
-
-    if (policyfile.empty()) {
-      if (debug) 
-        std::cout << " Policy file not specified." << std::endl;
-    }
-    else if (debug) 
-      std::cout << " Policy file: " << policyfile << std::endl;
-  }
-  
   /* get vo */
   
   char *vo = getenv("VO");
   if (vo != NULL && strcmp(vo, "") != 0)
     voID = vo;
   
-  /* controls that number of bits for the key is appropiate */
-
-  if((bits!=512) && (bits!=1024) && (bits!=2048) && (bits!=4096)) {
-    std::cerr << "Error: number of bits in key must be one of 512, 1024, 2048, 4096." << std::endl;
-    exit(1);
-  }
-  else if(debug) std::cout << "Number of bits in key :" << bits << std::endl; 
-  
   /* certficate duration option */
-  
-  if(!(hours>0)) {
-    std::cerr << "Error: duration must be positive." << std::endl;
-    exit(1);
-  }
   
   if (vomslife == -1)
     vomslife = hours;
   
-  if(!(vomslife>0)) {
-    std::cerr << "Error: duration of AC must be positive." << std::endl;
-    exit(1);
-  }
+  VO *voelem = NULL;
 
-  /* allow password form stdin */
+  /* collect local vo information */
+  if (!voms.empty()) {
+    if (!volist) {
+      volist = (VOLIST *)calloc(1, sizeof(VOLIST));
+      volist->vos = NULL;
+    }
+    voelem = (VO*)calloc(1, sizeof(VO));
+    volist->vos = (VO**)listadd((char**)volist->vos, (char*)voelem, sizeof(VO*));
+
+    voelem->hostcert = (char*)hostcert.c_str();
+    voelem->hostkey = (char*)hostkey.c_str();
+    voelem->uri = (char*)uri.c_str();
+    voelem->voname = (char*)voms.c_str();
+    voelem->vomslife = vomslife;
+  
+    voelem->fqans = (char **)malloc(sizeof(char*)*(fqans.size()+1));
+    for (unsigned int i  = 0; i < fqans.size(); i++)
+      voelem->fqans[i] = (char*)(fqans[i].c_str());
+    voelem->fqans[fqans.size()] = NULL;
+
+    std::string targ;
+    for (unsigned int i  = 0; i < targets.size(); i++)
+      targ += targets[i];
+    voelem->targets = (char*)(targ.c_str());
+  }
+  
+  /* A failure here exits the program entirely */
+  VerifyOptions();
+
+  /* allow password from stdin */
 
   if(pwstdin)
     pw_cb = (int (*)())(pwstdin_callback);
 
   /* with --debug prints configuration files used */
 
-  if(debug) {
-    std::cout << "Using configuration directory " << confile << std::endl;
-  }
+  Print(DEBUG) << "Using configuration directory " << confile << std::endl;
 
   /* file used */
   
@@ -361,7 +351,6 @@ Fake::Fake(int argc, char ** argv) :   confile(CONFILENAME),
   certfile = (crtfile.empty() ? NULL : const_cast<char *>(crtfile.c_str()));
   keyfile  = (kfile.empty()   ? NULL : const_cast<char *>(kfile.c_str()));
 
-
   /* prepare proxy_cred_desc */
 
   if(!pcdInit())
@@ -369,27 +358,19 @@ Fake::Fake(int argc, char ** argv) :   confile(CONFILENAME),
 
 }
 
-Fake::~Fake() {
-
-  if(cacertfile)  
-    free(cacertfile);
-  if(certdir)  
-    free(certdir);
-  if(certfile)  
-    free(certfile);
-  if(keyfile)  
-    free(keyfile);
-  if(outfile)  
-    free(outfile);
+Fake::~Fake() 
+{
+  free(cacertfile);
+  free(certdir);
+  free(certfile);
+  free(keyfile);
+  free(outfile);
 
   OBJ_cleanup();
-
 }
 
-bool Fake::Run() {
-
-  std::string filedata;
-
+bool Fake::Run() 
+{
   /* set output file and environment */
   
   char * oldenv = getenv("X509_USER_PROXY");
@@ -403,32 +384,28 @@ bool Fake::Run() {
   
   /* contacts servers for each vo */
 
-  Retrieve();
- 
+  if (volist)
+    if (!Retrieve(volist))
+      exit(1);
+
   /* set output file and environment */
   
   proxyfile = outfile;
   setenv("X509_USER_PROXY", proxyfile.c_str(), 1);  
   
-  /* include file */
-  
-  if (!incfile.empty())
-    if(!IncludeFile(filedata))
-      if(!quiet) std::cout << "Wasn't able to include file " << incfile << std::endl;;
-  
   /* with separate write info to file and exit */
   
   if (!separate.empty() && aclist) {
     if(!WriteSeparate())
-      if(!quiet) std::cout << "Wasn't able to write to " << separate << std::endl;
+      Print(WARN) << "Wasn't able to write to " << separate << std::endl;
     exit(0);
   }
   
   /* create a proxy containing the data retrieved from VOMS servers */
   
-  if(!quiet) std::cout << "Creating proxy " << std::flush; 
-  if(debug) std::cout << "to " << proxyfile << " " << std::flush;
-  if(CreateProxy("", filedata, aclist, NULL, proxyver)) {
+  Print(INFO) << "Creating proxy " << std::flush; 
+  Print(DEBUG) << "to " << proxyfile << " " << std::flush;
+  if(CreateProxy("", aclist, proxyver)) {
     listfree((char **)aclist, (freefn)AC_free);
     goto err;
   }
@@ -442,7 +419,6 @@ bool Fake::Run() {
   else {
     setenv("X509_USER_PROXY", oldenv, 1);
   }
-  free(oldenv);
   
   /* assure user certificate is not expired or going to, else ad but still create proxy */
   
@@ -458,324 +434,55 @@ bool Fake::Run() {
 
 }
 
-bool Fake::CreateProxy(std::string data, std::string filedata, AC ** aclist, BIGNUM * dataorder, int version) {
+bool Fake::CreateProxy(std::string data, AC ** aclist, int version) 
+{
+  struct arguments *args = makeproxyarguments();
+  int ret = -1;
 
-  bool status = true;
-  
-  X509 * ncert = NULL;
-  EVP_PKEY * npkey;
-  X509_REQ * req;
-  BIO * bp = NULL;
-  STACK_OF(X509_EXTENSION) * extensions = NULL;
-  X509_EXTENSION *ex1 = NULL, *ex2 = NULL, *ex3 = NULL, *ex4 = NULL, *ex5 = NULL, *ex6 = NULL, *ex7 = NULL;
-  bool voms, classadd, file, vo, acs, order, info;
-  order = acs = vo = voms = classadd = file = false;
-  
-  FILE *fpout = fopen(proxyfile.c_str(), "w");
-  if (fpout == NULL) {
-    PRXYerr(PRXYERR_F_LOCAL_CREATE, PRXYERR_R_PROBLEM_PROXY_FILE);
-    ERR_add_error_data(2, "\nOpen failed for File=", proxyfile.c_str());
-    goto err;
-  }
-  
-#ifndef WIN32
-  if (fchmod(fileno(fpout),0600) == -1) {
-    PRXYerr(PRXYERR_F_LOCAL_CREATE, PRXYERR_R_PROBLEM_PROXY_FILE);
-    ERR_add_error_data(2, "\n        chmod failed for File=", proxyfile.c_str());
-    goto err;
-  }
-#endif
-  
-  if (proxy_genreq(ucert, &req, &npkey, bits, (int (*)())kpcallback))
-    goto err;
-
-  /* Add proxy extensions */
-
-  /* initialize extensions stack */
-
-  if ((extensions = sk_X509_EXTENSION_new_null()) == NULL) {
-    PRXYerr(PRXYERR_F_PROXY_SIGN, PRXYERR_R_CLASS_ADD_EXT);
-    goto err;
-  }
-  
-  /* include extension */
-
-  if (!filedata.empty()) {
-    
-    if ((ex3 = CreateProxyExtension("incfile", filedata)) == NULL) {
-      PRXYerr(PRXYERR_F_PROXY_SIGN, PRXYERR_R_CLASS_ADD_EXT);
-      goto err;
+  if (args) {
+    args->proxyfilename = strdup(proxyfile.c_str());
+    if (!incfile.empty())
+      args->filename      = strdup(incfile.c_str());
+    args->aclist        = aclist;
+    args->proxyversion  = version;
+    if (!data.empty()) {
+      args->data          = (char*)data.data();
+      args->datalen       = data.length();
     }
-
-    if (!sk_X509_EXTENSION_push(extensions, ex3)) {
-      PRXYerr(PRXYERR_F_PROXY_SIGN, PRXYERR_R_CLASS_ADD_EXT);
-      goto err;
+    if (!newsubject.empty()) {
+      args->subject       = strdup(newsubject.c_str());
+      args->subjectlen    = strlen(args->subject);
     }
+    args->cert          = ucert;
+    args->chain         = cert_chain;
+    args->key           = upkey;
+    args->bits          = bits;
+    if (!policyfile.empty())
+      args->policyfile    = strdup(policyfile.c_str());
+    if (!policylang.empty())
+      args->policylang    = strdup(policylang.c_str());
+    args->pathlength    = pathlength;
+    args->hours         = hours;
+    args->minutes       = 0;
+    args->limited       = limit_proxy;
+    args->voID          = strdup(voID.c_str());
+    args->callback      = (int (*)())kpcallback;
 
-    file = true;
+    int warn = 0;
+    void *additional = NULL;
+
+    struct proxy *proxy = makeproxy(args, &warn, &additional);
+
+    if (proxy)
+      ret = writeproxy(proxyfile.c_str(), proxy);
+
+    freeproxy(proxy);
+    freeproxyarguments(args);
+
+    Print(INFO) << " Done" << std::endl << std::flush;
   }
 
-  /* AC extension  */
-
-  if (aclist) {
-
-    if ((ex5 = X509V3_EXT_conf_nid(NULL, NULL, OBJ_txt2nid("acseq"), (char *)aclist)) == NULL) {
-      PRXYerr(PRXYERR_F_PROXY_SIGN, PRXYERR_R_CLASS_ADD_EXT);
-      goto err;
-    }
-    
-    if (!sk_X509_EXTENSION_push(extensions, ex5)) {
-      PRXYerr(PRXYERR_F_PROXY_SIGN, PRXYERR_R_CLASS_ADD_EXT);
-      goto err;
-    }
-    
-    acs = true;
-  }
-  
-  /* vo extension */
-  
-  if (!voID.empty()) {
-  
-    if ((ex4 = CreateProxyExtension("vo", voID)) == NULL) {
-      PRXYerr(PRXYERR_F_PROXY_SIGN,PRXYERR_R_CLASS_ADD_EXT);
-      goto err;
-    }
-    
-    if (!sk_X509_EXTENSION_push(extensions, ex4)) {
-      PRXYerr(PRXYERR_F_PROXY_SIGN,PRXYERR_R_CLASS_ADD_EXT);
-      goto err;
-    }
-    
-    vo = true;
-  }
-  
-  /* order extension */
-
-  if (dataorder) {
-    
-    std::string tmp = std::string(BN_bn2hex(dataorder));
-    
-    if ((ex6 = CreateProxyExtension("order", tmp)) == NULL) {
-      PRXYerr(PRXYERR_F_PROXY_SIGN,PRXYERR_R_CLASS_ADD_EXT);
-      goto err;
-    }
-    
-    if (!sk_X509_EXTENSION_push(extensions, ex6)) {
-      PRXYerr(PRXYERR_F_PROXY_SIGN,PRXYERR_R_CLASS_ADD_EXT);
-      goto err;
-    }
-    
-    order = true;
-  }
-
-  /* class_add extension */
-
-#ifdef CLASS_ADD
-  
-  if (class_add_buf && class_add_buf_len > 0) {
-    if ((ex2 = proxy_extension_class_add_create((void *)class_add_buf, class_add_buf_len)) == NULL) {
-      PRXYerr(PRXYERR_F_PROXY_SIGN,PRXYERR_R_CLASS_ADD_EXT);
-      goto err;
-    }
-    
-    if (!sk_X509_EXTENSION_push(extensions, ex2)) {
-      PRXYerr(PRXYERR_F_PROXY_SIGN,PRXYERR_R_CLASS_ADD_EXT);
-      goto err;
-    }
-    
-    classadd = true;
-  }
-
-#endif
-  
-  /* PCI extension */
-  
-  if (version==3) {
-
-    std::string                         policy;
-    unsigned char *                     der;
-    int                                 derlen;
-    unsigned char *                     pp;
-    int                                 w;
-    myPROXYPOLICY *                       proxypolicy;
-    myPROXYCERTINFO *                     proxycertinfo;
-    ASN1_OBJECT *                       policy_language;
-    
-    
-    /* getting contents of policy file */
-  
-    std::ifstream fp;
-    if (!policyfile.empty()) {
-      fp.open(policyfile.c_str());
-      if (!fp) {
-        std::cerr << std::endl << "Error: can't open policy file" << std::endl;
-        exit(1);
-      }
-      fp.unsetf(std::ios::skipws);
-      char c;
-      while(fp.get(c))
-        policy += c;
-    }
-    
-    /* setting policy language field */
-    
-    if (policylang.empty()) {
-      if (policyfile.empty()) {
-        policylang = IMPERSONATION_PROXY_OID;
-        if (debug) 
-          std::cout << "No policy language specified, Gsi impersonation proxy assumed." << std::endl;
-      }
-      else {
-        policylang = GLOBUS_GSI_PROXY_GENERIC_POLICY_OID;
-        if (debug) 
-          std::cout << "No policy language specified with policy file, assuming generic." << std::endl;
-      }
-    }
-    
-    /* predefined policy language can be specified with simple name string */
-    
-    else if (policylang == IMPERSONATION_PROXY_SN)
-      policylang = IMPERSONATION_PROXY_OID;
-    else if (policylang == INDEPENDENT_PROXY_SN)
-      policylang = INDEPENDENT_PROXY_OID;
-    
-    /* does limited prevale on others? don't know what does grid-proxy_init since if pl is given with
-       limited options it crash */
-    if (limit_proxy)
-      policylang = LIMITED_PROXY_OID;
-
-    OBJ_create((char *)policylang.c_str(), (char *)policylang.c_str(), (char *)policylang.c_str());
-    
-    if (!(policy_language = OBJ_nid2obj(OBJ_sn2nid(policylang.c_str())))) {
-      PRXYerr(PRXYERR_F_PROXY_SIGN, PRXYERR_R_CLASS_ADD_OID);
-      goto err;
-    }
-    
-    /* proxypolicy */
-    
-    proxypolicy = myPROXYPOLICY_new();
-    if (policy.size()>0)
-      myPROXYPOLICY_set_policy(proxypolicy, (unsigned char *)policy.c_str(), policy.size());
-    myPROXYPOLICY_set_policy_language(proxypolicy, policy_language);
-
-    /* proxycertinfo */
-    
-    proxycertinfo = myPROXYCERTINFO_new();
-    myPROXYCERTINFO_set_proxypolicy(proxycertinfo, proxypolicy);
-    if (pathlength>=0) {
-      myPROXYCERTINFO_set_path_length(proxycertinfo, pathlength);
-    }
-    
-    /* 2der conversion */
-    
-    derlen = i2d_myPROXYCERTINFO(proxycertinfo, NULL);
-    der = (unsigned char *)malloc(derlen);
-    pp = der;
-    w = i2d_myPROXYCERTINFO(proxycertinfo, &pp);
-    
-    std::string tmp = (char *)der;
-    
-    if ((ex7 = CreateProxyExtension("myPROXYCERTINFO", tmp, true)) == NULL) {
-      PRXYerr(PRXYERR_F_PROXY_SIGN, PRXYERR_R_CLASS_ADD_EXT);
-      goto err;
-    }
-    
-    if (!sk_X509_EXTENSION_push(extensions, ex7)) {
-      PRXYerr(PRXYERR_F_PROXY_SIGN,PRXYERR_R_CLASS_ADD_EXT);
-      goto err;
-    }
-    
-  }
-  
-  if (proxy_sign(ucert, upkey, req, &ncert, hours*60*60,
-                 extensions, limit_proxy, version)) {
-    goto err;
-  }
-  
-  if ((bp = BIO_new(BIO_s_file())) != NULL)
-    BIO_set_fp(bp, fpout, BIO_NOCLOSE);
-  
-  if (proxy_marshal_bp(bp, ncert, npkey, ucert, cert_chain))
-    goto err;
-  
-  if (!quiet) std::cout << " Done" << std::endl << std::flush;
-
-  status = false;
-
- err:
-
-  if (ncert)
-    X509_free(ncert);
-  if (bp)
-    BIO_free(bp);
-  if (fpout)
-    fclose(fpout);
-  if (extensions) {
-    sk_X509_EXTENSION_pop_free(extensions, X509_EXTENSION_free);
-    voms = classadd = file = vo = acs = order = info = false;
-  }
-  if (req) {
-    X509_REQ_free(req);
-  }
-  if (npkey)
-    EVP_PKEY_free(npkey);
-  if (info)
-    X509_EXTENSION_free(ex7);
-  if (order)
-    X509_EXTENSION_free(ex6);
-  if (acs)
-    X509_EXTENSION_free(ex5);
-  if (voms)
-    X509_EXTENSION_free(ex2);
-  if (file)
-    X509_EXTENSION_free(ex3);
-  if (vo)
-    X509_EXTENSION_free(ex4);
-  if (classadd)
-    X509_EXTENSION_free(ex1);
-  
-  return status;
-
-}
-
-X509_EXTENSION * Fake::CreateProxyExtension(std::string name, std::string data, bool crit) {
-
-  X509_EXTENSION *                    ex = NULL;
-  ASN1_OBJECT *                       ex_obj = NULL;
-  ASN1_OCTET_STRING *                 ex_oct = NULL;
-
-  if (!(ex_obj = OBJ_nid2obj(OBJ_txt2nid((char *)name.c_str())))) {
-    PRXYerr(PRXYERR_F_PROXY_SIGN,PRXYERR_R_CLASS_ADD_OID);
-    goto err;
-  }
-  
-  if (!(ex_oct = ASN1_OCTET_STRING_new())) {
-    PRXYerr(PRXYERR_F_PROXY_SIGN,PRXYERR_R_CLASS_ADD_EXT);
-    goto err;
-  }
-  
-  ex_oct->data = (unsigned char *)data.c_str();
-  ex_oct->length = data.size();
-  
-  if (!(ex = X509_EXTENSION_create_by_OBJ(NULL, ex_obj, crit, ex_oct))) {
-    PRXYerr(PRXYERR_F_PROXY_SIGN,PRXYERR_R_CLASS_ADD_EXT);
-    goto err;
-  }
-	
-  ex_oct = NULL;
-	
-  return ex;
-  
- err:
-  
-  if (ex_oct)
-    ASN1_OCTET_STRING_free(ex_oct);
-  
-  if (ex_obj)
-    ASN1_OBJECT_free(ex_obj);
-  
-  return NULL;
-  
+  return ret == -1;
 }
 
 bool Fake::WriteSeparate() 
@@ -786,72 +493,52 @@ bool Fake::WriteSeparate()
     
     while(*aclist)
 #ifdef TYPEDEF_I2D_OF
-      if (!PEM_ASN1_write_bio(((i2d_of_void*)i2d_AC), "ATTRIBUTE CERTIFICATE", out, (char *)*(aclist++), NULL, NULL, 0, NULL, NULL)) {
+      if (!PEM_ASN1_write_bio(((i2d_of_void*)i2d_AC), "ATTRIBUTE CERTIFICATE", out, (char *)*(aclist++), NULL, NULL, 0, NULL, NULL))
 #else
-      if (!PEM_ASN1_write_bio(((int (*)())i2d_AC), "ATTRIBUTE CERTIFICATE", out, (char *)*(aclist++), NULL, NULL, 0, NULL, NULL)) {
+      if (!PEM_ASN1_write_bio(((int (*)())i2d_AC), "ATTRIBUTE CERTIFICATE", out, (char *)*(aclist++), NULL, NULL, 0, NULL, NULL))
 #endif
-        if (!quiet) 
-          std::cout << "Unable to write to BIO" << std::endl;
+      {
+        Print(ERROR) << "Unable to write to file" << std::endl;
         return false;
       }
     
     BIO_free(out);
   
-    if (!quiet)
-      std::cout << "Wrote ACs to " << separate << std::endl;
-    
+    Print(INFO) << "Wrote ACs to " << separate << std::endl;
   }
 
   return true;
 }
 
-bool Fake::IncludeFile(std::string& filedata) {
-
-  std::ifstream fp;
-  fp.open(incfile.c_str());
-  if (!fp) {
-    std::cerr << std::endl << "Error: cannot opens file" << std::endl;
-    return false;
-  }
-  fp.unsetf(std::ios::skipws);
-  char c;
-  while(fp.get(c))
-    filedata += c;
-  
-  return true;
-}
-
-void Fake::Test() {
-
+void Fake::Test() 
+{
   ASN1_UTCTIME * asn1_time = ASN1_UTCTIME_new();
   X509_gmtime_adj(asn1_time, 0);
   time_t time_now = ASN1_UTCTIME_mktime(asn1_time);
   time_t time_after = ASN1_UTCTIME_mktime(X509_get_notAfter(ucert));
   time_t time_diff = time_after - time_now ;
 
-  if (!quiet) {
-    if (time_diff < 0)
-      std::cout << std::endl << "Error: your certificate expired "
+  if (time_diff < 0)
+    Print(INFO) << std::endl << "Error: your certificate expired "
                 << asctime(localtime(&time_after)) << std::endl << std::flush;
-    else if (hours && time_diff < hours*60*60)
-      std::cout << "Warning: your certificate and proxy will expire "
+  else if (hours && time_diff < hours*60*60)
+    Print(INFO) << "Warning: your certificate and proxy will expire "
                 << asctime(localtime(&time_after))
                 << "which is within the requested lifetime of the proxy"
                 << std::endl << std::flush;
   
-    time_t time_after_proxy;
+  time_t time_after_proxy;
     
-    if (hours) 
-      time_after_proxy = time_now + hours*60*60;
-    else 
-      time_after_proxy = time_after;
+  if (hours) 
+    time_after_proxy = time_now + hours*60*60;
+  else 
+    time_after_proxy = time_after;
     
-    std::cout << "Your proxy is valid until "
+  Print(INFO) << "Your proxy is valid until "
               << asctime(localtime(&time_after_proxy)) << std::endl << std::flush;
-  }
 }
 
-bool Fake::Retrieve() 
+bool Fake::Retrieve(VOLIST *volist) 
 {
   AC **actmplist = NULL;
   AC *ac = NULL;
@@ -862,37 +549,75 @@ bool Fake::Retrieve()
   X509 *hcert = NULL, *holder = NULL;
   EVP_PKEY *hkey = NULL;
 
-  // generic attributes TO BE FILLED
-  std::vector<std::string> attributes;
+  for (int i = 0; volist->vos[i]; i++) {
+    VO *vo = volist->vos[i];
 
-  if (hcrt && hckey && owncert) {
-    if ((BIO_read_filename(hcrt, hostcert.c_str()) > 0) &&
-        (BIO_read_filename(hckey, hostkey.c_str()) > 0) &&
-        (BIO_read_filename(owncert, certfile) > 0)) {
-      hcert = PEM_read_bio_X509(hcrt, NULL, 0, NULL);
-      holder = PEM_read_bio_X509(owncert, NULL, 0, NULL);
-      hkey = PEM_read_bio_PrivateKey(hckey, NULL, 0, NULL);
+    // generic attributes
+    char ** attributes = vo->gas;
 
-      if (hcert && hkey) {
-        ac = AC_new();
-        if (ac)
-          res = createac(hcert, NULL, holder, hkey, (BIGNUM *)(BN_value_one()), fqans,
-                         targets, attributes, &ac, voms, uri, hours*3600, !newformat);
-      }
+    if (hcrt && hckey && owncert) {
+      int hcertres = BIO_read_filename(hcrt, vo->hostcert);
+      int holderres = BIO_read_filename(hckey, vo->hostkey);
+      int hkeyres = BIO_read_filename(owncert, certfile);
+      if ((hcertres  > 0) && (holderres > 0) && (hkeyres > 0)) {
+        hcert = PEM_read_bio_X509(hcrt, NULL, 0, NULL);
+        holder = PEM_read_bio_X509(owncert, NULL, 0, NULL);
+        hkey = PEM_read_bio_PrivateKey(hckey, NULL, 0, NULL);
+        
+        if (hcert && hkey) {
+          ac = AC_new();
+          //          const char *uri = vo->uri ? vo->uri : "";
+
+          // The following two lines allow the creation of an AC
+          // without any FQAN.
+          char *vector[1] = {NULL };
+          char **fqanlist = vo->fqans ? vo->fqans : vector;
+
+          if (ac)
+            res = writeac(hcert, NULL, holder, hkey, (BIGNUM *)(BN_value_one()), fqanlist,
+                          vo->targets, attributes, &ac, vo->voname, vo->uri, vo->vomslife, !newformat);
+        }
+      } 
+      else {
+        if (hcertres <= 0) {
+          if (vo->hostcert == NULL)
+            Print(ERROR) << "Host credential file unspecified!" << std::endl;
+          else
+            Print(ERROR) << "Could not open host credential file: " << vo->hostcert << std::endl;
+        }
+        if (holderres <= 0) {
+          if (vo->hostkey == NULL)
+            Print(ERROR) << "Host key file unspecified!" << std::endl;
+          else
+            Print(ERROR) << "Could not open host key file: " << vo->hostkey << std::endl;
+        }
+        if (hkeyres <= 0) {
+          if (certfile == NULL)
+            Print(ERROR) << "Holder key file unspecified!" << std::endl;
+          else
+            Print(ERROR) << "Could not open holder key file: " << certfile << std::endl;
+        }
+        return false;
+      }        
     }
+
+    if (!res)
+      actmplist = (AC **)listadd((char **)aclist, (char *)ac, sizeof(AC *));
+
+    if (actmplist)
+      aclist = actmplist;
+
+    X509_free(hcert);
+    X509_free(holder);
+    EVP_PKEY_free(hkey);
+    BIO_free(hcrt);
+    BIO_free(hckey);
+    BIO_free(owncert);
+
+    hcrt = BIO_new(BIO_s_file());
+    hckey = BIO_new(BIO_s_file());
+    owncert = BIO_new(BIO_s_file());
   }
-
-  if (!res)
-    actmplist = (AC **)listadd((char **)aclist, (char *)ac, sizeof(AC *));
-  if (actmplist)
-    aclist = actmplist;
-
-  X509_free(hcert);
-  X509_free(holder);
-  EVP_PKEY_free(hkey);
-  BIO_free(hcrt);
-  BIO_free(hckey);
-  BIO_free(owncert);
 
   if (!actmplist) {
     AC_free(ac);
@@ -920,15 +645,14 @@ bool Fake::pcdInit() {
   if (!determine_filenames(&cacertfile, &certdir, &outfile, &certfile, &keyfile, noregen))
     goto err;
   
-  if (debug) std::cout << "Files being used:" << std::endl 
-                       << " CA certificate file: " << (cacertfile ? cacertfile : "none") << std::endl
-                       << " Trusted certificates directory : " << (this->certdir ? this->certdir : "none") << std::endl
-                       << " Proxy certificate file : " << (this->outfile ? this->outfile : "none") << std::endl
-                       << " User certificate file: " << (this->certfile ? this->certfile : "none") << std::endl
-                       << " User key file: " << (this->keyfile ? this->keyfile : "none") << std::endl << std::flush;
+  Print(DEBUG) << "Files being used:" << std::endl 
+               << " CA certificate file: " << (cacertfile ? cacertfile : "none") << std::endl
+               << " Trusted certificates directory : " << (this->certdir ? this->certdir : "none") << std::endl
+               << " Proxy certificate file : " << (this->outfile ? this->outfile : "none") << std::endl
+               << " User certificate file: " << (this->certfile ? this->certfile : "none") << std::endl
+               << " User key file: " << (this->keyfile ? this->keyfile : "none") << std::endl << std::flush;
   
-  if (debug)
-    std::cout << "Output to " << outfile << std::endl << std::flush;
+  Print(DEBUG) << "Output to " << outfile << std::endl << std::flush;
   
   if (!load_credentials(certfile, keyfile, &ucert, &cert_chain, &upkey, pw_cb))
     goto err;
@@ -942,8 +666,8 @@ bool Fake::pcdInit() {
   
 }
 
-void Fake::Error() {
-
+void Fake::Error() 
+{
   unsigned long l;
   char buf[256];
 #if SSLEAY_VERSION_NUMBER  >= 0x00904100L
@@ -973,14 +697,152 @@ void Fake::Error() {
     if (dat) {
       l = ERR_get_error_line(&file, &line);
       if (debug)
-        std::cerr << ERR_error_string(l,buf) << ":"
-                  << file << ":" << line << dat << std::endl << std::flush;
-      else
-        std::cerr << ERR_reason_error_string(l) << dat
-                  << "\nFunction: " << ERR_func_error_string(l) << std::endl;
+        Print(DEBUG) << ERR_error_string(l,buf) << ":"
+                     << file << ":" << line << dat << std::endl << std::flush;
+      else 
+        Print(ERROR) << ERR_reason_error_string(l) << dat
+                     << "\nFunction: " << ERR_func_error_string(l) << std::endl;
     }
     
     free(dat);
   }
+}
 
+
+void Fake::exitError(const char *string) 
+{
+  Print(ERROR) << string << std::endl;
+  exit(1);
+}
+
+bool Fake::VerifyOptions()
+{
+  if (debug) {
+    quiet = false;
+    yydebug = 1;
+  }
+
+  if (!voms.empty()) {
+    if (hostcert.empty())
+      exitError("Error: You must specify an host certificate!");
+
+    if (hostcert.empty() || hostkey.empty())
+      exitError("Error: You must specify an host key!");
+  }
+
+  /* set globus version */
+
+  version = globus(version);
+  if (version == 0) {
+    version = 22;
+    Print(DEBUG) << "Unable to discover Globus version: trying for 2.2" << std::endl;
+  }
+  else 
+    Print(DEBUG) << "Detected Globus version: " << version << std::endl;
+
+  if (rfc && proxyver != 0) 
+    exitError("Usedboth -rfc and --proxyver!\nChoose one or the other.");
+
+  if (rfc)
+    proxyver = 4;
+
+  /* set proxy version */
+  
+  if (proxyver!=2 && proxyver!=3 && proxyver!=4 && proxyver!=0)
+    exitError("Error: proxyver must be 2 or 3 or 4");
+  else if (proxyver==0) {
+    Print(DEBUG) << "Unspecified proxy version, settling on version: ";
+
+    if (version<30)
+      proxyver = 2;
+    else if (version<40)
+      proxyver = 3;
+    else
+      proxyver = 4;
+
+    Print(DEBUG) << proxyver << std::endl;
+  }
+
+  /* PCI extension option */ 
+  
+  if (proxyver>3) {
+    if (!policylang.empty())
+      if (policyfile.empty())
+        exitError("Error: if you specify a policy language you also need to specify a policy file");
+  }
+  
+  if (proxyver>3) {
+    Print(DEBUG) << "PCI extension info: " << std::endl << " Path length: " << pathlength << std::endl;
+
+    if (policylang.empty())
+      Print(DEBUG) << " Policy language not specified." << std::endl;
+    else 
+      Print(DEBUG) << " Policy language: " << policylang << std::endl;
+
+    if (policyfile.empty())
+      Print(DEBUG) << " Policy file not specified." << std::endl;
+    else 
+      Print(DEBUG) << " Policy file: " << policyfile << std::endl;
+  }
+
+  /* controls that number of bits for the key is appropiate */
+
+  if ((bits!=512) && (bits!=1024) && 
+      (bits!=2048) && (bits!=4096))
+    exitError("Error: number of bits in key must be one of 512, 1024, 2048, 4096.");
+  else 
+    Print(DEBUG) << "Number of bits in key :" << bits << std::endl; 
+
+  /* certificate duration option */
+  
+  if (hours < 0)
+    exitError("Error: duration must be positive.");
+
+  if (volist) {
+    for (int i = 0; i < volist->current; i++) {
+      VO *vo = volist->vos[i];
+      if (!vo->voname)
+        exitError("Error: You must give a name to a VO!");
+
+      if (vo->hostcert == NULL)
+        exitError("Error: You must specify an host certificate!");
+
+      if (vo->hostkey == NULL)
+        exitError("Error: You must specify an host key!");
+
+      if (vo->vomslife < 0)
+        exitError("Error: Duration of AC must be positive.");
+    }
+  }
+
+  return true;
+}
+
+struct nullstream: std::ostream {
+  struct nullbuf: std::streambuf {
+    int overflow(int c) { return traits_type::not_eof(c); }
+  } m_sbuf;
+  nullstream(): std::ios(&m_sbuf), std::ostream(&m_sbuf) {}
+};
+
+nullstream voidstream;
+
+std::ostream& Fake::Print(message_type type) 
+{
+  if (type == FORCED)
+    return std::cout;
+
+  if (type == ERROR)
+    return std::cerr;
+
+  if (quiet)
+    return voidstream;
+
+  if (type == WARN)
+    return std::cerr;
+
+  if (type == DEBUG && !debug)
+    return voidstream;
+
+  return std::cout;
 }

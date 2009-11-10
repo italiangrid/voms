@@ -3,9 +3,10 @@
  * Authors: Vincenzo Ciaschini - Vincenzo.Ciaschini@cnaf.infn.it 
  *          Valerio Venturi - Valerio.Venturi@cnaf.infn.it 
  *
- * Copyright (c) 2002, 2003 INFN-CNAF on behalf of the EU DataGrid.
+ * Copyright (c) 2002-2009 INFN-CNAF on behalf of the EU DataGrid
+ * and EGEE I, II and III
  * For license conditions see LICENSE file or
- * http://www.edg.org/license.html
+ * http://www.apache.org/licenses/LICENSE-2.0.txt
  *
  * Parts of this code may be based upon or even include verbatim pieces,
  * originally written by other people, in which case the original header
@@ -14,6 +15,8 @@
  *********************************************************************/
 #ifndef VOMS_UTILS_VOMSFAKE_H
 #define VOMS_UTILS_VOMSFAKE_H
+
+#include "config.h"
 
 #include <string>
 #include <vector>
@@ -24,8 +27,10 @@ extern "C" {
   
 #include "sslutils.h"
 #include "newformat.h"
-  
+#include "parsertypes.h"  
 }
+
+enum message_type {FORCED, INFO, WARN, ERROR, DEBUG};
 
 class Fake {
 
@@ -92,6 +97,7 @@ class Fake {
   std::string hostcert, hostkey;
 
   bool newformat;
+  std::string newsubject;
  public:
   
   Fake(int argc, char** argv);
@@ -100,16 +106,12 @@ class Fake {
 
  private:
   
-  bool CreateProxy(std::string data, std::string filedata, AC ** aclist, BIGNUM * dataorder, int version);
-  X509_EXTENSION * CreateProxyExtension(std::string name, std::string data, bool crit = false);
+  bool CreateProxy(std::string filedata, AC ** aclist, int version);
 
-  bool Retrieve();
+  bool Retrieve(VOLIST *list);
   
   // write AC and data retrieved form server to file
   bool WriteSeparate();
-  
-  // include a file in a non critical extension
-  bool IncludeFile(std::string& filedata);
   
   // test if certificate used for signing is expired
   void Test();
@@ -122,6 +124,10 @@ class Fake {
   // get openssl error */
   void Error();
 
+  bool VerifyOptions();
+  void exitError(const char *message);
+  std::ostream& Print(message_type type);
+  bool rfc;
 };
 
 #endif

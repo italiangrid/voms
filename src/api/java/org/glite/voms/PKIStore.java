@@ -2,9 +2,10 @@
  *
  * Authors: Vincenzo Ciaschini - Vincenzo.Ciaschini@cnaf.infn.it
  *
- * Copyright (c) 2002, 2003, 2004, 2005, 2006 INFN-CNAF on behalf of the 
- * EGEE project.
- * For license conditions see LICENSE
+ * Copyright (c) 2002-2009 INFN-CNAF on behalf of the EU DataGrid
+ * and EGEE I, II and III
+ * For license conditions see LICENSE file or
+ * http://www.apache.org/licenses/LICENSE-2.0.txt
  *
  * Parts of this code may be based upon or even include verbatim pieces,
  * originally written by other people, in which case the original header
@@ -36,7 +37,6 @@ import java.util.Vector;
 import javax.security.auth.x500.X500Principal;
 
 import org.apache.log4j.Logger;
-import org.bouncycastle.jce.X509Principal;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.glite.voms.ac.VOMSTrustStore;
 
@@ -55,6 +55,8 @@ public class PKIStore implements VOMSTrustStore {
     private Hashtable signings     = null;
     private Hashtable lscfiles     = null;
     private Hashtable vomscerts    = null;
+    private long      lastmodified = 0;
+    private int       instances    = 1;
 
     private static Logger logger = Logger.getLogger(PKIStore.class.getName());
 
@@ -154,6 +156,18 @@ public class PKIStore implements VOMSTrustStore {
     public synchronized void refresh() {
         PKIStore newReader = null;
 
+        File f = new File(certDir);
+
+        /* The code below did not work.  In place changes to a file do not 
+           change the lastmodified date of the directory, only the 
+           lastaccessed, and java does not provide a way to determine the
+           latter. */
+        /*
+        if (f.lastModified() == lastmodified) {
+            logger.debug("No changes to directory -- Do not refresh");
+            return;
+        }
+        */
         try {
             newReader = new PKIStore(certDir, type, aggressive, false);
         } 
@@ -166,32 +180,31 @@ public class PKIStore implements VOMSTrustStore {
                 newReader.stopRefresh();
         }
         
-        //        Hashtable tmp = null;
+        try {
+            certificates.clear();
+            certificates = newReader.certificates;
+            newReader.certificates = null;
 
-         try {
-             certificates.clear();
-             certificates = newReader.certificates;
-             newReader.certificates = null;
+            crls.clear();
+            crls = newReader.crls;
+            newReader.crls = null;
 
-             crls.clear();
-             crls = newReader.crls;
-             newReader.crls = null;
+            signings.clear();
+            signings = newReader.signings;
+            newReader.signings = null;
 
-             signings.clear();
-             signings = newReader.signings;
-             newReader.signings = null;
+            lscfiles.clear();
+            lscfiles = newReader.lscfiles;
+            newReader.lscfiles = null;
 
-             lscfiles.clear();
-             lscfiles = newReader.lscfiles;
-             newReader.lscfiles = null;
-
-             vomscerts.clear();
-             vomscerts = newReader.vomscerts;
-             newReader.vomscerts = null;
-         }
-         finally {
-             newReader = null;
-         }
+            vomscerts.clear();
+            vomscerts = newReader.vomscerts;
+            newReader.vomscerts = null;
+            lastmodified = f.lastModified();
+        }
+        finally {
+            newReader = null;
+        }
     }
 
     PKIStore(String dir, int type, boolean aggressive, boolean timer)  throws IOException, CertificateException, CRLException {
@@ -207,52 +220,73 @@ public class PKIStore implements VOMSTrustStore {
             throw new IllegalArgumentException("Unsupported value for type parameter in PKIReader constructor");
 
         if ((dir == null) || dir.equals("")) {
-            if (type == TYPE_VOMSDIR)
-                dir = DEFAULT_VOMSDIR;
-            else if (type == TYPE_CADIR)
-                dir = DEFAULT_CADIR;
+            if (type == TYPE_VOMSDIR) {
+                dir = System.getProperty("VOMSDIR");
+                if (dir == null)
+                    dir = DEFAULT_VOMSDIR;
+            }
+            else if (type == TYPE_CADIR) {
+                dir = System.getProperty("CADIR");
+                if (dir == null)
+                    dir = DEFAULT_CADIR;
+            }
         }
 
+        logger.info("Initializing "+ ((type == TYPE_VOMSDIR) ? "VOMS": "CA") + " certificate store from directory: "+dir);
         
         // Some sanity checks on VOMSDIR and CA dir
         File theDir = new File(dir);
         
         if (!theDir.exists()){
          
-            StringBuffer message = new StringBuffer();
-            message.append( "Directory "+dir+" doesn't exist on this machine!" );
-            if (type == TYPE_VOMSDIR)
-                message.append(" Please specify a value for the vomsdir directory or set the VOMSDIR system property.");
-            else
+            if (type == TYPE_CADIR) {
+                StringBuffer message = new StringBuffer();
+                message.append("Directory ");
+                message.append(dir);
+                message.append(" doesn't exist on this machine!");
                 message.append(" Please specify a value for the cadir directory or set the CADIR system property.");
-            
-            throw new FileNotFoundException(message.toString());
-            
-        }
-        
-        if (!theDir.isDirectory()){
-            
-            throw new IllegalArgumentException(((type == TYPE_VOMSDIR)? "Voms certificate" : "CA certificate")+ 
-                    " directory passed as argument is not a directory! ["+theDir.getAbsolutePath()+"]");
+                throw new FileNotFoundException(message.toString());
+            }
+            else {
+                logger.warn("Please specify a value for the vomsdir directory or set the VOMSDIR system property.");
+            }
             
         }
         
-        if (theDir.list().length == 0){
+        if (theDir.exists()) {
+            if (!theDir.isDirectory()){
             
-            throw new IllegalArgumentException(((type == TYPE_VOMSDIR)? "Voms certificate" : "CA certificate")+ 
-                    " directory passed as argument is empty! ["+theDir.getAbsolutePath()+"]");
+                throw new IllegalArgumentException(((type == TYPE_VOMSDIR)? "Voms certificate" : "CA certificate")+ 
+                                                   " directory passed as argument is not a directory! ["+theDir.getAbsolutePath()+"]");
+            }
         }
         
+        if (theDir.exists()) {
+            if (theDir.list().length == 0){
+                if (type == TYPE_CADIR)
+                    throw new IllegalArgumentException("CA certificate directory passed as argument is empty! [" +
+                                                       theDir.getAbsolutePath()+"]");
+                else {
+                    logger.warn("Voms certificate directory passed as argument is empty! [" +
+                                theDir.getAbsolutePath() + "]");
+                    logger.warn("Validation of VOMS Attribute Certificate will likely fail.");
+                }
+            }
+        }
+
         certDir = dir;
         this.type = type;
 
-        load();
+        if (theDir.exists())
+            load();
+
+        lastmodified = theDir.lastModified();
 
         if (timer) {
             theTimer = new Timer(true);
-
             theTimer.scheduleAtFixedRate(new Refreshener(), 30000, 30000);
         }
+        instances = 1;
     }
 
     /**
@@ -285,6 +319,10 @@ public class PKIStore implements VOMSTrustStore {
         this(dir, type, true, true); 
     }
 
+    public PKIStore(int type) throws IOException, CertificateException, CRLException {
+        this(null, type, true, true);
+    }
+
     public PKIStore() {
         aggressive = true;
         certificates = new Hashtable(HASHCAPACITY);
@@ -292,6 +330,7 @@ public class PKIStore implements VOMSTrustStore {
         signings     = new Hashtable(HASHCAPACITY);
         lscfiles     = new Hashtable(HASHCAPACITY);
         vomscerts    = new Hashtable(HASHCAPACITY);
+        instances = 1;
     }
 
 
@@ -317,9 +356,18 @@ public class PKIStore implements VOMSTrustStore {
      * object.  The penalty for not doing it is a memor leak.
      */
     public void stopRefresh() {
-        if (theTimer != null)
-            theTimer.cancel();
-        theTimer = null;
+        if (instances != 0)
+            instances --;
+
+        if (instances == 0) {
+            if (theTimer != null)
+                theTimer.cancel();
+            theTimer = null;
+        }
+    }
+
+    protected void addInstance() {
+        instances++;
     }
 
     /**
@@ -332,7 +380,7 @@ public class PKIStore implements VOMSTrustStore {
         aggressive = b;
     }
 
-    private class Couple {
+    private static class Couple {
         Object first;
         Object second;
 
@@ -353,8 +401,6 @@ public class PKIStore implements VOMSTrustStore {
      */
     public LSCFile getLSC(String voName, String hostName) {
         Hashtable lscList = (Hashtable)lscfiles.get(voName);
-        //            if (lscList == null)
-        //                lscList = (Hashtable)lscfiles.get("");
 
         if (lscList != null) {
             return (LSCFile)lscList.get(hostName);
@@ -504,26 +550,10 @@ public class PKIStore implements VOMSTrustStore {
         }
     }
 
-    private void load(X509CRL[] crls) {
-        int len = crls.length;
-
-        for (int i = 0; i < len; i++) {
-            load(crls[i]);
-        }
-    }
-
     private void load(SigningPolicy sp) {
         String key = sp.getName();
 
         signings.put(key, sp);
-    }
-
-    private void load(SigningPolicy[] sps) {
-        int len = sps.length;
-
-        for (int i = 0; i < len; i++) {
-            load(sps[i]);
-        }
     }
 
     private void load(LSCFile lsc, String vo) {
@@ -540,15 +570,6 @@ public class PKIStore implements VOMSTrustStore {
 
         lscList.put(key, lsc);
     }
-
-    private void load(LSCFile[] lscs, String vo) {
-        int len = lscs.length;
-
-        for (int i = 0; i < len; i++) {
-            load(lscs[i], vo);
-        }
-    }
-
 
     private void getForCA(File file) throws IOException, CertificateException, CRLException {
         File[] files = file.listFiles();
@@ -573,14 +594,6 @@ public class PKIStore implements VOMSTrustStore {
                     }
                     else if (value == SIGN) {
                         load((SigningPolicy)c.first);
-//                         if (logger.isDebugEnabled()) {
-//                             logger.debug("Access_id_CA: " + ((SigningPolicy)c.first).getAccessIDCA());
-//                             logger.debug("Pos_rights  : " + ((SigningPolicy)c.first).getPosRights());
-//                             Vector subjects = ((SigningPolicy)c.first).getCondSubjects();
-//                             ListIterator li = subjects.listIterator();
-//                             while (li.hasNext())
-//                                 logger.debug("Subject     : " + (String)li.next());
-//                         }
                     }
                 }
             }
@@ -647,7 +660,7 @@ public class PKIStore implements VOMSTrustStore {
                         }
                     }
                 }
-                else if (vo == "")
+                else if (vo.equals(""))
                     getForVOMS(f, f.getName());
                 f = null;
             }
@@ -672,23 +685,16 @@ public class PKIStore implements VOMSTrustStore {
                 if (!aggressive)
                     throw e;
             }
-//             catch(Exception e) {
-//                 logger.error(e.getMessage(), e);
-//                 f = null;
-
-//                 if (!aggressive)
-//                     throw e;
-//             }
         }
     }
 
     private Couple getObject(File f) throws IOException, CertificateException, CRLException {
         if (f.getName().matches(".*\\.lsc")) {
-            return new Couple(new LSCFile(f), new Integer(LSC));
+            return new Couple(new LSCFile(f), Integer.valueOf(LSC));
         }
 
         if (f.getName().matches(".*\\.signing_policy")) {
-            return new Couple(new SigningPolicy(f), new Integer(SIGN));
+            return new Couple(new SigningPolicy(f), Integer.valueOf(SIGN));
 
         }
 
@@ -703,10 +709,10 @@ public class PKIStore implements VOMSTrustStore {
         }
 
         if (o instanceof X509CRL)
-            return new Couple(o, new Integer(CRL));
+            return new Couple(o, Integer.valueOf(CRL));
 
         if (o instanceof List)
-            return new Couple(o, new Integer(CERT));
+            return new Couple(o, Integer.valueOf(CERT));
 
         return null;
     }

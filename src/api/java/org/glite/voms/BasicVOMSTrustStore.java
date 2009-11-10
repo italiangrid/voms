@@ -1,3 +1,18 @@
+/*********************************************************************
+ *
+ * Authors: Vincenzo Ciaschini - Vincenzo.Ciaschini@cnaf.infn.it 
+ *          Valerio Venturi    - Valerio.Venturi@cnaf.infn.it
+ *
+ * Copyright (c) 2002-2009 INFN-CNAF on behalf of the EU DataGrid
+ * and EGEE I, II and III
+ * For license conditions see LICENSE file or
+ * http://www.apache.org/licenses/LICENSE-2.0.txt
+ *
+ * Parts of this code may be based upon or even include verbatim pieces,
+ * originally written by other people, in which case the original header
+ * follows.
+ *
+ *********************************************************************/
 /*
  * Copyright (c) Members of the EGEE Collaboration. 2004.
  * See http://eu-egee.org/partners/ for details on the copyright holders.
@@ -172,67 +187,6 @@ class FileEndingIterator {
     }
 }
 
-// class PrivateKeyReader {
-//     public static PrivateKeyReader instance(String filename) {
-//         return new PrivateKeyReader(new File(filename));
-//     }
-
-//     public static PrivateKeyReader instance(File file) {
-//         return new PrivateKeyReader(file);
-//     }
-
-//     private BufferedInputStream stream;
-
-//     private PrivateKeyReader(File file) {
-//         stream = new BufferedInputStream(new FileInputStream(file));
-//     }
-
-//     public PrivateKey readKey() {
-//         return readKey(null);
-//     }
-
-//     public PrivateKey readKey(byte[] password) {
-//         skipComments(stream);
-
-//     }
-
-//     private void skipComments(BufferedInputStream stream) throws IOException {
-//         byte[] b = new byte[BUF_LEN]; // the byte buffer
-//         stream.mark(BUF_LEN + 2); // mark the beginning
-
-//         while (stream.available() > 0) { // check that there are still something to read
-
-//             int num = stream.read(b); // read bytes from the file to the byte buffer
-//             String buffer = new String(b, 0, num); // generate a string from the byte buffer
-//             int index = buffer.indexOf("----BEGIN RSA PRIVATE KEY"); // check if the certificate beginning is in the chars read this time
-
-//             if (index == -1) { // not found
-//                 // System.out.println("skipping:" + buffer);
-//                 stream.reset(); // rewind the file to the beginning of the last read
-//                 stream.skip(BUF_LEN - 100); // skip only part of the way as the "----BEGIN" can be in the transition of two 1000 char block
-//                 stream.mark(BUF_LEN + 2); // mark the new position
-//             } else { // found
-
-//                 while ((buffer.charAt(index - 1) == '-') && (index > 0)) { // search the beginnig of the ----BEGIN tag
-//                     index--;
-
-//                     if (index == 0) { // prevent charAt test when reaching the beginning of buffer
-
-//                         break;
-//                     }
-//                 }
-
-//                 // System.out.println("Last skip:" + buffer.substring(0, index));
-//                 stream.reset(); // rewind to the beginning of the last read
-//                 stream.skip(index); // skip to the beginning of the tag
-//                 stream.mark(10000); // mark the position
-
-//                 return;
-//             }
-//         }
-//     }
-// }
-
 /** Reads all certificates from given files, accepts binary form of DER encoded certs and
  * the Base64 form of the DER encoded certs (PEM). The base64 certs can contain garbage in front of
  * the actual certificate that has to begin with "-----BEGIN".
@@ -338,9 +292,7 @@ class FileCertReader {
         BufferedInputStream fis = new BufferedInputStream(new FileInputStream(keyfile));
         skipToKeyBeginning(fis);
 
-        PrivateKey key = (PrivateKey) PrivateKeyInfo.getInstance(new ASN1InputStream(fis).readObject()).getPrivateKey();
-
-        return key;
+        return (PrivateKey) PrivateKeyInfo.getInstance(new ASN1InputStream(fis).readObject()).getPrivateKey();
     }
 
     /** Reads the certificates from the files defined in the
@@ -407,13 +359,10 @@ class FileCertReader {
 
         try {
             // load CA certificates
-            //            System.out.println("Reading CA certificates");
             DirectoryList dir = new DirectoryList(files); // get the list of files matching CAFiles
 
             Iterator CAFileIter = dir.getListing().iterator();
 
-            // create a iterator that returns inputsteam for all the files from dir CAPath with ending CAEnding
-            //            FileEndingIterator CAFileIter = new FileEndingIterator(CAPath, CAEnding);
             // go through the files
             while (CAFileIter.hasNext()) { // go through the files reading the certificates
 
@@ -424,7 +373,6 @@ class FileCertReader {
         } catch (IOException e) {
             logger.fatal("Error while reading certificates or CRLs: " + e.getMessage());
 
-            //            e.printStackTrace();
             throw new CertificateException("Error while reading certificates or CRLs: " +
                 e.getMessage());
         }
@@ -440,7 +388,6 @@ class FileCertReader {
      * @return Returns the Vector of objects read form the file.
      */
     public Vector readFile(File certFile, int type) throws IOException {
-        //                System.out.println("Opening " + nextFile.toString());
         BufferedInputStream binStream = null;
         Vector objects = new Vector();
 
@@ -461,7 +408,6 @@ class FileCertReader {
             logger.fatal("Error while reading certificates or crls from file " +
                 certFile.toString() + "error was: " + e.getMessage());
 
-            //            e.printStackTrace();
             throw new IOException("Error while reading certificates or crls from file " +
                 certFile.toString() + "error was: " + e.getMessage());
         } finally {
@@ -498,29 +444,18 @@ class FileCertReader {
                     skipToCertBeginning(binStream); // skip the garbage
                 }
 
-                byte[] b = new byte[1000];
                 binStream.mark(100000);
 
-                /*                            System.out.println("The file contains:--------------");
-                   while(binStream.available()>0){
-                       int num = binStream.read(b);
-                       System.out.println(new String(b, 0, num));
-                   }
-                   System.out.println("The file ends-------------------");
-                 */
                 binStream.reset();
 
-                //                                System.out.println("Reading certificate form file"  + nextFile.toString() + " Available bytes:" + binStreamCA.available());
                 object = readObject(binStream, type);
             } catch (Exception e) {
                 if (errors != 0) { // if the error persists after first pass, fail
-                    //                    e.printStackTrace();
                     logger.error("Certificate or CRL reading failed: " + e.getMessage());
                     throw new CertificateException("Certificate or CRL reading failed: " +
                         e.getMessage());
                 }
 
-                //                                System.out.println("Trying again");
                 errors = 1; // first try failed, try again with skipping
                 binStream.reset(); // rewind the file to the beginning of this try
             }
@@ -589,7 +524,6 @@ class FileCertReader {
             int index = buffer.indexOf("----BEGIN"); // check if the certificate beginning is in the chars read this time
 
             if (index == -1) { // not found
-                //                System.out.println("skipping:" + buffer);
                 stream.reset(); // rewind the file to the beginning of the last read
                 stream.skip(BUF_LEN - 100); // skip only part of the way as the "----BEGIN" can be in the transition of two 1000 char block
                 stream.mark(BUF_LEN + 2); // mark the new position
@@ -604,7 +538,6 @@ class FileCertReader {
                     }
                 }
 
-                //                System.out.println("Last skip:" + buffer.substring(0, index));
                 stream.reset(); // rewind to the beginning of the last read
                 stream.skip(index); // skip to the beginning of the tag
                 stream.mark(10000); // mark the position
@@ -629,7 +562,6 @@ class FileCertReader {
                 index = buffer.indexOf("----BEGIN ENCRYPTED");
 
             if (index == -1) { // not found
-                // System.out.println("skipping:" + buffer);
                 stream.reset(); // rewind the file to the beginning of the last read
                 stream.skip(BUF_LEN - 100); // skip only part of the way as the "----BEGIN" can be in the transition of two 1000 char block
                 stream.mark(BUF_LEN + 2); // mark the new position
@@ -644,7 +576,6 @@ class FileCertReader {
                     }
                 }
 
-                // System.out.println("Last skip:" + buffer.substring(0, index));
                 stream.reset(); // rewind to the beginning of the last read
                 stream.skip(index); // skip to the beginning of the tag
                 stream.mark(10000); // mark the position
@@ -799,7 +730,6 @@ public final class BasicVOMSTrustStore implements ACTrustStore {
     String trustedDirList = null;
     private Hashtable issuerCerts = new Hashtable();
     private long refreshPeriod = -1;
-    private String path = null;
     private Timer theTimer = null;
 
     /**

@@ -32,7 +32,7 @@ PRE_UNINSTALL = :
 POST_UNINSTALL = :
 build_triplet = @build@
 host_triplet = @host@
-sbin_PROGRAMS = voms$(EXEEXT)
+@BUILD_SERVER_TRUE@sbin_PROGRAMS = voms$(EXEEXT)
 subdir = src/server
 DIST_COMMON = $(srcdir)/Makefile.am $(srcdir)/Makefile.in
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
@@ -47,21 +47,22 @@ CONFIG_CLEAN_FILES =
 am__installdirs = "$(DESTDIR)$(sbindir)"
 sbinPROGRAMS_INSTALL = $(INSTALL_PROGRAM)
 PROGRAMS = $(sbin_PROGRAMS)
-am_voms_OBJECTS = main.$(OBJEXT) vomsd.$(OBJEXT) uuid.$(OBJEXT) \
-	attribute.$(OBJEXT)
+am__voms_SOURCES_DIST = main.cc vomsd.cc VOMSServer.h attribute.h \
+	uuid.c uuid.h attribute.cc
+@BUILD_SERVER_TRUE@am_voms_OBJECTS = main.$(OBJEXT) vomsd.$(OBJEXT) \
+@BUILD_SERVER_TRUE@	uuid.$(OBJEXT) attribute.$(OBJEXT)
 voms_OBJECTS = $(am_voms_OBJECTS)
 am__DEPENDENCIES_1 =
-voms_DEPENDENCIES =  \
-	$(top_builddir)/src/socklib/$(USE_SOCK_LIB_SERVER) \
-	$(top_builddir)/src/common/libutilities.la \
-	$(top_builddir)/src/sslutils/$(USE_SSL_UTILS_LIB) \
-	$(top_builddir)/src/ac/$(USE_CCATTCERT_LIB) \
-	$(top_builddir)/src/common/libutilc.la \
-	$(top_builddir)/src/ac/$(USE_ATTCERT_LIB) \
-	$(top_builddir)/src/replib/librep.la \
-	$(top_builddir)/src/log/liblog.la \
-	$(top_builddir)/src/api/ccapi/$(USE_CCAPI_LIB) \
-	$(am__DEPENDENCIES_1)
+@BUILD_SERVER_TRUE@voms_DEPENDENCIES = $(top_builddir)/src/socklib/$(USE_SOCK_LIB_SERVER) \
+@BUILD_SERVER_TRUE@	$(top_builddir)/src/common/libutilities.la \
+@BUILD_SERVER_TRUE@	$(top_builddir)/src/sslutils/$(USE_SSL_UTILS_LIB) \
+@BUILD_SERVER_TRUE@	$(top_builddir)/src/ac/$(USE_CCATTCERT_LIB) \
+@BUILD_SERVER_TRUE@	$(top_builddir)/src/common/libutilc.la \
+@BUILD_SERVER_TRUE@	$(top_builddir)/src/ac/$(USE_ATTCERT_LIB) \
+@BUILD_SERVER_TRUE@	$(top_builddir)/src/replib/librep.la \
+@BUILD_SERVER_TRUE@	$(top_builddir)/src/log/liblog.la \
+@BUILD_SERVER_TRUE@	$(top_builddir)/src/api/ccapi/$(USE_CCAPI_LIB) \
+@BUILD_SERVER_TRUE@	$(am__DEPENDENCIES_1)
 voms_LINK = $(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) \
 	--mode=link $(CXXLD) $(AM_CXXFLAGS) $(CXXFLAGS) \
 	$(voms_LDFLAGS) $(LDFLAGS) -o $@
@@ -87,7 +88,7 @@ CXXLINK = $(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) \
 	--mode=link $(CXXLD) $(AM_CXXFLAGS) $(CXXFLAGS) $(AM_LDFLAGS) \
 	$(LDFLAGS) -o $@
 SOURCES = $(voms_SOURCES)
-DIST_SOURCES = $(voms_SOURCES)
+DIST_SOURCES = $(am__voms_SOURCES_DIST)
 ETAGS = etags
 CTAGS = ctags
 DISTFILES = $(DIST_COMMON) $(DIST_SOURCES) $(TEXINFOS) $(EXTRA_DIST)
@@ -275,32 +276,32 @@ with_dbuser = @with_dbuser@
 with_mysqlconf = @with_mysqlconf@
 with_reportdir = @with_reportdir@
 with_scratchdir = @with_scratchdir@
-voms_SOURCES = \
-	main.cc \
-	vomsd.cc \
-	VOMSServer.h \
-	attribute.h \
-	uuid.c \
-	uuid.h \
-	attribute.cc
+@BUILD_SERVER_TRUE@voms_SOURCES = \
+@BUILD_SERVER_TRUE@	main.cc \
+@BUILD_SERVER_TRUE@	vomsd.cc \
+@BUILD_SERVER_TRUE@	VOMSServer.h \
+@BUILD_SERVER_TRUE@	attribute.h \
+@BUILD_SERVER_TRUE@	uuid.c \
+@BUILD_SERVER_TRUE@	uuid.h \
+@BUILD_SERVER_TRUE@	attribute.cc
 
-voms_LDADD = \
-	$(top_builddir)/src/socklib/$(USE_SOCK_LIB_SERVER) \
-	$(top_builddir)/src/common/libutilities.la \
-	$(top_builddir)/src/sslutils/$(USE_SSL_UTILS_LIB) \
-	$(top_builddir)/src/ac/$(USE_CCATTCERT_LIB) \
-	$(top_builddir)/src/common/libutilc.la \
-	$(top_builddir)/src/ac/$(USE_ATTCERT_LIB) \
-	$(top_builddir)/src/replib/librep.la \
-	$(top_builddir)/src/log/liblog.la \
-	$(top_builddir)/src/api/ccapi/$(USE_CCAPI_LIB) \
-	$(EXPAT_LIBS)
+@BUILD_SERVER_TRUE@voms_LDADD = \
+@BUILD_SERVER_TRUE@	$(top_builddir)/src/socklib/$(USE_SOCK_LIB_SERVER) \
+@BUILD_SERVER_TRUE@	$(top_builddir)/src/common/libutilities.la \
+@BUILD_SERVER_TRUE@	$(top_builddir)/src/sslutils/$(USE_SSL_UTILS_LIB) \
+@BUILD_SERVER_TRUE@	$(top_builddir)/src/ac/$(USE_CCATTCERT_LIB) \
+@BUILD_SERVER_TRUE@	$(top_builddir)/src/common/libutilc.la \
+@BUILD_SERVER_TRUE@	$(top_builddir)/src/ac/$(USE_ATTCERT_LIB) \
+@BUILD_SERVER_TRUE@	$(top_builddir)/src/replib/librep.la \
+@BUILD_SERVER_TRUE@	$(top_builddir)/src/log/liblog.la \
+@BUILD_SERVER_TRUE@	$(top_builddir)/src/api/ccapi/$(USE_CCAPI_LIB) \
+@BUILD_SERVER_TRUE@	$(EXPAT_LIBS)
 
-voms_LDFLAGS = 
-AM_CPPFLAGS = \
-	-I$(top_srcdir)/src/include \
-	-I$(top_srcdir)/src/api/ccapi \
-	$(GLOBUS_CFLAGS)
+@BUILD_SERVER_TRUE@voms_LDFLAGS = 
+@BUILD_SERVER_TRUE@AM_CPPFLAGS = \
+@BUILD_SERVER_TRUE@	-I$(top_srcdir)/src/include \
+@BUILD_SERVER_TRUE@	-I$(top_srcdir)/src/api/ccapi \
+@BUILD_SERVER_TRUE@	$(GLOBUS_CFLAGS)
 
 all: all-am
 
@@ -530,6 +531,7 @@ distclean-generic:
 maintainer-clean-generic:
 	@echo "This command is intended for maintainers to use"
 	@echo "it deletes files that may require special tools to rebuild."
+@BUILD_SERVER_FALSE@install-exec-hook:
 clean: clean-am
 
 clean-am: clean-generic clean-libtool clean-sbinPROGRAMS \
@@ -608,9 +610,9 @@ uninstall-am: uninstall-sbinPROGRAMS
 	tags uninstall uninstall-am uninstall-sbinPROGRAMS
 
 
-install-exec-hook:
-	-ln -s voms $(DESTDIR)$(sbindir)/edg-voms
-@ENABLE_GLITE_TRUE@	-ln -s voms $(DESTDIR)$(sbindir)/glite-voms
+@BUILD_SERVER_TRUE@install-exec-hook:
+@BUILD_SERVER_TRUE@	-ln -s voms $(DESTDIR)$(sbindir)/edg-voms
+@BUILD_SERVER_TRUE@@ENABLE_GLITE_TRUE@	-ln -s voms $(DESTDIR)$(sbindir)/glite-voms
 # Tell versions [3.59,3.63) of GNU make to not export all variables.
 # Otherwise a system limit (for SysV at least) may be exceeded.
 .NOEXPORT:

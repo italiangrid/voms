@@ -189,12 +189,12 @@ killprocs() {
             if checkpid $pid 2>&1; then
 			   # TERM first, then KILL if not dead
                 kill -TERM $pid
-                usleep 100000
+                sleep 0.1
                 if checkpid $pid && sleep 1 &&
                     checkpid $pid && sleep 3 &&
                     checkpid $pid ; then
                     kill -KILL $pid
-                    usleep 100000
+                    sleep 0.1
                 fi
 		        fi
             checkpid $pid
@@ -235,7 +235,7 @@ function stop() {
         if test -f $@LOCATION_ENV@/etc/voms/$vo/voms.conf ; then
             echo -n "Stopping $prog($vo): "
 #	    pids=$(ps axo pid,args | grep "${voms} --conf $@LOCATION_ENV@/etc/voms/$vo/voms.conf" | grep -v grep | cut -f 1 -d '/')
-            pids=`ps -efww | grep "$@LOCATION_ENV@/sbin/edg-voms --conf $@LOCATION_ENV@/etc/voms/$vo/voms.conf" | grep -v grep|awk '{ print $2; }'`
+            pids=`ps -efww | grep "$@LOCATION_ENV@/sbin/edg-voms --conf $@LOCATION_ENV@/etc/voms/$vo/voms.conf" | grep -v grep|awk '{ print $2; }'|tr '\n' ' '`
             dbname=`grep dbname $@LOCATION_ENV@/etc/voms/$vo/voms.conf | awk -F"=" '{ print $2; }'`
             username=`grep username $@LOCATION_ENV@/etc/voms/$vo/voms.conf | awk -F"=" '{ print $2; }'`
             if test "x$username" = "x"; then
@@ -259,7 +259,9 @@ function stop() {
                 RETVAL=1
                 continue
             fi
-            killprocs ${pids}
+            for pid in $pids; do
+                killprocs ${pid} ;
+            done
             RETVAL=$?
             echo
             [ $RETVAL -eq 0 ] && rm -f /var/lock/subsys/voms.$vo
@@ -330,6 +332,36 @@ function getstatus() {
     return $value
 }
 
+function reload() {
+    RETGLOB=0
+    # Stop daemons.
+    prog=`basename ${voms}`
+    if test -z $1; then
+        vos=`ls $@LOCATION_ENV@/etc/voms`
+    else
+        vos=$1
+    fi
+
+    for vo in $vos ; do
+        if test -f $@LOCATION_ENV@/etc/voms/$vo/voms.conf ; then
+            echo -n "Reload $prog($vo): "
+            pids=`ps -efww | grep "$@LOCATION_ENV@/sbin/edg-voms --conf $@LOCATION_ENV@/etc/voms/$vo/voms.conf" | grep -v grep | awk '{ print $2; }'`
+	    if test -z "$pids"; then
+		failure; echo
+		RETVAL=1
+		continue
+	    else
+		kill -HUP $pids
+	    fi
+	    RETVAL=$?
+            RETGLOB=$((RETGLOB + RETVAL))
+	fi
+    done
+
+    return $RETGLOB
+}
+
+
 # See how we were called.
 case "$1" in
     start)
@@ -353,9 +385,14 @@ case "$1" in
         condrestart $2
         RETVAL=$?
         ;;
+    reload)
+	reload $2
+	RETVAL=$?
+	;;
     *)
         echo $"Usage: $0 {start|stop|restart|status|condrestart} [VO]"
         RETVAL=1
 esac
 
 exit $RETVAL
+

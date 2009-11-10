@@ -1,15 +1,15 @@
 
-defaultsysconfdir = $(prefix)/etc
+defaultsysconfdir = @sysconfdir@
 
 defaultsysconf_DATA = \
 	vomses.template
 
-sysconfdir = $(prefix)/etc/voms
+sysconfdir = @sysconfdir@/voms
 
 sysconf_DATA = \
 	voms.data
 
-libexecdir = $(prefix)/libexec/voms
+libexecdir = @libexecdir@/voms
 
 libexec_SCRIPTS = \
 	voms_install_db \
@@ -17,7 +17,7 @@ libexec_SCRIPTS = \
 	voms-ping \
 	mysql2oracle
 
-initdir = $(prefix)/etc/init.d
+initdir = @sysconfdir@/init.d
 
 EXTRA_DIST = \
 	vomses.template \

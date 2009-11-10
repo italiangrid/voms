@@ -223,7 +223,7 @@ includedir = @includedir@
 infodir = @infodir@
 install_sh = @install_sh@
 libdir = @libdir@
-libexecdir = $(prefix)/libexec/voms
+libexecdir = @libexecdir@/voms
 localedir = @localedir@
 localstatedir = @localstatedir@
 lt_ECHO = @lt_ECHO@
@@ -237,7 +237,7 @@ psdir = @psdir@
 sbindir = @sbindir@
 sharedstatedir = @sharedstatedir@
 srcdir = @srcdir@
-sysconfdir = $(prefix)/etc/voms
+sysconfdir = @sysconfdir@/voms
 target_alias = @target_alias@
 top_build_prefix = @top_build_prefix@
 top_builddir = @top_builddir@
@@ -247,7 +247,7 @@ with_dbuser = @with_dbuser@
 with_mysqlconf = @with_mysqlconf@
 with_reportdir = @with_reportdir@
 with_scratchdir = @with_scratchdir@
-defaultsysconfdir = $(prefix)/etc
+defaultsysconfdir = @sysconfdir@
 defaultsysconf_DATA = \
 	vomses.template
 
@@ -260,7 +260,7 @@ libexec_SCRIPTS = \
 	voms-ping \
 	mysql2oracle
 
-initdir = $(prefix)/etc/init.d
+initdir = @sysconfdir@/init.d
 EXTRA_DIST = \
 	vomses.template \
 	voms.data \

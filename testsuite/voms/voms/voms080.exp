@@ -1,0 +1,54 @@
+load_lib vomstest.exp
+testheader "See if voms-proxy-init returns correct message when the certificate expires."
+
+set temp ""
+
+proc myprolog {} {
+    if [info exists ::env(VOMS_LOCATION)] then {
+        set ::temp $::env(VOMS_LOCATION)
+    } else {
+        set ::temp ""
+    }
+    set ::env(VOMS_LOCATION) "/tmp"
+}
+
+proc myepilog {} {
+    if [string equal $::temp ""] then {
+        unset ::env(VOMS_LOCATION)
+    } else {
+        set ::env(VOMS_LOCATION) $::temp
+    }
+}
+
+proc mytest {} {
+    _activateCert mycert2
+
+    _vomsStart voms1
+    set outname [exec mktemp $::SCRATCHDIR/voms-proxy-init-XXXXXX]
+
+    set res [catch {set out [exec $::INSTALLDIR/bin/voms-proxy-init --voms voms1 >& $outname]}]
+
+    _vomsStop voms1
+
+    set uncorrect "Cannot find file or dir"
+    set out2 [exec cat $outname]
+
+    if [regexp $uncorrect $out2 dummy] then {
+        addlog $outname
+        testmessage "warning about missing dir present when it should not be."
+        return $::FAILTEST
+    } else {
+        return $::PASSTEST
+    }
+
+    if $res then {
+        testmessage "voms-proxy-init failed when it should not have."
+        addlog $outname
+        return $::FAILTEST
+    }
+}
+
+test_set_prolog myprolog
+test_set_epilog myepilog
+
+do_test

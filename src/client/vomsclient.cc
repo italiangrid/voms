@@ -3,9 +3,10 @@
  * Authors: Vincenzo Ciaschini - Vincenzo.Ciaschini@cnaf.infn.it 
  *          Valerio Venturi - Valerio.Venturi@cnaf.infn.it 
  *
- * Copyright (c) 2002, 2003 INFN-CNAF on behalf of the EU DataGrid.
+ * Copyright (c) 2002-2009 INFN-CNAF on behalf of the EU DataGrid
+ * and EGEE I, II and III
  * For license conditions see LICENSE file or
- * http://www.edg.org/license.html
+ * http://www.apache.org/licenses/LICENSE-2.0.txt
  *
  * Parts of this code may be based upon or even include verbatim pieces,
  * originally written by other people, in which case the original header
@@ -33,7 +34,6 @@ extern "C" {
 
 #include "replace.h"
 }
-
 #include <iostream>
 #include <fstream>
 #include <sstream>
@@ -54,11 +54,12 @@ extern "C" {
 extern "C" 
 {
 #include "myproxycertinfo.h"
+#include "proxy.h"
 }
 
 #include "init.h"
 
-static bool isAC(std::string data);
+static AC *getAC(const std::string& data);
 
 const std::string SUBPACKAGE      = "voms-proxy-init";
 
@@ -78,28 +79,29 @@ extern "C" {
 static int (*pw_cb)() = NULL;
 
 
-static int pwstdin_callback(char * buf, int num, int w) {
-  
+static int pwstdin_callback(char * buf, int num, UNUSED(int w)) 
+{
   int i;
   
   if (!(fgets(buf, num, stdin))) {
     std::cerr << "Failed to read pass-phrase from stdin" << std::endl;
     return -1;
   }
+
   i = strlen(buf);
+
   if (buf[i-1] == '\n') {
       buf[i-1] = '\0';
       i--;
   }
   return i;	
-  
 }
   
-static void kpcallback(int p, int n) {
-    
+static int kpcallback(int p, UNUSED(int n)) 
+{
   char c='B';
     
-  if (quiet) return;
+  if (quiet) return 0;
     
   if (p == 0) c='.';
   if (p == 1) c='+';
@@ -107,18 +109,14 @@ static void kpcallback(int p, int n) {
   if (p == 3) c='\n';
   if (!debug) c = '.';
   fputc(c,stderr);
-  
+
+  return 0;
 }
   
 extern int proxy_verify_cert_chain(X509 * ucert, STACK_OF(X509) * cert_chain, proxy_verify_desc * pvd);
 extern void proxy_verify_ctx_init(proxy_verify_ctx_desc * pvxd);
-  
 }
 
-static char *norep();
-int InitProxyCertInfoExtension(void);
-void *myproxycertinfo_s2i(struct v3_ext_method *method, struct v3_ext_ctx *ctx, char *data);
-char *myproxycertinfo_i2s(struct v3_ext_method *method, void *ext);
 
 class rand_wrapper 
 {
@@ -130,7 +128,7 @@ public:
     srand(seed);
   }
 
-  ptrdiff_t operator() (ptrdiff_t max)
+  UNUSED(ptrdiff_t operator() (ptrdiff_t max))
   {
     return static_cast<ptrdiff_t>(rand() % max);
   }
@@ -138,38 +136,40 @@ public:
 };
 
 Client::Client(int argc, char ** argv) :
-                                           ignorewarn(false),
-                                           failonwarn(false),
-                                           cacertfile(NULL),
-                                           certdir(NULL),
-                                           certfile(NULL),
-                                           keyfile(NULL),
-                                           confile(CONFILENAME),
-                                           userconf(""),
-                                           incfile(""),
-                                           separate(""),
-                                           bits(1024),
-                                           hours(12),
-                                           minutes(0),
-                                           ac_hours(12),
-                                           ac_minutes(0),
-                                           limit_proxy(false),
-                                           proxyver(0),
-                                           pathlength(-1),
-                                           verify(false),
-                                           noregen(false),
-                                           version(0),
+                                         ignorewarn(false),
+                                         failonwarn(false),
+                                         cacertfile(NULL),
+                                         certdir(NULL),
+                                         certfile(NULL),
+                                         keyfile(NULL),
+                                         confile(CONFILENAME),
+                                         userconf(""),
+                                         incfile(""),
+                                         separate(""),
+                                         bits(1024),
+                                         hours(12),
+                                         minutes(0),
+                                         ac_hours(12),
+                                         ac_minutes(0),
+                                         limit_proxy(false),
+                                         proxyver(0),
+                                         pathlength(-1),
+                                         verify(false),
+                                         noregen(false),
+                                         version(0),
 #ifdef CLASS_ADD
-                                           classs_add_buf(NULL),
-                                           class_add_buf_len(0),
+                                         class_add_buf(NULL),
+                                         class_add_buf_len(0),
 #endif 
-                                           dataorder(NULL),
-                                           aclist(NULL),
-                                           voID(""),
-                                           listing(false),
-                                           cert_chain(NULL),
-                                           ucert(NULL),
-                                           private_key(NULL)
+                                         dataorder(NULL),
+                                         aclist(NULL),
+                                         voID(""),
+                                         listing(false),
+                                         cert_chain(NULL),
+                                         ucert(NULL),
+                                         private_key(NULL),
+                                         timeout(-1),
+                                         v(NULL)
 {
   bool progversion = false;
   std::string valid;
@@ -243,7 +243,8 @@ Client::Client(int argc, char ** argv) :
       "    -failonwarn                    Treat warnings as errors.\n" \
       "    -list                          Show all available attributes.\n" \
       "    -rfc                           Creates RFC 3820 compliant proxy (synonymous with -proxyver 4)\n" \
-      "    -old                           Creates GT2 compliant proxy (synonymous with -proxyver 2)\n"
+      "    -old                           Creates GT2 compliant proxy (synonymous with -proxyver 2)\n" \
+      "    -timeout <num>                 Timeout for server connections, in seconds.\n"
       "\n";
 
     set_usage(LONG_USAGE);
@@ -292,6 +293,7 @@ Client::Client(int argc, char ** argv) :
 #ifdef CLASS_ADD
       {"classadd",        1, (int *)class_add_buf,OPT_STRING},
 #endif
+      {"timeout",         0,        &timeout,     OPT_NUM},
       {0, 0, 0, 0}
     };
 
@@ -299,7 +301,7 @@ Client::Client(int argc, char ** argv) :
       exit(1);
 
     if (!progversion && listing && vomses.size() != 1) {
-      std::cerr << "Exactly ONE voms server must be specified!\n" << std::endl;
+      Print(ERROR) << "Exactly ONE voms server must be specified!\n" << std::endl;
       exit(1);
     }
   }
@@ -328,6 +330,7 @@ Client::Client(int argc, char ** argv) :
       "    -noregen                       Use existing proxy certificate to connect to server and sign the new proxy.\n" \
       "    -ignorewarn                    Ignore warnings.\n" \
       "    -failonwarn                    Treat warnings as errors.\n" \
+      "    -timeout <num>                 Timeout for server connections, in seconds.\n" \
       "    -list                          Show all available attributes.\n" \
       "\n";
 
@@ -358,6 +361,7 @@ Client::Client(int argc, char ** argv) :
       {"ignorewarn",      0, (int *)&ignorewarn,  OPT_BOOL},
       {"failonwarn",      0, (int *)&failonwarn,  OPT_BOOL},
       {"list",            0, (int *)&listing,     OPT_BOOL},
+      {"timeout",         0,        &timeout,     OPT_NUM},
       {0, 0, 0, 0}
     };
 
@@ -365,14 +369,14 @@ Client::Client(int argc, char ** argv) :
       exit(1);
 
     if (!progversion && vomses.size() != 1) {
-      std::cerr << "Exactly ONE voms server must be specified!\n" << std::endl;
+      Print(ERROR) << "Exactly ONE voms server must be specified!\n" << std::endl;
       exit(1);
     }
   }
   
   /* wouldn't make sense */
 
-  if(debug)
+  if (debug)
     ignorewarn = failonwarn = quiet = false;
 
   if (quiet)
@@ -384,8 +388,8 @@ Client::Client(int argc, char ** argv) :
   /* show version and exit */
   
   if (progversion) {
-    std::cout << SUBPACKAGE << "\nVersion: " << VERSION << std::endl;
-    std::cout << "Compiled: " << __DATE__ << " " << __TIME__ << std::endl;
+    Print(FORCED) << SUBPACKAGE << "\nVersion: " << VERSION << std::endl;
+    Print(FORCED) << "Compiled: " << __DATE__ << " " << __TIME__ << std::endl;
     exit(0);
   }
 
@@ -393,11 +397,11 @@ Client::Client(int argc, char ** argv) :
 
   version = globus(version);
   if (version == 0) {
-    version = 22;
-    if(debug) std::cout << "Unable to discover Globus version: trying for 2.2" << std::endl;
+    version = 24;
+    Print(DEBUG) << "Unable to discover Globus version: trying for 2.4" << std::endl;
   }
   else 
-    if(debug) std::cout << "Detected Globus version: " << version << std::endl;
+    Print(DEBUG) << "Detected Globus version: " << version/10 << "." << version % 10 << std::endl;
   
   /* set proxy version */
   if (rfc)
@@ -406,45 +410,44 @@ Client::Client(int argc, char ** argv) :
   if (old)
     proxyver = 2;
 
-  if(proxyver!=2 && proxyver!=3 && proxyver != 4 && proxyver!=0) {
-    std::cerr << "Error: proxyver must be 2, 3 or 4" << std::endl;
+  if (proxyver!=2 && proxyver!=3 && proxyver != 4 && proxyver!=0) {
+    Print(ERROR) << "Error: proxyver must be 2, 3 or 4" << std::endl;
     exit(1);
   }
-  else if(proxyver==0) {
-    if(debug)
-      std::cout << "Unspecified proxy version, settling on Globus version: ";
-    if(version<30)
+  else if (proxyver==0) {
+    if (version<30)
       proxyver = 2;
-    else proxyver = 3;
-    if(debug)
-      std::cout << proxyver << std::endl;
+    else if (version < 40)
+      proxyver = 3;
+    else
+      proxyver = 4;
+
+    Print(DEBUG) << "Unspecified proxy version, settling on Globus version: " 
+                 << proxyver << std::endl;
   }
   
   /* PCI extension option */ 
   
-  if(proxyver >= 3)
-  {
-    if(!policylang.empty())
-      if(policyfile.empty()) {
-        std::cerr << "Error: if you specify a policy language you also need to specify a policy file" << std::endl;
+  if (proxyver >= 3) {
+    if (!policylang.empty())
+      if (policyfile.empty()) {
+        Print(ERROR) << "Error: if you specify a policy language you also need to specify a policy file" << std::endl;
         exit(1);
       }
   }
   
-  if(proxyver >= 3)
-  {
-    if(debug) 
-      std::cout << "PCI extension info: " << std::endl << " Path length: " << pathlength << std::endl;
-    if(policylang.empty())
-      if(debug) 
-        std::cout << " Policy language not specified." << policylang << std::endl;
-      else if(debug) 
-        std::cout << " Policy language: " << policylang << std::endl;
-    if(policyfile.empty())
-      if(debug) 
-        std::cout << " Policy file not specified." << std::endl;
-      else if(debug) 
-        std::cout << " Policy file: " << policyfile << std::endl;
+  if (proxyver >= 3) {
+    Print(DEBUG) << "PCI extension info: " << std::endl << " Path length: " << pathlength << std::endl;
+
+    if (policylang.empty())
+      Print(DEBUG) << " Policy language not specified." << policylang << std::endl;
+    else
+      Print(DEBUG) << " Policy language: " << policylang << std::endl;
+
+    if (policyfile.empty())
+      Print(DEBUG) << " Policy file not specified." << std::endl;
+    else
+      Print(DEBUG) << " Policy file: " << policyfile << std::endl;
   }
   
   /* get vo */
@@ -455,124 +458,65 @@ Client::Client(int argc, char ** argv) :
   
   /* controls that number of bits for the key is appropiate */
   
-  if((bits!=512) && (bits!=1024) && (bits!=2048) && (bits!=4096)) {
-    std::cerr << "Error: number of bits in key must be one of 512, 1024, 2048, 4096." << std::endl;
+  if ((bits!=512) && (bits!=1024) && (bits!=2048) && (bits!=4096)) {
+    Print(ERROR) << "Error: number of bits in key must be one of 512, 1024, 2048, 4096." << std::endl;
     exit(1);
   }
-  else if(debug) 
-    std::cout << "Number of bits in key :" << bits << std::endl; 
+
+  Print(DEBUG) << "Number of bits in key :" << bits << std::endl; 
   
   /* parse valid options */
 
-  if (!valid.empty())
-  {
+  if (!valid.empty()) {
     std::string::size_type pos = valid.find(':');
     if (pos != std::string::npos && pos > 0) {
       hours  = ac_hours = atoi(valid.substr(0, pos).c_str());
       minutes = ac_minutes = atoi(valid.substr(pos+1).c_str());
     }
     else {
-      std::cerr << "-valid argument must be in the format: h:m" << std::endl;
+      Print(ERROR) << "-valid argument must be in the format: h:m" << std::endl;
       exit(1);
     }
-    if(hours < 0)
-    {
-      std::cerr << "-valid argument must be in the format: h:m" << std::endl;
+    if (hours < 0) {
+      Print(ERROR) << "-valid argument must be in the format: h:m" << std::endl;
       exit(1);
     }    
-    if(minutes < 0 || minutes > 59)
-    {
-      std::cerr << "specified minutes must be in the range 0-59" << std::endl;
+    if (minutes < 0 || minutes > 59) {
+      Print(ERROR) << "specified minutes must be in the range 0-59" << std::endl;
       exit(1);
     }
   }
 
   /* parse vomslife options */
 
-  if (!vomslife.empty())
-  {
+  if (!vomslife.empty()) {
     std::string::size_type pos = vomslife.find(':');
-    if (pos != std::string::npos && pos > 0) 
-    {
+
+    if (pos != std::string::npos && pos > 0) {
       ac_hours   = atoi(vomslife.substr(0, pos).c_str());
       ac_minutes = atoi(vomslife.substr(pos+1).c_str());
     }
-    else 
-    {
-      std::cerr << "-vomslife argument must be in the format: h:m" << std::endl;
+    else {
+      Print(ERROR) << "-vomslife argument must be in the format: h:m" << std::endl;
       exit(1);
     }
-    if(ac_hours < 0)
-    {
-      std::cerr << "-valid argument must be in the format: h:m" << std::endl;
+
+    if (ac_hours < 0) {
+      Print(ERROR) << "specified hours must be in the range 0-23" << std::endl;
       exit(1);
     }    
-    if(ac_minutes < 0 || ac_minutes >59)
-    {
-      std::cerr << "specified minutes must be in the range 0-59" << std::endl;
+
+    if (ac_minutes < 0 || ac_minutes >59) {
+      Print(ERROR) << "specified minutes must be in the range 0-59" << std::endl;
       exit(1);
     }
   }
 
   /* allow password from stdin */
   
-  if(pwstdin)
+  if (pwstdin)
     pw_cb = (int (*)())(pwstdin_callback);
 
-  /* configuration files */
-
-  if (userconf.empty()) {
-    char *uc = getenv("VOMS_USERCONF");
-    if (uc)
-      userconf = uc;
-  }
-  if (userconf.empty()) {
-    char *uc = getenv("HOME");
-    if (uc)
-      userconf = std::string(uc) + "/" + USERCONFILENAME;
-    else
-      userconf = std::string("~/") + USERCONFILENAME;
-  }
-  
-  /* parse order and target vector to a comma-separated list */
-  
-  for (std::vector<std::string>::iterator i = order.begin(); i != order.end(); i++)
-    ordering += (i == order.begin() ? std::string("") : std::string(",")) + FQANParse(*i).substr(1);
-
-  for (std::vector<std::string>::iterator i = targets.begin(); i != targets.end(); i++)
-    targetlist += (i == targets.begin() ? ("") : std::string(",")) + *i;
-  
-  /* preliminary controls a server for each vo is known, else exit */
-  
-  vomsdata v;
-
-  if (confiles.empty()) {
-    confiles.push_back(userconf);
-    confiles.push_back(CONFILENAME);
-  }
-  else
-    userconf="";
-
-  if (!LoadVomses(v, true))
-    exit(1);
-
-  for (unsigned int i = 0; i < vomses.size(); i++) {
-  
-    Contact contact(vomses[i]);
-    
-    /* exit if any server for that vo known */
-    
-    std::vector<contactdata> servers;
-    servers = v.FindByAlias(contact.vo().empty() ? contact.nick() : contact.vo());
-    if (servers.empty()) 
-    {
-      std::cerr << "VOMS Server for " << contact.vo() << " not known!" << std::endl;
-      exit(1);
-    }
-    
-    if(listing)
-      break;
-  }
 
   /* file used */
   
@@ -582,61 +526,113 @@ Client::Client(int argc, char ** argv) :
   this->certfile = (certfile.empty() ? NULL : const_cast<char *>(certfile.c_str()));
   this->keyfile = (keyfile.empty() ? NULL : const_cast<char *>(keyfile.c_str()));
 
+  /* prepare proxy_cred_desc */
+
+  if (!pcdInit())
+    exit(3);
+
+  v = new vomsdata("", certdir);
+
+  /* Do VOMS-specific tests only if (at least) a voms server needs
+     to be contacted (aside from simple parsing for correctness) */
+  if (!vomses.empty()) {
+    /* configuration files */
+
+    if (userconf.empty()) {
+      char *uc = getenv("VOMS_USERCONF");
+      if (uc) {
+        userconf = uc;
+        confiles.push_back(userconf);
+      }
+    }
+
+    /* If userconf is still empty, then VOMS_USERCONF
+       was not defined */
+    if (userconf.empty()) {
+      char *uc = getenv("HOME");
+      if (uc)
+        userconf = std::string(uc) + "/" + USERCONFILENAME;
+      else
+        userconf = std::string("~/") + USERCONFILENAME;
+    }
+  
+    /* parse order and target vector to a comma-separated list */
+  
+    for (std::vector<std::string>::iterator i = order.begin(); i != order.end(); i++)
+      ordering += (i == order.begin() ? std::string("") : std::string(",")) + FQANParse(*i).substr(1);
+
+    for (std::vector<std::string>::iterator i = targets.begin(); i != targets.end(); i++)
+      targetlist += (i == targets.begin() ? ("") : std::string(",")) + *i;
+  
+    /* preliminary checks if at least a server for each 
+       vo is known, else exit */
+  
+    if (confiles.empty()) {
+      confiles.push_back(userconf);
+      confiles.push_back(CONFILENAME);
+    }
+    else
+      userconf="";
+
+    if (!LoadVomses())
+      exit(1);
+
+    for (unsigned int i = 0; i < vomses.size(); i++) {
+  
+      Contact contact(vomses[i]);
+    
+      /* exit if any server for that vo known */
+    
+      std::vector<contactdata> servers;
+      servers = v->FindByAlias(contact.vo().empty() ? contact.nick() : contact.vo());
+      if (servers.empty()) {
+        Print(ERROR) << "VOMS Server for " << vomses[i] << " not known!" << std::endl;
+        exit(1);
+      }
+    
+      if (listing)
+        break;
+    }
+  }
+
+  if (!certdir.empty())
+    setenv("X509_CERT_DIR", certdir.c_str(), 1);
+
   /* prepare dataorder */
    
   dataorder = BN_new();
   if (!dataorder) 
     exit(1);
   BN_one(dataorder);
-
-  /* prepare proxy_cred_desc */
-
-  if(!pcdInit())
-    exit(3);
-
-  /* verify if the cert is good i.e. is signed by one of the trusted CAs. */
-
-  if(verify)
-    if(!Verify())
-      exit(3);
 }
 
 Client::~Client() {
 
-  if (cert_chain)
-    sk_X509_pop_free(cert_chain, X509_free);
-  if (ucert)
-    X509_free(ucert);
-  if (private_key)
-    EVP_PKEY_free(private_key);
-  if(cacertfile)  
-    free(cacertfile);
-  if(certdir)  
-    free(certdir);
-  if(certfile)  
-    free(certfile);
-  if(keyfile)  
-    free(keyfile);
-  if(outfile)  
-    free(outfile);
+  sk_X509_pop_free(cert_chain, X509_free);
+  X509_free(ucert);
+  EVP_PKEY_free(private_key);
+  free(cacertfile);
+  free(certdir);
+  free(certfile);
+  free(keyfile);
+  free(outfile);
 
-  if (dataorder)
-    BN_free(dataorder);
+  if (v)
+    delete v;
+
+  BN_free(dataorder);
 
   OBJ_cleanup();
 
 }
 
-bool Client::Run() {
-
-  bool ret = true;
-  std::string filedata;
-
+bool Client::Run() 
+{
   /* set output file and environment */
   
   char * oldenv = getenv("X509_USER_PROXY");
 
-  if(!noregen) {
+  if (!noregen) {
     std::stringstream tmpproxyname;
     tmpproxyname << "/tmp/tmp_x509up_u" << getuid() << "_" << getpid();
     proxyfile = tmpproxyname.str();
@@ -645,25 +641,13 @@ bool Client::Run() {
   
   /* vomsdata */
   
-  vomsdata v(certdir);
-
-  for (std::vector<std::string>::iterator i = confiles.begin(); i != confiles.end(); i++) {
-    if(debug)
-      std::cout << "Using configuration file "<< *i << std::endl;
-    if (!LoadVomses(v, false))
-      std::cerr << v.ErrorMessage() << std::endl;
-  }
-
-  //  v.LoadSystemContacts(confile);
-  //  v.LoadUserContacts(userconf);
-  v.SetLifetime(ac_hours * 3600 + ac_minutes * 60);
-  v.Order(ordering);
-  v.AddTarget(targetlist);
+  v->SetLifetime(ac_hours * 3600 + ac_minutes * 60);
+  v->Order(ordering);
+  v->AddTarget(targetlist);
   
   /* contacts servers for each vo */
 
-  for(std::vector<std::string>::iterator i = vomses.begin(); i != vomses.end(); ++i)
-  {
+  for(std::vector<std::string>::iterator i = vomses.begin(); i != vomses.end(); ++i) {
     if ((*i).empty())
       continue;
 
@@ -674,13 +658,11 @@ bool Client::Run() {
 
     /* find servers for that vo */
     std::vector<contactdata> servers;
-    servers = v.FindByAlias(contact.nick());
-    if (!servers.empty()){
-      rand_wrapper rd(time(0));
-      random_shuffle(servers.begin(), 
-                     servers.end(),
-                     rd);
-    }
+    servers = v->FindByAlias(contact.nick());
+    rand_wrapper rd(time(0));
+    random_shuffle(servers.begin(), 
+                   servers.end(),
+                   rd);
 
     std::string vo = (contact.vo().empty() ? servers[0].vo : contact.vo());
 
@@ -705,90 +687,79 @@ bool Client::Run() {
     std::string buffer;
     int version;
 
-    (void)v.LoadCredentials(ucert, cert_chain, private_key);
+    (void)v->LoadCredentials(ucert, private_key, cert_chain);
 
     /* contact each server until one answers */
-    for (std::vector<contactdata>::iterator beg = servers.begin(); beg != servers.end(); beg++) 
-    {
+    for (std::vector<contactdata>::iterator beg = servers.begin(); beg != servers.end(); beg++) {
       /* create a temporary proxy to contact the server */  
-      if(!noregen) 
-      {
-        if(!quiet) std::cout << "Creating temporary proxy " << std::flush;
-        if(debug) std::cout << "to " << proxyfile << " " << std::flush;
+      if (!noregen) {
+        Print(INFO) << "Creating temporary proxy " << std::flush;
+        Print(DEBUG) << "to " << proxyfile << " " << std::flush;
+
         int tmp = hours;
         hours = 1;
-        if(CreateProxy("", "", NULL, (beg->version == -1 ? proxyver : beg->version/10)))
+        if (CreateProxy("", NULL, (beg->version == -1 ? proxyver : beg->version/10)))
           goto err;
         hours = tmp;
       }
       
       /* contact server */
-      if(!quiet) std::cout << "Contacting " << " " << beg->host << ":" << beg->port
-                           << " [" << beg->contact << "] \"" << beg->vo << "\"" << std::flush;
+      Print(INFO) << "Contacting " << " " << beg->host << ":" << beg->port
+                  << " [" << beg->contact << "] \"" << beg->vo << "\"" << std::flush;
       
       /* when called voms-proxy-list */
       if (listing)
         command = "N";
 
-      int status = v.ContactRaw(beg->host, beg->port, beg->contact, command, buffer, version);
+      int status = v->ContactRaw(beg->host, beg->port, beg->contact, command, buffer, version, timeout);
 
       /* print status */
-      if(!status)
-      {
-        if(!quiet) 
-          std::cout << " Failed" << std::endl;
+      if (!status) {
+        Print(INFO) << " Failed" << std::endl;
       }        
-      else
-      {
-        if(!quiet)
-          std::cout << " Done" << std::endl;
+      else {
+        Print(INFO) << " Done" << std::endl;
       }
       
       /* check for socket error */
 
-      if (!status && v.error == VERR_NOSOCKET)
+      if (!status && v->error == VERR_NOSOCKET)
         Error();
       
       /* check for errors from the server */
-      std::string serror = v.ServerErrors();
+      std::string serror = v->ServerErrors();
       if (!status && !serror.empty()) {
-        std::cerr << std::endl << "Error: " << serror << std::endl;
+        Print(ERROR) << std::endl << "Error: " << serror << std::endl;
       }
       
       /* check for warnings from the server */
-      if((status && !serror.empty()) && !ignorewarn)
-      {
-        if(!quiet)
-          std::cerr << std::endl << "Warning: " << serror << std::endl << std::endl;
+      if ((status && !serror.empty()) && !ignorewarn) {
+        Print(WARN) << std::endl << "Warning: " << serror << std::endl << std::endl;
         
-        if(failonwarn) 
-        {
-          if (!quiet)
-            std::cerr << std::endl << "Error in getting data from VOMS server:" << beg->contact
+        if (failonwarn) {
+          Print(WARN) << std::endl << "Error in getting data from VOMS server:" << beg->contact
                       << " (or in memorizing)" << std::endl;
-          if(!noregen)
+          if (!noregen)
             unlink(proxyfile.c_str()); 
           exit(1);
         }
       }
       
       /* check for errors */
-      std::string cerror = v.ErrorMessage();
-      if (!status && serror.empty() && !cerror.empty())
-      {
-        std::cerr << std::endl << "Error: " << cerror << std::endl;
+      std::string cerror = v->ErrorMessage();
+      if (!status && serror.empty() && !cerror.empty()) {
+        Print(ERROR) << std::endl << "Error: " << cerror << std::endl;
       }
 
-      /* digets AC */
-      if(status) 
-      {
-        if (isAC(buffer)) 
-        {
+      /* digest AC */
+      if (status) {
+        AC *ac;
+
+        if ((ac = getAC(buffer))) {
           /* retrieve AC and add to list */
-          if (!Retrieve(buffer)) {
-            std::cerr << "\nError decoding AC." << std::endl;
-            std::cerr << "Error: " << v.ErrorMessage() << std::endl;
-            if(!noregen)
+          if (!AddToList(ac)) {
+            std::cerr << "Error while handling AC." << std::endl;
+            if (!noregen)
               unlink(proxyfile.c_str()); 
             exit(3);
           }
@@ -796,33 +767,31 @@ bool Client::Run() {
           /* if contact succeded jumps to other vos */
           break;
         }
-
-        else {
+        else if (listing) {
           data += buffer;
           break;
         }
+        else {
+          Print(ERROR) << "\nError decoding AC." << std::endl
+                       << "Error: " << v->ErrorMessage() << std::endl;
+        }
       }
-      if(beg != servers.end()-1) 
-      {
-        if(!quiet) 
-          std::cout << std::endl << "Trying next server for " << beg->nick << "." << std::endl;
+
+      if (beg != servers.end()-1) {
+        Print(INFO) << std::endl << "Trying next server for " << beg->nick << "." << std::endl;
       }
-      else 
-      {
-        if (!quiet) std::cout << std::endl << "None of the contacted servers for " << beg->vo << " were capable\nof returning a valid AC for the user." << std::endl;
-        if(!noregen) 
+      else {
+        Print(ERROR) << std::endl << "None of the contacted servers for " << beg->vo << " were capable\nof returning a valid AC for the user." << std::endl;
+        if (!noregen) 
           unlink(proxyfile.c_str());
         exit(1);
       }
     }
-    
-    if(i == vomses.end())
-      break;
   }
   
   /* unlink tmp proxy file */
 
-  if(!noregen)
+  if (!noregen)
     unlink(proxyfile.c_str()); 
 
   /* set output file and environment */
@@ -830,39 +799,36 @@ bool Client::Run() {
   proxyfile = outfile;
   setenv("X509_USER_PROXY", proxyfile.c_str(), 1);  
   
-  /* include file */
-  
-  if (!incfile.empty())
-    if(!IncludeFile(filedata))
-      if(!quiet) std::cout << "Wasn't able to include file " << incfile << std::endl;;
-  
   /* with separate write info to file and exit */
   
   if (!separate.empty() && (!data.empty() || aclist)) {
-    if(!WriteSeparate())
-      if(!quiet) std::cout << "Wasn't able to write to " << separate << std::endl;
+    if (!WriteSeparate()) {
+      Print(ERROR) << "Wasn't able to write to " << separate << std::endl;
+      exit(1);
+    }
     exit(0);
   }
 
   if (listing) {
-    std::cout << "Available attributes:\n" << data <<std::endl;
+    Print(FORCED) << "Available attributes:\n" << data <<std::endl;
     exit(0);
   }
 
   if (!data.empty())
-    std::cout << "RECEIVED DATA:\n" << data << std::endl;
+    Print(FORCED) << "RECEIVED DATA:\n" << data << std::endl;
   
   /* create a proxy containing the data retrieved from VOMS servers */
   
-  if(!quiet) std::cout << "Creating proxy " << std::flush; 
-  if(debug) std::cout << "to " << proxyfile << " " << std::flush;
-  if(CreateProxy(data, filedata, vomses.empty() ? NULL : aclist, proxyver)) {
-    //    listfree((char **)aclist, (freefn)AC_free);
+  Print(INFO)  << "Creating proxy " << std::flush; 
+  Print(DEBUG) << "to " << proxyfile << " " << std::flush;
+  if (CreateProxy(data, vomses.empty() ? NULL : aclist, proxyver)) {
     goto err;
   }
-  else
+  else 
     free(aclist);
   
+  Print(INFO) << "\n" << std::flush;
+
   /* unset environment */
   
   if (!oldenv)
@@ -873,669 +839,286 @@ bool Client::Run() {
   
   /* assure user certificate is not expired or going to, else advise but still create proxy */
   
-  if(Test())
-    ret = false;
+  if (Test())
+    return false;
   
-  return ret;
+  return Verify(true);
 
  err:
   
   Error();
-  std::cerr << "ERROR: " << v.ErrorMessage() << std::endl;
+  Print(ERROR) << "ERROR: " << v->ErrorMessage() << std::endl;
   return false;
 
 }
 
-bool Client::CreateProxy(std::string data, std::string filedata, AC ** aclist, int version) {
-
-  bool status = true;
-  char *confstr = NULL;
-
-  X509 * ncert = NULL;
-  EVP_PKEY * npkey = NULL;
-  X509_REQ * req = NULL;
-  BIO * bp = NULL;
-  STACK_OF(X509_EXTENSION) * extensions = NULL;
-  X509_EXTENSION *ex1 = NULL, *ex2 = NULL, *ex3 = NULL, *ex4 = NULL, *ex5 = NULL, *ex6 = NULL, *ex7 = NULL, *ex8 = NULL;
-  bool voms, classadd, file, vo, acs, info, kusg, order;
-  order = acs = vo = voms = classadd = file = kusg = false;
-  static int init = 0;
-
-  if (!init) {
-    InitProxyCertInfoExtension();
-    init = 1;
-  }
-
-  FILE * fpout = NULL;
-  int fdout = -1;
-  int try_counter;
-
-  try_counter = 3;  /* try 3 times in case of asynchrounous calls */
-  while ( (try_counter > 0) && (fdout < 0) )
-  {
-    /* We always unlink the file first; it is the only way to be
-     * certain that the file we open has never in its entire lifetime
-     * had the world-readable bit set.  
-     */
-    unlink(proxyfile.c_str());
-    
-    /* Now, we must open w/ O_EXCL to make certain that WE are 
-     * creating the file, so we know that the file was BORN w/ mode 0600.
-     * As a bonus, O_EXCL flag will cause a failure in the precense
-     * of a symlink, so we are safe from zaping a file due to the
-     * presence of a symlink.
-     */
-    fdout = open(proxyfile.c_str(), O_WRONLY|O_EXCL|O_CREAT,0600);
-    try_counter--;
-  }
- 
- 
-  /* Now, make a call to set proper permissions, just in case the
-   * user's umask is stupid.  Note this call to fchmod will also
-   * fail if our fdout is still -1 because our open failed above.
-   */
-#ifndef WIN32
-  if(fchmod(fdout, S_IRUSR|S_IWUSR) < 0)
-  {
-    PRXYerr(PRXYERR_F_LOCAL_CREATE, PRXYERR_R_PROBLEM_PROXY_FILE);
-    ERR_add_error_data(2, "\nchmod failed for file ", proxyfile.c_str());
-    goto err;
-  }
-#endif 
-  
-  /* Finally, we have a safe fd.  Make it a stream like ssl wants. */
-  fpout = fdopen(fdout, "w");
-
-
-  if (proxy_genreq(ucert, &req, &npkey, bits, (int (*)())kpcallback))
-    goto err;
-
-  /* Add proxy extensions */
-
-  /* initialize extensions stack */
-
-  if ((extensions = sk_X509_EXTENSION_new_null()) == NULL) {
-    PRXYerr(PRXYERR_F_PROXY_SIGN, PRXYERR_R_CLASS_ADD_EXT);
-    goto err;
-  }
-  
-  /* voms extension */
-  
-  if (data.size()) {
-    
-    if ((ex1 = CreateProxyExtension("voms", data)) == NULL) {
-      PRXYerr(PRXYERR_F_PROXY_SIGN, PRXYERR_R_CLASS_ADD_EXT);
-      goto err;
-    }
-    
-    if (!sk_X509_EXTENSION_push(extensions, ex1)) {
-      PRXYerr(PRXYERR_F_PROXY_SIGN, PRXYERR_R_CLASS_ADD_EXT);
-      goto err;
-    }
-    
-    voms = true;
-  }
-
-  /* include extension */
-
-  if (!filedata.empty()) {
-    
-    if ((ex3 = CreateProxyExtension("incfile", filedata)) == NULL) {
-      PRXYerr(PRXYERR_F_PROXY_SIGN, PRXYERR_R_CLASS_ADD_EXT);
-      goto err;
-    }
-
-    if (!sk_X509_EXTENSION_push(extensions, ex3)) {
-      PRXYerr(PRXYERR_F_PROXY_SIGN, PRXYERR_R_CLASS_ADD_EXT);
-      goto err;
-    }
-
-    file = true;
-  }
-
-  /* AC extension  */
-
-  if (aclist) {
-
-    if ((ex5 = X509V3_EXT_conf_nid(NULL, NULL, OBJ_txt2nid("acseq"), (char *)aclist)) == NULL) {
-      PRXYerr(PRXYERR_F_PROXY_SIGN, PRXYERR_R_CLASS_ADD_EXT);
-      goto err;
-    }
-    
-    if (!sk_X509_EXTENSION_push(extensions, ex5)) {
-      PRXYerr(PRXYERR_F_PROXY_SIGN, PRXYERR_R_CLASS_ADD_EXT);
-      goto err;
-    }
-    
-    acs = true;
-  }
-
-  confstr =  const_cast<char *>("digitalSignature: hu, keyEncipherment: hu, dataEncipherment: hu");
-  if ((ex8 = X509V3_EXT_conf_nid(NULL, NULL, NID_key_usage, confstr)) == NULL) {
-    PRXYerr(PRXYERR_F_PROXY_SIGN, PRXYERR_R_CLASS_ADD_EXT);
-    goto err;
-  }
-  X509_EXTENSION_set_critical(ex8, 1);
-
-  if (!sk_X509_EXTENSION_push(extensions, ex8)) {
-    PRXYerr(PRXYERR_F_PROXY_SIGN,PRXYERR_R_CLASS_ADD_EXT);
-    goto err;
-  }
-
-  kusg = true;
-
-  /* vo extension */
-  
-  if (!voID.empty()) {
-  
-    if ((ex4 = CreateProxyExtension("vo", voID)) == NULL) {
-      PRXYerr(PRXYERR_F_PROXY_SIGN,PRXYERR_R_CLASS_ADD_EXT);
-      goto err;
-    }
-    
-    if (!sk_X509_EXTENSION_push(extensions, ex4)) {
-      PRXYerr(PRXYERR_F_PROXY_SIGN,PRXYERR_R_CLASS_ADD_EXT);
-      goto err;
-    }
-    
-    vo = true;
-  }
-  
-
-  /* class_add extension */
-
-#ifdef CLASS_ADD
-  
-  if (class_add_buf && class_add_buf_len > 0) {
-    if ((ex2 = proxy_extension_class_add_create((void *)class_add_buf, class_add_buf_len)) == NULL) {
-      PRXYerr(PRXYERR_F_PROXY_SIGN,PRXYERR_R_CLASS_ADD_EXT);
-      goto err;
-    }
-    
-    if (!sk_X509_EXTENSION_push(extensions, ex2)) {
-      PRXYerr(PRXYERR_F_PROXY_SIGN,PRXYERR_R_CLASS_ADD_EXT);
-      goto err;
-    }
-    
-    classadd = true;
-  }
-
-#endif
-  /* order extension */
- 
-  if (aclist && dataorder) {
-
-    char *buffer = BN_bn2hex(dataorder);
-    std::string tmp = std::string(buffer);
-    OPENSSL_free(buffer);
-
-    if ((ex6 = CreateProxyExtension("order", tmp)) == NULL) {
-      PRXYerr(PRXYERR_F_PROXY_SIGN,PRXYERR_R_CLASS_ADD_EXT);
-      goto err;
-    }
-
-    if (!sk_X509_EXTENSION_push(extensions, ex6)) {
-      PRXYerr(PRXYERR_F_PROXY_SIGN,PRXYERR_R_CLASS_ADD_EXT);
-      goto err;
-    }
-
-    order = true;
-  }
-  
-  /* PCI extension */
-  
-  if (version>=3) {
-
-    std::string                         policy;
-    unsigned char *                     der;
-    int                                 derlen;
-    unsigned char *                     pp;
-    int                                 w;
-    myPROXYPOLICY *                     proxypolicy;
-    myPROXYCERTINFO *                   proxycertinfo;
-    ASN1_OBJECT *                       policy_language;
-    
-    
-    /* getting contents of policy file */
-  
-    std::ifstream fp;
-    if(!policyfile.empty()) {
-      fp.open(policyfile.c_str());
-      if(!fp) {
-        std::cerr << std::endl << "Error: can't open policy file" << std::endl;
-        exit(1);
-      }
-      fp.unsetf(std::ios::skipws);
-      char c;
-      while(fp.get(c))
-        policy += c;
-    }
-    
-    /* setting policy language field */
-    
-    if(policylang.empty()) {
-      if(policyfile.empty()) {
-        policylang = IMPERSONATION_PROXY_OID;
-        if(debug) std::cout << "No policy language specified, Gsi impersonation proxy assumed." << std::endl;
-      }
-      else {
-        policylang = GLOBUS_GSI_PROXY_GENERIC_POLICY_OID;
-        if(debug) std::cout << "No policy language specified with policy file, assuming generic." << std::endl;
-      }
-    }
-    
-    /* predefined policy language can be specified with simple name string */
-    
-    else if(policylang == IMPERSONATION_PROXY_SN)
-      policylang = IMPERSONATION_PROXY_OID;
-    else if(policylang == INDEPENDENT_PROXY_SN)
-      policylang = INDEPENDENT_PROXY_OID;
-    
-    /* does limited prevale on others? don't know what does grid-proxy_init since if pl is given with
-       limited options it crash */
-    if(limit_proxy)
-      policylang = LIMITED_PROXY_OID;
-
-    OBJ_create((char *)policylang.c_str(), (char *)policylang.c_str(), (char *)policylang.c_str());
-    
-    if(!(policy_language = OBJ_nid2obj(OBJ_sn2nid(policylang.c_str())))) {
-      PRXYerr(PRXYERR_F_PROXY_SIGN, PRXYERR_R_CLASS_ADD_OID);
-      goto err;
-    }
-    
-    /* proxypolicy */
-    
-    proxypolicy = myPROXYPOLICY_new();
-    if(policy.size()>0)
-      myPROXYPOLICY_set_policy(proxypolicy, (unsigned char *)policy.c_str(), policy.size());
-    myPROXYPOLICY_set_policy_language(proxypolicy, policy_language);
-
-    /* proxycertinfo */
-    
-    proxycertinfo = myPROXYCERTINFO_new();
-    myPROXYCERTINFO_set_version(proxycertinfo, version);
-    myPROXYCERTINFO_set_proxypolicy(proxycertinfo, proxypolicy);
-    if(pathlength>=0) {
-      myPROXYCERTINFO_set_path_length(proxycertinfo, pathlength);
-    }
-    
-    /* 2der conversion */
-
-    if (proxycertinfo->version == 3)
-      ex7 = X509V3_EXT_conf_nid(NULL, NULL, OBJ_txt2nid("PROXYCERTINFO_V3"), (char *)proxycertinfo);
-    else
-      ex7 = X509V3_EXT_conf_nid(NULL, NULL, OBJ_txt2nid("PROXYCERTINFO_V4"), (char *)proxycertinfo);
-
-    if (ex7 == NULL) {
-      PRXYerr(PRXYERR_F_PROXY_SIGN, PRXYERR_R_CLASS_ADD_EXT);
-      goto err;
-    }
-
-    X509_EXTENSION_set_critical(ex7, 1);
-    if (!sk_X509_EXTENSION_push(extensions, ex7)) {
-      PRXYerr(PRXYERR_F_PROXY_SIGN,PRXYERR_R_CLASS_ADD_EXT);
-      goto err;
-    }
-    
-  }
-  
-  if (proxy_sign(ucert,
-                 private_key,
-                 req,
-                 &ncert,
-                 hours*60*60 + minutes*60,
-                 extensions,
-                 limit_proxy,
-                 version)) {
-    goto err;
-  }
-  
-  if ((bp = BIO_new(BIO_s_file())) != NULL)
-    BIO_set_fp(bp, fpout, BIO_NOCLOSE);
-  
-  if (proxy_marshal_bp(bp, ncert, npkey, ucert, cert_chain))
-    goto err;
-  
-  if(!quiet) std::cout << " Done" << std::endl;
-
-  status = false;
-
- err:
-
-  if (ncert)
-    X509_free(ncert);
-  if (bp)
-    BIO_free(bp);
-  if (fpout)
-    fclose(fpout);
-  if (extensions) {
-    sk_X509_EXTENSION_pop_free(extensions, X509_EXTENSION_free);
-    order = kusg = voms = classadd = file = vo = acs = info = false;
-  }
-  if(req) {
-    X509_REQ_free(req);
-  }
-  if (kusg)
-    X509_EXTENSION_free(ex8);
-  if(npkey)
-    EVP_PKEY_free(npkey);
-  if (order)
-    X509_EXTENSION_free(ex6);
-  if (info)
-    X509_EXTENSION_free(ex7);
-  if (acs)
-    X509_EXTENSION_free(ex5);
-  if (voms)
-    X509_EXTENSION_free(ex2);
-  if (file)
-    X509_EXTENSION_free(ex3);
-  if (vo)
-    X509_EXTENSION_free(ex4);
-  if (classadd)
-    X509_EXTENSION_free(ex1);
-  
-  return status;
-
-}
-
-int InitProxyCertInfoExtension(void)
+bool Client::CreateProxy(std::string data, AC ** aclist, int version) 
 {
+  struct arguments *args = makeproxyarguments();
+  int ret = -1;
 
-#define PROXYCERTINFO_V3      "1.3.6.1.4.1.3536.1.222"
-#define PROXYCERTINFO_V4      "1.3.6.1.5.5.7.1.14"
-#define OBJC(c,n) OBJ_create(c,n,#c)
+  if (args) {
+    args->proxyfilename = strdup(proxyfile.c_str());
+    if (!incfile.empty())
+      args->filename      = strdup(incfile.c_str());
+    args->aclist        = aclist;
+    args->proxyversion  = version;
+    if (!data.empty()) {
+      args->data          = (char*)data.data();
+      args->datalen       = data.length();
+    }
+    args->subject       = NULL;
+    args->subjectlen    = 0;
+    args->cert          = ucert;
+    args->chain         = cert_chain;
+    args->key           = private_key;
+    args->bits          = bits;
+    if (!policyfile.empty())
+      args->policyfile    = strdup(policyfile.c_str());
+    if (!policylang.empty())
+      args->policylang    = strdup(policylang.c_str());
+    args->pathlength    = pathlength;
+    args->hours         = hours;
+    args->minutes       = minutes;
+    args->limited       = limit_proxy;
+    args->voID          = strdup(voID.c_str());
+    args->callback      = (int (*)())kpcallback;
+    int warn = 0;
+    void *additional = NULL;
 
-  X509V3_EXT_METHOD *pcert;
+    struct proxy *proxy = makeproxy(args, &warn, &additional);
 
-  /* Proxy Certificate Extension's related objects */
-  OBJC(PROXYCERTINFO_V3, "PROXYCERTINFO_V3");
-  OBJC(PROXYCERTINFO_V4, "PROXYCERTINFO_V4");
+    ProxyCreationError(warn, additional);
 
-  pcert = (X509V3_EXT_METHOD *)OPENSSL_malloc(sizeof(X509V3_EXT_METHOD));
+    if (proxy)
+      ret = writeproxy(proxyfile.c_str(), proxy);
 
-  if (pcert) {
-    memset(pcert, 0, sizeof(*pcert));
-    pcert->ext_nid = OBJ_txt2nid("PROXYCERTINFO_V3");
-    pcert->ext_flags = 0;
-    pcert->ext_new  = (X509V3_EXT_NEW) myPROXYCERTINFO_new;
-    pcert->ext_free = (X509V3_EXT_FREE)myPROXYCERTINFO_free;
-    pcert->d2i      = (X509V3_EXT_D2I) d2i_myPROXYCERTINFO;
-    pcert->i2d      = (X509V3_EXT_I2D) i2d_myPROXYCERTINFO;
-    pcert->i2s      = (X509V3_EXT_I2S) myproxycertinfo_i2s;
-    pcert->s2i      = (X509V3_EXT_S2I) myproxycertinfo_s2i;
-    pcert->v2i      = (X509V3_EXT_V2I) NULL;
-    pcert->r2i      = (X509V3_EXT_R2I) NULL;
-    pcert->i2v      = (X509V3_EXT_I2V) NULL;
-    pcert->i2r      = (X509V3_EXT_I2R) NULL;
+    Print(INFO) << " Done" << std::endl << std::flush;
 
-    X509V3_EXT_add(pcert);
-  }
+    freeproxy(proxy);
+    freeproxyarguments(args);
 
-  pcert = (X509V3_EXT_METHOD *)OPENSSL_malloc(sizeof(X509V3_EXT_METHOD));
-
-  if (pcert) {
-    memset(pcert, 0, sizeof(*pcert));
-    pcert->ext_nid = OBJ_txt2nid("PROXYCERTINFO_V4");
-    pcert->ext_flags = 0;
-    pcert->ext_new  = (X509V3_EXT_NEW) myPROXYCERTINFO_new;
-    pcert->ext_free = (X509V3_EXT_FREE)myPROXYCERTINFO_free;
-    pcert->d2i      = (X509V3_EXT_D2I) d2i_myPROXYCERTINFO;
-    pcert->i2d      = (X509V3_EXT_I2D) i2d_myPROXYCERTINFO;
-    pcert->i2s      = (X509V3_EXT_I2S) myproxycertinfo_i2s;
-    pcert->s2i      = (X509V3_EXT_S2I) myproxycertinfo_s2i;
-    pcert->v2i      = (X509V3_EXT_V2I) NULL;
-    pcert->r2i      = (X509V3_EXT_R2I) NULL;
-    pcert->i2v      = (X509V3_EXT_I2V) NULL;
-    pcert->i2r      = (X509V3_EXT_I2R) NULL;
-
-    X509V3_EXT_add(pcert);
 
   }
+
+  return ret == -1;
 }
 
-void *myproxycertinfo_s2i(struct v3_ext_method *method, struct v3_ext_ctx *ctx, char *data)
+void Client::ProxyCreationError(int error, void *additional)
 {
-  return (myPROXYCERTINFO*)data;
+  switch (error) {
+  case PROXY_NO_ERROR:
+    break;
+
+  case PROXY_ERROR_OPEN_FILE:
+    Print(ERROR) << "Error: cannot open file: " 
+                 << (char *)additional << std::endl;
+    Print(ERROR) << strerror(errno) << std::endl;
+    break;
+
+  case PROXY_ERROR_FILE_READ:
+    Print(ERROR) << "Error: cannot read from file: "
+                 << (char *)additional << std::endl;
+    Print(ERROR) << strerror(errno) << std::endl;
+    break;
+
+  case PROXY_ERROR_STAT_FILE:
+    Print(ERROR) << "Error: cannot stat file: " 
+                 << (char *)additional << std::endl;
+    Print(ERROR) << strerror(errno) << std::endl;
+    break;
+
+  case PROXY_ERROR_OUT_OF_MEMORY:
+    Print(ERROR) << "Error: out of memory" << std::endl;
+    break;
+
+  case PROXY_WARNING_GSI_ASSUMED:
+    Print(DEBUG) << "\nNo policy language specified, Gsi impersonation proxy assumed." << std::endl;
+    break;
+
+  case PROXY_WARNING_GENERIC_LANGUAGE_ASSUMED:
+    Print (DEBUG) << "\nNo policy language specified with policy file, assuming generic." << std::endl;
+    break;
+
+  default:
+    Print(ERROR) << "Unknown error" << std::endl;
+    break;
+  }
 }
 
-char *myproxycertinfo_i2s(struct v3_ext_method *method, void *ext)
-{
-  return norep();
-}
-
-X509_EXTENSION * Client::CreateProxyExtension(std::string name, std::string data, bool crit) 
-{
-
-  X509_EXTENSION *                    ex = NULL;
-  ASN1_OBJECT *                       ex_obj = NULL;
-  ASN1_OCTET_STRING *                 ex_oct = NULL;
-
-  if(!(ex_obj = OBJ_nid2obj(OBJ_txt2nid((char *)name.c_str())))) {
-    PRXYerr(PRXYERR_F_PROXY_SIGN,PRXYERR_R_CLASS_ADD_OID);
-    goto err;
-  }
-  
-  if(!(ex_oct = ASN1_OCTET_STRING_new())) {
-    PRXYerr(PRXYERR_F_PROXY_SIGN,PRXYERR_R_CLASS_ADD_EXT);
-    goto err;
-  }
-  
-  ex_oct->data = (unsigned char *)data.c_str();
-  ex_oct->length = data.size();
-  
-  if (!(ex = X509_EXTENSION_create_by_OBJ(NULL, ex_obj, crit, ex_oct))) {
-    PRXYerr(PRXYERR_F_PROXY_SIGN,PRXYERR_R_CLASS_ADD_EXT);
-    goto err;
-  }
-	
-  //  ASN1_OCTET_STRING_free(ex_oct);
-  //  ASN1_OBJECT_free(ex_obj);
-  ex_oct = NULL;
-	
-  return ex;
-  
- err:
-  
-  if (ex_oct)
-    ASN1_OCTET_STRING_free(ex_oct);
-  
-  if (ex_obj)
-    ASN1_OBJECT_free(ex_obj);
-  
-  return NULL;
-  
-}
 
 bool Client::WriteSeparate() {
 
-  if(aclist) {
+  if (aclist) {
     
     BIO * out = BIO_new(BIO_s_file());
-    if(data.empty())
+
+    if (data.empty())
       BIO_write_filename(out, (char *)separate.c_str());
     else BIO_write_filename(out, (char *)(separate+".ac").c_str());
     
     while(*aclist) {
 #ifdef TYPEDEF_I2D_OF
-      if(!PEM_ASN1_write_bio((i2d_of_void *)i2d_AC, "ATTRIBUTE CERTIFICATE", out, (char *)*(aclist++), NULL, NULL, 0, NULL, NULL))
+      if (!PEM_ASN1_write_bio((i2d_of_void *)i2d_AC, "ATTRIBUTE CERTIFICATE", out, (char *)*(aclist++), NULL, NULL, 0, NULL, NULL))
 #else
-      if(!PEM_ASN1_write_bio(((int (*)())i2d_AC), "ATTRIBUTE CERTIFICATE", out, (char *)*(aclist++), NULL, NULL, 0, NULL, NULL))
+      if (!PEM_ASN1_write_bio(((int (*)())i2d_AC), "ATTRIBUTE CERTIFICATE", out, (char *)*(aclist++), NULL, NULL, 0, NULL, NULL))
 #endif
         {
-          if(!quiet) std::cout << "Unable to write to BIO" << std::endl;
+          Print(INFO) << "Unable to write to BIO" << std::endl;
           return false;;
         }
     }
 
     BIO_free(out);
   
-    if(data.empty())
-      if(!quiet)
-        std::cout << "Wrote ACs to " << separate << std::endl;
+    if (data.empty())
+      Print(INFO) << "Wrote ACs to " << separate << std::endl;
   }
   
-  if(!data.empty()) {
-    
-    if(aclist) {
-      if(!quiet)
-        std:: cout << "Wrote ACs to " << separate+".ac" << std::endl;      
+  if (!data.empty()) {
+    if (aclist) {
+      Print(INFO) << "Wrote ACs to " << separate+".ac" << std::endl;      
     }
     
     std::ofstream fs;
     fs.open((separate+".data").c_str());
+
     if (!fs) {
-      std::cerr << "cannot open file" << std::endl;
+      Print(ERROR) << "cannot open file: " << separate+".data" << std::endl;
       return false;
     }
     else {
-      for(std::string::iterator pos = data.begin(); pos != data.end(); pos++)
+      for (std::string::iterator pos = data.begin(); pos != data.end(); pos++)
         fs << *pos;
       fs.close();
     }
     
-    if(!quiet)
-      std::cout << "Wrote data to " << separate+".data" << std::endl;
+    Print(INFO) << "Wrote data to " << separate+".data" << std::endl;
 
   }
 
   return true;
 }
 
+bool Client::Verify(bool doproxy) 
+{
 
-bool Client::IncludeFile(std::string& filedata) {
+  X509 *cert = ucert;
+  STACK_OF(X509) *chain = cert_chain;
 
-  std::ifstream fp;
-  fp.open(incfile.c_str());
-  if(!fp) {
-    std::cerr << std::endl << "Error: cannot opens file" << std::endl;
-    return false;
+  if (doproxy) {
+    load_credentials(outfile, outfile, &cert, &chain, NULL, pw_cb);
   }
-  fp.unsetf(std::ios::skipws);
-  char c;
-  while(fp.get(c))
-    filedata += c;
-  
-  return true;
-}
 
-bool Client::Verify() {
-
-  bool status = false;
-
+  /* First step:  Verify certificate chain. */
   proxy_verify_ctx_init(&pvxd);
   proxy_verify_init(&pvd, &pvxd);
   pvxd.certdir = this->certdir;
-  if (proxy_verify_cert_chain(ucert, cert_chain, &pvd)) {
-    if(!quiet) std::cout << "verify OK" << std::endl; 
+
+  if (proxy_verify_cert_chain(cert, chain, &pvd)) {
+    if (doproxy) {
+      /* Second step: Verify AC. */
+      if (!v->Retrieve(cert, chain, RECURSE_CHAIN)) {
+        if (v->error != VERR_NOEXT) {
+          Print(ERROR) << "Error: verify failed." << std::endl
+                       << v->ErrorMessage() << std::endl;
+          return false;
+        }
+      }
+    }
+    if (verify) 
+      Print(FORCED) << "verify OK" << std::endl; 
     return true;
   }
   else {
-    std::cerr << "Error: verify failed." << std::endl;
-    goto err;
+    Print(ERROR) << "Error: Certificate verify failed." << std::endl;
+    Error();
+    return false;
   }
-  
- err:
-  
+
+  // Should never reach here
+
   Error();
-
-  return status;
-
+  return false;
 }
 
-bool Client::Test() {
-
+bool Client::Test() 
+{
   ASN1_UTCTIME * asn1_time = ASN1_UTCTIME_new();
   X509_gmtime_adj(asn1_time, 0);
   time_t time_now = ASN1_UTCTIME_mktime(asn1_time);
   ASN1_UTCTIME_free(asn1_time);
   time_t time_after = ASN1_UTCTIME_mktime(X509_get_notAfter(ucert));
   time_t time_diff = time_after - time_now ;
-  
+  int length  = hours*60*60 + minutes*60;
+
   if (time_diff < 0) {
-    if (!quiet) 
-      std::cout << std::endl << "ERROR: Your certificate expired "
+    Print(WARN) << std::endl << "ERROR: Your certificate expired "
                 << asctime(localtime(&time_after)) << std::endl;
     
     return 2;
   } 
   
-  if (hours && time_diff < hours*60*60 + minutes*60) {
-    if (!quiet) std::cout << std::endl << "Warning: your certificate and proxy will expire "
-                          << asctime(localtime(&time_after))
-                          << "which is within the requested lifetime of the proxy"
-                          << std::endl;
+  if (hours && time_diff < length) {
+    Print(WARN) << std::endl << "Warning: your certificate and proxy will expire "
+                << asctime(localtime(&time_after))
+                << "which is within the requested lifetime of the proxy"
+                << std::endl;
     return 1;
   }
   
-  if (!quiet)
-  {
+  if (!quiet) {
     time_t time_after_proxy;
-    time_after_proxy = time_now + hours*60*60 + minutes*60;
+    time_after_proxy = time_now + length;
     
-    if (!quiet) std::cout << "Your proxy is valid until "
-                          << asctime(localtime(&time_after_proxy)) << std::flush;
-    
-    return 0;
+    Print(INFO) << "Your proxy is valid until "
+                << asctime(localtime(&time_after_proxy)) << std::flush;
   }
 
   return 0;
 }
 
-bool Client::Retrieve(std::string buffer) {
+bool Client::AddToList(AC *ac) 
+{
+  AC **actmplist = NULL;
 
-  bool status =  false;
-
-  if(buffer.empty())
-    return status;
-
-  AC ** actmplist = NULL;
-  AC * ac;
-  char *p, *pp;
-  
-  int len = buffer.size();
-  pp = (char *)malloc(buffer.size());
-  if (!pp)
+  if (!ac)
     return false;
 
-  pp = (char *)memcpy(pp, buffer.data(), buffer.size());
-  p = pp;
-  
-  if((ac = d2i_AC(NULL, (unsigned char **)&p, len))) {
-    actmplist = (AC **)listadd((char **)aclist, (char *)ac, sizeof(AC *));
-    if (actmplist) {
-      aclist = actmplist;
-      (void)BN_lshift1(dataorder, dataorder);
-      (void)BN_set_bit(dataorder, 0);
-      status = true;
-    }
-    else {
-      listfree((char **)aclist, (freefn)AC_free);
-      goto err;
-    }
+  actmplist = (AC **)listadd((char **)aclist, (char *)ac, sizeof(AC *));
+
+
+  if (actmplist) {
+    /* Only for comaptibility with APIs version <= 1.5 */
+
+    aclist = actmplist;
+    (void)BN_lshift1(dataorder, dataorder);
+    (void)BN_set_bit(dataorder, 0);
+    return true;
   }
-  
- err:
+  else {
+    listfree((char **)aclist, (freefn)AC_free);
+    Error();
+    return false;
+  }
 
-  free(pp);
-  Error();
-  return status;
-
+  /* Control should never reach here */
+  /*   return false; */
 }
 
-static bool checkstats(char *file, int mode, bool debug)
+bool Client::checkstats(char *file, int mode)
 {
   struct stat stats;
 
   if (stat(file, &stats) == -1) {
-    std::cerr << "Unable to find user certificate or key" << std::endl;
+    Print(ERROR) << "Unable to find user certificate or key: " << file << std::endl;
     return false;
   }
 
   if (stats.st_mode & mode) {
-    std::cerr << std::endl << "ERROR: Couldn't find valid credentials to generate a proxy." << std::endl 
-              << "Use --debug for further information." << std::endl;
-    if(debug)
-      std::cout << "Wrong permissions on file: " << file << std::endl;
+    Print(ERROR) << std::endl << "ERROR: Couldn't find valid credentials to generate a proxy." << std::endl 
+                 << "Use --debug for further information." << std::endl;
+    Print(DEBUG) << "Wrong permissions on file: " << file << std::endl;
 
     return false;
   }
@@ -1549,35 +1132,47 @@ bool Client::pcdInit() {
 
   ERR_load_prxyerr_strings(0);
   SSLeay_add_ssl_algorithms();
+
   
   if (!determine_filenames(&cacertfile, &certdir, &outfile, &certfile, &keyfile, noregen ? 1 : 0))
     goto err;
+
+  if (!noregen) {
+    if (certfile)
+      setenv("X509_USER_CERT", certfile, 1);
+
+    if (keyfile)
+      setenv("X509_USER_KEY", keyfile, 1);
+  }
+  else {
+    if (outfile) {
+      setenv("X509_USER_CERT", outfile, 1);
+      setenv("X509_USER_KEY", outfile, 1);
+    }
+  }
   
   // verify that user's certificate and key have the correct permissions
 
-  if (!checkstats(certfile, S_IXUSR | S_IWGRP | S_IXGRP | S_IWOTH | S_IXOTH, debug) ||
+  if (!checkstats(certfile, S_IXUSR | S_IWGRP | S_IXGRP | S_IWOTH | S_IXOTH) ||
       !checkstats(keyfile, S_IXUSR | S_IRGRP | S_IWGRP | S_IXGRP | S_IRGRP |
-                  S_IWOTH | S_IXOTH, debug))
+                  S_IWOTH | S_IXOTH))
     exit(1);
   
-  if(debug) 
-    std::cout << "Files being used:" << std::endl 
-              << " CA certificate file: " << (cacertfile ? cacertfile : "none") << std::endl
-              << " Trusted certificates directory : " << (certdir ? certdir : "none") << std::endl
-              << " Proxy certificate file : " << (outfile ? outfile : "none") << std::endl
-              << " User certificate file: " << (certfile ? certfile : "none") << std::endl
-              << " User key file: " << (keyfile ? keyfile : "none") << std::endl;
-  
-  if (debug)
-    std::cout << "Output to " << outfile << std::endl;
+  Print(DEBUG) << "Files being used:" << std::endl 
+               << " CA certificate file: " << (cacertfile ? cacertfile : "none") << std::endl
+               << " Trusted certificates directory : " << (certdir ? certdir : "none") << std::endl
+               << " Proxy certificate file : " << (outfile ? outfile : "none") << std::endl
+               << " User certificate file: " << (certfile ? certfile : "none") << std::endl
+               << " User key file: " << (keyfile ? keyfile : "none") << std::endl
+               << "Output to " << outfile << std::endl;
 
   if (!load_credentials(certfile, keyfile, &ucert, &cert_chain, &private_key, pw_cb))
     goto err;
 
-  if(!quiet) {
+  if (!quiet) {
     char * s = NULL;
     s = X509_NAME_oneline(X509_get_subject_name(ucert),NULL,0);
-    std::cout << "Your identity: " << s << std::endl;
+    Print(INFO) << "Your identity: " << s << std::endl;
     OPENSSL_free(s);
   }
 
@@ -1589,8 +1184,8 @@ bool Client::pcdInit() {
   
 }
 
-void Client::Error() {
-
+void Client::Error() 
+{
   unsigned long l;
   char buf[256];
 #if SSLEAY_VERSION_NUMBER  >= 0x00904100L
@@ -1631,13 +1226,11 @@ void Client::Error() {
     
     free(dat);
   }
-
 }
 
-static bool isAC(std::string data)
+static AC *getAC(const std::string& data)
 {
   char *p, *pp;
-  bool res = false;
   AC *ac = NULL;
   int len = data.size();
 
@@ -1647,54 +1240,68 @@ static bool isAC(std::string data)
     pp = (char *)memcpy(pp, data.data(), len);
     p = pp;
     ac = d2i_AC(NULL, (unsigned char **)&p, len);
-    if (ac)
-      res = true;
-    AC_free(ac);
     free(pp);
   }
 
-  return res;
+  return ac;
 }
 
-static char *norep()
+bool Client::LoadVomses()
 {
-  static char *buffer=const_cast<char *>("");
-
-/*   buffer=malloc(1); */
-/*   if (buffer) */
-/*     *buffer='\0'; */
-  return buffer;
-
-}
-
-bool Client::LoadVomses(vomsdata& v, bool loud)
-{
-  bool cumulative = false;
+  bool failfatal   = failonwarn  || confiles.size() == 1;
+  bool alwaysprint = !ignorewarn || confiles.size() == 1;
 
   for (std::vector<std::string>::iterator i = confiles.begin(); i != confiles.end(); i++) {
-    if(debug)
+    if (debug)
       std::cout << "Using configuration file "<< *i << std::endl;
-    bool res = v.LoadSystemContacts(*i);
 
-    cumulative |= res;
+    bool res = v->LoadSystemContacts(*i);
 
     if (!res) {
-      if (*i != userconf && loud)
-        std::cerr << v.ErrorMessage() << std::endl;
-    }
-    else if (v.error == VERR_DIR && loud) {
-      /* A global return of error and a VERR_DIR may mean some files could not be
-         read, but at least some could. */
-      if (*i != userconf) {
-        if (!v.ErrorMessage().empty()) {
-          if (!ignorewarn)
-            std::cerr << v.ErrorMessage() << std::endl;
-          if (failonwarn)
+      if (v->error == VERR_FORMAT) {
+        Print(ERROR) << v->ErrorMessage() << std::endl;
+        return false;
+      }
+      else if (v->error == VERR_DIR) {
+        /* Ignore errors while reading default file
+           unless that is the only file */
+        if (*i != userconf || confiles.size() == 1) {
+          if (alwaysprint)
+            Print(ERROR) << v->ErrorMessage() << std::endl;
+          if (failfatal)
             return false;
         }
       }
     }
   }
+  return true;
+}
 
-  return cumulative;
+struct nullstream: std::ostream {
+  struct nullbuf: std::streambuf {
+    int overflow(int c) { return traits_type::not_eof(c); }
+  } m_sbuf;
+  nullstream(): std::ios(&m_sbuf), std::ostream(&m_sbuf) {}
+};
+
+nullstream voidstream;
+
+std::ostream& Client::Print(message_type type) 
+{
+  if (type == FORCED)
+    return std::cout;
+
+  if (type == ERROR || (failonwarn && type == WARN))
+    return std::cerr;
+
+  if (quiet || (ignorewarn && type == WARN))
+    return voidstream;
+
+  if (type == WARN)
+    return std::cerr;
+
+  if (type == DEBUG && !debug)
+    return voidstream;
+
+  return std::cout;
 }

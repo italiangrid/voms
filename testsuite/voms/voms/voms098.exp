@@ -1,0 +1,50 @@
+load_lib vomstest.exp
+testheader "See if reloading configuration works."
+
+proc myprolog {} {
+}
+
+proc myepilog {} {
+    _removeVOMSOption voms1 timeout
+}
+
+proc mytest {} {
+    _activateCert mycert2
+
+    _vomsStart voms1
+    _addVOMSOption voms1 timeout 10000
+    _vomsReload voms1
+    set outname [exec mktemp $::SCRATCHDIR/voms-proxy-init-XXXXXX]
+    set res [catch {set out [exec $::INSTALLDIR/bin/voms-proxy-init --voms voms1 --vomslife 23:50 >& $outname]}]
+    _vomsStop voms1
+    
+    if  $res then {
+        addlog $outname
+        testmessage "voms-proxy-init incorrectly failed."
+        return $::FAILTEST
+    } else {
+        set correct "The validity of this VOMS AC in your proxy is shortened"
+	set out2 [exec cat $outname]
+
+	if [regexp $correct $out2] then {
+	    testmessage "Warning correctly returned"
+	    return $::PASSTEST
+	}
+
+	set outname2 [exec mktemp $::SCRATCHDIR/voms-proxy-info-XXXXXX]
+	set id [open $outname2 "w+"]
+	puts $id $correct
+	close $id
+	addlog $outname
+	addlog $outname2
+
+        testmessage "voms-proxy-init incorrectly returned a success."
+        return $::FAILTEST
+    }
+}
+
+#test_set_prolog myprolog
+test_set_epilog myepilog
+
+do_test
+

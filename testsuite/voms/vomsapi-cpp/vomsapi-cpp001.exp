@@ -1,13 +1,7 @@
 load_lib vomstest.exp
+testheader "See if the C++ API testsuite starts."
 
 proc mytest {} {
-    testheader "See if the C API testsuite starts."
-
-    if {[info exists ::NOCCLIB] != 0} then {
-        testmessage "Either libraries are not present, or the executables cannot be compiled, or the test was disabled."
-        return $::UNDECIDEDTEST
-    }
-
     testmessage "noerror"
     return $::PASSTEST
 }

@@ -1,7 +1,7 @@
 load_lib vomstest.exp
+testheader "See if all attributes can be retrieved by a voms proxy."
 
 proc mytest {} {
-    testheader "See if all attributes can be retreived by a voms proxy."
     _activateCert mycert2
 
     _vomsStart voms1
@@ -20,7 +20,7 @@ proc mytest {} {
 
     if $res then {
         addlog $outname
-        testmessage "voms proxy info failed."
+        testmessage "voms-proxy-info failed."
         return $::FAILTEST
     } else {
         #match against known (correct) output

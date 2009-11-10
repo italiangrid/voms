@@ -7,6 +7,7 @@ rename cleanup _cleanup
 rename unsupported _unsupported
 set _test_prolog ""
 set _test_epilog ""
+set _testmessage ""
 set LOGOUTS ""
 
 proc load_lib {file} {
@@ -30,13 +31,6 @@ proc fail message {
 
     puts $_logdescriptor "<td align=\"left\" bgcolor=\"red\">failed</td><td>$message</td>"
     puts $_logdescriptor "<td>"
-
-    set scriptname [file normalize [uplevel info script]]
-    set fname [file dirname [file dirname $scriptname]]
-    set realname [string range $scriptname [string length $$fname] end]
-    set newname [exec mktemp $REPORTDIR/out-XXXXXX]
-    file copy -force $scriptname $newname
-    puts $_logdescriptor "<a href=\"$newname\">$realname</a>"
 
     foreach name [split $LOGOUTS] {
         if [file exists $name] then {
@@ -89,21 +83,37 @@ proc cleanup {} {
     puts $::_logdescriptor "</body></html>"
     flush $::_logdescriptor
     close $::_logdescriptor
-#    catch {exec rm -rf $::INSTALLDIR/ca}
+    exec lcov --directory ../src --capture -o app.info -q >/dev/null
+    exec lcov -r app.info "/usr*" "*/mystack.c" "*/lex.yy.c" "*/vomsfake.tab.c" "*/vomsparser.c" -o app1.info >/dev/null
+    exec rm app.info
+    exec lcov -r zero.info "/usr*" "*/mystack.c" "*/lex.yy.c" "*/vomsfake.tab.c" "*/vomsparser.c" -o zero1.info >/dev/null
+    exec rm zero.info
+    exec lcov -a zero1.info -a app1.info -o total.info >/dev/null
+    exec rm app1.info zero1.info
+    exec lcov -r total.info "/usr*" "*/mystack.c" "*/lex.yy.c" "*/vomsfake.tab.c" "*/vomsparser.c" -o voms.info >/dev/null
+    exec rm total.info
+    exec genhtml --show-details --legend --highlight -o $::REPORTDIR/coverage voms.info >/dev/null
+    exec rm voms.info
+
+    catch {exec rm -rf $::INSTALLDIR/ca}
     catch {exec rm -rf $::SCRATCHDIR}
 }
 
 proc testheader {description {testname ""}} {
+    global REPORTDIR
+
     set scriptname [file normalize [uplevel info script]]
     set fname [file dirname [file dirname $scriptname]]
 
     set realname [string range $scriptname [string length $$fname] end]
-    puts $::_logdescriptor "<tr><td align=\"left\">$realname</td><td align=\"left\">$description</td>"
+    set newname [exec mktemp $REPORTDIR/out-XXXXXX]
+    file copy -force $scriptname $newname
+    puts $::_logdescriptor "<tr><td align=\"left\"><a href=\"$newname\">$realname</a></td><td align=\"left\">$description</td>"
     set ::LOGOUTS ""
     set ::_testmessage ""
 }
 
-#Error codes should be > 6 to avoid conflicting with TCL own codes
+#Error codes should be > 6 to avoid conflicting with DejaGNU's own codes
 set ::PASSTEST 1000
 set ::FAILTEST 1100
 set ::UNDECIDEDTEST 1200
@@ -133,6 +143,35 @@ proc do_test { {name ""} } {
     set res $::UNDECIDEDTEST
     set res2 0
 
+    set scriptname [file normalize [uplevel info script]]
+    set fname [file dirname [file dirname $scriptname]]
+
+    set realname [string range $scriptname [string length $$fname] end]
+
+    if {[info exists ::NOJAVALIB] != 0} then {
+        if [regexp "vomsapi-java*" $realname] {
+            set $_testmessage "Test disabled."
+            unsupported $_testmessage
+            return
+        }
+    }
+
+    if {[info exists ::NOCCLIB] != 0} then {
+        if [regexp "vomsapi-cpp*" $realname] {
+            set $_testmessage "Test disabled."
+            unsupported $_testmessage
+            return
+        }
+    }
+
+    if {[info exists ::NOCLIB] != 0} then {
+        if [regexp "vomsapi-c[0-9]*" $realname] {
+            set $_testmessage "Test disabled."
+            unsupported $_testmessage
+            return
+        }
+    }
+
     _backupVOMS voms1
     if [expr ![string equal $::_test_prolog ""]] then {
         set res2 [catch {set out [$::_test_prolog]} out]
@@ -147,13 +186,13 @@ proc do_test { {name ""} } {
         }
 
         if [expr ! [ string equal $::_test_epilog ""]] then {
-            set res2 [catch {set out [$::_test_epilog]} out]
+            set res2 [catch {set out2 [$::_test_epilog]} out2]
         }
         # Ensures that an eventual failure from the epilog
         # is considered a failure for the whole test
         if { $res2 != 0 } then {
             set res $res2
-            set $_testmessage "Failure during epilog execution."
+            set $_testmessage "Failure during epilog execution."        
         }
     } else {
         set res $res2

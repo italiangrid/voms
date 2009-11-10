@@ -1,7 +1,7 @@
 load_lib vomstest.exp
+testheader "Dummied out."
 
 proc mytest {} {
-    testheader "Dummied out."
     testmessage "noerror"
     return $::PASSTEST
 }

@@ -1,7 +1,7 @@
 load_lib vomstest.exp
+testheader "See if voms --nologfile vorks."
 
 proc mytest {} {
-    testheader "See if voms --nologfile vorks."
     _activateCert mycert2
 
     _addVOMSOption voms1 nologfile

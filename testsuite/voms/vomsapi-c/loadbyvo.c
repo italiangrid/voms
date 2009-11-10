@@ -22,7 +22,7 @@ int main(int argc, char *argv[]) {
       total --;
 
       for (count = 0; count < total; count ++)
-        printf("\"%s\" \"%s\" \"%s\" \"%s\" \"%ld\" \"%ld\"\n", 
+        printf("\"%s\" \"%s\" \"%s\" \"%s\" \"%ld\" \"%d\"\n", 
                 vomses[count]->nick, vomses[count]->host,
                 vomses[count]->contact, vomses[count]->vo, vomses[count]->port,
                 vomses[count]->version);

@@ -1,7 +1,7 @@
 load_lib vomstest.exp
+testheader "See if -acexists works."
 
 proc mytest {} {
-    testheader "See if -acexists works."
     _activateCert mycert2
 
     _vomsStart voms1
@@ -24,12 +24,12 @@ proc mytest {} {
         return $::FAILTEST
     } else {
         if [catch {set out2 [exec $::INSTALLDIR/bin/voms-proxy-info --acexists voms2 >& $outname]}] then {
+            testmessage "uneexpected AC verified to not exist."
+            return $::PASSTEST
+        } else {
             addlog $outname
             testmessage "unexpected ac found!"
             return $::FAILTEST
-        } else {
-            testmessage "expected AC verified to exist."
-            return $::PASSTEST
         }
     }
 }

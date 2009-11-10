@@ -3,9 +3,9 @@
  * Authors:
  *      Vincenzo Ciaschini - vincenzo.ciaschini@cnaf.infn.it
  *
- * Copyright (c) 2006 INFN-CNAF on behalf of the EGEE project.
- *
- * For license conditions see LICENSE
+ * Copyright (c) 2006-2009 INFN-CNAF on behalf of the EGEE I, II and III
+ * For license conditions see LICENSE file or
+ * http://www.apache.org/licenses/LICENSE-2.0.txt
  *
  * Parts of this code may be based upon or even include verbatim pieces,
  * originally written by other people, in which case the original header
@@ -18,8 +18,13 @@ import org.bouncycastle.asn1.DERInteger;
 import org.bouncycastle.asn1.DEREncodable;
 import org.bouncycastle.asn1.DEREncodableVector;
 import org.bouncycastle.asn1.DERObject;
+import org.bouncycastle.asn1.DERObjectIdentifier;
 import org.bouncycastle.asn1.DERSequence;
 import org.bouncycastle.asn1.ASN1Sequence;
+import org.bouncycastle.asn1.ASN1Object;
+import java.io.IOException;
+import java.io.ByteArrayInputStream;
+import org.bouncycastle.asn1.DERInputStream;
 
 public class MyProxyCertInfo implements DEREncodable {
 
@@ -48,7 +53,7 @@ public class MyProxyCertInfo implements DEREncodable {
         return policy;
     }
 
-    public MyProxyCertInfo(ASN1Sequence seq) {
+    private void setFromSeq(ASN1Sequence seq) {
         if (seq.size() == 1) {
             // Only one element.  Must be a ProxyPolicy
             this.pathLen = -1;
@@ -68,6 +73,26 @@ public class MyProxyCertInfo implements DEREncodable {
                 this.version = VOMSProxyBuilder.GT4_PROXY;
             }
         }
+    }
+    public MyProxyCertInfo(ASN1Sequence seq) {
+        setFromSeq(seq);
+    }
+
+    public MyProxyCertInfo(byte[] payload) {
+        DERObject derObj = null;
+        try {
+            ByteArrayInputStream inStream = new ByteArrayInputStream(payload);
+            DERInputStream derInputStream = new DERInputStream(inStream);
+            derObj = derInputStream.readObject();
+        } catch (IOException e) {
+            throw new IllegalArgumentException("Unable to convert byte array: " + 
+                                                   e.getMessage());
+        }
+        if (derObj instanceof ASN1Sequence) {
+            setFromSeq((ASN1Sequence)derObj);
+        }
+        else
+            throw new IllegalArgumentException("Unable to convert byte array");
     }
 
     public DERObject getDERObject() {

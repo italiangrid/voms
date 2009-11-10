@@ -1,5 +1,5 @@
 
-includedir = $(prefix)/include/glite/security/voms
+includedir = @includedir@/glite/security/voms
 
 lib_LTLIBRARIES = \
 	$(WANTED_API_LIBS) # may add the libraries defined in EXTRA_LTLIBRARIES
@@ -8,6 +8,7 @@ CCSOURCES = \
 	api_util.cc \
 	voms_api.cc \
 	ccval.cc \
+	internal.cc \
 	cinterface.cc
 
 API_INCLUDES = \
@@ -65,6 +66,7 @@ CSOURCES = \
 	api_util.cc \
 	voms_api.cc \
 	ccval.cc \
+	internal.cc \
 	cinterface.cc
 
 libvomsc_la_SOURCES = \
@@ -393,7 +395,7 @@ EXTRA_DIST = \
 	voms_apic.h \
 	cinterface.h \
 	realdata.h \
-  ctest.c
+	internal.h
 
 CLEANFILES = \
 	libvomsapi_gcc32.la \

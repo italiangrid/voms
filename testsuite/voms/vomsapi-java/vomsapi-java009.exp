@@ -1,0 +1,38 @@
+load_lib vomstest.exp
+testheader "See if warnings from the server are correctly interpreted."
+
+proc mytest {} {
+    _activateCert mycert2
+
+    # Create a proxy to validate.
+    _vomsStart voms1
+
+    set ::_buildout [exec mktemp $::SCRATCHDIR/program-out-XXXXXX]
+    set proxyout [exec mktemp $::SCRATCHDIR/proxy-XXXXXX]
+    set res [_execJava contactvoms5.java $::_certdir/mycert2-cert.pem $::_certdir/mycert2-key.pem $proxyout]
+
+    _vomsStop voms1
+
+    addlog $::_buildout
+
+    if $res then {
+        testmessage "proxy creation failed."
+        return $::FAILTEST
+    }
+
+    set correct "The validity of this VOMS AC in your proxy is shortened"
+
+    set out [exec cat $::_buildout]
+
+    if [regexp $correct $out] then {
+        testmessage "Warning recognized."
+        return $::PASSTEST
+    } else {
+        addlog $::INSTALLDIR/var/log/voms.voms1
+        testmessage "Unexpected output."
+        return $::FAILTEST
+    }
+    return $::FAILTEST
+}
+
+do_test

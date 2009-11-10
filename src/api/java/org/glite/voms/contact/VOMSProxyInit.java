@@ -1,11 +1,12 @@
 /*********************************************************************
  *
  * Authors: 
- *      Andrea Ceccanti - andrea.ceccanti@cnaf.infn.it 
+ *      Andrea Ceccanti    - andrea.ceccanti@cnaf.infn.it 
+ *      Vincenzo Ciaschini - vincenzo.ciaschini@cnaf.infn.it
  *          
- * Copyright (c) 2006 INFN-CNAF on behalf of the EGEE project.
- * 
- * For license conditions see LICENSE
+ * Copyright (c) 2006-2009 INFN-CNAF on behalf of the EGEE I, II and III
+ * For license conditions see LICENSE file or
+ * http://www.apache.org/licenses/LICENSE-2.0.txt
  *
  * Parts of this code may be based upon or even include verbatim pieces,
  * originally written by other people, in which case the original header
@@ -57,6 +58,10 @@ public class VOMSProxyInit {
 
     private String policyType = null;
 
+    private int bits = 1024;
+
+    private VOMSWarningMessage[] warnings = null;
+
     public VOMSProxyInit(String privateKeyPassword){
     
         try {
@@ -77,9 +82,11 @@ public class VOMSProxyInit {
         
     }
 
-    private VOMSProxyInit(UserCredentials userCredentials) {
-        if (userCredentials == null)
+    private VOMSProxyInit(UserCredentials credentials) {
+        if (credentials == null)
             throw new VOMSException("Unable to find GlobusCredentials!");
+
+        userCredentials = credentials;
 
         try {
             serverMap = VOMSESFileParser.instance().buildServerMap();
@@ -111,11 +118,14 @@ public class VOMSProxyInit {
     }
     
     public synchronized AttributeCertificate getVomsAC(VOMSRequestOptions requestOptions){
-        
+        warnings = null;
         if (requestOptions.getVoName() == null)
             throw new VOMSException("Please specify a vo name to create a voms ac.");
         
         Set servers = serverMap.get( requestOptions.getVoName());
+
+        if (servers ==  null)
+            throw new VOMSException("Unknown VO '"+requestOptions.getVoName()+"'. Check the VO name or your vomses configuration files.");
         
         Iterator serverIter = servers.iterator();
         
@@ -129,6 +139,9 @@ public class VOMSProxyInit {
                 
                 if (!response.hasErrors()){
                     
+                    if (response.hasWarnings())
+                        logAndSetWarningMessages(response);
+
                     AttributeCertificate ac = VOMSProxyBuilder.buildAC(response.getAC());
                     log.info( "Got AC from VOMS server "+serverInfo.compactString() );
                     
@@ -146,6 +159,57 @@ public class VOMSProxyInit {
                     }
                     
                     return ac;
+                }
+                
+                log.error( "Got error response from VOMS server "+serverInfo.compactString() );
+                logErrorMessages( response );
+                
+            }catch(VOMSException e){
+                
+                log.error(e.getMessage());
+                if (log.isDebugEnabled()){
+                    log.error(e.getMessage(),e);
+                }
+                
+                if (serverIter.hasNext())
+                    continue;
+                
+                throw(e);
+            }
+        }
+        
+        return null;            
+    }
+
+    public synchronized String getVomsData(VOMSRequestOptions requestOptions){
+        warnings = null;
+
+        if (requestOptions.getVoName() == null)
+            throw new VOMSException("Please specify a vo name to create a voms ac.");
+        
+        Set servers = serverMap.get( requestOptions.getVoName());
+
+        if (servers ==  null)
+            throw new VOMSException("Unknown VO '"+requestOptions.getVoName()+"'. Check the VO name or your vomses configuration files.");
+        
+        Iterator serverIter = servers.iterator();
+        
+        while(serverIter.hasNext()){
+            
+            VOMSServerInfo serverInfo = (VOMSServerInfo) serverIter.next();
+            
+            try{
+            
+                VOMSResponse response = contactServer( serverInfo, requestOptions );
+                
+                if (!response.hasErrors()){
+
+                    if (response.hasWarnings())
+                        logAndSetWarningMessages(response);
+                    
+                    byte[] data = response.getData();
+                    log.info( "Got Data from VOMS server "+data );
+                    return new String(data);
                 }
                 
                 log.error( "Got error response from VOMS server "+serverInfo.compactString() );
@@ -204,36 +268,29 @@ public class VOMSProxyInit {
         log.debug("AC Validation ended at: "+ new Date(  ));
         
     }
+
     public synchronized UserCredentials getVomsProxy(){
-        
         return getVomsProxy( null );
-        
     }
-    
-    
-    protected UserCredentials getGridProxy(){
-        
-        UserCredentials proxy = VOMSProxyBuilder.buildProxy( userCredentials, proxyLifetime, proxyType);
-        
+
+    protected UserCredentials getGridProxy() {
+        UserCredentials proxy = VOMSProxyBuilder.buildProxy( userCredentials, proxyLifetime, proxyType, bits);
+
+        warnings = null;
+
         try{
-            
             saveProxy( proxy );
             return proxy;
-            
         }catch ( FileNotFoundException e ) {
-            
             log.error("Error saving proxy to file "+proxyOutputFile+":"+e.getMessage());
             if (log.isDebugEnabled())
                 log.error(e.getMessage(),e);
             
             throw new VOMSException("Error saving proxy to file "+proxyOutputFile+":"+e.getMessage(),e);
         }
-        
     }
 
     public synchronized UserCredentials getVomsProxy(Collection listOfReqOptions) {
-        
-        
         if (listOfReqOptions == null)
             return getGridProxy();
         
@@ -243,7 +300,8 @@ public class VOMSProxyInit {
         Iterator i = listOfReqOptions.iterator();
         
         List ACs = new ArrayList();
-        
+
+        warnings = null;
         while (i.hasNext()){
             
             VOMSRequestOptions options = (VOMSRequestOptions)i.next();
@@ -268,7 +326,7 @@ public class VOMSProxyInit {
                                                              ACs, proxyLifetime, 
                                                              proxyType, 
                                                              delegationType,
-                                                             policyType);
+                                                             policyType, this.bits);
         
         try {            
             saveProxy( proxy );
@@ -300,9 +358,29 @@ public class VOMSProxyInit {
         
         for ( int i = 0; i < msgs.length; i++ ) {
             log.error(msgs[i]);
+        }        
+    }
+
+    private void logAndSetWarningMessages(VOMSResponse response){
+        
+        VOMSWarningMessage[] msgs = response.warningMessages();
+        
+        setWarnings(msgs);
+        for ( int i = 0; i < msgs.length; i++ ) {
+            log.warn(msgs[i]);
         }
-        
-        
+    }
+
+    private void setWarnings(VOMSWarningMessage[] msgs) {
+        warnings = msgs;
+    }
+
+    public boolean hasWarnings() {
+        return warnings != null;
+    }
+
+    public VOMSWarningMessage[] getWarnings() {
+        return warnings;
     }
 
     protected VOMSResponse contactServer(VOMSServerInfo sInfo, VOMSRequestOptions reqOptions) {
@@ -382,7 +460,15 @@ public class VOMSProxyInit {
     
         this.proxyType = proxyType;
     }
-    
+
+    public int getProxyKeySize() {
+        return bits;
+    }
+
+    public void setProxyKeySize(int bits) {
+        this.bits = bits;
+    }
+
     public String getPolicyType() {
         return policyType;
     }

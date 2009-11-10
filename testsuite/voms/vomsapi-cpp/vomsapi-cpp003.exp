@@ -1,13 +1,7 @@
 load_lib vomstest.exp
+testheader "See if data can be retrieved."
 
 proc mytest {} {
-    testheader "See if data can be retrieved."
-
-    if {[info exists ::NOCCLIB] != 0} then {
-        testmessage "Either libraries are not present, or the executables cannot be compiled, or the test was disabled."
-        return $::UNDECIDEDTEST
-    }
-
     _activateCert mycert2
 
     _vomsStart voms1

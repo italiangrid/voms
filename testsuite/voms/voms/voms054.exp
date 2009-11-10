@@ -1,7 +1,7 @@
 load_lib vomstest.exp
+testheader "See if voms --skipcacheck works."
 
 proc mytest {} {
-    testheader "See if voms --skipcacheck works."
     _activateCert mycertsameasmycert2
 
     _addVOMSOption voms1 skipcacheck

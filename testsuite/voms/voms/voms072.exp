@@ -1,7 +1,7 @@
 load_lib vomstest.exp
+testheader "See if voms starts when it cannot log."
 
 proc mytest {} {
-    testheader "See if voms starts when it cannot log."
     _activateCert mycert2
 
     _removeVOMSOption voms1 syslog

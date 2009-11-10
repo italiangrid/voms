@@ -33,7 +33,7 @@ db_password_admin=""
 voms_username_query=""
 voms_password_query=""
 
-ECHO=echo
+ECHO=/bin/echo
 
 # Default path
 basepath=$@LOCATION_ENV@
@@ -50,6 +50,13 @@ logformat=""
 sqlloc=""
 help=""
 oldformat="no"
+
+if test "x@with_mysqlconf@" != "x" ; then
+    MYSQLCONF=" --defaults-file=@with_mysqlconf@ "
+else
+    MYSQLCONF=""
+fi
+
 
 TEMP=`getopt -o h --long mysql-home:,loglevel:,logtype:,logformat:,logdateformat:,oracle-home:,db:,port:,code:,voms-vo:,socktimeout:,db-type:,sqlloc:,db-admin:,db-pwd:,voms-name:,voms-pwd:,newformat,compat -n 'voms_install_db' -- "$@"`
 
@@ -170,11 +177,11 @@ fi
 # choose client
 if test "x$db_type" = "xmysql" ; then
     if test -z $db_password_admin ; then
-        MYSQLADMIN="$MYSQL_HOME/bin/mysqladmin -u $db_username_admin"
-        CLIENT="$MYSQL_HOME/bin/mysql -u $db_username_admin"
+        MYSQLADMIN="$MYSQL_HOME/bin/mysqladmin $MYSQLCONF -u $db_username_admin"
+        CLIENT="$MYSQL_HOME/bin/mysql $MYSQLCONF -u $db_username_admin"
     else
-        MYSQLADMIN="$MYSQL_HOME/bin/mysqladmin -u $db_username_admin -p$db_password_admin"
-        CLIENT="$MYSQL_HOME/bin/mysql -u $db_username_admin -p$db_password_admin"	
+        MYSQLADMIN="$MYSQL_HOME/bin/mysqladmin $MYSQLCONF -u $db_username_admin -p$db_password_admin"
+        CLIENT="$MYSQL_HOME/bin/mysql $MYSQLCONF -u $db_username_admin -p$db_password_admin"	
     fi
 elif test "x$db_type" = "xoracle" ; then
     CLIENT="$ORACLE_HOME/bin/sqlplus -S $db_username_admin/$db_password_admin@$voms_database"
@@ -187,6 +194,11 @@ fi
 if test "x$db_type" = "xmysql" ; then
     $CLIENT -e "DROP DATABASE IF EXISTS $voms_database;
                 CREATE DATABASE $voms_database;"
+    if test $? -ne 0 ; then
+        $ECHO "Could not execute $CLIENT command"
+        exit 1;
+    fi
+
     CLIENT="$CLIENT -D$voms_database" 
 fi
 

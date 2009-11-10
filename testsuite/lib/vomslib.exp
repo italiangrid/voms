@@ -11,6 +11,10 @@ variable _capath
 variable _certdir
 variable _vomsdir
 
+proc _cleanproxy {} {
+    set filename "/tmp/x509up_u[exec id -u]"
+    file delete $filename
+}
 proc _activateCert {cert} {
     file mkdir $::env(HOME)/.globus2
     file copy -force "$::_certdir/$cert-cert.pem" $::env(HOME)/.globus2/usercert.pem
@@ -108,7 +112,7 @@ proc _make_ca { dn name { day 365 } {condsubject "" }} {
         set id [open "$::_cadir/$hashname.signing_policy" w+]
         set out "/C=IT/*"
         if {[string bytelength $condsubject]} then {
-            set out $consubject
+            set out $condsubject
         }
         puts $id "access_id_CA       X509    '$dn'
 pos_rights         globus   CA:sign
@@ -162,6 +166,10 @@ cond_subjects      globus   '\"$out\"'"
 }
 
 
+proc _protect_key { certname { password "password" } } {
+    exec openssl rsa -in $::_certdir/$certname-key.pem -out $::_certdir/$certname-key.pem -inform PEM -outform PEM -des3 -passout "pass:$password" 2>/dev/null
+}
+
 proc _make_cert_from_ca { dn name certname {day 2}} {
     if [expr ![file exists "$::_capath/$name"]] then {
         puts "CA $name does not exist!"
@@ -180,9 +188,7 @@ proc _make_cert_from_ca { dn name certname {day 2}} {
         exec openssl ca  -config $::_capath/$name/$name.cnf -policy policy_anything -startdate "$startdate" -enddate "$expireddate" -out $::_certdir/$certname-cert.pem -in $::_certdir/$certname-cert.req -batch 2>/dev/null
     } else {
         exec openssl ca  -config $::_capath/$name/$name.cnf -policy policy_anything -days $day -out $::_certdir/$certname-cert.pem -in $::_certdir/$certname-cert.req -batch 2>/dev/null
-    }
-
-    
+    }    
 }
 
 proc _ca_make_config { dn name path } {
@@ -244,7 +250,7 @@ cert_opt 	= ca_default		  # Certificate field options
 
 default_days	= 365			# how long to certify for
 default_crl_days= 30			# how long before next CRL
-default_md	= md5			# which md to use.
+default_md	= sha1			# which md to use.
 preserve	= no			# keep passed DN ordering
 policy		= policy_anything
 

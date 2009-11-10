@@ -280,5 +280,4 @@ EXTRA_DIST = \
 	write.h \
 	init.h \
 	extensions.h \
-	test.c \
 	attributes.h

@@ -3,9 +3,9 @@
  * Authors: 
  *      Andrea Ceccanti - andrea.ceccanti@cnaf.infn.it 
  *          
- * Copyright (c) 2006 INFN-CNAF on behalf of the EGEE project.
- * 
- * For license conditions see LICENSE
+ * Copyright (c) 2006-2009 INFN-CNAF on behalf of the EGEE I, II and III
+ * For license conditions see LICENSE file or
+ * http://www.apache.org/licenses/LICENSE-2.0.txt
  *
  * Parts of this code may be based upon or even include verbatim pieces,
  * originally written by other people, in which case the original header
@@ -98,11 +98,15 @@ public class VOMSServerInfo {
         if (this == obj)
             return true;
         
+        if (!(obj instanceof VOMSServerInfo))
+            return false;
+
         VOMSServerInfo other = (VOMSServerInfo)obj;
-        
-        if (this.hostName.equals( other.getHostName() )){
-            
-            return this.getPort() == other.getPort();
+
+        if (other.getHostName() != null) {
+            if (this.hostName.equals(other.getHostName())){
+                return this.getPort() == other.getPort();
+            }
         }
         
         return false;
@@ -113,15 +117,13 @@ public class VOMSServerInfo {
         int result = 14;
         
         result =  29 * result + hostName.hashCode();
-        result = 29 * result + port;
-    
-        return result;
+        return 29 * result + port;
     }
     
     public static VOMSServerInfo fromStringArray(String[] tokens){
         VOMSServerInfo info = new VOMSServerInfo();
         
-        info.setVoName( tokens[0] );
+        info.setVoName( tokens[4] );
         info.setHostName( tokens[1] );
         info.setPort( Integer.parseInt( tokens[2] )) ;
         info.setHostDn( tokens[3] );

@@ -1,7 +1,7 @@
 load_lib vomstest.exp
+testheader "Requesting a non-existent role should fail."
 
 proc mytest {} {
-    testheader "Requesting a non-existent role should fail."
     _activateCert mycert2
 
     _vomsStart voms1
@@ -14,7 +14,7 @@ proc mytest {} {
         return $::PASSTEST
     } else {
         addlog $outname
-        testmessage "voms proxy init succeeded with a non-existent role."
+        testmessage "voms-proxy-init succeeded with a non-existent role."
         return $::FAILTEST
     }
 }

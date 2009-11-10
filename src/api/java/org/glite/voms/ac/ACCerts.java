@@ -2,9 +2,10 @@
  *
  * Authors: Vincenzo Ciaschini - Vincenzo.Ciaschini@cnaf.infn.it
  *
- * Copyright (c) 2002, 2003, 2004, 2005, 2006 INFN-CNAF on behalf of the 
- * EGEE project.
- * For license conditions see LICENSE
+ * Copyright (c) 2002-2009 INFN-CNAF on behalf of the 
+ * EGEE I, II and III
+ * For license conditions see LICENSE file or
+ * http://www.apache.org/licenses/LICENSE-2.0.txt
  *
  * Parts of this code may be based upon or even include verbatim pieces,
  * originally written by other people, in which case the original header
@@ -81,22 +82,17 @@ public class ACCerts implements DEREncodable {
 
         for (Enumeration e = seq.getObjects(); e.hasMoreElements();){
             Object o = e.nextElement();
-            //            System.out.println("O CLASS: " + o.getClass());
+
             if (o instanceof DERSequence) {
                 ASN1Sequence s = ASN1Sequence.getInstance(o);
                 byte[] data = null;
                 try {
                       data = new X509CertificateObject(X509CertificateStructure.getInstance(s)).getEncoded();
                       l.add((X509Certificate)cf.generateCertificate(new ByteArrayInputStream(data)));
-//                      X509CertificateObject obj  = null;
-//                      obj = new X509CertificateObject(X509CertificateStructure.getInstance(s));
-//                      l.add(obj);
                 }
                 catch(Exception ex) {
                     throw new IllegalArgumentException("Error in encoding ACCerts. " + ex.getMessage());
                 }
-
-                //X509CertificateStructure.getInstance(s));
             }
             else
                 throw new IllegalArgumentException("Incorrect encoding for ACCerts");

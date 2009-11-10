@@ -2,9 +2,10 @@
  *
  * Authors: Vincenzo Ciaschini - Vincenzo.Ciaschini@cnaf.infn.it 
  *
- * Copyright (c) 2002, 2003 INFN-CNAF on behalf of the EU DataGrid.
+ * Copyright (c) 2002-2009 INFN-CNAF on behalf of the EU DataGrid
+ * and EGEE I, II and III
  * For license conditions see LICENSE file or
- * http://www.edg.org/license.html
+ * http://www.apache.org/licenses/LICENSE-2.0.txt
  *
  * Parts of this code may be based upon or even include verbatim pieces,
  * originally written by other people, in which case the original header
@@ -321,6 +322,7 @@ void AC_FORM_free(AC_FORM *a)
 
 }
 
+#if 0
 int i2d_AC_ACI(AC_ACI *a, unsigned char **pp)
 {
   M_ASN1_I2D_vars(a);
@@ -359,6 +361,7 @@ void AC_ACI_free(AC_ACI *a)
   AC_FORM_free(a->form);
   OPENSSL_free(a);
 }
+#endif
 
 int i2d_AC_HOLDER(AC_HOLDER *a, unsigned char **pp)
 {

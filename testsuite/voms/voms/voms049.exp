@@ -1,7 +1,7 @@
 load_lib vomstest.exp
+testheader "See if voms-proxy-init --path-length works."
 
 proc mytest {} {
-    testheader "See if voms-proxy-init --path-length works."
     _activateCert mycert2
 
     _vomsStart voms1
@@ -22,7 +22,7 @@ proc mytest {} {
         return $::FAILTEST
     } else {
         #match against known (correct) output
-        set correct ".*Path Length: 1"
+        set correct ".*Path Length Constraint: 01"
         set out2 [exec cat  $outname]
         if [regexp $correct $out2] then {
             testmessage "voms-proxy-init --path-length worked successfully."

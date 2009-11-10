@@ -1,7 +1,7 @@
 load_lib vomstest.exp
+testheader "See if voms-proxy-init --limited (gt2) works."
 
 proc mytest {} {
-    testheader "See if voms-proxy-init --limited (gt2) works."
     _activateCert mycert2
 
     _vomsStart voms1
@@ -10,7 +10,7 @@ proc mytest {} {
     _vomsStop voms1
 
     if $res then {
-        logadd $outname
+        addlog $outname
         testmessage "voms-proxy-init failed."
         return $::FAILTEST
     }

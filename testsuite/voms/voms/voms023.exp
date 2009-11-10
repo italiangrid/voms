@@ -1,8 +1,7 @@
 load_lib vomstest.exp
+testheader "See if a proxy type is detected correctly."
 
 proc mytest {} {
-
-    testheader "See if a proxy type is detected correctly."
     _activateCert mycert2
 
     _vomsStart voms1
@@ -53,7 +52,7 @@ proc mytest {} {
     set outname [exec mktemp $::SCRATCHDIR/voms-proxy-info-XXXXXX]
     if [catch {set out2 [exec $::INSTALLDIR/bin/voms-proxy-info --type >& $outname]}] then {
         addlog $outname
-        testmessage "voms proxy info failed."
+        testmessage "voms-proxy-info failed."
         return $::FAILTEST
     }
 
@@ -85,7 +84,7 @@ proc mytest {} {
     set outname [exec mktemp $::SCRATCHDIR/voms-proxy-info-XXXXXX]
     if [catch {set out2 [exec $::INSTALLDIR/bin/voms-proxy-info --type >& $outname]}] then {
         addlog $outname
-        testmessage "voms proxy info failed."
+        testmessage "voms-proxy-info failed."
         return $::FAILTEST
     }
 

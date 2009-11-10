@@ -1,7 +1,7 @@
 load_lib vomstest.exp
+testheader "See if a non-existent role and normal groups can be requested."
 
 proc mytest {} {
-    testheader "See if a non-existent role and normal groups can be requested."
     _activateCert mycert2
 
     _vomsStart voms1

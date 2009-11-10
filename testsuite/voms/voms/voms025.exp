@@ -1,7 +1,7 @@
 load_lib vomstest.exp
+testheader "See if voms-proxy-info --chain works."
 
 proc mytest {} {
-    testheader "See if voms-proxy-info --chain works."
     _activateCert mycert2
 
     _vomsStart voms1
@@ -46,8 +46,8 @@ timeleft  : \[0-9\]*:\[0-9\]*:\[0-9\]*"
             set id [open $outname2 "w+"]
             puts $id $correct
             close $id
-            addlog $outname $
-            addlog outname2
+            addlog $outname
+            addlog $outname2
             testmessage "Unexpected output in voms-proxy-info"
             return $::FAILTEST
         }

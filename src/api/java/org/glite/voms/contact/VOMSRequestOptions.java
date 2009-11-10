@@ -3,9 +3,9 @@
  * Authors: 
  *      Andrea Ceccanti - andrea.ceccanti@cnaf.infn.it 
  *          
- * Copyright (c) 2006 INFN-CNAF on behalf of the EGEE project.
- * 
- * For license conditions see LICENSE
+ * Copyright (c) 2006-2009 INFN-CNAF on behalf of the EGEE I, II and III
+ * For license conditions see LICENSE file or
+ * http://www.apache.org/licenses/LICENSE-2.0.txt
  *
  * Parts of this code may be based upon or even include verbatim pieces,
  * originally written by other people, in which case the original header
@@ -54,8 +54,9 @@ public class VOMSRequestOptions {
     private int verificationType;
 
     private String voName;
-    
-    
+
+    private boolean requestList = false;
+
     /** 
      * @return the lifetime set for this {@link VOMSRequestOptions} object.
      */
@@ -200,6 +201,14 @@ public class VOMSRequestOptions {
         getTargets().add( target );
     }
 
+    public void doRequestList() {
+        requestList = true;
+    }
+
+    public boolean isRequestList() {
+        return requestList;
+    }
+
     private String asCommaSeparatedString( List l ) {
 
         if ( l.isEmpty() )
@@ -213,7 +222,7 @@ public class VOMSRequestOptions {
             Object o = i.next();
             result.append( o.toString() );
             if ( i.hasNext() )
-                result.append( "," );
+                result.append( ',' );
 
         }
 

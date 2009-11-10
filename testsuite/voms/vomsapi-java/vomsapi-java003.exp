@@ -1,0 +1,32 @@
+load_lib vomstest.exp
+testheader "See if basic validation succeeds."
+
+proc mytest {} {
+    _activateCert mycert2
+
+    # Create a proxy to validate.
+    _vomsStart voms1
+    set outname [exec mktemp $::SCRATCHDIR/voms-proxy-init-XXXXXX]
+    set res [catch {set out [exec $::INSTALLDIR/bin/voms-proxy-init --voms voms1 --out $::SCRATCHDIR/proxy.pem >& $outname]}]
+    _vomsStop voms1
+
+    if $res then {
+        addlog $outname
+        testmessage "voms-proxy-init failed."
+        return $::FAILTEST
+    }
+
+    set ::_buildout [exec mktemp $::SCRATCHDIR/program-out-XXXXXX]
+    set res [_execJava basicvalidation.java $::SCRATCHDIR/proxy.pem]
+
+    if $res then {
+        addlog $::_buildout
+        testmessage "Basic validation failed."
+        return $::FAILTEST
+    }
+
+    testmessage "basic validation succeeded"
+    return $::PASSTEST
+}
+
+do_test

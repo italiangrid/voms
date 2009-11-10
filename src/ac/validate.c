@@ -2,9 +2,10 @@
  *
  * Authors: Vincenzo Ciaschini - Vincenzo.Ciaschini@cnaf.infn.it 
  *
- * Copyright (c) 2002, 2003 INFN-CNAF on behalf of the EU DataGrid.
+ * Copyright (c) 2002-2009 INFN-CNAF on behalf of the EU DataGrid
+ * and EGEE I, II and III
  * For license conditions see LICENSE file or
- * http://www.edg.org/license.html
+ * http://www.apache.org/licenses/LICENSE-2.0.txt
  *
  * Parts of this code may be based upon or even include verbatim pieces,
  * originally written by other people, in which case the original header
@@ -132,6 +133,9 @@ char *get_error(int e)
   case AC_ERR_EXT_TARGET:
     return "Unable to parse Target extension.";
     break;
+  case AC_ERR_TARGET_NO_MATCH:
+    return "Cannot find match among allowed hosts.";
+    break;
   case AC_ERR_EXT_KEY:
     return "AC issuer key unreadable or unverifiable.";
     break;
@@ -166,7 +170,7 @@ char *get_error(int e)
 int validate(X509 *cert, X509 *issuer, AC *ac, struct col *voms, int valids, time_t vertime)
 {
   STACK_OF(GENERAL_NAME) *names;
-  GENERAL_NAME  *name;
+  GENERAL_NAME  *name = NULL;
   ASN1_GENERALIZEDTIME *b;
   ASN1_GENERALIZEDTIME *a;
   EVP_PKEY *key;
@@ -175,7 +179,6 @@ int validate(X509 *cert, X509 *issuer, AC *ac, struct col *voms, int valids, tim
 
   if (valids) {
     CHECK(ac);
-    CHECK(cert);
     CHECK(ac->acinfo);
     CHECK(ac->acinfo->version);
     CHECK(ac->acinfo->holder);
@@ -210,14 +213,18 @@ int validate(X509 *cert, X509 *issuer, AC *ac, struct col *voms, int valids, tim
     voms->version    = 1;
     voms->siglen     = ac->signature->length;
     voms->signature  = ac->signature->data;
-/*     bn               = ASN1_INTEGER_to_BN(ac->acinfo->version, NULL); */
-/*     voms->version    = BN_bn2hex(bn); */
-/*     BN_free(bn); */
     bn               = ASN1_INTEGER_to_BN(ac->acinfo->serial, NULL);
     voms->serial     = BN_bn2hex(bn);
     BN_free(bn);
-    voms->user       = X509_NAME_oneline(X509_get_subject_name(cert), NULL, 0);
-    voms->userca     = X509_NAME_oneline(X509_get_issuer_name(cert), NULL, 0);
+    if (cert) {
+      voms->user       = X509_NAME_oneline(X509_get_subject_name(cert), NULL, 0);
+      voms->userca     = X509_NAME_oneline(X509_get_issuer_name(cert), NULL, 0);
+    }
+    else {
+      if (valids & VER_ID)
+        ERROR(AC_ERR_HOLDER);
+      voms->user  = voms->userca = NULL;
+    }
     if (issuer) {
       voms->server     = X509_NAME_oneline(X509_get_subject_name(issuer), NULL, 0);
       voms->serverca   = X509_NAME_oneline(X509_get_issuer_name(issuer), NULL, 0);
@@ -229,26 +236,27 @@ int validate(X509 *cert, X509 *issuer, AC *ac, struct col *voms, int valids, tim
   }
 
   if (valids) {
-    if (ac->acinfo->holder->baseid) {
-      CHECK(ac->acinfo->holder->baseid->serial);
-      CHECK(ac->acinfo->holder->baseid->issuer);
+    if (valids & VER_ID) {
 
-      if (ASN1_INTEGER_cmp(ac->acinfo->holder->baseid->serial,
-			   cert->cert_info->serialNumber))
-        ERROR(AC_ERR_HOLDER_SERIAL);
+      if (ac->acinfo->holder->baseid) {
+        CHECK(ac->acinfo->holder->baseid->serial);
+        CHECK(ac->acinfo->holder->baseid->issuer);
 
-      names = ac->acinfo->holder->baseid->issuer;
-      if ((sk_GENERAL_NAME_num(names) != 1))
-        ERROR(AC_ERR_HOLDER);
-      if (!(name = sk_GENERAL_NAME_value(names,0)))
-        ERROR(AC_ERR_HOLDER);
-      if (name->type != GEN_DIRNAME)
-        ERROR(AC_ERR_HOLDER);
-      if (X509_NAME_cmp(name->d.dirn, cert->cert_info->subject) &&
-          X509_NAME_cmp(name->d.dirn, cert->cert_info->issuer))
-        ERROR(AC_ERR_HOLDER);
+        if (ASN1_INTEGER_cmp(ac->acinfo->holder->baseid->serial,
+                             cert->cert_info->serialNumber))
+          ERROR(AC_ERR_HOLDER_SERIAL);
 
-      if (valids & VER_ID) {
+        names = ac->acinfo->holder->baseid->issuer;
+        if ((sk_GENERAL_NAME_num(names) != 1))
+          ERROR(AC_ERR_HOLDER);
+        if (!(name = sk_GENERAL_NAME_value(names,0)))
+          ERROR(AC_ERR_HOLDER);
+        if (name->type != GEN_DIRNAME)
+          ERROR(AC_ERR_HOLDER);
+        if (X509_NAME_cmp(name->d.dirn, cert->cert_info->subject) &&
+            X509_NAME_cmp(name->d.dirn, cert->cert_info->issuer))
+          ERROR(AC_ERR_HOLDER);
+
         if ((!ac->acinfo->holder->baseid->uid && cert->cert_info->issuerUID) ||
             (!cert->cert_info->issuerUID && ac->acinfo->holder->baseid->uid))
           ERROR(AC_ERR_UID_MISMATCH);
@@ -257,21 +265,21 @@ int validate(X509 *cert, X509 *issuer, AC *ac, struct col *voms, int valids, tim
                                     cert->cert_info->issuerUID))
             ERROR(AC_ERR_UID_MISMATCH);
         }
-      }
-    }
-    else if (ac->acinfo->holder->name) {
-      names = ac->acinfo->holder->name;
-      if ((sk_GENERAL_NAME_num(names) == 1) || 
-          ((name = sk_GENERAL_NAME_value(names,0))) ||
-          (name->type != GEN_DIRNAME)) {
-        if (X509_NAME_cmp(name->d.dirn, cert->cert_info->issuer)) {
-          /* CHECK ALT_NAMES */
-          /* in VOMS ACs, checking into alt names is assumed to always fail. */
-          ERROR(AC_ERR_UID_MISMATCH);
+      }    
+      else if (ac->acinfo->holder->name) {
+        names = ac->acinfo->holder->name;
+        if ((sk_GENERAL_NAME_num(names) == 1) || 
+            ((name = sk_GENERAL_NAME_value(names,0))) ||
+            (name->type != GEN_DIRNAME)) {
+          if (X509_NAME_cmp(name->d.dirn, cert->cert_info->issuer)) {
+            /* CHECK ALT_NAMES */
+            /* in VOMS ACs, checking into alt names is assumed to always fail. */
+            ERROR(AC_ERR_UID_MISMATCH);
+          }
         }
       }
     }
-  
+
     names = ac->acinfo->form->names;
 
     if ((sk_GENERAL_NAME_num(names) != 1))
@@ -292,8 +300,8 @@ int validate(X509 *cert, X509 *issuer, AC *ac, struct col *voms, int valids, tim
   a = ac->acinfo->validity->notAfter;
 
   if (voms) {
-    voms->date1 = strndup(b->data, b->length);
-    voms->date2 = strndup(a->data, a->length);
+    voms->date1 = strndup((const char*)b->data, b->length);
+    voms->date2 = strndup((const char*)a->data, a->length);
   }
 
   if (valids & VER_DATE) {
@@ -336,7 +344,6 @@ int validate(X509 *cert, X509 *issuer, AC *ac, struct col *voms, int valids, tim
 static int checkAttributes(STACK_OF(AC_ATTR) *atts, struct col *voms)
 {
   int nid3;
-
   int pos3;
   int i;
 
@@ -400,8 +407,9 @@ static int checkAttributes(STACK_OF(AC_ATTR) *atts, struct col *voms)
   if (data->type == GEN_URI) {
     char *point;
     if (voms) {
-      voms->voname = strndup(data->d.ia5->data, data->d.ia5->length);
+      voms->voname = strndup((char*)data->d.ia5->data, data->d.ia5->length);
       point = strstr(voms->voname, "://");
+
       if (point) {
         *point='\0';
         voms->uri = point + 3;
@@ -413,16 +421,14 @@ static int checkAttributes(STACK_OF(AC_ATTR) *atts, struct col *voms)
     return AC_ERR_ATTRIB_URI;
 
   /* scan the stack of IETFATTRVAL to put attribute in voms struct */
-  for (i=0; i<sk_AC_IETFATTRVAL_num(values); i++) 
-  {
+  for (i=0; i<sk_AC_IETFATTRVAL_num(values); i++) {
     capname = sk_AC_IETFATTRVAL_value(values, i);
 
     if (!(capname->type == V_ASN1_OCTET_STRING))
       return AC_ERR_ATTRIB_FQAN;
 
-    if (voms) 
-    {
-      str  = strndup(capname->data, capname->length);
+    if (voms) {
+      str  = strndup((char*)capname->data, capname->length);
       str2 = strdup(str);
       d = (struct data *)malloc(sizeof(struct data));
 
@@ -445,6 +451,7 @@ static int checkAttributes(STACK_OF(AC_ATTR) *atts, struct col *voms)
         *rolestart = '\0';
         r = rolestart + 6;
       }
+
       if (capstart) {
         *capstart = '\0';
         c = capstart + 12;
@@ -460,8 +467,8 @@ static int checkAttributes(STACK_OF(AC_ATTR) *atts, struct col *voms)
       dlist = dtmp;
     }
   }
-  if (voms) 
-  {
+
+  if (voms) {
     voms->std     = dlist;
     voms->compact = list;
     voms->type    = TYPE_STD;
@@ -476,10 +483,12 @@ static int checkAttributes(STACK_OF(AC_ATTR) *atts, struct col *voms)
 
     while (*list)
       free(*list++);
+
     while (*dlist) {
       free ((*dlist)->group);
       free(*dlist++);
     }
+
     free(tmp);
     free(dtmp);
     free(str);
@@ -511,7 +520,7 @@ static int checkExtensions(STACK_OF(X509_EXTENSION) *exts, X509 *iss, struct col
   int pos4 = X509v3_get_ext_by_NID(exts, nid3, -1);
   int pos5 = X509v3_get_ext_by_NID(exts, nid5, -1);
 
-  int ret = AC_ERR_UNKNOWN;
+  int ret = 0;
 
   /* noRevAvail, Authkeyid MUST be present */
   if (pos1 < 0 || pos2 < 0)
@@ -532,25 +541,34 @@ static int checkExtensions(STACK_OF(X509_EXTENSION) *exts, X509 *iss, struct col
         int i;
         ASN1_IA5STRING *fqdns = ASN1_IA5STRING_new();
         if (fqdns) {
+          ret = AC_ERR_TARGET_NO_MATCH;
           ASN1_STRING_set(fqdns, fqdn, strlen(fqdn));
           targets = (AC_TARGETS *)X509V3_EXT_d2i(ex);
-          if (targets)
+          if (targets) {
             for (i = 0; i < sk_AC_TARGET_num(targets->targets); i++) {
               name = sk_AC_TARGET_value(targets->targets, i);
               if (name->name && name->name->type == GEN_URI) {
                 ok = !ASN1_STRING_cmp(name->name->d.ia5, fqdns);
-                if (ok)
+                if (ok) {
+                  ret = 0;
                   break;
+                }
               }
             }
+            if (!ok) {
+              ASN1_STRING_free(fqdns);
+              return AC_ERR_TARGET_NO_MATCH;
+            }
+          }
           ASN1_STRING_free(fqdns);
         }
         if (!ok)
-          ret = AC_ERR_EXT_TARGET;
+          return AC_ERR_EXT_TARGET;
       }
     }
     else
-      ret = AC_ERR_EXT_CRIT;
+      return AC_ERR_EXT_CRIT;
+
     pos3 = X509v3_get_ext_by_critical(exts, 1, pos3);
   }
 
@@ -561,12 +579,17 @@ static int checkExtensions(STACK_OF(X509_EXTENSION) *exts, X509 *iss, struct col
     AC_FULL_ATTRIBUTES *full_attr = NULL;
     ex = sk_X509_EXTENSION_value(exts, pos5);
     full_attr = (AC_FULL_ATTRIBUTES *)X509V3_EXT_d2i(ex);
+
     if (full_attr) {
-      if (!interpret_attributes(full_attr, voms))
+      if (!interpret_attributes(full_attr, voms)) {
         ret = AC_ERR_ATTRIB;
+      }
     }
     AC_FULL_ATTRIBUTES_free(full_attr);
   }
+
+  if (ret)
+    return ret;
 
   if (valids & VER_KEYID) {
     if (pos2 >= 0) {
@@ -574,11 +597,14 @@ static int checkExtensions(STACK_OF(X509_EXTENSION) *exts, X509 *iss, struct col
       AUTHORITY_KEYID *key;
       ex = sk_X509_EXTENSION_value(exts, pos2);
       key = (AUTHORITY_KEYID *)X509V3_EXT_d2i(ex);
+
       if (key) {
         ret = 0;
+
         if (iss) {
           if (key->keyid) {
             unsigned char hashed[20];
+
             if (!SHA1(iss->cert_info->key->public_key->data,
                       iss->cert_info->key->public_key->length,
                       hashed))
@@ -651,7 +677,6 @@ static char *getfqdn(void)
 
 static int interpret_attributes(AC_FULL_ATTRIBUTES *full_attr, struct col *voms)
 {
-
   struct full_att *fa      = malloc(sizeof(struct full_att));
   struct att_list *al      = NULL;
   struct att      *a       = NULL;
@@ -668,7 +693,6 @@ static int interpret_attributes(AC_FULL_ATTRIBUTES *full_attr, struct col *voms)
 
   providers = full_attr->providers;
 
-
   for (i = 0; i < sk_AC_ATT_HOLDER_num(providers); i++) {
     AC_ATT_HOLDER *holder = sk_AC_ATT_HOLDER_value(providers, i);
     STACK_OF(AC_ATTRIBUTE) *atts = holder->attributes;
@@ -682,16 +706,13 @@ static int interpret_attributes(AC_FULL_ATTRIBUTES *full_attr, struct col *voms)
     al->grantor = NULL;
     al->attrs   = NULL;
 
-
-
-
     for (j = 0; j < sk_AC_ATTRIBUTE_num(atts); j++) {
       AC_ATTRIBUTE *at = sk_AC_ATTRIBUTE_value(atts, j);
       char ** tmp = NULL;
 
-      name      = strndup(at->name->data,      at->name->length);
-      value     = strndup(at->value->data,     at->value->length);
-      qualifier = strndup(at->qualifier->data, at->qualifier->length);
+      name      = strndup((const char*)at->name->data,      at->name->length);
+      value     = strndup((const char*)at->value->data,     at->value->length);
+      qualifier = strndup((const char*)at->qualifier->data, at->qualifier->length);
       if (!name || !value || !qualifier)
         goto err;
 
@@ -713,7 +734,7 @@ static int interpret_attributes(AC_FULL_ATTRIBUTES *full_attr, struct col *voms)
     }
 
     gn = sk_GENERAL_NAME_value(holder->grantor, 0);
-    grant = strndup(gn->d.ia5->data, gn->d.ia5->length);
+    grant = strndup((char*)gn->d.ia5->data, gn->d.ia5->length);
     if (!grant)
       goto err;
     
@@ -734,20 +755,14 @@ static int interpret_attributes(AC_FULL_ATTRIBUTES *full_attr, struct col *voms)
   fa = NULL;
 
  err:
-  if (grant)
-    free(grant);
-  if (name)
-    free(name);
-  if (value)
-    free(value);
-  if (qualifier)
-    free(qualifier);
-  if (a)
-    free_att(a);
-  if (al)
-    free_att_list(al);
+  free(grant);
+  free(name);
+  free(value);
+  free(qualifier);
+  free_att(a);
+  free_att_list(al);
+  free_full_att(fa);
   if (fa) {
-    free_full_att(fa);
     return 0;
   }
   else

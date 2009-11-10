@@ -1,4 +1,4 @@
-
+if BUILD_CLIENTS
 bin_PROGRAMS = voms-proxy-init
 
 voms_proxy_init_SOURCES = \
@@ -10,7 +10,7 @@ voms_proxy_init_SOURCES = \
 	fqan.cc
 
 voms_proxy_init_LDADD = \
-  $(top_builddir)/src/api/ccapi/libvomsapi.la \
+  $(top_builddir)/src/api/ccapi/libvomsapi_nog.la \
   $(top_builddir)/src/sslutils/libssl_utils_nog.la \
 	$(EXPAT_LIBS)
 
@@ -27,4 +27,5 @@ install-exec-hook:
 if ENABLE_GLITE
 	-ln -s voms-proxy-init $(DESTDIR)$(bindir)/glite-voms-proxy-init
 	-ln -s voms-proxy-init $(DESTDIR)$(bindir)/glite-voms-proxy-list
+endif
 endif

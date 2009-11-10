@@ -1,0 +1,20 @@
+load_lib vomstest.exp
+testheader "See if an VOMS_Destroy() works."
+
+proc mytest {} {
+    _activateCert mycert2
+
+    set ::_buildout [exec mktemp $::SCRATCHDIR/voms-api-c-XXXXXX]
+    set res [_exeC destroy.c -useproxy]
+
+    if $res then {
+        addlog $::_buildout
+        testmessage "VOMS_Destroy() failed."
+        return $::FAILTEST
+    } else {
+        testmessage "VOMS_Destroy() works correctly"
+        return $::PASSTEST
+    }
+}
+
+do_test

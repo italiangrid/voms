@@ -2,9 +2,10 @@
  *
  * Authors: Vincenzo Ciaschini - Vincenzo.Ciaschini@cnaf.infn.it 
  *
- * Copyright (c) 2002, 2003 INFN-CNAF on behalf of the EU DataGrid.
+ * Copyright (c) 2002-2009 INFN-CNAF on behalf of the EU DataGrid
+ * and EGEE I, II and III
  * For license conditions see LICENSE file or
- * http://www.edg.org/license.html
+ * http://www.apache.org/licenses/LICENSE-2.0.txt
  *
  * Parts of this code may be based upon or even include verbatim pieces,
  * originally written by other people, in which case the original header
@@ -14,6 +15,8 @@
 #include "config.h"
 
 #include "log.h"
+#include "streamers.h"
+
 #include <stdio.h>
 #include <string.h>
 #include <dirent.h>
@@ -71,12 +74,9 @@ static int fileoutputter(void *data, const char *s)
 
   if (ld->maxlog) {
     if (position > ld->maxlog) {
-      if (logfile_rotate(ld->name)) {
-        if (!filereopen(ld))
-          write(ld->fd, "VOMS: LOGGING ROTATION ERROR\n", 29);
+      if (!logfile_rotate(ld->name) || !filereopen(ld)) {
+        (void)write(ld->fd, "VOMS: LOGGING ROTATION ERROR\n", 29);
       }
-      else
-        write(ld->fd, "VOMS: LOGGING ROTATION ERROR\n", 29);
     }
   }
   output = strdup(s);
@@ -250,7 +250,7 @@ static int logfile_rotate(const char * name)
       while ((de = readdir(dir))) {
         pos = strrchr(de->d_name, '.');
         if (pos && 
-            pos - de->d_name == strlen(basename) &&
+            (size_t)(pos - de->d_name) == strlen(basename) &&
             strncmp(basename, de->d_name, strlen(basename)) == 0 &&
             atoi((++pos)) > max)
           max = atoi(pos);

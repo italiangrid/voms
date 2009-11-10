@@ -1,0 +1,78 @@
+load_lib vomstest.exp
+testheader "See if voms-proxy-init --help works."
+
+proc mytest {} {
+    _activateCert mycert2
+
+    _vomsStart voms1
+    set outname [exec mktemp $::SCRATCHDIR/voms-proxy-init-XXXXXX]
+    set res [catch {set out [exec $::INSTALLDIR/bin/voms-proxy-init --help >& $outname]}]
+    _vomsStop voms1
+
+    if $res then {
+        addlog $outname
+        testmessage "voms-proxy-init failed."
+        return $::FAILTEST
+    }
+    #match against known (correct) output
+    set correct ".*voms-proxy-init:
+    Options
+    -help, -usage                  Displays usage
+    -version                       Displays version
+    -debug                         Enables extra debug output
+    -quiet, -q                     Quiet mode, minimal output
+    -verify                        Verifies certificate to make proxy for
+    -pwstdin                       Allows passphrase from stdin
+    -limited                       Creates a limited proxy
+    -valid <h:m>                   Proxy and AC are valid for h hours and m minutes
+                                   \(defaults to 12:00\)
+    -hours H                       Proxy is valid for H hours \(default:12\)
+    -bits                          Number of bits in key \\{512\|1024\|2048\|4096\\}
+    -cert     <certfile>           Non-standard location of user certificate
+    -key      <keyfile>            Non-standard location of user key
+    -certdir  <certdir>            Non-standard location of trusted cert dir
+    -out      <proxyfile>          Non-standard location of new proxy cert
+    -voms <voms<:command>>         Specify voms server. :command is optional,
+                                   and is used to ask for specific attributes
+                                   \(e.g: roles\)
+    -order <group<:role>>          Specify ordering of attributes.
+    -target <hostname>             Targets the AC against a specific hostname.
+    -vomslife <h:m>                Try to get a VOMS pseudocert valid for h hours
+                                   and m minutes \(default to value of -valid\).
+    -include <file>                Include the contents of the specified file.
+    -conf <file>                   Read options from <file>.
+    -confile <file>                Non-standard location of voms server addresses. Deprecated
+    -userconf <file>               Non-standard location of user-defined voms server addresses. Deprecated
+    -vomses <file>                 Non-standard location of configuration files.
+    -policy <policyfile>           File containing policy to store in the ProxyCertInfo extension.
+    -pl, -policy-language <oid>    OID string for the policy language.
+    -policy-language <oid>         OID string for the policy language.
+    -path-length <l>               Allow a chain of at most l proxies to be generated from this ones.
+    -globus <version>              Globus version. \(MajorMinor\)
+    -proxyver                      Version of proxy certificate.
+    -noregen                       Use existing proxy certificate to connect to server and sign the new proxy.
+    -separate <file>               Saves the informations returned by the server on file <file>.
+    -ignorewarn                    Ignore warnings.
+    -failonwarn                    Treat warnings as errors.
+    -list                          Show all available attributes.
+    -rfc                           Creates RFC 3820 compliant proxy \(synonymous with -proxyver 4\)
+    -old                           Creates GT2 compliant proxy \(synonymous with -proxyver 2\)
+    -timeout <num>                 Timeout for server connections, in seconds."
+
+    set out2 [exec cat  $outname]
+    if [regexp $correct $out2] then {
+        testmessage "--help worked."
+        return $::PASSTEST
+    } else {
+        set outname2 [exec mktemp $::SCRATCHDIR/voms-proxy-info-XXXXXX]
+        set id [open $outname2 "w+"]
+        puts $id $correct
+        close $id
+        addlog $outname 
+        addlog $outname2
+        testmessage "Unexpected output in voms-proxy-init"
+        return $::FAILTEST
+    }
+}
+
+do_test

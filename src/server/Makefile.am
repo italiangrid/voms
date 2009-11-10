@@ -1,4 +1,4 @@
-
+if BUILD_SERVER
 sbin_PROGRAMS = voms
 
 voms_SOURCES = \
@@ -33,4 +33,5 @@ install-exec-hook:
 	-ln -s voms $(DESTDIR)$(sbindir)/edg-voms
 if ENABLE_GLITE
 	-ln -s voms $(DESTDIR)$(sbindir)/glite-voms
+endif
 endif

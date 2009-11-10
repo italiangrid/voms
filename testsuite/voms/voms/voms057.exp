@@ -1,7 +1,7 @@
 load_lib vomstest.exp
+testheader "See if voms --uri works."
 
 proc mytest {} {
-    testheader "See if voms --uri works."
     _activateCert mycert2
 
     _addVOMSOption voms1 uri testsite:10000
