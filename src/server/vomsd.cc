@@ -1477,7 +1477,7 @@ static bool determine_group_and_role(std::string command, char *comm, char **gro
 
   char *string = strdup(command.c_str()+1);
 
-  if (command[0] != '/') {
+  if (string[0] != '/') {
     /* old syntax */
     *comm = command[0];
 
@@ -1492,13 +1492,15 @@ static bool determine_group_and_role(std::string command, char *comm, char **gro
       break;
     case 'B':
       *role = strchr(string, ':');
-      if (*role)
-        *role++ = '\0';
+      if (*role) {
+        (*role) = '\0';
+        (*role)++;
+      }
+      break;
     }
   }
   else {
     /* fqan syntax */
-    char *string = strdup(command.c_str());
     char *divider  = strstr(string, "/Role=");
     char *divider2 = strstr(string, ":");
     if (divider) {
