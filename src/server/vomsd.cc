@@ -55,6 +55,7 @@ void *logh = NULL;
 #include "pass.h"
 #include "errors.h"
 #include "vomsxml.h"
+#include "fqan.h"
 
 #include <map>
 #include <set>
@@ -112,15 +113,18 @@ static std::string soap_host = "";
 static char *soap_hostname = NULL;
 static bool checkinside(gattrib g, std::vector<std::string> list);
 
-int
-makeACSSL(SSL *ssl, void *logh, char **FQANs, int size, const std::string &order, char **targets, int targsize, int requested, VOMSServer *v, AC **returnedAC, char **returnedMessage);
+std::string
+makeACSSL(SSL *ssl, void *logh, char **FQANs, int size, const std::string &order, char **targets, int targsize, int requested, VOMSServer *v);
 
-int
+std::string
 makeACSOAP(struct soap *soap, void *logh, char **FQANs, int size, char **targets, int targsize, int requested, 
-           VOMSServer *v, AC **ac, char **message);
+           VOMSServer *v);
 
 int
 makeACREST(struct soap *soap, void *logh, char **FQANs, int size, int requested, VOMSServer *v);
+
+std::string makeAC(EVP_PKEY *key, X509 *issuer, X509 *holder, 
+                   const std::string &message, void *logh, VOMSServer *v);
 
 int http_get(soap *soap);
 
@@ -663,12 +667,12 @@ static char *cacertdir = "/etc/grid-security/certificates";
 static char *hostcert  = "/etc/grid-security/hostcert.pem";
 static char *hostkey   = "/etc/grid-security/hostkey.pem";
 
-extern proxy_verify_desc *setup_initializers();
+extern proxy_verify_desc *setup_initializers(char*);
 
 static int myverify_callback(int ok, X509_STORE_CTX *ctx)
 {
   if (!X509_STORE_CTX_get_ex_data(ctx, PVD_STORE_EX_DATA_IDX)) {
-    proxy_verify_desc *pvd = setup_initializers();
+    proxy_verify_desc *pvd = setup_initializers(cacertdir);
     pvd->pvxd->certdir = cacertdir;
     X509_STORE_CTX_set_ex_data(ctx, PVD_STORE_EX_DATA_IDX, pvd);
   }
@@ -886,7 +890,7 @@ void VOMSServer::Run()
 }
 
 std::string makeAC(EVP_PKEY *key, X509 *issuer, X509 *holder, 
-                   const std::string &message, void *logh)
+                   const std::string &message, void *logh, VOMSServer *v)
 {
   LOGM(VARP, logh, LEV_DEBUG, T_PRE, "Received Request: %s", message.c_str());
 
@@ -899,7 +903,7 @@ std::string makeAC(EVP_PKEY *key, X509 *issuer, X509 *holder,
 
   std::vector<std::string> comm = r.command;
 
-  bool dobase64 = base64encoding | r.base64;
+  bool dobase64 = v->base64encoding | r.base64;
   int requested = r.lifetime;
 
   std::vector<std::string> targs;
@@ -922,13 +926,13 @@ std::string makeAC(EVP_PKEY *key, X509 *issuer, X509 *holder,
 
   if (requested != 0) {
     if (requested == -1)
-      requested = validity;
-    else if (validity < requested) {
+      requested = v->validity;
+    else if (v->validity < requested) {
       err.num = WARN_SHORT_VALIDITY;
-      err.message = uri + ": The validity of this VOMS AC in your proxy is shortened to " +
-        stringify(validity, tmp) + " seconds!";
+      err.message = v->uri + ": The validity of this VOMS AC in your proxy is shortened to " +
+        stringify(v->validity, tmp) + " seconds!";
       errs.push_back(err);
-      requested = validity;
+      requested = v->validity;
     }
   }
 
@@ -940,14 +944,11 @@ std::string makeAC(EVP_PKEY *key, X509 *issuer, X509 *holder,
 
   if (!newdb) {
     err.num = ERR_WITH_DB;
-    err.message = voname + ": Problems in DB communication.";
+    err.message = v->voname + ": Problems in DB communication.";
 
     LOG(logh, LEV_ERROR, T_PRE, err.message.c_str());
     errs.push_back(err);
-    std::string ret = XML_Ans_Encode("A", errs, dobase64);
-    LOGM(VARP, logh, LEV_DEBUG, T_PRE, "Sending: %s", ret.c_str());
-    sock.Send(ret);
-    return false;
+    return XML_Ans_Encode("A", errs, dobase64);
   }
 
   if (!newdb->operation(OPERATION_GET_USER, &uid, holder)) {
@@ -959,20 +960,17 @@ std::string makeAC(EVP_PKEY *key, X509 *issuer, X509 *holder,
 
     if (code != ERR_NO_DB) {
       err.num = ERR_NOT_MEMBER;
-      err.message = voname + ": User unknown to this VO.";
+      err.message = v->voname + ": User unknown to this VO.";
     }
     else {
       err.num = ERR_WITH_DB;
-      err.message = voname + ": Problems in DB communication.";
+      err.message = v->voname + ": Problems in DB communication.";
     }
 
 
     LOG(logh, LEV_ERROR, T_PRE, err.message.c_str());
     errs.push_back(err);
-    std::string ret = XML_Ans_Encode("A", errs, dobase64);
-    LOGM(VARP, logh, LEV_DEBUG, T_PRE, "Sending: %s", ret.c_str());
-    sock.Send(ret);
-    return false;
+    return XML_Ans_Encode("A", errs, dobase64);
   }
 
   LOGM(VARP, logh, LEV_INFO, T_PRE, "Userid = \"%ld\"", uid);
@@ -1090,10 +1088,10 @@ std::string makeAC(EVP_PKEY *key, X509 *issuer, X509 *holder,
   if (!result) {
     LOG(logh, LEV_ERROR, T_PRE, "Error in executing request!");
     err.num = ERR_NOT_MEMBER;
-    if (command == (std::string("G/")+ voname))
-      err.message = voname + ": User unknown to this VO.";
+    if (command == (std::string("G/")+ v->voname))
+      err.message = v->voname + ": User unknown to this VO.";
     else
-      err.message = voname + ": Unable to satisfy " + command + " Request!";
+      err.message = v->voname + ": Unable to satisfy " + command + " Request!";
 
     LOG(logh, LEV_ERROR, T_PRE, err.message.c_str());
     errs.push_back(err);
@@ -1115,14 +1113,14 @@ std::string makeAC(EVP_PKEY *key, X509 *issuer, X509 *holder,
 
   if(!fqans.empty()) {
     /* check whether the user is allowed to requests those attributes */
-    vomsdata v("", "");
-    v.SetVerificationType((verify_type)(VERIFY_SIGN));
-    v.Retrieve(sock.actual_cert, sock.peer_stack, RECURSE_DEEP);
+    vomsdata vd("", "");
+    vd.SetVerificationType((verify_type)(VERIFY_SIGN));
+    vd.Retrieve(v->sock.actual_cert, v->sock.peer_stack, RECURSE_DEEP);
 
     /* find the attributes corresponding to the vo */
     std::vector<std::string> existing;
-    for(std::vector<voms>::iterator index = (v.data).begin(); index != (v.data).end(); ++index) {
-      if(index->voname == voname)
+    for(std::vector<voms>::iterator index = (vd.data).begin(); index != (vd.data).end(); ++index) {
+      if(index->voname == v->voname)
         existing.insert(existing.end(),
                      index->fqan.begin(),
                      index->fqan.end());
@@ -1169,7 +1167,7 @@ std::string makeAC(EVP_PKEY *key, X509 *issuer, X509 *holder,
     if (fqans.empty()) {
       LOG(logh, LEV_ERROR, T_PRE, "Error in executing request!");
       err.num = ERR_ATTR_EMPTY;
-      err.message = voname + " : your certificate already contains attributes, only a subset of them can be issued.";
+      err.message = v->voname + " : your certificate already contains attributes, only a subset of them can be issued.";
       errs.push_back(err);
       return XML_Ans_Encode("A", errs, dobase64);
     }
@@ -1178,7 +1176,7 @@ std::string makeAC(EVP_PKEY *key, X509 *issuer, X509 *holder,
     if(subset) {
       LOG(logh, LEV_ERROR, T_PRE, "Error in executing request!");
       err.num = WARN_ATTR_SUBSET;
-      err.message = voname + " : your certificate already contains attributes, only a subset of them can be issued.";
+      err.message = v->voname + " : your certificate already contains attributes, only a subset of them can be issued.";
       errs.push_back(err);
     }
   }
@@ -1217,8 +1215,8 @@ std::string makeAC(EVP_PKEY *key, X509 *issuer, X509 *holder,
 
         LOGM(VARP, logh, LEV_DEBUG, T_PRE, "length = %d", i2d_AC(a, NULL));
         if (a)
-          res = createac(issuer, sock.own_stack, holder, key, serial,
-                         fqans, targs, attributes_compact, &a, voname, uri, requested, !newformat);
+          res = createac(issuer, v->sock.own_stack, holder, key, serial,
+                         fqans, targs, attributes_compact, &a, v->voname, v->uri, requested, !v->newformat);
 
         if (!res) {
           unsigned int len = i2d_AC(a, NULL);
@@ -1244,7 +1242,7 @@ std::string makeAC(EVP_PKEY *key, X509 *issuer, X509 *holder,
 
       if (res || codedac.empty()) {
         LOG(logh, LEV_ERROR, T_PRE, "Error in executing request!");
-        err.message = voname + ": Unable to satisfy " + command + " request due to database error.";
+        err.message = v->voname + ": Unable to satisfy " + command + " request due to database error.";
         errs.push_back(err);
         return XML_Ans_Encode("A", errs, dobase64);
       }
@@ -1268,7 +1266,7 @@ std::string makeAC(EVP_PKEY *key, X509 *issuer, X509 *holder,
   }
   else {
     err.num = ERR_NOT_MEMBER;
-    err.message = std::string("You are not a member of the ") + voname + " VO!";
+    err.message = std::string("You are not a member of the ") + v->voname + " VO!";
     errs.push_back(err);
     return XML_Ans_Encode("", errs, dobase64);
   }
@@ -1292,9 +1290,9 @@ VOMSServer::Execute(EVP_PKEY *key, X509 *issuer, X509 *holder, X509 *peer_cert, 
     }
   }
 
-  std::string answer = makeAC(key, issuer, holder, message, context, logh);
-  LOGM(VARP, logh, LEV_DEBUG, T_PRE, "Sending: %s", ret.c_str());
-  sock.send(answer);
+  std::string answer = makeAC(key, issuer, holder, message, logh, this);
+  LOGM(VARP, logh, LEV_DEBUG, T_PRE, "Sending: %s", answer.c_str());
+  sock.Send(answer);
 }
 
 void VOMSServer::UpdateOpts(void)
@@ -1606,11 +1604,10 @@ int __ns1__GetAttributeCertificate(struct soap *soap,
   if (!st->ns1__StatusCode)
     return my_receiver_fault(soap, "Not Enough Memory");
 
-  std::string message = makeACSOAP(soap, logh, 
-                                   req->ns1__FQAN, req->__sizeFQAN,
-                                   req->ns1__Target, req->__sizeTarget,
-                                   *req->ns1__Lifetime, selfpointer,
-                                   &ac, &message);
+  std::string answerstring = makeACSOAP(soap, logh, 
+                                        req->ns1__FQAN, req->__sizeFQAN,
+                                        req->ns1__Target, req->__sizeTarget,
+                                        *req->ns1__Lifetime, selfpointer);
 
   st->ns1__StatusCode->Value="http://voms.cnaf.infn.it";
   st->ns1__StatusMessage = message;
@@ -1619,12 +1616,9 @@ int __ns1__GetAttributeCertificate(struct soap *soap,
   ans->AttributeCertificate="";
   answer a;
 
-  if (XML_Ans_Decode(message, a)) {
+  if (XML_Ans_Decode(answerstring, a)) {
     if (!a.ac.empty()) {
-      encoded = a.ac.c_str();
-
-      ans->AttributeCertificate = (char *)encoded;
-      }
+      ans->AttributeCertificate = (char *)a.ac.c_str();
     }
   }
 
@@ -1636,12 +1630,11 @@ std::string
 makeACSOAP(struct soap *soap, void *logh, 
            char **FQANs, int size, 
            char **targets, int targsize, 
-           int requested, VOMSServer *v, 
-           AC **ac, char **message)
+           int requested, VOMSServer *v)
 {
   return makeACSSL(soap->ssl, logh, FQANs, size, 
                    std::string(""), targets, 
-                targsize, requested);
+                   targsize, requested, selfpointer);
 }
 
 std::string
@@ -1663,8 +1656,7 @@ makeACSSL(SSL *ssl, void *logh, char **FQANs, int size, const std::string &origo
 
   if (!load_credentials(hostcert, hostkey, 
                         &issuer, NULL,  &key, pw_cb)) {
-    *returnedMessage = "Cannot read certificates.";
-    return 1;
+    return "";
   }
 
   std::string command = "";
@@ -1690,9 +1682,9 @@ makeACSSL(SSL *ssl, void *logh, char **FQANs, int size, const std::string &origo
     i++;
   }
 
-  std::string message = XML_Req_Encode(command, "", targets, requested);
+  std::string message = XML_Req_Encode(command, std::string(""), targs, requested);
 
-  return makeAC(key, issuer, holder, message, logh);
+  return makeAC(key, issuer, holder, message, logh, selfpointer);
 }
 
 int http_get(soap *soap)
@@ -1824,7 +1816,7 @@ makeACREST(struct soap *soap, void *logh, char **FQANs, int size, int requested,
   char *message = NULL;
   char *targets = NULL;
 
-  std::string result = makeACSSL(soap->ssl, logh, FQANs, size, std::string(""), &targets, 0, requested);
+  std::string result = makeACSSL(soap->ssl, logh, FQANs, size, std::string(""), &targets, 0, requested, selfpointer);
 
   answer a;
 

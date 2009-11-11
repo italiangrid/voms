@@ -187,7 +187,7 @@ extern "C" {
 }
 
 
-static proxy_verify_desc *setup_initializers(char *cadir) 
+proxy_verify_desc *setup_initializers(char *cadir) 
 {
   proxy_verify_ctx_desc *pvxd = NULL;
   proxy_verify_desc *pvd = NULL;
