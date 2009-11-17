@@ -119,6 +119,10 @@ pos_rights         globus   CA:sign
 cond_subjects      globus   '\"$out\"'"
         flush $id
         close $id
+        set id [open "$::_cadir/$hashname.namespaces" w+]
+        puts $id "TO ISSUER \"$dn\"  PERMIT SUBJECT \"$out\""
+        flush $id
+        close $id
     }
 }
 
@@ -158,6 +162,10 @@ proc _make_ca_from_ca { dn fathername name {day 365 } {condsubject ""}} {
         puts $id "access_id_CA       X509    '$dn'
 pos_rights         globus   CA:sign
 cond_subjects      globus   '\"$out\"'"
+        flush $id
+        close $id
+        set id [open "$::_cadir/$hashname.namespaces" w+]
+        puts "TO ISSUER \"$dn\"  PERMIT SUBJECT \"$out\""
         flush $id
         close $id
         file copy $::_capath/$name/cacert.pem $::_certdir/$name-cert.pem
