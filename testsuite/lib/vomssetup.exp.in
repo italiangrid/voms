@@ -1,6 +1,7 @@
 variable _vomsdefinitions
 variable _buildout
 variable _javaProperty
+variable _vomschannel
 
 proc _doScript {command} {
     set id [open "$::SCRATCHDIR/script.sh" w+]
@@ -112,8 +113,10 @@ proc _vomsReload { name } {
     }
 }
 
+
 proc _vomsStart {name } {
     set saved ""
+    set ::_vomschannel ""
     catch {set saved $::env(GLITE_LOCATION)}
     set ::env(GLITE_LOCATION) $::INSTALLDIR
     exec /bin/sh -c "rm -f $::INSTALLDIR/var/log/voms.$name*"
@@ -123,6 +126,13 @@ proc _vomsStart {name } {
     } else {
         unset ::env(GLITE_LOCATION)
     }
+    after 1000
+    set port "[exec cat $::_vomsdefinitions/$name/options/port]"
+    set result [catch {set ::_vomschannel [socket localhost $port]} value]
+    while {$result != 0} {
+        set result [catch {set ::_vomschannel [socket localhost $port]} value]
+    }
+    close $::_vomschannel
 }
 
 proc _vomsStop {name } {
@@ -134,12 +144,6 @@ proc _vomsStop {name } {
         set ::env(GLITE_LOCATION) $saved
     } else {
         unset ::env(GLITE_LOCATION)
-    }
-    after 1000
-    set port "[exec cat $::_vomsdefinitions/$name/options/port]"
-    catch {socket localhost $port} value
-    while {value == 0} {
-        catch {socket localhost $port} value
     }
 }
 
