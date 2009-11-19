@@ -123,16 +123,20 @@ static int restriction_evaluate_policy(X509 *cert, struct policy *policy)
     return success;
 
   subject = X509_NAME_oneline(X509_get_subject_name(cert), 0 ,0);
+  fprintf(stderr, "Evaluating CERT:%s\n", subject);
   if (!subject)
     return success;
 
   cond = policy->conds;
+
+  fprintf(stderr, "POLICY CA:%s\n", policy->caname);
 
   while (cond[condindex]) {
     if (cond[condindex]->subjects) {
       char **subjects = cond[condindex]->subjects;
       int tempsuccess;
 
+      fprintf(stderr, "match: %s to %s\n", subjects[subjindex], subject);
       while (subjects[subjindex]) {
         if (policy->type == TYPE_NAMESPACE)
           tempsuccess = evaluate_match_namespace(subjects[subjindex], 
@@ -144,6 +148,7 @@ static int restriction_evaluate_policy(X509 *cert, struct policy *policy)
                                                cond[condindex]->positive);
 
 
+        fprintf(stderr, "tempsuccess = %s\n", (tempsuccess == 2 ? "UNDECIDED" : (tempsuccess == 1 ? "DENY" : "PERMIT")));
         if (tempsuccess != SUCCESS_UNDECIDED)
           success = tempsuccess;
 
@@ -171,6 +176,7 @@ static int evaluate_cert(X509 *cert, struct policy **namespaces)
   if (!X509_NAME_cmp(X509_get_subject_name(cert),
                      X509_get_issuer_name(cert))) {
     char *subject = X509_NAME_oneline(X509_get_subject_name(cert), NULL, 0);
+    fprintf(stderr, "Self signed CA (%s)\n", subject);
     OPENSSL_free(subject);
     return SUCCESS_PERMIT;
   }
@@ -178,6 +184,7 @@ static int evaluate_cert(X509 *cert, struct policy **namespaces)
     struct policy *policy = namespaces[policyindex];
 
     result = restriction_evaluate_policy(cert, policy);
+    fprintf(stderr, "Result = %s\n", (result == 2 ? "UNDECIDED" : (result == 1 ? "DENY" : "PERMIT")));
     if (result != SUCCESS_UNDECIDED)
       break;
     currentindex = policyindex;
@@ -205,6 +212,7 @@ static int restriction_evaluate_namespace(STACK_OF(X509) *chain, struct policy *
   }
 
   if (result == SUCCESS_UNDECIDED) {
+    fprintf(stderr, "UNDECIDED from NAMESPACE converted into PERMIT\n");
     result = SUCCESS_PERMIT;
   }
 
@@ -237,9 +245,11 @@ int restriction_evaluate(STACK_OF(X509) *chain, struct policy **namespaces,
 {
   int result = 0;
 
+  fprintf(stderr, "Evaluating namespace\n");
   result = restriction_evaluate_namespace(chain, namespaces);
 
   if (result == SUCCESS_UNDECIDED) {
+    fprintf(stderr, "evaluating signing policy\n");
     result = restriction_evaluate_signing(chain, signings);
   }
   return result;

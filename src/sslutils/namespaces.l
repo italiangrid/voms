@@ -38,10 +38,10 @@ extern char *strndup(char*, size_t);
 
 \' BEGIN(SINGLE_QUOTED);
 
-<SINGLE_QUOTED>.*\' yylval_param->string = strndup(yytext, strlen(yytext)-1); BEGIN(INITIAL); return SUBJECT;
+<SINGLE_QUOTED>.*\' yylval_param->string = strndup(yytext, strlen(yytext)-1); fprintf(stderr, "GOT SINGLE_QUOTED:%s\n", yytext); BEGIN(INITIAL); return SUBJECT;
 
 \" BEGIN(DOUBLE_QUOTED);
-<DOUBLE_QUOTED>.*\" yylval_param->string = strndup(yytext, strlen(yytext)-1); BEGIN(INITIAL); return SUBJECT;
+<DOUBLE_QUOTED>.*\" yylval_param->string = strndup(yytext, strlen(yytext)-1); fprintf(stderr, "GOT DOUBLE_QUOTED_FROM_NAMESPACES:%s\n", yylval_param->string); BEGIN(INITIAL); return SUBJECT;
 
 
 (?i:TO)       return TO;

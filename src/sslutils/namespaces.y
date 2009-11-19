@@ -66,6 +66,11 @@ rule: TO ISSUER SUBJECT condition {
     $$->conds = nmlistadd(NULL, $4, sizeof(struct condition *));
     $$->type = TYPE_NAMESPACE;
   }
+
+  printf("TEXT READ:\n");
+  printf("TO ISSUER %s %s SUBJECT %s\n", $$->caname, 
+         ($$->conds[0]->positive ? "PERMIT" : "DENY"),
+         $$->conds[0]->subjects[0]);
  }
 | TO ISSUER SELF condition {
   $$ = (struct policy *)calloc(1, sizeof(struct policy));
@@ -75,6 +80,11 @@ rule: TO ISSUER SUBJECT condition {
     $$->conds = nmlistadd(NULL, $4, sizeof(struct condition *));
     $$->type = TYPE_NAMESPACE;
   }
+  printf("TEXT READ:\n");
+  printf("TO ISSUER SELF SUBJECT %s\n", 
+         ($$->conds[0]->positive ? "PERMIT" : "DENY"),
+         $$->conds[0]->subjects[0]);
+
  }
 ;
 

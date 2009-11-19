@@ -66,6 +66,23 @@ eacl_entry: access_identities POS_RIGHTS GLOBUS CA_SIGN restrictions {
   if ($1) {
     $$->conds = (struct condition**)($5);
   }
+  {
+    struct condition **conds = $$->conds;
+    printf("PRINTING RULE\n");
+    printf("CA = %s\n", $$->caname);
+
+    if (conds) {
+      while (*conds) {
+        char **vector = (*conds)->subjects;
+        printf("BATCH\n");
+        if (vector)
+          while (*vector) {
+            printf("ACCEPTING: %s\n", *vector++);
+          }
+        conds++;
+      }
+    }
+  }
   $$ = $1;
 }
 | access_identities NEG_RIGHTS GLOBUS CA_SIGN restrictions {
@@ -178,7 +195,7 @@ char **parse_subjects(char *string)
       if (!end)
         return NULL;
       *end = '\0';
-
+      fprintf(stdout, "ADDING: %s\n", string+1);
       list = (char**)listadd(list, string+1, sizeof(char*));
       string = ++end;
       while (isspace(*string))
@@ -187,6 +204,7 @@ char **parse_subjects(char *string)
     else if (divider == '\0')
       break;
     else  {
+      fprintf(stdout, "ADDING: %s\n", string);
       list = (char**)listadd(list, string, sizeof(char*));
       string += strlen(string);
     }
