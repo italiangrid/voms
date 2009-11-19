@@ -19,7 +19,6 @@ proc mytest {} {
         timeout { set dopass 0 }
     }
 
-    close -i $spawn_id
     set res [catch {set out [exec killall a.out]}]
     set out2 [exec cat $outname]
 
