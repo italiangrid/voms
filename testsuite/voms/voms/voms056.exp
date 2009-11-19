@@ -19,7 +19,7 @@ proc mytest {} {
         return $::PASSTEST
     } else {
         testmessage "Timeout did not work"
-        reurn $::FAILTEST
+        return $::FAILTEST
     }
 }
 

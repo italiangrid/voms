@@ -165,7 +165,7 @@ cond_subjects      globus   '\"$out\"'"
         flush $id
         close $id
         set id [open "$::_cadir/$hashname.namespaces" w+]
-        puts "TO ISSUER \"$dn\"  PERMIT SUBJECT \"$out\""
+        puts $id "TO ISSUER \"$dn\"  PERMIT SUBJECT \"$out\""
         flush $id
         close $id
         file copy $::_capath/$name/cacert.pem $::_certdir/$name-cert.pem

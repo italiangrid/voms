@@ -174,7 +174,6 @@ proc _readConfigFile {file} {
         regexp {\s*([a-zA-Z0-9_]*)\s*(.*)} $text dummy name value
         if [expr ! [string equal $dummy ""]] then {
             set ::$name $value
-            puts ::$name $value
         }
     }
 }

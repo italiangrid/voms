@@ -28,7 +28,9 @@ proc fail message {
     global LOGOUTS
     global REPORTDIR
     global _logdescriptor
+    global INSTALLDIR
 
+    addlog $INSTALLDIR/var/log/voms.voms1
     puts $_logdescriptor "<td align=\"left\" bgcolor=\"red\">failed</td><td>$message</td>"
     puts $_logdescriptor "<td>"
 
