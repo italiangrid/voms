@@ -2123,14 +2123,11 @@ proxy_verify_callback(
                 struct policy **namespaces = NULL;
                 int result = SUCCESS_UNDECIDED;
 
-                fprintf(stderr, "Calling read_pathrestriction\n");
                 read_pathrestriction(ctx->chain, cert_dir, &namespaces, &signings);
 
                 result = restriction_evaluate(ctx->chain, namespaces, signings);
                 
-                fprintf(stderr, "Freeing namesSPACES\n");
                 free_policies(namespaces);
-                fprintf(stderr, "Freeing SIGNIGS\n");
                 free_policies(signings);
 
                 if (result != SUCCESS_PERMIT)

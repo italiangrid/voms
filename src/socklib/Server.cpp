@@ -195,9 +195,8 @@ GSISocketServer::Close()
     gss_release_cred(&status, &credential);
   credential = GSS_C_NO_CREDENTIAL;
 
-  if (newopened) {
+  if (newopened)
     close(newsck);
-  }
   newopened=false;
 
   if (opened)

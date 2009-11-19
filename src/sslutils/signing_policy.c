@@ -463,8 +463,8 @@ static const yytype_int8 yyrhs[] =
 /* YYRLINE[YYN] -- source line where rule number YYN was defined.  */
 static const yytype_uint8 yyrline[] =
 {
-       0,    62,    62,    63,    65,    88,    94,    98,   101,   106,
-     119,   123,   135
+       0,    62,    62,    63,    65,    71,    77,    81,    84,    89,
+     102,   106,   118
 };
 #endif
 
@@ -1407,23 +1407,6 @@ yyreduce:
   if ((yyvsp[(1) - (5)].policy)) {
     (yyval.policy)->conds = (struct condition**)((yyvsp[(5) - (5)].array));
   }
-  {
-    struct condition **conds = (yyval.policy)->conds;
-    printf("PRINTING RULE\n");
-    printf("CA = %s\n", (yyval.policy)->caname);
-
-    if (conds) {
-      while (*conds) {
-        char **vector = (*conds)->subjects;
-        printf("BATCH\n");
-        if (vector)
-          while (*vector) {
-            printf("ACCEPTING: %s\n", *vector++);
-          }
-        conds++;
-      }
-    }
-  }
   (yyval.policy) = (yyvsp[(1) - (5)].policy);
 }
     break;
@@ -1431,7 +1414,7 @@ yyreduce:
   case 5:
 
 /* Line 1455 of yacc.c  */
-#line 88 "signing_policy.y"
+#line 71 "signing_policy.y"
     {
   /* Ignore this.  Globus does. */
   free((yyvsp[(1) - (5)].policy));
@@ -1442,7 +1425,7 @@ yyreduce:
   case 6:
 
 /* Line 1455 of yacc.c  */
-#line 94 "signing_policy.y"
+#line 77 "signing_policy.y"
     {
   (yyval.policy) = (yyvsp[(1) - (1)].policy);
 }
@@ -1451,7 +1434,7 @@ yyreduce:
   case 7:
 
 /* Line 1455 of yacc.c  */
-#line 98 "signing_policy.y"
+#line 81 "signing_policy.y"
     {
   (yyval.array) = splistadd(NULL, (yyvsp[(1) - (1)].cond), sizeof((yyvsp[(1) - (1)].cond)));
 }
@@ -1460,7 +1443,7 @@ yyreduce:
   case 8:
 
 /* Line 1455 of yacc.c  */
-#line 101 "signing_policy.y"
+#line 84 "signing_policy.y"
     {
   (yyval.array) = splistadd((yyvsp[(2) - (2)].array), (yyvsp[(1) - (2)].cond), sizeof((yyvsp[(1) - (2)].cond)));
 }
@@ -1469,7 +1452,7 @@ yyreduce:
   case 9:
 
 /* Line 1455 of yacc.c  */
-#line 106 "signing_policy.y"
+#line 89 "signing_policy.y"
     {
   (yyval.policy) = (struct policy *)calloc(1, sizeof(struct policy));
 
@@ -1488,7 +1471,7 @@ yyreduce:
   case 10:
 
 /* Line 1455 of yacc.c  */
-#line 119 "signing_policy.y"
+#line 102 "signing_policy.y"
     {
   (yyval.policy) = (struct policy *)calloc(1, sizeof(struct policy));
 }
@@ -1497,7 +1480,7 @@ yyreduce:
   case 11:
 
 /* Line 1455 of yacc.c  */
-#line 123 "signing_policy.y"
+#line 106 "signing_policy.y"
     { 
     (yyval.cond) = (struct condition*)malloc(sizeof(struct condition));
     if ((yyval.cond)) {
@@ -1515,7 +1498,7 @@ yyreduce:
   case 12:
 
 /* Line 1455 of yacc.c  */
-#line 135 "signing_policy.y"
+#line 118 "signing_policy.y"
     {
     (yyval.cond) = (struct condition*)malloc(sizeof(struct condition));
 
@@ -1534,7 +1517,7 @@ yyreduce:
 
 
 /* Line 1455 of yacc.c  */
-#line 1538 "signing_policy.c"
+#line 1521 "signing_policy.c"
       default: break;
     }
   YY_SYMBOL_PRINT ("-> $$ =", yyr1[yyn], &yyval, &yyloc);
@@ -1746,7 +1729,7 @@ yyreturn:
 
 
 /* Line 1675 of yacc.c  */
-#line 150 "signing_policy.y"
+#line 133 "signing_policy.y"
 
 
 char **splistadd(char **vect, char *data, int size)
@@ -1795,7 +1778,7 @@ char **parse_subjects(char *string)
       if (!end)
         return NULL;
       *end = '\0';
-      fprintf(stdout, "ADDING: %s\n", string+1);
+
       list = (char**)listadd(list, string+1, sizeof(char*));
       string = ++end;
       while (isspace(*string))
@@ -1804,7 +1787,6 @@ char **parse_subjects(char *string)
     else if (divider == '\0')
       break;
     else  {
-      fprintf(stdout, "ADDING: %s\n", string);
       list = (char**)listadd(list, string, sizeof(char*));
       string += strlen(string);
     }

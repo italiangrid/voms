@@ -456,7 +456,7 @@ static const yytype_int8 yyrhs[] =
 /* YYRLINE[YYN] -- source line where rule number YYN was defined.  */
 static const yytype_uint8 yyrline[] =
 {
-       0,    57,    57,    58,    61,    75,    91,   101,   102
+       0,    57,    57,    58,    61,    70,    81,    91,    92
 };
 #endif
 
@@ -1393,18 +1393,13 @@ yyreduce:
     (yyval.policy)->conds = nmlistadd(NULL, (yyvsp[(4) - (4)].cond), sizeof(struct condition *));
     (yyval.policy)->type = TYPE_NAMESPACE;
   }
-
-  printf("TEXT READ:\n");
-  printf("TO ISSUER %s %s SUBJECT %s\n", (yyval.policy)->caname, 
-         ((yyval.policy)->conds[0]->positive ? "PERMIT" : "DENY"),
-         (yyval.policy)->conds[0]->subjects[0]);
  }
     break;
 
   case 5:
 
 /* Line 1455 of yacc.c  */
-#line 75 "namespaces.y"
+#line 70 "namespaces.y"
     {
   (yyval.policy) = (struct policy *)calloc(1, sizeof(struct policy));
   if ((yyval.policy)) {
@@ -1413,18 +1408,13 @@ yyreduce:
     (yyval.policy)->conds = nmlistadd(NULL, (yyvsp[(4) - (4)].cond), sizeof(struct condition *));
     (yyval.policy)->type = TYPE_NAMESPACE;
   }
-  printf("TEXT READ:\n");
-  printf("TO ISSUER SELF SUBJECT %s\n", 
-         ((yyval.policy)->conds[0]->positive ? "PERMIT" : "DENY"),
-         (yyval.policy)->conds[0]->subjects[0]);
-
  }
     break;
 
   case 6:
 
 /* Line 1455 of yacc.c  */
-#line 91 "namespaces.y"
+#line 81 "namespaces.y"
     {
   (yyval.cond) = (struct condition *)calloc(1, sizeof(struct condition));
   if ((yyval.cond)) {
@@ -1438,21 +1428,21 @@ yyreduce:
   case 7:
 
 /* Line 1455 of yacc.c  */
-#line 101 "namespaces.y"
+#line 91 "namespaces.y"
     { (yyval.integer) = 1; }
     break;
 
   case 8:
 
 /* Line 1455 of yacc.c  */
-#line 102 "namespaces.y"
+#line 92 "namespaces.y"
     { (yyval.integer) = 0; }
     break;
 
 
 
 /* Line 1455 of yacc.c  */
-#line 1456 "namespaces.c"
+#line 1446 "namespaces.c"
       default: break;
     }
   YY_SYMBOL_PRINT ("-> $$ =", yyr1[yyn], &yyval, &yyloc);
@@ -1664,7 +1654,7 @@ yyreturn:
 
 
 /* Line 1675 of yacc.c  */
-#line 105 "namespaces.y"
+#line 95 "namespaces.y"
 
 
 char **nmlistadd(char **vect, char *data, int size)
