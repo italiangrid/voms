@@ -28,7 +28,7 @@
 #include <openssl/evp.h>
 #include <openssl/bio.h>
 
-#include "proxy.h"
+#include "vomsproxy.h"
 #include "myproxycertinfo.h"
 #include "sslutils.h"
 
@@ -37,17 +37,17 @@ static char *readfromfile(char *file, int *size, int *warning);
 static void setWarning(int *warning, int value);
 static void setAdditional(void **additional, void *data);
 
-struct arguments *makeproxyarguments()
+struct VOMSProxyArguments *VOMS_MakeProxyArguments()
 {
-  return (struct arguments*)calloc(1, sizeof(struct arguments));
+  return (struct VOMSProxyArguments*)calloc(1, sizeof(struct VOMSProxyArguments));
 }
 
-void freeproxyarguments(struct arguments *args)
+void VOMS_FreeProxyArguments(struct VOMSProxyArguments *args)
 {
   free(args);
 }
 
-void freeproxy(struct proxy *proxy)
+void VOMS_FreeProxy(struct VOMSProxy *proxy)
 {
   if (proxy) {
     X509_free(proxy->cert);
@@ -57,12 +57,12 @@ void freeproxy(struct proxy *proxy)
   }
 }
 
-struct proxy *allocproxy() 
+struct VOMSProxy *VOMS_AllocProxy() 
 {
-  return (struct proxy*)calloc(1, sizeof(struct proxy));
+  return (struct VOMSProxy*)calloc(1, sizeof(struct VOMSProxy));
 }
 
-int writeproxy(const char *filename, struct proxy *proxy)
+int VOMS_WriteProxy(const char *filename, struct VOMSProxy *proxy)
 {
   int ret = -1;
   int fd = -1;
@@ -101,7 +101,7 @@ static int kpcallback(int UNUSED(p), int UNUSED(n))
   return 0;
 }
 
-struct proxy *makeproxy(struct arguments *args, int *warning, void **additional) 
+struct VOMSProxy *VOMS_MakeProxy(struct VOMSProxyArguments *args, int *warning, void **additional) 
 {
   char *confstr = NULL;
   char *value = NULL;
@@ -118,7 +118,9 @@ struct proxy *makeproxy(struct arguments *args, int *warning, void **additional)
   int voms = 0, classadd = 0, file = 0, vo = 0, acs = 0, info = 0, 
     kusg = 0, order = 0;
   int i = 0;
-  struct proxy*proxy = NULL;
+  int proxyindex;
+  
+  struct VOMSProxy *proxy = NULL;
 
   static int init = 0;
 
@@ -136,11 +138,33 @@ struct proxy *makeproxy(struct arguments *args, int *warning, void **additional)
   else
     cback = kpcallback;
 
-  if (proxy_genreq(args->cert, &req, &npkey, args->bits, 
-                   args->subject ? args->subject : NULL, 
-                   (int (*)())cback))
-    goto err;
+  
+  if (args->proxyrequest == NULL) {
+    if (proxy_genreq(args->cert, &req, &npkey, args->bits, 
+                     args->newsubject ? args->newsubject : NULL, 
+                     (int (*)())cback))
+      goto err;
+  }
+  else
+    req = args->proxyrequest;
 
+  /* Add passed extensions */
+  if (args->extensions) {
+    for (proxyindex = 0; proxyindex < sk_X509_EXTENSION_num(args->extensions); proxyindex++) {
+      X509_EXTENSION *ext = X509_EXTENSION_dup(sk_X509_EXTENSION_value(args->extensions, i));
+      if (ext) {
+        if (!sk_X509_EXTENSION_push(extensions, ext)) {
+          X509_EXTENSION_free(ext);
+          PRXYerr(PRXYERR_F_PROXY_SIGN, PRXYERR_R_CLASS_ADD_EXT);
+          goto err;
+        }
+      }
+      else {
+        PRXYerr(PRXYERR_F_PROXY_SIGN, PRXYERR_R_CLASS_ADD_EXT);
+        goto err;
+      }
+    }
+  }
   /* Add proxy extensions */
 
   /* initialize extensions stack */
@@ -289,7 +313,7 @@ struct proxy *makeproxy(struct arguments *args, int *warning, void **additional)
     /* getting contents of policy file */
 
     char *policy = NULL;
-    int policysize;
+    int policysize = 0;
     char *policylang = args->policylang;
 
     if (args->policyfile) {
@@ -340,8 +364,14 @@ struct proxy *makeproxy(struct arguments *args, int *warning, void **additional)
     
       proxypolicy = myPROXYPOLICY_new();
 
-      if (policy)
+      if (policy) {
         myPROXYPOLICY_set_policy(proxypolicy, (unsigned char*)policy, policysize);
+        free(policy);
+      }
+      else if (args->policytext)
+        myPROXYPOLICY_set_policy(proxypolicy, 
+                                 (unsigned char*)args->policytext, 
+                                 strlen(args->policytext));
 
       myPROXYPOLICY_set_policy_language(proxypolicy, policy_language);
 
@@ -357,6 +387,10 @@ struct proxy *makeproxy(struct arguments *args, int *warning, void **additional)
       value = (char *)proxycertinfo;
     }
     else {
+      if (policysize == 0)
+        if (args->policytext)
+          policysize = strlen(args->policytext);
+
       value = (char*)calloc(1, policysize + strlen(policylang) + 
                             31 + 1 + 30);
 
@@ -365,10 +399,18 @@ struct proxy *makeproxy(struct arguments *args, int *warning, void **additional)
       
         snprintf(buffer, 30, "%d", args->pathlength);
         buffer[30]='\0';
-        sprintf(value, "language:%s,pathlen:%s,policy:text:%s", policylang, buffer, policy);
+        if (!args->policytext) {
+          sprintf(value, "language:%s,pathlen:%s,policy:text:%s", policylang, buffer, policy);
+          free(policy);
+        }
+        else 
+          sprintf(value, "language:%s,pathlen:%s,policy:text:%s", policylang, buffer, args->policytext);
       }
       else
-        sprintf(value, "language:%s,policy:text:%s", policylang, policy);
+        if (!args->policytext)
+          sprintf(value, "language:%s,policy:text:%s", policylang, policy);
+        else
+          sprintf(value, "language:%s,policy:text:%s", policylang, args->policytext);
     }
 
     if (args->proxyversion == 3) {
@@ -411,12 +453,12 @@ struct proxy *makeproxy(struct arguments *args, int *warning, void **additional)
                  extensions,
                  args->limited,
                  args->proxyversion,
-                 args->subject ? args->subject : NULL)) {
+                 args->newsubject ? args->newsubject : NULL)) {
     goto err;
   }
   
 
-  proxy = (struct proxy*)malloc(sizeof(struct proxy));
+  proxy = (struct VOMSProxy*)malloc(sizeof(struct VOMSProxy));
 
   if (proxy) {
     proxy->cert = ncert;
@@ -427,7 +469,6 @@ struct proxy *makeproxy(struct arguments *args, int *warning, void **additional)
 
     for (i = 0; i < sk_X509_num(args->chain); i++)
       sk_X509_push(proxy->chain, X509_dup(sk_X509_value(args->chain, i)));
-
   }
 
  err:
@@ -441,7 +482,8 @@ struct proxy *makeproxy(struct arguments *args, int *warning, void **additional)
     sk_X509_EXTENSION_pop_free(extensions, X509_EXTENSION_free);
     order = kusg = voms = classadd = file = vo = acs = info = 0;
   }
-  X509_REQ_free(req);
+  if (!args->proxyrequest)
+    X509_REQ_free(req);
 
   if (kusg)
     X509_EXTENSION_free(ex8);
@@ -555,3 +597,4 @@ static void setAdditional(void **additional, void *data)
   if (additional)
     *additional = data;
 }
+ 

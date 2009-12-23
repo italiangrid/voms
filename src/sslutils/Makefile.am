@@ -1,9 +1,14 @@
+includedir = @includedir@/glite/security/voms
+
+include_HEADERS = \
+	vomsproxy.h
+
 noinst_LTLIBRARIES = \
 	$(WANTED_SSL_UTILS_LIBS) # may add the libraries defined in EXTRA_LTLIBRARIES
 
 SOURCES= scutils.c scutils.h sslutils.c sslutils.h proxycertinfo.c \
 	signing_policy.c lex.signing.c namespaces.c lex.namespaces.c \
-	evaluate.c proxy.c proxy.h
+	evaluate.c proxy.c vomsproxy.h
 
 evaluate.$(OBJEXT): signing_policy.h namespaces.h
 

@@ -54,7 +54,7 @@ extern "C" {
 extern "C" 
 {
 #include "myproxycertinfo.h"
-#include "proxy.h"
+#include "vomsproxy.h"
 }
 
 #include "init.h"
@@ -868,7 +868,7 @@ bool Client::Run()
 
 bool Client::CreateProxy(std::string data, AC ** aclist, int version) 
 {
-  struct arguments *args = makeproxyarguments();
+  struct VOMSProxyArguments *args = VOMS_MakeProxyArguments();
   int ret = -1;
 
   if (args) {
@@ -881,8 +881,8 @@ bool Client::CreateProxy(std::string data, AC ** aclist, int version)
       args->data          = (char*)data.data();
       args->datalen       = data.length();
     }
-    args->subject       = NULL;
-    args->subjectlen    = 0;
+    args->newsubject       = NULL;
+    args->newsubjectlen    = 0;
     args->cert          = ucert;
     args->chain         = cert_chain;
     args->key           = private_key;
@@ -900,17 +900,17 @@ bool Client::CreateProxy(std::string data, AC ** aclist, int version)
     int warn = 0;
     void *additional = NULL;
 
-    struct proxy *proxy = makeproxy(args, &warn, &additional);
+    struct VOMSProxy *proxy = VOMS_MakeProxy(args, &warn, &additional);
 
     ProxyCreationError(warn, additional);
 
     if (proxy)
-      ret = writeproxy(proxyfile.c_str(), proxy);
+      ret = VOMS_WriteProxy(proxyfile.c_str(), proxy);
 
     Print(INFO) << " Done" << std::endl << std::flush;
 
-    freeproxy(proxy);
-    freeproxyarguments(args);
+    VOMS_FreeProxy(proxy);
+    VOMS_FreeProxyArguments(args);
 
 
   }

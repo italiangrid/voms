@@ -16,47 +16,54 @@
 #ifndef VOMS_PROXY_H
 #define VOMS_PROXY_H
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #include <openssl/x509.h>
 #include <openssl/stack.h>
 #include <openssl/evp.h>
 
 #include "newformat.h"
 
-struct arguments {
+struct VOMSProxyArguments {
+  X509_REQ       *proxyrequest;
   char           *proxyfilename;
   char           *filename;
   AC            **aclist;
   int             proxyversion;
   char           *data;
   int             datalen;
-  char           *subject;
-  int             subjectlen;
+  char           *newsubject;
+  int             newsubjectlen;
   X509           *cert;
-  STACK_OF(X509) *chain;
   EVP_PKEY       *key;
   int             bits;
   char           *policyfile;
   char           *policylang;
+  char           *policytext;
   int             pathlength;
   int             hours;
   int             minutes;
   int             limited;
   char           *voID;
   int (*callback)();
+  STACK_OF(X509_EXTENSION) *extensions;
+  STACK_OF(X509) *chain;
 };
 
-struct proxy {
+struct VOMSProxy {
   X509 *cert;
   STACK_OF(X509) *chain;
   EVP_PKEY *key;
 };
 
-struct arguments *makeproxyarguments();
-void freeproxyarguments(struct arguments *args);
-void freeproxy(struct proxy *proxy);
-struct proxy *allocproxy();
-int writeproxy(const char *filename, struct proxy *proxy);
-struct proxy *makeproxy(struct arguments *args, int *warning, void **additional);
+struct VOMSProxyArguments *VOMS_MakeProxyArguments();
+void VOMS_FreeProxyArguments(struct VOMSProxyArguments *args);
+void VOMS_FreeProxy(struct VOMSProxy *proxy);
+struct VOMSProxy *VOMS_AllocProxy();
+int VOMS_WriteProxy(const char *filename, struct VOMSProxy *proxy);
+struct VOMSProxy *VOMS_MakeProxy(struct VOMSProxyArguments *args, int *warning, void **additional);
 
 #define PROXY_NO_ERROR                            0
 #define PROXY_ERROR_OPEN_FILE                     1
@@ -65,5 +72,9 @@ struct proxy *makeproxy(struct arguments *args, int *warning, void **additional)
 #define PROXY_ERROR_FILE_READ                     4
 #define PROXY_WARNING_GSI_ASSUMED              1000
 #define PROXY_WARNING_GENERIC_LANGUAGE_ASSUMED 1001
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif

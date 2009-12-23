@@ -41,7 +41,7 @@ extern "C" {
 #include "credentials.h"
 #include "parsertypes.h"
 #include "vomsparser.h"
-#include "proxy.h"
+#include "vomsproxy.h"
 
 VOLIST *volist = NULL;
   extern int yyparse();
@@ -436,7 +436,7 @@ bool Fake::Run()
 
 bool Fake::CreateProxy(std::string data, AC ** aclist, int version) 
 {
-  struct arguments *args = makeproxyarguments();
+  struct VOMSProxyArguments *args = VOMS_MakeProxyArguments();
   int ret = -1;
 
   if (args) {
@@ -450,8 +450,8 @@ bool Fake::CreateProxy(std::string data, AC ** aclist, int version)
       args->datalen       = data.length();
     }
     if (!newsubject.empty()) {
-      args->subject       = strdup(newsubject.c_str());
-      args->subjectlen    = strlen(args->subject);
+      args->newsubject       = strdup(newsubject.c_str());
+      args->newsubjectlen    = strlen(args->newsubject);
     }
     args->cert          = ucert;
     args->chain         = cert_chain;
@@ -471,13 +471,13 @@ bool Fake::CreateProxy(std::string data, AC ** aclist, int version)
     int warn = 0;
     void *additional = NULL;
 
-    struct proxy *proxy = makeproxy(args, &warn, &additional);
+    struct VOMSProxy *proxy = VOMS_MakeProxy(args, &warn, &additional);
 
     if (proxy)
-      ret = writeproxy(proxyfile.c_str(), proxy);
+      ret = VOMS_WriteProxy(proxyfile.c_str(), proxy);
 
-    freeproxy(proxy);
-    freeproxyarguments(args);
+    VOMS_FreeProxy(proxy);
+    VOMS_FreeProxyArguments(args);
 
     Print(INFO) << " Done" << std::endl << std::flush;
   }
