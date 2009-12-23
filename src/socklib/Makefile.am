@@ -6,16 +6,22 @@ include_HEADERS = \
 noinst_LTLIBRARIES = \
 	$(WANTED_SOCK_LIBS) # may add the libraries defined in EXTRA_LTLIBRARIES
 
-SOURCES = Client.cpp ipv6sock.c
+SOURCES = Client.cpp ipv6sock.cc
 
-libsock_la_SOURCES = 	Client.cpp ipv6sock.c
-libsock_nog_la_SOURCES = Client.cpp Server.cpp ipv6sock.c
+libsock_la_SOURCES = 	Client.cpp ipv6sock.cc
+libsock_nog_la_SOURCES = Client.cpp Server.cpp ipv6sock.cc
 
 libsock_nog_la_CXXFLAGS = \
 	$(NO_GLOBUS_FLAGS) \
 	-I $(top_srcdir)/src/include \
 	-I $(top_srcdir)/src/sslutils \
 	$(GLOBUS_CFLAGS)
+
+# libsock_nog_la_CPPFLAGS = \
+# 	$(NO_GLOBUS_FLAGS) \
+# 	-I $(top_srcdir)/src/include \
+# 	-I $(top_srcdir)/src/sslutils \
+# 	$(GLOBUS_CFLAGS)
 
 libsock_nog_la_LIBADD = \
 	-lcrypto -lssl
@@ -25,6 +31,11 @@ libsock_la_CXXFLAGS = \
 	-I $(top_srcdir)/src/include \
 	-I $(top_srcdir)/src/sslutils \
 	$(GLOBUS_CFLAGS)
+
+# libsock_la_CPPFLAGS = \
+# 	-I $(top_srcdir)/src/include \
+# 	-I $(top_srcdir)/src/sslutils \
+# 	$(GLOBUS_CFLAGS)
 
 libsock_la_LIBADD = \
 	$(top_builddir)/src/sslutils/libssl_utils.la \
@@ -36,15 +47,6 @@ EXTRA_DIST = globuswrap.h vomsssl.h
 ###
 
 EXTRA_LTLIBRARIES = \
-	libsock_server_gcc32.la \
-	libsock_server_gcc32dbg.la \
-	libsock_server_gcc32pthr.la \
-	libsock_server_gcc32dbgpthr.la \
-	libsock_server_gcc64.la \
-	libsock_server_gcc64dbg.la \
-	libsock_server_gcc64pthr.la \
-	libsock_server_gcc64dbgpthr.la \
-	libsock_server.la \
 	libsock_gcc32.la \
 	libsock_gcc32dbg.la \
 	libsock_gcc32pthr.la \
@@ -66,7 +68,7 @@ CLEANFILES = \
 	libsock_gcc64dbg.la \
 	libsock_gcc64pthr.la \
 	libsock_gcc64dbgpthr.la \
-	libsock-nog.la \
+	libsock_nog.la \
 	libsock.la
 
 ###

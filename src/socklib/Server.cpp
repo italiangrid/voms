@@ -49,10 +49,11 @@ extern "C" {
 #include "credentials.h"
   //#include "globuswrap.h"
 #include "log.h"
-#include "ipv6sock.h"
 #include "vomsssl.h"
 #include "sslutils.h"
 }
+
+#include "ipv6sock.h"
 
 #include "data.h"
 

@@ -20,7 +20,9 @@
 #include <stdlib.h>
 #include <string.h>
 
+extern "C" {
 #include "log.h"
+}
 
 static char *getid(struct sockaddr *client, char **symbolic, char **port)
 {
@@ -37,7 +39,7 @@ static char *getid(struct sockaddr *client, char **symbolic, char **port)
   while ((result = 
           getnameinfo(client, sizeof(struct sockaddr_storage), buffer, 
                       bufsize, ports, 99, 0)) == EAI_OVERFLOW) {
-    char *newbuf = realloc(buffer, bufsize + 50);
+    char *newbuf = (char*)realloc(buffer, bufsize + 50);
 
     if (newbuf) {
       bufsize += 50;
@@ -60,7 +62,7 @@ static char *getid(struct sockaddr *client, char **symbolic, char **port)
 
   while ((result = 
           getnameinfo(client, sizeof(struct sockaddr_storage), buffer, bufsize, NULL, 0, NI_NUMERICHOST)) == EAI_OVERFLOW) {
-    char *newbuf = realloc(buffer, bufsize + 70);
+    char *newbuf = (char*)realloc(buffer, bufsize + 70);
 
     if (newbuf) {
       bufsize += 70;

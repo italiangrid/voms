@@ -46,8 +46,9 @@ extern "C" {
 
 #include "log.h"
 #include "sslutils.h"
-#include "ipv6sock.h"
 }
+
+#include "ipv6sock.h"
 
 #include <cstring>
 #include "data.h"
