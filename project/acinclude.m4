@@ -104,7 +104,7 @@ AC_DEFUN([AC_OPENSSL],
 #include <openssl/opensslv.h>
 OPENSSL_VERSION_TEXT
 HERE
-    openssl_version=`$CPP -I$NO_GLOBUS_FLAGS -o - -P conftest.h`
+    openssl_version=`$CPP $NO_GLOBUS_FLAGS -o - -P conftest.h`
     AC_MSG_RESULT($openssl_version)
     rm -f conftest.h
   fi
