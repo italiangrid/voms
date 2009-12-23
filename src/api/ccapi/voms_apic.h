@@ -16,6 +16,10 @@
 #ifndef VOMS_APIC_H
 #define VOMS_APIC_H
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #ifndef GSSAPI_H_
 typedef void * gss_cred_id_t;
 typedef void * gss_ctx_id_t;
@@ -402,6 +406,11 @@ extern char **VOMS_GetTargetsList(struct voms *v, struct vomsdata *vd, int *erro
 extern void VOMS_FreeTargetsList(char **);
 
 extern int VOMS_SetTimeout(int t, struct vomsdata *vd, int *error);
+
+#ifdef __cplusplus
+}
+#endif
+
 #endif
 
 
