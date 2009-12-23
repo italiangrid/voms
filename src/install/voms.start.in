@@ -202,7 +202,14 @@ checkpid()
 {
     ps --pid $1 >> /dev/null
     if [ $? == 0 ]; then
-        return 0
+
+        ps --pid $1 | grep voms >>/dev/null
+        if [ $? == 0 ]; then 
+            return 0
+        else
+            #pid file is stale.  The Process running is not a voms.
+            return 1
+        fi
     else
         return 1
     fi
