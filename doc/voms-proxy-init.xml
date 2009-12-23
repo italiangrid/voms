@@ -168,6 +168,9 @@ and will react accordingly, by returning a failure itself.</para>
 Instead of producing an attribute certificate, this optin will print
 on screen a list of all attributes available to the user.</para>
 
+<para><option>-includeac</option> <replaceable>file</replaceable>
+Adds the VOMS AC in <emphasis remap='I'>file</emphasis> to the proxy.</para>
+
 </refsect1>
 
 &bugzilla;
