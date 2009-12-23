@@ -76,9 +76,7 @@ public class VOMSRequestOptions {
 
     
     /**
-     * 
-     * Returns the ordering string of this {@link VOMSRequestOptions} object.
-     * @return
+     * @return the ordering string of this {@link VOMSRequestOptions} object.
      */
     public String getOrdering() {
 
@@ -100,10 +98,7 @@ public class VOMSRequestOptions {
 
     
     /**
-     * 
-     * Returs the list of the requested FQANs specified in this {@link VOMSRequestOptions} object.
-     * 
-     * @return
+     * @return the list of the requested FQANs specified in this {@link VOMSRequestOptions} object.
      */
     public List getRequestedFQANs() {
 
@@ -124,10 +119,8 @@ public class VOMSRequestOptions {
 
     
     /**
-     * Returns the list of targets (i.e., host where the requested ACs will be valid) for this
+     * @return the list of targets (i.e., host where the requested ACs will be valid) for this
      * {@link VOMSRequestOptions} object.
-     * 
-     * @return
      */
     public List getTargets() {
 
@@ -136,10 +129,8 @@ public class VOMSRequestOptions {
 
     
     /**
-     * Returns the list of targets (i.e., host where the requested ACs will be valid) for this
+     * @return the list of targets (i.e., host where the requested ACs will be valid) for this
      * {@link VOMSRequestOptions} object as a string containing a a comma-separated list of host names.
-     * 
-     * @return
      */
     public String getTargetsAsString() {
 

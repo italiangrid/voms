@@ -32,6 +32,7 @@ extern "C" {
 #define ERR_NO_IDDATA          8
 #define ERR_NO_DB              9
 #define ERR_NO_SESSION        10
+#define ERR_USER_SUSPENDED    11
 
 #define OPTION_SET_SOCKET   1
 #define OPTION_SET_PORT     2

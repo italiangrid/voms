@@ -456,7 +456,7 @@ static const yytype_int8 yyrhs[] =
 /* YYRLINE[YYN] -- source line where rule number YYN was defined.  */
 static const yytype_uint8 yyrline[] =
 {
-       0,    57,    57,    58,    61,    75,    91,   101,   102
+       0,    57,    57,    58,    61,    71,    82,    97,    98
 };
 #endif
 
@@ -1389,22 +1389,18 @@ yyreduce:
   (yyval.policy) = (struct policy *)calloc(1, sizeof(struct policy));
   if ((yyval.policy)) {
     (yyval.policy)->self = 0;
-    (yyval.policy)->caname = (yyvsp[(3) - (4)].string);
+    (yyval.policy)->caname = strdup((yyvsp[(3) - (4)].string));
     (yyval.policy)->conds = nmlistadd(NULL, (yyvsp[(4) - (4)].cond), sizeof(struct condition *));
     (yyval.policy)->type = TYPE_NAMESPACE;
   }
 
-  printf("TEXT READ:\n");
-  printf("TO ISSUER %s %s SUBJECT %s\n", (yyval.policy)->caname, 
-         ((yyval.policy)->conds[0]->positive ? "PERMIT" : "DENY"),
-         (yyval.policy)->conds[0]->subjects[0]);
  }
     break;
 
   case 5:
 
 /* Line 1455 of yacc.c  */
-#line 75 "namespaces.y"
+#line 71 "namespaces.y"
     {
   (yyval.policy) = (struct policy *)calloc(1, sizeof(struct policy));
   if ((yyval.policy)) {
@@ -1413,24 +1409,24 @@ yyreduce:
     (yyval.policy)->conds = nmlistadd(NULL, (yyvsp[(4) - (4)].cond), sizeof(struct condition *));
     (yyval.policy)->type = TYPE_NAMESPACE;
   }
-  printf("TEXT READ:\n");
-  printf("TO ISSUER SELF SUBJECT %s\n", 
-         ((yyval.policy)->conds[0]->positive ? "PERMIT" : "DENY"),
-         (yyval.policy)->conds[0]->subjects[0]);
-
  }
     break;
 
   case 6:
 
 /* Line 1455 of yacc.c  */
-#line 91 "namespaces.y"
+#line 82 "namespaces.y"
     {
   (yyval.cond) = (struct condition *)calloc(1, sizeof(struct condition));
   if ((yyval.cond)) {
     (yyval.cond)->positive = (yyvsp[(1) - (3)].integer);
     (yyval.cond)->original = strdup((yyvsp[(3) - (3)].string));
-    (yyval.cond)->subjects = nmlistadd(NULL, (yyvsp[(3) - (3)].string), sizeof(char*));
+    (yyval.cond)->subjects = nmlistadd(NULL, (yyval.cond)->original, sizeof(char*));
+    if (!(yyval.cond)->subjects) {
+      free((yyval.cond)->original);
+      free((yyval.cond));
+        (yyval.cond) = NULL;
+    }
   }
 }
     break;
@@ -1438,21 +1434,21 @@ yyreduce:
   case 7:
 
 /* Line 1455 of yacc.c  */
-#line 101 "namespaces.y"
+#line 97 "namespaces.y"
     { (yyval.integer) = 1; }
     break;
 
   case 8:
 
 /* Line 1455 of yacc.c  */
-#line 102 "namespaces.y"
+#line 98 "namespaces.y"
     { (yyval.integer) = 0; }
     break;
 
 
 
 /* Line 1455 of yacc.c  */
-#line 1456 "namespaces.c"
+#line 1452 "namespaces.c"
       default: break;
     }
   YY_SYMBOL_PRINT ("-> $$ =", yyr1[yyn], &yyval, &yyloc);
@@ -1664,7 +1660,7 @@ yyreturn:
 
 
 /* Line 1675 of yacc.c  */
-#line 105 "namespaces.y"
+#line 101 "namespaces.y"
 
 
 char **nmlistadd(char **vect, char *data, int size)

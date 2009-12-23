@@ -154,7 +154,6 @@ USE_ATTCERT_LIB = @USE_ATTCERT_LIB@
 USE_CAPI_LIB = @USE_CAPI_LIB@
 USE_CCAPI_LIB = @USE_CCAPI_LIB@
 USE_CCATTCERT_LIB = @USE_CCATTCERT_LIB@
-USE_OLDGAA_LIB = @USE_OLDGAA_LIB@
 USE_SOCK_LIB = @USE_SOCK_LIB@
 USE_SOCK_LIB_SERVER = @USE_SOCK_LIB_SERVER@
 USE_SSL_UTILS_LIB = @USE_SSL_UTILS_LIB@
@@ -162,7 +161,6 @@ VAR_LOCATION_ENV = @VAR_LOCATION_ENV@
 VERSION = @VERSION@
 WANTED_API_LIBS = @WANTED_API_LIBS@
 WANTED_ATTCERT_LIBS = @WANTED_ATTCERT_LIBS@
-WANTED_OLDGAA_LIBS = @WANTED_OLDGAA_LIBS@
 WANTED_SOCK_LIBS = @WANTED_SOCK_LIBS@
 WANTED_SSL_UTILS_LIBS = @WANTED_SSL_UTILS_LIBS@
 WANTED_UTIL_LIBS = @WANTED_UTIL_LIBS@
@@ -244,6 +242,7 @@ JAVA_CLASSES = org/glite/voms/BasicVOMSTrustStore.class \
 							 org/glite/voms/VOMSValidator.class \
 							 org/glite/voms/VOMSTrustManager.class \
 							 org/glite/voms/VOMSKeyManager.class \
+							 org/glite/voms/Namespace.class \
 							 org/glite/voms/ac/ACGenerator.class \
 							 org/glite/voms/ac/ACTrustStore.class \
 							 org/glite/voms/ac/ACValidator.class \
@@ -468,7 +467,7 @@ makedirs:
 
 install-exec-hook:
 	$(mkinstalldirs) $(DESTDIR)/$(datadir)/java
-	$(INSTALL) $(top_builddir)/src/api/java/vomsjapi.jar $(DESTDIR)/$(datadir)/java
+	$(INSTALL) -m644 $(top_builddir)/src/api/java/vomsjapi.jar $(DESTDIR)/$(datadir)/java
 
 clean:
 	rm -f $(top_builddir)/src/api/java/vomsjapi.jar

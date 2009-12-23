@@ -30,6 +30,10 @@ voms_proxy_fake_SOURCES = \
 	vomsparser.c \
 	lex.yy.c 
 
+vomsfake.$(OBJEXT): vomsparser.h
+
+vomsparser.$(OBJEXT): vomsparser.h
+
 vomsparser.h vomsparser.c: vomsfake.y
 	bison -t -d -o vomsparser.c vomsfake.y
 

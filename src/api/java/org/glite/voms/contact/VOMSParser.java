@@ -61,7 +61,7 @@ public class VOMSParser {
     /**
      * 
      * Parses a voms response reading from a given input stream.
-     * @param is, the input stream.
+     * @param is the input stream.
      * @return a {@link VOMSResponse} object that represents the parsed response.
      */
     public VOMSResponse parseResponse(InputStream is){

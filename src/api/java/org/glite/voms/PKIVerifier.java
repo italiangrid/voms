@@ -627,6 +627,8 @@ public class PKIVerifier {
         // now verifies it
         int stackSize = certStack.size();
         int stackPos = stackSize+1;
+	Stack constructedStack = new Stack();
+
         while ( !certStack.isEmpty() ) {
             currentCert = (X509Certificate) certStack.pop();
             stackPos = stackPos -1;
@@ -714,7 +716,7 @@ public class PKIVerifier {
 
             logger.debug( "Checking CA " + isCA );
             if ( isCA ) {
-                if ( !allowsPath( currentCert, issuerCert ) ) {
+	        if ( !allowsPath( currentCert, issuerCert, constructedStack ) ) {
                     logger.error( "Certificate verification: subject '"
                             + currentCert.getSubjectDN().getName()
                             + "' not allowed by CA '"
@@ -760,6 +762,7 @@ public class PKIVerifier {
             issuerCert = currentCert;
             candidatePublicKey = currentCert.getPublicKey();
             currentLength++;
+	    constructedStack.push(currentCert);
         }
 
         if ( !success )
@@ -768,7 +771,58 @@ public class PKIVerifier {
         return true;
     }
 
-    private boolean allowsPath( X509Certificate cert, X509Certificate issuer ) {
+  private boolean allowsNamespaces(X509Certificate cert, X509Certificate issuer,
+				   Stack certStack) {
+
+    // self signed certificates always pass.
+    if (PKIUtils.selfIssued(cert))
+      return true;
+
+    Hashtable namespaces = caStore.getNamespaces();
+    Namespace namespaceCandidate = (Namespace) namespaces.get(PKIUtils.getHash(issuer));
+	  
+    if (namespaceCandidate == null) {
+      // specification says to travel up the chain in this case
+      int size = certStack.size();
+      int current = size;
+
+      if (size > 0) {
+	do {
+	  namespaceCandidate = (Namespace)namespaces.get(PKIUtils.getHash(
+				  (X509Certificate)certStack.elementAt(current)));
+	  current -= 1;
+	} while (namespaceCandidate == null && current != -1);
+      }
+
+      if (namespaceCandidate == null) {
+	//no candidates were found.  According to the rules, this is a permit
+	return true;
+      }
+    }
+    // at this point, namespaceCandidate != null
+
+    int index = namespaceCandidate.findIssuer(issuer);
+
+    while (index != -1) {
+      logger.debug("looking inside namespace");
+      namespaceCandidate.setCurrent(index);
+      String subject = namespaceCandidate.getSubject();
+      boolean permit = namespaceCandidate.getPermit();
+      String currentSubj = PKIUtils.getOpenSSLFormatPrincipal(issuer.getSubjectDN());
+      String currentSubjReversed = PKIUtils.getOpenSSLFormatPrincipal(issuer.getSubjectDN(), true);
+      if (subject.equals(currentSubj) || subject.equals(currentSubjReversed)) {
+	// this is the right policy
+	return permit;
+      }
+      // no decision as of yet.  Look for other rules
+      index = namespaceCandidate.findIssuer(issuer, index);
+    }
+    // candidates found, but no rule applies.  This is a deny
+    return false;
+  }
+
+    private boolean allowsPath( X509Certificate cert, X509Certificate issuer,
+				Stack certStack) {
 
         /* Self-signed certificates do not need to be checked against the signing policy. */
         if (PKIUtils.selfIssued(cert))
@@ -781,6 +835,9 @@ public class PKIVerifier {
 
         logger.debug("signCandidate is: " + signCandidate);
         boolean matched = false;
+
+	if (signCandidate == null)
+	  return allowsNamespaces(cert, issuer, certStack);
 
         if ( signCandidate != null ) {
             logger.debug("Class of issuer is : " + issuer.getClass());

@@ -1,0 +1,48 @@
+load_lib vomstest.exp
+testheader "See if a default REST request for not registeres user fails."
+
+proc mytest {} {
+    _activateCert mycert3
+
+    _vomsStart voms1
+    set outname [exec mktemp $::SCRATCHDIR/openssl-output-XXXXXX]
+    set errname [exec mktemp $::SCRATCHDIR/openssl-error-XXXXXX]
+    set tempfile [exec mktemp $::SCRATCHDIR/openssl-input-XXXXXX]
+    set id [open $tempfile "w+"]
+    puts $id "GET /generate-ac?fqans=/voms1 HTTP/1.1"
+    puts $id ""
+    close $id
+
+    set res [catch {set out [exec openssl s_client -connect localhost:33334 -CApath $::_cadir -cert $::env(HOME)/.globus2/usercert.pem -key $::env(HOME)/.globus2/userkey.pem -quiet 2>$errname <$tempfile >$outname]}]
+
+    _vomsStop voms1
+
+    set out [exec cat $outname]
+
+    if  $res then {
+        addlog $outname
+	addlog $errname
+        testmessage "openssl s_client incorrectly failed."
+	
+        return $::FAILTEST
+    } else {
+        set correct1 "HTTP/1.1 403 Forbidden"
+
+	if [regexp $correct1 $out] then {
+	    #result is correctly bad request
+
+	    set correct1 "<\\?xml version=\"1.0\" encoding=\"UTF-8\"\\?><voms><error><code>NoSuchUser</code><message>voms1: User unknown to this VO.</message></error></voms>"
+
+	    if [regexp $correct1 $out] then {
+		testmessage "Output was as intended."
+		return $::PASSTEST
+	    }
+	}
+	
+	addlog $outname
+        testmessage "REST output was incorrect."
+        return $::FAILTEST
+    }
+}
+
+do_test

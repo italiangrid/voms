@@ -418,12 +418,18 @@ static void  endreq(void *userdata, const char *name)
   {
     d->command = listadd(d->command, d->value, sizeof(char *));
   }  
-  else if (strcmp(name, "lifetime") == 0)
+  else if (strcmp(name, "lifetime") == 0) {
     d->lifetime = atoi(d->value);
-  else if (strcmp(name, "base64") == 0)
+    free(d->value);
+  }
+  else if (strcmp(name, "base64") == 0) {
     d->base64 = 1;
-  else if (strcmp(name, "version") == 0)
+    free(d->value);
+  }
+  else if (strcmp(name, "version") == 0) {
     d->version = atoi(d->value);
+    free(d->value);
+  }
   d->value=NULL;
 }
 

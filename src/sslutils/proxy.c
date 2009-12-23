@@ -364,7 +364,7 @@ struct proxy *makeproxy(struct arguments *args, int *warning, void **additional)
         char buffer[31];
       
         snprintf(buffer, 30, "%d", args->pathlength);
-	buffer[30]='\0';
+        buffer[30]='\0';
         sprintf(value, "language:%s,pathlen:%s,policy:text:%s", policylang, buffer, policy);
       }
       else
@@ -381,6 +381,7 @@ struct proxy *makeproxy(struct arguments *args, int *warning, void **additional)
         ctx.db = (void*)&ctx;
         ex7 = X509V3_EXT_conf_nid(NULL, &ctx, OBJ_obj2nid(OBJ_txt2obj(PROXYCERTINFO_V4,1)), (char*)value);
         free(value);
+        value = NULL;
       }
       else
         ex7 = X509V3_EXT_conf_nid(NULL, NULL, OBJ_obj2nid(OBJ_txt2obj(PROXYCERTINFO_V4,1)), (char*)value);

@@ -97,7 +97,6 @@ AC_DEFUN([AC_OPENSSL],
       WANTED_API_LIBS="$WANTED_API_LIBS libvomsapi_nog.la"
       WANTED_ATTCERT_LIBS="$WANTED_ATTCERT_LIBS libattributes_nog.la"
       WANTED_SSL_UTILS_LIBS="$WANTED_SSL_UTILS_LIBS libssl_utils_nog.la"
-      WANTED_OLDGAA_LIBS="$WANTED_OLDGAA_LIBS liboldgaa_nog.la"
       WANTED_UTIL_LIBS="$WANTED_UTIL_LIBS libutilities_nog.la libutilc_nog.la"
       WANTED_SOCK_LIBS="$WANTED_SOCK_LIBS libsock_nog.la"
     fi
@@ -166,18 +165,15 @@ AC_DEFUN([AC_GLOBUS],
     AC_MSG_RESULT([found $GLOBUS_FLAVORS ($with_globus_flavor selected)])
 
     if test "x$with_globus_flavor" = "x" ; then
-      if test "x$USE_OLDGAA_LIB" = "x"; then
-        USE_OLDGAA_LIB="liboldgaa.la"
-      fi
       if test "x$USE_SSL_UTILS_LIB" = "x"; then
-        USE_SSL_UTILS_LIB="libssl_utils.la"
+        USE_SSL_UTILS_LIB="libssl_utils_nog.la"
       fi
       if test "x$USE_SOCK_LIB" = "x"; then
         USE_SOCK_LIB="libsock.la"
-        USE_SOCK_LIB_SERVER="libsock_server.la"
+        USE_SOCK_LIB_SERVER="libsock_nog.la"
       fi
       if test "x$USE_CCAPI_LIB" = "x"; then
-        USE_CCAPI_LIB="libvomsapi.la"
+        USE_CCAPI_LIB="libvomsapi_nog.la"
       fi
       if test "x$USE_CAPI_LIB" = "x"; then
         USE_CAPI_LIB="libvomsc.la"
@@ -189,9 +185,8 @@ AC_DEFUN([AC_GLOBUS],
         USE_CCATTCERT_LIB="libccattcert.la"
       fi
 
-      WANTED_OLDGAA_LIBS="$WANTED_OLDGAA_LIBS liboldgaa.la"
       WANTED_SSL_UTILS_LIBS="$WANTED_SSL_UTILS_LIBS libssl_utils.la"
-      WANTED_SOCK_LIBS="$WANTED_SOCK_LIBS libsock.la libsock_server.la"
+      WANTED_SOCK_LIBS="$WANTED_SOCK_LIBS libsock.la libsock_nog.la"
       WANTED_ATTCERT_LIBS="$WANTED_ATTCERT_LIBS libattcert.la libccattcert.la"
       WANTED_API_LIBS="$WANTED_API_LIBS libvomsapi.la libvomsc.la"
       WANTED_UTIL_LIBS="$WANTED_UTIL_LIBS libutilities.la libutilc.la"
@@ -224,15 +219,12 @@ AC_DEFUN([AC_GLOBUS],
     AC_MSG_RESULT([Final globus flavors: ${GLOBUS_FLAVORS}])
 
     for flavor in $GLOBUS_FLAVORS ; do
-      if test "x$USE_OLDGAA_LIB" = "x"; then
-        USE_OLDGAA_LIB="liboldgaa_$flavor.la"
-      fi
       if test "x$USE_SSL_UTILS_LIB" = "x"; then
         USE_SSL_UTILS_LIB="libssl_utils_$flavor.la"
       fi
       if test "x$USE_SOCK_LIB" = "x"; then
         USE_SOCK_LIB="libsock_$flavor.la"
-        USE_SOCK_LIB_SERVER="libsock_server_$flavor.la"
+        USE_SOCK_LIB_SERVER="libsock_nog.la"
       fi
       if test "x$USE_CCAPI_LIB" = "x"; then
         USE_CCAPI_LIB="libvomsapi_$flavor.la"
@@ -246,9 +238,8 @@ AC_DEFUN([AC_GLOBUS],
       if test "x$USE_CCATTCERT_LIB" = "x"; then
         USE_CCATTCERT_LIB="libccattcert_$flavor.la"
       fi
-      WANTED_OLDGAA_LIBS="$WANTED_OLDGAA_LIBS liboldgaa_$flavor.la"
       WANTED_SSL_UTILS_LIBS="$WANTED_SSL_UTILS_LIBS libssl_utils_"$flavor".la"
-      WANTED_SOCK_LIBS="$WANTED_SOCK_LIBS libsock_$flavor.la libsock_server_$flavor.la"
+      WANTED_SOCK_LIBS="$WANTED_SOCK_LIBS libsock_$flavor.la libsock_nog.la"
       WANTED_CCAPI_LIBS="$WANTED_CCAPI_LIBS libvomsapi_"$flavor".la"
       WANTED_CAPI_LIBS="$WANTED_CAPI_LIBS libvomsc_"$flavor".la"
       WANTED_ATTCERT_LIBS="$WANTED_ATTCERT_LIBS libattcert_"$flavor".la libccattcert_"$flavor".la"
@@ -329,7 +320,6 @@ AC_DEFUN([AC_GLOBUS],
                 [AC_MSG_RESULT(no)])
     LDFLAGS="$LDFLAGS_SAVE"
     AC_LANG_POP(C)
-    AC_SUBST(WANTED_OLDGAA_LIBS)
     AC_SUBST(WANTED_SSL_UTILS_LIBS)
     AC_SUBST(WANTED_SOCK_LIBS)
     AC_SUBST(WANTED_API_LIBS)
@@ -367,7 +357,6 @@ AC_DEFUN([AC_GLOBUS],
     AC_SUBST(GLOBUS_GCC64DBGPTHR_GSS_LIBS)
     AC_SUBST(GLOBUS_GCC64PTHR_GSS_LIBS)
 
-    AC_SUBST(USE_OLDGAA_LIB)
     AC_SUBST(USE_SSL_UTILS_LIB)
     AC_SUBST(USE_SOCK_LIB)
     AC_SUBST(USE_SOCK_LIB_SERVER)
@@ -389,8 +378,10 @@ AC_DEFUN([AC_COMPILER],
       [ac_with_debug="no"])
     
     if test "x$ac_with_debug" = "xyes" ; then
-      CFLAGS="-g -O0 -fprofile-arcs -ftest-coverage"
-      CXXFLAGS="-g -O0 -fprofile-arcs -ftest-coverage"
+      CFLAGS="-g -O0"
+      CXXFLAGS="-g -O0"
+#      CFLAGS="-g -O0 -fprofile-arcs -ftest-coverage"
+#      CXXFLAGS="-g -O0 -fprofile-arcs -ftest-coverage"
     fi
 
     AC_ARG_WITH(warnings,
@@ -560,7 +551,7 @@ AC_DEFUN([AC_ENABLE_DOCS],
 	      *) AC_MSG_ERROR(bad value $(enableval) for --enable-docs) ;;
 	      esac
 	    ],
-	    [build_docs="yes"])
+	    [build_docs="no"])
 
     AM_CONDITIONAL(BUILD_DOCS, test x$build_docs = xyes)
 ])
@@ -571,12 +562,18 @@ AC_DEFUN([AC_ENABLE_GLITE],
 [
     AC_ARG_ENABLE(glite,
         [  --enable-glite     enable gLite  ],
-        [ac_enable_glite="yes"],
-        [ac_enable_glite="no"])
+        [
+          case "$enableval" in
+          yes) glite="yes" ;;
+          no) glite="no" ;;
+          *) AC_MSG_ERROR(bad value $(enableval) for --enable-glite) ;;
+          esac
+        ],
+        [glite="yes"])
 
-    AM_CONDITIONAL(ENABLE_GLITE, test x$ac_enable_glite = xyes)
+    AM_CONDITIONAL(ENABLE_GLITE, test x$glite = xyes)
 
-    if test "x$ac_enable_glite" = "xno"; then
+    if test "x$glite" = "xno"; then
     	DISTTAR=$WORKDIR
     	AC_SUBST(DISTTAR)
     	AC_SUBST(LOCATION_ENV, "VOMS_LOCATION")
@@ -584,7 +581,7 @@ AC_DEFUN([AC_ENABLE_GLITE],
     	AC_SUBST(VAR_LOCATION_ENV, "VOMS_LOCATION_VAR")
     	AC_DEFINE(LOCATION_ENV, "VOMS_LOCATION", [Environment variable name])
     	AC_DEFINE_UNQUOTED(LOCATION_DIR, "$prefix", [Location of system directory])
-    	AC_DEFINE(USER_DIR, ".edg", [Location of user directory])
+    	AC_DEFINE(USER_DIR, ".voms", [Location of user directory])
     else
     	AC_MSG_RESULT([Preparing for gLite environment])
     	AC_GLITE

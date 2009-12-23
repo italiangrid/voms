@@ -115,6 +115,7 @@ class Client {
   X509                     *ucert;
   EVP_PKEY                 *private_key;
   int                       timeout;
+  std::string               acfile;
   vomsdata                 *v;
 
  public:
@@ -147,5 +148,6 @@ class Client {
   std::ostream& Print(message_type type);
   bool checkstats(char *file, int mode);
   void ProxyCreationError(int, void *);
+  AC *ReadSeparate(const std::string&);
 };
 #endif

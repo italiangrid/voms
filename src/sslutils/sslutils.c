@@ -1661,8 +1661,16 @@ int PRIVATE proxy_check_proxy_name(
     int nidv3, nidv4 = 0;
     int indexv3 = -1, indexv4 = -1;
 
-    nidv3 = OBJ_obj2nid(OBJ_txt2obj(PROXYCERTINFO_V3,1));
-    nidv4 = OBJ_obj2nid(OBJ_txt2obj(PROXYCERTINFO_V4,1));
+    ASN1_OBJECT *objv3;
+    ASN1_OBJECT *objv4;
+
+    objv3 = OBJ_txt2obj(PROXYCERTINFO_V3,1);
+    objv4 = OBJ_txt2obj(PROXYCERTINFO_V4,1);
+    nidv3 = OBJ_obj2nid(objv3);
+    nidv4 = OBJ_obj2nid(objv4);
+
+    ASN1_OBJECT_free(objv3);
+    ASN1_OBJECT_free(objv4);
 
     if (nidv3 == 0 || nidv4 == 0)
       ERR_clear_error();
@@ -1690,6 +1698,9 @@ int PRIVATE proxy_check_proxy_name(
 
           }
         }
+#ifdef EXFLAG_PROXY
+        cert->ex_flags |= EXFLAG_PROXY;
+#endif
         return 1;
       }
     }
@@ -1747,6 +1758,12 @@ int PRIVATE proxy_check_proxy_name(
             X509_NAME_free(name);
         }
     }
+
+#ifdef EXFLAG_PROXY
+    if (ret > 0)
+      cert->ex_flags |= EXFLAG_PROXY;
+#endif
+
     return ret;
 }
 
@@ -1918,11 +1935,20 @@ proxy_verify_callback(
             break;
 #endif
         case X509_V_ERR_UNABLE_TO_GET_ISSUER_CERT_LOCALLY:
+        case X509_V_ERR_CERT_UNTRUSTED:
           if (proxy_check_proxy_name(ctx->current_cert) > 0) {
             /* Server side, needed to fully recognize a proxy. */
             ok = 1;
           }
           break;
+
+#ifdef X509_V_ERR_PROXY_CERTIFICATES_NOT_ALLOWED;
+        case X509_V_ERR_PROXY_CERTIFICATES_NOT_ALLOWED:
+          /* Proxies ARE allowed */
+          ok = 1;
+          break;
+#endif
+
         default:
             break;
         }                       
@@ -2123,14 +2149,11 @@ proxy_verify_callback(
                 struct policy **namespaces = NULL;
                 int result = SUCCESS_UNDECIDED;
 
-                fprintf(stderr, "Calling read_pathrestriction\n");
                 read_pathrestriction(ctx->chain, cert_dir, &namespaces, &signings);
 
                 result = restriction_evaluate(ctx->chain, namespaces, signings);
                 
-                fprintf(stderr, "Freeing namesSPACES\n");
                 free_policies(namespaces);
-                fprintf(stderr, "Freeing SIGNIGS\n");
                 free_policies(signings);
 
                 if (result != SUCCESS_PERMIT)
@@ -2943,19 +2966,19 @@ proxy_get_filenames(
     status = 0;
 err:
     if (!status) {
-      if (p_cert_file && cert_file) {
+      if (p_cert_file && cert_file && !(*p_cert_file)) {
         *p_cert_file = strdup(cert_file);
       }
-      if (p_cert_dir && cert_dir) {
+      if (p_cert_dir && cert_dir && !(*p_cert_dir)) {
         *p_cert_dir = strdup(cert_dir);
       }
-      if (p_user_proxy && user_proxy) {
+      if (p_user_proxy && user_proxy && !(*p_user_proxy)) {
         *p_user_proxy = strdup(user_proxy);
       }
-      if (p_user_cert && user_cert) {
+      if (p_user_cert && user_cert && !(*p_user_cert)) {
         *p_user_cert = strdup(user_cert);
       }
-      if (p_user_key && user_key) {
+      if (p_user_key && user_key && !(*p_user_key)) {
         *p_user_key = strdup(user_key);
       }
     }

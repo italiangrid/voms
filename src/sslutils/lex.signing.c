@@ -2771,7 +2771,7 @@ BEGIN(SINGLE_QUOTED);
 case 3:
 YY_RULE_SETUP
 #line 40 "signing_policy.l"
-yylval_param->string = strndup(yytext, strlen(yytext)-1); fprintf(stderr, "GOT SINGLE_QUOTED:%s\n", yytext); BEGIN(INITIAL); return SUBJECTS;
+yylval_param->string = yytext; BEGIN(INITIAL); return SUBJECTS;
 	YY_BREAK
 case 4:
 YY_RULE_SETUP
@@ -2781,7 +2781,7 @@ BEGIN(DOUBLE_QUOTED);
 case 5:
 YY_RULE_SETUP
 #line 43 "signing_policy.l"
-yylval_param->string = strndup(yytext, strlen(yytext)-1); fprintf(stderr, "GOT DOUBLE_QUOTED:%s\n", yylval_param->string); BEGIN(INITIAL); return SUBJECTS;
+yylval_param->string = yytext; BEGIN(INITIAL); return SUBJECTS;
 	YY_BREAK
 case 6:
 YY_RULE_SETUP
@@ -2816,7 +2816,7 @@ return CA_SIGN;
 case 12:
 YY_RULE_SETUP
 #line 52 "signing_policy.l"
-fprintf(stderr, "ACCESS_ID_CA\n"); return ACCESS_ID_CA;
+return ACCESS_ID_CA;
 	YY_BREAK
 case 13:
 YY_RULE_SETUP

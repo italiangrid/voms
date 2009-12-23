@@ -126,13 +126,6 @@ proc _vomsStart {name } {
     } else {
         unset ::env(GLITE_LOCATION)
     }
-    after 1000
-    set port "[exec cat $::_vomsdefinitions/$name/options/port]"
-    set result [catch {set ::_vomschannel [socket localhost $port]} value]
-    while {$result != 0} {
-        set result [catch {set ::_vomschannel [socket localhost $port]} value]
-    }
-    close $::_vomschannel
 }
 
 proc _vomsStop {name } {

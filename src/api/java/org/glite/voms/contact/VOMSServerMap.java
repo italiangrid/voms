@@ -31,6 +31,7 @@ import org.apache.commons.lang.StringUtils;
  * same vos. For more info about vomses configuration files, see {@link VOMSESFileParser}.
  * 
  * @author Andrea Ceccanti
+ * @author Vincenzo Ciaschini
  *
  */
 public class VOMSServerMap {
@@ -38,7 +39,7 @@ public class VOMSServerMap {
     protected Map map = new TreeMap();
     
     public void add(VOMSServerInfo info){
-        String key = info.getVoName();
+        String key = info.getAlias();
         
         if (map.containsKey( key )){
             

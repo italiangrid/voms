@@ -59,15 +59,18 @@ public class VOMSKeyManager implements X509KeyManager {
         throws NoSuchAlgorithmException, KeyStoreException,
                UnrecoverableKeyException, IOException,
                CertificateException {
-        KeyManagerFactory keyManagerFactory = KeyManagerFactory.getInstance("SunX509");
-        KeyStore keyStore = KeyStore.getInstance("JKS");
-        keyStore.load(null, "".toCharArray());
-        logger.debug("ABOUT to set key entry");
+      if (creds.getUserKey() == null) {
+	throw new UnrecoverableKeyException("Passed Credential does not hold a private key!");
+      }
+      KeyManagerFactory keyManagerFactory = KeyManagerFactory.getInstance("SunX509");
+      KeyStore keyStore = KeyStore.getInstance("JKS");
+      keyStore.load(null, "".toCharArray());
+      logger.debug("ABOUT to set key entry");
 
-        keyStore.setKeyEntry("alias", creds.getUserKey(), "".toCharArray(), creds.getUserChain());
-        logger.debug("STORETYPE: " + keyStore.getType());
-        keyManagerFactory.init(keyStore, "".toCharArray());
-        manager = (X509KeyManager)keyManagerFactory.getKeyManagers()[0];
+      keyStore.setKeyEntry("alias", creds.getUserKey(), "".toCharArray(), creds.getUserChain());
+      logger.debug("STORETYPE: " + keyStore.getType());
+      keyManagerFactory.init(keyStore, "".toCharArray());
+      manager = (X509KeyManager)keyManagerFactory.getKeyManagers()[0];
     }
 
     public VOMSKeyManager(String certfile, String keyfile, String password, int type) {

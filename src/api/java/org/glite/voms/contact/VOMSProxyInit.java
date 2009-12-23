@@ -396,7 +396,6 @@ public class VOMSProxyInit {
             socket = VOMSSocket.instance( userCredentials, sInfo.getHostDn());
         
         try {
-            
             socket.connect( sInfo.getHostName(), sInfo.getPort());
             
         } catch ( Exception e ) {
@@ -412,6 +411,11 @@ public class VOMSProxyInit {
         VOMSResponse response;
         
         try {
+
+            // re-set the reqOptions voName property to be the true voName recorded by the 
+            // sInfo object (the reqOptions voName could actually be an alias rather than 
+            // the true vo name).  
+            reqOptions.setVoName(sInfo.getVoName()); 
             
             protocol.sendRequest( reqOptions, socket.getOutputStream());
             response = protocol.getResponse( socket.getInputStream() );

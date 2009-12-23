@@ -169,6 +169,7 @@ Client::Client(int argc, char ** argv) :
                                          ucert(NULL),
                                          private_key(NULL),
                                          timeout(-1),
+					 acfile(""),
                                          v(NULL)
 {
   bool progversion = false;
@@ -245,6 +246,7 @@ Client::Client(int argc, char ** argv) :
       "    -rfc                           Creates RFC 3820 compliant proxy (synonymous with -proxyver 4)\n" \
       "    -old                           Creates GT2 compliant proxy (synonymous with -proxyver 2)\n" \
       "    -timeout <num>                 Timeout for server connections, in seconds.\n"
+      "    -includeac <file>              get AC from file.\n"
       "\n";
 
     set_usage(LONG_USAGE);
@@ -293,7 +295,8 @@ Client::Client(int argc, char ** argv) :
 #ifdef CLASS_ADD
       {"classadd",        1, (int *)class_add_buf,OPT_STRING},
 #endif
-      {"timeout",         0,        &timeout,     OPT_NUM},
+      {"timeout",         1,        &timeout,     OPT_NUM},
+      {"includeac",       1, (int *)&acfile,      OPT_STRING},
       {0, 0, 0, 0}
     };
 
@@ -521,10 +524,10 @@ Client::Client(int argc, char ** argv) :
   /* file used */
   
   this->cacertfile = NULL;
-  this->certdir = (certdir.empty() ? NULL : const_cast<char *>(certdir.c_str()));
-  this->outfile = (outfile.empty() ? NULL : const_cast<char *>(outfile.c_str()));
-  this->certfile = (certfile.empty() ? NULL : const_cast<char *>(certfile.c_str()));
-  this->keyfile = (keyfile.empty() ? NULL : const_cast<char *>(keyfile.c_str()));
+  this->certdir = (certdir.empty() ? NULL : strdup(const_cast<char *>(certdir.c_str())));
+  this->outfile = (outfile.empty() ? NULL : strdup(const_cast<char *>(outfile.c_str())));
+  this->certfile = (certfile.empty() ? NULL : strdup(const_cast<char *>(certfile.c_str())));
+  this->keyfile = (keyfile.empty() ? NULL : strdup(const_cast<char *>(keyfile.c_str())));
 
   /* prepare proxy_cred_desc */
 
@@ -816,12 +819,23 @@ bool Client::Run()
 
   if (!data.empty())
     Print(FORCED) << "RECEIVED DATA:\n" << data << std::endl;
+
+  if (!acfile.empty()) {
+    AC *ac = ReadSeparate(acfile);
+    if (ac)
+      (void)AddToList(ac);
+    else {
+      Print(ERROR) << "Error while reading AC from file: " << acfile << std::endl << std::flush;
+      exit(1);
+    }
+  }
   
   /* create a proxy containing the data retrieved from VOMS servers */
   
   Print(INFO)  << "Creating proxy " << std::flush; 
   Print(DEBUG) << "to " << proxyfile << " " << std::flush;
-  if (CreateProxy(data, vomses.empty() ? NULL : aclist, proxyver)) {
+
+  if (CreateProxy(data, aclist ? aclist : NULL, proxyver)) {
     goto err;
   }
   else 
@@ -946,9 +960,26 @@ void Client::ProxyCreationError(int error, void *additional)
   }
 }
 
+AC *Client::ReadSeparate(const std::string& file) 
+{
+  BIO *in = BIO_new(BIO_s_file());
 
-bool Client::WriteSeparate() {
+  int res = BIO_read_filename(in, (char*)(file.c_str()));
+  AC * ac = NULL;
 
+  if (res)
+#ifdef TYPEDEF_I2D_OF
+    ac = (AC*)PEM_ASN1_read_bio((d2i_of_void*)d2i_AC, "ATTRIBUTE CERTIFICATE", in, NULL, NULL, NULL);
+#else
+  ac = (AC*)PEM_ASN1_read_bio(((char * (*)())d2i_AC), "ATTRIBUTE CERTIFICATE", in, NULL, NULL, NULL);
+#endif
+  BIO_free(in);
+
+  return ac;
+}
+
+bool Client::WriteSeparate() 
+{
   if (aclist) {
     
     BIO * out = BIO_new(BIO_s_file());
@@ -1136,6 +1167,9 @@ bool Client::pcdInit() {
   
   if (!determine_filenames(&cacertfile, &certdir, &outfile, &certfile, &keyfile, noregen ? 1 : 0))
     goto err;
+
+  if (certfile == keyfile) 
+    keyfile = strdup(certfile);
 
   if (!noregen) {
     if (certfile)

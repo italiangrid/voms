@@ -78,7 +78,10 @@ public class UserCredentials {
 
         log.debug("Cert is: " + userCert.getSubjectDN());
         writer.writeObject(userCert);
-        writer.writeObject(userKey);
+
+	if (userKey != null)
+	  writer.writeObject(userKey);
+
         for (int i=1; i < userChain.length; i++) {
             log.debug("Chain["+i+"] is: " + userChain[i].getSubjectDN());
             writer.writeObject(userChain[i]);
@@ -360,7 +363,7 @@ public class UserCredentials {
      * Static instance constructor for a {@link UserCredentials}.
      * For more info on the user credentials load procedure, see {@link #instance()}.
      *
-     * @param keyPassword, the password that is to be used to decrypt the user private key.
+     * @param keyPassword the password that is to be used to decrypt the user private key.
      * @return the loaded user credentials.
      *
      * @throws  VOMSException
@@ -379,9 +382,9 @@ public class UserCredentials {
      * This methods allows a user to bypass the default credentials search procedure (highlighted {@link #instance() here}),
      * by specifying the path to a PEM X509 user cert and private key.
      *
-     * @param userCertFile, the path to the PEM X509 user certificate.
-     * @param userKeyFile, the path to the PEM X509 private key.
-     * @param keyPassword, the password that is to be used to decrypt the user private key.
+     * @param userCertFile the path to the PEM X509 user certificate.
+     * @param userKeyFile the path to the PEM X509 private key.
+     * @param keyPassword the password that is to be used to decrypt the user private key.
      * @return the loaded user credentials.
      *
      * @throws  VOMSException
@@ -399,8 +402,8 @@ public class UserCredentials {
      * This methods allows a user to bypass the default credentials search procedure (highlighted {@link #instance() here}),
      * by specifying the path to a PEM X509 user cert and private key.
      *
-     * @param userCertFile, the path to the PEM X509 user certificate.
-     * @param userKeyFile, the path to the PEM X509 private key.
+     * @param userCertFile the path to the PEM X509 user certificate.
+     * @param userKeyFile the path to the PEM X509 private key.
      * @return the loaded user credentials.
      *
      * @throws  VOMSException
@@ -418,7 +421,7 @@ public class UserCredentials {
      * This methods allows a user to bypass the default credentials search procedure (highlighted {@link #instance() here}),
      * by specifying the path to a PEM X509 user cert and private key.
      *
-     * @param credentials, the GlobusCredentials object containing the user's own proxy
+     * @param credentials the GlobusCredentials object containing the user's own proxy
      * @return the loaded user credentials.
      *
      * @throws  VOMSException

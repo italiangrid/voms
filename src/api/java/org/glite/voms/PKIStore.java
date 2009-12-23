@@ -55,6 +55,7 @@ public class PKIStore implements VOMSTrustStore {
     private Hashtable signings     = null;
     private Hashtable lscfiles     = null;
     private Hashtable vomscerts    = null;
+    private Hashtable namespaces   = null;
     private long      lastmodified = 0;
     private int       instances    = 1;
 
@@ -70,10 +71,11 @@ public class PKIStore implements VOMSTrustStore {
      */
     public static final int TYPE_CADIR = 2;
 
-    private static final int CERT = 1;
-    private static final int CRL  = 2;
-    private static final int SIGN = 3;
-    private static final int LSC  = 4;
+    private static final int CERT      = 1;
+    private static final int CRL       = 2;
+    private static final int SIGN      = 3;
+    private static final int LSC       = 4;
+    private static final int NAMESPACE = 5;
     private static final int HASHCAPACITY = 75;
 
     private boolean aggressive = false;
@@ -135,6 +137,10 @@ public class PKIStore implements VOMSTrustStore {
         return signings;
     }
 
+
+    public Hashtable getNamespaces() {
+        return namespaces;
+    }
 
     static {
         if (Security.getProvider("BC") == null) {
@@ -200,6 +206,11 @@ public class PKIStore implements VOMSTrustStore {
             vomscerts.clear();
             vomscerts = newReader.vomscerts;
             newReader.vomscerts = null;
+
+            namespaces.clear();
+            namespaces = newReader.namespaces;
+            newReader.namespaces = null;
+
             lastmodified = f.lastModified();
         }
         finally {
@@ -214,6 +225,7 @@ public class PKIStore implements VOMSTrustStore {
         signings     = new Hashtable(HASHCAPACITY);
         lscfiles     = new Hashtable(HASHCAPACITY);
         vomscerts    = new Hashtable(HASHCAPACITY);
+	namespaces   = new Hashtable(HASHCAPACITY);
 
         if (type != TYPE_VOMSDIR &&
             type != TYPE_CADIR)
@@ -330,6 +342,7 @@ public class PKIStore implements VOMSTrustStore {
         signings     = new Hashtable(HASHCAPACITY);
         lscfiles     = new Hashtable(HASHCAPACITY);
         vomscerts    = new Hashtable(HASHCAPACITY);
+        namespaces   = new Hashtable(HASHCAPACITY);
         instances = 1;
     }
 
@@ -556,6 +569,12 @@ public class PKIStore implements VOMSTrustStore {
         signings.put(key, sp);
     }
 
+    private void load(Namespace nsp) {
+        String key = nsp.getName();
+
+	namespaces.put(key, nsp);
+    }
+
     private void load(LSCFile lsc, String vo) {
         String key = lsc.getName();
         Hashtable lscList = null;
@@ -595,6 +614,9 @@ public class PKIStore implements VOMSTrustStore {
                     else if (value == SIGN) {
                         load((SigningPolicy)c.first);
                     }
+		    else if (value == NAMESPACE) {
+		        load((Namespace)c.first);
+		    }
                 }
             }
             catch(IOException e) {
@@ -697,6 +719,10 @@ public class PKIStore implements VOMSTrustStore {
             return new Couple(new SigningPolicy(f), Integer.valueOf(SIGN));
 
         }
+
+	if (f.getName().matches(".*\\.namespace")) {
+	    return new Couple(new Namespace(f), Integer.valueOf(NAMESPACE));
+	}
 
         Object o = null;
         try {

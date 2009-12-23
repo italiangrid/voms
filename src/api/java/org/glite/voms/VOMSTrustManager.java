@@ -20,7 +20,10 @@ import java.security.Security;
 import java.security.cert.X509Certificate;
 import java.security.cert.CertificateException;
 import java.security.cert.CRLException;
+import java.util.ArrayList;
+import java.util.Enumeration;
 import java.util.Hashtable;
+import java.util.Vector;
 import java.io.IOException;
 import org.apache.log4j.Logger;
 
@@ -41,9 +44,8 @@ public class VOMSTrustManager implements X509TrustManager {
     }
 
     public VOMSTrustManager(String dir) throws IOException, CertificateException, CRLException  {
-        verifier = new PKIVerifier();
         store = PKIStoreFactory.getStore(dir, PKIStore.TYPE_CADIR);
-        verifier.setCAStore(store);
+        verifier = new PKIVerifier(null, store);
         stopcalled = false;
     }
 
@@ -87,8 +89,15 @@ public class VOMSTrustManager implements X509TrustManager {
     }
 
     public X509Certificate[] getAcceptedIssuers() {
-        Hashtable CAs = store.getCAs();
+        Hashtable<String,Vector<X509Certificate>> CAs= store.getCAs();
+        ArrayList<X509Certificate> certs= new ArrayList<X509Certificate>(CAs.size());
 
-        return (X509Certificate[])(CAs.values().toArray());
+        for (Enumeration<Vector<X509Certificate>> certVectors= CAs.elements(); certVectors.hasMoreElements();) {
+            Vector<X509Certificate> certVector= certVectors.nextElement();
+            certs.addAll(certVector);
+        }
+
+        X509Certificate[] array= new X509Certificate[certs.size()];
+        return certs.toArray(array); 
     }
 }

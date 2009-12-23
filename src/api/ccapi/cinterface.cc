@@ -93,6 +93,7 @@ struct vomsdatar *VOMS_Init(char *voms, char *cert)
       vd->extra_data = vd->workvo = NULL;
       vd->volen = vd->extralen = 0;
       vd->real = v;
+      vd->timeout = -1;
     }
   }
   catch(...) {}

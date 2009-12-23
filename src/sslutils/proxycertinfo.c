@@ -460,14 +460,20 @@ void InitProxyCertInfoExtension(int full)
 
   X509V3_EXT_METHOD *pcert;
   static int set = 0;
+  ASN1_OBJECT *objv3;
+  ASN1_OBJECT *objv4;
 
   if (set)
     return;
 
   set = 1;
 
+
+  objv3 = OBJ_txt2obj(PROXYCERTINFO_V3,1);
+  objv4 = OBJ_txt2obj(PROXYCERTINFO_V4,1);
+
   /* Proxy Certificate Extension's related objects */
-  if (OBJ_obj2nid(OBJ_txt2obj(PROXYCERTINFO_V3,1)) == 0) {
+  if (OBJ_obj2nid(objv3) == 0) {
     ERR_clear_error();
     OBJC(PROXYCERTINFO_V3, "Proxy Certificate Information");
     if (full) {
@@ -493,7 +499,7 @@ void InitProxyCertInfoExtension(int full)
     }
   }
 
-  if (OBJ_obj2nid(OBJ_txt2obj(PROXYCERTINFO_V4,1)) == 0) {
+  if (OBJ_obj2nid(objv4) == 0) {
     ERR_clear_error();
     OBJC(PROXYCERTINFO_V4, "Proxy Certificate Information");
     if (full) {
@@ -522,6 +528,9 @@ void InitProxyCertInfoExtension(int full)
 #ifdef X509_V_FLAG_ALLOW_PROXY_CERTS
   nativeopenssl = 1;
 #endif
+
+  ASN1_OBJECT_free(objv3);
+  ASN1_OBJECT_free(objv4);
 
   return;
 }

@@ -31,8 +31,8 @@ extern "C" {
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <arpa/inet.h>
+#include <fcntl.h>
 
-#include "gssapi.h"
 #include <memory.h>
 #include <time.h>
 #include <stdio.h>
@@ -45,10 +45,16 @@ extern "C" {
 #include <openssl/x509.h>
 #include <openssl/ssl.h>
 #include <openssl/err.h>
+#include <openssl/bio.h>
 #include "credentials.h"
-#include "globuswrap.h"
+  //#include "globuswrap.h"
 #include "log.h"
+#include "ipv6sock.h"
+#include "vomsssl.h"
+#include "sslutils.h"
 }
+
+#include "data.h"
 
 /** Functionalities for transmitting and receiveing tokens. */
 #include "tokens.h"
@@ -56,32 +62,121 @@ extern "C" {
 /** This class header file. */
 #include "Server.h"
 
-extern int sockalarmed;
 static void Error(void *logh);
 
-static X509 *
-decouple_ctx(gss_ctx_id_t context, STACK_OF(X509) **stk)
-{
-  if (!stk || (context == 0L))
-    return NULL;
+extern int do_select(int fd, fd_set *rset, fd_set *wset, int starttime, int timeout, int wanted);
 
-  *stk = ((gss2_ctx_id_desc *)context)->peer_cred_handle->cred_handle->cert_chain;
-  return ((gss2_ctx_id_desc *)context)->peer_cred_handle->cred_handle->cert;
-}
-
-static int get_peer_data(gss_ctx_id_t context, EVP_PKEY **key, char **issuer, X509 **pcert, X509 **acert, STACK_OF(X509) **stk)
+static int get_peer(X509 *acert, STACK_OF(X509) *acert_stack, EVP_PKEY **key, char **issuer, X509 **pcert)
 {
-  if (!context || !key || !issuer || !pcert)
+  if (!key || !issuer || !pcert)
     return 0;
 
-  *acert = decouple_ctx(context, stk);
-  *pcert = get_real_cert(*acert, *stk);
+  STACK_OF(X509) *stack = acert_stack;
+
+  *pcert = get_real_cert(acert, stack);
   *key = X509_extract_key(*pcert);
 
   if (*key && *pcert)
     return get_issuer(*pcert, issuer);
   else
     return 0;
+}
+
+static int globusf_read(BIO *b, char *out, int outl);
+static int globusf_write(BIO *b, const char *in, int inl);
+
+typedef enum { UNKNOWN, GSI, SSL2, TLS, SSL_GLOBUS} mode_type;
+
+static mode_type mode = UNKNOWN; /* Global, since it needs to be shared between 
+                                    send and receive. */
+static int expected = 0;
+
+static mode_type detect_mode(unsigned char *beginning) 
+{
+  if (beginning[0] >= 20 && beginning[0] <= 23) {
+    /*
+     * either TLS or SSL3.  They are equivalent for our purposes.
+     */
+    return TLS;
+  }
+
+  if (beginning[0] == 26)
+    return SSL_GLOBUS; /* Globus' own SSL variant */
+
+  if (beginning[0] & 0x80) {
+  /*
+   * The data length of an SSL packet is at most 32767.
+   */
+    return SSL2;
+  }
+
+#if 0
+  if (beginning[0] & 0xc0)
+    return SSL2;
+#endif
+
+  return GSI;
+}
+
+int (*readb)(BIO *, char *, int);
+int (*writeb)(BIO *, const char *, int);
+
+static int globusf_read(BIO *b, char *out, int outl)
+{
+  int ret = 0;
+
+  ret = readb(b, out, outl);
+
+  if (ret >= 4) {
+    if (mode == UNKNOWN)
+      mode = detect_mode((unsigned char*)out);
+
+    if (mode == GSI) {
+      if (expected == 0) {
+        expected = ((((((unsigned char)out[0] << 8) + 
+                       (unsigned char)out[1]) << 8) + 
+                     (unsigned char)out[2]) << 8) + 
+          (unsigned char)out[3];
+        memmove(out, out + 4, ret - 4);
+        ret -= 4;
+      }
+      expected -= ret;
+
+      if (ret == 0) {
+        // implies only size was read.  Better reread.
+        ret = readb(b, out, outl);
+
+        if (ret > 0) {
+          expected -= ret;
+        }
+      }
+    }
+  }
+  else if (ret > 0) {
+    if ((mode == GSI) && (expected > 0))
+      expected -= ret;
+  }
+
+  return ret;
+}
+
+static int globusf_write(BIO *b, const char *in, int inl) 
+{
+  int ret = 0;
+
+  if (mode != GSI) 
+    ret = writeb(b, in, inl);
+  else {
+    unsigned char buffer[4];
+    buffer[0] = (inl & 0xff000000) >> 24;
+    buffer[1] = (inl & 0x00ff0000) >> 16;
+    buffer[2] = (inl & 0x0000ff00) >> 8;
+    buffer[3] = (inl & 0x000000ff);
+    writeb(b, (const char*)(buffer), 4);
+    ret = writeb(b, in, inl);
+  }
+
+  return ret;
 }
 
 /**
@@ -92,22 +187,25 @@ static int get_peer_data(gss_ctx_id_t context, EVP_PKEY **key, char **issuer, X5
 GSISocketServer::GSISocketServer(int p, int v, void *l, int b, bool m) :
   version(v), own_subject(""), own_ca(""), peer_subject(""), 
   peer_ca(""), peer_serial(""), own_key(NULL), peer_key(NULL), own_cert(NULL), 
-  peer_cert(NULL), own_stack(NULL), peer_stack(NULL), port(p), opened(false), 
-  credential(GSS_C_NO_CREDENTIAL), context(GSS_C_NO_CONTEXT), 
-  backlog(b), newopened(false), mustclose(m), conflags(0), logh(l)
+  peer_cert(NULL), own_stack(NULL), peer_stack(NULL), 
+  ssl(NULL), ctx(NULL), conn(NULL), pvd(NULL), cacertdir(NULL),
+  upkey(NULL), ucert(NULL), cert_chain(NULL), error(""),
+  port(p), opened(false), sck(-1), backlog(b), newsock(-1), timeout(30),
+  newopened(false), mustclose(m), logh(l)
 {
   if (OBJ_txt2nid("UID") == NID_undef)
     OBJ_create("0.9.2342.19200300.100.1.1","USERID","userId");
+  logh;
 }
 
 void GSISocketServer::SetTimeout(int sec)
 {
-  sockalarmed = sec;
+  timeout = sec;
 }
 
 int GSISocketServer::GetTimeout()
 {
-  return sockalarmed;
+  return timeout;
 }
 
 bool
@@ -130,29 +228,12 @@ GSISocketServer::SetLogger(void *l)
 bool 
 GSISocketServer::Open()
 {
-  bool result = false;
-  struct sockaddr_in myaddr_in;
+  char portstring[36];
 
-  memset ((char *)&myaddr_in, 0, sizeof(struct sockaddr_in));
-  
-  myaddr_in.sin_family = AF_INET;
-  myaddr_in.sin_addr.s_addr = INADDR_ANY;
-  myaddr_in.sin_port=htons(port);
+  snprintf(portstring, 35, "%ld", port);
+  sck = bind_and_listen(portstring, backlog, logh);
 
-  if((sck = socket (AF_INET, SOCK_STREAM, 0)) == -1) {
-    LOG(logh, LEV_ERROR, T_PRE, "Cannot create socket.\n");
-    return false;
-  }
-
-  opened = true;
-  unsigned int value = 1;
-	
-  setsockopt( sck, SOL_SOCKET, SO_REUSEADDR, (void *) &value, sizeof(socklen_t));
-  result = ((bind(sck, (struct sockaddr*)&myaddr_in, sizeof(struct sockaddr_in)) != -1) && (listen(sck, backlog) != -1));
-
-  if (!result)
-    LOGM(VARP, logh, LEV_ERROR, T_PRE, "Cannot bind to socket %d!\n", port);
-  return result;
+  return sck != -1;
 }
 
 void GSISocketServer::AdjustBacklog(int n)
@@ -175,7 +256,7 @@ void GSISocketServer::CleanSocket()
   if (newopened) {
     struct linger l = {1,0};
 
-    setsockopt(newsck, SOL_SOCKET, SO_LINGER, (void *)&l, sizeof(struct linger));
+    setsockopt(newsock, SOL_SOCKET, SO_LINGER, (void *)&l, sizeof(struct linger));
   }
 }
 
@@ -185,18 +266,8 @@ void GSISocketServer::CleanSocket()
 void 
 GSISocketServer::Close()
 {
-  OM_uint32 status;
-
-  if (context != GSS_C_NO_CONTEXT)
-    gss_delete_sec_context(&status, &context, GSS_C_NO_BUFFER);
-  context = GSS_C_NO_CONTEXT;
-
-  if (credential != GSS_C_NO_CREDENTIAL)
-    gss_release_cred(&status, &credential);
-  credential = GSS_C_NO_CREDENTIAL;
-
   if (newopened) {
-    close(newsck);
+    close(newsock);
   }
   newopened=false;
 
@@ -214,27 +285,21 @@ GSISocketServer::Close()
 
 void GSISocketServer::CloseListener(void)
 {
-  if (opened)
-    close(sck);
-  opened = false;
-}
+  if (opened) {
+    struct linger l = {1,0};
 
-gss_ctx_id_t GSISocketServer::GetContext() 
-{
-  return context;
+    setsockopt(sck, SOL_SOCKET, SO_LINGER, (void *)&l, sizeof(struct linger));
+
+    close(sck);
+  }
+  opened = false;
 }
 
 void GSISocketServer::CloseListened(void)
 {
   if (newopened)
-    close(newsck);
+    close(newsock);
   newopened = false;
-}
-
-void 
-GSISocketServer::SetFlags(OM_uint32 flags)
-{
-  conflags = flags;
 }
 
 /**
@@ -246,79 +311,123 @@ GSISocketServer::SetFlags(OM_uint32 flags)
 bool
 GSISocketServer::AcceptGSIAuthentication()
 {
-  OM_uint32      major_status = 0, minor_status = 0, status=0;
-  OM_uint32      ret_flags = GSS_C_GLOBUS_SSL_COMPATIBLE;
-  int            token_status = 0;
-  char           *name = NULL;
-  gss_cred_id_t  delegated_cred = GSS_C_NO_CREDENTIAL;
-
-  if (!newopened)
-    return false;
-
-  if (context != GSS_C_NO_CONTEXT)
-    gss_delete_sec_context(&status, &context, GSS_C_NO_BUFFER);
-  context = GSS_C_NO_CONTEXT;
-
-  if (credential != GSS_C_NO_CREDENTIAL)
-    gss_release_cred(&status, &credential);
-  credential = GSS_C_NO_CREDENTIAL;
-
-  major_status = globus_gss_assist_acquire_cred(&minor_status,
-                                                GSS_C_BOTH,
-                                                &credential);
-  if(GSS_ERROR(major_status)) {
-    char *str = NULL;
-    globus_gss_assist_display_status_str(&str,
-					 const_cast<char*>("Failed to acquire credentials:"),
-					 major_status, minor_status, 0);
-    LOG(logh, LEV_ERROR, T_PRE, str);
-    free(str);
-    return false;
-  }
-
-  major_status =
-    globus_gss_assist_accept_sec_context(&minor_status, &context,
-                                         credential, &name,
-                                         &ret_flags, NULL,
-                                         &token_status, &delegated_cred,
-                                         &get_token, (void *) &newsck,
-                                         &send_token, (void *) &newsck);
-
-  if (GSS_ERROR(major_status)) {
-    char *str = NULL;
-    LOGM(VARP, logh, LEV_DEBUG, T_PRE, "Major: %x, minor: %x\n", major_status, minor_status); 
-    globus_gss_assist_display_status_str(&str,
-                                         const_cast<char*>("Failed to establish security context (accept):"),
-                                         major_status, minor_status, token_status);
-    LOG(logh, LEV_ERROR, T_PRE, str);
-    Error(logh);
-    free(str);
-    return false;
-  }
-
-  if ((ret_flags & conflags) != conflags) {
-    LOGM(VARP, logh, LEV_ERROR, T_PRE, "Flags Mismatch:\nExpected: %d\nReceived:%d",
-         conflags, (ret_flags & conflags));
-    return false;
-  }
-
+  char *name = NULL;
+  long  errorcode = 0;
   char *tmp = NULL;
+  int   flags;
 
-  X509 *rcert = NULL;
-  STACK_OF(X509) *stk = NULL;
+  bool result = false;
+  time_t curtime, starttime;
+  fd_set rset;
+  fd_set wset;
+  int ret, ret2;
+  int expected = 0;
+  BIO *bio = NULL;
+  char *cert_file, *user_cert, *user_key, *user_proxy;
+  char *serial=NULL;
+  X509 *identitycert = NULL;
 
-  rcert = decouple_cred(credential, &stk);
-  own_stack = stk;
+  cert_file = user_cert = user_key = user_proxy = NULL;
+
+  if (proxy_get_filenames(0, &cert_file, &cacertdir, &user_proxy, &user_cert, &user_key) == 0) {
+    (void)load_credentials(user_cert, user_key, &ucert, &cert_chain, &upkey, NULL);
+  }
+//   free(cert_file);
+//   free(user_cert);
+//   free(user_key);
+//   free(user_proxy);
+
+  own_cert = ucert;
+  own_stack = cert_chain;
+  own_key = upkey;
+  ctx = SSL_CTX_new(SSLv23_method());
+  SSL_CTX_load_verify_locations(ctx, NULL, cacertdir);
+  SSL_CTX_use_certificate(ctx, ucert);
+  SSL_CTX_use_PrivateKey(ctx,upkey);
+  SSL_CTX_set_cipher_list(ctx, "ALL:!LOW:!EXP:!MD5:!MD2");    
+  SSL_CTX_set_purpose(ctx, X509_PURPOSE_ANY);
+  SSL_CTX_set_mode(ctx, SSL_MODE_AUTO_RETRY);
+  SSL_CTX_set_verify(ctx, SSL_VERIFY_PEER | SSL_VERIFY_FAIL_IF_NO_PEER_CERT, proxy_verify_callback);
+  SSL_CTX_set_verify_depth(ctx, 100);
+  SSL_CTX_set_cert_verify_callback(ctx, proxy_app_verify_callback, 0);
+
+  if (cert_chain) {
+    /*
+     * Certificate was a proxy with a cert. chain.
+     * Add the certificates one by one to the chain.
+     */
+    X509_STORE_add_cert(ctx->cert_store, ucert);
+    for (int i = 0; i <sk_X509_num(cert_chain); ++i) {
+      X509 *cert = (sk_X509_value(cert_chain,i));
+
+      if (!X509_STORE_add_cert(ctx->cert_store, cert)) {
+        if (ERR_GET_REASON(ERR_peek_error()) == X509_R_CERT_ALREADY_IN_HASH_TABLE) {
+          ERR_clear_error();
+          continue;
+        }
+        else {
+          SetErrorOpenSSL("Cannot add certificate to the SSL context's certificate store");
+          goto err;
+        }
+      }
+    }
+  }
+
+  flags = fcntl(newsock, F_GETFL, 0);
+  (void)fcntl(newsock, F_SETFL, flags | O_NONBLOCK);
+
+  bio = BIO_new_socket(newsock, BIO_NOCLOSE);
+  (void)BIO_set_nbio(bio, 1);
+
+  ssl = SSL_new(ctx);
+  setup_SSL_proxy_handler(ssl, cacertdir);
+
+   writeb = bio->method->bwrite;
+   readb  = bio->method->bread;
+   bio->method->bwrite = globusf_write;
+   bio->method->bread  = globusf_read;
+
+  SSL_set_bio(ssl, bio, bio);
+
+  curtime = starttime = time(NULL);
+
+  ret = ret2 = -1;
+  expected = 0;
+
+  do {
+    ret = do_select(newsock, &rset, &wset, starttime, timeout, expected);
+    if (ret > 0) {
+      ret2 = SSL_accept(ssl);
+      curtime = time(NULL);
+      expected = errorcode = SSL_get_error(ssl, ret2);
+    }
+  } while (ret > 0 && (ret2 <= 0 && ((timeout == -1) ||
+           ((timeout != -1) &&
+            (curtime - starttime) < timeout)) &&
+           (errorcode == SSL_ERROR_WANT_READ ||
+            errorcode == SSL_ERROR_WANT_WRITE)));
+
+  if (ret2 <= 0 || ret <= 0) {
+    if (timeout != -1 && (curtime - starttime <= timeout))
+      SetError("Connection stuck during handshake: timeout reached.");
+    else
+      SetErrorOpenSSL("Error during SSL handshake:");
+    goto err;
+  }
+
+
+  actual_cert = SSL_get_peer_certificate(ssl);
+  peer_stack  = SSL_get_peer_cert_chain(ssl);
 
   char buffer[1000];
 
   LOGM(VARP, logh, LEV_DEBUG, T_PRE, "Certificate DN: %s",
-       X509_NAME_oneline(X509_get_subject_name(rcert), buffer, 999));
+       X509_NAME_oneline(X509_get_subject_name(actual_cert), buffer, 999));
   LOGM(VARP, logh, LEV_DEBUG, T_PRE, "Certificate CA: %s",
-       X509_NAME_oneline(X509_get_issuer_name(rcert), buffer, 999));
-  LOGM(VARP, logh, LEV_DEBUG, T_PRE, "Stack Size: %d", sk_X509_num(stk));
+       X509_NAME_oneline(X509_get_issuer_name(actual_cert), buffer, 999));
+  LOGM(VARP, logh, LEV_DEBUG, T_PRE, "Stack Size: %d", sk_X509_num(peer_stack));
 
-  X509 *identitycert = get_real_cert(rcert, stk);
+  identitycert = get_real_cert(actual_cert, peer_stack);
 
   if (identitycert) {
     char *name = X509_NAME_oneline(X509_get_subject_name(identitycert), NULL, 0);
@@ -326,8 +435,8 @@ GSISocketServer::AcceptGSIAuthentication()
     OPENSSL_free(name);
   }
 
-  for (int i = 0; i < sk_X509_num(stk); i++) {
-    X509 *cert = sk_X509_value(stk, i);
+  for (int i = 0; i < sk_X509_num(peer_stack); i++) {
+    X509 *cert = sk_X509_value(peer_stack, i);
     LOGM(VARP, logh, LEV_DEBUG, T_PRE, "Certificate DN: %s",
          X509_NAME_oneline(X509_get_subject_name(cert), buffer, 999));
     LOGM(VARP, logh, LEV_DEBUG, T_PRE, "Certificate CA: %s",
@@ -335,26 +444,40 @@ GSISocketServer::AcceptGSIAuthentication()
   }
 
   tmp = NULL;
-  (void)get_own_data(credential, &own_key, &tmp, &own_cert);
-  if (tmp)
-    own_ca = std::string(tmp);
-  free(tmp);
+//   (void)get_own_data(credential, &own_key, &tmp, &own_cert);
+//   if (tmp)
+//     own_ca = std::string(tmp);
+//   free(tmp);
 
-  peer_subject = name; 
+  peer_cert = identitycert;
+  peer_key = X509_extract_key(peer_cert);
+
+  name = X509_NAME_oneline(X509_get_subject_name(peer_cert), NULL, 0);
+  if (name)
+    peer_subject = std::string(name); 
+  OPENSSL_free(name);
 
   tmp = NULL;
-  (void)get_peer_data(context, &peer_key, &tmp, &peer_cert, &actual_cert, &peer_stack);
+
+//   (void)get_peer(peer_cert, peer_stack, &peer_key, &tmp, &actual_cert);
 
   if (tmp)
     peer_ca = std::string(tmp);
   free(tmp);
 
-  char *serial = get_peer_serial(actual_cert);
+  serial = get_peer_serial(actual_cert);
 
   peer_serial = std::string(serial ? serial : "");
   free(serial);
 
   return true;
+
+err:
+  destroy_SSL_proxy_handler(ssl);
+  SSL_free(ssl);
+  SSL_CTX_free(ctx);
+
+  return false;
 }
 
 /**
@@ -366,43 +489,12 @@ GSISocketServer::AcceptGSIAuthentication()
 bool 
 GSISocketServer::Listen()
 {
-  struct sockaddr_in peeraddr_in;
-  socklen_t addrlen = sizeof(struct sockaddr_in);
+  newsock = accept_ipv6(sck, logh);
 
-  if (!opened) {
-    LOG(logh, LEV_ERROR, T_PRE, "Socket unopened!");
-    return false;
-  }
-
-#ifndef HAVE_SOCKLEN_T
-  newsck = accept(sck, (struct sockaddr*)&peeraddr_in, &((int)addrlen));
-#else
-  newsck = accept(sck, (struct sockaddr*)&peeraddr_in, &addrlen);
-#endif
-
-  if (newsck != -1) {
-    /* Try to identify host */
-#ifdef HAVE_SOCKLEN_T
-    struct hostent * he = gethostbyaddr((void *)&peeraddr_in, (int)addrlen, AF_INET);
-#else
-    struct hostent * he = gethostbyaddr((void *)&peeraddr_in, addrlen, AF_INET);
-#endif
-
-    if (he) {
-      if (he->h_name)
-        LOGM(VARP, logh, LEV_INFO, T_PRE, 
-             "Received connection from: %s (%s):%d\n", he->h_name, 
-             inet_ntoa(peeraddr_in.sin_addr), peeraddr_in.sin_port);
-    }
-    else
-      LOGM(VARP, logh, LEV_INFO, T_PRE, "Received connection from: %s:%d\n", 
-           inet_ntoa(peeraddr_in.sin_addr), peeraddr_in.sin_port);
-
+  if (newsock != -1)
     newopened = true;
-    return true;
-  }
-  else
-    return false;
+
+  return newsock != -1;
 }
 
 /**
@@ -413,18 +505,127 @@ GSISocketServer::Listen()
 bool 
 GSISocketServer::Send(const std::string &s)
 {
-  if (!(context == GSS_C_NO_CONTEXT)) {
-    OM_uint32 min_stat;
-     
-    int token_status;
-    return (1 == my_send(&min_stat, context, const_cast<char *>(s.c_str()),
-                         s.length(), &token_status, send_token, &newsck, logh));
+  if (!ssl) {
+    SetError("No connection established");
+    return false;
   }
 
-  return false;
+  ERR_clear_error();
+
+  int ret = 0, nwritten=0;
+
+  const char *str = s.c_str();
+
+  int fd = BIO_get_fd(SSL_get_rbio(ssl), NULL);
+  time_t starttime, curtime;
+
+  fd_set rset;
+  fd_set wset;
+  bool do_continue = false;
+  int expected = 0;
+
+  curtime = starttime = time(NULL);
+
+  do {
+    ret = do_select(fd, &rset, &wset, starttime, timeout, expected);
+    do_continue = false;
+    if (ret > 0) {
+      ret = SSL_write(ssl, str + nwritten, strlen(str) - nwritten);
+      curtime = time(NULL);
+      switch (SSL_get_error(ssl, ret)) {
+      case SSL_ERROR_NONE:
+        nwritten += ret;
+        if ((size_t)nwritten == strlen(str))
+          do_continue = false;
+        else
+          do_continue = true;
+        break;
+
+      case SSL_ERROR_WANT_READ:
+        expected = SSL_ERROR_WANT_READ;
+        ret = 1;
+        do_continue = true;
+        break;
+        
+      case SSL_ERROR_WANT_WRITE:
+        expected = SSL_ERROR_WANT_WRITE;
+        ret = 1;
+        do_continue = true;
+        break;
+
+      default:
+        do_continue = false;
+      }
+    }
+  } while (ret <= 0 && do_continue);
+            
+  if (ret <=0) {
+    if (timeout != -1 && (curtime - starttime <= timeout))
+      SetError("Connection stuck during write: timeout reached.");
+    else
+      SetErrorOpenSSL("Error during SSL write:");
+    return false;
+  }
+
+  return true;
 }
 
 
+bool GSISocketServer::Peek(int bufsize, std::string& s)
+{
+  if (!ssl) {
+    SetError("No connection established");
+    return false;
+  }
+
+  ERR_clear_error();
+
+  int ret = -1, ret2 = -1;
+
+  char *buffer = (char *)OPENSSL_malloc(bufsize);
+
+  int fd = BIO_get_fd(SSL_get_rbio(ssl), NULL);
+  time_t starttime, curtime;
+
+  fd_set rset;
+  fd_set wset;
+  int error = 0;
+  int expected = 0;
+
+  starttime = time(NULL);
+
+  do {
+    ret = do_select(fd, &rset, &wset, starttime, timeout, expected);
+    curtime = time(NULL);
+
+    if (ret > 0) {
+      ret2 = SSL_peek(ssl, buffer, bufsize);
+
+      if (ret2 <= 0)
+        expected = error = SSL_get_error(ssl, ret2);
+    }
+  } while ((ret > 0) && 
+           ((ret2 <= 0) && 
+            (((timeout == -1) ||
+              ((timeout != -1) && 
+               (curtime - starttime < timeout))) &&
+             ((error == SSL_ERROR_WANT_READ) ||
+              (error == SSL_ERROR_WANT_WRITE)))));
+            
+  if (ret <= 0 || ret2 <= 0) {
+    if (timeout != -1 && (curtime - starttime <= timeout))
+      SetError("Connection stuck during read: timeout reached.");
+    else
+      SetErrorOpenSSL("Error during SSL read:");
+    OPENSSL_free(buffer);
+    return false;
+  }
+
+  s = std::string(buffer, ret2);
+  OPENSSL_free(buffer);
+  return true;
+
+}
 /**
  * Receive a string value.
  * @param s the string to fill.
@@ -433,30 +634,109 @@ GSISocketServer::Send(const std::string &s)
 bool 
 GSISocketServer::Receive(std::string& s)
 {
-  OM_uint32 min_stat;
-
-  char  *message = NULL;
-  size_t length;
-  int    token_status;
-  int ret = 0;
-
-  ret = my_recv(&min_stat, context, &message, &length, &token_status, 
-                get_token, &newsck, logh);
-
-  if (ret) {
-    s = std::string(message,length);
-    free(message);
-  }
-  else {
-    char *str = NULL;
-    globus_gss_assist_display_status_str(&str, 
-					 const_cast<char*>("GSS authentication failure "),
-                                         ret, min_stat, token_status); 
-    LOG(logh, LEV_ERROR, T_PRE, str);
-    free(str);
+  if (!ssl) {
+    SetError("No connection established");
+    return false;
   }
 
-  return ret == 1;
+  ERR_clear_error();
+
+  int ret = -1, ret2 = -1;
+
+  int bufsize=8192;
+
+  char *buffer = (char *)OPENSSL_malloc(bufsize);
+
+  int fd = BIO_get_fd(SSL_get_rbio(ssl), NULL);
+  time_t starttime, curtime;
+
+  fd_set rset;
+  fd_set wset;
+  int error = 0;
+  int expected = 0;
+
+  starttime = time(NULL);
+
+  do {
+    ret = do_select(fd, &rset, &wset, starttime, timeout, expected);
+    curtime = time(NULL);
+
+    if (ret > 0) {
+      ret2 = SSL_read(ssl, buffer, bufsize);
+
+      if (ret2 <= 0)
+        expected = error = SSL_get_error(ssl, ret2);
+    }
+  } while ((ret > 0) && 
+           ((ret2 <= 0) && 
+            (((timeout == -1) ||
+              ((timeout != -1) && 
+               (curtime - starttime < timeout))) &&
+             ((error == SSL_ERROR_WANT_READ) ||
+              (error == SSL_ERROR_WANT_WRITE)))));
+            
+  if (ret <= 0 || ret2 <= 0) {
+    if (timeout != -1 && (curtime - starttime <= timeout))
+      SetError("Connection stuck during read: timeout reached.");
+    else
+      SetErrorOpenSSL("Error during SSL read:");
+    OPENSSL_free(buffer);
+    return false;
+  }
+
+  s = std::string(buffer, ret2);
+  OPENSSL_free(buffer);
+  return true;
+}
+
+void GSISocketServer::SetError(const std::string &g)
+{
+  error = g;
+}
+
+void GSISocketServer::SetErrorOpenSSL(const std::string &message)
+{
+  error = message;
+
+  unsigned long l;
+  char buf[256];
+#if SSLEAY_VERSION_NUMBER  >= 0x00904100L
+  const char *file;
+#else
+  char *file;
+#endif
+  int line;
+    
+  /* WIN32 does not have the ERR_get_error_line_data */ 
+  /* exported, so simulate it till it is fixed */
+  /* in SSLeay-0.9.0 */
+  
+  while ( ERR_peek_error() != 0 ) {
+    
+    l = ERR_get_error_line(&file, &line);
+
+    std::string temp;
+    int code = ERR_GET_REASON(l);
+    char *message = NULL;
+
+    switch (code) {
+    case SSL_R_SSLV3_ALERT_CERTIFICATE_EXPIRED:
+      error += "Either proxy or user certificate are expired.";
+      break;
+
+    default:
+      message = (char*)ERR_reason_error_string(l);
+
+      error += std::string(ERR_error_string(l, buf))+ ":" + 
+        std::string(file) + ":" + stringify(line, temp) + "\n";
+
+      if (message)
+        error += std::string(ERR_reason_error_string(l)) + ":" + 
+          std::string(ERR_func_error_string(l)) + "\n";
+
+      break;
+    }
+  }
 }
 
 static void Error(void *logh)

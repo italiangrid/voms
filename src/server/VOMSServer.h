@@ -43,7 +43,7 @@ public:
 
 private:
   VOMSServer &operator=(VOMSServer const &) {exit(1);}
-  void Execute(EVP_PKEY *, X509 *, X509 *, X509*,  gss_ctx_id_t);
+  void Execute(EVP_PKEY *, X509 *, X509 *, X509*);
 
 public:
   GSISocketServer sock;

@@ -57,7 +57,8 @@ proc mytest {} {
     -list                          Show all available attributes.
     -rfc                           Creates RFC 3820 compliant proxy \(synonymous with -proxyver 4\)
     -old                           Creates GT2 compliant proxy \(synonymous with -proxyver 2\)
-    -timeout <num>                 Timeout for server connections, in seconds."
+    -timeout <num>                 Timeout for server connections, in seconds.
+    -includeac <file>              get AC from file."
 
     set out2 [exec cat  $outname]
     if [regexp $correct $out2] then {

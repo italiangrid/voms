@@ -14,6 +14,7 @@ JAVA_CLASSES = org/glite/voms/BasicVOMSTrustStore.class \
 							 org/glite/voms/VOMSValidator.class \
 							 org/glite/voms/VOMSTrustManager.class \
 							 org/glite/voms/VOMSKeyManager.class \
+							 org/glite/voms/Namespace.class \
 							 org/glite/voms/ac/ACGenerator.class \
 							 org/glite/voms/ac/ACTrustStore.class \
 							 org/glite/voms/ac/ACValidator.class \
@@ -71,7 +72,7 @@ makedirs:
 
 install-exec-hook:
 	$(mkinstalldirs) $(DESTDIR)/$(datadir)/java
-	$(INSTALL) $(top_builddir)/src/api/java/vomsjapi.jar $(DESTDIR)/$(datadir)/java
+	$(INSTALL) -m644 $(top_builddir)/src/api/java/vomsjapi.jar $(DESTDIR)/$(datadir)/java
 
 clean:
 	rm -f $(top_builddir)/src/api/java/vomsjapi.jar

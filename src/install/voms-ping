@@ -25,7 +25,7 @@ echo_failure() {
   echo "  ]"
 }
 
-function test_vo {
+test_vo() {
    local voname="$1"
    local port=`cat $GLITE_LOCATION/etc/voms/$voname/voms.conf  | grep '^--port' | sed 's/^--port=//'`
    local dn=`openssl x509 -subject -noout -in /etc/grid-security/hostcert.pem|cut -d' ' -f2-`
@@ -41,7 +41,7 @@ function test_vo {
 "$voname" "localhost" "$port" "$dn" "$voname"
 EOF
    rm -f /tmp/oo
-   /opt/glite/bin/voms-proxy-init --voms $vo --out /tmp/proxy --userconf=/tmp/vomses 2>/tmp/oo >/dev/null
+   ${GLITE_LOCATION:-/usr}/bin/voms-proxy-init --voms $vo --out /tmp/proxy --userconf=/tmp/vomses 2>/tmp/oo >/dev/null
    res=$?
    if test $res -ne 0; then
       grep "User unknown to this VO" /tmp/oo >/dev/null

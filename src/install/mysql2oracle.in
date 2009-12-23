@@ -1,8 +1,7 @@
-#!/bin/sh
+#!/bin/bash
 #set -x
 
-function usage()
-{
+usage () {
     echo
     echo "usage : mysql2oracle [OPTIONS]"
     echo

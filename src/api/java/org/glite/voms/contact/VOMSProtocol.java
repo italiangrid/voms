@@ -97,8 +97,8 @@ public class VOMSProtocol {
      * 
      * This method is used to send a request to a VOMS server.
      *  
-     * @param requestOptions, the request options. See {@link VOMSRequestOptions}. 
-     * @param stream, an output stream.
+     * @param requestOptions the request options. See {@link VOMSRequestOptions}. 
+     * @param stream an output stream.
      */
     public void sendRequest(VOMSRequestOptions requestOptions, OutputStream stream){
         
@@ -154,7 +154,7 @@ public class VOMSProtocol {
     /**
      * This method is used to parse a VOMS response from an input stream.
      * 
-     * @param stream, the input stream from which the response will be parsed.
+     * @param stream the input stream from which the response will be parsed.
      * @return a {@link VOMSResponse} object.
      */
     public VOMSResponse getResponse(InputStream stream){

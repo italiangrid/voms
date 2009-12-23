@@ -57,6 +57,11 @@ void *logh = NULL;
 #include "vomsxml.h"
 #include "fqan.h"
 
+extern "C" {
+extern char *Decode(const char *, int, int *);
+extern char *Encode(const char *, int, int *, int);
+}
+
 #include <map>
 #include <set>
 #include <string>
@@ -121,7 +126,7 @@ makeACSOAP(struct soap *soap, void *logh, char **FQANs, int size, char **targets
            VOMSServer *v);
 
 int
-makeACREST(struct soap *soap, void *logh, char **FQANs, int size, int requested, VOMSServer *v);
+makeACREST(struct soap *soap, void *logh, char **FQANs, int size, int requested, int unknown, VOMSServer *v);
 
 std::string makeAC(EVP_PKEY *key, X509 *issuer, X509 *holder, 
                    const std::string &message, void *logh, VOMSServer *v);
@@ -381,8 +386,8 @@ VOMSServer::VOMSServer(int argc, char *argv[]) : sock(0,0,NULL,50,false),
     {"syslog",          0, (int *)&do_syslog,         OPT_BOOL},
     {"base64",          0, (int *)&base64encoding,    OPT_BOOL},
     {"nologfile",       0, (int *)&nologfile,         OPT_BOOL},
-    {"soap_port",       1, &soap_port,                OPT_NUM},
-    {"soap_host",       1, (int *)&soap_host,         OPT_STRING},
+//     {"soap_port",       1, &soap_port,                OPT_NUM},
+//     {"soap_host",       1, (int *)&soap_host,         OPT_STRING},
     {0, 0, 0, 0}
   };
 
@@ -400,8 +405,8 @@ VOMSServer::VOMSServer(int argc, char *argv[]) : sock(0,0,NULL,50,false),
             "[-x509_user_proxy file] [-test] [-uri uri] [-code num]\n"
             "[-loglevel lev] [-logtype type] [-logformat format]\n"
             "[-logdateformat format] [-debug] [-backlog num] [-skipcacheck]\n"
-            "[-version][-sqlloc path][-compat][-logmax n][-socktimeout n]\n"
-            "[-shortfqans]\n");
+            "[-version] [-sqlloc path] [-compat] [-logmax n] [-socktimeout n]\n"
+            "[-shortfqans] [-newformat] [-syslog] [-base64] [-nologfile]\n");
 
   if (!getopts(argc, argv, opts))
     throw VOMSInitException("unable to read options");
@@ -651,7 +656,6 @@ VOMSServer::VOMSServer(int argc, char *argv[]) : sock(0,0,NULL,50,false),
     setenv("X509_USER_KEY", x509_user_key.c_str(), 1);
   }
 
-  sock.SetFlags(GSS_C_MUTUAL_FLAG | GSS_C_CONF_FLAG | GSS_C_INTEG_FLAG);
   sock.SetLogger(logh);
   std::string msg = "URI: " + uri;
 
@@ -750,33 +754,21 @@ void VOMSServer::Run()
   FD_ZERO(&rset);
 
   sop = soap_new();
-  old_plugin = sop->fsslauth;
-  sop->fsslauth = myplugin;
+//   old_plugin = sop->fsslauth;
+//  sop->fsslauth = myplugin;
   sop->fget = http_get;
-  soap_ssl_server_context(sop,
-                          SOAP_SSLv3_TLSv1|SOAP_SSL_REQUIRE_CLIENT_AUTHENTICATION,
-                          NULL,
-                          NULL,
-                          NULL,
-                          "/etc/grid-security/certificates",
-                          NULL,
-                          NULL,
-                          NULL);
-
-
-  m = soap_bind(sop, soap_hostname, soap_port, backlog);
-  if (m < 0) {
-    soap_print_fault(sop, stderr);
-  }
-  FD_SET(m, &rset);
 
   try {
     signal(SIGHUP, sighup_handler);
     LOG(logh, LEV_DEBUG, T_PRE, "Trying to open socket.");
     sock.Open();
+    LOGM(VARP, logh, LEV_DEBUG, T_PRE, "Opened Socket: %d", sock.sck); 
+    if (sock.sck == -1) {
+      LOG(logh, LEV_ERROR, T_PRE, "Unable to bind socket");
+      exit(1);
+    }
     sock.SetTimeout(socktimeout);
     FD_SET(sock.sck, &rset);
-    int mymax = (m > sock.sck ? m+1 : sock.sck+1);
 
     for (;;) {
 
@@ -785,46 +777,15 @@ void VOMSServer::Run()
         UpdateOpts();
       }
 
-      int selret=-1;
+      int selret = -1;
+
       do {
-        selret = select(mymax, &rset, NULL, NULL, NULL);
+        selret = select(sock.sck+1, &rset, NULL, NULL, NULL);
       } while (selret <= 0);
 
       if (reload) {
         reload=0;
         UpdateOpts();
-      }
-
-      if (FD_ISSET(m, &rset)) {
-        int s = soap_accept(sop);
-        if (s < 0)
-          soap_print_fault(sop, stderr);
-        else {
-          (void)SetCurLogType(logh, T_REQUEST);
-
-          if (!gatekeeper_test && !debug) {
-            pid = fork();
-            if (pid) {
-              LOGM(VARP, logh, LEV_INFO, T_PRE, "Starting Executor with pid = %d", pid);
-              close(s);
-            }
-
-            if (!pid) {
-              struct soap *tsoap = soap_copy(sop);
-              if (tsoap) {
-                if (!soap_ssl_accept(tsoap)) {
-                  soap_serve(tsoap);
-                }
-                soap_destroy(tsoap);
-                soap_end(tsoap);
-                soap_free(tsoap);
-              }
-              soap_end(sop);
-              soap_free(sop);
-              exit(0);
-            }
-          }
-        }
       }
 
       if (FD_ISSET(sock.sck, &rset)) {
@@ -858,9 +819,20 @@ void VOMSServer::Run()
               LOGM(VARP, logh, LEV_INFO, T_PRE, " user: %s", user.c_str());
               LOGM(VARP, logh, LEV_INFO, T_PRE, " ca  : %s", userca.c_str());
               LOGM(VARP, logh, LEV_INFO, T_PRE, " serial: %s", sock.peer_serial.c_str());
+              std::string peek;
 
+              (void)sock.Peek(3, peek);
+
+              LOGM(VARP, logh, LEV_INFO, T_PRE, "peek data: %s", peek.c_str());
+
+              if (peek == "GET") {
+                sop->socket = sock.newsock;
+                sop->ssl = sock.ssl;
+                sop->fparse(sop);
+                return;
+              }
               LOG(logh, LEV_DEBUG, T_PRE, "Starting Execution.");
-              Execute(sock.own_key, sock.own_cert, sock.peer_cert, sock.actual_cert, sock.GetContext());
+              Execute(sock.own_key, sock.own_cert, sock.peer_cert, sock.actual_cert);
             }
             else {
               LOGM(VARP, logh, LEV_INFO, T_PRE, "Failed to authenticate peer");
@@ -882,7 +854,6 @@ void VOMSServer::Run()
         }
       }
       FD_ZERO(&rset);
-      FD_SET(m, &rset);
       FD_SET(sock.sck, &rset);
     }
   }
@@ -953,12 +924,22 @@ std::string makeAC(EVP_PKEY *key, X509 *issuer, X509 *holder,
 
   if (!newdb->operation(OPERATION_GET_USER, &uid, holder)) {
     int code;
+    std::string message;
     LOG(logh, LEV_ERROR, T_PRE, "Error in executing request!");
     LOG(logh, LEV_ERROR, T_PRE, newdb->errorMessage());
     code = newdb->error();
+    char *mes = newdb->errorMessage();
+    if (mes) 
+      message = std::string(mes);
+    else
+      message = "unknown";
+  
     db->releaseSession(newdb);
 
-    if (code != ERR_NO_DB) {
+    if (code == ERR_USER_SUSPENDED) {
+      err.num = ERR_SUSPENDED;
+      err.message = std::string("User is currently suspended!\nSuspension reason: ") + message;
+    } else if (code != ERR_NO_DB) {
       err.num = ERR_NOT_MEMBER;
       err.message = v->voname + ": User unknown to this VO.";
     }
@@ -982,8 +963,7 @@ std::string makeAC(EVP_PKEY *key, X509 *issuer, X509 *holder,
 
   int k = 0;
 
-  for(std::vector<std::string>::iterator i = comm.begin(); i != comm.end(); ++i)
-  {
+  for(std::vector<std::string>::iterator i = comm.begin(); i != comm.end(); ++i) {
     char commletter = '\0';
     command = comm[k++];
     char *group = NULL;
@@ -1182,10 +1162,6 @@ std::string makeAC(EVP_PKEY *key, X509 *issuer, X509 *holder,
   }
 
   if (!fqans.empty()) {
-
-
-    ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
     // test logging retrieved attributes
 
     if(result && !attributes.empty()) {
@@ -1244,10 +1220,13 @@ std::string makeAC(EVP_PKEY *key, X509 *issuer, X509 *holder,
         LOG(logh, LEV_ERROR, T_PRE, "Error in executing request!");
         err.message = v->voname + ": Unable to satisfy " + command + " request due to database error.";
         errs.push_back(err);
+        BN_free(serial);
         return XML_Ans_Encode("A", errs, dobase64);
       }
     }
 
+    BN_free(serial);
+    serial = NULL;
     (void)SetCurLogType(logh, T_RESULT);
 
     if (comm[0] == "N")
@@ -1273,7 +1252,7 @@ std::string makeAC(EVP_PKEY *key, X509 *issuer, X509 *holder,
 }
 
 void
-VOMSServer::Execute(EVP_PKEY *key, X509 *issuer, X509 *holder, X509 *peer_cert, gss_ctx_id_t context)
+VOMSServer::Execute(EVP_PKEY *key, X509 *issuer, X509 *holder, X509 *peer_cert)
 {
   std::string message;
 
@@ -1369,8 +1348,6 @@ void VOMSServer::UpdateOpts(void)
 
   LogOptionInt(logh, "MAXSIZE", logmax);
   LogOption(logh, "DATEFORMAT", logdf.c_str());
-
-  sock.SetFlags(GSS_C_MUTUAL_FLAG | GSS_C_CONF_FLAG | GSS_C_INTEG_FLAG);
 
   if (logh) {
     loglevels lev;
@@ -1658,6 +1635,8 @@ makeACSSL(SSL *ssl, void *logh, char **FQANs, int size, const std::string &origo
 
   if (!load_credentials(hostcert, hostkey, 
                         &issuer, NULL,  &key, pw_cb)) {
+    X509_free(issuer);
+    EVP_PKEY_free(key);
     return "";
   }
 
@@ -1686,14 +1665,35 @@ makeACSSL(SSL *ssl, void *logh, char **FQANs, int size, const std::string &origo
 
   std::string message = XML_Req_Encode(command, std::string(""), targs, requested);
 
-  return makeAC(key, issuer, holder, message, logh, selfpointer);
+  std::string ret = makeAC(key, issuer, holder, message, logh, selfpointer);
+  X509_free(issuer);
+  EVP_PKEY_free(key);
+
+  return ret;
 }
 
 int http_get(soap *soap)
 {
-  char *s = strchr(soap->path, '?');
-  if (!s)
+  char *path = strdup(soap->path);
+  int unknown = 0;
+
+  LOGM(VARP, logh, LEV_DEBUG, T_PRE, "REST Request: %s", path);
+
+  if (!path)
     return SOAP_GET_METHOD;
+
+  char *s = strchr(path, '?');
+
+  if (s)
+    *s='\0';
+
+  char *prepath=canonicalize_string(path);
+
+  if (strcmp(prepath, "/generate-ac") != 0) {
+    soap_response(soap,404);
+    soap_end_send(soap);
+    return 404;
+  }
 
   soap_response(soap, SOAP_HTML);
 
@@ -1703,51 +1703,68 @@ int http_get(soap *soap)
   std::string orderstring;
   int size = 0;
 
+  if (s) {
+    ++s;
 
-  if (!strlen(s))
-    return 500;
-
-  ++s;
-
-  char *basis = s;
-  char *next = NULL;
-
-  do {
-    next = strchr(basis, '?');
-
-    if (next)
-      *next='\0';
-
-    char *equal = strchr(basis, '=');
-    if (!equal)
+    if (!strlen(s)) {
+      free(path);
+      soap_response(soap, 404);
+      soap_end_send(soap);
       return 500;
-    *equal='\0';
-
-    char *name   = basis;
-    char *value  = equal+1;
-    char *cname  = canonicalize_string(name);
-    char *cvalue = canonicalize_string(value);
-
-    if (strcmp(cname, "lifetime") == 0)
-      lifetime = atoi(cvalue);
-
-    if (strcmp(cname, "fqan") == 0) {
-      fqans.push_back(std::string(cvalue));
-      size++;
     }
 
-    if (strcmp(cname, "order") == 0) {
-      if (orderstring.empty())
-        orderstring = std::string(cvalue);
-      else
-        orderstring += ", " + std::string(cvalue);
-    }
+    char *basis = s;
+    char *next = NULL;
 
-    /* purposefully ignore other parameters */
+    do {
+      next = strchr(basis, '&');
 
-    if (next)
-      basis = next+1;
-  } while (next);
+      if (next)
+        *next='\0';
+
+      char *equal = strchr(basis, '=');
+      if (!equal)
+        return 500;
+      *equal='\0';
+
+      char *name   = basis;
+      char *value  = equal+1;
+      char *cname  = canonicalize_string(name);
+      char *cvalue = canonicalize_string(value);
+
+      if (strcmp(cname, "lifetime") == 0)
+        lifetime = atoi(cvalue);
+
+      else if (strcmp(cname, "fqans") == 0) {
+        char *position = strchr(cvalue, ',');
+
+        while (position) {
+          *position = '\0';
+          fqans.push_back(std::string(cvalue));
+          cvalue = ++position;
+          position = strchr(cvalue, ',');
+	  size ++;
+        }
+        fqans.push_back(std::string(cvalue));
+
+        size++;
+      }
+
+      else if (strcmp(cname, "order") == 0) {
+        if (orderstring.empty())
+          orderstring = std::string(cvalue);
+        else
+          orderstring += ", " + std::string(cvalue);
+      }
+      else {
+	/* purposefully ignore other parameters */
+	/* but put it in an otherwise positive response */
+	unknown = 1;
+      }
+      if (next)
+        basis = next+1;
+    } while (next);
+  }
 
   char **FQANS = NULL;
   if (size) {
@@ -1761,7 +1778,15 @@ int http_get(soap *soap)
     FQANS[0]=maingroup;
     size = 1;
   }
-  return makeACREST(soap, logh, FQANS, size, lifetime, selfpointer);
+  int res = makeACREST(soap, logh, FQANS, size, lifetime, unknown, selfpointer);
+
+  int i =0;
+
+  free(FQANS);
+
+  free(path);
+
+  return res;
 }
 
 static int hexint(char c)
@@ -1770,10 +1795,10 @@ static int hexint(char c)
     return c - '0';
 
   if (c >= 'a' && c <= 'f')
-    return c - 'a';
+    return c - 'a' + 10;
 
   if (c >= 'A' && c <= 'F')
-    return c - 'A';
+    return c - 'A' + 10;
 
   return 0;
 }
@@ -1788,8 +1813,10 @@ static char *canonicalize_string(char *original)
       *currentout++ = *currentin++;
     else {
       char first = *(currentin+1);
+
       if (first != '\0') {
         char second = *(currentin+2);
+
         if (second != '\0') {
           if (isxdigit(first) && isxdigit(second)) {
             *currentout++=hexint(first)*16 + hexint(second);
@@ -1810,9 +1837,10 @@ static char *canonicalize_string(char *original)
   return original;
 }
 
+static int EncodeAnswerForRest(const std::string& input, int unknown, std::string& output);
 
 int
-makeACREST(struct soap *soap, void *logh, char **FQANs, int size, int requested, VOMSServer *v)
+makeACREST(struct soap *soap, void *logh, char **FQANs, int size, int requested, int unknown, VOMSServer *v)
 {
   AC *ac = NULL;
   char *message = NULL;
@@ -1820,18 +1848,69 @@ makeACREST(struct soap *soap, void *logh, char **FQANs, int size, int requested,
 
   std::string result = makeACSSL(soap->ssl, logh, FQANs, size, std::string(""), &targets, 0, requested, selfpointer);
 
+  std::string output;
+
+  int value = EncodeAnswerForRest(result, unknown, output);
+  soap->http_content = "text/xml";
+  soap_response(soap, value);
+  soap_send(soap, output.c_str());
+  soap_end_send(soap);
+
+  return SOAP_OK;
+}
+
+static int EncodeAnswerForRest(const std::string& input, int unknown, std::string& output)
+{
   answer a;
 
-  if (XML_Ans_Decode(result, a)) {
-    if (!a.ac.empty()) {
-      soap->http_content = "text/xml";
-      soap_response(soap, SOAP_HTML);
-      soap_send(soap, result.c_str());
-      soap_end_send(soap);
+  if (XML_Ans_Decode(input, a)) {
+    if (!a.ac.empty() && a.ac != "A") {
+      int len = 0;
+      char *ac = Encode(a.ac.c_str(), a.ac.length(), &len, !a.base64);
 
-      return SOAP_OK;
+      output = "<?xml version=\"1.0\" encoding=\"UTF-8\"?><voms><ac>" +std::string(ac, len) +"</ac>";
+      std::vector<errorp> errs = a.errs;
+      for (std::vector<errorp>::iterator i = errs.begin(); i != errs.end(); i++)
+        output +="<warning>"+i->message+"</warning>";
+      if (unknown) 
+	output +="<warning>Unknown parameters in the request were ignored!</warning>";
+      output += "</voms>";
+      free(ac);
+      return SOAP_HTML;
+    }
+    else {
+      // some error occured.  Look inside
+      output = "<?xml version=\"1.0\" encoding=\"UTF-8\"?><voms><error>";
+      std::vector<errorp> errs = a.errs;
+      int value = 500;
+
+      for (std::vector<errorp>::iterator i = errs.begin(); i != errs.end(); i++) {
+        if (i->num == ERR_NOT_MEMBER) {
+          const char *msg = i->message.c_str();
+
+          if (strstr(msg, "Unable to satisfy") == NULL) {
+            output += "<code>NoSuchUser</code><message>" +
+              i->message + "</message>";
+            value = 403;
+          }
+          else {
+            output += "<code>BadRequest</code><message>"+i->message + "</message>";
+            value = 400;
+          }
+        }
+        else if (i->num == ERR_SUSPENDED) {
+          const char *msg = i->message.c_str();
+          value = 403;
+          output +="<code>SuspendedUser</code><message>"+i->message+"</message>";
+        }
+      }
+      output +="</error></voms>";
+      return value;
     }
   }
-
-  return 500;
+  else {
+      output = "<?xml version=\"1.0\" encoding=\"UTF-8\"?><voms><error>"
+        "<code>InternalError</code><message>Internal Error</message></voms>";
+      return 500;
+  }
 }

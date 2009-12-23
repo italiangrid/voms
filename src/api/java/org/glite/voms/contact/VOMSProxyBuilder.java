@@ -139,9 +139,9 @@ public class VOMSProxyBuilder {
      *
      * This methods builds an {@link AttributeCertificate} (AC) object starting from an array of bytes.
      *
-     * @param acBytes, the byte array containing the attribute certificate.
+     * @param acBytes the byte array containing the attribute certificate.
      * @return the {@link AttributeCertificate} object
-     * @throws VOMSException, in case of parsing errors.
+     * @throws VOMSException in case of parsing errors.
      */
     public static AttributeCertificate buildAC(byte[] acBytes){
 
@@ -169,12 +169,12 @@ public class VOMSProxyBuilder {
      * passed as arguments and including a list of {@link AttributeCertificate} objects that
      * will be included in the proxy.
      *
-     * @param cred, the {@link UserCredentials} from which the proxy must be created.
-     * @param ACs, the list of {@link AttributeCertificate} objects.
-     * @param lifetime, the lifetime in seconds of the generated proxy.
-     * @param version, the version of globus to which the proxy conforms
-     * @return a {@link GlobusCredential} object that represents the proxy.
-     * @throws {@link VOMSException}, if something goes wrong.
+     * @param cred the {@link UserCredentials} from which the proxy must be created.
+     * @param ACs the list of {@link AttributeCertificate} objects.
+     * @param lifetime the lifetime in seconds of the generated proxy.
+     * @param gtVersion the version of globus to which the proxy conforms
+     * @return a {@link UserCredentials} object that represents the proxy.
+     * @throws VOMSException if something goes wrong.
      *
      * @author Vincenzo Ciaschini
      * @author Andrea Ceccanti
@@ -298,6 +298,12 @@ public class VOMSProxyBuilder {
         String cnValue = null;
         ProxyPolicy policy = null;
         BigInteger serialNum = null;
+
+	if (issuerKey == null) {
+	  log.error("Passed issuer key is null");
+	  throw new VOMSException("Passed issuerKey is null!");
+	}
+
 
         switch (gtVersion) {
         case GT2_PROXY:

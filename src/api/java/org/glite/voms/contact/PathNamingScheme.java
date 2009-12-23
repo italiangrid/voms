@@ -61,7 +61,7 @@ public class PathNamingScheme {
     /**
      * This methods checks that the string passed as argument complies with the voms FQAN syntax.
      *  
-     * @param containerName, the string that must be checked for compatibility with FQAN syntax. 
+     * @param containerName the string that must be checked for compatibility with FQAN syntax. 
      * @throws VOMSSyntaxException
      *         If there's an error in the FQAN syntax.
      */
@@ -81,7 +81,7 @@ public class PathNamingScheme {
      * This methods checks that the string passed as argument complies with the syntax used
      * by voms to identify groups.
      * 
-     * @param groupName, the string that has to be checked.
+     * @param groupName the string that has to be checked.
      * @throws VOMSSyntaxException
      *          If the string passed as argument doens not comply with the voms sytax.
      */
@@ -116,7 +116,7 @@ public class PathNamingScheme {
     /**
      * This methods checks that the FQAN passed as argument identifies a voms group.
      * 
-     * @param groupName, the string to check.
+     * @param groupName the string to check.
      * @return  <ul><li>true, if the string passed as argument identifies a voms group.
      *          <li>false, otherwise.
      *          </ul>
@@ -131,7 +131,7 @@ public class PathNamingScheme {
     /**
      * This methods checks that the FQAN passed as argument identifies a voms role.
      * 
-     * @param roleName, the string to check.
+     * @param roleName the string to check.
      * @return <ul><li>true, if the string passed as argument identifies a voms role.
      *          <li>false, otherwise.
      *          </ul>
@@ -147,7 +147,7 @@ public class PathNamingScheme {
      * This methods checks that the FQAN passed as argument identifies a qualified voms role, i.e.,
      * a role defined in the context of a voms group.
      * 
-     * @param roleName, the string to check.
+     * @param roleName the string to check.
      * @return <ul><li>true, if the string passed as argument identifies a qualified voms role.
      *          <li>false, otherwise.
      *          </ul>
@@ -163,7 +163,7 @@ public class PathNamingScheme {
     /**
      * This method extracts the role name information from the FQAN passed as argument.
      * 
-     * @param containerName, the FQAN
+     * @param containerName the FQAN
      * @return <ul><li>A string containing the role name, if found</li>
      *              <li>null, if no role information is contained in the FQAN passed as argument
      *         </ul>
@@ -190,7 +190,7 @@ public class PathNamingScheme {
     /**
      * This method extracts group name information from the FQAN passed as argument.
      * 
-     * @param containerName, the FQAN 
+     * @param containerName the FQAN 
      * @return <ul><li>A string containing the group name, if found</li>
      *              <li>null, if no group information is contained in the FQAN passed as argument
      *         </ul>

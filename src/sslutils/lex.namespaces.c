@@ -1825,7 +1825,7 @@ BEGIN(SINGLE_QUOTED);
 case 3:
 YY_RULE_SETUP
 #line 41 "namespaces.l"
-yylval_param->string = strndup(yytext, strlen(yytext)-1); fprintf(stderr, "GOT SINGLE_QUOTED:%s\n", yytext); BEGIN(INITIAL); return SUBJECT;
+yylval_param->string = yytext; BEGIN(INITIAL); return SUBJECT;
 	YY_BREAK
 case 4:
 YY_RULE_SETUP
@@ -1835,7 +1835,7 @@ BEGIN(DOUBLE_QUOTED);
 case 5:
 YY_RULE_SETUP
 #line 44 "namespaces.l"
-yylval_param->string = strndup(yytext, strlen(yytext)-1); fprintf(stderr, "GOT DOUBLE_QUOTED_FROM_NAMESPACES:%s\n", yylval_param->string); BEGIN(INITIAL); return SUBJECT;
+yylval_param->string = yytext; BEGIN(INITIAL); return SUBJECT;
 	YY_BREAK
 case 6:
 YY_RULE_SETUP

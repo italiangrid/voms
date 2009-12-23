@@ -674,11 +674,18 @@ public class PKIUtils {
              Object read = null;
              do {
                  read = pem.readObject();
+		 logger.debug("File is: " + file.getAbsolutePath());
                  logger.debug("Object read is: " + read);
-             } while (!(read instanceof KeyPair));
-             KeyPair pair = (KeyPair)read;
-             logger.debug("key = " + pair );
-             return pair.getPrivate();
+             } while (!(read instanceof KeyPair) && read != null);
+	     if (read != null) {
+	       KeyPair pair = (KeyPair)read;
+	       logger.debug("key = " + pair );
+	       return pair.getPrivate();
+	     }
+	     else {
+	       // no private key was found!
+	       return null;
+	     }
          }
          catch (IOException e) {
              throw new IllegalArgumentException("Not a PEM format file " + file.getName(), e);

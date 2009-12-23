@@ -176,7 +176,11 @@ static int bread(int fd, char** buffer)
   if (*buffer) {
     while (offset < slen) {
       do {
+#ifdef PIPE_BUF
         readbytes = read(fd, *buffer + offset, (slen - offset > PIPE_BUF ? PIPE_BUF : slen - offset));
+#else
+        readbytes = read(fd, *buffer + offset, (slen - offset > fpathconf(fd, _PC_PIPE_BUF) ? fpathconf(fd, _PC_PIPE_BUF) : slen - offset));
+#endif
       } while (readbytes < 0 && (errno == EINTR
 #ifdef ERESTART
                                    || errno == ERESTART

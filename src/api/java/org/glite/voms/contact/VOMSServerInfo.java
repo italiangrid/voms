@@ -23,6 +23,7 @@ import org.apache.commons.lang.builder.ToStringBuilder;
  * in vomses configuration files. See {@link VOMSESFileParser}.
  * 
  * @author Andrea Ceccanti
+ * @author Vincenzo Ciaschini
  *
  */
 public class VOMSServerInfo {
@@ -32,7 +33,15 @@ public class VOMSServerInfo {
     String hostDn;
     String voName;
     String globusVersion;
-    
+    String alias;
+
+    public String getAlias() {
+        return alias;
+    }
+
+    public void setAlias(String alias) {
+        this.alias = alias;
+    }
 
     public String getHostDn() {
     
@@ -127,10 +136,8 @@ public class VOMSServerInfo {
         info.setHostName( tokens[1] );
         info.setPort( Integer.parseInt( tokens[2] )) ;
         info.setHostDn( tokens[3] );
-        
-        // Vo name is repeated here, since by convention it must be
-        // equal to the alias we just store the alias in VOMSServerInfo
-        
+        info.setAlias( tokens[0] );
+
         // Check if the globus version is there
         if (tokens.length == 6)
             info.setGlobusVersion( tokens[5] );

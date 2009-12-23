@@ -826,7 +826,6 @@ USE_CCAPI_LIB
 USE_SOCK_LIB_SERVER
 USE_SOCK_LIB
 USE_SSL_UTILS_LIB
-USE_OLDGAA_LIB
 GLOBUS_GCC64PTHR_GSS_LIBS
 GLOBUS_GCC64DBGPTHR_GSS_LIBS
 GLOBUS_GCC64DBG_GSS_LIBS
@@ -859,7 +858,6 @@ WANTED_ATTCERT_LIBS
 WANTED_API_LIBS
 WANTED_SOCK_LIBS
 WANTED_SSL_UTILS_LIBS
-WANTED_OLDGAA_LIBS
 EXPAT_STATIC_LIBS
 EXPAT_LIBS
 EXPAT_CFLAGS
@@ -5409,13 +5407,13 @@ if test "${lt_cv_nm_interface+set}" = set; then
 else
   lt_cv_nm_interface="BSD nm"
   echo "int some_variable = 0;" > conftest.$ac_ext
-  (eval echo "\"\$as_me:5412: $ac_compile\"" >&5)
+  (eval echo "\"\$as_me:5410: $ac_compile\"" >&5)
   (eval "$ac_compile" 2>conftest.err)
   cat conftest.err >&5
-  (eval echo "\"\$as_me:5415: $NM \\\"conftest.$ac_objext\\\"\"" >&5)
+  (eval echo "\"\$as_me:5413: $NM \\\"conftest.$ac_objext\\\"\"" >&5)
   (eval "$NM \"conftest.$ac_objext\"" 2>conftest.err > conftest.out)
   cat conftest.err >&5
-  (eval echo "\"\$as_me:5418: output\"" >&5)
+  (eval echo "\"\$as_me:5416: output\"" >&5)
   cat conftest.out >&5
   if $GREP 'External.*some_variable' conftest.out > /dev/null; then
     lt_cv_nm_interface="MS dumpbin"
@@ -6610,7 +6608,7 @@ ia64-*-hpux*)
   ;;
 *-*-irix6*)
   # Find out which ABI we are using.
-  echo '#line 6613 "configure"' > conftest.$ac_ext
+  echo '#line 6611 "configure"' > conftest.$ac_ext
   if { (eval echo "$as_me:$LINENO: \"$ac_compile\"") >&5
   (eval $ac_compile) 2>&5
   ac_status=$?
@@ -8946,11 +8944,11 @@ else
    -e 's:.*FLAGS}\{0,1\} :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:8949: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:8947: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>conftest.err)
    ac_status=$?
    cat conftest.err >&5
-   echo "$as_me:8953: \$? = $ac_status" >&5
+   echo "$as_me:8951: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s "$ac_outfile"; then
      # The compiler can only warn and ignore the option if not recognized
      # So say no if there are warnings other than the usual output.
@@ -9285,11 +9283,11 @@ else
    -e 's:.*FLAGS}\{0,1\} :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:9288: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:9286: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>conftest.err)
    ac_status=$?
    cat conftest.err >&5
-   echo "$as_me:9292: \$? = $ac_status" >&5
+   echo "$as_me:9290: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s "$ac_outfile"; then
      # The compiler can only warn and ignore the option if not recognized
      # So say no if there are warnings other than the usual output.
@@ -9390,11 +9388,11 @@ else
    -e 's:.*FLAGS}\{0,1\} :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:9393: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:9391: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>out/conftest.err)
    ac_status=$?
    cat out/conftest.err >&5
-   echo "$as_me:9397: \$? = $ac_status" >&5
+   echo "$as_me:9395: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s out/conftest2.$ac_objext
    then
      # The compiler can only warn and ignore the option if not recognized
@@ -9445,11 +9443,11 @@ else
    -e 's:.*FLAGS}\{0,1\} :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:9448: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:9446: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>out/conftest.err)
    ac_status=$?
    cat out/conftest.err >&5
-   echo "$as_me:9452: \$? = $ac_status" >&5
+   echo "$as_me:9450: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s out/conftest2.$ac_objext
    then
      # The compiler can only warn and ignore the option if not recognized
@@ -12245,7 +12243,7 @@ else
   lt_dlunknown=0; lt_dlno_uscore=1; lt_dlneed_uscore=2
   lt_status=$lt_dlunknown
   cat > conftest.$ac_ext <<_LT_EOF
-#line 12248 "configure"
+#line 12246 "configure"
 #include "confdefs.h"
 
 #if HAVE_DLFCN_H
@@ -12341,7 +12339,7 @@ else
   lt_dlunknown=0; lt_dlno_uscore=1; lt_dlneed_uscore=2
   lt_status=$lt_dlunknown
   cat > conftest.$ac_ext <<_LT_EOF
-#line 12344 "configure"
+#line 12342 "configure"
 #include "confdefs.h"
 
 #if HAVE_DLFCN_H
@@ -14361,11 +14359,11 @@ else
    -e 's:.*FLAGS}\{0,1\} :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:14364: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:14362: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>conftest.err)
    ac_status=$?
    cat conftest.err >&5
-   echo "$as_me:14368: \$? = $ac_status" >&5
+   echo "$as_me:14366: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s "$ac_outfile"; then
      # The compiler can only warn and ignore the option if not recognized
      # So say no if there are warnings other than the usual output.
@@ -14460,11 +14458,11 @@ else
    -e 's:.*FLAGS}\{0,1\} :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:14463: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:14461: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>out/conftest.err)
    ac_status=$?
    cat out/conftest.err >&5
-   echo "$as_me:14467: \$? = $ac_status" >&5
+   echo "$as_me:14465: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s out/conftest2.$ac_objext
    then
      # The compiler can only warn and ignore the option if not recognized
@@ -14512,11 +14510,11 @@ else
    -e 's:.*FLAGS}\{0,1\} :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:14515: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:14513: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>out/conftest.err)
    ac_status=$?
    cat out/conftest.err >&5
-   echo "$as_me:14519: \$? = $ac_status" >&5
+   echo "$as_me:14517: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s out/conftest2.$ac_objext
    then
      # The compiler can only warn and ignore the option if not recognized
@@ -15508,8 +15506,10 @@ fi
 
 
     if test "x$ac_with_debug" = "xyes" ; then
-      CFLAGS="-g -O0 -fprofile-arcs -ftest-coverage"
-      CXXFLAGS="-g -O0 -fprofile-arcs -ftest-coverage"
+      CFLAGS="-g -O0"
+      CXXFLAGS="-g -O0"
+#      CFLAGS="-g -O0 -fprofile-arcs -ftest-coverage"
+#      CXXFLAGS="-g -O0 -fprofile-arcs -ftest-coverage"
     fi
 
 
@@ -15651,7 +15651,6 @@ $as_echo_n "checking for system OpenSSL version... " >&6; }
       WANTED_API_LIBS="$WANTED_API_LIBS libvomsapi_nog.la"
       WANTED_ATTCERT_LIBS="$WANTED_ATTCERT_LIBS libattributes_nog.la"
       WANTED_SSL_UTILS_LIBS="$WANTED_SSL_UTILS_LIBS libssl_utils_nog.la"
-      WANTED_OLDGAA_LIBS="$WANTED_OLDGAA_LIBS liboldgaa_nog.la"
       WANTED_UTIL_LIBS="$WANTED_UTIL_LIBS libutilities_nog.la libutilc_nog.la"
       WANTED_SOCK_LIBS="$WANTED_SOCK_LIBS libsock_nog.la"
     fi
@@ -15672,13 +15671,21 @@ $as_echo "$openssl_version" >&6; }
 
     # Check whether --enable-glite was given.
 if test "${enable_glite+set}" = set; then
-  enableval=$enable_glite; ac_enable_glite="yes"
+  enableval=$enable_glite;
+          case "$enableval" in
+          yes) glite="yes" ;;
+          no) glite="no" ;;
+          *) { { $as_echo "$as_me:$LINENO: error: bad value $(enableval) for --enable-glite" >&5
+$as_echo "$as_me: error: bad value $(enableval) for --enable-glite" >&2;}
+   { (exit 1); exit 1; }; } ;;
+          esac
+
 else
-  ac_enable_glite="no"
+  glite="yes"
 fi
 
 
-     if test x$ac_enable_glite = xyes; then
+     if test x$glite = xyes; then
   ENABLE_GLITE_TRUE=
   ENABLE_GLITE_FALSE='#'
 else
@@ -15687,7 +15694,7 @@ else
 fi
 
 
-    if test "x$ac_enable_glite" = "xno"; then
+    if test "x$glite" = "xno"; then
     	DISTTAR=$WORKDIR
 
     	LOCATION_ENV="VOMS_LOCATION"
@@ -15708,7 +15715,7 @@ _ACEOF
 
 
 cat >>confdefs.h <<\_ACEOF
-#define USER_DIR ".edg"
+#define USER_DIR ".voms"
 _ACEOF
 
     else
@@ -16009,18 +16016,15 @@ fi
 $as_echo "found $GLOBUS_FLAVORS ($with_globus_flavor selected)" >&6; }
 
     if test "x$with_globus_flavor" = "x" ; then
-      if test "x$USE_OLDGAA_LIB" = "x"; then
-        USE_OLDGAA_LIB="liboldgaa.la"
-      fi
       if test "x$USE_SSL_UTILS_LIB" = "x"; then
-        USE_SSL_UTILS_LIB="libssl_utils.la"
+        USE_SSL_UTILS_LIB="libssl_utils_nog.la"
       fi
       if test "x$USE_SOCK_LIB" = "x"; then
         USE_SOCK_LIB="libsock.la"
-        USE_SOCK_LIB_SERVER="libsock_server.la"
+        USE_SOCK_LIB_SERVER="libsock_nog.la"
       fi
       if test "x$USE_CCAPI_LIB" = "x"; then
-        USE_CCAPI_LIB="libvomsapi.la"
+        USE_CCAPI_LIB="libvomsapi_nog.la"
       fi
       if test "x$USE_CAPI_LIB" = "x"; then
         USE_CAPI_LIB="libvomsc.la"
@@ -16032,9 +16036,8 @@ $as_echo "found $GLOBUS_FLAVORS ($with_globus_flavor selected)" >&6; }
         USE_CCATTCERT_LIB="libccattcert.la"
       fi
 
-      WANTED_OLDGAA_LIBS="$WANTED_OLDGAA_LIBS liboldgaa.la"
       WANTED_SSL_UTILS_LIBS="$WANTED_SSL_UTILS_LIBS libssl_utils.la"
-      WANTED_SOCK_LIBS="$WANTED_SOCK_LIBS libsock.la libsock_server.la"
+      WANTED_SOCK_LIBS="$WANTED_SOCK_LIBS libsock.la libsock_nog.la"
       WANTED_ATTCERT_LIBS="$WANTED_ATTCERT_LIBS libattcert.la libccattcert.la"
       WANTED_API_LIBS="$WANTED_API_LIBS libvomsapi.la libvomsc.la"
       WANTED_UTIL_LIBS="$WANTED_UTIL_LIBS libutilities.la libutilc.la"
@@ -16068,15 +16071,12 @@ $as_echo "found $GLOBUS_FLAVORS ($with_globus_flavor selected)" >&6; }
 $as_echo "Final globus flavors: ${GLOBUS_FLAVORS}" >&6; }
 
     for flavor in $GLOBUS_FLAVORS ; do
-      if test "x$USE_OLDGAA_LIB" = "x"; then
-        USE_OLDGAA_LIB="liboldgaa_$flavor.la"
-      fi
       if test "x$USE_SSL_UTILS_LIB" = "x"; then
         USE_SSL_UTILS_LIB="libssl_utils_$flavor.la"
       fi
       if test "x$USE_SOCK_LIB" = "x"; then
         USE_SOCK_LIB="libsock_$flavor.la"
-        USE_SOCK_LIB_SERVER="libsock_server_$flavor.la"
+        USE_SOCK_LIB_SERVER="libsock_nog.la"
       fi
       if test "x$USE_CCAPI_LIB" = "x"; then
         USE_CCAPI_LIB="libvomsapi_$flavor.la"
@@ -16090,9 +16090,8 @@ $as_echo "Final globus flavors: ${GLOBUS_FLAVORS}" >&6; }
       if test "x$USE_CCATTCERT_LIB" = "x"; then
         USE_CCATTCERT_LIB="libccattcert_$flavor.la"
       fi
-      WANTED_OLDGAA_LIBS="$WANTED_OLDGAA_LIBS liboldgaa_$flavor.la"
       WANTED_SSL_UTILS_LIBS="$WANTED_SSL_UTILS_LIBS libssl_utils_"$flavor".la"
-      WANTED_SOCK_LIBS="$WANTED_SOCK_LIBS libsock_$flavor.la libsock_server_$flavor.la"
+      WANTED_SOCK_LIBS="$WANTED_SOCK_LIBS libsock_$flavor.la libsock_nog.la"
       WANTED_CCAPI_LIBS="$WANTED_CCAPI_LIBS libvomsapi_"$flavor".la"
       WANTED_CAPI_LIBS="$WANTED_CAPI_LIBS libvomsc_"$flavor".la"
       WANTED_ATTCERT_LIBS="$WANTED_ATTCERT_LIBS libattcert_"$flavor".la libccattcert_"$flavor".la"
@@ -16234,8 +16233,6 @@ ac_cpp='$CPP $CPPFLAGS'
 ac_compile='$CC -c $CFLAGS $CPPFLAGS conftest.$ac_ext >&5'
 ac_link='$CC -o conftest$ac_exeext $CFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
 ac_compiler_gnu=$ac_cv_c_compiler_gnu
-
-
 
 
 
@@ -16482,7 +16479,7 @@ $as_echo "$as_me: error: bad value $(enableval) for --enable-docs" >&2;}
 	      esac
 
 else
-  build_docs="yes"
+  build_docs="no"
 fi
 
 

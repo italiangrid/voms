@@ -100,6 +100,7 @@ static int fileoutputter(void *data, const char *s)
     } while (len == 0 && data);
 
     output = translate(output, data);
+    free(data);
   }
 
   size = strlen(output);

@@ -1,0 +1,27 @@
+load_lib vomstest.exp
+testheader "See if voms-proxy-init --includeac get an error with bogus input."
+
+proc mytest {} {
+    _activateCert mycert2
+
+
+    set tempout [exec mktemp $::SCRATCHDIR/ac-XXXXXX]
+    set includename [exec mktemp $::SCRATCHDIR/voms-proxy-init-XXXXXX]
+
+    set id [open $tempout "w+"]
+    puts $id "bobh"
+    close $id
+
+    set res [catch {set out [exec $::INSTALLDIR/bin/voms-proxy-init --includeac $tempout >& $includename]}]
+
+    if $res then {
+
+	testmessage "voms-proxy-init --includeac correctly failed."
+	return $::PASSTEST
+    }
+    addlog $includename
+    testmessage "voms-proxy-init --includeac incorrectly returned success."
+    return $::FAILTEST
+}
+
+do_test

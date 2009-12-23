@@ -62,6 +62,12 @@ public class VOMSESFileParser {
 
         List list = new ArrayList();
 
+        File defaultLocFile = new File( File.separator + "etc"
+                + File.separator + "vomses" );
+
+        if ( defaultLocFile.exists() )
+            list.add( defaultLocFile );
+
         if ( gliteLoc != null ) {
             File gliteLocFile = new File( gliteLoc + File.separator + "etc"
                     + File.separator + "vomses" );
@@ -96,6 +102,12 @@ public class VOMSESFileParser {
 
         if ( gliteVomses.exists() )
             list.add( gliteVomses );
+
+        File vomsVomses = new File( System.getProperty( "user.home" )
+                + File.separator + ".voms" + File.separator + "vomses" );
+
+        if ( vomsVomses.exists() )
+            list.add( vomsVomses );
 
         vomsesPaths = list;
 

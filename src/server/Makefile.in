@@ -56,10 +56,10 @@ am__voms_SOURCES_DIST = main.cc vomsd.cc VOMSServer.h attribute.h \
 voms_OBJECTS = $(am_voms_OBJECTS)
 am__DEPENDENCIES_1 =
 @BUILD_SERVER_TRUE@voms_DEPENDENCIES = $(top_builddir)/src/socklib/$(USE_SOCK_LIB_SERVER) \
-@BUILD_SERVER_TRUE@	$(top_builddir)/src/common/libutilities.la \
+@BUILD_SERVER_TRUE@	$(top_builddir)/src/common/libutilities_nog.la \
 @BUILD_SERVER_TRUE@	$(top_builddir)/src/sslutils/$(USE_SSL_UTILS_LIB) \
 @BUILD_SERVER_TRUE@	$(top_builddir)/src/ac/$(USE_CCATTCERT_LIB) \
-@BUILD_SERVER_TRUE@	$(top_builddir)/src/common/libutilc.la \
+@BUILD_SERVER_TRUE@	$(top_builddir)/src/common/libutilc_nog.la \
 @BUILD_SERVER_TRUE@	$(top_builddir)/src/ac/$(USE_ATTCERT_LIB) \
 @BUILD_SERVER_TRUE@	$(top_builddir)/src/replib/librep.la \
 @BUILD_SERVER_TRUE@	$(top_builddir)/src/log/liblog.la \
@@ -203,7 +203,6 @@ USE_ATTCERT_LIB = @USE_ATTCERT_LIB@
 USE_CAPI_LIB = @USE_CAPI_LIB@
 USE_CCAPI_LIB = @USE_CCAPI_LIB@
 USE_CCATTCERT_LIB = @USE_CCATTCERT_LIB@
-USE_OLDGAA_LIB = @USE_OLDGAA_LIB@
 USE_SOCK_LIB = @USE_SOCK_LIB@
 USE_SOCK_LIB_SERVER = @USE_SOCK_LIB_SERVER@
 USE_SSL_UTILS_LIB = @USE_SSL_UTILS_LIB@
@@ -211,7 +210,6 @@ VAR_LOCATION_ENV = @VAR_LOCATION_ENV@
 VERSION = @VERSION@
 WANTED_API_LIBS = @WANTED_API_LIBS@
 WANTED_ATTCERT_LIBS = @WANTED_ATTCERT_LIBS@
-WANTED_OLDGAA_LIBS = @WANTED_OLDGAA_LIBS@
 WANTED_SOCK_LIBS = @WANTED_SOCK_LIBS@
 WANTED_SSL_UTILS_LIBS = @WANTED_SSL_UTILS_LIBS@
 WANTED_UTIL_LIBS = @WANTED_UTIL_LIBS@
@@ -292,10 +290,10 @@ with_scratchdir = @with_scratchdir@
 
 @BUILD_SERVER_TRUE@voms_LDADD = \
 @BUILD_SERVER_TRUE@	$(top_builddir)/src/socklib/$(USE_SOCK_LIB_SERVER) \
-@BUILD_SERVER_TRUE@	$(top_builddir)/src/common/libutilities.la \
+@BUILD_SERVER_TRUE@	$(top_builddir)/src/common/libutilities_nog.la \
 @BUILD_SERVER_TRUE@	$(top_builddir)/src/sslutils/$(USE_SSL_UTILS_LIB) \
 @BUILD_SERVER_TRUE@	$(top_builddir)/src/ac/$(USE_CCATTCERT_LIB) \
-@BUILD_SERVER_TRUE@	$(top_builddir)/src/common/libutilc.la \
+@BUILD_SERVER_TRUE@	$(top_builddir)/src/common/libutilc_nog.la \
 @BUILD_SERVER_TRUE@	$(top_builddir)/src/ac/$(USE_ATTCERT_LIB) \
 @BUILD_SERVER_TRUE@	$(top_builddir)/src/replib/librep.la \
 @BUILD_SERVER_TRUE@	$(top_builddir)/src/log/liblog.la \

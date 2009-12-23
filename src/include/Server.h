@@ -33,11 +33,12 @@
 #define VOMS_GSISOCKETSERVER
 
 /** Include the secure socket globus definition. */
-#include "globus_gss_assist.h"
+//#include "globus_gss_assist.h"
 
 #include <stdio.h>
 #include <openssl/evp.h>
 #include <openssl/x509.h>
+#include <openssl/ssl.h>
 
 #include <string>
 
@@ -91,17 +92,21 @@ class GSISocketServer
    * @param fp a pinter to a file.
    */ 
   void RedirectGSIOutput(FILE *fp) { gsi_logfile = fp; }
-  void SetFlags(OM_uint32 flags);
+  //  void SetFlags(OM_uint32 flags);
   void SetLogger(void *log);
   void CleanSocket();
   bool Send(const std::string &s);
   bool Receive(std::string &s);
+  bool Peek(int size, std::string &s);
   bool AcceptGSIAuthentication(void); 
   void AdjustBacklog(int b);
   bool ReOpen(int, int, int=5, bool=true);
   void SetTimeout(int);
   int  GetTimeout();
-  gss_ctx_id_t GetContext();
+  //  gss_ctx_id_t GetContext();
+
+  void SetError(const std::string &g);
+  void SetErrorOpenSSL(const std::string &message);
 
  private:
   /**
@@ -127,18 +132,25 @@ public:
   X509 *actual_cert;
   STACK_OF(X509) *own_stack;
   STACK_OF(X509) *peer_stack;
+  SSL *ssl;
+  SSL_CTX *ctx;
+  BIO *conn;
+  void *pvd;
+  char           *cacertdir;
+  EVP_PKEY       *upkey;
+  X509           *ucert;
+  STACK_OF(X509) *cert_chain;
+  std::string error;
 
 public:
   int port;
   bool opened;
-  gss_cred_id_t credential;
-  gss_ctx_id_t  context;
   int sck;
   int backlog;
-  int newsck;
+  int newsock;
+  int timeout;
   bool newopened;
   bool mustclose;
-  OM_uint32 conflags;
   void *logh;
 };
 

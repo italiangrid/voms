@@ -42,9 +42,11 @@ extern "C" {
 #include <openssl/err.h>
 #include <openssl/bio.h>
 #include <unistd.h>
+#include <fcntl.h>
 
 #include "log.h"
 #include "sslutils.h"
+#include "ipv6sock.h"
 }
 
 #include <cstring>
@@ -328,6 +330,8 @@ GSISocketClient::Open()
   std::string hostport;
   std::string temp;
   int expected = 0;
+  char portstring[36];
+  int flags;
 
   meth = SSLv3_method();
 
@@ -372,22 +376,18 @@ GSISocketClient::Open()
     }
   }
 
-  hostport = host + ":" + stringify(port,temp);
-  conn = BIO_new(BIO_s_connect());
-  (void)BIO_set_nbio(conn,1);
-  (void)BIO_set_conn_hostname(conn, hostport.c_str());
+  snprintf(portstring, 35, "%ld", port);
+  fd = sock_connect(host.c_str(), portstring, NULL);
 
-  do {
-    ret = BIO_do_connect(conn);
-    if (ret <= 0 && !BIO_should_retry(conn))
-      goto err;
-  } while (ret <= 0);
+  flags = fcntl(fd, F_GETFL, 0);
+  (void)fcntl(fd, F_SETFL, flags | O_NONBLOCK);
+
+  conn = BIO_new_socket(fd, BIO_NOCLOSE);
+  (void)BIO_set_nbio(conn,1);
 
   ssl = SSL_new(ctx);
   setup_SSL_proxy_handler(ssl, cacertdir);
   SSL_set_bio(ssl, conn, conn);
-
-  fd = BIO_get_fd(conn, NULL);
 
   conn = NULL;
 

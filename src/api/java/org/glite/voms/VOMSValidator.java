@@ -159,7 +159,7 @@ public class VOMSValidator {
         if (validatedChain == null)
             myValidatedChain = null; // allow null
         else
-            myValidatedChain = validatedChain.clone(); // allow null
+            myValidatedChain = (X509Certificate[])validatedChain.clone();
 
         if (acValidator == null) {
             if (theTrustStore == null) {
@@ -292,7 +292,7 @@ public class VOMSValidator {
         if (validatedChain == null) 
             myValidatedChain = null;
         else
-            myValidatedChain = validatedChain.clone();
+            myValidatedChain = (X509Certificate[])validatedChain.clone();
         myVomsAttributes = new Vector();
         myFQANTree = null;
         isParsed = false;

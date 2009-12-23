@@ -31,6 +31,7 @@ struct error {
 #define ERR_WITH_DB         (ERROR_OFFSET + 3)
 #define ERR_NOT_MEMBER      (ERROR_OFFSET + 1)
 #define ERR_ATTR_EMPTY      (ERROR_OFFSET + 2)
+#define ERR_SUSPENDED       (ERROR_OFFSET + 4)
 
 extern void free_error(struct error *);
 extern struct error *alloc_error(int, const char *);

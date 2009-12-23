@@ -43,8 +43,8 @@ struct ans {
   int version;
 };
 
-char *XMLEncodeReq(const char *, const char *, const char *, int);
-char *XMLEncodeAns(struct error **, const char *, int, const char *, int, int);
-int XMLDecodeReq(const char *, struct req *);
-int XMLDecodeAns(const char *, struct ans *);
+extern char *XMLEncodeReq(const char *, const char *, const char *, int);
+extern char *XMLEncodeAns(struct error **, const char *, int, const char *, int, int);
+extern int XMLDecodeReq(const char *, struct req *);
+extern int XMLDecodeAns(const char *, struct ans *);
 #endif

@@ -1,0 +1,47 @@
+load_lib vomstest.exp
+testheader "See if voms-proxy-init --includeac works."
+
+proc mytest {} {
+    _activateCert mycert2
+
+    _vomsStart voms1
+    set outname [exec mktemp $::SCRATCHDIR/voms-proxy-init-XXXXXX]
+    set res [catch {set out [exec $::INSTALLDIR/bin/voms-proxy-init --voms voms1 --separate $::SCRATCHDIR/tempout >& $outname]}]
+    _vomsStop voms1
+
+    if $res then {
+        addlog $outname
+        testmessage "voms-proxy-init --separate failed."
+        return $::FAILTEST
+    }
+
+    set includename [exec mktemp $::SCRATCHDIR/voms-proxy-init-XXXXXX]
+    set res [catch {set out [exec $::INSTALLDIR/bin/voms-proxy-init --includeac $::SCRATCHDIR/tempout >& $includename]}]
+
+    if $res then {
+	addlog $includename
+	testmessage "voms-proxy-init --includeac failed."
+	return $::FAILTEST
+    }
+    #match against known (correct) output
+    set correct "attribute : /voms1"
+
+    set infoout [exec mktemp $::SCRATCHDIR/voms-proxy-info-XXXXXX]
+    if [catch {set out2 [exec $::INSTALLDIR/bin/voms-proxy-info --all >& $infoout]}] then {
+	addlog $infoout
+	testmessage "voms-proxy-info failed."
+	return $::FAILTEST
+    }
+
+    addlog $infoout
+    set out2 [exec cat $infoout]
+    if [regexp -- $correct $out2 dummy] then {
+	testmessage "voms-proxy-init --includeac worked successfully."
+	return $::PASSTEST
+    } else {
+	testmessage "Unexpected output in voms-proxy-info"
+	return $::FAILTEST
+    }
+}
+
+do_test
