@@ -432,7 +432,7 @@ noinst_LTLIBRARIES = \
 
 SOURCES = scutils.c scutils.h sslutils.c sslutils.h proxycertinfo.c \
 	signing_policy.c lex.signing.c namespaces.c lex.namespaces.c \
-	evaluate.c proxy.c proxy.h
+	evaluate.c proxy.c vomsproxy.h
 
 libssl_utils_la_SOURCES = $(SOURCES)
 libssl_utils_nog_la_SOURCES = $(SOURCES)
