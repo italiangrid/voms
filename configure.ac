@@ -1,5 +1,5 @@
 AC_INIT([GLite Security VOMS], [1.9.14])
-AC_PREREQ(2.59)
+AC_PREREQ(2.57)
 AC_CONFIG_AUX_DIR([./project])
 AM_INIT_AUTOMAKE
 AC_CONFIG_SRCDIR([src/utils/voms_proxy_destroy.cc])

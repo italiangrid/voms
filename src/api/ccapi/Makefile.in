@@ -70,7 +70,7 @@ am__objects_1 = libvomsapi_la-api_util.lo libvomsapi_la-voms_api.lo \
 am_libvomsapi_la_OBJECTS = $(am__objects_1)
 libvomsapi_la_OBJECTS = $(am_libvomsapi_la_OBJECTS)
 libvomsapi_la_LINK = $(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) \
-	$(LIBTOOLFLAGS) --mode=link $(CXXLD) $(AM_CXXFLAGS) \
+	$(LIBTOOLFLAGS) --mode=link $(CXXLD) $(libvomsapi_la_CXXFLAGS) \
 	$(CXXFLAGS) $(libvomsapi_la_LDFLAGS) $(LDFLAGS) -o $@
 am__DEPENDENCIES_3 = $(am__DEPENDENCIES_1) \
 	$(top_builddir)/src/replib/librep.la \
@@ -86,8 +86,9 @@ am__objects_2 = libvomsapi_gcc32_la-api_util.lo \
 am_libvomsapi_gcc32_la_OBJECTS = $(am__objects_2)
 libvomsapi_gcc32_la_OBJECTS = $(am_libvomsapi_gcc32_la_OBJECTS)
 libvomsapi_gcc32_la_LINK = $(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) \
-	$(LIBTOOLFLAGS) --mode=link $(CXXLD) $(AM_CXXFLAGS) \
-	$(CXXFLAGS) $(libvomsapi_gcc32_la_LDFLAGS) $(LDFLAGS) -o $@
+	$(LIBTOOLFLAGS) --mode=link $(CXXLD) \
+	$(libvomsapi_gcc32_la_CXXFLAGS) $(CXXFLAGS) \
+	$(libvomsapi_gcc32_la_LDFLAGS) $(LDFLAGS) -o $@
 libvomsapi_gcc32dbg_la_DEPENDENCIES = $(am__DEPENDENCIES_3) \
 	$(top_builddir)/src/socklib/libsock_gcc32dbg.la \
 	$(top_builddir)/src/ac/libccattcert_gcc32dbg.la
@@ -99,8 +100,9 @@ am__objects_3 = libvomsapi_gcc32dbg_la-api_util.lo \
 am_libvomsapi_gcc32dbg_la_OBJECTS = $(am__objects_3)
 libvomsapi_gcc32dbg_la_OBJECTS = $(am_libvomsapi_gcc32dbg_la_OBJECTS)
 libvomsapi_gcc32dbg_la_LINK = $(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) \
-	$(LIBTOOLFLAGS) --mode=link $(CXXLD) $(AM_CXXFLAGS) \
-	$(CXXFLAGS) $(libvomsapi_gcc32dbg_la_LDFLAGS) $(LDFLAGS) -o $@
+	$(LIBTOOLFLAGS) --mode=link $(CXXLD) \
+	$(libvomsapi_gcc32dbg_la_CXXFLAGS) $(CXXFLAGS) \
+	$(libvomsapi_gcc32dbg_la_LDFLAGS) $(LDFLAGS) -o $@
 libvomsapi_gcc32dbgpthr_la_DEPENDENCIES = $(am__DEPENDENCIES_3) \
 	$(top_builddir)/src/socklib/libsock_gcc32dbgpthr.la \
 	$(top_builddir)/src/ac/libccattcert_gcc32dbgpthr.la
@@ -114,7 +116,7 @@ libvomsapi_gcc32dbgpthr_la_OBJECTS =  \
 	$(am_libvomsapi_gcc32dbgpthr_la_OBJECTS)
 libvomsapi_gcc32dbgpthr_la_LINK = $(LIBTOOL) --tag=CXX \
 	$(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=link $(CXXLD) \
-	$(AM_CXXFLAGS) $(CXXFLAGS) \
+	$(libvomsapi_gcc32dbgpthr_la_CXXFLAGS) $(CXXFLAGS) \
 	$(libvomsapi_gcc32dbgpthr_la_LDFLAGS) $(LDFLAGS) -o $@
 libvomsapi_gcc32pthr_la_DEPENDENCIES = $(am__DEPENDENCIES_3) \
 	$(top_builddir)/src/socklib/libsock_gcc32pthr.la \
@@ -128,9 +130,9 @@ am_libvomsapi_gcc32pthr_la_OBJECTS = $(am__objects_5)
 libvomsapi_gcc32pthr_la_OBJECTS =  \
 	$(am_libvomsapi_gcc32pthr_la_OBJECTS)
 libvomsapi_gcc32pthr_la_LINK = $(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) \
-	$(LIBTOOLFLAGS) --mode=link $(CXXLD) $(AM_CXXFLAGS) \
-	$(CXXFLAGS) $(libvomsapi_gcc32pthr_la_LDFLAGS) $(LDFLAGS) -o \
-	$@
+	$(LIBTOOLFLAGS) --mode=link $(CXXLD) \
+	$(libvomsapi_gcc32pthr_la_CXXFLAGS) $(CXXFLAGS) \
+	$(libvomsapi_gcc32pthr_la_LDFLAGS) $(LDFLAGS) -o $@
 libvomsapi_gcc64_la_DEPENDENCIES = $(am__DEPENDENCIES_3) \
 	$(top_builddir)/src/socklib/libsock_gcc64.la \
 	$(top_builddir)/src/ac/libccattcert_gcc64.la
@@ -141,8 +143,9 @@ am__objects_6 = libvomsapi_gcc64_la-api_util.lo \
 am_libvomsapi_gcc64_la_OBJECTS = $(am__objects_6)
 libvomsapi_gcc64_la_OBJECTS = $(am_libvomsapi_gcc64_la_OBJECTS)
 libvomsapi_gcc64_la_LINK = $(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) \
-	$(LIBTOOLFLAGS) --mode=link $(CXXLD) $(AM_CXXFLAGS) \
-	$(CXXFLAGS) $(libvomsapi_gcc64_la_LDFLAGS) $(LDFLAGS) -o $@
+	$(LIBTOOLFLAGS) --mode=link $(CXXLD) \
+	$(libvomsapi_gcc64_la_CXXFLAGS) $(CXXFLAGS) \
+	$(libvomsapi_gcc64_la_LDFLAGS) $(LDFLAGS) -o $@
 libvomsapi_gcc64dbg_la_DEPENDENCIES = $(am__DEPENDENCIES_3) \
 	$(top_builddir)/src/socklib/libsock_gcc64dbg.la \
 	$(top_builddir)/src/ac/libccattcert_gcc64dbg.la
@@ -154,8 +157,9 @@ am__objects_7 = libvomsapi_gcc64dbg_la-api_util.lo \
 am_libvomsapi_gcc64dbg_la_OBJECTS = $(am__objects_7)
 libvomsapi_gcc64dbg_la_OBJECTS = $(am_libvomsapi_gcc64dbg_la_OBJECTS)
 libvomsapi_gcc64dbg_la_LINK = $(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) \
-	$(LIBTOOLFLAGS) --mode=link $(CXXLD) $(AM_CXXFLAGS) \
-	$(CXXFLAGS) $(libvomsapi_gcc64dbg_la_LDFLAGS) $(LDFLAGS) -o $@
+	$(LIBTOOLFLAGS) --mode=link $(CXXLD) \
+	$(libvomsapi_gcc64dbg_la_CXXFLAGS) $(CXXFLAGS) \
+	$(libvomsapi_gcc64dbg_la_LDFLAGS) $(LDFLAGS) -o $@
 libvomsapi_gcc64dbgpthr_la_DEPENDENCIES = $(am__DEPENDENCIES_3) \
 	$(top_builddir)/src/socklib/libsock_gcc64dbgpthr.la \
 	$(top_builddir)/src/ac/libccattcert_gcc64dbgpthr.la
@@ -169,7 +173,7 @@ libvomsapi_gcc64dbgpthr_la_OBJECTS =  \
 	$(am_libvomsapi_gcc64dbgpthr_la_OBJECTS)
 libvomsapi_gcc64dbgpthr_la_LINK = $(LIBTOOL) --tag=CXX \
 	$(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=link $(CXXLD) \
-	$(AM_CXXFLAGS) $(CXXFLAGS) \
+	$(libvomsapi_gcc64dbgpthr_la_CXXFLAGS) $(CXXFLAGS) \
 	$(libvomsapi_gcc64dbgpthr_la_LDFLAGS) $(LDFLAGS) -o $@
 libvomsapi_gcc64pthr_la_DEPENDENCIES = $(am__DEPENDENCIES_3) \
 	$(top_builddir)/src/socklib/libsock_gcc64pthr.la \
@@ -183,9 +187,9 @@ am_libvomsapi_gcc64pthr_la_OBJECTS = $(am__objects_9)
 libvomsapi_gcc64pthr_la_OBJECTS =  \
 	$(am_libvomsapi_gcc64pthr_la_OBJECTS)
 libvomsapi_gcc64pthr_la_LINK = $(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) \
-	$(LIBTOOLFLAGS) --mode=link $(CXXLD) $(AM_CXXFLAGS) \
-	$(CXXFLAGS) $(libvomsapi_gcc64pthr_la_LDFLAGS) $(LDFLAGS) -o \
-	$@
+	$(LIBTOOLFLAGS) --mode=link $(CXXLD) \
+	$(libvomsapi_gcc64pthr_la_CXXFLAGS) $(CXXFLAGS) \
+	$(libvomsapi_gcc64pthr_la_LDFLAGS) $(LDFLAGS) -o $@
 libvomsapi_nog_la_DEPENDENCIES = $(am__DEPENDENCIES_2) \
 	$(top_builddir)/src/ac/libattributes_nog.la
 am__objects_10 = libvomsapi_nog_la-api_util.lo \
@@ -194,8 +198,9 @@ am__objects_10 = libvomsapi_nog_la-api_util.lo \
 am_libvomsapi_nog_la_OBJECTS = $(am__objects_10)
 libvomsapi_nog_la_OBJECTS = $(am_libvomsapi_nog_la_OBJECTS)
 libvomsapi_nog_la_LINK = $(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) \
-	$(LIBTOOLFLAGS) --mode=link $(CXXLD) $(AM_CXXFLAGS) \
-	$(CXXFLAGS) $(libvomsapi_nog_la_LDFLAGS) $(LDFLAGS) -o $@
+	$(LIBTOOLFLAGS) --mode=link $(CXXLD) \
+	$(libvomsapi_nog_la_CXXFLAGS) $(CXXFLAGS) \
+	$(libvomsapi_nog_la_LDFLAGS) $(LDFLAGS) -o $@
 libvomsc_la_DEPENDENCIES = $(am__DEPENDENCIES_3) \
 	$(top_builddir)/src/socklib/libsock.la \
 	$(top_builddir)/src/ac/libccattcert.la
@@ -205,7 +210,7 @@ am__objects_11 = libvomsc_la-api_util.lo libvomsc_la-voms_api.lo \
 am_libvomsc_la_OBJECTS = $(am__objects_11)
 libvomsc_la_OBJECTS = $(am_libvomsc_la_OBJECTS)
 libvomsc_la_LINK = $(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) \
-	$(LIBTOOLFLAGS) --mode=link $(CXXLD) $(AM_CXXFLAGS) \
+	$(LIBTOOLFLAGS) --mode=link $(CXXLD) $(libvomsc_la_CXXFLAGS) \
 	$(CXXFLAGS) $(libvomsc_la_LDFLAGS) $(LDFLAGS) -o $@
 libvomsc_gcc32_la_DEPENDENCIES = $(am__DEPENDENCIES_3) \
 	$(top_builddir)/src/socklib/libsock_gcc32.la \
@@ -216,8 +221,9 @@ am__objects_12 = libvomsc_gcc32_la-api_util.lo \
 am_libvomsc_gcc32_la_OBJECTS = $(am__objects_12)
 libvomsc_gcc32_la_OBJECTS = $(am_libvomsc_gcc32_la_OBJECTS)
 libvomsc_gcc32_la_LINK = $(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) \
-	$(LIBTOOLFLAGS) --mode=link $(CXXLD) $(AM_CXXFLAGS) \
-	$(CXXFLAGS) $(libvomsc_gcc32_la_LDFLAGS) $(LDFLAGS) -o $@
+	$(LIBTOOLFLAGS) --mode=link $(CXXLD) \
+	$(libvomsc_gcc32_la_CXXFLAGS) $(CXXFLAGS) \
+	$(libvomsc_gcc32_la_LDFLAGS) $(LDFLAGS) -o $@
 libvomsc_gcc32dbg_la_DEPENDENCIES = $(am__DEPENDENCIES_3) \
 	$(top_builddir)/src/socklib/libsock_gcc32dbg.la \
 	$(top_builddir)/src/ac/libccattcert_gcc32dbg.la
@@ -228,8 +234,9 @@ am__objects_13 = libvomsc_gcc32dbg_la-api_util.lo \
 am_libvomsc_gcc32dbg_la_OBJECTS = $(am__objects_13)
 libvomsc_gcc32dbg_la_OBJECTS = $(am_libvomsc_gcc32dbg_la_OBJECTS)
 libvomsc_gcc32dbg_la_LINK = $(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) \
-	$(LIBTOOLFLAGS) --mode=link $(CXXLD) $(AM_CXXFLAGS) \
-	$(CXXFLAGS) $(libvomsc_gcc32dbg_la_LDFLAGS) $(LDFLAGS) -o $@
+	$(LIBTOOLFLAGS) --mode=link $(CXXLD) \
+	$(libvomsc_gcc32dbg_la_CXXFLAGS) $(CXXFLAGS) \
+	$(libvomsc_gcc32dbg_la_LDFLAGS) $(LDFLAGS) -o $@
 libvomsc_gcc32dbgpthr_la_DEPENDENCIES = $(am__DEPENDENCIES_3) \
 	$(top_builddir)/src/socklib/libsock_gcc32dbgpthr.la \
 	$(top_builddir)/src/ac/libccattcert_gcc32dbgpthr.la
@@ -243,8 +250,8 @@ libvomsc_gcc32dbgpthr_la_OBJECTS =  \
 	$(am_libvomsc_gcc32dbgpthr_la_OBJECTS)
 libvomsc_gcc32dbgpthr_la_LINK = $(LIBTOOL) --tag=CXX \
 	$(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=link $(CXXLD) \
-	$(AM_CXXFLAGS) $(CXXFLAGS) $(libvomsc_gcc32dbgpthr_la_LDFLAGS) \
-	$(LDFLAGS) -o $@
+	$(libvomsc_gcc32dbgpthr_la_CXXFLAGS) $(CXXFLAGS) \
+	$(libvomsc_gcc32dbgpthr_la_LDFLAGS) $(LDFLAGS) -o $@
 libvomsc_gcc32pthr_la_DEPENDENCIES = $(am__DEPENDENCIES_3) \
 	$(top_builddir)/src/socklib/libsock_gcc32pthr.la \
 	$(top_builddir)/src/ac/libccattcert_gcc32pthr.la
@@ -256,8 +263,9 @@ am__objects_15 = libvomsc_gcc32pthr_la-api_util.lo \
 am_libvomsc_gcc32pthr_la_OBJECTS = $(am__objects_15)
 libvomsc_gcc32pthr_la_OBJECTS = $(am_libvomsc_gcc32pthr_la_OBJECTS)
 libvomsc_gcc32pthr_la_LINK = $(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) \
-	$(LIBTOOLFLAGS) --mode=link $(CXXLD) $(AM_CXXFLAGS) \
-	$(CXXFLAGS) $(libvomsc_gcc32pthr_la_LDFLAGS) $(LDFLAGS) -o $@
+	$(LIBTOOLFLAGS) --mode=link $(CXXLD) \
+	$(libvomsc_gcc32pthr_la_CXXFLAGS) $(CXXFLAGS) \
+	$(libvomsc_gcc32pthr_la_LDFLAGS) $(LDFLAGS) -o $@
 libvomsc_gcc64_la_DEPENDENCIES = $(am__DEPENDENCIES_3) \
 	$(top_builddir)/src/socklib/libsock_gcc64.la \
 	$(top_builddir)/src/ac/libccattcert_gcc64.la
@@ -267,8 +275,9 @@ am__objects_16 = libvomsc_gcc64_la-api_util.lo \
 am_libvomsc_gcc64_la_OBJECTS = $(am__objects_16)
 libvomsc_gcc64_la_OBJECTS = $(am_libvomsc_gcc64_la_OBJECTS)
 libvomsc_gcc64_la_LINK = $(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) \
-	$(LIBTOOLFLAGS) --mode=link $(CXXLD) $(AM_CXXFLAGS) \
-	$(CXXFLAGS) $(libvomsc_gcc64_la_LDFLAGS) $(LDFLAGS) -o $@
+	$(LIBTOOLFLAGS) --mode=link $(CXXLD) \
+	$(libvomsc_gcc64_la_CXXFLAGS) $(CXXFLAGS) \
+	$(libvomsc_gcc64_la_LDFLAGS) $(LDFLAGS) -o $@
 libvomsc_gcc64dbg_la_DEPENDENCIES = $(am__DEPENDENCIES_3) \
 	$(top_builddir)/src/socklib/libsock_gcc64dbg.la \
 	$(top_builddir)/src/ac/libccattcert_gcc64dbg.la
@@ -279,8 +288,9 @@ am__objects_17 = libvomsc_gcc64dbg_la-api_util.lo \
 am_libvomsc_gcc64dbg_la_OBJECTS = $(am__objects_17)
 libvomsc_gcc64dbg_la_OBJECTS = $(am_libvomsc_gcc64dbg_la_OBJECTS)
 libvomsc_gcc64dbg_la_LINK = $(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) \
-	$(LIBTOOLFLAGS) --mode=link $(CXXLD) $(AM_CXXFLAGS) \
-	$(CXXFLAGS) $(libvomsc_gcc64dbg_la_LDFLAGS) $(LDFLAGS) -o $@
+	$(LIBTOOLFLAGS) --mode=link $(CXXLD) \
+	$(libvomsc_gcc64dbg_la_CXXFLAGS) $(CXXFLAGS) \
+	$(libvomsc_gcc64dbg_la_LDFLAGS) $(LDFLAGS) -o $@
 libvomsc_gcc64dbgpthr_la_DEPENDENCIES = $(am__DEPENDENCIES_3) \
 	$(top_builddir)/src/socklib/libsock_gcc64dbgpthr.la \
 	$(top_builddir)/src/ac/libccattcert_gcc64dbgpthr.la
@@ -294,8 +304,8 @@ libvomsc_gcc64dbgpthr_la_OBJECTS =  \
 	$(am_libvomsc_gcc64dbgpthr_la_OBJECTS)
 libvomsc_gcc64dbgpthr_la_LINK = $(LIBTOOL) --tag=CXX \
 	$(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=link $(CXXLD) \
-	$(AM_CXXFLAGS) $(CXXFLAGS) $(libvomsc_gcc64dbgpthr_la_LDFLAGS) \
-	$(LDFLAGS) -o $@
+	$(libvomsc_gcc64dbgpthr_la_CXXFLAGS) $(CXXFLAGS) \
+	$(libvomsc_gcc64dbgpthr_la_LDFLAGS) $(LDFLAGS) -o $@
 libvomsc_gcc64pthr_la_DEPENDENCIES = $(am__DEPENDENCIES_3) \
 	$(top_builddir)/src/socklib/libsock_gcc64pthr.la \
 	$(top_builddir)/src/ac/libccattcert_gcc64pthr.la
@@ -307,8 +317,9 @@ am__objects_19 = libvomsc_gcc64pthr_la-api_util.lo \
 am_libvomsc_gcc64pthr_la_OBJECTS = $(am__objects_19)
 libvomsc_gcc64pthr_la_OBJECTS = $(am_libvomsc_gcc64pthr_la_OBJECTS)
 libvomsc_gcc64pthr_la_LINK = $(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) \
-	$(LIBTOOLFLAGS) --mode=link $(CXXLD) $(AM_CXXFLAGS) \
-	$(CXXFLAGS) $(libvomsc_gcc64pthr_la_LDFLAGS) $(LDFLAGS) -o $@
+	$(LIBTOOLFLAGS) --mode=link $(CXXLD) \
+	$(libvomsc_gcc64pthr_la_CXXFLAGS) $(CXXFLAGS) \
+	$(libvomsc_gcc64pthr_la_LDFLAGS) $(LDFLAGS) -o $@
 DEFAULT_INCLUDES = -I.@am__isrc@ -I$(top_builddir)/src/autogen
 depcomp = $(SHELL) $(top_srcdir)/./project/depcomp
 am__depfiles_maybe = depfiles
@@ -556,7 +567,7 @@ API_INCLUDES = \
 libvomsapi_nog_la_SOURCES = \
 	$(CCSOURCES)
 
-libvomsapi_nog_la_CPPFLAGS = \
+libvomsapi_nog_la_CXXFLAGS = \
 	$(NO_GLOBUS_FLAGS) \
 	-DNOGLOBUS \
 	$(API_INCLUDES)
@@ -581,7 +592,7 @@ libvomsapi_nog_la_LIBADD = \
 libvomsapi_la_SOURCES = \
 	$(CCSOURCES)
 
-libvomsapi_la_CPPFLAGS = \
+libvomsapi_la_CXXFLAGS = \
 	$(NO_GLOBUS_FLAGS) \
 	-DNOGLOBUS \
 	$(API_INCLUDES)
@@ -611,7 +622,7 @@ CSOURCES = \
 libvomsc_la_SOURCES = \
 	$(CSOURCES)
 
-libvomsc_la_CPPFLAGS = \
+libvomsc_la_CXXFLAGS = \
 	-I$(top_srcdir)/src/include \
 	$(API_INCLUDES) \
 	$(GLOBUS_CFLAGS)
@@ -631,10 +642,10 @@ libvomsc_la_LIBADD = \
 #noinst_PROGRAMS = test ctest
 #test_SOURCES = test.cc
 #test_LDADD = libvomsapi.la
-#test_CPPFLAGS = -I$(top_srcdir)/src/include $(GLOBUS_CFLAGS)
+#test_CXXFLAGS = -I$(top_srcdir)/src/include $(GLOBUS_CFLAGS)
 #ctest_SOURCES = ctest.c
 #ctest_LDADD = libvomsc.la
-#ctest_CPPFLAGS = -I$(top_srcdir)/src/include $(GLOBUS_CFLAGS)
+#ctest_CFLAGS = -I$(top_srcdir)/src/include $(GLOBUS_CFLAGS)
 EXTRA_LTLIBRARIES = \
 	libvomsapi_gcc32.la \
 	libvomsapi_gcc32dbg.la \
@@ -659,7 +670,7 @@ EXTRA_LTLIBRARIES = \
 libvomsapi_gcc32_la_SOURCES = \
 	$(CCSOURCES)
 
-libvomsapi_gcc32_la_CPPFLAGS = \
+libvomsapi_gcc32_la_CXXFLAGS = \
 	-I$(top_srcdir)/src/include \
 	$(API_INCLUDES) \
 	$(GLOBUS_GCC32_CFLAGS)
@@ -675,7 +686,7 @@ libvomsapi_gcc32_la_LDFLAGS = \
 libvomsapi_gcc32dbg_la_SOURCES = \
 	$(CCSOURCES)
 
-libvomsapi_gcc32dbg_la_CPPFLAGS = \
+libvomsapi_gcc32dbg_la_CXXFLAGS = \
 	-I$(top_srcdir)/src/include \
 	$(GLOBUS_GCC32DBG_CFLAGS) \
 	$(API_INCLUDES)
@@ -691,7 +702,7 @@ libvomsapi_gcc32dbg_la_LDFLAGS = \
 libvomsapi_gcc32pthr_la_SOURCES = \
 	$(CCSOURCES)
 
-libvomsapi_gcc32pthr_la_CPPFLAGS = \
+libvomsapi_gcc32pthr_la_CXXFLAGS = \
 	-I$(top_srcdir)/src/include \
 	$(API_INCLUDES) \
 	$(GLOBUS_GCC32PTHR_CFLAGS)
@@ -707,7 +718,7 @@ libvomsapi_gcc32pthr_la_LDFLAGS = \
 libvomsapi_gcc32dbgpthr_la_SOURCES = \
 	$(CCSOURCES)
 
-libvomsapi_gcc32dbgpthr_la_CPPFLAGS = \
+libvomsapi_gcc32dbgpthr_la_CXXFLAGS = \
 	-I$(top_srcdir)/src/include \
 	$(API_INCLUDES) \
 	$(GLOBUS_GCC32DBGPTHR_CFLAGS)
@@ -723,7 +734,7 @@ libvomsapi_gcc32dbgpthr_la_LDFLAGS = \
 libvomsc_gcc32_la_SOURCES = \
 	$(CSOURCES)
 
-libvomsc_gcc32_la_CPPFLAGS = \
+libvomsc_gcc32_la_CXXFLAGS = \
 	-I$(top_srcdir)/src/include \
 	$(API_INCLUDES) \
 	$(GLOBUS_GCC32_CFLAGS)
@@ -739,7 +750,7 @@ libvomsc_gcc32_la_LDFLAGS = \
 libvomsc_gcc32dbg_la_SOURCES = \
 	$(CSOURCES)
 
-libvomsc_gcc32dbg_la_CPPFLAGS = \
+libvomsc_gcc32dbg_la_CXXFLAGS = \
 	-I$(top_srcdir)/src/include \
 	$(API_INCLUDES) \
 	$(GLOBUS_GCC32DBG_CFLAGS)
@@ -755,7 +766,7 @@ libvomsc_gcc32dbg_la_LDFLAGS = \
 libvomsc_gcc32pthr_la_SOURCES = \
 	$(CSOURCES)
 
-libvomsc_gcc32pthr_la_CPPFLAGS = \
+libvomsc_gcc32pthr_la_CXXFLAGS = \
 	-I$(top_srcdir)/src/include \
 	$(API_INCLUDES) \
 	$(GLOBUS_GCC32PTHR_CFLAGS)
@@ -771,7 +782,7 @@ libvomsc_gcc32pthr_la_LDFLAGS = \
 libvomsc_gcc32dbgpthr_la_SOURCES = \
 	$(CSOURCES)
 
-libvomsc_gcc32dbgpthr_la_CPPFLAGS = \
+libvomsc_gcc32dbgpthr_la_CXXFLAGS = \
 	-I$(top_srcdir)/src/include \
 	$(API_INCLUDES) \
 	$(GLOBUS_GCC32DBGPTHR_CFLAGS)
@@ -787,7 +798,7 @@ libvomsc_gcc32dbgpthr_la_LDFLAGS = \
 libvomsapi_gcc64_la_SOURCES = \
 	$(CCSOURCES)
 
-libvomsapi_gcc64_la_CPPFLAGS = \
+libvomsapi_gcc64_la_CXXFLAGS = \
 	-I$(top_srcdir)/src/include \
 	$(API_INCLUDES) \
 	$(GLOBUS_GCC64_CFLAGS)
@@ -803,7 +814,7 @@ libvomsapi_gcc64_la_LDFLAGS = \
 libvomsapi_gcc64dbg_la_SOURCES = \
 	$(CCSOURCES)
 
-libvomsapi_gcc64dbg_la_CPPFLAGS = \
+libvomsapi_gcc64dbg_la_CXXFLAGS = \
 	-I$(top_srcdir)/src/include \
 	$(API_INCLUDES) \
 	$(GLOBUS_GCC64DBG_CFLAGS)
@@ -819,7 +830,7 @@ libvomsapi_gcc64dbg_la_LDFLAGS = \
 libvomsapi_gcc64pthr_la_SOURCES = \
 	$(CCSOURCES)
 
-libvomsapi_gcc64pthr_la_CPPFLAGS = \
+libvomsapi_gcc64pthr_la_CXXFLAGS = \
 	-I$(top_srcdir)/src/include \
 	$(API_INCLUDES) \
 	$(GLOBUS_GCC64PTHR_CFLAGS)
@@ -835,7 +846,7 @@ libvomsapi_gcc64pthr_la_LDFLAGS = \
 libvomsapi_gcc64dbgpthr_la_SOURCES = \
 	$(CCSOURCES)
 
-libvomsapi_gcc64dbgpthr_la_CPPFLAGS = \
+libvomsapi_gcc64dbgpthr_la_CXXFLAGS = \
 	-I$(top_srcdir)/src/include \
 	$(API_INCLUDES) \
 	$(GLOBUS_GCC64DBGPTHR_CFLAGS)
@@ -851,7 +862,7 @@ libvomsapi_gcc64dbgpthr_la_LDFLAGS = \
 libvomsc_gcc64_la_SOURCES = \
 	$(CSOURCES)
 
-libvomsc_gcc64_la_CPPFLAGS = \
+libvomsc_gcc64_la_CXXFLAGS = \
 	-I$(top_srcdir)/src/include \
 	$(API_INCLUDES) \
 	$(GLOBUS_GCC64_CFLAGS)
@@ -867,7 +878,7 @@ libvomsc_gcc64_la_LDFLAGS = \
 libvomsc_gcc64dbg_la_SOURCES = \
 	$(CSOURCES)
 
-libvomsc_gcc64dbg_la_CPPFLAGS = \
+libvomsc_gcc64dbg_la_CXXFLAGS = \
 	-I$(top_srcdir)/src/include \
 	$(API_INCLUDES) \
 	$(GLOBUS_GCC64DBG_CFLAGS)
@@ -883,7 +894,7 @@ libvomsc_gcc64dbg_la_LDFLAGS = \
 libvomsc_gcc64pthr_la_SOURCES = \
 	$(CSOURCES)
 
-libvomsc_gcc64pthr_la_CPPFLAGS = \
+libvomsc_gcc64pthr_la_CXXFLAGS = \
 	-I$(top_srcdir)/src/include \
 	$(API_INCLUDES) \
 	$(GLOBUS_GCC64PTHR_CFLAGS)
@@ -899,7 +910,7 @@ libvomsc_gcc64pthr_la_LDFLAGS = \
 libvomsc_gcc64dbgpthr_la_SOURCES = \
 	$(CSOURCES)
 
-libvomsc_gcc64dbgpthr_la_CPPFLAGS = \
+libvomsc_gcc64dbgpthr_la_CXXFLAGS = \
 	-I$(top_srcdir)/src/include \
 	$(API_INCLUDES) \
 	$(GLOBUS_GCC64DBGPTHR_CFLAGS)
@@ -1196,669 +1207,669 @@ distclean-compile:
 @am__fastdepCXX_FALSE@	$(LTCXXCOMPILE) -c -o $@ $<
 
 libvomsapi_la-api_util.lo: api_util.cc
-@am__fastdepCXX_TRUE@	$(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libvomsapi_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT libvomsapi_la-api_util.lo -MD -MP -MF $(DEPDIR)/libvomsapi_la-api_util.Tpo -c -o libvomsapi_la-api_util.lo `test -f 'api_util.cc' || echo '$(srcdir)/'`api_util.cc
+@am__fastdepCXX_TRUE@	$(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libvomsapi_la_CXXFLAGS) $(CXXFLAGS) -MT libvomsapi_la-api_util.lo -MD -MP -MF $(DEPDIR)/libvomsapi_la-api_util.Tpo -c -o libvomsapi_la-api_util.lo `test -f 'api_util.cc' || echo '$(srcdir)/'`api_util.cc
 @am__fastdepCXX_TRUE@	mv -f $(DEPDIR)/libvomsapi_la-api_util.Tpo $(DEPDIR)/libvomsapi_la-api_util.Plo
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='api_util.cc' object='libvomsapi_la-api_util.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libvomsapi_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o libvomsapi_la-api_util.lo `test -f 'api_util.cc' || echo '$(srcdir)/'`api_util.cc
+@am__fastdepCXX_FALSE@	$(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libvomsapi_la_CXXFLAGS) $(CXXFLAGS) -c -o libvomsapi_la-api_util.lo `test -f 'api_util.cc' || echo '$(srcdir)/'`api_util.cc
 
 libvomsapi_la-voms_api.lo: voms_api.cc
-@am__fastdepCXX_TRUE@	$(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libvomsapi_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT libvomsapi_la-voms_api.lo -MD -MP -MF $(DEPDIR)/libvomsapi_la-voms_api.Tpo -c -o libvomsapi_la-voms_api.lo `test -f 'voms_api.cc' || echo '$(srcdir)/'`voms_api.cc
+@am__fastdepCXX_TRUE@	$(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libvomsapi_la_CXXFLAGS) $(CXXFLAGS) -MT libvomsapi_la-voms_api.lo -MD -MP -MF $(DEPDIR)/libvomsapi_la-voms_api.Tpo -c -o libvomsapi_la-voms_api.lo `test -f 'voms_api.cc' || echo '$(srcdir)/'`voms_api.cc
 @am__fastdepCXX_TRUE@	mv -f $(DEPDIR)/libvomsapi_la-voms_api.Tpo $(DEPDIR)/libvomsapi_la-voms_api.Plo
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='voms_api.cc' object='libvomsapi_la-voms_api.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libvomsapi_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o libvomsapi_la-voms_api.lo `test -f 'voms_api.cc' || echo '$(srcdir)/'`voms_api.cc
+@am__fastdepCXX_FALSE@	$(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libvomsapi_la_CXXFLAGS) $(CXXFLAGS) -c -o libvomsapi_la-voms_api.lo `test -f 'voms_api.cc' || echo '$(srcdir)/'`voms_api.cc
 
 libvomsapi_la-ccval.lo: ccval.cc
-@am__fastdepCXX_TRUE@	$(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libvomsapi_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT libvomsapi_la-ccval.lo -MD -MP -MF $(DEPDIR)/libvomsapi_la-ccval.Tpo -c -o libvomsapi_la-ccval.lo `test -f 'ccval.cc' || echo '$(srcdir)/'`ccval.cc
+@am__fastdepCXX_TRUE@	$(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libvomsapi_la_CXXFLAGS) $(CXXFLAGS) -MT libvomsapi_la-ccval.lo -MD -MP -MF $(DEPDIR)/libvomsapi_la-ccval.Tpo -c -o libvomsapi_la-ccval.lo `test -f 'ccval.cc' || echo '$(srcdir)/'`ccval.cc
 @am__fastdepCXX_TRUE@	mv -f $(DEPDIR)/libvomsapi_la-ccval.Tpo $(DEPDIR)/libvomsapi_la-ccval.Plo
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='ccval.cc' object='libvomsapi_la-ccval.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libvomsapi_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o libvomsapi_la-ccval.lo `test -f 'ccval.cc' || echo '$(srcdir)/'`ccval.cc
+@am__fastdepCXX_FALSE@	$(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libvomsapi_la_CXXFLAGS) $(CXXFLAGS) -c -o libvomsapi_la-ccval.lo `test -f 'ccval.cc' || echo '$(srcdir)/'`ccval.cc
 
 libvomsapi_la-internal.lo: internal.cc
-@am__fastdepCXX_TRUE@	$(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libvomsapi_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT libvomsapi_la-internal.lo -MD -MP -MF $(DEPDIR)/libvomsapi_la-internal.Tpo -c -o libvomsapi_la-internal.lo `test -f 'internal.cc' || echo '$(srcdir)/'`internal.cc
+@am__fastdepCXX_TRUE@	$(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libvomsapi_la_CXXFLAGS) $(CXXFLAGS) -MT libvomsapi_la-internal.lo -MD -MP -MF $(DEPDIR)/libvomsapi_la-internal.Tpo -c -o libvomsapi_la-internal.lo `test -f 'internal.cc' || echo '$(srcdir)/'`internal.cc
 @am__fastdepCXX_TRUE@	mv -f $(DEPDIR)/libvomsapi_la-internal.Tpo $(DEPDIR)/libvomsapi_la-internal.Plo
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='internal.cc' object='libvomsapi_la-internal.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libvomsapi_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o libvomsapi_la-internal.lo `test -f 'internal.cc' || echo '$(srcdir)/'`internal.cc
+@am__fastdepCXX_FALSE@	$(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libvomsapi_la_CXXFLAGS) $(CXXFLAGS) -c -o libvomsapi_la-internal.lo `test -f 'internal.cc' || echo '$(srcdir)/'`internal.cc
 
 libvomsapi_la-cinterface.lo: cinterface.cc
-@am__fastdepCXX_TRUE@	$(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libvomsapi_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT libvomsapi_la-cinterface.lo -MD -MP -MF $(DEPDIR)/libvomsapi_la-cinterface.Tpo -c -o libvomsapi_la-cinterface.lo `test -f 'cinterface.cc' || echo '$(srcdir)/'`cinterface.cc
+@am__fastdepCXX_TRUE@	$(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libvomsapi_la_CXXFLAGS) $(CXXFLAGS) -MT libvomsapi_la-cinterface.lo -MD -MP -MF $(DEPDIR)/libvomsapi_la-cinterface.Tpo -c -o libvomsapi_la-cinterface.lo `test -f 'cinterface.cc' || echo '$(srcdir)/'`cinterface.cc
 @am__fastdepCXX_TRUE@	mv -f $(DEPDIR)/libvomsapi_la-cinterface.Tpo $(DEPDIR)/libvomsapi_la-cinterface.Plo
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='cinterface.cc' object='libvomsapi_la-cinterface.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libvomsapi_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o libvomsapi_la-cinterface.lo `test -f 'cinterface.cc' || echo '$(srcdir)/'`cinterface.cc
+@am__fastdepCXX_FALSE@	$(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libvomsapi_la_CXXFLAGS) $(CXXFLAGS) -c -o libvomsapi_la-cinterface.lo `test -f 'cinterface.cc' || echo '$(srcdir)/'`cinterface.cc
 
 libvomsapi_gcc32_la-api_util.lo: api_util.cc
-@am__fastdepCXX_TRUE@	$(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libvomsapi_gcc32_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT libvomsapi_gcc32_la-api_util.lo -MD -MP -MF $(DEPDIR)/libvomsapi_gcc32_la-api_util.Tpo -c -o libvomsapi_gcc32_la-api_util.lo `test -f 'api_util.cc' || echo '$(srcdir)/'`api_util.cc
+@am__fastdepCXX_TRUE@	$(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libvomsapi_gcc32_la_CXXFLAGS) $(CXXFLAGS) -MT libvomsapi_gcc32_la-api_util.lo -MD -MP -MF $(DEPDIR)/libvomsapi_gcc32_la-api_util.Tpo -c -o libvomsapi_gcc32_la-api_util.lo `test -f 'api_util.cc' || echo '$(srcdir)/'`api_util.cc
 @am__fastdepCXX_TRUE@	mv -f $(DEPDIR)/libvomsapi_gcc32_la-api_util.Tpo $(DEPDIR)/libvomsapi_gcc32_la-api_util.Plo
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='api_util.cc' object='libvomsapi_gcc32_la-api_util.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libvomsapi_gcc32_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o libvomsapi_gcc32_la-api_util.lo `test -f 'api_util.cc' || echo '$(srcdir)/'`api_util.cc
+@am__fastdepCXX_FALSE@	$(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libvomsapi_gcc32_la_CXXFLAGS) $(CXXFLAGS) -c -o libvomsapi_gcc32_la-api_util.lo `test -f 'api_util.cc' || echo '$(srcdir)/'`api_util.cc
 
 libvomsapi_gcc32_la-voms_api.lo: voms_api.cc
-@am__fastdepCXX_TRUE@	$(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libvomsapi_gcc32_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT libvomsapi_gcc32_la-voms_api.lo -MD -MP -MF $(DEPDIR)/libvomsapi_gcc32_la-voms_api.Tpo -c -o libvomsapi_gcc32_la-voms_api.lo `test -f 'voms_api.cc' || echo '$(srcdir)/'`voms_api.cc
+@am__fastdepCXX_TRUE@	$(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libvomsapi_gcc32_la_CXXFLAGS) $(CXXFLAGS) -MT libvomsapi_gcc32_la-voms_api.lo -MD -MP -MF $(DEPDIR)/libvomsapi_gcc32_la-voms_api.Tpo -c -o libvomsapi_gcc32_la-voms_api.lo `test -f 'voms_api.cc' || echo '$(srcdir)/'`voms_api.cc
 @am__fastdepCXX_TRUE@	mv -f $(DEPDIR)/libvomsapi_gcc32_la-voms_api.Tpo $(DEPDIR)/libvomsapi_gcc32_la-voms_api.Plo
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='voms_api.cc' object='libvomsapi_gcc32_la-voms_api.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libvomsapi_gcc32_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o libvomsapi_gcc32_la-voms_api.lo `test -f 'voms_api.cc' || echo '$(srcdir)/'`voms_api.cc
+@am__fastdepCXX_FALSE@	$(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libvomsapi_gcc32_la_CXXFLAGS) $(CXXFLAGS) -c -o libvomsapi_gcc32_la-voms_api.lo `test -f 'voms_api.cc' || echo '$(srcdir)/'`voms_api.cc
 
 libvomsapi_gcc32_la-ccval.lo: ccval.cc
-@am__fastdepCXX_TRUE@	$(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libvomsapi_gcc32_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT libvomsapi_gcc32_la-ccval.lo -MD -MP -MF $(DEPDIR)/libvomsapi_gcc32_la-ccval.Tpo -c -o libvomsapi_gcc32_la-ccval.lo `test -f 'ccval.cc' || echo '$(srcdir)/'`ccval.cc
+@am__fastdepCXX_TRUE@	$(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libvomsapi_gcc32_la_CXXFLAGS) $(CXXFLAGS) -MT libvomsapi_gcc32_la-ccval.lo -MD -MP -MF $(DEPDIR)/libvomsapi_gcc32_la-ccval.Tpo -c -o libvomsapi_gcc32_la-ccval.lo `test -f 'ccval.cc' || echo '$(srcdir)/'`ccval.cc
 @am__fastdepCXX_TRUE@	mv -f $(DEPDIR)/libvomsapi_gcc32_la-ccval.Tpo $(DEPDIR)/libvomsapi_gcc32_la-ccval.Plo
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='ccval.cc' object='libvomsapi_gcc32_la-ccval.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libvomsapi_gcc32_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o libvomsapi_gcc32_la-ccval.lo `test -f 'ccval.cc' || echo '$(srcdir)/'`ccval.cc
+@am__fastdepCXX_FALSE@	$(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libvomsapi_gcc32_la_CXXFLAGS) $(CXXFLAGS) -c -o libvomsapi_gcc32_la-ccval.lo `test -f 'ccval.cc' || echo '$(srcdir)/'`ccval.cc
 
 libvomsapi_gcc32_la-internal.lo: internal.cc
-@am__fastdepCXX_TRUE@	$(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libvomsapi_gcc32_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT libvomsapi_gcc32_la-internal.lo -MD -MP -MF $(DEPDIR)/libvomsapi_gcc32_la-internal.Tpo -c -o libvomsapi_gcc32_la-internal.lo `test -f 'internal.cc' || echo '$(srcdir)/'`internal.cc
+@am__fastdepCXX_TRUE@	$(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libvomsapi_gcc32_la_CXXFLAGS) $(CXXFLAGS) -MT libvomsapi_gcc32_la-internal.lo -MD -MP -MF $(DEPDIR)/libvomsapi_gcc32_la-internal.Tpo -c -o libvomsapi_gcc32_la-internal.lo `test -f 'internal.cc' || echo '$(srcdir)/'`internal.cc
 @am__fastdepCXX_TRUE@	mv -f $(DEPDIR)/libvomsapi_gcc32_la-internal.Tpo $(DEPDIR)/libvomsapi_gcc32_la-internal.Plo
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='internal.cc' object='libvomsapi_gcc32_la-internal.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libvomsapi_gcc32_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o libvomsapi_gcc32_la-internal.lo `test -f 'internal.cc' || echo '$(srcdir)/'`internal.cc
+@am__fastdepCXX_FALSE@	$(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libvomsapi_gcc32_la_CXXFLAGS) $(CXXFLAGS) -c -o libvomsapi_gcc32_la-internal.lo `test -f 'internal.cc' || echo '$(srcdir)/'`internal.cc
 
 libvomsapi_gcc32_la-cinterface.lo: cinterface.cc
-@am__fastdepCXX_TRUE@	$(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libvomsapi_gcc32_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT libvomsapi_gcc32_la-cinterface.lo -MD -MP -MF $(DEPDIR)/libvomsapi_gcc32_la-cinterface.Tpo -c -o libvomsapi_gcc32_la-cinterface.lo `test -f 'cinterface.cc' || echo '$(srcdir)/'`cinterface.cc
+@am__fastdepCXX_TRUE@	$(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libvomsapi_gcc32_la_CXXFLAGS) $(CXXFLAGS) -MT libvomsapi_gcc32_la-cinterface.lo -MD -MP -MF $(DEPDIR)/libvomsapi_gcc32_la-cinterface.Tpo -c -o libvomsapi_gcc32_la-cinterface.lo `test -f 'cinterface.cc' || echo '$(srcdir)/'`cinterface.cc
 @am__fastdepCXX_TRUE@	mv -f $(DEPDIR)/libvomsapi_gcc32_la-cinterface.Tpo $(DEPDIR)/libvomsapi_gcc32_la-cinterface.Plo
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='cinterface.cc' object='libvomsapi_gcc32_la-cinterface.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libvomsapi_gcc32_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o libvomsapi_gcc32_la-cinterface.lo `test -f 'cinterface.cc' || echo '$(srcdir)/'`cinterface.cc
+@am__fastdepCXX_FALSE@	$(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libvomsapi_gcc32_la_CXXFLAGS) $(CXXFLAGS) -c -o libvomsapi_gcc32_la-cinterface.lo `test -f 'cinterface.cc' || echo '$(srcdir)/'`cinterface.cc
 
 libvomsapi_gcc32dbg_la-api_util.lo: api_util.cc
-@am__fastdepCXX_TRUE@	$(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libvomsapi_gcc32dbg_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT libvomsapi_gcc32dbg_la-api_util.lo -MD -MP -MF $(DEPDIR)/libvomsapi_gcc32dbg_la-api_util.Tpo -c -o libvomsapi_gcc32dbg_la-api_util.lo `test -f 'api_util.cc' || echo '$(srcdir)/'`api_util.cc
+@am__fastdepCXX_TRUE@	$(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libvomsapi_gcc32dbg_la_CXXFLAGS) $(CXXFLAGS) -MT libvomsapi_gcc32dbg_la-api_util.lo -MD -MP -MF $(DEPDIR)/libvomsapi_gcc32dbg_la-api_util.Tpo -c -o libvomsapi_gcc32dbg_la-api_util.lo `test -f 'api_util.cc' || echo '$(srcdir)/'`api_util.cc
 @am__fastdepCXX_TRUE@	mv -f $(DEPDIR)/libvomsapi_gcc32dbg_la-api_util.Tpo $(DEPDIR)/libvomsapi_gcc32dbg_la-api_util.Plo
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='api_util.cc' object='libvomsapi_gcc32dbg_la-api_util.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libvomsapi_gcc32dbg_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o libvomsapi_gcc32dbg_la-api_util.lo `test -f 'api_util.cc' || echo '$(srcdir)/'`api_util.cc
+@am__fastdepCXX_FALSE@	$(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libvomsapi_gcc32dbg_la_CXXFLAGS) $(CXXFLAGS) -c -o libvomsapi_gcc32dbg_la-api_util.lo `test -f 'api_util.cc' || echo '$(srcdir)/'`api_util.cc
 
 libvomsapi_gcc32dbg_la-voms_api.lo: voms_api.cc
-@am__fastdepCXX_TRUE@	$(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libvomsapi_gcc32dbg_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT libvomsapi_gcc32dbg_la-voms_api.lo -MD -MP -MF $(DEPDIR)/libvomsapi_gcc32dbg_la-voms_api.Tpo -c -o libvomsapi_gcc32dbg_la-voms_api.lo `test -f 'voms_api.cc' || echo '$(srcdir)/'`voms_api.cc
+@am__fastdepCXX_TRUE@	$(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libvomsapi_gcc32dbg_la_CXXFLAGS) $(CXXFLAGS) -MT libvomsapi_gcc32dbg_la-voms_api.lo -MD -MP -MF $(DEPDIR)/libvomsapi_gcc32dbg_la-voms_api.Tpo -c -o libvomsapi_gcc32dbg_la-voms_api.lo `test -f 'voms_api.cc' || echo '$(srcdir)/'`voms_api.cc
 @am__fastdepCXX_TRUE@	mv -f $(DEPDIR)/libvomsapi_gcc32dbg_la-voms_api.Tpo $(DEPDIR)/libvomsapi_gcc32dbg_la-voms_api.Plo
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='voms_api.cc' object='libvomsapi_gcc32dbg_la-voms_api.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libvomsapi_gcc32dbg_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o libvomsapi_gcc32dbg_la-voms_api.lo `test -f 'voms_api.cc' || echo '$(srcdir)/'`voms_api.cc
+@am__fastdepCXX_FALSE@	$(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libvomsapi_gcc32dbg_la_CXXFLAGS) $(CXXFLAGS) -c -o libvomsapi_gcc32dbg_la-voms_api.lo `test -f 'voms_api.cc' || echo '$(srcdir)/'`voms_api.cc
 
 libvomsapi_gcc32dbg_la-ccval.lo: ccval.cc
-@am__fastdepCXX_TRUE@	$(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libvomsapi_gcc32dbg_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT libvomsapi_gcc32dbg_la-ccval.lo -MD -MP -MF $(DEPDIR)/libvomsapi_gcc32dbg_la-ccval.Tpo -c -o libvomsapi_gcc32dbg_la-ccval.lo `test -f 'ccval.cc' || echo '$(srcdir)/'`ccval.cc
+@am__fastdepCXX_TRUE@	$(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libvomsapi_gcc32dbg_la_CXXFLAGS) $(CXXFLAGS) -MT libvomsapi_gcc32dbg_la-ccval.lo -MD -MP -MF $(DEPDIR)/libvomsapi_gcc32dbg_la-ccval.Tpo -c -o libvomsapi_gcc32dbg_la-ccval.lo `test -f 'ccval.cc' || echo '$(srcdir)/'`ccval.cc
 @am__fastdepCXX_TRUE@	mv -f $(DEPDIR)/libvomsapi_gcc32dbg_la-ccval.Tpo $(DEPDIR)/libvomsapi_gcc32dbg_la-ccval.Plo
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='ccval.cc' object='libvomsapi_gcc32dbg_la-ccval.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libvomsapi_gcc32dbg_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o libvomsapi_gcc32dbg_la-ccval.lo `test -f 'ccval.cc' || echo '$(srcdir)/'`ccval.cc
+@am__fastdepCXX_FALSE@	$(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libvomsapi_gcc32dbg_la_CXXFLAGS) $(CXXFLAGS) -c -o libvomsapi_gcc32dbg_la-ccval.lo `test -f 'ccval.cc' || echo '$(srcdir)/'`ccval.cc
 
 libvomsapi_gcc32dbg_la-internal.lo: internal.cc
-@am__fastdepCXX_TRUE@	$(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libvomsapi_gcc32dbg_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT libvomsapi_gcc32dbg_la-internal.lo -MD -MP -MF $(DEPDIR)/libvomsapi_gcc32dbg_la-internal.Tpo -c -o libvomsapi_gcc32dbg_la-internal.lo `test -f 'internal.cc' || echo '$(srcdir)/'`internal.cc
+@am__fastdepCXX_TRUE@	$(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libvomsapi_gcc32dbg_la_CXXFLAGS) $(CXXFLAGS) -MT libvomsapi_gcc32dbg_la-internal.lo -MD -MP -MF $(DEPDIR)/libvomsapi_gcc32dbg_la-internal.Tpo -c -o libvomsapi_gcc32dbg_la-internal.lo `test -f 'internal.cc' || echo '$(srcdir)/'`internal.cc
 @am__fastdepCXX_TRUE@	mv -f $(DEPDIR)/libvomsapi_gcc32dbg_la-internal.Tpo $(DEPDIR)/libvomsapi_gcc32dbg_la-internal.Plo
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='internal.cc' object='libvomsapi_gcc32dbg_la-internal.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libvomsapi_gcc32dbg_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o libvomsapi_gcc32dbg_la-internal.lo `test -f 'internal.cc' || echo '$(srcdir)/'`internal.cc
+@am__fastdepCXX_FALSE@	$(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libvomsapi_gcc32dbg_la_CXXFLAGS) $(CXXFLAGS) -c -o libvomsapi_gcc32dbg_la-internal.lo `test -f 'internal.cc' || echo '$(srcdir)/'`internal.cc
 
 libvomsapi_gcc32dbg_la-cinterface.lo: cinterface.cc
-@am__fastdepCXX_TRUE@	$(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libvomsapi_gcc32dbg_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT libvomsapi_gcc32dbg_la-cinterface.lo -MD -MP -MF $(DEPDIR)/libvomsapi_gcc32dbg_la-cinterface.Tpo -c -o libvomsapi_gcc32dbg_la-cinterface.lo `test -f 'cinterface.cc' || echo '$(srcdir)/'`cinterface.cc
+@am__fastdepCXX_TRUE@	$(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libvomsapi_gcc32dbg_la_CXXFLAGS) $(CXXFLAGS) -MT libvomsapi_gcc32dbg_la-cinterface.lo -MD -MP -MF $(DEPDIR)/libvomsapi_gcc32dbg_la-cinterface.Tpo -c -o libvomsapi_gcc32dbg_la-cinterface.lo `test -f 'cinterface.cc' || echo '$(srcdir)/'`cinterface.cc
 @am__fastdepCXX_TRUE@	mv -f $(DEPDIR)/libvomsapi_gcc32dbg_la-cinterface.Tpo $(DEPDIR)/libvomsapi_gcc32dbg_la-cinterface.Plo
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='cinterface.cc' object='libvomsapi_gcc32dbg_la-cinterface.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libvomsapi_gcc32dbg_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o libvomsapi_gcc32dbg_la-cinterface.lo `test -f 'cinterface.cc' || echo '$(srcdir)/'`cinterface.cc
+@am__fastdepCXX_FALSE@	$(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libvomsapi_gcc32dbg_la_CXXFLAGS) $(CXXFLAGS) -c -o libvomsapi_gcc32dbg_la-cinterface.lo `test -f 'cinterface.cc' || echo '$(srcdir)/'`cinterface.cc
 
 libvomsapi_gcc32dbgpthr_la-api_util.lo: api_util.cc
-@am__fastdepCXX_TRUE@	$(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libvomsapi_gcc32dbgpthr_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT libvomsapi_gcc32dbgpthr_la-api_util.lo -MD -MP -MF $(DEPDIR)/libvomsapi_gcc32dbgpthr_la-api_util.Tpo -c -o libvomsapi_gcc32dbgpthr_la-api_util.lo `test -f 'api_util.cc' || echo '$(srcdir)/'`api_util.cc
+@am__fastdepCXX_TRUE@	$(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libvomsapi_gcc32dbgpthr_la_CXXFLAGS) $(CXXFLAGS) -MT libvomsapi_gcc32dbgpthr_la-api_util.lo -MD -MP -MF $(DEPDIR)/libvomsapi_gcc32dbgpthr_la-api_util.Tpo -c -o libvomsapi_gcc32dbgpthr_la-api_util.lo `test -f 'api_util.cc' || echo '$(srcdir)/'`api_util.cc
 @am__fastdepCXX_TRUE@	mv -f $(DEPDIR)/libvomsapi_gcc32dbgpthr_la-api_util.Tpo $(DEPDIR)/libvomsapi_gcc32dbgpthr_la-api_util.Plo
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='api_util.cc' object='libvomsapi_gcc32dbgpthr_la-api_util.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libvomsapi_gcc32dbgpthr_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o libvomsapi_gcc32dbgpthr_la-api_util.lo `test -f 'api_util.cc' || echo '$(srcdir)/'`api_util.cc
+@am__fastdepCXX_FALSE@	$(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libvomsapi_gcc32dbgpthr_la_CXXFLAGS) $(CXXFLAGS) -c -o libvomsapi_gcc32dbgpthr_la-api_util.lo `test -f 'api_util.cc' || echo '$(srcdir)/'`api_util.cc
 
 libvomsapi_gcc32dbgpthr_la-voms_api.lo: voms_api.cc
-@am__fastdepCXX_TRUE@	$(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libvomsapi_gcc32dbgpthr_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT libvomsapi_gcc32dbgpthr_la-voms_api.lo -MD -MP -MF $(DEPDIR)/libvomsapi_gcc32dbgpthr_la-voms_api.Tpo -c -o libvomsapi_gcc32dbgpthr_la-voms_api.lo `test -f 'voms_api.cc' || echo '$(srcdir)/'`voms_api.cc
+@am__fastdepCXX_TRUE@	$(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libvomsapi_gcc32dbgpthr_la_CXXFLAGS) $(CXXFLAGS) -MT libvomsapi_gcc32dbgpthr_la-voms_api.lo -MD -MP -MF $(DEPDIR)/libvomsapi_gcc32dbgpthr_la-voms_api.Tpo -c -o libvomsapi_gcc32dbgpthr_la-voms_api.lo `test -f 'voms_api.cc' || echo '$(srcdir)/'`voms_api.cc
 @am__fastdepCXX_TRUE@	mv -f $(DEPDIR)/libvomsapi_gcc32dbgpthr_la-voms_api.Tpo $(DEPDIR)/libvomsapi_gcc32dbgpthr_la-voms_api.Plo
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='voms_api.cc' object='libvomsapi_gcc32dbgpthr_la-voms_api.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libvomsapi_gcc32dbgpthr_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o libvomsapi_gcc32dbgpthr_la-voms_api.lo `test -f 'voms_api.cc' || echo '$(srcdir)/'`voms_api.cc
+@am__fastdepCXX_FALSE@	$(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libvomsapi_gcc32dbgpthr_la_CXXFLAGS) $(CXXFLAGS) -c -o libvomsapi_gcc32dbgpthr_la-voms_api.lo `test -f 'voms_api.cc' || echo '$(srcdir)/'`voms_api.cc
 
 libvomsapi_gcc32dbgpthr_la-ccval.lo: ccval.cc
-@am__fastdepCXX_TRUE@	$(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libvomsapi_gcc32dbgpthr_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT libvomsapi_gcc32dbgpthr_la-ccval.lo -MD -MP -MF $(DEPDIR)/libvomsapi_gcc32dbgpthr_la-ccval.Tpo -c -o libvomsapi_gcc32dbgpthr_la-ccval.lo `test -f 'ccval.cc' || echo '$(srcdir)/'`ccval.cc
+@am__fastdepCXX_TRUE@	$(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libvomsapi_gcc32dbgpthr_la_CXXFLAGS) $(CXXFLAGS) -MT libvomsapi_gcc32dbgpthr_la-ccval.lo -MD -MP -MF $(DEPDIR)/libvomsapi_gcc32dbgpthr_la-ccval.Tpo -c -o libvomsapi_gcc32dbgpthr_la-ccval.lo `test -f 'ccval.cc' || echo '$(srcdir)/'`ccval.cc
 @am__fastdepCXX_TRUE@	mv -f $(DEPDIR)/libvomsapi_gcc32dbgpthr_la-ccval.Tpo $(DEPDIR)/libvomsapi_gcc32dbgpthr_la-ccval.Plo
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='ccval.cc' object='libvomsapi_gcc32dbgpthr_la-ccval.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libvomsapi_gcc32dbgpthr_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o libvomsapi_gcc32dbgpthr_la-ccval.lo `test -f 'ccval.cc' || echo '$(srcdir)/'`ccval.cc
+@am__fastdepCXX_FALSE@	$(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libvomsapi_gcc32dbgpthr_la_CXXFLAGS) $(CXXFLAGS) -c -o libvomsapi_gcc32dbgpthr_la-ccval.lo `test -f 'ccval.cc' || echo '$(srcdir)/'`ccval.cc
 
 libvomsapi_gcc32dbgpthr_la-internal.lo: internal.cc
-@am__fastdepCXX_TRUE@	$(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libvomsapi_gcc32dbgpthr_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT libvomsapi_gcc32dbgpthr_la-internal.lo -MD -MP -MF $(DEPDIR)/libvomsapi_gcc32dbgpthr_la-internal.Tpo -c -o libvomsapi_gcc32dbgpthr_la-internal.lo `test -f 'internal.cc' || echo '$(srcdir)/'`internal.cc
+@am__fastdepCXX_TRUE@	$(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libvomsapi_gcc32dbgpthr_la_CXXFLAGS) $(CXXFLAGS) -MT libvomsapi_gcc32dbgpthr_la-internal.lo -MD -MP -MF $(DEPDIR)/libvomsapi_gcc32dbgpthr_la-internal.Tpo -c -o libvomsapi_gcc32dbgpthr_la-internal.lo `test -f 'internal.cc' || echo '$(srcdir)/'`internal.cc
 @am__fastdepCXX_TRUE@	mv -f $(DEPDIR)/libvomsapi_gcc32dbgpthr_la-internal.Tpo $(DEPDIR)/libvomsapi_gcc32dbgpthr_la-internal.Plo
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='internal.cc' object='libvomsapi_gcc32dbgpthr_la-internal.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libvomsapi_gcc32dbgpthr_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o libvomsapi_gcc32dbgpthr_la-internal.lo `test -f 'internal.cc' || echo '$(srcdir)/'`internal.cc
+@am__fastdepCXX_FALSE@	$(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libvomsapi_gcc32dbgpthr_la_CXXFLAGS) $(CXXFLAGS) -c -o libvomsapi_gcc32dbgpthr_la-internal.lo `test -f 'internal.cc' || echo '$(srcdir)/'`internal.cc
 
 libvomsapi_gcc32dbgpthr_la-cinterface.lo: cinterface.cc
-@am__fastdepCXX_TRUE@	$(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libvomsapi_gcc32dbgpthr_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT libvomsapi_gcc32dbgpthr_la-cinterface.lo -MD -MP -MF $(DEPDIR)/libvomsapi_gcc32dbgpthr_la-cinterface.Tpo -c -o libvomsapi_gcc32dbgpthr_la-cinterface.lo `test -f 'cinterface.cc' || echo '$(srcdir)/'`cinterface.cc
+@am__fastdepCXX_TRUE@	$(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libvomsapi_gcc32dbgpthr_la_CXXFLAGS) $(CXXFLAGS) -MT libvomsapi_gcc32dbgpthr_la-cinterface.lo -MD -MP -MF $(DEPDIR)/libvomsapi_gcc32dbgpthr_la-cinterface.Tpo -c -o libvomsapi_gcc32dbgpthr_la-cinterface.lo `test -f 'cinterface.cc' || echo '$(srcdir)/'`cinterface.cc
 @am__fastdepCXX_TRUE@	mv -f $(DEPDIR)/libvomsapi_gcc32dbgpthr_la-cinterface.Tpo $(DEPDIR)/libvomsapi_gcc32dbgpthr_la-cinterface.Plo
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='cinterface.cc' object='libvomsapi_gcc32dbgpthr_la-cinterface.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libvomsapi_gcc32dbgpthr_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o libvomsapi_gcc32dbgpthr_la-cinterface.lo `test -f 'cinterface.cc' || echo '$(srcdir)/'`cinterface.cc
+@am__fastdepCXX_FALSE@	$(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libvomsapi_gcc32dbgpthr_la_CXXFLAGS) $(CXXFLAGS) -c -o libvomsapi_gcc32dbgpthr_la-cinterface.lo `test -f 'cinterface.cc' || echo '$(srcdir)/'`cinterface.cc
 
 libvomsapi_gcc32pthr_la-api_util.lo: api_util.cc
-@am__fastdepCXX_TRUE@	$(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libvomsapi_gcc32pthr_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT libvomsapi_gcc32pthr_la-api_util.lo -MD -MP -MF $(DEPDIR)/libvomsapi_gcc32pthr_la-api_util.Tpo -c -o libvomsapi_gcc32pthr_la-api_util.lo `test -f 'api_util.cc' || echo '$(srcdir)/'`api_util.cc
+@am__fastdepCXX_TRUE@	$(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libvomsapi_gcc32pthr_la_CXXFLAGS) $(CXXFLAGS) -MT libvomsapi_gcc32pthr_la-api_util.lo -MD -MP -MF $(DEPDIR)/libvomsapi_gcc32pthr_la-api_util.Tpo -c -o libvomsapi_gcc32pthr_la-api_util.lo `test -f 'api_util.cc' || echo '$(srcdir)/'`api_util.cc
 @am__fastdepCXX_TRUE@	mv -f $(DEPDIR)/libvomsapi_gcc32pthr_la-api_util.Tpo $(DEPDIR)/libvomsapi_gcc32pthr_la-api_util.Plo
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='api_util.cc' object='libvomsapi_gcc32pthr_la-api_util.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libvomsapi_gcc32pthr_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o libvomsapi_gcc32pthr_la-api_util.lo `test -f 'api_util.cc' || echo '$(srcdir)/'`api_util.cc
+@am__fastdepCXX_FALSE@	$(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libvomsapi_gcc32pthr_la_CXXFLAGS) $(CXXFLAGS) -c -o libvomsapi_gcc32pthr_la-api_util.lo `test -f 'api_util.cc' || echo '$(srcdir)/'`api_util.cc
 
 libvomsapi_gcc32pthr_la-voms_api.lo: voms_api.cc
-@am__fastdepCXX_TRUE@	$(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libvomsapi_gcc32pthr_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT libvomsapi_gcc32pthr_la-voms_api.lo -MD -MP -MF $(DEPDIR)/libvomsapi_gcc32pthr_la-voms_api.Tpo -c -o libvomsapi_gcc32pthr_la-voms_api.lo `test -f 'voms_api.cc' || echo '$(srcdir)/'`voms_api.cc
+@am__fastdepCXX_TRUE@	$(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libvomsapi_gcc32pthr_la_CXXFLAGS) $(CXXFLAGS) -MT libvomsapi_gcc32pthr_la-voms_api.lo -MD -MP -MF $(DEPDIR)/libvomsapi_gcc32pthr_la-voms_api.Tpo -c -o libvomsapi_gcc32pthr_la-voms_api.lo `test -f 'voms_api.cc' || echo '$(srcdir)/'`voms_api.cc
 @am__fastdepCXX_TRUE@	mv -f $(DEPDIR)/libvomsapi_gcc32pthr_la-voms_api.Tpo $(DEPDIR)/libvomsapi_gcc32pthr_la-voms_api.Plo
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='voms_api.cc' object='libvomsapi_gcc32pthr_la-voms_api.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libvomsapi_gcc32pthr_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o libvomsapi_gcc32pthr_la-voms_api.lo `test -f 'voms_api.cc' || echo '$(srcdir)/'`voms_api.cc
+@am__fastdepCXX_FALSE@	$(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libvomsapi_gcc32pthr_la_CXXFLAGS) $(CXXFLAGS) -c -o libvomsapi_gcc32pthr_la-voms_api.lo `test -f 'voms_api.cc' || echo '$(srcdir)/'`voms_api.cc
 
 libvomsapi_gcc32pthr_la-ccval.lo: ccval.cc
-@am__fastdepCXX_TRUE@	$(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libvomsapi_gcc32pthr_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT libvomsapi_gcc32pthr_la-ccval.lo -MD -MP -MF $(DEPDIR)/libvomsapi_gcc32pthr_la-ccval.Tpo -c -o libvomsapi_gcc32pthr_la-ccval.lo `test -f 'ccval.cc' || echo '$(srcdir)/'`ccval.cc
+@am__fastdepCXX_TRUE@	$(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libvomsapi_gcc32pthr_la_CXXFLAGS) $(CXXFLAGS) -MT libvomsapi_gcc32pthr_la-ccval.lo -MD -MP -MF $(DEPDIR)/libvomsapi_gcc32pthr_la-ccval.Tpo -c -o libvomsapi_gcc32pthr_la-ccval.lo `test -f 'ccval.cc' || echo '$(srcdir)/'`ccval.cc
 @am__fastdepCXX_TRUE@	mv -f $(DEPDIR)/libvomsapi_gcc32pthr_la-ccval.Tpo $(DEPDIR)/libvomsapi_gcc32pthr_la-ccval.Plo
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='ccval.cc' object='libvomsapi_gcc32pthr_la-ccval.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libvomsapi_gcc32pthr_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o libvomsapi_gcc32pthr_la-ccval.lo `test -f 'ccval.cc' || echo '$(srcdir)/'`ccval.cc
+@am__fastdepCXX_FALSE@	$(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libvomsapi_gcc32pthr_la_CXXFLAGS) $(CXXFLAGS) -c -o libvomsapi_gcc32pthr_la-ccval.lo `test -f 'ccval.cc' || echo '$(srcdir)/'`ccval.cc
 
 libvomsapi_gcc32pthr_la-internal.lo: internal.cc
-@am__fastdepCXX_TRUE@	$(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libvomsapi_gcc32pthr_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT libvomsapi_gcc32pthr_la-internal.lo -MD -MP -MF $(DEPDIR)/libvomsapi_gcc32pthr_la-internal.Tpo -c -o libvomsapi_gcc32pthr_la-internal.lo `test -f 'internal.cc' || echo '$(srcdir)/'`internal.cc
+@am__fastdepCXX_TRUE@	$(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libvomsapi_gcc32pthr_la_CXXFLAGS) $(CXXFLAGS) -MT libvomsapi_gcc32pthr_la-internal.lo -MD -MP -MF $(DEPDIR)/libvomsapi_gcc32pthr_la-internal.Tpo -c -o libvomsapi_gcc32pthr_la-internal.lo `test -f 'internal.cc' || echo '$(srcdir)/'`internal.cc
 @am__fastdepCXX_TRUE@	mv -f $(DEPDIR)/libvomsapi_gcc32pthr_la-internal.Tpo $(DEPDIR)/libvomsapi_gcc32pthr_la-internal.Plo
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='internal.cc' object='libvomsapi_gcc32pthr_la-internal.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libvomsapi_gcc32pthr_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o libvomsapi_gcc32pthr_la-internal.lo `test -f 'internal.cc' || echo '$(srcdir)/'`internal.cc
+@am__fastdepCXX_FALSE@	$(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libvomsapi_gcc32pthr_la_CXXFLAGS) $(CXXFLAGS) -c -o libvomsapi_gcc32pthr_la-internal.lo `test -f 'internal.cc' || echo '$(srcdir)/'`internal.cc
 
 libvomsapi_gcc32pthr_la-cinterface.lo: cinterface.cc
-@am__fastdepCXX_TRUE@	$(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libvomsapi_gcc32pthr_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT libvomsapi_gcc32pthr_la-cinterface.lo -MD -MP -MF $(DEPDIR)/libvomsapi_gcc32pthr_la-cinterface.Tpo -c -o libvomsapi_gcc32pthr_la-cinterface.lo `test -f 'cinterface.cc' || echo '$(srcdir)/'`cinterface.cc
+@am__fastdepCXX_TRUE@	$(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libvomsapi_gcc32pthr_la_CXXFLAGS) $(CXXFLAGS) -MT libvomsapi_gcc32pthr_la-cinterface.lo -MD -MP -MF $(DEPDIR)/libvomsapi_gcc32pthr_la-cinterface.Tpo -c -o libvomsapi_gcc32pthr_la-cinterface.lo `test -f 'cinterface.cc' || echo '$(srcdir)/'`cinterface.cc
 @am__fastdepCXX_TRUE@	mv -f $(DEPDIR)/libvomsapi_gcc32pthr_la-cinterface.Tpo $(DEPDIR)/libvomsapi_gcc32pthr_la-cinterface.Plo
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='cinterface.cc' object='libvomsapi_gcc32pthr_la-cinterface.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libvomsapi_gcc32pthr_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o libvomsapi_gcc32pthr_la-cinterface.lo `test -f 'cinterface.cc' || echo '$(srcdir)/'`cinterface.cc
+@am__fastdepCXX_FALSE@	$(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libvomsapi_gcc32pthr_la_CXXFLAGS) $(CXXFLAGS) -c -o libvomsapi_gcc32pthr_la-cinterface.lo `test -f 'cinterface.cc' || echo '$(srcdir)/'`cinterface.cc
 
 libvomsapi_gcc64_la-api_util.lo: api_util.cc
-@am__fastdepCXX_TRUE@	$(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libvomsapi_gcc64_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT libvomsapi_gcc64_la-api_util.lo -MD -MP -MF $(DEPDIR)/libvomsapi_gcc64_la-api_util.Tpo -c -o libvomsapi_gcc64_la-api_util.lo `test -f 'api_util.cc' || echo '$(srcdir)/'`api_util.cc
+@am__fastdepCXX_TRUE@	$(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libvomsapi_gcc64_la_CXXFLAGS) $(CXXFLAGS) -MT libvomsapi_gcc64_la-api_util.lo -MD -MP -MF $(DEPDIR)/libvomsapi_gcc64_la-api_util.Tpo -c -o libvomsapi_gcc64_la-api_util.lo `test -f 'api_util.cc' || echo '$(srcdir)/'`api_util.cc
 @am__fastdepCXX_TRUE@	mv -f $(DEPDIR)/libvomsapi_gcc64_la-api_util.Tpo $(DEPDIR)/libvomsapi_gcc64_la-api_util.Plo
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='api_util.cc' object='libvomsapi_gcc64_la-api_util.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libvomsapi_gcc64_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o libvomsapi_gcc64_la-api_util.lo `test -f 'api_util.cc' || echo '$(srcdir)/'`api_util.cc
+@am__fastdepCXX_FALSE@	$(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libvomsapi_gcc64_la_CXXFLAGS) $(CXXFLAGS) -c -o libvomsapi_gcc64_la-api_util.lo `test -f 'api_util.cc' || echo '$(srcdir)/'`api_util.cc
 
 libvomsapi_gcc64_la-voms_api.lo: voms_api.cc
-@am__fastdepCXX_TRUE@	$(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libvomsapi_gcc64_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT libvomsapi_gcc64_la-voms_api.lo -MD -MP -MF $(DEPDIR)/libvomsapi_gcc64_la-voms_api.Tpo -c -o libvomsapi_gcc64_la-voms_api.lo `test -f 'voms_api.cc' || echo '$(srcdir)/'`voms_api.cc
+@am__fastdepCXX_TRUE@	$(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libvomsapi_gcc64_la_CXXFLAGS) $(CXXFLAGS) -MT libvomsapi_gcc64_la-voms_api.lo -MD -MP -MF $(DEPDIR)/libvomsapi_gcc64_la-voms_api.Tpo -c -o libvomsapi_gcc64_la-voms_api.lo `test -f 'voms_api.cc' || echo '$(srcdir)/'`voms_api.cc
 @am__fastdepCXX_TRUE@	mv -f $(DEPDIR)/libvomsapi_gcc64_la-voms_api.Tpo $(DEPDIR)/libvomsapi_gcc64_la-voms_api.Plo
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='voms_api.cc' object='libvomsapi_gcc64_la-voms_api.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libvomsapi_gcc64_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o libvomsapi_gcc64_la-voms_api.lo `test -f 'voms_api.cc' || echo '$(srcdir)/'`voms_api.cc
+@am__fastdepCXX_FALSE@	$(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libvomsapi_gcc64_la_CXXFLAGS) $(CXXFLAGS) -c -o libvomsapi_gcc64_la-voms_api.lo `test -f 'voms_api.cc' || echo '$(srcdir)/'`voms_api.cc
 
 libvomsapi_gcc64_la-ccval.lo: ccval.cc
-@am__fastdepCXX_TRUE@	$(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libvomsapi_gcc64_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT libvomsapi_gcc64_la-ccval.lo -MD -MP -MF $(DEPDIR)/libvomsapi_gcc64_la-ccval.Tpo -c -o libvomsapi_gcc64_la-ccval.lo `test -f 'ccval.cc' || echo '$(srcdir)/'`ccval.cc
+@am__fastdepCXX_TRUE@	$(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libvomsapi_gcc64_la_CXXFLAGS) $(CXXFLAGS) -MT libvomsapi_gcc64_la-ccval.lo -MD -MP -MF $(DEPDIR)/libvomsapi_gcc64_la-ccval.Tpo -c -o libvomsapi_gcc64_la-ccval.lo `test -f 'ccval.cc' || echo '$(srcdir)/'`ccval.cc
 @am__fastdepCXX_TRUE@	mv -f $(DEPDIR)/libvomsapi_gcc64_la-ccval.Tpo $(DEPDIR)/libvomsapi_gcc64_la-ccval.Plo
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='ccval.cc' object='libvomsapi_gcc64_la-ccval.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libvomsapi_gcc64_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o libvomsapi_gcc64_la-ccval.lo `test -f 'ccval.cc' || echo '$(srcdir)/'`ccval.cc
+@am__fastdepCXX_FALSE@	$(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libvomsapi_gcc64_la_CXXFLAGS) $(CXXFLAGS) -c -o libvomsapi_gcc64_la-ccval.lo `test -f 'ccval.cc' || echo '$(srcdir)/'`ccval.cc
 
 libvomsapi_gcc64_la-internal.lo: internal.cc
-@am__fastdepCXX_TRUE@	$(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libvomsapi_gcc64_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT libvomsapi_gcc64_la-internal.lo -MD -MP -MF $(DEPDIR)/libvomsapi_gcc64_la-internal.Tpo -c -o libvomsapi_gcc64_la-internal.lo `test -f 'internal.cc' || echo '$(srcdir)/'`internal.cc
+@am__fastdepCXX_TRUE@	$(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libvomsapi_gcc64_la_CXXFLAGS) $(CXXFLAGS) -MT libvomsapi_gcc64_la-internal.lo -MD -MP -MF $(DEPDIR)/libvomsapi_gcc64_la-internal.Tpo -c -o libvomsapi_gcc64_la-internal.lo `test -f 'internal.cc' || echo '$(srcdir)/'`internal.cc
 @am__fastdepCXX_TRUE@	mv -f $(DEPDIR)/libvomsapi_gcc64_la-internal.Tpo $(DEPDIR)/libvomsapi_gcc64_la-internal.Plo
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='internal.cc' object='libvomsapi_gcc64_la-internal.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libvomsapi_gcc64_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o libvomsapi_gcc64_la-internal.lo `test -f 'internal.cc' || echo '$(srcdir)/'`internal.cc
+@am__fastdepCXX_FALSE@	$(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libvomsapi_gcc64_la_CXXFLAGS) $(CXXFLAGS) -c -o libvomsapi_gcc64_la-internal.lo `test -f 'internal.cc' || echo '$(srcdir)/'`internal.cc
 
 libvomsapi_gcc64_la-cinterface.lo: cinterface.cc
-@am__fastdepCXX_TRUE@	$(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libvomsapi_gcc64_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT libvomsapi_gcc64_la-cinterface.lo -MD -MP -MF $(DEPDIR)/libvomsapi_gcc64_la-cinterface.Tpo -c -o libvomsapi_gcc64_la-cinterface.lo `test -f 'cinterface.cc' || echo '$(srcdir)/'`cinterface.cc
+@am__fastdepCXX_TRUE@	$(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libvomsapi_gcc64_la_CXXFLAGS) $(CXXFLAGS) -MT libvomsapi_gcc64_la-cinterface.lo -MD -MP -MF $(DEPDIR)/libvomsapi_gcc64_la-cinterface.Tpo -c -o libvomsapi_gcc64_la-cinterface.lo `test -f 'cinterface.cc' || echo '$(srcdir)/'`cinterface.cc
 @am__fastdepCXX_TRUE@	mv -f $(DEPDIR)/libvomsapi_gcc64_la-cinterface.Tpo $(DEPDIR)/libvomsapi_gcc64_la-cinterface.Plo
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='cinterface.cc' object='libvomsapi_gcc64_la-cinterface.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libvomsapi_gcc64_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o libvomsapi_gcc64_la-cinterface.lo `test -f 'cinterface.cc' || echo '$(srcdir)/'`cinterface.cc
+@am__fastdepCXX_FALSE@	$(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libvomsapi_gcc64_la_CXXFLAGS) $(CXXFLAGS) -c -o libvomsapi_gcc64_la-cinterface.lo `test -f 'cinterface.cc' || echo '$(srcdir)/'`cinterface.cc
 
 libvomsapi_gcc64dbg_la-api_util.lo: api_util.cc
-@am__fastdepCXX_TRUE@	$(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libvomsapi_gcc64dbg_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT libvomsapi_gcc64dbg_la-api_util.lo -MD -MP -MF $(DEPDIR)/libvomsapi_gcc64dbg_la-api_util.Tpo -c -o libvomsapi_gcc64dbg_la-api_util.lo `test -f 'api_util.cc' || echo '$(srcdir)/'`api_util.cc
+@am__fastdepCXX_TRUE@	$(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libvomsapi_gcc64dbg_la_CXXFLAGS) $(CXXFLAGS) -MT libvomsapi_gcc64dbg_la-api_util.lo -MD -MP -MF $(DEPDIR)/libvomsapi_gcc64dbg_la-api_util.Tpo -c -o libvomsapi_gcc64dbg_la-api_util.lo `test -f 'api_util.cc' || echo '$(srcdir)/'`api_util.cc
 @am__fastdepCXX_TRUE@	mv -f $(DEPDIR)/libvomsapi_gcc64dbg_la-api_util.Tpo $(DEPDIR)/libvomsapi_gcc64dbg_la-api_util.Plo
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='api_util.cc' object='libvomsapi_gcc64dbg_la-api_util.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libvomsapi_gcc64dbg_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o libvomsapi_gcc64dbg_la-api_util.lo `test -f 'api_util.cc' || echo '$(srcdir)/'`api_util.cc
+@am__fastdepCXX_FALSE@	$(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libvomsapi_gcc64dbg_la_CXXFLAGS) $(CXXFLAGS) -c -o libvomsapi_gcc64dbg_la-api_util.lo `test -f 'api_util.cc' || echo '$(srcdir)/'`api_util.cc
 
 libvomsapi_gcc64dbg_la-voms_api.lo: voms_api.cc
-@am__fastdepCXX_TRUE@	$(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libvomsapi_gcc64dbg_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT libvomsapi_gcc64dbg_la-voms_api.lo -MD -MP -MF $(DEPDIR)/libvomsapi_gcc64dbg_la-voms_api.Tpo -c -o libvomsapi_gcc64dbg_la-voms_api.lo `test -f 'voms_api.cc' || echo '$(srcdir)/'`voms_api.cc
+@am__fastdepCXX_TRUE@	$(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libvomsapi_gcc64dbg_la_CXXFLAGS) $(CXXFLAGS) -MT libvomsapi_gcc64dbg_la-voms_api.lo -MD -MP -MF $(DEPDIR)/libvomsapi_gcc64dbg_la-voms_api.Tpo -c -o libvomsapi_gcc64dbg_la-voms_api.lo `test -f 'voms_api.cc' || echo '$(srcdir)/'`voms_api.cc
 @am__fastdepCXX_TRUE@	mv -f $(DEPDIR)/libvomsapi_gcc64dbg_la-voms_api.Tpo $(DEPDIR)/libvomsapi_gcc64dbg_la-voms_api.Plo
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='voms_api.cc' object='libvomsapi_gcc64dbg_la-voms_api.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libvomsapi_gcc64dbg_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o libvomsapi_gcc64dbg_la-voms_api.lo `test -f 'voms_api.cc' || echo '$(srcdir)/'`voms_api.cc
+@am__fastdepCXX_FALSE@	$(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libvomsapi_gcc64dbg_la_CXXFLAGS) $(CXXFLAGS) -c -o libvomsapi_gcc64dbg_la-voms_api.lo `test -f 'voms_api.cc' || echo '$(srcdir)/'`voms_api.cc
 
 libvomsapi_gcc64dbg_la-ccval.lo: ccval.cc
-@am__fastdepCXX_TRUE@	$(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libvomsapi_gcc64dbg_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT libvomsapi_gcc64dbg_la-ccval.lo -MD -MP -MF $(DEPDIR)/libvomsapi_gcc64dbg_la-ccval.Tpo -c -o libvomsapi_gcc64dbg_la-ccval.lo `test -f 'ccval.cc' || echo '$(srcdir)/'`ccval.cc
+@am__fastdepCXX_TRUE@	$(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libvomsapi_gcc64dbg_la_CXXFLAGS) $(CXXFLAGS) -MT libvomsapi_gcc64dbg_la-ccval.lo -MD -MP -MF $(DEPDIR)/libvomsapi_gcc64dbg_la-ccval.Tpo -c -o libvomsapi_gcc64dbg_la-ccval.lo `test -f 'ccval.cc' || echo '$(srcdir)/'`ccval.cc
 @am__fastdepCXX_TRUE@	mv -f $(DEPDIR)/libvomsapi_gcc64dbg_la-ccval.Tpo $(DEPDIR)/libvomsapi_gcc64dbg_la-ccval.Plo
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='ccval.cc' object='libvomsapi_gcc64dbg_la-ccval.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libvomsapi_gcc64dbg_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o libvomsapi_gcc64dbg_la-ccval.lo `test -f 'ccval.cc' || echo '$(srcdir)/'`ccval.cc
+@am__fastdepCXX_FALSE@	$(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libvomsapi_gcc64dbg_la_CXXFLAGS) $(CXXFLAGS) -c -o libvomsapi_gcc64dbg_la-ccval.lo `test -f 'ccval.cc' || echo '$(srcdir)/'`ccval.cc
 
 libvomsapi_gcc64dbg_la-internal.lo: internal.cc
-@am__fastdepCXX_TRUE@	$(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libvomsapi_gcc64dbg_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT libvomsapi_gcc64dbg_la-internal.lo -MD -MP -MF $(DEPDIR)/libvomsapi_gcc64dbg_la-internal.Tpo -c -o libvomsapi_gcc64dbg_la-internal.lo `test -f 'internal.cc' || echo '$(srcdir)/'`internal.cc
+@am__fastdepCXX_TRUE@	$(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libvomsapi_gcc64dbg_la_CXXFLAGS) $(CXXFLAGS) -MT libvomsapi_gcc64dbg_la-internal.lo -MD -MP -MF $(DEPDIR)/libvomsapi_gcc64dbg_la-internal.Tpo -c -o libvomsapi_gcc64dbg_la-internal.lo `test -f 'internal.cc' || echo '$(srcdir)/'`internal.cc
 @am__fastdepCXX_TRUE@	mv -f $(DEPDIR)/libvomsapi_gcc64dbg_la-internal.Tpo $(DEPDIR)/libvomsapi_gcc64dbg_la-internal.Plo
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='internal.cc' object='libvomsapi_gcc64dbg_la-internal.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libvomsapi_gcc64dbg_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o libvomsapi_gcc64dbg_la-internal.lo `test -f 'internal.cc' || echo '$(srcdir)/'`internal.cc
+@am__fastdepCXX_FALSE@	$(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libvomsapi_gcc64dbg_la_CXXFLAGS) $(CXXFLAGS) -c -o libvomsapi_gcc64dbg_la-internal.lo `test -f 'internal.cc' || echo '$(srcdir)/'`internal.cc
 
 libvomsapi_gcc64dbg_la-cinterface.lo: cinterface.cc
-@am__fastdepCXX_TRUE@	$(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libvomsapi_gcc64dbg_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT libvomsapi_gcc64dbg_la-cinterface.lo -MD -MP -MF $(DEPDIR)/libvomsapi_gcc64dbg_la-cinterface.Tpo -c -o libvomsapi_gcc64dbg_la-cinterface.lo `test -f 'cinterface.cc' || echo '$(srcdir)/'`cinterface.cc
+@am__fastdepCXX_TRUE@	$(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libvomsapi_gcc64dbg_la_CXXFLAGS) $(CXXFLAGS) -MT libvomsapi_gcc64dbg_la-cinterface.lo -MD -MP -MF $(DEPDIR)/libvomsapi_gcc64dbg_la-cinterface.Tpo -c -o libvomsapi_gcc64dbg_la-cinterface.lo `test -f 'cinterface.cc' || echo '$(srcdir)/'`cinterface.cc
 @am__fastdepCXX_TRUE@	mv -f $(DEPDIR)/libvomsapi_gcc64dbg_la-cinterface.Tpo $(DEPDIR)/libvomsapi_gcc64dbg_la-cinterface.Plo
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='cinterface.cc' object='libvomsapi_gcc64dbg_la-cinterface.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libvomsapi_gcc64dbg_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o libvomsapi_gcc64dbg_la-cinterface.lo `test -f 'cinterface.cc' || echo '$(srcdir)/'`cinterface.cc
+@am__fastdepCXX_FALSE@	$(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libvomsapi_gcc64dbg_la_CXXFLAGS) $(CXXFLAGS) -c -o libvomsapi_gcc64dbg_la-cinterface.lo `test -f 'cinterface.cc' || echo '$(srcdir)/'`cinterface.cc
 
 libvomsapi_gcc64dbgpthr_la-api_util.lo: api_util.cc
-@am__fastdepCXX_TRUE@	$(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libvomsapi_gcc64dbgpthr_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT libvomsapi_gcc64dbgpthr_la-api_util.lo -MD -MP -MF $(DEPDIR)/libvomsapi_gcc64dbgpthr_la-api_util.Tpo -c -o libvomsapi_gcc64dbgpthr_la-api_util.lo `test -f 'api_util.cc' || echo '$(srcdir)/'`api_util.cc
+@am__fastdepCXX_TRUE@	$(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libvomsapi_gcc64dbgpthr_la_CXXFLAGS) $(CXXFLAGS) -MT libvomsapi_gcc64dbgpthr_la-api_util.lo -MD -MP -MF $(DEPDIR)/libvomsapi_gcc64dbgpthr_la-api_util.Tpo -c -o libvomsapi_gcc64dbgpthr_la-api_util.lo `test -f 'api_util.cc' || echo '$(srcdir)/'`api_util.cc
 @am__fastdepCXX_TRUE@	mv -f $(DEPDIR)/libvomsapi_gcc64dbgpthr_la-api_util.Tpo $(DEPDIR)/libvomsapi_gcc64dbgpthr_la-api_util.Plo
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='api_util.cc' object='libvomsapi_gcc64dbgpthr_la-api_util.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libvomsapi_gcc64dbgpthr_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o libvomsapi_gcc64dbgpthr_la-api_util.lo `test -f 'api_util.cc' || echo '$(srcdir)/'`api_util.cc
+@am__fastdepCXX_FALSE@	$(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libvomsapi_gcc64dbgpthr_la_CXXFLAGS) $(CXXFLAGS) -c -o libvomsapi_gcc64dbgpthr_la-api_util.lo `test -f 'api_util.cc' || echo '$(srcdir)/'`api_util.cc
 
 libvomsapi_gcc64dbgpthr_la-voms_api.lo: voms_api.cc
-@am__fastdepCXX_TRUE@	$(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libvomsapi_gcc64dbgpthr_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT libvomsapi_gcc64dbgpthr_la-voms_api.lo -MD -MP -MF $(DEPDIR)/libvomsapi_gcc64dbgpthr_la-voms_api.Tpo -c -o libvomsapi_gcc64dbgpthr_la-voms_api.lo `test -f 'voms_api.cc' || echo '$(srcdir)/'`voms_api.cc
+@am__fastdepCXX_TRUE@	$(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libvomsapi_gcc64dbgpthr_la_CXXFLAGS) $(CXXFLAGS) -MT libvomsapi_gcc64dbgpthr_la-voms_api.lo -MD -MP -MF $(DEPDIR)/libvomsapi_gcc64dbgpthr_la-voms_api.Tpo -c -o libvomsapi_gcc64dbgpthr_la-voms_api.lo `test -f 'voms_api.cc' || echo '$(srcdir)/'`voms_api.cc
 @am__fastdepCXX_TRUE@	mv -f $(DEPDIR)/libvomsapi_gcc64dbgpthr_la-voms_api.Tpo $(DEPDIR)/libvomsapi_gcc64dbgpthr_la-voms_api.Plo
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='voms_api.cc' object='libvomsapi_gcc64dbgpthr_la-voms_api.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libvomsapi_gcc64dbgpthr_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o libvomsapi_gcc64dbgpthr_la-voms_api.lo `test -f 'voms_api.cc' || echo '$(srcdir)/'`voms_api.cc
+@am__fastdepCXX_FALSE@	$(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libvomsapi_gcc64dbgpthr_la_CXXFLAGS) $(CXXFLAGS) -c -o libvomsapi_gcc64dbgpthr_la-voms_api.lo `test -f 'voms_api.cc' || echo '$(srcdir)/'`voms_api.cc
 
 libvomsapi_gcc64dbgpthr_la-ccval.lo: ccval.cc
-@am__fastdepCXX_TRUE@	$(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libvomsapi_gcc64dbgpthr_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT libvomsapi_gcc64dbgpthr_la-ccval.lo -MD -MP -MF $(DEPDIR)/libvomsapi_gcc64dbgpthr_la-ccval.Tpo -c -o libvomsapi_gcc64dbgpthr_la-ccval.lo `test -f 'ccval.cc' || echo '$(srcdir)/'`ccval.cc
+@am__fastdepCXX_TRUE@	$(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libvomsapi_gcc64dbgpthr_la_CXXFLAGS) $(CXXFLAGS) -MT libvomsapi_gcc64dbgpthr_la-ccval.lo -MD -MP -MF $(DEPDIR)/libvomsapi_gcc64dbgpthr_la-ccval.Tpo -c -o libvomsapi_gcc64dbgpthr_la-ccval.lo `test -f 'ccval.cc' || echo '$(srcdir)/'`ccval.cc
 @am__fastdepCXX_TRUE@	mv -f $(DEPDIR)/libvomsapi_gcc64dbgpthr_la-ccval.Tpo $(DEPDIR)/libvomsapi_gcc64dbgpthr_la-ccval.Plo
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='ccval.cc' object='libvomsapi_gcc64dbgpthr_la-ccval.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libvomsapi_gcc64dbgpthr_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o libvomsapi_gcc64dbgpthr_la-ccval.lo `test -f 'ccval.cc' || echo '$(srcdir)/'`ccval.cc
+@am__fastdepCXX_FALSE@	$(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libvomsapi_gcc64dbgpthr_la_CXXFLAGS) $(CXXFLAGS) -c -o libvomsapi_gcc64dbgpthr_la-ccval.lo `test -f 'ccval.cc' || echo '$(srcdir)/'`ccval.cc
 
 libvomsapi_gcc64dbgpthr_la-internal.lo: internal.cc
-@am__fastdepCXX_TRUE@	$(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libvomsapi_gcc64dbgpthr_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT libvomsapi_gcc64dbgpthr_la-internal.lo -MD -MP -MF $(DEPDIR)/libvomsapi_gcc64dbgpthr_la-internal.Tpo -c -o libvomsapi_gcc64dbgpthr_la-internal.lo `test -f 'internal.cc' || echo '$(srcdir)/'`internal.cc
+@am__fastdepCXX_TRUE@	$(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libvomsapi_gcc64dbgpthr_la_CXXFLAGS) $(CXXFLAGS) -MT libvomsapi_gcc64dbgpthr_la-internal.lo -MD -MP -MF $(DEPDIR)/libvomsapi_gcc64dbgpthr_la-internal.Tpo -c -o libvomsapi_gcc64dbgpthr_la-internal.lo `test -f 'internal.cc' || echo '$(srcdir)/'`internal.cc
 @am__fastdepCXX_TRUE@	mv -f $(DEPDIR)/libvomsapi_gcc64dbgpthr_la-internal.Tpo $(DEPDIR)/libvomsapi_gcc64dbgpthr_la-internal.Plo
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='internal.cc' object='libvomsapi_gcc64dbgpthr_la-internal.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libvomsapi_gcc64dbgpthr_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o libvomsapi_gcc64dbgpthr_la-internal.lo `test -f 'internal.cc' || echo '$(srcdir)/'`internal.cc
+@am__fastdepCXX_FALSE@	$(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libvomsapi_gcc64dbgpthr_la_CXXFLAGS) $(CXXFLAGS) -c -o libvomsapi_gcc64dbgpthr_la-internal.lo `test -f 'internal.cc' || echo '$(srcdir)/'`internal.cc
 
 libvomsapi_gcc64dbgpthr_la-cinterface.lo: cinterface.cc
-@am__fastdepCXX_TRUE@	$(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libvomsapi_gcc64dbgpthr_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT libvomsapi_gcc64dbgpthr_la-cinterface.lo -MD -MP -MF $(DEPDIR)/libvomsapi_gcc64dbgpthr_la-cinterface.Tpo -c -o libvomsapi_gcc64dbgpthr_la-cinterface.lo `test -f 'cinterface.cc' || echo '$(srcdir)/'`cinterface.cc
+@am__fastdepCXX_TRUE@	$(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libvomsapi_gcc64dbgpthr_la_CXXFLAGS) $(CXXFLAGS) -MT libvomsapi_gcc64dbgpthr_la-cinterface.lo -MD -MP -MF $(DEPDIR)/libvomsapi_gcc64dbgpthr_la-cinterface.Tpo -c -o libvomsapi_gcc64dbgpthr_la-cinterface.lo `test -f 'cinterface.cc' || echo '$(srcdir)/'`cinterface.cc
 @am__fastdepCXX_TRUE@	mv -f $(DEPDIR)/libvomsapi_gcc64dbgpthr_la-cinterface.Tpo $(DEPDIR)/libvomsapi_gcc64dbgpthr_la-cinterface.Plo
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='cinterface.cc' object='libvomsapi_gcc64dbgpthr_la-cinterface.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libvomsapi_gcc64dbgpthr_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o libvomsapi_gcc64dbgpthr_la-cinterface.lo `test -f 'cinterface.cc' || echo '$(srcdir)/'`cinterface.cc
+@am__fastdepCXX_FALSE@	$(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libvomsapi_gcc64dbgpthr_la_CXXFLAGS) $(CXXFLAGS) -c -o libvomsapi_gcc64dbgpthr_la-cinterface.lo `test -f 'cinterface.cc' || echo '$(srcdir)/'`cinterface.cc
 
 libvomsapi_gcc64pthr_la-api_util.lo: api_util.cc
-@am__fastdepCXX_TRUE@	$(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libvomsapi_gcc64pthr_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT libvomsapi_gcc64pthr_la-api_util.lo -MD -MP -MF $(DEPDIR)/libvomsapi_gcc64pthr_la-api_util.Tpo -c -o libvomsapi_gcc64pthr_la-api_util.lo `test -f 'api_util.cc' || echo '$(srcdir)/'`api_util.cc
+@am__fastdepCXX_TRUE@	$(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libvomsapi_gcc64pthr_la_CXXFLAGS) $(CXXFLAGS) -MT libvomsapi_gcc64pthr_la-api_util.lo -MD -MP -MF $(DEPDIR)/libvomsapi_gcc64pthr_la-api_util.Tpo -c -o libvomsapi_gcc64pthr_la-api_util.lo `test -f 'api_util.cc' || echo '$(srcdir)/'`api_util.cc
 @am__fastdepCXX_TRUE@	mv -f $(DEPDIR)/libvomsapi_gcc64pthr_la-api_util.Tpo $(DEPDIR)/libvomsapi_gcc64pthr_la-api_util.Plo
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='api_util.cc' object='libvomsapi_gcc64pthr_la-api_util.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libvomsapi_gcc64pthr_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o libvomsapi_gcc64pthr_la-api_util.lo `test -f 'api_util.cc' || echo '$(srcdir)/'`api_util.cc
+@am__fastdepCXX_FALSE@	$(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libvomsapi_gcc64pthr_la_CXXFLAGS) $(CXXFLAGS) -c -o libvomsapi_gcc64pthr_la-api_util.lo `test -f 'api_util.cc' || echo '$(srcdir)/'`api_util.cc
 
 libvomsapi_gcc64pthr_la-voms_api.lo: voms_api.cc
-@am__fastdepCXX_TRUE@	$(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libvomsapi_gcc64pthr_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT libvomsapi_gcc64pthr_la-voms_api.lo -MD -MP -MF $(DEPDIR)/libvomsapi_gcc64pthr_la-voms_api.Tpo -c -o libvomsapi_gcc64pthr_la-voms_api.lo `test -f 'voms_api.cc' || echo '$(srcdir)/'`voms_api.cc
+@am__fastdepCXX_TRUE@	$(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libvomsapi_gcc64pthr_la_CXXFLAGS) $(CXXFLAGS) -MT libvomsapi_gcc64pthr_la-voms_api.lo -MD -MP -MF $(DEPDIR)/libvomsapi_gcc64pthr_la-voms_api.Tpo -c -o libvomsapi_gcc64pthr_la-voms_api.lo `test -f 'voms_api.cc' || echo '$(srcdir)/'`voms_api.cc
 @am__fastdepCXX_TRUE@	mv -f $(DEPDIR)/libvomsapi_gcc64pthr_la-voms_api.Tpo $(DEPDIR)/libvomsapi_gcc64pthr_la-voms_api.Plo
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='voms_api.cc' object='libvomsapi_gcc64pthr_la-voms_api.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libvomsapi_gcc64pthr_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o libvomsapi_gcc64pthr_la-voms_api.lo `test -f 'voms_api.cc' || echo '$(srcdir)/'`voms_api.cc
+@am__fastdepCXX_FALSE@	$(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libvomsapi_gcc64pthr_la_CXXFLAGS) $(CXXFLAGS) -c -o libvomsapi_gcc64pthr_la-voms_api.lo `test -f 'voms_api.cc' || echo '$(srcdir)/'`voms_api.cc
 
 libvomsapi_gcc64pthr_la-ccval.lo: ccval.cc
-@am__fastdepCXX_TRUE@	$(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libvomsapi_gcc64pthr_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT libvomsapi_gcc64pthr_la-ccval.lo -MD -MP -MF $(DEPDIR)/libvomsapi_gcc64pthr_la-ccval.Tpo -c -o libvomsapi_gcc64pthr_la-ccval.lo `test -f 'ccval.cc' || echo '$(srcdir)/'`ccval.cc
+@am__fastdepCXX_TRUE@	$(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libvomsapi_gcc64pthr_la_CXXFLAGS) $(CXXFLAGS) -MT libvomsapi_gcc64pthr_la-ccval.lo -MD -MP -MF $(DEPDIR)/libvomsapi_gcc64pthr_la-ccval.Tpo -c -o libvomsapi_gcc64pthr_la-ccval.lo `test -f 'ccval.cc' || echo '$(srcdir)/'`ccval.cc
 @am__fastdepCXX_TRUE@	mv -f $(DEPDIR)/libvomsapi_gcc64pthr_la-ccval.Tpo $(DEPDIR)/libvomsapi_gcc64pthr_la-ccval.Plo
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='ccval.cc' object='libvomsapi_gcc64pthr_la-ccval.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libvomsapi_gcc64pthr_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o libvomsapi_gcc64pthr_la-ccval.lo `test -f 'ccval.cc' || echo '$(srcdir)/'`ccval.cc
+@am__fastdepCXX_FALSE@	$(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libvomsapi_gcc64pthr_la_CXXFLAGS) $(CXXFLAGS) -c -o libvomsapi_gcc64pthr_la-ccval.lo `test -f 'ccval.cc' || echo '$(srcdir)/'`ccval.cc
 
 libvomsapi_gcc64pthr_la-internal.lo: internal.cc
-@am__fastdepCXX_TRUE@	$(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libvomsapi_gcc64pthr_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT libvomsapi_gcc64pthr_la-internal.lo -MD -MP -MF $(DEPDIR)/libvomsapi_gcc64pthr_la-internal.Tpo -c -o libvomsapi_gcc64pthr_la-internal.lo `test -f 'internal.cc' || echo '$(srcdir)/'`internal.cc
+@am__fastdepCXX_TRUE@	$(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libvomsapi_gcc64pthr_la_CXXFLAGS) $(CXXFLAGS) -MT libvomsapi_gcc64pthr_la-internal.lo -MD -MP -MF $(DEPDIR)/libvomsapi_gcc64pthr_la-internal.Tpo -c -o libvomsapi_gcc64pthr_la-internal.lo `test -f 'internal.cc' || echo '$(srcdir)/'`internal.cc
 @am__fastdepCXX_TRUE@	mv -f $(DEPDIR)/libvomsapi_gcc64pthr_la-internal.Tpo $(DEPDIR)/libvomsapi_gcc64pthr_la-internal.Plo
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='internal.cc' object='libvomsapi_gcc64pthr_la-internal.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libvomsapi_gcc64pthr_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o libvomsapi_gcc64pthr_la-internal.lo `test -f 'internal.cc' || echo '$(srcdir)/'`internal.cc
+@am__fastdepCXX_FALSE@	$(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libvomsapi_gcc64pthr_la_CXXFLAGS) $(CXXFLAGS) -c -o libvomsapi_gcc64pthr_la-internal.lo `test -f 'internal.cc' || echo '$(srcdir)/'`internal.cc
 
 libvomsapi_gcc64pthr_la-cinterface.lo: cinterface.cc
-@am__fastdepCXX_TRUE@	$(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libvomsapi_gcc64pthr_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT libvomsapi_gcc64pthr_la-cinterface.lo -MD -MP -MF $(DEPDIR)/libvomsapi_gcc64pthr_la-cinterface.Tpo -c -o libvomsapi_gcc64pthr_la-cinterface.lo `test -f 'cinterface.cc' || echo '$(srcdir)/'`cinterface.cc
+@am__fastdepCXX_TRUE@	$(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libvomsapi_gcc64pthr_la_CXXFLAGS) $(CXXFLAGS) -MT libvomsapi_gcc64pthr_la-cinterface.lo -MD -MP -MF $(DEPDIR)/libvomsapi_gcc64pthr_la-cinterface.Tpo -c -o libvomsapi_gcc64pthr_la-cinterface.lo `test -f 'cinterface.cc' || echo '$(srcdir)/'`cinterface.cc
 @am__fastdepCXX_TRUE@	mv -f $(DEPDIR)/libvomsapi_gcc64pthr_la-cinterface.Tpo $(DEPDIR)/libvomsapi_gcc64pthr_la-cinterface.Plo
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='cinterface.cc' object='libvomsapi_gcc64pthr_la-cinterface.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libvomsapi_gcc64pthr_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o libvomsapi_gcc64pthr_la-cinterface.lo `test -f 'cinterface.cc' || echo '$(srcdir)/'`cinterface.cc
+@am__fastdepCXX_FALSE@	$(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libvomsapi_gcc64pthr_la_CXXFLAGS) $(CXXFLAGS) -c -o libvomsapi_gcc64pthr_la-cinterface.lo `test -f 'cinterface.cc' || echo '$(srcdir)/'`cinterface.cc
 
 libvomsapi_nog_la-api_util.lo: api_util.cc
-@am__fastdepCXX_TRUE@	$(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libvomsapi_nog_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT libvomsapi_nog_la-api_util.lo -MD -MP -MF $(DEPDIR)/libvomsapi_nog_la-api_util.Tpo -c -o libvomsapi_nog_la-api_util.lo `test -f 'api_util.cc' || echo '$(srcdir)/'`api_util.cc
+@am__fastdepCXX_TRUE@	$(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libvomsapi_nog_la_CXXFLAGS) $(CXXFLAGS) -MT libvomsapi_nog_la-api_util.lo -MD -MP -MF $(DEPDIR)/libvomsapi_nog_la-api_util.Tpo -c -o libvomsapi_nog_la-api_util.lo `test -f 'api_util.cc' || echo '$(srcdir)/'`api_util.cc
 @am__fastdepCXX_TRUE@	mv -f $(DEPDIR)/libvomsapi_nog_la-api_util.Tpo $(DEPDIR)/libvomsapi_nog_la-api_util.Plo
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='api_util.cc' object='libvomsapi_nog_la-api_util.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libvomsapi_nog_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o libvomsapi_nog_la-api_util.lo `test -f 'api_util.cc' || echo '$(srcdir)/'`api_util.cc
+@am__fastdepCXX_FALSE@	$(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libvomsapi_nog_la_CXXFLAGS) $(CXXFLAGS) -c -o libvomsapi_nog_la-api_util.lo `test -f 'api_util.cc' || echo '$(srcdir)/'`api_util.cc
 
 libvomsapi_nog_la-voms_api.lo: voms_api.cc
-@am__fastdepCXX_TRUE@	$(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libvomsapi_nog_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT libvomsapi_nog_la-voms_api.lo -MD -MP -MF $(DEPDIR)/libvomsapi_nog_la-voms_api.Tpo -c -o libvomsapi_nog_la-voms_api.lo `test -f 'voms_api.cc' || echo '$(srcdir)/'`voms_api.cc
+@am__fastdepCXX_TRUE@	$(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libvomsapi_nog_la_CXXFLAGS) $(CXXFLAGS) -MT libvomsapi_nog_la-voms_api.lo -MD -MP -MF $(DEPDIR)/libvomsapi_nog_la-voms_api.Tpo -c -o libvomsapi_nog_la-voms_api.lo `test -f 'voms_api.cc' || echo '$(srcdir)/'`voms_api.cc
 @am__fastdepCXX_TRUE@	mv -f $(DEPDIR)/libvomsapi_nog_la-voms_api.Tpo $(DEPDIR)/libvomsapi_nog_la-voms_api.Plo
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='voms_api.cc' object='libvomsapi_nog_la-voms_api.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libvomsapi_nog_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o libvomsapi_nog_la-voms_api.lo `test -f 'voms_api.cc' || echo '$(srcdir)/'`voms_api.cc
+@am__fastdepCXX_FALSE@	$(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libvomsapi_nog_la_CXXFLAGS) $(CXXFLAGS) -c -o libvomsapi_nog_la-voms_api.lo `test -f 'voms_api.cc' || echo '$(srcdir)/'`voms_api.cc
 
 libvomsapi_nog_la-ccval.lo: ccval.cc
-@am__fastdepCXX_TRUE@	$(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libvomsapi_nog_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT libvomsapi_nog_la-ccval.lo -MD -MP -MF $(DEPDIR)/libvomsapi_nog_la-ccval.Tpo -c -o libvomsapi_nog_la-ccval.lo `test -f 'ccval.cc' || echo '$(srcdir)/'`ccval.cc
+@am__fastdepCXX_TRUE@	$(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libvomsapi_nog_la_CXXFLAGS) $(CXXFLAGS) -MT libvomsapi_nog_la-ccval.lo -MD -MP -MF $(DEPDIR)/libvomsapi_nog_la-ccval.Tpo -c -o libvomsapi_nog_la-ccval.lo `test -f 'ccval.cc' || echo '$(srcdir)/'`ccval.cc
 @am__fastdepCXX_TRUE@	mv -f $(DEPDIR)/libvomsapi_nog_la-ccval.Tpo $(DEPDIR)/libvomsapi_nog_la-ccval.Plo
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='ccval.cc' object='libvomsapi_nog_la-ccval.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libvomsapi_nog_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o libvomsapi_nog_la-ccval.lo `test -f 'ccval.cc' || echo '$(srcdir)/'`ccval.cc
+@am__fastdepCXX_FALSE@	$(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libvomsapi_nog_la_CXXFLAGS) $(CXXFLAGS) -c -o libvomsapi_nog_la-ccval.lo `test -f 'ccval.cc' || echo '$(srcdir)/'`ccval.cc
 
 libvomsapi_nog_la-internal.lo: internal.cc
-@am__fastdepCXX_TRUE@	$(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libvomsapi_nog_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT libvomsapi_nog_la-internal.lo -MD -MP -MF $(DEPDIR)/libvomsapi_nog_la-internal.Tpo -c -o libvomsapi_nog_la-internal.lo `test -f 'internal.cc' || echo '$(srcdir)/'`internal.cc
+@am__fastdepCXX_TRUE@	$(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libvomsapi_nog_la_CXXFLAGS) $(CXXFLAGS) -MT libvomsapi_nog_la-internal.lo -MD -MP -MF $(DEPDIR)/libvomsapi_nog_la-internal.Tpo -c -o libvomsapi_nog_la-internal.lo `test -f 'internal.cc' || echo '$(srcdir)/'`internal.cc
 @am__fastdepCXX_TRUE@	mv -f $(DEPDIR)/libvomsapi_nog_la-internal.Tpo $(DEPDIR)/libvomsapi_nog_la-internal.Plo
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='internal.cc' object='libvomsapi_nog_la-internal.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libvomsapi_nog_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o libvomsapi_nog_la-internal.lo `test -f 'internal.cc' || echo '$(srcdir)/'`internal.cc
+@am__fastdepCXX_FALSE@	$(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libvomsapi_nog_la_CXXFLAGS) $(CXXFLAGS) -c -o libvomsapi_nog_la-internal.lo `test -f 'internal.cc' || echo '$(srcdir)/'`internal.cc
 
 libvomsapi_nog_la-cinterface.lo: cinterface.cc
-@am__fastdepCXX_TRUE@	$(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libvomsapi_nog_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT libvomsapi_nog_la-cinterface.lo -MD -MP -MF $(DEPDIR)/libvomsapi_nog_la-cinterface.Tpo -c -o libvomsapi_nog_la-cinterface.lo `test -f 'cinterface.cc' || echo '$(srcdir)/'`cinterface.cc
+@am__fastdepCXX_TRUE@	$(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libvomsapi_nog_la_CXXFLAGS) $(CXXFLAGS) -MT libvomsapi_nog_la-cinterface.lo -MD -MP -MF $(DEPDIR)/libvomsapi_nog_la-cinterface.Tpo -c -o libvomsapi_nog_la-cinterface.lo `test -f 'cinterface.cc' || echo '$(srcdir)/'`cinterface.cc
 @am__fastdepCXX_TRUE@	mv -f $(DEPDIR)/libvomsapi_nog_la-cinterface.Tpo $(DEPDIR)/libvomsapi_nog_la-cinterface.Plo
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='cinterface.cc' object='libvomsapi_nog_la-cinterface.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libvomsapi_nog_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o libvomsapi_nog_la-cinterface.lo `test -f 'cinterface.cc' || echo '$(srcdir)/'`cinterface.cc
+@am__fastdepCXX_FALSE@	$(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libvomsapi_nog_la_CXXFLAGS) $(CXXFLAGS) -c -o libvomsapi_nog_la-cinterface.lo `test -f 'cinterface.cc' || echo '$(srcdir)/'`cinterface.cc
 
 libvomsc_la-api_util.lo: api_util.cc
-@am__fastdepCXX_TRUE@	$(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libvomsc_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT libvomsc_la-api_util.lo -MD -MP -MF $(DEPDIR)/libvomsc_la-api_util.Tpo -c -o libvomsc_la-api_util.lo `test -f 'api_util.cc' || echo '$(srcdir)/'`api_util.cc
+@am__fastdepCXX_TRUE@	$(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libvomsc_la_CXXFLAGS) $(CXXFLAGS) -MT libvomsc_la-api_util.lo -MD -MP -MF $(DEPDIR)/libvomsc_la-api_util.Tpo -c -o libvomsc_la-api_util.lo `test -f 'api_util.cc' || echo '$(srcdir)/'`api_util.cc
 @am__fastdepCXX_TRUE@	mv -f $(DEPDIR)/libvomsc_la-api_util.Tpo $(DEPDIR)/libvomsc_la-api_util.Plo
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='api_util.cc' object='libvomsc_la-api_util.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libvomsc_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o libvomsc_la-api_util.lo `test -f 'api_util.cc' || echo '$(srcdir)/'`api_util.cc
+@am__fastdepCXX_FALSE@	$(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libvomsc_la_CXXFLAGS) $(CXXFLAGS) -c -o libvomsc_la-api_util.lo `test -f 'api_util.cc' || echo '$(srcdir)/'`api_util.cc
 
 libvomsc_la-voms_api.lo: voms_api.cc
-@am__fastdepCXX_TRUE@	$(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libvomsc_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT libvomsc_la-voms_api.lo -MD -MP -MF $(DEPDIR)/libvomsc_la-voms_api.Tpo -c -o libvomsc_la-voms_api.lo `test -f 'voms_api.cc' || echo '$(srcdir)/'`voms_api.cc
+@am__fastdepCXX_TRUE@	$(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libvomsc_la_CXXFLAGS) $(CXXFLAGS) -MT libvomsc_la-voms_api.lo -MD -MP -MF $(DEPDIR)/libvomsc_la-voms_api.Tpo -c -o libvomsc_la-voms_api.lo `test -f 'voms_api.cc' || echo '$(srcdir)/'`voms_api.cc
 @am__fastdepCXX_TRUE@	mv -f $(DEPDIR)/libvomsc_la-voms_api.Tpo $(DEPDIR)/libvomsc_la-voms_api.Plo
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='voms_api.cc' object='libvomsc_la-voms_api.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libvomsc_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o libvomsc_la-voms_api.lo `test -f 'voms_api.cc' || echo '$(srcdir)/'`voms_api.cc
+@am__fastdepCXX_FALSE@	$(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libvomsc_la_CXXFLAGS) $(CXXFLAGS) -c -o libvomsc_la-voms_api.lo `test -f 'voms_api.cc' || echo '$(srcdir)/'`voms_api.cc
 
 libvomsc_la-ccval.lo: ccval.cc
-@am__fastdepCXX_TRUE@	$(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libvomsc_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT libvomsc_la-ccval.lo -MD -MP -MF $(DEPDIR)/libvomsc_la-ccval.Tpo -c -o libvomsc_la-ccval.lo `test -f 'ccval.cc' || echo '$(srcdir)/'`ccval.cc
+@am__fastdepCXX_TRUE@	$(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libvomsc_la_CXXFLAGS) $(CXXFLAGS) -MT libvomsc_la-ccval.lo -MD -MP -MF $(DEPDIR)/libvomsc_la-ccval.Tpo -c -o libvomsc_la-ccval.lo `test -f 'ccval.cc' || echo '$(srcdir)/'`ccval.cc
 @am__fastdepCXX_TRUE@	mv -f $(DEPDIR)/libvomsc_la-ccval.Tpo $(DEPDIR)/libvomsc_la-ccval.Plo
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='ccval.cc' object='libvomsc_la-ccval.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libvomsc_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o libvomsc_la-ccval.lo `test -f 'ccval.cc' || echo '$(srcdir)/'`ccval.cc
+@am__fastdepCXX_FALSE@	$(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libvomsc_la_CXXFLAGS) $(CXXFLAGS) -c -o libvomsc_la-ccval.lo `test -f 'ccval.cc' || echo '$(srcdir)/'`ccval.cc
 
 libvomsc_la-internal.lo: internal.cc
-@am__fastdepCXX_TRUE@	$(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libvomsc_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT libvomsc_la-internal.lo -MD -MP -MF $(DEPDIR)/libvomsc_la-internal.Tpo -c -o libvomsc_la-internal.lo `test -f 'internal.cc' || echo '$(srcdir)/'`internal.cc
+@am__fastdepCXX_TRUE@	$(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libvomsc_la_CXXFLAGS) $(CXXFLAGS) -MT libvomsc_la-internal.lo -MD -MP -MF $(DEPDIR)/libvomsc_la-internal.Tpo -c -o libvomsc_la-internal.lo `test -f 'internal.cc' || echo '$(srcdir)/'`internal.cc
 @am__fastdepCXX_TRUE@	mv -f $(DEPDIR)/libvomsc_la-internal.Tpo $(DEPDIR)/libvomsc_la-internal.Plo
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='internal.cc' object='libvomsc_la-internal.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libvomsc_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o libvomsc_la-internal.lo `test -f 'internal.cc' || echo '$(srcdir)/'`internal.cc
+@am__fastdepCXX_FALSE@	$(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libvomsc_la_CXXFLAGS) $(CXXFLAGS) -c -o libvomsc_la-internal.lo `test -f 'internal.cc' || echo '$(srcdir)/'`internal.cc
 
 libvomsc_la-cinterface.lo: cinterface.cc
-@am__fastdepCXX_TRUE@	$(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libvomsc_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT libvomsc_la-cinterface.lo -MD -MP -MF $(DEPDIR)/libvomsc_la-cinterface.Tpo -c -o libvomsc_la-cinterface.lo `test -f 'cinterface.cc' || echo '$(srcdir)/'`cinterface.cc
+@am__fastdepCXX_TRUE@	$(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libvomsc_la_CXXFLAGS) $(CXXFLAGS) -MT libvomsc_la-cinterface.lo -MD -MP -MF $(DEPDIR)/libvomsc_la-cinterface.Tpo -c -o libvomsc_la-cinterface.lo `test -f 'cinterface.cc' || echo '$(srcdir)/'`cinterface.cc
 @am__fastdepCXX_TRUE@	mv -f $(DEPDIR)/libvomsc_la-cinterface.Tpo $(DEPDIR)/libvomsc_la-cinterface.Plo
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='cinterface.cc' object='libvomsc_la-cinterface.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libvomsc_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o libvomsc_la-cinterface.lo `test -f 'cinterface.cc' || echo '$(srcdir)/'`cinterface.cc
+@am__fastdepCXX_FALSE@	$(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libvomsc_la_CXXFLAGS) $(CXXFLAGS) -c -o libvomsc_la-cinterface.lo `test -f 'cinterface.cc' || echo '$(srcdir)/'`cinterface.cc
 
 libvomsc_gcc32_la-api_util.lo: api_util.cc
-@am__fastdepCXX_TRUE@	$(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libvomsc_gcc32_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT libvomsc_gcc32_la-api_util.lo -MD -MP -MF $(DEPDIR)/libvomsc_gcc32_la-api_util.Tpo -c -o libvomsc_gcc32_la-api_util.lo `test -f 'api_util.cc' || echo '$(srcdir)/'`api_util.cc
+@am__fastdepCXX_TRUE@	$(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libvomsc_gcc32_la_CXXFLAGS) $(CXXFLAGS) -MT libvomsc_gcc32_la-api_util.lo -MD -MP -MF $(DEPDIR)/libvomsc_gcc32_la-api_util.Tpo -c -o libvomsc_gcc32_la-api_util.lo `test -f 'api_util.cc' || echo '$(srcdir)/'`api_util.cc
 @am__fastdepCXX_TRUE@	mv -f $(DEPDIR)/libvomsc_gcc32_la-api_util.Tpo $(DEPDIR)/libvomsc_gcc32_la-api_util.Plo
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='api_util.cc' object='libvomsc_gcc32_la-api_util.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libvomsc_gcc32_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o libvomsc_gcc32_la-api_util.lo `test -f 'api_util.cc' || echo '$(srcdir)/'`api_util.cc
+@am__fastdepCXX_FALSE@	$(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libvomsc_gcc32_la_CXXFLAGS) $(CXXFLAGS) -c -o libvomsc_gcc32_la-api_util.lo `test -f 'api_util.cc' || echo '$(srcdir)/'`api_util.cc
 
 libvomsc_gcc32_la-voms_api.lo: voms_api.cc
-@am__fastdepCXX_TRUE@	$(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libvomsc_gcc32_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT libvomsc_gcc32_la-voms_api.lo -MD -MP -MF $(DEPDIR)/libvomsc_gcc32_la-voms_api.Tpo -c -o libvomsc_gcc32_la-voms_api.lo `test -f 'voms_api.cc' || echo '$(srcdir)/'`voms_api.cc
+@am__fastdepCXX_TRUE@	$(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libvomsc_gcc32_la_CXXFLAGS) $(CXXFLAGS) -MT libvomsc_gcc32_la-voms_api.lo -MD -MP -MF $(DEPDIR)/libvomsc_gcc32_la-voms_api.Tpo -c -o libvomsc_gcc32_la-voms_api.lo `test -f 'voms_api.cc' || echo '$(srcdir)/'`voms_api.cc
 @am__fastdepCXX_TRUE@	mv -f $(DEPDIR)/libvomsc_gcc32_la-voms_api.Tpo $(DEPDIR)/libvomsc_gcc32_la-voms_api.Plo
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='voms_api.cc' object='libvomsc_gcc32_la-voms_api.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libvomsc_gcc32_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o libvomsc_gcc32_la-voms_api.lo `test -f 'voms_api.cc' || echo '$(srcdir)/'`voms_api.cc
+@am__fastdepCXX_FALSE@	$(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libvomsc_gcc32_la_CXXFLAGS) $(CXXFLAGS) -c -o libvomsc_gcc32_la-voms_api.lo `test -f 'voms_api.cc' || echo '$(srcdir)/'`voms_api.cc
 
 libvomsc_gcc32_la-ccval.lo: ccval.cc
-@am__fastdepCXX_TRUE@	$(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libvomsc_gcc32_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT libvomsc_gcc32_la-ccval.lo -MD -MP -MF $(DEPDIR)/libvomsc_gcc32_la-ccval.Tpo -c -o libvomsc_gcc32_la-ccval.lo `test -f 'ccval.cc' || echo '$(srcdir)/'`ccval.cc
+@am__fastdepCXX_TRUE@	$(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libvomsc_gcc32_la_CXXFLAGS) $(CXXFLAGS) -MT libvomsc_gcc32_la-ccval.lo -MD -MP -MF $(DEPDIR)/libvomsc_gcc32_la-ccval.Tpo -c -o libvomsc_gcc32_la-ccval.lo `test -f 'ccval.cc' || echo '$(srcdir)/'`ccval.cc
 @am__fastdepCXX_TRUE@	mv -f $(DEPDIR)/libvomsc_gcc32_la-ccval.Tpo $(DEPDIR)/libvomsc_gcc32_la-ccval.Plo
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='ccval.cc' object='libvomsc_gcc32_la-ccval.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libvomsc_gcc32_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o libvomsc_gcc32_la-ccval.lo `test -f 'ccval.cc' || echo '$(srcdir)/'`ccval.cc
+@am__fastdepCXX_FALSE@	$(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libvomsc_gcc32_la_CXXFLAGS) $(CXXFLAGS) -c -o libvomsc_gcc32_la-ccval.lo `test -f 'ccval.cc' || echo '$(srcdir)/'`ccval.cc
 
 libvomsc_gcc32_la-internal.lo: internal.cc
-@am__fastdepCXX_TRUE@	$(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libvomsc_gcc32_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT libvomsc_gcc32_la-internal.lo -MD -MP -MF $(DEPDIR)/libvomsc_gcc32_la-internal.Tpo -c -o libvomsc_gcc32_la-internal.lo `test -f 'internal.cc' || echo '$(srcdir)/'`internal.cc
+@am__fastdepCXX_TRUE@	$(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libvomsc_gcc32_la_CXXFLAGS) $(CXXFLAGS) -MT libvomsc_gcc32_la-internal.lo -MD -MP -MF $(DEPDIR)/libvomsc_gcc32_la-internal.Tpo -c -o libvomsc_gcc32_la-internal.lo `test -f 'internal.cc' || echo '$(srcdir)/'`internal.cc
 @am__fastdepCXX_TRUE@	mv -f $(DEPDIR)/libvomsc_gcc32_la-internal.Tpo $(DEPDIR)/libvomsc_gcc32_la-internal.Plo
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='internal.cc' object='libvomsc_gcc32_la-internal.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libvomsc_gcc32_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o libvomsc_gcc32_la-internal.lo `test -f 'internal.cc' || echo '$(srcdir)/'`internal.cc
+@am__fastdepCXX_FALSE@	$(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libvomsc_gcc32_la_CXXFLAGS) $(CXXFLAGS) -c -o libvomsc_gcc32_la-internal.lo `test -f 'internal.cc' || echo '$(srcdir)/'`internal.cc
 
 libvomsc_gcc32_la-cinterface.lo: cinterface.cc
-@am__fastdepCXX_TRUE@	$(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libvomsc_gcc32_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT libvomsc_gcc32_la-cinterface.lo -MD -MP -MF $(DEPDIR)/libvomsc_gcc32_la-cinterface.Tpo -c -o libvomsc_gcc32_la-cinterface.lo `test -f 'cinterface.cc' || echo '$(srcdir)/'`cinterface.cc
+@am__fastdepCXX_TRUE@	$(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libvomsc_gcc32_la_CXXFLAGS) $(CXXFLAGS) -MT libvomsc_gcc32_la-cinterface.lo -MD -MP -MF $(DEPDIR)/libvomsc_gcc32_la-cinterface.Tpo -c -o libvomsc_gcc32_la-cinterface.lo `test -f 'cinterface.cc' || echo '$(srcdir)/'`cinterface.cc
 @am__fastdepCXX_TRUE@	mv -f $(DEPDIR)/libvomsc_gcc32_la-cinterface.Tpo $(DEPDIR)/libvomsc_gcc32_la-cinterface.Plo
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='cinterface.cc' object='libvomsc_gcc32_la-cinterface.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libvomsc_gcc32_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o libvomsc_gcc32_la-cinterface.lo `test -f 'cinterface.cc' || echo '$(srcdir)/'`cinterface.cc
+@am__fastdepCXX_FALSE@	$(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libvomsc_gcc32_la_CXXFLAGS) $(CXXFLAGS) -c -o libvomsc_gcc32_la-cinterface.lo `test -f 'cinterface.cc' || echo '$(srcdir)/'`cinterface.cc
 
 libvomsc_gcc32dbg_la-api_util.lo: api_util.cc
-@am__fastdepCXX_TRUE@	$(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libvomsc_gcc32dbg_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT libvomsc_gcc32dbg_la-api_util.lo -MD -MP -MF $(DEPDIR)/libvomsc_gcc32dbg_la-api_util.Tpo -c -o libvomsc_gcc32dbg_la-api_util.lo `test -f 'api_util.cc' || echo '$(srcdir)/'`api_util.cc
+@am__fastdepCXX_TRUE@	$(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libvomsc_gcc32dbg_la_CXXFLAGS) $(CXXFLAGS) -MT libvomsc_gcc32dbg_la-api_util.lo -MD -MP -MF $(DEPDIR)/libvomsc_gcc32dbg_la-api_util.Tpo -c -o libvomsc_gcc32dbg_la-api_util.lo `test -f 'api_util.cc' || echo '$(srcdir)/'`api_util.cc
 @am__fastdepCXX_TRUE@	mv -f $(DEPDIR)/libvomsc_gcc32dbg_la-api_util.Tpo $(DEPDIR)/libvomsc_gcc32dbg_la-api_util.Plo
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='api_util.cc' object='libvomsc_gcc32dbg_la-api_util.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libvomsc_gcc32dbg_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o libvomsc_gcc32dbg_la-api_util.lo `test -f 'api_util.cc' || echo '$(srcdir)/'`api_util.cc
+@am__fastdepCXX_FALSE@	$(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libvomsc_gcc32dbg_la_CXXFLAGS) $(CXXFLAGS) -c -o libvomsc_gcc32dbg_la-api_util.lo `test -f 'api_util.cc' || echo '$(srcdir)/'`api_util.cc
 
 libvomsc_gcc32dbg_la-voms_api.lo: voms_api.cc
-@am__fastdepCXX_TRUE@	$(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libvomsc_gcc32dbg_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT libvomsc_gcc32dbg_la-voms_api.lo -MD -MP -MF $(DEPDIR)/libvomsc_gcc32dbg_la-voms_api.Tpo -c -o libvomsc_gcc32dbg_la-voms_api.lo `test -f 'voms_api.cc' || echo '$(srcdir)/'`voms_api.cc
+@am__fastdepCXX_TRUE@	$(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libvomsc_gcc32dbg_la_CXXFLAGS) $(CXXFLAGS) -MT libvomsc_gcc32dbg_la-voms_api.lo -MD -MP -MF $(DEPDIR)/libvomsc_gcc32dbg_la-voms_api.Tpo -c -o libvomsc_gcc32dbg_la-voms_api.lo `test -f 'voms_api.cc' || echo '$(srcdir)/'`voms_api.cc
 @am__fastdepCXX_TRUE@	mv -f $(DEPDIR)/libvomsc_gcc32dbg_la-voms_api.Tpo $(DEPDIR)/libvomsc_gcc32dbg_la-voms_api.Plo
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='voms_api.cc' object='libvomsc_gcc32dbg_la-voms_api.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libvomsc_gcc32dbg_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o libvomsc_gcc32dbg_la-voms_api.lo `test -f 'voms_api.cc' || echo '$(srcdir)/'`voms_api.cc
+@am__fastdepCXX_FALSE@	$(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libvomsc_gcc32dbg_la_CXXFLAGS) $(CXXFLAGS) -c -o libvomsc_gcc32dbg_la-voms_api.lo `test -f 'voms_api.cc' || echo '$(srcdir)/'`voms_api.cc
 
 libvomsc_gcc32dbg_la-ccval.lo: ccval.cc
-@am__fastdepCXX_TRUE@	$(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libvomsc_gcc32dbg_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT libvomsc_gcc32dbg_la-ccval.lo -MD -MP -MF $(DEPDIR)/libvomsc_gcc32dbg_la-ccval.Tpo -c -o libvomsc_gcc32dbg_la-ccval.lo `test -f 'ccval.cc' || echo '$(srcdir)/'`ccval.cc
+@am__fastdepCXX_TRUE@	$(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libvomsc_gcc32dbg_la_CXXFLAGS) $(CXXFLAGS) -MT libvomsc_gcc32dbg_la-ccval.lo -MD -MP -MF $(DEPDIR)/libvomsc_gcc32dbg_la-ccval.Tpo -c -o libvomsc_gcc32dbg_la-ccval.lo `test -f 'ccval.cc' || echo '$(srcdir)/'`ccval.cc
 @am__fastdepCXX_TRUE@	mv -f $(DEPDIR)/libvomsc_gcc32dbg_la-ccval.Tpo $(DEPDIR)/libvomsc_gcc32dbg_la-ccval.Plo
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='ccval.cc' object='libvomsc_gcc32dbg_la-ccval.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libvomsc_gcc32dbg_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o libvomsc_gcc32dbg_la-ccval.lo `test -f 'ccval.cc' || echo '$(srcdir)/'`ccval.cc
+@am__fastdepCXX_FALSE@	$(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libvomsc_gcc32dbg_la_CXXFLAGS) $(CXXFLAGS) -c -o libvomsc_gcc32dbg_la-ccval.lo `test -f 'ccval.cc' || echo '$(srcdir)/'`ccval.cc
 
 libvomsc_gcc32dbg_la-internal.lo: internal.cc
-@am__fastdepCXX_TRUE@	$(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libvomsc_gcc32dbg_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT libvomsc_gcc32dbg_la-internal.lo -MD -MP -MF $(DEPDIR)/libvomsc_gcc32dbg_la-internal.Tpo -c -o libvomsc_gcc32dbg_la-internal.lo `test -f 'internal.cc' || echo '$(srcdir)/'`internal.cc
+@am__fastdepCXX_TRUE@	$(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libvomsc_gcc32dbg_la_CXXFLAGS) $(CXXFLAGS) -MT libvomsc_gcc32dbg_la-internal.lo -MD -MP -MF $(DEPDIR)/libvomsc_gcc32dbg_la-internal.Tpo -c -o libvomsc_gcc32dbg_la-internal.lo `test -f 'internal.cc' || echo '$(srcdir)/'`internal.cc
 @am__fastdepCXX_TRUE@	mv -f $(DEPDIR)/libvomsc_gcc32dbg_la-internal.Tpo $(DEPDIR)/libvomsc_gcc32dbg_la-internal.Plo
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='internal.cc' object='libvomsc_gcc32dbg_la-internal.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libvomsc_gcc32dbg_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o libvomsc_gcc32dbg_la-internal.lo `test -f 'internal.cc' || echo '$(srcdir)/'`internal.cc
+@am__fastdepCXX_FALSE@	$(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libvomsc_gcc32dbg_la_CXXFLAGS) $(CXXFLAGS) -c -o libvomsc_gcc32dbg_la-internal.lo `test -f 'internal.cc' || echo '$(srcdir)/'`internal.cc
 
 libvomsc_gcc32dbg_la-cinterface.lo: cinterface.cc
-@am__fastdepCXX_TRUE@	$(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libvomsc_gcc32dbg_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT libvomsc_gcc32dbg_la-cinterface.lo -MD -MP -MF $(DEPDIR)/libvomsc_gcc32dbg_la-cinterface.Tpo -c -o libvomsc_gcc32dbg_la-cinterface.lo `test -f 'cinterface.cc' || echo '$(srcdir)/'`cinterface.cc
+@am__fastdepCXX_TRUE@	$(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libvomsc_gcc32dbg_la_CXXFLAGS) $(CXXFLAGS) -MT libvomsc_gcc32dbg_la-cinterface.lo -MD -MP -MF $(DEPDIR)/libvomsc_gcc32dbg_la-cinterface.Tpo -c -o libvomsc_gcc32dbg_la-cinterface.lo `test -f 'cinterface.cc' || echo '$(srcdir)/'`cinterface.cc
 @am__fastdepCXX_TRUE@	mv -f $(DEPDIR)/libvomsc_gcc32dbg_la-cinterface.Tpo $(DEPDIR)/libvomsc_gcc32dbg_la-cinterface.Plo
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='cinterface.cc' object='libvomsc_gcc32dbg_la-cinterface.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libvomsc_gcc32dbg_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o libvomsc_gcc32dbg_la-cinterface.lo `test -f 'cinterface.cc' || echo '$(srcdir)/'`cinterface.cc
+@am__fastdepCXX_FALSE@	$(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libvomsc_gcc32dbg_la_CXXFLAGS) $(CXXFLAGS) -c -o libvomsc_gcc32dbg_la-cinterface.lo `test -f 'cinterface.cc' || echo '$(srcdir)/'`cinterface.cc
 
 libvomsc_gcc32dbgpthr_la-api_util.lo: api_util.cc
-@am__fastdepCXX_TRUE@	$(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libvomsc_gcc32dbgpthr_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT libvomsc_gcc32dbgpthr_la-api_util.lo -MD -MP -MF $(DEPDIR)/libvomsc_gcc32dbgpthr_la-api_util.Tpo -c -o libvomsc_gcc32dbgpthr_la-api_util.lo `test -f 'api_util.cc' || echo '$(srcdir)/'`api_util.cc
+@am__fastdepCXX_TRUE@	$(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libvomsc_gcc32dbgpthr_la_CXXFLAGS) $(CXXFLAGS) -MT libvomsc_gcc32dbgpthr_la-api_util.lo -MD -MP -MF $(DEPDIR)/libvomsc_gcc32dbgpthr_la-api_util.Tpo -c -o libvomsc_gcc32dbgpthr_la-api_util.lo `test -f 'api_util.cc' || echo '$(srcdir)/'`api_util.cc
 @am__fastdepCXX_TRUE@	mv -f $(DEPDIR)/libvomsc_gcc32dbgpthr_la-api_util.Tpo $(DEPDIR)/libvomsc_gcc32dbgpthr_la-api_util.Plo
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='api_util.cc' object='libvomsc_gcc32dbgpthr_la-api_util.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libvomsc_gcc32dbgpthr_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o libvomsc_gcc32dbgpthr_la-api_util.lo `test -f 'api_util.cc' || echo '$(srcdir)/'`api_util.cc
+@am__fastdepCXX_FALSE@	$(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libvomsc_gcc32dbgpthr_la_CXXFLAGS) $(CXXFLAGS) -c -o libvomsc_gcc32dbgpthr_la-api_util.lo `test -f 'api_util.cc' || echo '$(srcdir)/'`api_util.cc
 
 libvomsc_gcc32dbgpthr_la-voms_api.lo: voms_api.cc
-@am__fastdepCXX_TRUE@	$(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libvomsc_gcc32dbgpthr_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT libvomsc_gcc32dbgpthr_la-voms_api.lo -MD -MP -MF $(DEPDIR)/libvomsc_gcc32dbgpthr_la-voms_api.Tpo -c -o libvomsc_gcc32dbgpthr_la-voms_api.lo `test -f 'voms_api.cc' || echo '$(srcdir)/'`voms_api.cc
+@am__fastdepCXX_TRUE@	$(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libvomsc_gcc32dbgpthr_la_CXXFLAGS) $(CXXFLAGS) -MT libvomsc_gcc32dbgpthr_la-voms_api.lo -MD -MP -MF $(DEPDIR)/libvomsc_gcc32dbgpthr_la-voms_api.Tpo -c -o libvomsc_gcc32dbgpthr_la-voms_api.lo `test -f 'voms_api.cc' || echo '$(srcdir)/'`voms_api.cc
 @am__fastdepCXX_TRUE@	mv -f $(DEPDIR)/libvomsc_gcc32dbgpthr_la-voms_api.Tpo $(DEPDIR)/libvomsc_gcc32dbgpthr_la-voms_api.Plo
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='voms_api.cc' object='libvomsc_gcc32dbgpthr_la-voms_api.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libvomsc_gcc32dbgpthr_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o libvomsc_gcc32dbgpthr_la-voms_api.lo `test -f 'voms_api.cc' || echo '$(srcdir)/'`voms_api.cc
+@am__fastdepCXX_FALSE@	$(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libvomsc_gcc32dbgpthr_la_CXXFLAGS) $(CXXFLAGS) -c -o libvomsc_gcc32dbgpthr_la-voms_api.lo `test -f 'voms_api.cc' || echo '$(srcdir)/'`voms_api.cc
 
 libvomsc_gcc32dbgpthr_la-ccval.lo: ccval.cc
-@am__fastdepCXX_TRUE@	$(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libvomsc_gcc32dbgpthr_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT libvomsc_gcc32dbgpthr_la-ccval.lo -MD -MP -MF $(DEPDIR)/libvomsc_gcc32dbgpthr_la-ccval.Tpo -c -o libvomsc_gcc32dbgpthr_la-ccval.lo `test -f 'ccval.cc' || echo '$(srcdir)/'`ccval.cc
+@am__fastdepCXX_TRUE@	$(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libvomsc_gcc32dbgpthr_la_CXXFLAGS) $(CXXFLAGS) -MT libvomsc_gcc32dbgpthr_la-ccval.lo -MD -MP -MF $(DEPDIR)/libvomsc_gcc32dbgpthr_la-ccval.Tpo -c -o libvomsc_gcc32dbgpthr_la-ccval.lo `test -f 'ccval.cc' || echo '$(srcdir)/'`ccval.cc
 @am__fastdepCXX_TRUE@	mv -f $(DEPDIR)/libvomsc_gcc32dbgpthr_la-ccval.Tpo $(DEPDIR)/libvomsc_gcc32dbgpthr_la-ccval.Plo
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='ccval.cc' object='libvomsc_gcc32dbgpthr_la-ccval.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libvomsc_gcc32dbgpthr_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o libvomsc_gcc32dbgpthr_la-ccval.lo `test -f 'ccval.cc' || echo '$(srcdir)/'`ccval.cc
+@am__fastdepCXX_FALSE@	$(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libvomsc_gcc32dbgpthr_la_CXXFLAGS) $(CXXFLAGS) -c -o libvomsc_gcc32dbgpthr_la-ccval.lo `test -f 'ccval.cc' || echo '$(srcdir)/'`ccval.cc
 
 libvomsc_gcc32dbgpthr_la-internal.lo: internal.cc
-@am__fastdepCXX_TRUE@	$(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libvomsc_gcc32dbgpthr_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT libvomsc_gcc32dbgpthr_la-internal.lo -MD -MP -MF $(DEPDIR)/libvomsc_gcc32dbgpthr_la-internal.Tpo -c -o libvomsc_gcc32dbgpthr_la-internal.lo `test -f 'internal.cc' || echo '$(srcdir)/'`internal.cc
+@am__fastdepCXX_TRUE@	$(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libvomsc_gcc32dbgpthr_la_CXXFLAGS) $(CXXFLAGS) -MT libvomsc_gcc32dbgpthr_la-internal.lo -MD -MP -MF $(DEPDIR)/libvomsc_gcc32dbgpthr_la-internal.Tpo -c -o libvomsc_gcc32dbgpthr_la-internal.lo `test -f 'internal.cc' || echo '$(srcdir)/'`internal.cc
 @am__fastdepCXX_TRUE@	mv -f $(DEPDIR)/libvomsc_gcc32dbgpthr_la-internal.Tpo $(DEPDIR)/libvomsc_gcc32dbgpthr_la-internal.Plo
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='internal.cc' object='libvomsc_gcc32dbgpthr_la-internal.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libvomsc_gcc32dbgpthr_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o libvomsc_gcc32dbgpthr_la-internal.lo `test -f 'internal.cc' || echo '$(srcdir)/'`internal.cc
+@am__fastdepCXX_FALSE@	$(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libvomsc_gcc32dbgpthr_la_CXXFLAGS) $(CXXFLAGS) -c -o libvomsc_gcc32dbgpthr_la-internal.lo `test -f 'internal.cc' || echo '$(srcdir)/'`internal.cc
 
 libvomsc_gcc32dbgpthr_la-cinterface.lo: cinterface.cc
-@am__fastdepCXX_TRUE@	$(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libvomsc_gcc32dbgpthr_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT libvomsc_gcc32dbgpthr_la-cinterface.lo -MD -MP -MF $(DEPDIR)/libvomsc_gcc32dbgpthr_la-cinterface.Tpo -c -o libvomsc_gcc32dbgpthr_la-cinterface.lo `test -f 'cinterface.cc' || echo '$(srcdir)/'`cinterface.cc
+@am__fastdepCXX_TRUE@	$(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libvomsc_gcc32dbgpthr_la_CXXFLAGS) $(CXXFLAGS) -MT libvomsc_gcc32dbgpthr_la-cinterface.lo -MD -MP -MF $(DEPDIR)/libvomsc_gcc32dbgpthr_la-cinterface.Tpo -c -o libvomsc_gcc32dbgpthr_la-cinterface.lo `test -f 'cinterface.cc' || echo '$(srcdir)/'`cinterface.cc
 @am__fastdepCXX_TRUE@	mv -f $(DEPDIR)/libvomsc_gcc32dbgpthr_la-cinterface.Tpo $(DEPDIR)/libvomsc_gcc32dbgpthr_la-cinterface.Plo
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='cinterface.cc' object='libvomsc_gcc32dbgpthr_la-cinterface.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libvomsc_gcc32dbgpthr_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o libvomsc_gcc32dbgpthr_la-cinterface.lo `test -f 'cinterface.cc' || echo '$(srcdir)/'`cinterface.cc
+@am__fastdepCXX_FALSE@	$(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libvomsc_gcc32dbgpthr_la_CXXFLAGS) $(CXXFLAGS) -c -o libvomsc_gcc32dbgpthr_la-cinterface.lo `test -f 'cinterface.cc' || echo '$(srcdir)/'`cinterface.cc
 
 libvomsc_gcc32pthr_la-api_util.lo: api_util.cc
-@am__fastdepCXX_TRUE@	$(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libvomsc_gcc32pthr_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT libvomsc_gcc32pthr_la-api_util.lo -MD -MP -MF $(DEPDIR)/libvomsc_gcc32pthr_la-api_util.Tpo -c -o libvomsc_gcc32pthr_la-api_util.lo `test -f 'api_util.cc' || echo '$(srcdir)/'`api_util.cc
+@am__fastdepCXX_TRUE@	$(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libvomsc_gcc32pthr_la_CXXFLAGS) $(CXXFLAGS) -MT libvomsc_gcc32pthr_la-api_util.lo -MD -MP -MF $(DEPDIR)/libvomsc_gcc32pthr_la-api_util.Tpo -c -o libvomsc_gcc32pthr_la-api_util.lo `test -f 'api_util.cc' || echo '$(srcdir)/'`api_util.cc
 @am__fastdepCXX_TRUE@	mv -f $(DEPDIR)/libvomsc_gcc32pthr_la-api_util.Tpo $(DEPDIR)/libvomsc_gcc32pthr_la-api_util.Plo
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='api_util.cc' object='libvomsc_gcc32pthr_la-api_util.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libvomsc_gcc32pthr_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o libvomsc_gcc32pthr_la-api_util.lo `test -f 'api_util.cc' || echo '$(srcdir)/'`api_util.cc
+@am__fastdepCXX_FALSE@	$(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libvomsc_gcc32pthr_la_CXXFLAGS) $(CXXFLAGS) -c -o libvomsc_gcc32pthr_la-api_util.lo `test -f 'api_util.cc' || echo '$(srcdir)/'`api_util.cc
 
 libvomsc_gcc32pthr_la-voms_api.lo: voms_api.cc
-@am__fastdepCXX_TRUE@	$(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libvomsc_gcc32pthr_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT libvomsc_gcc32pthr_la-voms_api.lo -MD -MP -MF $(DEPDIR)/libvomsc_gcc32pthr_la-voms_api.Tpo -c -o libvomsc_gcc32pthr_la-voms_api.lo `test -f 'voms_api.cc' || echo '$(srcdir)/'`voms_api.cc
+@am__fastdepCXX_TRUE@	$(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libvomsc_gcc32pthr_la_CXXFLAGS) $(CXXFLAGS) -MT libvomsc_gcc32pthr_la-voms_api.lo -MD -MP -MF $(DEPDIR)/libvomsc_gcc32pthr_la-voms_api.Tpo -c -o libvomsc_gcc32pthr_la-voms_api.lo `test -f 'voms_api.cc' || echo '$(srcdir)/'`voms_api.cc
 @am__fastdepCXX_TRUE@	mv -f $(DEPDIR)/libvomsc_gcc32pthr_la-voms_api.Tpo $(DEPDIR)/libvomsc_gcc32pthr_la-voms_api.Plo
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='voms_api.cc' object='libvomsc_gcc32pthr_la-voms_api.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libvomsc_gcc32pthr_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o libvomsc_gcc32pthr_la-voms_api.lo `test -f 'voms_api.cc' || echo '$(srcdir)/'`voms_api.cc
+@am__fastdepCXX_FALSE@	$(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libvomsc_gcc32pthr_la_CXXFLAGS) $(CXXFLAGS) -c -o libvomsc_gcc32pthr_la-voms_api.lo `test -f 'voms_api.cc' || echo '$(srcdir)/'`voms_api.cc
 
 libvomsc_gcc32pthr_la-ccval.lo: ccval.cc
-@am__fastdepCXX_TRUE@	$(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libvomsc_gcc32pthr_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT libvomsc_gcc32pthr_la-ccval.lo -MD -MP -MF $(DEPDIR)/libvomsc_gcc32pthr_la-ccval.Tpo -c -o libvomsc_gcc32pthr_la-ccval.lo `test -f 'ccval.cc' || echo '$(srcdir)/'`ccval.cc
+@am__fastdepCXX_TRUE@	$(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libvomsc_gcc32pthr_la_CXXFLAGS) $(CXXFLAGS) -MT libvomsc_gcc32pthr_la-ccval.lo -MD -MP -MF $(DEPDIR)/libvomsc_gcc32pthr_la-ccval.Tpo -c -o libvomsc_gcc32pthr_la-ccval.lo `test -f 'ccval.cc' || echo '$(srcdir)/'`ccval.cc
 @am__fastdepCXX_TRUE@	mv -f $(DEPDIR)/libvomsc_gcc32pthr_la-ccval.Tpo $(DEPDIR)/libvomsc_gcc32pthr_la-ccval.Plo
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='ccval.cc' object='libvomsc_gcc32pthr_la-ccval.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libvomsc_gcc32pthr_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o libvomsc_gcc32pthr_la-ccval.lo `test -f 'ccval.cc' || echo '$(srcdir)/'`ccval.cc
+@am__fastdepCXX_FALSE@	$(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libvomsc_gcc32pthr_la_CXXFLAGS) $(CXXFLAGS) -c -o libvomsc_gcc32pthr_la-ccval.lo `test -f 'ccval.cc' || echo '$(srcdir)/'`ccval.cc
 
 libvomsc_gcc32pthr_la-internal.lo: internal.cc
-@am__fastdepCXX_TRUE@	$(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libvomsc_gcc32pthr_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT libvomsc_gcc32pthr_la-internal.lo -MD -MP -MF $(DEPDIR)/libvomsc_gcc32pthr_la-internal.Tpo -c -o libvomsc_gcc32pthr_la-internal.lo `test -f 'internal.cc' || echo '$(srcdir)/'`internal.cc
+@am__fastdepCXX_TRUE@	$(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libvomsc_gcc32pthr_la_CXXFLAGS) $(CXXFLAGS) -MT libvomsc_gcc32pthr_la-internal.lo -MD -MP -MF $(DEPDIR)/libvomsc_gcc32pthr_la-internal.Tpo -c -o libvomsc_gcc32pthr_la-internal.lo `test -f 'internal.cc' || echo '$(srcdir)/'`internal.cc
 @am__fastdepCXX_TRUE@	mv -f $(DEPDIR)/libvomsc_gcc32pthr_la-internal.Tpo $(DEPDIR)/libvomsc_gcc32pthr_la-internal.Plo
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='internal.cc' object='libvomsc_gcc32pthr_la-internal.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libvomsc_gcc32pthr_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o libvomsc_gcc32pthr_la-internal.lo `test -f 'internal.cc' || echo '$(srcdir)/'`internal.cc
+@am__fastdepCXX_FALSE@	$(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libvomsc_gcc32pthr_la_CXXFLAGS) $(CXXFLAGS) -c -o libvomsc_gcc32pthr_la-internal.lo `test -f 'internal.cc' || echo '$(srcdir)/'`internal.cc
 
 libvomsc_gcc32pthr_la-cinterface.lo: cinterface.cc
-@am__fastdepCXX_TRUE@	$(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libvomsc_gcc32pthr_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT libvomsc_gcc32pthr_la-cinterface.lo -MD -MP -MF $(DEPDIR)/libvomsc_gcc32pthr_la-cinterface.Tpo -c -o libvomsc_gcc32pthr_la-cinterface.lo `test -f 'cinterface.cc' || echo '$(srcdir)/'`cinterface.cc
+@am__fastdepCXX_TRUE@	$(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libvomsc_gcc32pthr_la_CXXFLAGS) $(CXXFLAGS) -MT libvomsc_gcc32pthr_la-cinterface.lo -MD -MP -MF $(DEPDIR)/libvomsc_gcc32pthr_la-cinterface.Tpo -c -o libvomsc_gcc32pthr_la-cinterface.lo `test -f 'cinterface.cc' || echo '$(srcdir)/'`cinterface.cc
 @am__fastdepCXX_TRUE@	mv -f $(DEPDIR)/libvomsc_gcc32pthr_la-cinterface.Tpo $(DEPDIR)/libvomsc_gcc32pthr_la-cinterface.Plo
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='cinterface.cc' object='libvomsc_gcc32pthr_la-cinterface.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libvomsc_gcc32pthr_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o libvomsc_gcc32pthr_la-cinterface.lo `test -f 'cinterface.cc' || echo '$(srcdir)/'`cinterface.cc
+@am__fastdepCXX_FALSE@	$(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libvomsc_gcc32pthr_la_CXXFLAGS) $(CXXFLAGS) -c -o libvomsc_gcc32pthr_la-cinterface.lo `test -f 'cinterface.cc' || echo '$(srcdir)/'`cinterface.cc
 
 libvomsc_gcc64_la-api_util.lo: api_util.cc
-@am__fastdepCXX_TRUE@	$(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libvomsc_gcc64_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT libvomsc_gcc64_la-api_util.lo -MD -MP -MF $(DEPDIR)/libvomsc_gcc64_la-api_util.Tpo -c -o libvomsc_gcc64_la-api_util.lo `test -f 'api_util.cc' || echo '$(srcdir)/'`api_util.cc
+@am__fastdepCXX_TRUE@	$(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libvomsc_gcc64_la_CXXFLAGS) $(CXXFLAGS) -MT libvomsc_gcc64_la-api_util.lo -MD -MP -MF $(DEPDIR)/libvomsc_gcc64_la-api_util.Tpo -c -o libvomsc_gcc64_la-api_util.lo `test -f 'api_util.cc' || echo '$(srcdir)/'`api_util.cc
 @am__fastdepCXX_TRUE@	mv -f $(DEPDIR)/libvomsc_gcc64_la-api_util.Tpo $(DEPDIR)/libvomsc_gcc64_la-api_util.Plo
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='api_util.cc' object='libvomsc_gcc64_la-api_util.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libvomsc_gcc64_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o libvomsc_gcc64_la-api_util.lo `test -f 'api_util.cc' || echo '$(srcdir)/'`api_util.cc
+@am__fastdepCXX_FALSE@	$(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libvomsc_gcc64_la_CXXFLAGS) $(CXXFLAGS) -c -o libvomsc_gcc64_la-api_util.lo `test -f 'api_util.cc' || echo '$(srcdir)/'`api_util.cc
 
 libvomsc_gcc64_la-voms_api.lo: voms_api.cc
-@am__fastdepCXX_TRUE@	$(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libvomsc_gcc64_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT libvomsc_gcc64_la-voms_api.lo -MD -MP -MF $(DEPDIR)/libvomsc_gcc64_la-voms_api.Tpo -c -o libvomsc_gcc64_la-voms_api.lo `test -f 'voms_api.cc' || echo '$(srcdir)/'`voms_api.cc
+@am__fastdepCXX_TRUE@	$(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libvomsc_gcc64_la_CXXFLAGS) $(CXXFLAGS) -MT libvomsc_gcc64_la-voms_api.lo -MD -MP -MF $(DEPDIR)/libvomsc_gcc64_la-voms_api.Tpo -c -o libvomsc_gcc64_la-voms_api.lo `test -f 'voms_api.cc' || echo '$(srcdir)/'`voms_api.cc
 @am__fastdepCXX_TRUE@	mv -f $(DEPDIR)/libvomsc_gcc64_la-voms_api.Tpo $(DEPDIR)/libvomsc_gcc64_la-voms_api.Plo
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='voms_api.cc' object='libvomsc_gcc64_la-voms_api.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libvomsc_gcc64_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o libvomsc_gcc64_la-voms_api.lo `test -f 'voms_api.cc' || echo '$(srcdir)/'`voms_api.cc
+@am__fastdepCXX_FALSE@	$(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libvomsc_gcc64_la_CXXFLAGS) $(CXXFLAGS) -c -o libvomsc_gcc64_la-voms_api.lo `test -f 'voms_api.cc' || echo '$(srcdir)/'`voms_api.cc
 
 libvomsc_gcc64_la-ccval.lo: ccval.cc
-@am__fastdepCXX_TRUE@	$(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libvomsc_gcc64_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT libvomsc_gcc64_la-ccval.lo -MD -MP -MF $(DEPDIR)/libvomsc_gcc64_la-ccval.Tpo -c -o libvomsc_gcc64_la-ccval.lo `test -f 'ccval.cc' || echo '$(srcdir)/'`ccval.cc
+@am__fastdepCXX_TRUE@	$(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libvomsc_gcc64_la_CXXFLAGS) $(CXXFLAGS) -MT libvomsc_gcc64_la-ccval.lo -MD -MP -MF $(DEPDIR)/libvomsc_gcc64_la-ccval.Tpo -c -o libvomsc_gcc64_la-ccval.lo `test -f 'ccval.cc' || echo '$(srcdir)/'`ccval.cc
 @am__fastdepCXX_TRUE@	mv -f $(DEPDIR)/libvomsc_gcc64_la-ccval.Tpo $(DEPDIR)/libvomsc_gcc64_la-ccval.Plo
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='ccval.cc' object='libvomsc_gcc64_la-ccval.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libvomsc_gcc64_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o libvomsc_gcc64_la-ccval.lo `test -f 'ccval.cc' || echo '$(srcdir)/'`ccval.cc
+@am__fastdepCXX_FALSE@	$(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libvomsc_gcc64_la_CXXFLAGS) $(CXXFLAGS) -c -o libvomsc_gcc64_la-ccval.lo `test -f 'ccval.cc' || echo '$(srcdir)/'`ccval.cc
 
 libvomsc_gcc64_la-internal.lo: internal.cc
-@am__fastdepCXX_TRUE@	$(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libvomsc_gcc64_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT libvomsc_gcc64_la-internal.lo -MD -MP -MF $(DEPDIR)/libvomsc_gcc64_la-internal.Tpo -c -o libvomsc_gcc64_la-internal.lo `test -f 'internal.cc' || echo '$(srcdir)/'`internal.cc
+@am__fastdepCXX_TRUE@	$(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libvomsc_gcc64_la_CXXFLAGS) $(CXXFLAGS) -MT libvomsc_gcc64_la-internal.lo -MD -MP -MF $(DEPDIR)/libvomsc_gcc64_la-internal.Tpo -c -o libvomsc_gcc64_la-internal.lo `test -f 'internal.cc' || echo '$(srcdir)/'`internal.cc
 @am__fastdepCXX_TRUE@	mv -f $(DEPDIR)/libvomsc_gcc64_la-internal.Tpo $(DEPDIR)/libvomsc_gcc64_la-internal.Plo
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='internal.cc' object='libvomsc_gcc64_la-internal.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libvomsc_gcc64_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o libvomsc_gcc64_la-internal.lo `test -f 'internal.cc' || echo '$(srcdir)/'`internal.cc
+@am__fastdepCXX_FALSE@	$(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libvomsc_gcc64_la_CXXFLAGS) $(CXXFLAGS) -c -o libvomsc_gcc64_la-internal.lo `test -f 'internal.cc' || echo '$(srcdir)/'`internal.cc
 
 libvomsc_gcc64_la-cinterface.lo: cinterface.cc
-@am__fastdepCXX_TRUE@	$(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libvomsc_gcc64_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT libvomsc_gcc64_la-cinterface.lo -MD -MP -MF $(DEPDIR)/libvomsc_gcc64_la-cinterface.Tpo -c -o libvomsc_gcc64_la-cinterface.lo `test -f 'cinterface.cc' || echo '$(srcdir)/'`cinterface.cc
+@am__fastdepCXX_TRUE@	$(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libvomsc_gcc64_la_CXXFLAGS) $(CXXFLAGS) -MT libvomsc_gcc64_la-cinterface.lo -MD -MP -MF $(DEPDIR)/libvomsc_gcc64_la-cinterface.Tpo -c -o libvomsc_gcc64_la-cinterface.lo `test -f 'cinterface.cc' || echo '$(srcdir)/'`cinterface.cc
 @am__fastdepCXX_TRUE@	mv -f $(DEPDIR)/libvomsc_gcc64_la-cinterface.Tpo $(DEPDIR)/libvomsc_gcc64_la-cinterface.Plo
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='cinterface.cc' object='libvomsc_gcc64_la-cinterface.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libvomsc_gcc64_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o libvomsc_gcc64_la-cinterface.lo `test -f 'cinterface.cc' || echo '$(srcdir)/'`cinterface.cc
+@am__fastdepCXX_FALSE@	$(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libvomsc_gcc64_la_CXXFLAGS) $(CXXFLAGS) -c -o libvomsc_gcc64_la-cinterface.lo `test -f 'cinterface.cc' || echo '$(srcdir)/'`cinterface.cc
 
 libvomsc_gcc64dbg_la-api_util.lo: api_util.cc
-@am__fastdepCXX_TRUE@	$(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libvomsc_gcc64dbg_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT libvomsc_gcc64dbg_la-api_util.lo -MD -MP -MF $(DEPDIR)/libvomsc_gcc64dbg_la-api_util.Tpo -c -o libvomsc_gcc64dbg_la-api_util.lo `test -f 'api_util.cc' || echo '$(srcdir)/'`api_util.cc
+@am__fastdepCXX_TRUE@	$(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libvomsc_gcc64dbg_la_CXXFLAGS) $(CXXFLAGS) -MT libvomsc_gcc64dbg_la-api_util.lo -MD -MP -MF $(DEPDIR)/libvomsc_gcc64dbg_la-api_util.Tpo -c -o libvomsc_gcc64dbg_la-api_util.lo `test -f 'api_util.cc' || echo '$(srcdir)/'`api_util.cc
 @am__fastdepCXX_TRUE@	mv -f $(DEPDIR)/libvomsc_gcc64dbg_la-api_util.Tpo $(DEPDIR)/libvomsc_gcc64dbg_la-api_util.Plo
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='api_util.cc' object='libvomsc_gcc64dbg_la-api_util.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libvomsc_gcc64dbg_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o libvomsc_gcc64dbg_la-api_util.lo `test -f 'api_util.cc' || echo '$(srcdir)/'`api_util.cc
+@am__fastdepCXX_FALSE@	$(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libvomsc_gcc64dbg_la_CXXFLAGS) $(CXXFLAGS) -c -o libvomsc_gcc64dbg_la-api_util.lo `test -f 'api_util.cc' || echo '$(srcdir)/'`api_util.cc
 
 libvomsc_gcc64dbg_la-voms_api.lo: voms_api.cc
-@am__fastdepCXX_TRUE@	$(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libvomsc_gcc64dbg_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT libvomsc_gcc64dbg_la-voms_api.lo -MD -MP -MF $(DEPDIR)/libvomsc_gcc64dbg_la-voms_api.Tpo -c -o libvomsc_gcc64dbg_la-voms_api.lo `test -f 'voms_api.cc' || echo '$(srcdir)/'`voms_api.cc
+@am__fastdepCXX_TRUE@	$(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libvomsc_gcc64dbg_la_CXXFLAGS) $(CXXFLAGS) -MT libvomsc_gcc64dbg_la-voms_api.lo -MD -MP -MF $(DEPDIR)/libvomsc_gcc64dbg_la-voms_api.Tpo -c -o libvomsc_gcc64dbg_la-voms_api.lo `test -f 'voms_api.cc' || echo '$(srcdir)/'`voms_api.cc
 @am__fastdepCXX_TRUE@	mv -f $(DEPDIR)/libvomsc_gcc64dbg_la-voms_api.Tpo $(DEPDIR)/libvomsc_gcc64dbg_la-voms_api.Plo
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='voms_api.cc' object='libvomsc_gcc64dbg_la-voms_api.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libvomsc_gcc64dbg_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o libvomsc_gcc64dbg_la-voms_api.lo `test -f 'voms_api.cc' || echo '$(srcdir)/'`voms_api.cc
+@am__fastdepCXX_FALSE@	$(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libvomsc_gcc64dbg_la_CXXFLAGS) $(CXXFLAGS) -c -o libvomsc_gcc64dbg_la-voms_api.lo `test -f 'voms_api.cc' || echo '$(srcdir)/'`voms_api.cc
 
 libvomsc_gcc64dbg_la-ccval.lo: ccval.cc
-@am__fastdepCXX_TRUE@	$(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libvomsc_gcc64dbg_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT libvomsc_gcc64dbg_la-ccval.lo -MD -MP -MF $(DEPDIR)/libvomsc_gcc64dbg_la-ccval.Tpo -c -o libvomsc_gcc64dbg_la-ccval.lo `test -f 'ccval.cc' || echo '$(srcdir)/'`ccval.cc
+@am__fastdepCXX_TRUE@	$(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libvomsc_gcc64dbg_la_CXXFLAGS) $(CXXFLAGS) -MT libvomsc_gcc64dbg_la-ccval.lo -MD -MP -MF $(DEPDIR)/libvomsc_gcc64dbg_la-ccval.Tpo -c -o libvomsc_gcc64dbg_la-ccval.lo `test -f 'ccval.cc' || echo '$(srcdir)/'`ccval.cc
 @am__fastdepCXX_TRUE@	mv -f $(DEPDIR)/libvomsc_gcc64dbg_la-ccval.Tpo $(DEPDIR)/libvomsc_gcc64dbg_la-ccval.Plo
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='ccval.cc' object='libvomsc_gcc64dbg_la-ccval.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libvomsc_gcc64dbg_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o libvomsc_gcc64dbg_la-ccval.lo `test -f 'ccval.cc' || echo '$(srcdir)/'`ccval.cc
+@am__fastdepCXX_FALSE@	$(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libvomsc_gcc64dbg_la_CXXFLAGS) $(CXXFLAGS) -c -o libvomsc_gcc64dbg_la-ccval.lo `test -f 'ccval.cc' || echo '$(srcdir)/'`ccval.cc
 
 libvomsc_gcc64dbg_la-internal.lo: internal.cc
-@am__fastdepCXX_TRUE@	$(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libvomsc_gcc64dbg_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT libvomsc_gcc64dbg_la-internal.lo -MD -MP -MF $(DEPDIR)/libvomsc_gcc64dbg_la-internal.Tpo -c -o libvomsc_gcc64dbg_la-internal.lo `test -f 'internal.cc' || echo '$(srcdir)/'`internal.cc
+@am__fastdepCXX_TRUE@	$(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libvomsc_gcc64dbg_la_CXXFLAGS) $(CXXFLAGS) -MT libvomsc_gcc64dbg_la-internal.lo -MD -MP -MF $(DEPDIR)/libvomsc_gcc64dbg_la-internal.Tpo -c -o libvomsc_gcc64dbg_la-internal.lo `test -f 'internal.cc' || echo '$(srcdir)/'`internal.cc
 @am__fastdepCXX_TRUE@	mv -f $(DEPDIR)/libvomsc_gcc64dbg_la-internal.Tpo $(DEPDIR)/libvomsc_gcc64dbg_la-internal.Plo
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='internal.cc' object='libvomsc_gcc64dbg_la-internal.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libvomsc_gcc64dbg_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o libvomsc_gcc64dbg_la-internal.lo `test -f 'internal.cc' || echo '$(srcdir)/'`internal.cc
+@am__fastdepCXX_FALSE@	$(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libvomsc_gcc64dbg_la_CXXFLAGS) $(CXXFLAGS) -c -o libvomsc_gcc64dbg_la-internal.lo `test -f 'internal.cc' || echo '$(srcdir)/'`internal.cc
 
 libvomsc_gcc64dbg_la-cinterface.lo: cinterface.cc
-@am__fastdepCXX_TRUE@	$(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libvomsc_gcc64dbg_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT libvomsc_gcc64dbg_la-cinterface.lo -MD -MP -MF $(DEPDIR)/libvomsc_gcc64dbg_la-cinterface.Tpo -c -o libvomsc_gcc64dbg_la-cinterface.lo `test -f 'cinterface.cc' || echo '$(srcdir)/'`cinterface.cc
+@am__fastdepCXX_TRUE@	$(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libvomsc_gcc64dbg_la_CXXFLAGS) $(CXXFLAGS) -MT libvomsc_gcc64dbg_la-cinterface.lo -MD -MP -MF $(DEPDIR)/libvomsc_gcc64dbg_la-cinterface.Tpo -c -o libvomsc_gcc64dbg_la-cinterface.lo `test -f 'cinterface.cc' || echo '$(srcdir)/'`cinterface.cc
 @am__fastdepCXX_TRUE@	mv -f $(DEPDIR)/libvomsc_gcc64dbg_la-cinterface.Tpo $(DEPDIR)/libvomsc_gcc64dbg_la-cinterface.Plo
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='cinterface.cc' object='libvomsc_gcc64dbg_la-cinterface.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libvomsc_gcc64dbg_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o libvomsc_gcc64dbg_la-cinterface.lo `test -f 'cinterface.cc' || echo '$(srcdir)/'`cinterface.cc
+@am__fastdepCXX_FALSE@	$(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libvomsc_gcc64dbg_la_CXXFLAGS) $(CXXFLAGS) -c -o libvomsc_gcc64dbg_la-cinterface.lo `test -f 'cinterface.cc' || echo '$(srcdir)/'`cinterface.cc
 
 libvomsc_gcc64dbgpthr_la-api_util.lo: api_util.cc
-@am__fastdepCXX_TRUE@	$(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libvomsc_gcc64dbgpthr_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT libvomsc_gcc64dbgpthr_la-api_util.lo -MD -MP -MF $(DEPDIR)/libvomsc_gcc64dbgpthr_la-api_util.Tpo -c -o libvomsc_gcc64dbgpthr_la-api_util.lo `test -f 'api_util.cc' || echo '$(srcdir)/'`api_util.cc
+@am__fastdepCXX_TRUE@	$(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libvomsc_gcc64dbgpthr_la_CXXFLAGS) $(CXXFLAGS) -MT libvomsc_gcc64dbgpthr_la-api_util.lo -MD -MP -MF $(DEPDIR)/libvomsc_gcc64dbgpthr_la-api_util.Tpo -c -o libvomsc_gcc64dbgpthr_la-api_util.lo `test -f 'api_util.cc' || echo '$(srcdir)/'`api_util.cc
 @am__fastdepCXX_TRUE@	mv -f $(DEPDIR)/libvomsc_gcc64dbgpthr_la-api_util.Tpo $(DEPDIR)/libvomsc_gcc64dbgpthr_la-api_util.Plo
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='api_util.cc' object='libvomsc_gcc64dbgpthr_la-api_util.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libvomsc_gcc64dbgpthr_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o libvomsc_gcc64dbgpthr_la-api_util.lo `test -f 'api_util.cc' || echo '$(srcdir)/'`api_util.cc
+@am__fastdepCXX_FALSE@	$(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libvomsc_gcc64dbgpthr_la_CXXFLAGS) $(CXXFLAGS) -c -o libvomsc_gcc64dbgpthr_la-api_util.lo `test -f 'api_util.cc' || echo '$(srcdir)/'`api_util.cc
 
 libvomsc_gcc64dbgpthr_la-voms_api.lo: voms_api.cc
-@am__fastdepCXX_TRUE@	$(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libvomsc_gcc64dbgpthr_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT libvomsc_gcc64dbgpthr_la-voms_api.lo -MD -MP -MF $(DEPDIR)/libvomsc_gcc64dbgpthr_la-voms_api.Tpo -c -o libvomsc_gcc64dbgpthr_la-voms_api.lo `test -f 'voms_api.cc' || echo '$(srcdir)/'`voms_api.cc
+@am__fastdepCXX_TRUE@	$(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libvomsc_gcc64dbgpthr_la_CXXFLAGS) $(CXXFLAGS) -MT libvomsc_gcc64dbgpthr_la-voms_api.lo -MD -MP -MF $(DEPDIR)/libvomsc_gcc64dbgpthr_la-voms_api.Tpo -c -o libvomsc_gcc64dbgpthr_la-voms_api.lo `test -f 'voms_api.cc' || echo '$(srcdir)/'`voms_api.cc
 @am__fastdepCXX_TRUE@	mv -f $(DEPDIR)/libvomsc_gcc64dbgpthr_la-voms_api.Tpo $(DEPDIR)/libvomsc_gcc64dbgpthr_la-voms_api.Plo
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='voms_api.cc' object='libvomsc_gcc64dbgpthr_la-voms_api.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libvomsc_gcc64dbgpthr_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o libvomsc_gcc64dbgpthr_la-voms_api.lo `test -f 'voms_api.cc' || echo '$(srcdir)/'`voms_api.cc
+@am__fastdepCXX_FALSE@	$(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libvomsc_gcc64dbgpthr_la_CXXFLAGS) $(CXXFLAGS) -c -o libvomsc_gcc64dbgpthr_la-voms_api.lo `test -f 'voms_api.cc' || echo '$(srcdir)/'`voms_api.cc
 
 libvomsc_gcc64dbgpthr_la-ccval.lo: ccval.cc
-@am__fastdepCXX_TRUE@	$(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libvomsc_gcc64dbgpthr_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT libvomsc_gcc64dbgpthr_la-ccval.lo -MD -MP -MF $(DEPDIR)/libvomsc_gcc64dbgpthr_la-ccval.Tpo -c -o libvomsc_gcc64dbgpthr_la-ccval.lo `test -f 'ccval.cc' || echo '$(srcdir)/'`ccval.cc
+@am__fastdepCXX_TRUE@	$(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libvomsc_gcc64dbgpthr_la_CXXFLAGS) $(CXXFLAGS) -MT libvomsc_gcc64dbgpthr_la-ccval.lo -MD -MP -MF $(DEPDIR)/libvomsc_gcc64dbgpthr_la-ccval.Tpo -c -o libvomsc_gcc64dbgpthr_la-ccval.lo `test -f 'ccval.cc' || echo '$(srcdir)/'`ccval.cc
 @am__fastdepCXX_TRUE@	mv -f $(DEPDIR)/libvomsc_gcc64dbgpthr_la-ccval.Tpo $(DEPDIR)/libvomsc_gcc64dbgpthr_la-ccval.Plo
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='ccval.cc' object='libvomsc_gcc64dbgpthr_la-ccval.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libvomsc_gcc64dbgpthr_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o libvomsc_gcc64dbgpthr_la-ccval.lo `test -f 'ccval.cc' || echo '$(srcdir)/'`ccval.cc
+@am__fastdepCXX_FALSE@	$(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libvomsc_gcc64dbgpthr_la_CXXFLAGS) $(CXXFLAGS) -c -o libvomsc_gcc64dbgpthr_la-ccval.lo `test -f 'ccval.cc' || echo '$(srcdir)/'`ccval.cc
 
 libvomsc_gcc64dbgpthr_la-internal.lo: internal.cc
-@am__fastdepCXX_TRUE@	$(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libvomsc_gcc64dbgpthr_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT libvomsc_gcc64dbgpthr_la-internal.lo -MD -MP -MF $(DEPDIR)/libvomsc_gcc64dbgpthr_la-internal.Tpo -c -o libvomsc_gcc64dbgpthr_la-internal.lo `test -f 'internal.cc' || echo '$(srcdir)/'`internal.cc
+@am__fastdepCXX_TRUE@	$(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libvomsc_gcc64dbgpthr_la_CXXFLAGS) $(CXXFLAGS) -MT libvomsc_gcc64dbgpthr_la-internal.lo -MD -MP -MF $(DEPDIR)/libvomsc_gcc64dbgpthr_la-internal.Tpo -c -o libvomsc_gcc64dbgpthr_la-internal.lo `test -f 'internal.cc' || echo '$(srcdir)/'`internal.cc
 @am__fastdepCXX_TRUE@	mv -f $(DEPDIR)/libvomsc_gcc64dbgpthr_la-internal.Tpo $(DEPDIR)/libvomsc_gcc64dbgpthr_la-internal.Plo
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='internal.cc' object='libvomsc_gcc64dbgpthr_la-internal.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libvomsc_gcc64dbgpthr_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o libvomsc_gcc64dbgpthr_la-internal.lo `test -f 'internal.cc' || echo '$(srcdir)/'`internal.cc
+@am__fastdepCXX_FALSE@	$(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libvomsc_gcc64dbgpthr_la_CXXFLAGS) $(CXXFLAGS) -c -o libvomsc_gcc64dbgpthr_la-internal.lo `test -f 'internal.cc' || echo '$(srcdir)/'`internal.cc
 
 libvomsc_gcc64dbgpthr_la-cinterface.lo: cinterface.cc
-@am__fastdepCXX_TRUE@	$(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libvomsc_gcc64dbgpthr_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT libvomsc_gcc64dbgpthr_la-cinterface.lo -MD -MP -MF $(DEPDIR)/libvomsc_gcc64dbgpthr_la-cinterface.Tpo -c -o libvomsc_gcc64dbgpthr_la-cinterface.lo `test -f 'cinterface.cc' || echo '$(srcdir)/'`cinterface.cc
+@am__fastdepCXX_TRUE@	$(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libvomsc_gcc64dbgpthr_la_CXXFLAGS) $(CXXFLAGS) -MT libvomsc_gcc64dbgpthr_la-cinterface.lo -MD -MP -MF $(DEPDIR)/libvomsc_gcc64dbgpthr_la-cinterface.Tpo -c -o libvomsc_gcc64dbgpthr_la-cinterface.lo `test -f 'cinterface.cc' || echo '$(srcdir)/'`cinterface.cc
 @am__fastdepCXX_TRUE@	mv -f $(DEPDIR)/libvomsc_gcc64dbgpthr_la-cinterface.Tpo $(DEPDIR)/libvomsc_gcc64dbgpthr_la-cinterface.Plo
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='cinterface.cc' object='libvomsc_gcc64dbgpthr_la-cinterface.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libvomsc_gcc64dbgpthr_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o libvomsc_gcc64dbgpthr_la-cinterface.lo `test -f 'cinterface.cc' || echo '$(srcdir)/'`cinterface.cc
+@am__fastdepCXX_FALSE@	$(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libvomsc_gcc64dbgpthr_la_CXXFLAGS) $(CXXFLAGS) -c -o libvomsc_gcc64dbgpthr_la-cinterface.lo `test -f 'cinterface.cc' || echo '$(srcdir)/'`cinterface.cc
 
 libvomsc_gcc64pthr_la-api_util.lo: api_util.cc
-@am__fastdepCXX_TRUE@	$(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libvomsc_gcc64pthr_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT libvomsc_gcc64pthr_la-api_util.lo -MD -MP -MF $(DEPDIR)/libvomsc_gcc64pthr_la-api_util.Tpo -c -o libvomsc_gcc64pthr_la-api_util.lo `test -f 'api_util.cc' || echo '$(srcdir)/'`api_util.cc
+@am__fastdepCXX_TRUE@	$(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libvomsc_gcc64pthr_la_CXXFLAGS) $(CXXFLAGS) -MT libvomsc_gcc64pthr_la-api_util.lo -MD -MP -MF $(DEPDIR)/libvomsc_gcc64pthr_la-api_util.Tpo -c -o libvomsc_gcc64pthr_la-api_util.lo `test -f 'api_util.cc' || echo '$(srcdir)/'`api_util.cc
 @am__fastdepCXX_TRUE@	mv -f $(DEPDIR)/libvomsc_gcc64pthr_la-api_util.Tpo $(DEPDIR)/libvomsc_gcc64pthr_la-api_util.Plo
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='api_util.cc' object='libvomsc_gcc64pthr_la-api_util.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libvomsc_gcc64pthr_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o libvomsc_gcc64pthr_la-api_util.lo `test -f 'api_util.cc' || echo '$(srcdir)/'`api_util.cc
+@am__fastdepCXX_FALSE@	$(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libvomsc_gcc64pthr_la_CXXFLAGS) $(CXXFLAGS) -c -o libvomsc_gcc64pthr_la-api_util.lo `test -f 'api_util.cc' || echo '$(srcdir)/'`api_util.cc
 
 libvomsc_gcc64pthr_la-voms_api.lo: voms_api.cc
-@am__fastdepCXX_TRUE@	$(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libvomsc_gcc64pthr_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT libvomsc_gcc64pthr_la-voms_api.lo -MD -MP -MF $(DEPDIR)/libvomsc_gcc64pthr_la-voms_api.Tpo -c -o libvomsc_gcc64pthr_la-voms_api.lo `test -f 'voms_api.cc' || echo '$(srcdir)/'`voms_api.cc
+@am__fastdepCXX_TRUE@	$(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libvomsc_gcc64pthr_la_CXXFLAGS) $(CXXFLAGS) -MT libvomsc_gcc64pthr_la-voms_api.lo -MD -MP -MF $(DEPDIR)/libvomsc_gcc64pthr_la-voms_api.Tpo -c -o libvomsc_gcc64pthr_la-voms_api.lo `test -f 'voms_api.cc' || echo '$(srcdir)/'`voms_api.cc
 @am__fastdepCXX_TRUE@	mv -f $(DEPDIR)/libvomsc_gcc64pthr_la-voms_api.Tpo $(DEPDIR)/libvomsc_gcc64pthr_la-voms_api.Plo
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='voms_api.cc' object='libvomsc_gcc64pthr_la-voms_api.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libvomsc_gcc64pthr_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o libvomsc_gcc64pthr_la-voms_api.lo `test -f 'voms_api.cc' || echo '$(srcdir)/'`voms_api.cc
+@am__fastdepCXX_FALSE@	$(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libvomsc_gcc64pthr_la_CXXFLAGS) $(CXXFLAGS) -c -o libvomsc_gcc64pthr_la-voms_api.lo `test -f 'voms_api.cc' || echo '$(srcdir)/'`voms_api.cc
 
 libvomsc_gcc64pthr_la-ccval.lo: ccval.cc
-@am__fastdepCXX_TRUE@	$(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libvomsc_gcc64pthr_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT libvomsc_gcc64pthr_la-ccval.lo -MD -MP -MF $(DEPDIR)/libvomsc_gcc64pthr_la-ccval.Tpo -c -o libvomsc_gcc64pthr_la-ccval.lo `test -f 'ccval.cc' || echo '$(srcdir)/'`ccval.cc
+@am__fastdepCXX_TRUE@	$(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libvomsc_gcc64pthr_la_CXXFLAGS) $(CXXFLAGS) -MT libvomsc_gcc64pthr_la-ccval.lo -MD -MP -MF $(DEPDIR)/libvomsc_gcc64pthr_la-ccval.Tpo -c -o libvomsc_gcc64pthr_la-ccval.lo `test -f 'ccval.cc' || echo '$(srcdir)/'`ccval.cc
 @am__fastdepCXX_TRUE@	mv -f $(DEPDIR)/libvomsc_gcc64pthr_la-ccval.Tpo $(DEPDIR)/libvomsc_gcc64pthr_la-ccval.Plo
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='ccval.cc' object='libvomsc_gcc64pthr_la-ccval.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libvomsc_gcc64pthr_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o libvomsc_gcc64pthr_la-ccval.lo `test -f 'ccval.cc' || echo '$(srcdir)/'`ccval.cc
+@am__fastdepCXX_FALSE@	$(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libvomsc_gcc64pthr_la_CXXFLAGS) $(CXXFLAGS) -c -o libvomsc_gcc64pthr_la-ccval.lo `test -f 'ccval.cc' || echo '$(srcdir)/'`ccval.cc
 
 libvomsc_gcc64pthr_la-internal.lo: internal.cc
-@am__fastdepCXX_TRUE@	$(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libvomsc_gcc64pthr_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT libvomsc_gcc64pthr_la-internal.lo -MD -MP -MF $(DEPDIR)/libvomsc_gcc64pthr_la-internal.Tpo -c -o libvomsc_gcc64pthr_la-internal.lo `test -f 'internal.cc' || echo '$(srcdir)/'`internal.cc
+@am__fastdepCXX_TRUE@	$(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libvomsc_gcc64pthr_la_CXXFLAGS) $(CXXFLAGS) -MT libvomsc_gcc64pthr_la-internal.lo -MD -MP -MF $(DEPDIR)/libvomsc_gcc64pthr_la-internal.Tpo -c -o libvomsc_gcc64pthr_la-internal.lo `test -f 'internal.cc' || echo '$(srcdir)/'`internal.cc
 @am__fastdepCXX_TRUE@	mv -f $(DEPDIR)/libvomsc_gcc64pthr_la-internal.Tpo $(DEPDIR)/libvomsc_gcc64pthr_la-internal.Plo
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='internal.cc' object='libvomsc_gcc64pthr_la-internal.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libvomsc_gcc64pthr_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o libvomsc_gcc64pthr_la-internal.lo `test -f 'internal.cc' || echo '$(srcdir)/'`internal.cc
+@am__fastdepCXX_FALSE@	$(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libvomsc_gcc64pthr_la_CXXFLAGS) $(CXXFLAGS) -c -o libvomsc_gcc64pthr_la-internal.lo `test -f 'internal.cc' || echo '$(srcdir)/'`internal.cc
 
 libvomsc_gcc64pthr_la-cinterface.lo: cinterface.cc
-@am__fastdepCXX_TRUE@	$(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libvomsc_gcc64pthr_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT libvomsc_gcc64pthr_la-cinterface.lo -MD -MP -MF $(DEPDIR)/libvomsc_gcc64pthr_la-cinterface.Tpo -c -o libvomsc_gcc64pthr_la-cinterface.lo `test -f 'cinterface.cc' || echo '$(srcdir)/'`cinterface.cc
+@am__fastdepCXX_TRUE@	$(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libvomsc_gcc64pthr_la_CXXFLAGS) $(CXXFLAGS) -MT libvomsc_gcc64pthr_la-cinterface.lo -MD -MP -MF $(DEPDIR)/libvomsc_gcc64pthr_la-cinterface.Tpo -c -o libvomsc_gcc64pthr_la-cinterface.lo `test -f 'cinterface.cc' || echo '$(srcdir)/'`cinterface.cc
 @am__fastdepCXX_TRUE@	mv -f $(DEPDIR)/libvomsc_gcc64pthr_la-cinterface.Tpo $(DEPDIR)/libvomsc_gcc64pthr_la-cinterface.Plo
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='cinterface.cc' object='libvomsc_gcc64pthr_la-cinterface.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libvomsc_gcc64pthr_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o libvomsc_gcc64pthr_la-cinterface.lo `test -f 'cinterface.cc' || echo '$(srcdir)/'`cinterface.cc
+@am__fastdepCXX_FALSE@	$(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libvomsc_gcc64pthr_la_CXXFLAGS) $(CXXFLAGS) -c -o libvomsc_gcc64pthr_la-cinterface.lo `test -f 'cinterface.cc' || echo '$(srcdir)/'`cinterface.cc
 
 mostlyclean-libtool:
 	-rm -f *.lo

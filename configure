@@ -15658,7 +15658,7 @@ $as_echo_n "checking for system OpenSSL version... " >&6; }
 #include <openssl/opensslv.h>
 OPENSSL_VERSION_TEXT
 HERE
-    openssl_version=`$CPP -I$NO_GLOBUS_FLAGS -o - -P conftest.h`
+    openssl_version=`$CPP $NO_GLOBUS_FLAGS -o - -P conftest.h`
     { $as_echo "$as_me:$LINENO: result: $openssl_version" >&5
 $as_echo "$openssl_version" >&6; }
     rm -f conftest.h
