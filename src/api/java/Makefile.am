@@ -10,6 +10,9 @@ JAVA_CLASSES = org/glite/voms/BasicVOMSTrustStore.class \
 							 org/glite/voms/PKIUtils.class \
 							 org/glite/voms/PKIVerifier.class \
 							 org/glite/voms/SigningPolicy.class \
+							 org/glite/voms/DirectoryList.class \
+							 org/glite/voms/FileCertReader.class \
+							 org/glite/voms/FileEndingIterator.class \
 							 org/glite/voms/VOMSAttribute.class \
 							 org/glite/voms/VOMSValidator.class \
 							 org/glite/voms/VOMSTrustManager.class \

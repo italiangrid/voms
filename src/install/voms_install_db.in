@@ -4,7 +4,11 @@
 # Default prefix
 @LOCATION_ENV@=${@LOCATION_ENV@:-@LOCATION_DIR@}
 if test -z $@VAR_LOCATION_ENV@ ; then
-    @VAR_LOCATION_ENV@=$@LOCATION_ENV@/var
+    if [ "$@LOCATION_ENV@" = "/usr" ] ; then
+        @VAR_LOCATION_ENV@=/var
+    else
+        @VAR_LOCATION_ENV@=$@LOCATION_ENV@/var
+    fi
 fi
 
 # CERTDIR
@@ -37,7 +41,9 @@ ECHO=/bin/echo
 
 # Default path
 basepath=$@LOCATION_ENV@
-datapath=$@LOCATION_ENV@
+if [ "$@LOCATION_ENV@" != "/usr" ] ; then
+    datapath=$@LOCATION_ENV@
+fi
 
 # Default Suffix
 code=0
@@ -85,6 +91,7 @@ while true ; do
   --logformat)              logformat=$2               ; shift 2 ;;
   --logdateformat)          logdateformat=$2           ; shift 2 ;;
   --newformat)              oldformat="yes"            ; shift 1 ;;
+  --oldformat)              oldformat="no"             ; shift 1 ;;
   -h)                       help="yes"                 ; shift 1 ;;
 	--)                       shift                      ; break   ;;
 	*)                        $ECHO "$1: Internal Error!" >&2 ; exit 1  ;;
@@ -134,6 +141,7 @@ if test "x$help" = "xyes"; then
     $ECHO "    --logformat format      See the vomsd(8) man page for details."
     $ECHO "    --logdateformat format  See the vomsd(8) man page for details."
     $ECHO "    --newformat             Creates AC according to the old format."
+    $ECHO "    --oldformat             Creates AC according to the old format."
     $ECHO "    --help                  This output."
     exit 0;
 fi
@@ -261,7 +269,7 @@ useradd -g voms voms 2>/dev/null
 
 # Setting ownership and permission for voms_password_query file
 mkdir -p $datapath/etc/voms/$voms_vo
-mkdir -p $@LOCATION_ENV@_VAR/log
+mkdir -p $@VAR_LOCATION_ENV@/log/
 #$datapath/log
 $ECHO $voms_password_query > $datapath/etc/voms/$voms_vo/voms.pass
 chown root.voms $datapath/etc/voms/$voms_vo/voms.pass
@@ -273,7 +281,7 @@ else
     logname=voms.$voms_vo
 fi
  
-$ECHO -en "--vo=$voms_vo\n--dbname=$voms_database\n--port=$port\n--username=$voms_username_query\n--passfile=$datapath/etc/voms/$voms_vo/voms.pass\n--sqlloc=$sqlloc\n--logfile=$@LOCATION_ENV@_VAR/log/$logname\n" > $datapath/etc/voms/$voms_vo/voms.conf
+$ECHO -en "--vo=$voms_vo\n--dbname=$voms_database\n--port=$port\n--username=$voms_username_query\n--passfile=$datapath/etc/voms/$voms_vo/voms.pass\n--sqlloc=$sqlloc\n--logfile=$@VAR_LOCATION_ENV@/log/$logname\n" > $datapath/etc/voms/$voms_vo/voms.conf
 $ECHO -en "--socktimeout=$timeout\n--loglevel=$loglevel\n--logtype=$logtype\n" >>$datapath/etc/voms/$voms_vo/voms.conf
 
 if test "x$compat_mode" = "x-compat"; then
