@@ -2426,7 +2426,7 @@ proxy_verify_cert_chain(
         X509_STORE_CTX_set_ex_data(&csc,
                                    PVD_STORE_EX_DATA_IDX, (void *)pvd);
 #ifdef X509_V_FLAG_ALLOW_PROXY_CERTS
-	X509_STORE_CTX_set_flags(&csc, X509_V_FLAG_ALLOW_PROXY_CERTS);
+        X509_STORE_CTX_set_flags(&csc, X509_V_FLAG_ALLOW_PROXY_CERTS);
 #endif
         if(!X509_verify_cert(&csc))
         {

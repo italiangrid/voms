@@ -1780,7 +1780,7 @@ char **parse_subjects(char *string)
     if (divider == '\'' || divider == '"') {
       char *end = strchr(string + 1, divider);
       if (!end)
-        return NULL;
+        return list;
       *end = '\0';
 
       list = (char**)splistadd(list, string+1, sizeof(char*));

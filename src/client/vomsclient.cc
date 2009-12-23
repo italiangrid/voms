@@ -895,6 +895,7 @@ bool Client::CreateProxy(std::string data, AC ** aclist, int version)
     args->hours         = hours;
     args->minutes       = minutes;
     args->limited       = limit_proxy;
+
     args->voID          = strdup(voID.c_str());
     args->callback      = (int (*)())kpcallback;
     int warn = 0;

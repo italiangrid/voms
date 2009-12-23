@@ -333,10 +333,11 @@ GSISocketServer::AcceptGSIAuthentication()
   if (proxy_get_filenames(0, &cert_file, &cacertdir, &user_proxy, &user_cert, &user_key) == 0) {
     (void)load_credentials(user_cert, user_key, &ucert, &cert_chain, &upkey, NULL);
   }
-//   free(cert_file);
-//   free(user_cert);
-//   free(user_key);
-//   free(user_proxy);
+
+  free(cert_file);
+  free(user_cert);
+  free(user_key);
+  free(user_proxy);
 
   own_cert = ucert;
   own_stack = cert_chain;
