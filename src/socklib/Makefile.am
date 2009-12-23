@@ -11,7 +11,7 @@ SOURCES = Client.cpp ipv6sock.c
 libsock_la_SOURCES = 	Client.cpp ipv6sock.c
 libsock_nog_la_SOURCES = Client.cpp Server.cpp ipv6sock.c
 
-libsock_nog_la_CPPFLAGS = \
+libsock_nog_la_CXXFLAGS = \
 	$(NO_GLOBUS_FLAGS) \
 	-I $(top_srcdir)/src/include \
 	-I $(top_srcdir)/src/sslutils \
@@ -21,7 +21,7 @@ libsock_nog_la_LIBADD = \
 	-lcrypto -lssl
 
 
-libsock_la_CPPFLAGS = \
+libsock_la_CXXFLAGS = \
 	-I $(top_srcdir)/src/include \
 	-I $(top_srcdir)/src/sslutils \
 	$(GLOBUS_CFLAGS)
@@ -75,7 +75,7 @@ CLEANFILES = \
 libsock_gcc32_la_SOURCES = \
 	$(SOURCES)
 
-libsock_gcc32_la_CPPFLAGS = \
+libsock_gcc32_la_CXXFLAGS = \
 	-I $(top_srcdir)/src/include \
 	-I $(top_srcdir)/src/sslutils \
 	$(GLOBUS_GCC32_CFLAGS)
@@ -88,7 +88,7 @@ libsock_gcc32_la_LIBADD = \
 libsock_gcc32dbg_la_SOURCES = \
 	$(SOURCES)
 
-libsock_gcc32dbg_la_CPPFLAGS = \
+libsock_gcc32dbg_la_CXXFLAGS = \
 	-I $(top_srcdir)/src/include \
 	-I $(top_srcdir)/src/sslutils \
 	$(GLOBUS_GCC32DBG_CFLAGS)
@@ -101,7 +101,7 @@ libsock_gcc32dbg_la_LIBADD = \
 libsock_gcc32pthr_la_SOURCES = \
 	$(SOURCES)
 
-libsock_gcc32pthr_la_CPPFLAGS = \
+libsock_gcc32pthr_la_CXXFLAGS = \
 	-I $(top_srcdir)/src/include \
 	-I $(top_srcdir)/src/sslutils \
 	$(GLOBUS_GCC32PTHR_CFLAGS)
@@ -114,7 +114,7 @@ libsock_gcc32pthr_la_LIBADD = \
 libsock_gcc32dbgpthr_la_SOURCES = \
 	$(SOURCES)
 
-libsock_gcc32dbgpthr_la_CPPFLAGS = \
+libsock_gcc32dbgpthr_la_CXXFLAGS = \
 	-I $(top_srcdir)/src/include \
 	-I $(top_srcdir)/src/sslutils \
 	$(GLOBUS_GCC32DBG_CFLAGS)
@@ -127,7 +127,7 @@ libsock_gcc32dbgpthr_la_LIBADD = \
 libsock_gcc64_la_SOURCES = \
 	$(SOURCES)
 
-libsock_gcc64_la_CPPFLAGS = \
+libsock_gcc64_la_CXXFLAGS = \
 	-I $(top_srcdir)/src/include \
 	-I $(top_srcdir)/src/sslutils \
 	$(GLOBUS_GCC64_CFLAGS)
@@ -140,7 +140,7 @@ libsock_gcc64_la_LIBADD = \
 libsock_gcc64dbg_la_SOURCES = \
 	$(SOURCES)
 
-libsock_gcc64dbg_la_CPPFLAGS = \
+libsock_gcc64dbg_la_CXXFLAGS = \
 	-I $(top_srcdir)/src/include \
 	-I $(top_srcdir)/src/sslutils \
 	$(GLOBUS_GCC64DBG_CFLAGS)
@@ -153,7 +153,7 @@ libsock_gcc64dbg_la_LIBADD = \
 libsock_gcc64pthr_la_SOURCES = \
 	$(SOURCES)
 
-libsock_gcc64pthr_la_CPPFLAGS = \
+libsock_gcc64pthr_la_CXXFLAGS = \
 	-I $(top_srcdir)/src/include \
 	-I $(top_srcdir)/src/sslutils \
 	$(GLOBUS_GCC64PTHR_CFLAGS)
@@ -166,7 +166,7 @@ libsock_gcc64pthr_la_LIBADD = \
 libsock_gcc64dbgpthr_la_SOURCES = \
 	$(SOURCES)
 
-libsock_gcc64dbgpthr_la_CPPFLAGS = \
+libsock_gcc64dbgpthr_la_CXXFLAGS = \
 	-I $(top_srcdir)/src/include \
 	-I $(top_srcdir)/src/sslutils \
 	$(GLOBUS_GCC64DBG_CFLAGS)
