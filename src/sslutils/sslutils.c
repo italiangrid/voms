@@ -1880,6 +1880,7 @@ proxy_verify_callback(
     char *                              ca_policy_file_path = NULL;
     char *                              cert_dir            = NULL;
     EVP_PKEY *key = NULL;
+    int       objset = 0;
 
     /*
      * If we are being called recursivly to check delegate
@@ -2061,6 +2062,7 @@ proxy_verify_callback(
                                       X509_get_subject_name(ctx->current_cert),
                                       &obj))
         {
+            objset = 1;
             crl =  obj.data.crl;
             crl_info = crl->crl;
             /* verify the signature on this CRL */
@@ -2093,15 +2095,7 @@ proxy_verify_callback(
                 ctx->error = X509_V_ERR_CRL_HAS_EXPIRED;
                 goto fail_verify;
             }
-        }
 
-        /* now check if the issuer has a CRL, and we are revoked */
-        if (X509_STORE_get_by_subject(ctx, X509_LU_CRL, 
-                                      X509_get_issuer_name(ctx->current_cert),
-                                      &obj))
-        {
-            crl = obj.data.crl;
-            crl_info = crl->crl;
             /* check if this cert is revoked */
 
 
@@ -2288,12 +2282,18 @@ proxy_verify_callback(
 
     EVP_PKEY_free(key);
 
+    if (objset)
+      X509_OBJECT_free_contents(&obj);
+
     return(ok);
 
 fail_verify:
 
     if (key)
       EVP_PKEY_free(key);
+
+    if (objset)
+      X509_OBJECT_free_contents(&obj);
 
     if (ctx->current_cert)
     {
@@ -2381,6 +2381,8 @@ proxy_verify_cert_chain(
     X509_STORE_CTX                      csc;
     X509 *                              xcert = NULL;
     X509 *                              scert = NULL;
+    int cscinitialized = 0;
+
     scert = ucert;
     cert_store = X509_STORE_new();
     X509_STORE_set_verify_cb_func(cert_store, proxy_verify_callback);
@@ -2418,7 +2420,7 @@ proxy_verify_cert_chain(
     {
         X509_LOOKUP_add_dir(lookup,pvd->pvxd->certdir,X509_FILETYPE_PEM);
         X509_STORE_CTX_init(&csc,cert_store,scert,NULL);
-
+        cscinitialized = 1;
 #if SSLEAY_VERSION_NUMBER >=  0x0090600fL
         /* override the check_issued with our version */
         csc.check_issued = proxy_check_issued;
@@ -2436,6 +2438,7 @@ proxy_verify_cert_chain(
     retval = 1;
 
 err:
+    if (cscinitialized) X509_STORE_CTX_cleanup(&csc);
     return retval;
 }
 #endif /* NO_PROXY_VERIFY_CALLBACK */
