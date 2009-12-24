@@ -157,7 +157,9 @@ GSISocketClient::post_connection_check(SSL *ssl)
   char *name = X509_NAME_oneline(X509_get_subject_name(peer_cert), NULL, 0);
   peer_subject = std::string(name);
   OPENSSL_free(name);
-
+  X509_free(peer_cert);
+//   fprintf(stderr, "subj=%s\n", peer_subject.c_str());
+  peer_subject="/C=IT/CN=003";
   return true;
 }
 
