@@ -1698,8 +1698,10 @@ int PRIVATE proxy_check_proxy_name(
 
           }
         }
+#if OPENSSL_VERSION_NUMBER >= 0x00908010
 #ifdef EXFLAG_PROXY
         cert->ex_flags |= EXFLAG_PROXY;
+#endif
 #endif
         return 1;
       }
@@ -1759,9 +1761,16 @@ int PRIVATE proxy_check_proxy_name(
         }
     }
 
+#if OPENSSL_VERSION_NUMBER >= 0x00908010
 #ifdef EXFLAG_PROXY
-    if (ret > 0)
+    if (ret > 0) {
       cert->ex_flags |= EXFLAG_PROXY;
+      if (ret == 1)
+        cert->ex_pcpathlen = -1; /* unlimited */
+      else if (ret == 2)
+        cert->ex_pcpathlen = 0; /* Only at top level if limited */
+    }
+#endif
 #endif
 
     return ret;
@@ -1934,7 +1943,19 @@ proxy_verify_callback(
              */
             ok = 1;
             break;
+
 #endif
+        case X509_V_ERR_INVALID_CA:
+          /*
+           * This may happen since proxy issuers are not CAs
+           */
+          if (proxy_check_proxy_name(ctx->cert) >= 1) {
+            if (proxy_check_issued(ctx, ctx->cert, ctx->current_cert)) {
+              ok = 1;
+            }
+          }
+          break;
+
         case X509_V_ERR_UNABLE_TO_GET_ISSUER_CERT_LOCALLY:
         case X509_V_ERR_CERT_UNTRUSTED:
           if (proxy_check_proxy_name(ctx->current_cert) > 0) {
