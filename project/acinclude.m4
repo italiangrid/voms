@@ -677,7 +677,7 @@ AC_DEFUN([AC_VOMS_SOCKLEN_T],
       ],
       [
         socklen_t addrlen = (socklen_t)5;
-        (void)getsockname(0, NULL, &addrlen); 
+        (void)getsockname(0, 0L, &addrlen); 
         return 0;
       ],
       [ac_have_socklen_t="yes"],
@@ -864,7 +864,7 @@ HERE
         AH_BOTTOM([#ifdef __cplusplus
 #include <new>
 #endif])
-        AC_DEFINE(__THROW_BAD_ALLOC, return NULL, __THROW_BAD_ALLOC)
+        AC_DEFINE(__THROW_BAD_ALLOC, return 0L, __THROW_BAD_ALLOC)
         AC_MSG_RESULT([yes])
       else
       AC_MSG_RESULT([no])

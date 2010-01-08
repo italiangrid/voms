@@ -15,7 +15,7 @@ voms_proxy_init_LDADD = \
 AM_CPPFLAGS = -I$(top_srcdir)/src/api/ccapi \
 	-I$(top_srcdir)/src/include \
 	-I$(top_srcdir)/src/sslutils \
-	$(GLOBUS_CFLAGS) \
+	$(NO_GLOBUS_FLAGS) \
 	$(EXPAT_CFLAGS)
 
 install-exec-hook:

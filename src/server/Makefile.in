@@ -305,7 +305,7 @@ with_scratchdir = @with_scratchdir@
 @BUILD_SERVER_TRUE@	-I$(top_srcdir)/src/include \
 @BUILD_SERVER_TRUE@	-I$(top_srcdir)/src/api/ccapi \
 @BUILD_SERVER_TRUE@  -DWITH_SOAPDEFS_H \
-@BUILD_SERVER_TRUE@	$(GLOBUS_CFLAGS)
+@BUILD_SERVER_TRUE@	$(NO_GLOBUS_FLAGS)
 
 all: all-am
 

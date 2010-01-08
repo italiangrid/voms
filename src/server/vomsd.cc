@@ -31,7 +31,6 @@ extern "C" {
 #include <openssl/evp.h>
 #include "newformat.h"
 #include "init.h"
-#include "gssapi.h"
 #include "credentials.h"
 
 #include "log.h"
@@ -73,11 +72,6 @@ extern char *Encode(const char *, int, int *, int);
 #include "dbwrap.h"
 
 #include "voms_api.h"
-
-#ifdef HAVE_GLOBUS_MODULE_ACTIVATE
-#include <globus_module.h>
-#include <globus_openssl.h>
-#endif
 
 extern int AC_Init(void);
 

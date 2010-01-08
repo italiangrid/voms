@@ -31,7 +31,7 @@ AM_CPPFLAGS = \
 	-I$(top_srcdir)/src/include \
 	-I$(top_srcdir)/src/api/ccapi \
   -DWITH_SOAPDEFS_H \
-	$(GLOBUS_CFLAGS)
+	$(NO_GLOBUS_FLAGS)
 
 install-exec-hook:
 	-ln -s voms $(DESTDIR)$(sbindir)/edg-voms

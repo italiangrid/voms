@@ -278,7 +278,7 @@ with_scratchdir = @with_scratchdir@
 @BUILD_CLIENTS_TRUE@AM_CPPFLAGS = -I$(top_srcdir)/src/api/ccapi \
 @BUILD_CLIENTS_TRUE@	-I$(top_srcdir)/src/include \
 @BUILD_CLIENTS_TRUE@	-I$(top_srcdir)/src/sslutils \
-@BUILD_CLIENTS_TRUE@	$(GLOBUS_CFLAGS) \
+@BUILD_CLIENTS_TRUE@	$(NO_GLOBUS_FLAGS) \
 @BUILD_CLIENTS_TRUE@	$(EXPAT_CFLAGS)
 
 all: all-am
