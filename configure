@@ -20447,7 +20447,7 @@ HERE
 
 
 cat >>confdefs.h <<\_ACEOF
-#define __THROW_BAD_ALLOC return NULL
+#define __THROW_BAD_ALLOC return 0L
 _ACEOF
 
         { $as_echo "$as_me:$LINENO: result: yes" >&5
@@ -20865,7 +20865,7 @@ main ()
 {
 
         socklen_t addrlen = (socklen_t)5;
-        (void)getsockname(0, NULL, &addrlen);
+        (void)getsockname(0, 0L, &addrlen);
         return 0;
 
   ;
