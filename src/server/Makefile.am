@@ -13,16 +13,17 @@ voms_SOURCES = \
 	soapServer.c \
 	stdsoap2.c
 
+#	$(top_builddir)/src/sslutils/libssl_utils_nog.la 
+
 voms_LDADD = \
-	$(top_builddir)/src/socklib/$(USE_SOCK_LIB_SERVER) \
+	$(top_builddir)/src/socklib/libsock_nog.la \
 	$(top_builddir)/src/common/libutilities_nog.la \
-	$(top_builddir)/src/sslutils/$(USE_SSL_UTILS_LIB) \
-	$(top_builddir)/src/ac/$(USE_CCATTCERT_LIB) \
+	$(top_builddir)/src/ac/libccattcert.la \
 	$(top_builddir)/src/common/libutilc_nog.la \
-	$(top_builddir)/src/ac/$(USE_ATTCERT_LIB) \
+	$(top_builddir)/src/ac/libattcert.la \
 	$(top_builddir)/src/replib/librep.la \
 	$(top_builddir)/src/log/liblog.la \
-	$(top_builddir)/src/api/ccapi/$(USE_CCAPI_LIB) \
+	$(top_builddir)/src/api/ccapi/libvomsapi_nog.la \
 	$(EXPAT_LIBS)
 
 voms_LDFLAGS =

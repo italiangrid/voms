@@ -1516,7 +1516,7 @@ Parameters:
 Returns:
 **********************************************************************/
 
-void PRIVATE
+void
 proxy_verify_init(
     proxy_verify_desc *                 pvd,
     proxy_verify_ctx_desc *             pvxd)
@@ -1543,7 +1543,7 @@ Parameters:
 Returns:
 **********************************************************************/
 
-void PRIVATE
+void
 proxy_verify_ctx_init(
     proxy_verify_ctx_desc *             pvxd)
 {
@@ -1563,7 +1563,7 @@ Parameters:
 Returns:
 **********************************************************************/
 
-void PRIVATE
+void
 proxy_verify_release(
     proxy_verify_desc *                 pvd)
 {
@@ -1585,7 +1585,7 @@ Parameters:
 Returns:
 **********************************************************************/
 
-void PRIVATE
+void
 proxy_verify_ctx_release(
     proxy_verify_ctx_desc *             pvxd)
 {
@@ -1611,7 +1611,7 @@ Returns:
         Same as X509_verify_cert 
 **********************************************************************/
 
-int PRIVATE
+int
 proxy_app_verify_callback(X509_STORE_CTX *ctx, UNUSED(void *empty))
 {
     /*
@@ -1650,7 +1650,7 @@ Returns:
 
 *********************************************************************/
 
-int PRIVATE proxy_check_proxy_name(
+int proxy_check_proxy_name(
     X509 *                              cert)
 {
     int                                 ret = 0;
@@ -1864,7 +1864,7 @@ Returns:
         0 - failed.  The x509_vfy.c will return a failed to caller. 
 **********************************************************************/
 
-int PRIVATE
+int
 proxy_verify_callback(
     int                                 ok,
     X509_STORE_CTX *                    ctx)
@@ -2552,7 +2552,7 @@ Parameters:
 Returns:
 **********************************************************************/
 
-int PRIVATE
+int
 proxy_get_filenames(
     int                                 proxy_in,
     char **                             p_cert_file,
@@ -3741,7 +3741,7 @@ err:
   return 0;
 }
 
-int PRIVATE load_credentials(const char *certname, const char *keyname,
+int load_credentials(const char *certname, const char *keyname,
                      X509 **cert, STACK_OF(X509) **stack, EVP_PKEY **key,
                      int (*callback)())
 {

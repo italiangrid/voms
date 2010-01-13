@@ -378,8 +378,7 @@ libsock_nog_la_SOURCES = Client.cpp Server.cpp ipv6sock.cc
 libsock_nog_la_CXXFLAGS = \
 	$(NO_GLOBUS_FLAGS) \
 	-I $(top_srcdir)/src/include \
-	-I $(top_srcdir)/src/sslutils \
-	$(GLOBUS_CFLAGS)
+	-I $(top_srcdir)/src/sslutils
 
 
 # libsock_nog_la_CPPFLAGS = \

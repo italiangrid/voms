@@ -318,8 +318,7 @@ libutilc_nog_la_CPPFLAGS = \
 	-DNOGLOBUS \
 	-I $(top_srcdir)/src/include \
 	-I $(top_srcdir)/src/sslutils \
-	$(EXPAT_CFLAGS) \
-	$(GLOBUS_CFLAGS)
+	$(EXPAT_CFLAGS) 
 
 libutilc_nog_la_SOURCES = \
 	list.c \

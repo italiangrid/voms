@@ -537,13 +537,13 @@ ASN1_UTCTIME_mktime(
 
 int PRIVATE determine_filenames(char **cacert, char **certdir, char **outfile,
                                 char **certfile, char **keyfile, int noregen);
-int PRIVATE load_credentials(const char *certname, const char *keyname,
+int load_credentials(const char *certname, const char *keyname,
                              X509 **cert, STACK_OF(X509) **stack, EVP_PKEY **key,
                              int (*callback)());
 int PRIVATE load_certificate_from_file(FILE *file, X509 **cert, 
                                        STACK_OF(X509) **stack);
 
-int PRIVATE
+int
 proxy_app_verify_callback(X509_STORE_CTX *ctx, UNUSED(void *empty));
 
 EXTERN_C_END

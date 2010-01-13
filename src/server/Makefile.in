@@ -55,15 +55,15 @@ am__voms_SOURCES_DIST = main.cc vomsd.cc VOMSServer.h attribute.h \
 @BUILD_SERVER_TRUE@	stdsoap2.$(OBJEXT)
 voms_OBJECTS = $(am_voms_OBJECTS)
 am__DEPENDENCIES_1 =
-@BUILD_SERVER_TRUE@voms_DEPENDENCIES = $(top_builddir)/src/socklib/$(USE_SOCK_LIB_SERVER) \
+@BUILD_SERVER_TRUE@voms_DEPENDENCIES =  \
+@BUILD_SERVER_TRUE@	$(top_builddir)/src/socklib/libsock_nog.la \
 @BUILD_SERVER_TRUE@	$(top_builddir)/src/common/libutilities_nog.la \
-@BUILD_SERVER_TRUE@	$(top_builddir)/src/sslutils/$(USE_SSL_UTILS_LIB) \
-@BUILD_SERVER_TRUE@	$(top_builddir)/src/ac/$(USE_CCATTCERT_LIB) \
+@BUILD_SERVER_TRUE@	$(top_builddir)/src/ac/libccattcert.la \
 @BUILD_SERVER_TRUE@	$(top_builddir)/src/common/libutilc_nog.la \
-@BUILD_SERVER_TRUE@	$(top_builddir)/src/ac/$(USE_ATTCERT_LIB) \
+@BUILD_SERVER_TRUE@	$(top_builddir)/src/ac/libattcert.la \
 @BUILD_SERVER_TRUE@	$(top_builddir)/src/replib/librep.la \
 @BUILD_SERVER_TRUE@	$(top_builddir)/src/log/liblog.la \
-@BUILD_SERVER_TRUE@	$(top_builddir)/src/api/ccapi/$(USE_CCAPI_LIB) \
+@BUILD_SERVER_TRUE@	$(top_builddir)/src/api/ccapi/libvomsapi_nog.la \
 @BUILD_SERVER_TRUE@	$(am__DEPENDENCIES_1)
 voms_LINK = $(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) \
 	--mode=link $(CXXLD) $(AM_CXXFLAGS) $(CXXFLAGS) \
@@ -288,16 +288,17 @@ with_scratchdir = @with_scratchdir@
 @BUILD_SERVER_TRUE@	soapServer.c \
 @BUILD_SERVER_TRUE@	stdsoap2.c
 
+
+#	$(top_builddir)/src/sslutils/libssl_utils_nog.la 
 @BUILD_SERVER_TRUE@voms_LDADD = \
-@BUILD_SERVER_TRUE@	$(top_builddir)/src/socklib/$(USE_SOCK_LIB_SERVER) \
+@BUILD_SERVER_TRUE@	$(top_builddir)/src/socklib/libsock_nog.la \
 @BUILD_SERVER_TRUE@	$(top_builddir)/src/common/libutilities_nog.la \
-@BUILD_SERVER_TRUE@	$(top_builddir)/src/sslutils/$(USE_SSL_UTILS_LIB) \
-@BUILD_SERVER_TRUE@	$(top_builddir)/src/ac/$(USE_CCATTCERT_LIB) \
+@BUILD_SERVER_TRUE@	$(top_builddir)/src/ac/libccattcert.la \
 @BUILD_SERVER_TRUE@	$(top_builddir)/src/common/libutilc_nog.la \
-@BUILD_SERVER_TRUE@	$(top_builddir)/src/ac/$(USE_ATTCERT_LIB) \
+@BUILD_SERVER_TRUE@	$(top_builddir)/src/ac/libattcert.la \
 @BUILD_SERVER_TRUE@	$(top_builddir)/src/replib/librep.la \
 @BUILD_SERVER_TRUE@	$(top_builddir)/src/log/liblog.la \
-@BUILD_SERVER_TRUE@	$(top_builddir)/src/api/ccapi/$(USE_CCAPI_LIB) \
+@BUILD_SERVER_TRUE@	$(top_builddir)/src/api/ccapi/libvomsapi_nog.la \
 @BUILD_SERVER_TRUE@	$(EXPAT_LIBS)
 
 @BUILD_SERVER_TRUE@voms_LDFLAGS = 
