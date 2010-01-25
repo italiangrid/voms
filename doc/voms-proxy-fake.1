@@ -122,6 +122,33 @@ Options may be specified indifferently with either a "\-" or "\-\-" prefix\&.
 .PP
 This forces the server to generate ACs in the new (correct) format\&. This is meant as a compatibility feature to ease migration while the servers upgrade to the new version\&.
 
+.PP
+\fB\-newsubject\fR  \fInewdn\fR
+
+.PP
+The created proxy will have newdn as subject rather than what is would normally have depending on the specific version of proxy created\&.
+
+.PP
+\fB\-voinfo\fR  \fIfile\fR
+
+.PP
+The file file contains informations for additional ACs that should be included in the created proxy\&. ACs specified via the \-voinfo option shall be added before ACs specified via the command line options\&.
+
+.PP
+The format of the file is the following:
+
+.PP
+[voname]
+
+.PP
+parameter=value
+
+.PP
+parameter=value
+
+.PP
+\&.\&.\&.
+
 .SH "BUGS"
 
 .PP
