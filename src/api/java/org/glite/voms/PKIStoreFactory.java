@@ -30,10 +30,52 @@ class Parameters {
     boolean timer;
 
     Parameters(String s, int t, boolean a, boolean ti) {
-        dir        = s;
+        if (s == null)
+            dir        = "";
+        else
+            dir = s;
         type       = t;
         aggressive = a;
         timer      = ti;
+    }
+
+    public boolean equals(Object anObject) {
+        if (this == anObject) {
+            return true;
+        }
+
+        if (anObject instanceof Parameters) {
+            Parameters p = (Parameters) anObject;
+            if (dir == null)
+                return p.dir == null && aggressive == p.aggressive && timer == p.timer && type == p.type;
+            else
+                return aggressive == p.aggressive && timer == p.timer && type == p.type && dir.equals(p.dir);
+        }
+        return false;
+    }
+
+    public int hashCode() {
+        int hash = 1;
+        hash = hash * 31 + (dir == null ? 0 : dir.hashCode());
+        hash = hash * 31 + type;
+        hash = hash * 31 + (aggressive ? 1 : 0);
+        hash = hash * 31 + (timer ? 1 : 0);
+        return hash;
+    }
+
+    public String toString() {
+        StringBuilder sb = new StringBuilder();
+        sb.append("Params: ");
+        sb.append("[dir:");
+        sb.append(dir);
+        sb.append("], [type:");
+        sb.append(type);
+        sb.append("], [agressive:");
+        sb.append(aggressive);
+        sb.append("], [timer:");
+        sb.append(timer);
+        sb.append("]");
+        return sb.toString();
     }
 }
 
