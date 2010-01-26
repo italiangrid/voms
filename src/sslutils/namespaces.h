@@ -56,7 +56,7 @@ typedef union YYSTYPE
 {
 
 /* Line 1676 of yacc.c  */
-#line 36 "namespaces.y"
+#line 35 "namespaces.y"
 
   char *string;
   struct condition *cond;

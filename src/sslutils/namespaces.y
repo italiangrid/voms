@@ -17,7 +17,6 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
-//#include "listfunc.h"
 
 #include "parsertypes.h"
 
@@ -54,8 +53,8 @@ void namespaceserror(void *policies, void *scanner, char const *msg);
 
 %%
 
-eacl: rule  { *policies = nmlistadd(*policies, $1, sizeof($1)); }
-| eacl rule { *policies = nmlistadd(*policies, $2, sizeof($2)); }
+eacl: rule  { *policies = (struct policy**)nmlistadd((char**)*policies, (char*)($1), sizeof($1)); }
+| eacl rule { *policies = (struct policy**)nmlistadd((char**)*policies, (char*)($2), sizeof($2)); }
 ;
 
 rule: TO ISSUER SUBJECT condition {
@@ -63,7 +62,7 @@ rule: TO ISSUER SUBJECT condition {
   if ($$) {
     $$->self = 0;
     $$->caname = strdup($3);
-    $$->conds = nmlistadd(NULL, $4, sizeof(struct condition *));
+    $$->conds = (struct condition**)nmlistadd(NULL, (char*)($4), sizeof(struct condition *));
     $$->type = TYPE_NAMESPACE;
   }
 
@@ -73,7 +72,7 @@ rule: TO ISSUER SUBJECT condition {
   if ($$) {
     $$->self = 1;
     $$->caname = NULL;
-    $$->conds = nmlistadd(NULL, $4, sizeof(struct condition *));
+    $$->conds = (struct condition**)nmlistadd(NULL, (char*)($4), sizeof(struct condition *));
     $$->type = TYPE_NAMESPACE;
   }
  }

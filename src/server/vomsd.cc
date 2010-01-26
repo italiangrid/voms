@@ -118,14 +118,13 @@ static char *soap_hostname = NULL;
 static bool checkinside(gattrib g, std::vector<std::string> list);
 
 std::string
-makeACSSL(SSL *ssl, void *logh, char **FQANs, int size, const std::string &order, char **targets, int targsize, int requested, VOMSServer *v);
+makeACSSL(SSL *ssl, void *logh, char **FQANs, int size, char **targets, int targsize, int requested, VOMSServer *v);
 
 std::string
-makeACSOAP(struct soap *soap, void *logh, char **FQANs, int size, char **targets, int targsize, int requested, 
-           VOMSServer *v);
+makeACSOAP(struct soap *soap, void *logh, char **FQANs, int size, char **targets, int targsize, int requested);
 
 int
-makeACREST(struct soap *soap, void *logh, char **FQANs, int size, int requested, int unknown, VOMSServer *v);
+makeACREST(struct soap *soap, void *logh, char **FQANs, int size, int requested, int unknown);
 
 std::string makeAC(EVP_PKEY *key, X509 *issuer, X509 *holder, 
                    const std::string &message, void *logh, VOMSServer *v);
@@ -663,67 +662,11 @@ static char *hostkey   = "/etc/grid-security/hostkey.pem";
 
 extern proxy_verify_desc *setup_initializers(char*);
 
-static int myverify_callback(int ok, X509_STORE_CTX *ctx)
-{
-  if (!X509_STORE_CTX_get_ex_data(ctx, PVD_STORE_EX_DATA_IDX)) {
-    proxy_verify_desc *pvd = setup_initializers(cacertdir);
-    pvd->pvxd->certdir = cacertdir;
-    X509_STORE_CTX_set_ex_data(ctx, PVD_STORE_EX_DATA_IDX, pvd);
-  }
-  return proxy_verify_callback(ok, ctx);
-}
-
-static int (*old_plugin)(struct soap *);
-
-static int myplugin(struct soap *soap)
-{
-  if (old_plugin(soap) == SOAP_OK) {
-    X509 *cert = NULL;
-    STACK_OF(X509) *chain = NULL;
-    EVP_PKEY *upkey = NULL;
-    pw_cb =(int (*)())(pwstdin_callback);
-
-    if (!load_credentials(hostcert, hostkey, &cert, &chain, &upkey, pw_cb))
-      return SOAP_ERR;
-
-    SSL_CTX_set_verify(soap->ctx, SSL_VERIFY_PEER | SSL_VERIFY_FAIL_IF_NO_PEER_CERT, myverify_callback);
-    SSL_CTX_use_certificate(soap->ctx, cert);
-    SSL_CTX_use_PrivateKey(soap->ctx, upkey);
-    SSL_CTX_set_purpose(soap->ctx, X509_PURPOSE_ANY);
-    SSL_CTX_set_mode(soap->ctx, SSL_MODE_AUTO_RETRY);
-    SSL_CTX_set_verify_depth(soap->ctx, 100);
-
-    if (chain) {
-      /*
-       * Certificate was a proxy with a cert. chain.
-       * Add the certificates one by one to the chain.
-       */
-      for (int i = 0; i <sk_X509_num(chain); ++i) {
-        X509 *cert = (sk_X509_value(chain,i));
-
-        if (!X509_STORE_add_cert(soap->ctx->cert_store, cert)) {
-          if (ERR_GET_REASON(ERR_peek_error()) == X509_R_CERT_ALREADY_IN_HASH_TABLE) {
-            ERR_clear_error();
-            continue;
-          }
-          else {
-            return SOAP_ERR;
-          }
-        }
-      }
-    }
-    
-    return SOAP_OK;
-  }
-
-  return SOAP_ERR;
-}
 
 void VOMSServer::Run()
 {
   pid_t pid = 0;
   struct soap *sop = NULL;
-  int m,s;
 
   if (!x509_user_cert.empty())
     hostcert = (char*)x509_user_cert.c_str();
@@ -744,8 +687,7 @@ void VOMSServer::Run()
   FD_ZERO(&rset);
 
   sop = soap_new();
-//   old_plugin = sop->fsslauth;
-//  sop->fsslauth = myplugin;
+
   sop->fget = http_get;
 
   try {
@@ -822,7 +764,7 @@ void VOMSServer::Run()
                 return;
               }
               LOG(logh, LEV_DEBUG, T_PRE, "Starting Execution.");
-              Execute(sock.own_key, sock.own_cert, sock.peer_cert, sock.actual_cert);
+              Execute(sock.own_key, sock.own_cert, sock.peer_cert);
             }
             else {
               LOGM(VARP, logh, LEV_INFO, T_PRE, "Failed to authenticate peer");
@@ -1100,7 +1042,6 @@ std::string makeAC(EVP_PKEY *key, X509 *issuer, X509 *holder,
     std::vector<std::string>::iterator end = fqans.end();
     bool subset = false;
 
-    int oldsize = fqans.size();
     if (!existing.empty())
       if (fqans.erase(remove_if(fqans.begin(),
                                 fqans.end(),
@@ -1242,7 +1183,7 @@ std::string makeAC(EVP_PKEY *key, X509 *issuer, X509 *holder,
 }
 
 void
-VOMSServer::Execute(EVP_PKEY *key, X509 *issuer, X509 *holder, X509 *peer_cert)
+VOMSServer::Execute(EVP_PKEY *key, X509 *issuer, X509 *holder)
 {
   std::string message;
 
@@ -1531,19 +1472,18 @@ std::string
 makeACSOAP(struct soap *soap, void *logh, 
            char **FQANs, int size, 
            char **targets, int targsize, 
-           int requested, VOMSServer *v)
+           int requested)
 {
   return makeACSSL(soap->ssl, logh, FQANs, size, 
-                   std::string(""), targets, 
+                   targets, 
                    targsize, requested, selfpointer);
 }
 
 std::string
-makeACSSL(SSL *ssl, void *logh, char **FQANs, int size, const std::string &origorder, char **targets, int targsize, int requested, VOMSServer *v)
+makeACSSL(SSL *ssl, void *logh, char **FQANs, int size, char **targets, int targsize, int requested, VOMSServer *v)
 {
   X509 *holder = SSL_get_peer_certificate(ssl);
   X509 *issuer = NULL;
-  STACK_OF(X509) *own_stack = NULL;
   EVP_PKEY *key = NULL;
   pw_cb =(int (*)())(pwstdin_callback);
   char *hostcert = "/etc/grid-security/hostcert.pem";
@@ -1700,9 +1640,7 @@ int http_get(soap *soap)
     FQANS[0]=maingroup;
     size = 1;
   }
-  int res = makeACREST(soap, logh, FQANS, size, lifetime, unknown, selfpointer);
-
-  int i =0;
+  int res = makeACREST(soap, logh, FQANS, size, lifetime, unknown);
 
   free(FQANS);
 
@@ -1762,13 +1700,11 @@ static char *canonicalize_string(char *original)
 static int EncodeAnswerForRest(const std::string& input, int unknown, std::string& output);
 
 int
-makeACREST(struct soap *soap, void *logh, char **FQANs, int size, int requested, int unknown, VOMSServer *v)
+makeACREST(struct soap *soap, void *logh, char **FQANs, int size, int requested, int unknown)
 {
-  AC *ac = NULL;
-  char *message = NULL;
   char *targets = NULL;
 
-  std::string result = makeACSSL(soap->ssl, logh, FQANs, size, std::string(""), &targets, 0, requested, selfpointer);
+  std::string result = makeACSSL(soap->ssl, logh, FQANs, size, &targets, 0, requested, selfpointer);
 
   std::string output;
 
@@ -1821,7 +1757,6 @@ static int EncodeAnswerForRest(const std::string& input, int unknown, std::strin
           }
         }
         else if (i->num == ERR_SUSPENDED) {
-          const char *msg = i->message.c_str();
           value = 403;
           output +="<code>SuspendedUser</code><message>"+i->message+"</message>";
         }

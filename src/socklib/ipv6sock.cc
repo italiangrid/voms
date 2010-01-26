@@ -161,13 +161,9 @@ int bind_and_listen(char* port, int backlog, void *logh)
 int accept_ipv6(int sock, void *logh)
 {
   int newsock = -1;
-  struct addrinfo hints, *address_list, *paddress;
   struct sockaddr_storage sock_addr;
   struct sockaddr *client = (struct sockaddr *)&sock_addr;
   socklen_t len = sizeof(sock_addr);
-
-  struct linger l = {1,0};
-  unsigned int on  = 1;
 
   if (sock == -1)
     return -1;
@@ -178,19 +174,16 @@ int accept_ipv6(int sock, void *logh)
   newsock = accept(sock, client, &len);
 #endif
 
-/*   setsockopt(newsock, SOL_SOCKET, SO_LINGER, (void *)&l, sizeof(struct linger)); */
-/*   setsockopt(sock, SOL_SOCKET, SO_REUSEADDR, (void *) &on, sizeof(socklen_t)); */
-
   if (newsock != -1) {
     logconnection(client, logh);
   }
   return newsock;
 }
 
-int sock_connect(const char *host, char *port, void *logh)
+int sock_connect(const char *host, char *port)
 {
   struct addrinfo hints, *address_list, *paddress;
-  int sock;
+  int sock = -1;
   unsigned int on  = 1;
   unsigned int off = 0;
 

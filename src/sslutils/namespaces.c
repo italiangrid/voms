@@ -96,7 +96,6 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
-//#include "listfunc.h"
 
 #include "parsertypes.h"
 
@@ -106,7 +105,7 @@ void namespaceserror(void *policies, void *scanner, char const *msg);
 
 
 /* Line 189 of yacc.c  */
-#line 110 "namespaces.c"
+#line 109 "namespaces.c"
 
 /* Enabling traces.  */
 #ifndef YYDEBUG
@@ -150,7 +149,7 @@ typedef union YYSTYPE
 {
 
 /* Line 214 of yacc.c  */
-#line 36 "namespaces.y"
+#line 35 "namespaces.y"
 
   char *string;
   struct condition *cond;
@@ -160,7 +159,7 @@ typedef union YYSTYPE
 
 
 /* Line 214 of yacc.c  */
-#line 164 "namespaces.c"
+#line 163 "namespaces.c"
 } YYSTYPE;
 # define YYSTYPE_IS_TRIVIAL 1
 # define yystype YYSTYPE /* obsolescent; will be withdrawn */
@@ -172,7 +171,7 @@ typedef union YYSTYPE
 
 
 /* Line 264 of yacc.c  */
-#line 176 "namespaces.c"
+#line 175 "namespaces.c"
 
 #ifdef short
 # undef short
@@ -456,7 +455,7 @@ static const yytype_int8 yyrhs[] =
 /* YYRLINE[YYN] -- source line where rule number YYN was defined.  */
 static const yytype_uint8 yyrline[] =
 {
-       0,    57,    57,    58,    61,    71,    82,    97,    98
+       0,    56,    56,    57,    60,    70,    81,    96,    97
 };
 #endif
 
@@ -1370,27 +1369,27 @@ yyreduce:
         case 2:
 
 /* Line 1455 of yacc.c  */
-#line 57 "namespaces.y"
-    { *policies = nmlistadd(*policies, (yyvsp[(1) - (1)].policy), sizeof((yyvsp[(1) - (1)].policy))); }
+#line 56 "namespaces.y"
+    { *policies = (struct policy**)nmlistadd((char**)*policies, (char*)((yyvsp[(1) - (1)].policy)), sizeof((yyvsp[(1) - (1)].policy))); }
     break;
 
   case 3:
 
 /* Line 1455 of yacc.c  */
-#line 58 "namespaces.y"
-    { *policies = nmlistadd(*policies, (yyvsp[(2) - (2)].policy), sizeof((yyvsp[(2) - (2)].policy))); }
+#line 57 "namespaces.y"
+    { *policies = (struct policy**)nmlistadd((char**)*policies, (char*)((yyvsp[(2) - (2)].policy)), sizeof((yyvsp[(2) - (2)].policy))); }
     break;
 
   case 4:
 
 /* Line 1455 of yacc.c  */
-#line 61 "namespaces.y"
+#line 60 "namespaces.y"
     {
   (yyval.policy) = (struct policy *)calloc(1, sizeof(struct policy));
   if ((yyval.policy)) {
     (yyval.policy)->self = 0;
     (yyval.policy)->caname = strdup((yyvsp[(3) - (4)].string));
-    (yyval.policy)->conds = nmlistadd(NULL, (yyvsp[(4) - (4)].cond), sizeof(struct condition *));
+    (yyval.policy)->conds = (struct condition**)nmlistadd(NULL, (char*)((yyvsp[(4) - (4)].cond)), sizeof(struct condition *));
     (yyval.policy)->type = TYPE_NAMESPACE;
   }
 
@@ -1400,13 +1399,13 @@ yyreduce:
   case 5:
 
 /* Line 1455 of yacc.c  */
-#line 71 "namespaces.y"
+#line 70 "namespaces.y"
     {
   (yyval.policy) = (struct policy *)calloc(1, sizeof(struct policy));
   if ((yyval.policy)) {
     (yyval.policy)->self = 1;
     (yyval.policy)->caname = NULL;
-    (yyval.policy)->conds = nmlistadd(NULL, (yyvsp[(4) - (4)].cond), sizeof(struct condition *));
+    (yyval.policy)->conds = (struct condition**)nmlistadd(NULL, (char*)((yyvsp[(4) - (4)].cond)), sizeof(struct condition *));
     (yyval.policy)->type = TYPE_NAMESPACE;
   }
  }
@@ -1415,7 +1414,7 @@ yyreduce:
   case 6:
 
 /* Line 1455 of yacc.c  */
-#line 82 "namespaces.y"
+#line 81 "namespaces.y"
     {
   (yyval.cond) = (struct condition *)calloc(1, sizeof(struct condition));
   if ((yyval.cond)) {
@@ -1434,21 +1433,21 @@ yyreduce:
   case 7:
 
 /* Line 1455 of yacc.c  */
-#line 97 "namespaces.y"
+#line 96 "namespaces.y"
     { (yyval.integer) = 1; }
     break;
 
   case 8:
 
 /* Line 1455 of yacc.c  */
-#line 98 "namespaces.y"
+#line 97 "namespaces.y"
     { (yyval.integer) = 0; }
     break;
 
 
 
 /* Line 1455 of yacc.c  */
-#line 1452 "namespaces.c"
+#line 1451 "namespaces.c"
       default: break;
     }
   YY_SYMBOL_PRINT ("-> $$ =", yyr1[yyn], &yyval, &yyloc);
@@ -1660,7 +1659,7 @@ yyreturn:
 
 
 /* Line 1675 of yacc.c  */
-#line 101 "namespaces.y"
+#line 100 "namespaces.y"
 
 
 char **nmlistadd(char **vect, char *data, int size)

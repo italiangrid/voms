@@ -18,7 +18,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
-  //#include "listfunc.h"
+#include <ctype.h>
 
 #include "parsertypes.h"
 
@@ -59,8 +59,8 @@ void signingerror(void *policies, void *scanner, char const *msg);
 %type <policy>    access_identities
 %%
 
-eacl: eacl_entry      { *policies = splistadd(*policies, $1, sizeof($1)); }
-| eacl eacl_entry { *policies = splistadd(*policies, $2, sizeof($2)); }
+eacl: eacl_entry      { *policies = (struct policy **)splistadd((char**)(*policies), (char*)($1), sizeof($1)); }
+| eacl eacl_entry { *policies = (struct policy **)splistadd((char**)(*policies), (char*)($2), sizeof($2)); }
 
 eacl_entry: access_identities POS_RIGHTS GLOBUS CA_SIGN restrictions {
   if ($1) {
@@ -79,10 +79,10 @@ access_identities: access_identity {
 }
 
 restrictions: realcondition {
-  $$ = splistadd(NULL, $1, sizeof($1));
+  $$ = splistadd(NULL, (char*)($1), sizeof($1));
 }
 | realcondition restrictions {
-  $$ = splistadd($2, $1, sizeof($1));
+  $$ = splistadd($2, (char*)($1), sizeof($1));
 }
 
 
@@ -167,7 +167,6 @@ char **splistadd(char **vect, char *data, int size)
 
 char **parse_subjects(char *string)
 {
-  char *temp = NULL;
   char **list = NULL;
   char divider;
 

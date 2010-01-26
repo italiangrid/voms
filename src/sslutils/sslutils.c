@@ -121,8 +121,8 @@ extern int restriction_evaluate(STACK_OF(X509) *chain, struct policy **namespace
                                 struct policy **signings);
 extern void free_policies(struct policy **policies);
 extern int read_pathrestriction(STACK_OF(X509) *chain, char *path,
-                                struct policy **namespaces, 
-                                struct policy **signings);
+                                struct policy ***namespaces, 
+                                struct policy ***signings);
 
 /**********************************************************************
                                Type definitions
@@ -313,68 +313,6 @@ getpid()
 
 #endif /* WIN32 */
 
-
-
-/**********************************************************************
-Function: get_ca_signing_policy_path()
-
-Description:
-
-Given a CA certificate, return the filename for the signing policy
-file for that certificate.
-
-        
-Parameters:
-
-cert_dir, a string specifying the path to the trusted certificates
-directory.
-
-ca_name, the X509_NAME of the CA in question.
-
-
-Returns:
-
-Allocated buffer containing string with path to signing policy file
-for this CA. NULL on error.
-
-**********************************************************************/
-
-
-static char *
-get_ca_signing_policy_path(
-    const char *                        cert_dir,
-    X509_NAME *                         ca_name)
-{
-    char *                              buffer;
-    unsigned int                        buffer_len;
-    unsigned long                       hash;
-    
-    if ((cert_dir == NULL) ||
-        (ca_name == NULL)) 
-    {
-        PRXYerr(PRXYERR_F_GET_CA_SIGN_PATH, PRXYERR_R_BAD_ARGUMENT);
-        return NULL;
-    }
-    
-    
-    hash = X509_NAME_hash(ca_name);
-    
-    buffer_len = strlen(cert_dir) + strlen(FILE_SEPERATOR) + 8 /* hash */
-        + strlen(SIGNING_POLICY_FILE_EXTENSION) + 1 /* NUL */;
-    
-    buffer = malloc(buffer_len);
-    
-    if (buffer == NULL) 
-    {
-        PRXYerr(PRXYERR_F_GET_CA_SIGN_PATH, PRXYERR_R_OUT_OF_MEMORY);
-        return NULL;
-    }
-
-    sprintf(buffer,"%s%s%08lx%s", cert_dir, FILE_SEPERATOR, hash,
-            SIGNING_POLICY_FILE_EXTENSION);
-    
-    return buffer;
-}
 
 #if SSLEAY_VERSION_NUMBER < 0x0900
 
@@ -798,7 +736,7 @@ proxy_genreq(
     }
     else
     {
-        bits = 512;
+        rbits = 512;
     }
 
     if ((pkey = EVP_PKEY_new()) == NULL)
@@ -1184,8 +1122,11 @@ proxy_sign_ext(
 
       } 
       else {
-        ASN1_INTEGER_set(X509_get_serialNumber(*new_cert),
-                         X509_get_serialNumber(user_cert));
+        ASN1_INTEGER *copy = ASN1_INTEGER_dup(X509_get_serialNumber(user_cert));
+        ASN1_INTEGER_free((*new_cert)->cert_info->serialNumber);
+
+        /* Note:  The copy == NULL case is handled immediately below. */
+        (*new_cert)->cert_info->serialNumber = copy;
       }
     }
 
@@ -1964,7 +1905,7 @@ proxy_verify_callback(
           }
           break;
 
-#ifdef X509_V_ERR_PROXY_CERTIFICATES_NOT_ALLOWED;
+#ifdef X509_V_ERR_PROXY_CERTIFICATES_NOT_ALLOWED
         case X509_V_ERR_PROXY_CERTIFICATES_NOT_ALLOWED:
           /* Proxies ARE allowed */
           ok = 1;

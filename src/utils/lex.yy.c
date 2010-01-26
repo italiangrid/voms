@@ -476,8 +476,9 @@ char *yytext;
 
 #include "parsertypes.h"
 #include "vomsparser.h"
+extern char* strdup(const char*); /* Local declaration to avoid spurious warning from gcc */
 
-#line 481 "lex.yy.c"
+#line 482 "lex.yy.c"
 
 #define INITIAL 0
 #define STR 1
@@ -660,9 +661,9 @@ YY_DECL
 	register char *yy_cp, *yy_bp;
 	register int yy_act;
     
-#line 29 "vomsparser.l"
+#line 30 "vomsparser.l"
 
-#line 666 "lex.yy.c"
+#line 667 "lex.yy.c"
 
 	if ( !(yy_init) )
 		{
@@ -747,47 +748,47 @@ do_action:	/* This label is used only to access EOF actions. */
 
 case 1:
 YY_RULE_SETUP
-#line 30 "vomsparser.l"
+#line 31 "vomsparser.l"
 BEGIN(STR);
 	YY_BREAK
 case 2:
 /* rule 2 can match eol */
 YY_RULE_SETUP
-#line 32 "vomsparser.l"
+#line 33 "vomsparser.l"
 yylval.string = strdup(yytext); return STRING;
 	YY_BREAK
 case 3:
 YY_RULE_SETUP
-#line 33 "vomsparser.l"
+#line 34 "vomsparser.l"
 BEGIN(INITIAL);
 	YY_BREAK
 case 4:
 YY_RULE_SETUP
-#line 35 "vomsparser.l"
+#line 36 "vomsparser.l"
 yylval.string = strdup(yytext); return ID;
 	YY_BREAK
 case 5:
 YY_RULE_SETUP
-#line 37 "vomsparser.l"
+#line 38 "vomsparser.l"
 return yytext[0];
 	YY_BREAK
 case 6:
 /* rule 6 can match eol */
 YY_RULE_SETUP
-#line 39 "vomsparser.l"
+#line 40 "vomsparser.l"
 
 	YY_BREAK
 case 7:
 YY_RULE_SETUP
-#line 40 "vomsparser.l"
+#line 41 "vomsparser.l"
 
 	YY_BREAK
 case 8:
 YY_RULE_SETUP
-#line 42 "vomsparser.l"
+#line 43 "vomsparser.l"
 ECHO;
 	YY_BREAK
-#line 791 "lex.yy.c"
+#line 792 "lex.yy.c"
 case YY_STATE_EOF(INITIAL):
 case YY_STATE_EOF(STR):
 	yyterminate();
@@ -1786,7 +1787,7 @@ void yyfree (void * ptr )
 
 #define YYTABLES_NAME "yytables"
 
-#line 42 "vomsparser.l"
+#line 43 "vomsparser.l"
 
 
 

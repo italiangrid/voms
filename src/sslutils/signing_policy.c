@@ -97,7 +97,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
-  //#include "listfunc.h"
+#include <ctype.h>
 
 #include "parsertypes.h"
 
@@ -1389,14 +1389,14 @@ yyreduce:
 
 /* Line 1455 of yacc.c  */
 #line 62 "signing_policy.y"
-    { *policies = splistadd(*policies, (yyvsp[(1) - (1)].policy), sizeof((yyvsp[(1) - (1)].policy))); }
+    { *policies = (struct policy **)splistadd((char**)(*policies), (char*)((yyvsp[(1) - (1)].policy)), sizeof((yyvsp[(1) - (1)].policy))); }
     break;
 
   case 3:
 
 /* Line 1455 of yacc.c  */
 #line 63 "signing_policy.y"
-    { *policies = splistadd(*policies, (yyvsp[(2) - (2)].policy), sizeof((yyvsp[(2) - (2)].policy))); }
+    { *policies = (struct policy **)splistadd((char**)(*policies), (char*)((yyvsp[(2) - (2)].policy)), sizeof((yyvsp[(2) - (2)].policy))); }
     break;
 
   case 4:
@@ -1436,7 +1436,7 @@ yyreduce:
 /* Line 1455 of yacc.c  */
 #line 81 "signing_policy.y"
     {
-  (yyval.array) = splistadd(NULL, (yyvsp[(1) - (1)].cond), sizeof((yyvsp[(1) - (1)].cond)));
+  (yyval.array) = splistadd(NULL, (char*)((yyvsp[(1) - (1)].cond)), sizeof((yyvsp[(1) - (1)].cond)));
 }
     break;
 
@@ -1445,7 +1445,7 @@ yyreduce:
 /* Line 1455 of yacc.c  */
 #line 84 "signing_policy.y"
     {
-  (yyval.array) = splistadd((yyvsp[(2) - (2)].array), (yyvsp[(1) - (2)].cond), sizeof((yyvsp[(1) - (2)].cond)));
+  (yyval.array) = splistadd((yyvsp[(2) - (2)].array), (char*)((yyvsp[(1) - (2)].cond)), sizeof((yyvsp[(1) - (2)].cond)));
 }
     break;
 
@@ -1767,7 +1767,6 @@ char **splistadd(char **vect, char *data, int size)
 
 char **parse_subjects(char *string)
 {
-  char *temp = NULL;
   char **list = NULL;
   char divider;
 

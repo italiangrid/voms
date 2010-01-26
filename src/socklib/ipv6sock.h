@@ -18,6 +18,6 @@
 
 extern int bind_and_listen(char* port, int backlog, void *logh);
 extern int accept_ipv6(int sock, void *logh);
-extern int sock_connect(const char *host, char *port, void *logh);
+extern int sock_connect(const char *host, char *port);
 
 #endif

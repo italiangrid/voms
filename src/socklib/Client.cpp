@@ -347,7 +347,6 @@ GSISocketClient::Open()
   SSL_CTX_set_options(ctx, SSL_OP_DONT_INSERT_EMPTY_FRAGMENTS | SSL_OP_NO_TLSv1 | SSL_OP_NO_SSLv2);
   SSL_CTX_set_verify(ctx, SSL_VERIFY_PEER | SSL_VERIFY_FAIL_IF_NO_PEER_CERT, proxy_verify_callback);
   SSL_CTX_set_verify_depth(ctx, 100);
-  //  SSL_CTX_set_cert_verify_callback(ctx, proxy_app_verify_callback, setup_initializers());
   SSL_CTX_load_verify_locations(ctx, NULL, cacertdir);
   SSL_CTX_use_certificate(ctx, ucert);
   SSL_CTX_use_PrivateKey(ctx, upkey);
@@ -378,8 +377,8 @@ GSISocketClient::Open()
     }
   }
 
-  snprintf(portstring, 35, "%ld", port);
-  fd = sock_connect(host.c_str(), portstring, NULL);
+  snprintf(portstring, 35, "%ld", (long int)port);
+  fd = sock_connect(host.c_str(), portstring);
 
   flags = fcntl(fd, F_GETFL, 0);
   (void)fcntl(fd, F_SETFL, flags | O_NONBLOCK);

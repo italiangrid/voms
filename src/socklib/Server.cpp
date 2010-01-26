@@ -47,7 +47,6 @@ extern "C" {
 #include <openssl/err.h>
 #include <openssl/bio.h>
 #include "credentials.h"
-  //#include "globuswrap.h"
 #include "log.h"
 #include "vomsssl.h"
 #include "sslutils.h"
@@ -63,26 +62,7 @@ extern "C" {
 /** This class header file. */
 #include "Server.h"
 
-static void Error(void *logh);
-
 extern int do_select(int fd, fd_set *rset, fd_set *wset, int starttime, int timeout, int wanted);
-
-static int get_peer(X509 *acert, STACK_OF(X509) *acert_stack, EVP_PKEY **key, char **issuer, X509 **pcert)
-{
-  if (!key || !issuer || !pcert)
-    return 0;
-
-  STACK_OF(X509) *stack = acert_stack;
-
-  *pcert = get_real_cert(acert, stack);
-  *key = X509_extract_key(*pcert);
-
-  if (*key && *pcert)
-    return get_issuer(*pcert, issuer);
-  else
-    return 0;
-}
-
 static int globusf_read(BIO *b, char *out, int outl);
 static int globusf_write(BIO *b, const char *in, int inl);
 
@@ -196,7 +176,6 @@ GSISocketServer::GSISocketServer(int p, void *l, int b, bool m) :
 {
   if (OBJ_txt2nid("UID") == NID_undef)
     OBJ_create("0.9.2342.19200300.100.1.1","USERID","userId");
-  logh;
 }
 
 void GSISocketServer::SetTimeout(int sec)
@@ -230,7 +209,7 @@ GSISocketServer::Open()
 {
   char portstring[36];
 
-  snprintf(portstring, 35, "%ld", port);
+  snprintf(portstring, 35, "%ld", (long int)port);
   sck = bind_and_listen(portstring, backlog, logh);
 
   return sck != -1;
@@ -316,7 +295,6 @@ GSISocketServer::AcceptGSIAuthentication()
   char *tmp = NULL;
   int   flags;
 
-  bool result = false;
   time_t curtime, starttime;
   fd_set rset;
   fd_set wset;
@@ -445,10 +423,6 @@ GSISocketServer::AcceptGSIAuthentication()
   }
 
   tmp = NULL;
-//   (void)get_own_data(credential, &own_key, &tmp, &own_cert);
-//   if (tmp)
-//     own_ca = std::string(tmp);
-//   free(tmp);
 
   peer_cert = identitycert;
   peer_key = X509_extract_key(peer_cert);
@@ -459,8 +433,6 @@ GSISocketServer::AcceptGSIAuthentication()
   OPENSSL_free(name);
 
   tmp = NULL;
-
-//   (void)get_peer(peer_cert, peer_stack, &peer_key, &tmp, &actual_cert);
 
   if (tmp)
     peer_ca = std::string(tmp);
@@ -740,42 +712,3 @@ void GSISocketServer::SetErrorOpenSSL(const std::string &message)
   }
 }
 
-static void Error(void *logh)
-{
-  unsigned long l;
-  char buf[256];
-#if SSLEAY_VERSION_NUMBER  >= 0x00904100L
-  const char *file;
-#else
-  char *file;
-#endif
-  char *dat;
-  int line;
-    
-  /* WIN32 does not have the ERR_get_error_line_data */ 
-  /* exported, so simulate it till it is fixed */
-  /* in SSLeay-0.9.0 */
-  
-  while ( ERR_peek_error() != 0 ) {
-    
-    int i;
-    ERR_STATE *es;
-      
-    es = ERR_get_state();
-    i = (es->bottom+1)%ERR_NUM_ERRORS;
-    
-    if (es->err_data[i] == NULL)
-      dat = strdup("");
-    else
-      dat = strdup(es->err_data[i]);
-    if (dat) {
-      l = ERR_get_error_line(&file, &line);
-
-        LOGM(VARP, logh, LEV_ERROR, T_PRE, "%s:%s:%d:%s\n", ERR_error_string(l, buf), file, line, dat);
-        LOGM(VARP, logh, LEV_ERROR, T_PRE, "%s:%s\nFunction: %s\n", ERR_reason_error_string(l), dat, ERR_func_error_string(l));
-    }
-    
-    free(dat);
-  }
-
-}

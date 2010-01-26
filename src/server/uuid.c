@@ -45,7 +45,12 @@ void generate_uuid(unsigned char uuid[16])
 
   if (have_urandom) {
     fd = open("/dev/urandom", O_RDONLY);
-    int hasread = read(fd, uuid, 16);
+    int hasread = 0;
+    int readb = 0;
+    do {
+      readb = read(fd, uuid+hasread, 16 - hasread);
+      hasread += readb;
+    } while (readb > 0 && hasread <16);
     close(fd);
   }
   else {

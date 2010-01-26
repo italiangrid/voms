@@ -198,7 +198,7 @@ static int restriction_evaluate_namespace(STACK_OF(X509) *chain, struct policy *
   int size = sk_X509_num(chain);
   int i = 0;
   int result = 0;
-  int start = 0, stop = 0, end = 0;
+  int start = 0, end = 0;
   int step = 0;
 
   if (size > 1 && isselfsigned(sk_X509_value(chain,0))) {

@@ -21,6 +21,7 @@
 
 #include "parsertypes.h"
 #include "vomsparser.h"
+extern char* strdup(const char*); /* Local declaration to avoid spurious warning from gcc */
 %}
 
 %x STR
