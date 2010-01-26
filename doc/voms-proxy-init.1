@@ -39,13 +39,22 @@ The voms\-proxy\-init generates a proxy with the VOMS information included in a 
 Options may be specified indifferently with either a "\-" or "\-\-" prefix\&. The options from \-help to \-out are present for compatibility with grid\-proxy\-init, and have the exact same meaning\&. The meaning of the other ones is the following\&.
 
 .PP
-\fB\-help\fR Displays usage
+\fB\-help\fR
 
 .PP
-\fB\-version\fR Displays version
+\fB\-usage\fR Displays usage
+
+.PP
+\fB\-version\fR
+
+.PP
+Displays version
 
 .PP
 \fB\-debug\fR Enables extra debug output
+
+.PP
+\fB\-quiet\fR
 
 .PP
 \fB\-q\fR Quiet mode, minimal output
@@ -117,7 +126,10 @@ The three options are synonyms\&. \-confile and \-userconf are deprecated\&. \-v
 \fB\-policy\fR The file containing the policy expression\&.
 
 .PP
-\fB\-policy\-language\fR\fI pl\fR The language in which the policy is expressed\&. Default is IMPERSONATION_PROXY\&.
+\fB\-policy\-language\fR\fI pl\fR
+
+.PP
+\fB\-pl\fR\fI pl\fR The language in which the policy is expressed\&. Default is IMPERSONATION_PROXY\&.
 
 .PP
 \fB\-path\-length\fR Maximum depth of proxy certfificate that can be signed from this\&.
@@ -127,6 +139,18 @@ The three options are synonyms\&. \-confile and \-userconf are deprecated\&. \-v
 
 .PP
 \fB\-proxyver\fR Version of the proxy certificate to create\&. May be 2 or 3\&. Default value is decided upon underlying globus version\&.
+
+.PP
+\fB\-rfc\fR This option is a synonym of \fB\-proxyver 4\fR and it generates a RFC\-compliant proxy\&.
+
+.PP
+\fB\-old\fR This option is a synonym of \fB\-proxyver 2\fR and it generates a legacy proxy\&.
+
+.PP
+\fB\-target\fR  \fIhostname\fR This option targets the generated AC to a specific host\&. This option may be specified multiple times to allow for multiple hosts\&.
+
+.PP
+\fB\-timeout\fR  \fIseconds\fR This option allows to specify the maximum number of seconds that voms\-proxy\-init will wait while trying to establish a connection with the server\&. Its default value is \-1 (unlimited)\&.
 
 .PP
 \fB\-noregen\fR Use existing proxy to contact the server and to sing the new proxy\&.

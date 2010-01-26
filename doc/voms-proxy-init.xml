@@ -40,15 +40,17 @@ options from -help to -out are present for compatibility with
 grid-proxy-init, and have the exact same meaning. The meaning of the other
 ones is the following.</para>
 
-<para><option>-help</option>
+<para><option>-help</option></para>
+<para><option>-usage</option>
 Displays usage</para>
 
-<para><option>-version</option>
-Displays version</para>
+<para><option>-version</option></para>
+<para>Displays version</para>
 
 <para><option>-debug</option>
 Enables extra debug output</para>
 
+<para><option>-quiet</option></para>
 <para><option>-q</option>
 Quiet mode, minimal output</para>
 
@@ -138,7 +140,8 @@ should be used instead.</para>
 <para><option>-policy</option>
 The file containing the policy expression.</para>
 
-<para><option>-policy-language</option><replaceable> pl</replaceable>
+<para><option>-policy-language</option><replaceable> pl</replaceable></para>
+<para><option>-pl</option><replaceable> pl</replaceable>
 The language in which the policy is expressed. Default is IMPERSONATION_PROXY.</para>
 
 <para><option>-path-length</option>
@@ -150,6 +153,24 @@ Underlying Globus version.</para>
 <para><option>-proxyver</option>
 Version of the proxy certificate to create. May be 2 or 3.
 Default value is decided upon underlying globus version.</para>
+
+<para><option>-rfc</option>
+This option is a synonym of <option>-proxyver 4</option> and it
+  generates a RFC-compliant proxy.</para>
+
+<para><option>-old</option>
+This option is a synonym of <option>-proxyver 2</option> and it
+  generates a legacy proxy.</para>
+
+<para><option>-target</option> <replaceable>hostname</replaceable>
+This option targets the generated AC to a specific host.  This
+  option may be specified multiple times to allow for multiple
+  hosts.</para>
+
+<para><option>-timeout</option> <replaceable>seconds</replaceable>
+This option allows to specify the maximum number of seconds that
+  voms-proxy-init will wait while trying to establish a connection
+  with the server.  Its default value is -1 (unlimited).</para>
 
 <para><option>-noregen</option>
 Use existing proxy to contact the server and to sing the new proxy.</para>
