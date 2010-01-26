@@ -41,7 +41,7 @@ libsock_la_LIBADD = \
 	$(top_builddir)/src/common/libutilc.la \
 	$(GLOBUS_GSS_API_LIBS)
 
-EXTRA_DIST = globuswrap.h vomsssl.h
+EXTRA_DIST = vomsssl.h
 
 ###
 
