@@ -68,15 +68,15 @@ class GSISocketServer
    * Destructor.
    * This method must be also implemented by object subclassing server socket.
    */
-  virtual ~GSISocketServer();
+  ~GSISocketServer();
 
   /**
    * Close the connection.
    */
-  virtual void Close();
-  virtual bool Open();
-  virtual void CloseListener(void);
-  virtual void CloseListened(void);
+  void Close();
+  bool Open();
+  void CloseListener(void);
+  void CloseListened(void);
 
   /**
    * Listen for incoming connection requests.
@@ -84,7 +84,7 @@ class GSISocketServer
    * @param a a reference to the secure GSI Socket Agent sent by Client.
    * @return the GSI Socket Agent redirecting communication on a dedicated port.
    */
-  virtual bool Listen();
+  bool Listen();
   void SetLogger(void *log);
   void CleanSocket();
   bool Send(const std::string &s);
