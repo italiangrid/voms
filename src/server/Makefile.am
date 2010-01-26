@@ -10,7 +10,6 @@ voms_SOURCES = \
 	uuid.h \
 	attribute.cc \
 	soapC.c \
-	soapServer.c \
 	stdsoap2.c
 
 #	$(top_builddir)/src/sslutils/libssl_utils_nog.la 

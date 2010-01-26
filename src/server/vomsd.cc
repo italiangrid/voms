@@ -81,6 +81,11 @@ extern "C" {
   extern char *get_error(int);
 }
 
+SOAP_NMAC struct Namespace namespaces[] =
+{
+  {NULL, NULL, NULL, NULL}
+};
+
 static const int DEFAULT_PORT    = 15000;
 static const int DEFAULT_TIMEOUT = 60;
 
@@ -581,14 +586,6 @@ VOMSServer::VOMSServer(int argc, char *argv[]) : sock(0,0,NULL,50,false),
   }
 
 
-  version = globus(version);
-  if (version == 0) {
-    std::cerr << "Unable to discover Globus Version: Trying for 2.2"
-              << std::endl;
-    LOG(logh, LEV_WARN, T_PRE, "Unable to discover Globus Version: Trying for 2.2");
-    version = 22;
-  }
-
   /* Determine hostname */
   int   ok;
 
@@ -619,7 +616,7 @@ VOMSServer::VOMSServer(int argc, char *argv[]) : sock(0,0,NULL,50,false),
 
   delete[] hostname;
 
-  sock = GSISocketServer(daemon_port, version, NULL, backlog);
+  sock = GSISocketServer(daemon_port, 22, NULL, backlog);
 
   setenv("GLOBUSID", globusid.c_str(), 1);
 
@@ -654,7 +651,6 @@ VOMSServer::VOMSServer(int argc, char *argv[]) : sock(0,0,NULL,50,false),
   std::string msg = "URI: " + uri;
 
   LOGM(VARP, logh, LEV_INFO, T_PRE, "URI: %s", uri.c_str());
-  LOGM(VARP,  logh, LEV_INFO, T_PRE, "Detected Globus Version: %d", version);
 
   AC_Init();
 }
@@ -1370,7 +1366,7 @@ void VOMSServer::UpdateOpts(void)
   }
 
   if (nport != daemon_port) {
-    if (!sock.ReOpen(daemon_port = nport, version, nblog, true))
+    if (!sock.ReOpen(daemon_port = nport, 22, nblog, true))
       LOG(logh, LEV_ERROR, T_PRE, "Failed to reopen socket! Server in unconsistent state.");
   }
   else if (nblog != backlog)
@@ -1530,74 +1526,6 @@ static bool determine_group_and_role(std::string command, char *comm, char **gro
 static bool checkinside(gattrib g, std::vector<std::string> list) {
   return !g.qualifier.empty() && (find(list.begin(), list.end(), g.qualifier) == list.end());
 }
-
-int ns3__getInterfaceVersion(struct soap *soap, char **tmp_string)
-{
-  *tmp_string="4";
-  return SOAP_OK;
-}
-
-int ns3__getVersion(struct soap *soap, char **tmp_string)
-{
-  *tmp_string="2.0";
-  return SOAP_OK;
-}
-
-SOAP_NMAC struct Namespace namespaces[] =
-{
-	{"SOAP-ENV", "http://schemas.xmlsoap.org/soap/envelope/", "http://www.w3.org/*/soap-envelope", NULL},
-	{"SOAP-ENC", "http://schemas.xmlsoap.org/soap/encoding/", "http://www.w3.org/*/soap-encoding", NULL},
-	{"xsi", "http://www.w3.org/2001/XMLSchema-instance", "http://www.w3.org/*/XMLSchema-instance", NULL},
-	{"xsd", "http://www.w3.org/2001/XMLSchema", "http://www.w3.org/*/XMLSchema", NULL},
-	{"ns1", "http://www.example.org/voms/", NULL, NULL},
-	{NULL, NULL, NULL, NULL}
-};
-
-int my_receiver_fault(struct soap *soap, const char *msg)
-{
-  return soap_receiver_fault(soap, msg, msg);
-}
-
-
-int __ns1__GetAttributeCertificate(struct soap *soap, 
-    struct _ns1__GetAttributeCertificate *req,
-    struct _ns1__GetAttributeCertificateResponse *ans)
-{
-  char *message=NULL;
-
-  struct ns1__StatusType *st = (struct ns1__StatusType*)
-    malloc(sizeof(struct ns1__StatusType));
-
-  if (!st)
-    return my_receiver_fault(soap, "Not Enough Memory");
-
-  st->ns1__StatusCode = (struct ns1__StatusCodeType *)
-    malloc(sizeof(struct ns1__StatusCodeType));
-
-  if (!st->ns1__StatusCode)
-    return my_receiver_fault(soap, "Not Enough Memory");
-
-  std::string answerstring = makeACSOAP(soap, logh, 
-                                        req->ns1__FQAN, req->__sizeFQAN,
-                                        req->ns1__Target, req->__sizeTarget,
-                                        *req->ns1__Lifetime, selfpointer);
-
-  st->ns1__StatusCode->Value="http://voms.cnaf.infn.it";
-  st->ns1__StatusMessage = message;
-  ans->Status = st;
-
-  ans->AttributeCertificate="";
-  answer a;
-
-  if (XML_Ans_Decode(answerstring, a)) {
-    if (!a.ac.empty()) {
-      ans->AttributeCertificate = (char *)a.ac.c_str();
-    }
-  }
-
-  return SOAP_OK;
-}
-
                                    
 std::string
 makeACSOAP(struct soap *soap, void *logh, 
@@ -1867,7 +1795,7 @@ static int EncodeAnswerForRest(const std::string& input, int unknown, std::strin
       for (std::vector<errorp>::iterator i = errs.begin(); i != errs.end(); i++)
         output +="<warning>"+i->message+"</warning>";
       if (unknown) 
-	output +="<warning>Unknown parameters in the request were ignored!</warning>";
+        output +="<warning>Unknown parameters in the request were ignored!</warning>";
       output += "</voms>";
       free(ac);
       return SOAP_HTML;
