@@ -70,7 +70,7 @@ public:
   /**
    * Destructor.
    */  
-  virtual ~GSISocketClient();
+  ~GSISocketClient();
 
   void RedirectGSIOutput(FILE *fp) { gsi_logfile = fp; }
   /**
@@ -89,15 +89,15 @@ public:
    * Open the connection.
    * @return true for successful opening, false otherwise.
    */
-  virtual bool Open();
+  bool Open();
   /**
    * Close the connection.
    * @return true for successful close, false otehrwise.
    */
-  virtual void Close();
+  void Close();
 
-  virtual bool post_connection_check(SSL*);
-  virtual bool LoadCredentials(const char *, X509 *, STACK_OF(X509) *, EVP_PKEY *);
+  bool post_connection_check(SSL*);
+  bool LoadCredentials(const char *, X509 *, STACK_OF(X509) *, EVP_PKEY *);
 
 protected:
   /**
