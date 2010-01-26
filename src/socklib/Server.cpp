@@ -185,8 +185,8 @@ static int globusf_write(BIO *b, const char *in, int inl)
  * @param p the secure server port.
  * @param b the backlog, that is the maximum number of outstanding connection requests.
  */
-GSISocketServer::GSISocketServer(int p, int v, void *l, int b, bool m) :
-  version(v), own_subject(""), own_ca(""), peer_subject(""), 
+GSISocketServer::GSISocketServer(int p, void *l, int b, bool m) :
+  own_subject(""), own_ca(""), peer_subject(""), 
   peer_ca(""), peer_serial(""), own_key(NULL), peer_key(NULL), own_cert(NULL), 
   peer_cert(NULL), own_stack(NULL), peer_stack(NULL), 
   ssl(NULL), ctx(NULL), conn(NULL), pvd(NULL), cacertdir(NULL),
@@ -210,11 +210,10 @@ int GSISocketServer::GetTimeout()
 }
 
 bool
-GSISocketServer::ReOpen(int p, int v, int b, bool m)
+GSISocketServer::ReOpen(int p, int b, bool m)
 {
   Close();
   port = p;
-  version = v;
   mustclose = m;
   backlog = b;
   return Open();

@@ -33,7 +33,6 @@
 #define VOMS_GSISOCKETSERVER
 
 /** Include the secure socket globus definition. */
-//#include "globus_gss_assist.h"
 
 #include <stdio.h>
 #include <openssl/evp.h>
@@ -64,7 +63,7 @@ class GSISocketServer
    * @param p the secure server port.
    * @param b the backlog, that is the maximum number of outstanding connection requests.
    */
-  GSISocketServer(int, int, void * = NULL, int=5, bool=true);
+  GSISocketServer(int, void * = NULL, int=5, bool=true);
   /**
    * Destructor.
    * This method must be also implemented by object subclassing server socket.
@@ -86,13 +85,6 @@ class GSISocketServer
    * @return the GSI Socket Agent redirecting communication on a dedicated port.
    */
   virtual bool Listen();
-  /**
-   * Redirects the GSI output.
-   * This method allows to define a logging file for GSI.
-   * @param fp a pinter to a file.
-   */ 
-  void RedirectGSIOutput(FILE *fp) { gsi_logfile = fp; }
-  //  void SetFlags(OM_uint32 flags);
   void SetLogger(void *log);
   void CleanSocket();
   bool Send(const std::string &s);
@@ -100,24 +92,12 @@ class GSISocketServer
   bool Peek(int size, std::string &s);
   bool AcceptGSIAuthentication(void); 
   void AdjustBacklog(int b);
-  bool ReOpen(int, int, int=5, bool=true);
+  bool ReOpen(int, int=5, bool=true);
   void SetTimeout(int);
   int  GetTimeout();
-  //  gss_ctx_id_t GetContext();
 
   void SetError(const std::string &g);
   void SetErrorOpenSSL(const std::string &message);
-
- private:
-  /**
-   * Accept the GSI Authentication.
-   * @param sock the socket for communication.
-   * @param ctx the authorization context.
-   * @return the context identifier. 
-   */
-  /** The reference to the log file. */
-  FILE *gsi_logfile;
-  int version;
 
 public:
   std::string    own_subject;

@@ -289,7 +289,7 @@ bool not_in(std::string fqan, std::vector<std::string> fqans)
 
 VOMSServer *selfpointer = NULL;
 
-VOMSServer::VOMSServer(int argc, char *argv[]) : sock(0,0,NULL,50,false),
+VOMSServer::VOMSServer(int argc, char *argv[]) : sock(0,NULL,50,false),
                                                  validity(86400),
                                                  logfile("/var/log/voms"),
                                                  gatekeeper_test(false),
@@ -616,7 +616,7 @@ VOMSServer::VOMSServer(int argc, char *argv[]) : sock(0,0,NULL,50,false),
 
   delete[] hostname;
 
-  sock = GSISocketServer(daemon_port, 22, NULL, backlog);
+  sock = GSISocketServer(daemon_port, NULL, backlog);
 
   setenv("GLOBUSID", globusid.c_str(), 1);
 
@@ -1366,7 +1366,7 @@ void VOMSServer::UpdateOpts(void)
   }
 
   if (nport != daemon_port) {
-    if (!sock.ReOpen(daemon_port = nport, 22, nblog, true))
+    if (!sock.ReOpen(daemon_port = nport, nblog, true))
       LOG(logh, LEV_ERROR, T_PRE, "Failed to reopen socket! Server in unconsistent state.");
   }
   else if (nblog != backlog)
