@@ -39,16 +39,16 @@ The voms\-proxy\-info command pritns information about a proxy, including inform
 Options may be specified indifferently with either a "\-" or "\-\-" prefix\&. The options from \-help to \-out are present for compatibility with grid\-proxy\-init, and have the exact same meaning\&. The meaning of the other ones is the following\&.
 
 .PP
-\fB\-help\fR Displays usage\&.
+\fB\-help\fR
+
+.PP
+\fB\-usage\fR Displays usage\&.
 
 .PP
 \fB\-version\fR Displays version\&.
 
 .PP
 \fB\-debug\fR Enables extra debug output\&. This is for bug reports only\&. Users must not rely on the extra output printed by this option\&.
-
-.PP
-\fB\-q\fR Quiet mode, minimal output\&.
 
 .PP
 \fB\-file\fR  \fIproxyfile\fR The name of the file containing the proxy, in case it is in a non\-standard place\&.
@@ -112,6 +112,18 @@ Options may be specified indifferently with either a "\-" or "\-\-" prefix\&. Th
 
 .PP
 \fB\-serial\fR Prints the serial number of each AC present in the proxy\&.
+
+.PP
+\fB\-dont\-verify\-ac\fR Skips the AC verification step\&. Warning! Data printed when this option is specified may not be reliable\&.
+
+.PP
+\fB\-targets\fR Prints the list of hosts to which the AC has been targeted\&.
+
+.PP
+\fB\-included\-file\fR In case the proxy included a user\-specified file, this option prints it to screen\&.
+
+.PP
+\fB\-uri\fR Prints the URI of the serve which issued this AC\&.
 
 .SH "BUGS"
 

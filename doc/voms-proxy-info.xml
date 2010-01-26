@@ -40,7 +40,8 @@ options from -help to -out are present for compatibility with
 grid-proxy-init, and have the exact same meaning. The meaning of the other
 ones is the following.</para>
 
-<para><option>-help</option>
+<para><option>-help</option></para>
+<para><option>-usage</option>
 Displays usage.</para>
 
 <para><option>-version</option>
@@ -49,9 +50,6 @@ Displays version.</para>
 <para><option>-debug</option>
 Enables extra debug output.  This is for bug reports only.  Users must not
 rely on the extra output printed by this option.</para>
-
-<para><option>-q</option>
-Quiet mode, minimal output.</para>
 
 <para><option>-file</option> <replaceable>proxyfile</replaceable>
 The name of the file containing the proxy, in case it is in a 
@@ -81,7 +79,6 @@ Print validity times.</para>
 <para><option>-timeleft</option>
 Prints how much time is left (in seconds) instead of the end time of the proxy. This
 option implies -valid</para>
-
 
 <para><option>-all</option>
 Prints everything.</para>
@@ -118,6 +115,20 @@ Prints how much time is left (in seconds) instead of the end time of the AC.</pa
 
 <para><option>-serial</option>
 Prints the serial number of each AC present in the proxy.</para>
+
+<para><option>-dont-verify-ac</option>
+Skips the AC verification step.  Warning!  Data printed when this
+  option is specified may not be reliable.</para>
+
+<para><option>-targets</option>
+Prints the list of hosts to which the AC has been targeted.</para>
+
+<para><option>-included-file</option>
+In case the proxy included a user-specified file, this option prints
+  it to screen.</para>
+
+<para><option>-uri</option>
+Prints the URI of the serve which issued this AC.</para>
 
 </refsect1>
 
