@@ -24,7 +24,7 @@ voms \- VOMS server
 .ad l
 .hy 0
 .HP 5
-\fBvoms\fR [\-foreground] [\-port\ \fIport\fR] [\-backlog\ \fIpnum\fR] [\-logfile\ \fIfile\fR] [\-globusid\ \fIid\fR] [\-globuspwd\ \fIfile\fR] [\-passfile\ \fIfile\fR] [\-x509_cert_dir\ \fIpath\fR] [\-x509_cert_file\ \fIfile\fR] [\-x509_user_cert\ \fIfile\fR] [\-x509_user_key\ \fIfile\fR] [\-x509_user_proxy\ \fIfile\fR] [\-dbname\ \fIname\fR] [\-username\ \fIname\fR] [\-vo\ \fI\ name\fR] [\-timeout\ \fI\ limit\fR] [\-test] [\-conf\ \fI\ file\fR] [\-uri\ \fI\ uri\fR] [\-version] [\-code\ \fIc\fR] [\-loglevel\ \fIlev\fR] [\-logtype\ \fItype\fR] [\-logformat\ \fIstr\fR] [\-logdateformat\ \fIstr\fR] [\-debug] [\-\-sqlloc\ \fIpath\fR] [\-\-compat] [\-\-socktimeout\ \fInum\fR] [\-\-maxlog\ \fInum\fR] [\-\-newformat] [\-\-skipcacheck]
+\fBvoms\fR [\-foreground] [\-port\ \fIport\fR] [\-backlog\ \fIpnum\fR] [\-logfile\ \fIfile\fR] [\-globusid\ \fIid\fR] [\-globuspwd\ \fIfile\fR] [\-passfile\ \fIfile\fR] [\-x509_cert_dir\ \fIpath\fR] [\-x509_cert_file\ \fIfile\fR] [\-x509_user_cert\ \fIfile\fR] [\-x509_user_key\ \fIfile\fR] [\-x509_user_proxy\ \fIfile\fR] [\-dbname\ \fIname\fR] [\-username\ \fIname\fR] [\-vo\ \fI\ name\fR] [\-timeout\ \fI\ limit\fR] [\-test] [\-conf\ \fI\ file\fR] [\-uri\ \fI\ uri\fR] [\-version] [\-code\ \fIc\fR] [\-loglevel\ \fIlev\fR] [\-logtype\ \fItype\fR] [\-logformat\ \fIstr\fR] [\-logdateformat\ \fIstr\fR] [\-debug] [\-sqlloc\ \fIpath\fR] [\-compat] [\-socktimeout\ \fInum\fR] [\-logmax\ \fInum\fR] [\-newformat] [\-skipcacheck] [\-help] [\-usage] [\-globus\ \fIversion\fR] [\-contactstring\ \fIcontact\fR] [\-mysql\-port\ \fIport\fR] [\-mysql\-socket\ \fIsocket\fR] [\-shortfqans] [\-syslog] [\-base64] [\-nologfile]
 .ad
 .hy
 
@@ -40,6 +40,15 @@ For the initial setup of the server, run the voms_install_db script as root\&.
 
 .PP
 Options may be specified indifferently with either a "\-" or "\-\-" prefix\&. Their meaning is the following\&.
+
+.PP
+\fB\-help\fR
+
+.PP
+\fB\-usage\fR
+
+.PP
+These options print a list of options that the server accepts\&. They are synonyms\&.
 
 .PP
 \fB\-foreground\fR
@@ -153,7 +162,10 @@ Prints information about the server and then exits\&.
 \fB\-code\fR  \fIc\fR
 
 .PP
-Defines a subset of AC serial numbers to be used in case multiple servers share the same host certificate\&. If not specified, this is the same as the port number
+\fB\-globus\fR  \fIversion\fR
+
+.PP
+These option are obsolete and only present for backwards compatibility with old installation\&. Currently, their values are ignored\&. Do not specify them in new installations\&.
 
 .PP
 \fB\-logtype\fR  \fItype\fR
@@ -292,6 +304,48 @@ This forces the server to generate ACs in the new (correct) format\&. This is me
 
 .PP
 This option, if specified, forces voms to drop some of the checks done as the authorization step before AC creation\&. Specifically, voms will no longer be capable of distinguishing to certificates with the same DN but different issuers\&. For obvious reasons, use of this option is discouraged\&. Note also that activating this option requires a previous check by the voms server administrator that there are no certificates registered in the DB which the same DN and different issuers\&. If there are, the result of a voms\-proxy\-init command for one of those users will be unpredictable\&.
+
+.PP
+\fB\-contactstring\fR  \fIcontact\fR
+
+.PP
+This string specifies information on how to contact the DB server\&. Its exact meaning depends on the DB backend used\&. For MySQL it is the hostname of the MySQL server, and it defaults to 'localhost'\&. For Oracle it is the contactstring of the DB\&. However, for oracle it is better to put what whould be the argument of this string into the 'tnsnames\&.ora' file and ignore this option,
+
+.PP
+\fB\-mysql\-port \fR  \fIport\fR
+
+.PP
+This option specified the port on which the MySQL server is listening if it is different from its 3306 default\&. This value is ignored for Oracle backends\&.
+
+.PP
+\fB\-mysql\-socket\fR  \fIsocket\fR
+
+.PP
+MySQL servers may be configured to allow access through a unix\-level socket\&. This option allows to specify this method of contact\&. However, it is almost always better to contact the server through the port\&. This option is ignored for Oracle backends\&.
+
+.PP
+\fB\-shortfqans\fR
+
+.PP
+This option instructs the server to always generate FQANs in their short form, i\&.e\&. without the /Role=NULL and /Capability=NULL parts\&. Successive server version will make this behaviour the default, and provide a \fB\-noshortfqans\fR option to fallback to the longer format\&. Specifying this option is recommended\&.
+
+.PP
+\fB\-syslog\fR
+
+.PP
+This option allows log messages to be sent to syslog\&.
+
+.PP
+\fB\-base64\fR
+
+.PP
+This option instructs the server to use the base64 encoding for its messages, rather than the in\-house encoding\&. This option will be made the default in future versions and \fB\-nobase64\fR will be provided to fallback to the inhouse encoding\&. Specifying this option is recommended\&.
+
+.PP
+\fB\-nologfile\fR
+
+.PP
+This option disables logging on the voms specific logfile\&. Please note that specifying this option without at the same time specifying \fB\-syslog\fR implies that no logging will take place\&.
 
 .SH "BUGS"
 
