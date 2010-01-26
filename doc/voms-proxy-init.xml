@@ -148,10 +148,11 @@ The language in which the policy is expressed. Default is IMPERSONATION_PROXY.</
 Maximum depth of proxy certfificate that can be signed from this.</para>
 
 <para><option>-globus</option> <replaceable>version</replaceable>
-Underlying Globus version.</para>
+Underlying Globus version.  This will influence the default value of
+  the <option>-proxyver</option>.</para>
 
 <para><option>-proxyver</option>
-Version of the proxy certificate to create. May be 2 or 3.
+Version of the proxy certificate to create. May be 2, 3 or 4.
 Default value is decided upon underlying globus version.</para>
 
 <para><option>-rfc</option>
