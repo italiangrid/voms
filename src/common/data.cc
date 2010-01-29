@@ -21,6 +21,8 @@ extern "C" {
 #include <string.h>
 #include <time.h>
 #include <limits.h>
+
+#include <openssl/err.h>
 }
 
 #include <string>
@@ -93,7 +95,7 @@ acceptable(const char *str)
   return true;
 }
 
-std::string
+char *
 timestamp(void)
 {
     time_t clock;
@@ -119,4 +121,54 @@ stringify(int i, std::string &s)
   s = val;
 
   return s;
+}
+
+std::string OpenSSLError(bool debug) 
+{
+  unsigned long l;
+  char buf[256];
+#if SSLEAY_VERSION_NUMBER  >= 0x00904100L
+  const char *file;
+#else
+  char *file;
+#endif
+  char *dat;
+  int line;
+
+  std::string outstring;
+    
+  /* WIN32 does not have the ERR_get_error_line_data */ 
+  /* exported, so simulate it till it is fixed */
+  /* in SSLeay-0.9.0 */
+  
+  while ( ERR_peek_error() != 0 ) {
+    
+    int i;
+    ERR_STATE *es;
+      
+    es = ERR_get_state();
+    i = (es->bottom+1)%ERR_NUM_ERRORS;
+    
+    if (es->err_data[i] == NULL)
+      dat = strdup("");
+    else
+      dat = strdup(es->err_data[i]);
+
+    if (dat) {
+      l = ERR_get_error_line(&file, &line);
+
+      if (debug) {
+	std::string temp;
+        outstring += std::string(ERR_error_string(l,buf)) + ":" +
+	  file + ":" + stringify(line, temp) + dat + "\n";
+      }
+      else
+        outstring += std::string(ERR_reason_error_string(l)) + dat +
+	  "\nFunction: " + ERR_func_error_string(l) + "\n";
+    }
+    
+    free(dat);
+  }
+
+  return outstring;
 }

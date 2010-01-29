@@ -36,6 +36,8 @@ static X509_EXTENSION *CreateProxyExtension(char * name, char *data, int datalen
 static char *readfromfile(char *file, int *size, int *warning);
 static void setWarning(int *warning, int value);
 static void setAdditional(void **additional, void *data);
+static X509_EXTENSION *set_KeyUsageFlags(int flags);
+static int get_KeyUsageFlags(X509 *cert);
 
 struct VOMSProxyArguments *VOMS_MakeProxyArguments()
 {
@@ -110,6 +112,7 @@ struct VOMSProxy *VOMS_MakeProxy(struct VOMSProxyArguments *args, int *warning, 
   EVP_PKEY * npkey = NULL;
   X509_REQ * req = NULL;
   STACK_OF(X509_EXTENSION) * extensions = NULL;
+  int ku_flags = 0;
 
   X509_EXTENSION *ex1 = NULL, *ex2 = NULL, *ex3 = NULL, 
     *ex4 = NULL, *ex5 = NULL, *ex6 = NULL, *ex7 = NULL, 
@@ -233,8 +236,13 @@ struct VOMSProxy *VOMS_MakeProxy(struct VOMSProxyArguments *args, int *warning, 
     acs = 1;
   }
 
+  ku_flags = get_KeyUsageFlags(args->cert);
+
+  ku_flags &= ~X509v3_KU_KEY_CERT_SIGN;
+  ku_flags &= ~X509v3_KU_NON_REPUDIATION;
+
   confstr = "digitalSignature: hu, keyEncipherment: hu, dataEncipherment: hu";
-  if ((ex8 = X509V3_EXT_conf_nid(NULL, NULL, NID_key_usage, confstr)) == NULL) {
+  if ((ex8 = set_KeyUsageFlags(ku_flags)) == NULL) {
     PRXYerr(PRXYERR_F_PROXY_SIGN, PRXYERR_R_CLASS_ADD_EXT);
     goto err;
   }
@@ -597,4 +605,46 @@ static void setAdditional(void **additional, void *data)
   if (additional)
     *additional = data;
 }
- 
+
+static X509_EXTENSION *set_KeyUsageFlags(int flags)
+{
+  int len =0;
+  unsigned char data[2];
+
+  X509_EXTENSION  *ext = NULL;
+  ASN1_BIT_STRING *str = ASN1_BIT_STRING_new();
+  
+  if (str) {
+    data[0] =  flags & 0x00ff;
+    data[1] = (flags & 0xff00) >> 8;
+
+    len = (data[1] ? 2 : 1);
+
+    ASN1_BIT_STRING_set(str, data, len);
+
+    ext = X509V3_EXT_i2d(NID_key_usage, 1, str);
+    ASN1_BIT_STRING_free(str);
+
+    return ext;
+  }
+
+  return NULL;
+}
+
+static int get_KeyUsageFlags(X509 *cert)
+{
+  int keyusage = 0;
+
+  ASN1_BIT_STRING *usage = X509_get_ext_d2i(cert, NID_key_usage, NULL, NULL);
+  
+  if (usage) {
+    if (usage->length > 0)
+      keyusage = usage->data[0];
+    if (usage->length > 1)
+      keyusage |= usage->data[1] << 8;
+
+    ASN1_BIT_STRING_free(usage);
+  }
+
+  return keyusage;
+}

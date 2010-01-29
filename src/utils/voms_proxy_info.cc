@@ -12,10 +12,6 @@
  * follows.
  *
  *********************************************************************/
-/*
- * No original header was present, but the still_valid() function was
- * adapted from original Globus code.
- */
 
 /**********************************************************************
                              Include header files
@@ -45,6 +41,7 @@ extern "C" {
 #include "openssl/pem.h"
 #include "openssl/ssl.h"
 #include "openssl/rsa.h"
+#include "openssl/conf.h"
 
 #ifdef USE_PKCS11
 #include "scutils.h"
@@ -62,6 +59,8 @@ extern int AC_Init(void);
 
 #include <string>
 #include "voms_api.h"
+
+extern const X509V3_EXT_METHOD v3_key_usage;
 
 #include <vector>
 #include <iostream>
@@ -85,6 +84,7 @@ static bool print(X509 *cert, STACK_OF(X509) *chain, vomsdata &vd);
 static STACK_OF(X509) *load_chain_from_file(char *certfile);
 static time_t stillvalid(ASN1_TIME *ctm);
 static const char *proxy_type(X509 *cert);
+static std::string getKeyUsage(X509 *cert);
 
 std::string program;
 
@@ -128,6 +128,7 @@ static bool        dont_verify_ac = false;
 static bool        targets = false;
 static bool        included = false;
 static bool        printuri = false;
+static bool        keyusage = false;
 
 int
 main(int argc, char **argv)
@@ -173,6 +174,7 @@ main(int argc, char **argv)
     "      -actimeleft           Time (in seconds) until AC expires\n"
     "      -serial               AC serial number \n"
     "      -uri                  Server URI\n"
+    "      -keyusage             Print content of KeyUsage extension.\n"
     "\n"
     "   [options to -exists]      (if none are given, H = B = 0 are assumed)\n"
     "      -valid H:M            time requirement for proxy to be valid\n"
@@ -217,6 +219,7 @@ main(int argc, char **argv)
     {"targets",        0, (int *)&targets,        OPT_BOOL},
     {"included-file",  0, (int *)&included,       OPT_BOOL},
     {"uri",            0, (int *)&printuri,       OPT_BOOL},
+    {"keyusage",       0, (int *)&keyusage,       OPT_BOOL},
     {0, 0, 0, 0}
   };
 
@@ -285,36 +288,37 @@ int numbits(X509 *cert)
   return bits;
 }
 
+static char *findlast(char *haystack, char *needle)
+{
+  char *point = strstr(haystack, needle);
+  char *tmp = point;
+
+  while (tmp) {
+    tmp = strstr(tmp+1, needle);
+    if (tmp)
+      point = tmp;
+  }
+
+  return point;
+}
+
 static const char *proxy_type(X509 *cert)
 {
   char *buffer = X509_NAME_oneline(X509_get_subject_name(cert), NULL, 0);
-  char *point1 = strstr(buffer,"CN=proxy");
-
-  char *tmp = point1;
-  while (tmp) {
-    tmp = strstr(tmp +1, "CN=proxy");
-    if (tmp)
-      point1 = tmp;
-  }
-  char *point2 = strstr(buffer,"CN=limited proxy");
-
-  tmp = point2;
-  while (tmp) {
-    tmp = strstr(tmp +1, "CN=limited proxy");
-    if (tmp)
-      point2 = tmp;
-  }
+  char *point1 = findlast(buffer,"CN=proxy");
+  char *point2 = findlast(buffer,"CN=limited proxy");
 
   int len = strlen(buffer);
 
   OPENSSL_free(buffer);
 
-  if (point1)
-    if (len == ((point1 - buffer) + 8))
+  /*
+   * check whether "proxy" or "limited proxy" came last
+   */
+  if (point1 > point2)
       return "proxy";
 
-  if (point2)
-    if (len == ((point2 - buffer) + 16))
+  if (point2 > point1)
       return "limited proxy";
 
   int nidv3 = OBJ_txt2nid(PROXYCERTINFO_V3);
@@ -381,47 +385,9 @@ test_proxy()
   kf   = NULL;
     
   if (!determine_filenames(&ccaf, &cd, &of, &cf, &kf, 0)) {
-    /* dump error from proxy routines. */
-    unsigned long l;
-    char buf[256];
-#if SSLEAY_VERSION_NUMBER  >= 0x00904100L
-    const char *file;
-#else
-    char *file;
-#endif
-    char *dat;
-    int line;
-    
-    /* WIN32 does not have the ERR_get_error_line_data */ 
-    /* exported, so simulate it till it is fixed */
-    /* in SSLeay-0.9.0 */
-  
-    while ( ERR_peek_error() != 0 ) {
-    
-      int i;
-      ERR_STATE *es;
-      
-      es = ERR_get_state();
-      i = (es->bottom+1)%ERR_NUM_ERRORS;
-    
-      if (es->err_data[i] == NULL)
-        dat = strdup("");
-      else
-        dat = strdup(es->err_data[i]);
+    std::string output = OpenSSLError(debug);
 
-      if (dat) {
-        l = ERR_get_error_line(&file, &line);
-
-        if (debug)
-          std::cerr << ERR_error_string(l,buf) << ":"
-                    << file << ":" << line << dat << std::endl;
-        else
-          std::cerr << ERR_reason_error_string(l) << dat
-                    << "\nFunction: " << ERR_func_error_string(l) << std::endl;
-      }
-    
-      free(dat);
-    }
+    std::cerr << output;
 
     goto err;
   }
@@ -438,6 +404,8 @@ test_proxy()
         goto err;
       }
       chain = load_chain_from_file(of);
+
+
       vomsdata d("","");
       if (!dont_verify_ac) {
           d.SetVerificationType((verify_type)(VERIFY_SIGN | VERIFY_KEY));
@@ -551,7 +519,9 @@ static bool print(X509 *cert, STACK_OF(X509) *chain, vomsdata &vd)
         
         if (strcmp(type, "unknown") != 0)
           std::cout << "type      : " << type << "\n";
-        
+
+	if (all || keyusage)
+	  std::cout << "key usage : " << getKeyUsage(cert) << "\n";
         std::cout << "strength  : " << totbits << " bits" << "\n";
         std::cout << "timeleft  : " << leftcert/3600 << ":" << std::setw(2) << std::setfill('0') 
                   << (leftcert%3600)/60 << ":" << std::setw(2) << std::setfill('0') << (leftcert%3600)%60 << "\n\n";
@@ -571,7 +541,8 @@ static bool print(X509 *cert, STACK_OF(X509) *chain, vomsdata &vd)
               << (leftcert%3600)/60 << ":" << std::setw(2) << std::setfill('0') << (leftcert%3600)%60 << "\n";
     if (!vd.extra_data.empty())
       std::cout << "included  : "  << vd.extra_data << "\n";
-
+    if (all || text || keyusage)
+      std::cout << "key usage : " << getKeyUsage(cert) << "\n";
   }    
   
   if (all) {
@@ -717,104 +688,31 @@ static bool print(X509 *cert, STACK_OF(X509) *chain, vomsdata &vd)
 
 static time_t stillvalid(ASN1_TIME *ctm)
 {
-  char     *str;
-  time_t    offset;
-  time_t    newtime;
-  char      buff1[32];
-  char     *p;
-  int       i;
-  struct tm tm;
-  int       size = 0;
+  return ASN1_TIME_mktime(ctm);
+}
 
-  switch (ctm->type) {
-  case V_ASN1_UTCTIME:
-    size=10;
-    break;
-  case V_ASN1_GENERALIZEDTIME:
-    size=12;
-    break;
-  }
-  p = buff1;
-  i = ctm->length;
-  str = (char *)ctm->data;
-  if ((i < 11) || (i > 17)) {
-    newtime = 0;
-  }
-  memcpy(p,str,size);
-  p += size;
-  str += size;
+static std::string getKeyUsage(X509 *cert)
+{
+  STACK_OF(CONF_VALUE) *confs = NULL;
+  ASN1_BIT_STRING *usage = NULL;
 
-  if ((*str == 'Z') || (*str == '-') || (*str == '+')) {
-    *(p++)='0'; *(p++)='0';
-  }
-  else {
-    *(p++)= *(str++); *(p++)= *(str++);
-  }
-  *(p++)='Z';
-  *(p++)='\0';
+  std::string keyusage;
 
-  if (*str == 'Z') {
-    offset=0;
-  }
-  else {
-    if ((*str != '+') && (str[5] != '-')) {
-      newtime = 0;
-    }
-    offset=((str[1]-'0')*10+(str[2]-'0'))*60;
-    offset+=(str[3]-'0')*10+(str[4]-'0');
-    if (*str == '-') {
-      offset=-offset;
-    }
+  confs = NULL;
+  usage = (ASN1_BIT_STRING*)X509_get_ext_d2i(cert, NID_key_usage, NULL, NULL);
+  confs = i2v_ASN1_BIT_STRING((X509V3_EXT_METHOD*)&v3_key_usage, usage, confs);
+  for (int i =0; i < sk_CONF_VALUE_num(confs); i ++) {
+    CONF_VALUE *conf = (CONF_VALUE*)sk_CONF_VALUE_value(confs, i);
+    keyusage += std::string(conf->name);
+    if (i != (sk_CONF_VALUE_num(confs) -1))
+      keyusage += ", ";
   }
 
-  tm.tm_isdst = 0;
-  int index = 0;
-  if (ctm->type == V_ASN1_UTCTIME) {
-    tm.tm_year  = (buff1[index++]-'0')*10;
-    tm.tm_year += (buff1[index++]-'0');
-  }
-  else {
-    tm.tm_year  = (buff1[index++]-'0')*1000;
-    tm.tm_year += (buff1[index++]-'0')*100;
-    tm.tm_year += (buff1[index++]-'0')*10;
-    tm.tm_year += (buff1[index++]-'0');
-  }
+  ASN1_BIT_STRING_free(usage);
 
-  if (tm.tm_year < 70) {
-    tm.tm_year+=100;
-  }
+  // Do not free it.  CONF_VALUE_free() is not defined.  The program
+  //  ends, so the loss of memory is irrelevant.
+  //  sk_CONF_VALUE_pop_free(confs, CONF_VALUE_free);
 
-  if (tm.tm_year > 1900) {
-    tm.tm_year -= 1900;
-  }
-
-  tm.tm_mon   = (buff1[index++]-'0')*10;
-  tm.tm_mon  += (buff1[index++]-'0')-1;
-  tm.tm_mday  = (buff1[index++]-'0')*10;
-  tm.tm_mday += (buff1[index++]-'0');
-  tm.tm_hour  = (buff1[index++]-'0')*10;
-  tm.tm_hour += (buff1[index++]-'0');
-  tm.tm_min   = (buff1[index++]-'0')*10;
-  tm.tm_min  += (buff1[index++]-'0');
-  tm.tm_sec   = (buff1[index++]-'0')*10;
-  tm.tm_sec  += (buff1[index++]-'0');
-
-  /*
-   * mktime assumes local time, so subtract off
-   * timezone, which is seconds off of GMT. first
-   * we need to initialize it with tzset() however.
-   */
-
-  tzset();
-#if defined(HAVE_TIMEGM)
-  newtime = (timegm(&tm) + offset*60*60);
-#elif defined(HAVE_TIME_T_TIMEZONE)
-  newtime = (mktime(&tm) + offset*60*60 - timezone);
-#elif defined(HAVE_TIME_T__TIMEZONE)
-  newtime = (mktime(&tm) + offset*60*60 - _timezone);
-#else
-  newtime = (mktime(&tm) + offset*60*60);
-#endif
-
-  return newtime;
+  return keyusage;
 }

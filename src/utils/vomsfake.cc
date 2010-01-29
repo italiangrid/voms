@@ -18,6 +18,7 @@
 #include "replace.h"
 
 #include "options.h"
+#include "data.h"
 
 #include <iostream>
 #include <fstream>
@@ -668,44 +669,12 @@ bool Fake::pcdInit() {
 
 void Fake::Error() 
 {
-  unsigned long l;
-  char buf[256];
-#if SSLEAY_VERSION_NUMBER  >= 0x00904100L
-  const char *file;
-#else
-  char *file;
-#endif
-  char *dat;
-  int line;
-    
-  /* WIN32 does not have the ERR_get_error_line_data */ 
-  /* exported, so simulate it till it is fixed */
-  /* in SSLeay-0.9.0 */
-  
-  while ( ERR_peek_error() != 0 ) {
-    
-    int i;
-    ERR_STATE *es;
-      
-    es = ERR_get_state();
-    i = (es->bottom+1)%ERR_NUM_ERRORS;
-    
-    if (es->err_data[i] == NULL)
-      dat = strdup("");
-    else
-      dat = strdup(es->err_data[i]);
-    if (dat) {
-      l = ERR_get_error_line(&file, &line);
-      if (debug)
-        Print(DEBUG) << ERR_error_string(l,buf) << ":"
-                     << file << ":" << line << dat << std::endl << std::flush;
-      else 
-        Print(ERROR) << ERR_reason_error_string(l) << dat
-                     << "\nFunction: " << ERR_func_error_string(l) << std::endl;
-    }
-    
-    free(dat);
-  }
+  std::string output = OpenSSLError(debug);
+
+  if (debug)
+    Print(DEBUG) << output;
+  else
+    Print(ERROR) << output;
 }
 
 

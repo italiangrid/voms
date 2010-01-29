@@ -535,6 +535,8 @@ time_t
 ASN1_UTCTIME_mktime(
     ASN1_UTCTIME *                     ctm);
 
+time_t ASN1_TIME_mktime(ASN1_TIME *ctm);
+
 int PRIVATE determine_filenames(char **cacert, char **certdir, char **outfile,
                                 char **certfile, char **keyfile, int noregen);
 int load_credentials(const char *certname, const char *keyname,

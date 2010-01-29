@@ -15,6 +15,7 @@
  *********************************************************************/
 
 #include "config.h"
+#include "data.h"
 
 extern "C" {
 #include <stdio.h>
@@ -31,7 +32,6 @@ extern "C" {
 
 #include "listfunc.h"
 #include "credentials.h"
-
 #include "replace.h"
 }
 #include <iostream>
@@ -1221,46 +1221,9 @@ bool Client::pcdInit() {
 
 void Client::Error() 
 {
-  unsigned long l;
-  char buf[256];
-#if SSLEAY_VERSION_NUMBER  >= 0x00904100L
-  const char *file;
-#else
-  char *file;
-#endif
-  char *dat;
-  int line;
-    
-  /* WIN32 does not have the ERR_get_error_line_data */ 
-  /* exported, so simulate it till it is fixed */
-  /* in SSLeay-0.9.0 */
+  std::string output = OpenSSLError(debug);
   
-  while ( ERR_peek_error() != 0 ) {
-    
-    int i;
-    ERR_STATE *es;
-      
-    es = ERR_get_state();
-    i = (es->bottom+1)%ERR_NUM_ERRORS;
-    
-    if (es->err_data[i] == NULL)
-      dat = strdup("");
-    else
-      dat = strdup(es->err_data[i]);
-
-    if (dat) {
-      l = ERR_get_error_line(&file, &line);
-
-      if (debug)
-        std::cerr << ERR_error_string(l,buf) << ":"
-                  << file << ":" << line << dat << std::endl;
-      else
-        std::cerr << ERR_reason_error_string(l) << dat
-                  << "\nFunction: " << ERR_func_error_string(l) << std::endl;
-    }
-    
-    free(dat);
-  }
+  std::cerr << output;
 }
 
 static AC *getAC(const std::string& data)

@@ -172,15 +172,17 @@ static int real_write(int fd, char *buffer, int size)
 int destroy_proxy(char *file, bool dry)
 {
   char delblock[100];
-  
-  if (dry)
-    std::cerr << "Would remove " << file << std::endl;
-  else {
-    memset(delblock, 0, 100);
 
-    int fd = open(file, O_RDWR);
+  int fd = open(file, O_RDWR);
 
-    if (fd != -1) {
+  if (fd != -1) {
+    if (dry) {
+      if (!quiet)
+	std::cerr << "Would remove " << file << std::endl;
+    }
+    else {
+      memset(delblock, 0, 100);
+
       int size = lseek(fd, 0L, SEEK_END);
       lseek(fd, 0L, SEEK_SET);
       if (size > 0) {
@@ -197,12 +199,12 @@ int destroy_proxy(char *file, bool dry)
       close(fd);
       remove(file);
     }
-    else {
-      printf("\nProxy file doesn't exist or has bad permissions\n\n");
-      return 1;
-    }
-    
-    return 0;
   }
+  else {
+    if (!quiet)
+      std::cerr << "\nProxy file doesn't exist or has bad permissions\n" << std::endl;
+    return 1;
+  }
+
   return 0;
 }

@@ -34,6 +34,7 @@ type      : proxy
 strength  : 1024 bits
 path      : /tmp/x509up_u\[0-9\]*
 timeleft  : \[0-9\]*:\[0-9\]*:\[0-9\]*
+key usage : Digital Signature, Key Encipherment
 === VO voms1 extension information ===
 VO        : voms1
 subject   : /C=IT/CN=001

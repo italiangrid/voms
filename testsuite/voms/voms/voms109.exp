@@ -1,0 +1,36 @@
+load_lib vomstest.exp
+testheader "See if voms-proxy-destroy --dryrun works."
+
+proc mytest {} {
+    _activateCert mycert2
+
+    _vomsStart voms1
+    set outname [exec mktemp $::SCRATCHDIR/voms-proxy-init-XXXXXX]
+    set res [catch {set out [exec $::INSTALLDIR/bin/voms-proxy-init --voms voms1 >& $outname]}]
+    _vomsStop voms1
+
+    if $res then {
+        addlog $outname
+        testmessage "voms-proxy-init failed."
+        return $::FAILTEST
+    }
+
+    set outname [exec mktemp $::SCRATCHDIR/voms-proxy-info-XXXXXX]
+    set res [catch {set out [exec $::INSTALLDIR/bin/voms-proxy-destroy --dryrun >& $outname]}]
+
+    if $res then {
+        addlog $outname
+        testmessage "voms-proxy-destroy failed."
+        return $::FAILTEST
+    } else {
+        if [file exists /tmp/x509up_u[exec id -u]] then {
+            testmessage "proxy exists."
+            return $::PASSTEST
+        } else {
+            testmessage "proxy deleted."
+            return $::FAILTEST
+        }
+    }
+}
+
+do_test

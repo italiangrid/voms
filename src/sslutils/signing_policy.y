@@ -209,6 +209,6 @@ int main()
   return signingparse(arg, scanner);
 }
 #endif
-void signingerror(void *policies, void *scanner, char const *msg)
+void signingerror(UNUSED(void *policies), UNUSED(void *scanner), UNUSED(char const *msg))
 {
 }

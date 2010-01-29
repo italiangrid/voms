@@ -140,6 +140,6 @@ int main()
 }
 #endif
 
-void namespaceserror(void *policies, void *scanner, char const *msg)
+void namespaceserror(UNUSED(void *policies), UNUSED(void *scanner), UNUSED(char const *msg))
 {
 }

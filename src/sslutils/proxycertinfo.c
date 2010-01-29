@@ -339,7 +339,7 @@ static myPROXYCERTINFO * d2i_myPROXYCERTINFO_v3(myPROXYCERTINFO ** cert_info, un
     M_ASN1_D2I_Init();
     M_ASN1_D2I_start_sequence();
 
-    M_ASN1_D2I_get(ret->proxypolicy, d2i_myPROXYPOLICY);
+    M_ASN1_D2I_get((ret->proxypolicy), d2i_myPROXYPOLICY);
 
     M_ASN1_D2I_get_EXP_opt(ret->path_length, d2i_ASN1_INTEGER, 1);
 
@@ -358,7 +358,7 @@ static myPROXYCERTINFO * d2i_myPROXYCERTINFO_v4(myPROXYCERTINFO ** cert_info, un
     
     M_ASN1_D2I_get_opt(ret->path_length, d2i_ASN1_INTEGER, V_ASN1_INTEGER);
 
-    M_ASN1_D2I_get(ret->proxypolicy,d2i_myPROXYPOLICY);
+    M_ASN1_D2I_get((ret->proxypolicy),d2i_myPROXYPOLICY);
 
     ret->version = 4;
     M_ASN1_D2I_Finish(cert_info, myPROXYCERTINFO_free, ASN1_F_D2I_PROXYCERTINFO);

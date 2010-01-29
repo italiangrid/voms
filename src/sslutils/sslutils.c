@@ -3469,87 +3469,119 @@ Returns:
         time_t 
 **********************************************************************/
 
+time_t PRIVATE ASN1_TIME_mktime(ASN1_TIME *ctm)
+{
+  /*
+   * note: ASN1_TIME, ASN1_UTCTIME, ASN1_GENERALIZEDTIME are different
+   * typedefs of the same type.
+   */
+  return ASN1_UTCTIME_mktime(ctm);
+}
+
 time_t PRIVATE
 ASN1_UTCTIME_mktime(
     ASN1_UTCTIME *                      ctm)
 {
-    char *                              str;
-    time_t                              offset;
-    char                                buff1[24];
-    char *                              p;
-    int                                 i;
-    struct tm                           tm;
+  char     *str;
+  time_t    offset;
+  time_t    newtime;
+  char      buff1[32];
+  char     *p;
+  int       i;
+  struct tm tm;
+  int       size = 0;
 
-    p = buff1;
-    i = ctm->length;
-    str = (char *)ctm->data;
-    if ((i < 11) || (i > 17))
-    {
-        return(0);
+  switch (ctm->type) {
+  case V_ASN1_UTCTIME:
+    size=10;
+    break;
+  case V_ASN1_GENERALIZEDTIME:
+    size=12;
+    break;
+  }
+  p = buff1;
+  i = ctm->length;
+  str = (char *)ctm->data;
+  if ((i < 11) || (i > 17)) {
+    newtime = 0;
+  }
+  memcpy(p,str,size);
+  p += size;
+  str += size;
+
+  if ((*str == 'Z') || (*str == '-') || (*str == '+')) {
+    *(p++)='0'; *(p++)='0';
+  }
+  else {
+    *(p++)= *(str++); *(p++)= *(str++);
+  }
+  *(p++)='Z';
+  *(p++)='\0';
+
+  if (*str == 'Z') {
+    offset=0;
+  }
+  else {
+    if ((*str != '+') && (str[5] != '-')) {
+      newtime = 0;
     }
-    memcpy(p,str,10);
-    p += 10;
-    str += 10;
-
-    if ((*str == 'Z') || (*str == '-') || (*str == '+'))
-    {
-        *(p++)='0'; *(p++)='0';
+    offset=((str[1]-'0')*10+(str[2]-'0'))*60;
+    offset+=(str[3]-'0')*10+(str[4]-'0');
+    if (*str == '-') {
+      offset=-offset;
     }
-    else
-    {
-        *(p++)= *(str++); *(p++)= *(str++);
-    }
-    *(p++)='Z';
-    *(p++)='\0';
+  }
 
-    if (*str == 'Z')
-    {
-        offset=0;
-    }
-    else
-    {
-        if ((*str != '+') && (str[5] != '-'))
-        {
-            return(0);
-        }
-        offset=((str[1]-'0')*10+(str[2]-'0'))*60;
-        offset+=(str[3]-'0')*10+(str[4]-'0');
-        if (*str == '-')
-        {
-            offset=-offset;
-        }
-    }
+  tm.tm_isdst = 0;
+  int index = 0;
+  if (ctm->type == V_ASN1_UTCTIME) {
+    tm.tm_year  = (buff1[index++]-'0')*10;
+    tm.tm_year += (buff1[index++]-'0');
+  }
+  else {
+    tm.tm_year  = (buff1[index++]-'0')*1000;
+    tm.tm_year += (buff1[index++]-'0')*100;
+    tm.tm_year += (buff1[index++]-'0')*10;
+    tm.tm_year += (buff1[index++]-'0');
+  }
 
-    tm.tm_isdst = 0;
-    tm.tm_year = (buff1[0]-'0')*10+(buff1[1]-'0');
+  if (tm.tm_year < 70) {
+    tm.tm_year+=100;
+  }
 
-    if (tm.tm_year < 70)
-    {
-        tm.tm_year+=100;
-    }
-        
-    tm.tm_mon   = (buff1[2]-'0')*10+(buff1[3]-'0')-1;
-    tm.tm_mday  = (buff1[4]-'0')*10+(buff1[5]-'0');
-    tm.tm_hour  = (buff1[6]-'0')*10+(buff1[7]-'0');
-    tm.tm_min   = (buff1[8]-'0')*10+(buff1[9]-'0');
-    tm.tm_sec   = (buff1[10]-'0')*10+(buff1[11]-'0');
+  if (tm.tm_year > 1900) {
+    tm.tm_year -= 1900;
+  }
 
-    /*
-     * mktime assumes local time, so subtract off
-     * timezone, which is seconds off of GMT. first
-     * we need to initialize it with tzset() however.
-     */
+  tm.tm_mon   = (buff1[index++]-'0')*10;
+  tm.tm_mon  += (buff1[index++]-'0')-1;
+  tm.tm_mday  = (buff1[index++]-'0')*10;
+  tm.tm_mday += (buff1[index++]-'0');
+  tm.tm_hour  = (buff1[index++]-'0')*10;
+  tm.tm_hour += (buff1[index++]-'0');
+  tm.tm_min   = (buff1[index++]-'0')*10;
+  tm.tm_min  += (buff1[index++]-'0');
+  tm.tm_sec   = (buff1[index++]-'0')*10;
+  tm.tm_sec  += (buff1[index++]-'0');
 
-    tzset();
+  /*
+   * mktime assumes local time, so subtract off
+   * timezone, which is seconds off of GMT. first
+   * we need to initialize it with tzset() however.
+   */
+
+  tzset();
 #if defined(HAVE_TIMEGM)
-    return (timegm(&tm) + offset*60*60);
+  newtime = (timegm(&tm) + offset*60*60);
 #elif defined(HAVE_TIME_T_TIMEZONE)
-    return (mktime(&tm) + offset*60*60 - timezone);
+  newtime = (mktime(&tm) + offset*60*60 - timezone);
 #elif defined(HAVE_TIME_T__TIMEZONE)
-    return (mktime(&tm) + offset*60*60 - _timezone);
+  newtime = (mktime(&tm) + offset*60*60 - _timezone);
 #else
-    return (mktime(&tm) + offset*60*60);
+  newtime = (mktime(&tm) + offset*60*60);
 #endif
+
+  return newtime;
 }
 
 
@@ -3820,9 +3852,9 @@ end:
 static X509_NAME *make_DN(const char *dnstring)
 {
   char *buffername = (char*)malloc(strlen(dnstring)+1);
-  char *buffervalue = (char*)malloc(strlen(dnstring)+1);
+  unsigned char *buffervalue = (unsigned char*)malloc(strlen(dnstring)+1);
   char *currentname = buffername;
-  char *currentvalue = buffervalue;
+  unsigned char *currentvalue = buffervalue;
   X509_NAME *name = NULL;
 
   name = X509_NAME_new();
@@ -3886,7 +3918,7 @@ static X509_NAME *make_DN(const char *dnstring)
       }
 
       *currentvalue='\0';
-      if (strlen(buffervalue) == 0)
+      if (strlen((char*)buffervalue) == 0)
         goto err;
 
       /* Now we have both type and value.  Add to the X509_NAME_ENTRY */

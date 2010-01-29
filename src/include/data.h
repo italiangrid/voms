@@ -19,6 +19,7 @@
 
 extern bool        acceptable(const char *str);
 extern bool        acceptable(std::string s);
-extern std::string timestamp(void);
+extern char *      timestamp(void);
 extern std::string stringify(int i, std::string &s);
+extern std::string OpenSSLError(bool debug);
 #endif

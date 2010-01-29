@@ -130,6 +130,8 @@ In case the proxy included a user-specified file, this option prints
 <para><option>-uri</option>
 Prints the URI of the serve which issued this AC.</para>
 
+<para><option>-keyusage</option>
+Print the content of the KeyUsage extension of the certificate.</para>
 </refsect1>
 
 &bugzilla;

@@ -112,10 +112,8 @@ int default_validity = -1;
 bool compat_flag = false;
 bool short_flags = false;
 
-int soap_port=8443;
-static std::string soap_host = "";
-static char *soap_hostname = NULL;
 static bool checkinside(gattrib g, std::vector<std::string> list);
+static void CreateURI(std::string &uri, int port);
 
 std::string
 makeACSSL(SSL *ssl, void *logh, char **FQANs, int size, char **targets, int targsize, int requested, VOMSServer *v);
@@ -137,7 +135,7 @@ static int (*pw_cb)() = NULL;
 
 static char *canonicalize_string(char *original);
 
-static int pwstdin_callback(char * buf, int num, int w) {
+static int pwstdin_callback(char * buf, int num, UNUSED(int w)) {
   
   int i;
   
@@ -384,8 +382,6 @@ VOMSServer::VOMSServer(int argc, char *argv[]) : sock(0,NULL,50,false),
     {"syslog",          0, (int *)&do_syslog,         OPT_BOOL},
     {"base64",          0, (int *)&base64encoding,    OPT_BOOL},
     {"nologfile",       0, (int *)&nologfile,         OPT_BOOL},
-//     {"soap_port",       1, &soap_port,                OPT_NUM},
-//     {"soap_host",       1, (int *)&soap_host,         OPT_STRING},
     {0, 0, 0, 0}
   };
 
@@ -580,40 +576,12 @@ VOMSServer::VOMSServer(int argc, char *argv[]) : sock(0,NULL,50,false),
     }
   }
   else {
-    LOGM(VARP, logh, LEV_ERROR, T_PRE, (std::string("Error connecting to the database : ") + errormessage).c_str());
+    LOGM(VARP, logh, LEV_ERROR, T_PRE, "Error connecting to the database : %s", errormessage.c_str());
     throw VOMSInitException((std::string("Error connecting to the database : ") + errormessage));
   }
 
-
-  /* Determine hostname */
-  int   ok;
-
-  int   hostnamesize = 50;
-  char *hostname = new char[1];
-  do {
-    delete[] hostname;
-    hostname = new char[hostnamesize];
-    ok = gethostname(hostname, hostnamesize);
-    hostnamesize += 50;
-  } while (ok);
-  
-
-  if (fakeuri.empty()) {
-    std::string temp;
-
-    uri = std::string(hostname) + ":" + stringify(daemon_port, temp);
-
-  }
-  else
-    uri = fakeuri;
-
-  if (soap_host.empty()) {
-    soap_hostname = NULL;
-  }
-  else
-    soap_hostname = strdup(hostname);
-
-  delete[] hostname;
+  uri = fakeuri;
+  CreateURI(uri, daemon_port);
 
   sock = GSISocketServer(daemon_port, NULL, backlog);
 
@@ -656,9 +624,9 @@ VOMSServer::VOMSServer(int argc, char *argv[]) : sock(0,NULL,50,false),
 
 VOMSServer::~VOMSServer() {}
 
-static char *cacertdir = "/etc/grid-security/certificates";
-static char *hostcert  = "/etc/grid-security/hostcert.pem";
-static char *hostkey   = "/etc/grid-security/hostkey.pem";
+static char *cacertdir = (char*)"/etc/grid-security/certificates";
+static char *hostcert  = (char*)"/etc/grid-security/hostcert.pem";
+static char *hostkey   = (char*)"/etc/grid-security/hostkey.pem";
 
 extern proxy_verify_desc *setup_initializers(char*);
 
@@ -747,7 +715,7 @@ void VOMSServer::Run()
               subject = sock.own_subject;
               ca = sock.own_ca;
 
-              LOGM(VARP, logh, LEV_INFO, T_PRE, "At: %s Received Contact :", timestamp().c_str());
+              LOGM(VARP, logh, LEV_INFO, T_PRE, "At: %s Received Contact :", timestamp());
               LOGM(VARP, logh, LEV_INFO, T_PRE, " user: %s", user.c_str());
               LOGM(VARP, logh, LEV_INFO, T_PRE, " ca  : %s", userca.c_str());
               LOGM(VARP, logh, LEV_INFO, T_PRE, " serial: %s", sock.peer_serial.c_str());
@@ -1303,7 +1271,6 @@ void VOMSServer::UpdateOpts(void)
     (void)SetCurLogType(logh, T_STARTUP);
     (void)LogService(logh, "vomsd");
     (void)LogFormat(logh, logf.c_str());
-    //    (void)LogDateFormat(logh, logdf.c_str());
   }
 
   if (nport != daemon_port) {
@@ -1313,24 +1280,8 @@ void VOMSServer::UpdateOpts(void)
   else if (nblog != backlog)
     sock.AdjustBacklog(backlog = nblog);
 
-  if (fakeuri.empty()) {
-    int   ok;
-
-    int   hostnamesize = 50;
-    char *hostname = new char[1];
-    do {
-      delete[] hostname;
-      hostname = new char[hostnamesize];
-      ok = gethostname(hostname, hostnamesize);
-      hostnamesize += 50;
-    } while (ok);
-    std::string temp;
-
-    uri = std::string(hostname) + ":" + stringify(daemon_port, temp);
-    delete[] hostname;
-  }
-  else
-    uri = fakeuri;
+  uri = fakeuri;
+  CreateURI(uri, daemon_port);
 
   setenv("GLOBUSID", globusid.c_str(), 1);
 
@@ -1486,8 +1437,8 @@ makeACSSL(SSL *ssl, void *logh, char **FQANs, int size, char **targets, int targ
   X509 *issuer = NULL;
   EVP_PKEY *key = NULL;
   pw_cb =(int (*)())(pwstdin_callback);
-  char *hostcert = "/etc/grid-security/hostcert.pem";
-  char *hostkey  = "/etc/grid-security/hostkey.pem";
+  char *hostcert = (char*)"/etc/grid-security/hostcert.pem";
+  char *hostkey  = (char*)"/etc/grid-security/hostkey.pem";
 
   if (!v->x509_user_cert.empty())
     hostcert = (char*)v->x509_user_cert.c_str();
@@ -1769,5 +1720,26 @@ static int EncodeAnswerForRest(const std::string& input, int unknown, std::strin
       output = "<?xml version=\"1.0\" encoding=\"UTF-8\"?><voms><error>"
         "<code>InternalError</code><message>Internal Error</message></voms>";
       return 500;
+  }
+}
+
+static void CreateURI(std::string &uri, int port)
+{
+  if (uri.empty()) {
+    int   hostnamesize = 50;
+    char *hostname = new char[1];
+    int ok = 0;
+    do {
+      delete[] hostname;
+      hostname = new char[hostnamesize];
+      ok = gethostname(hostname, hostnamesize);
+      hostnamesize += 50;
+    } while (ok);
+    
+    std::string temp;
+
+    uri = std::string(hostname) + ":" + stringify(port, temp);
+
+    delete[] hostname;
   }
 }

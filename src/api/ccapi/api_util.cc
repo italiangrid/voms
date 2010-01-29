@@ -874,7 +874,7 @@ vomsdata::contact(const std::string &hostname, int port, const std::string &cont
  * Kept for binary compatibility.
  * No one calls this.
  */
-STACK_OF(X509) *vomsdata::load_chain(BIO *in)
+STACK_OF(X509) *vomsdata::load_chain(UNUSED(BIO *in))
 {
   return NULL;
 }

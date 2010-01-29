@@ -80,67 +80,6 @@ get_real_cert(X509 *base, STACK_OF(X509) *stk)
   return NULL;
 }
 
-int 
-get_issuer(X509 *cert, char **buffer)
-{
-  X509_NAME *name;
-  char *result;
-  int gotit = 0;
-
-  name = X509_get_issuer_name(cert);
-  result = X509_NAME_oneline(name, NULL, 0);
-
-  free(*buffer);
-  *buffer = (char *)malloc(strlen(result)+1);
-  if (*buffer) {
-    strncpy(*buffer, result, strlen(result)+1);
-    gotit = 1;
-  }
-  OPENSSL_free(result);
-  return gotit;
-}
-
-
-EVP_PKEY *
-get_private_key(void *credential)
-{
-  globus_gsi_cred_handle_t ggch;
-  EVP_PKEY *pkey = NULL;
-
-  if (!credential)
-    return NULL;
-
-  ggch = ((gss2_cred_id_desc *)credential)->cred_handle;
-  if (ggch)
-    pkey = ggch->key;
-  else
-    return NULL;
-
-  return pkey;
-}
-
-int get_own_data(gss_cred_id_t credential, EVP_PKEY **key, char **issuer, X509 **pcert)
-{
-  /*  EVP_PKEY *pkey = NULL; */
-  STACK_OF(X509) *stk = NULL;
-  X509 *cert = NULL;
-
-  if (!credential || !key || !issuer || !pcert)
-    return 0;
-
-  cert = decouple_cred(credential, &stk);
-  *key   = get_private_key(credential);
-
-  *pcert = get_real_cert(cert, stk);
-
-  if (*pcert && *key) {
-    return get_issuer(*pcert, issuer);
-  }
-  else
-    return 0;
-}
-
-
 char *
 get_peer_serial(X509 *cert)
 {

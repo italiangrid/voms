@@ -117,7 +117,7 @@ public class VOMSKeyManager implements X509KeyManager {
     private KeyStore createKeyStore(String cert, String key, char[] passwd) throws CertificateException, IOException {
         FileCertReader reader = new FileCertReader();
 
-        X509Certificate[] certs = (X509Certificate [])(reader.readCerts(cert).toArray());
+        X509Certificate[] certs = (X509Certificate[])reader.readCerts(cert).toArray(new X509Certificate[] {});
 
         PrivateKey pkey = null;
         KeyStore store = null;

@@ -1,5 +1,5 @@
 load_lib vomstest.exp
-testheader "See if a voms proxy has the right attributes."
+testheader "See if voms-proxy-info -keyusage works."
 
 proc mytest {} {
     _activateCert mycert2
@@ -16,34 +16,15 @@ proc mytest {} {
     }
 
     set outname [exec mktemp $::SCRATCHDIR/voms-proxy-info-XXXXXX]
-    set res [catch {set out2 [exec $::INSTALLDIR/bin/voms-proxy-info --all >& $outname]}]
-
-    if $res then {
+    if [catch {set out2 [exec $::INSTALLDIR/bin/voms-proxy-info --text >& $outname]}] then {
         addlog $outname
-        testmessage "voms-proxy-info failed."
+        testmessage "voms-proxy-info returned an error."
         return $::FAILTEST
     } else {
-        #match against known (correct) output
-        set correct "subject   : /C=IT/CN=001/CN=proxy
-issuer    : /C=IT/CN=001
-identity  : /C=IT/CN=001
-type      : proxy
-strength  : 1024 bits
-path      : /tmp/x509up_u\[0-9\]*
-timeleft  : \[0-9\]*:\[0-9\]*:\[0-9\]*
-key usage : Digital Signature, Key Encipherment
-=== VO voms1 extension information ===
-VO        : voms1
-subject   : /C=IT/CN=001
-issuer    : /C=IT/CN=003
-attribute : /voms1
-attribute : /voms1/group1
-attribute : shortid = mycert2-g \\\(/voms1/group1\\\)
-attribute : shortid = mycert2 \\\(voms1\\\)
-timeleft  : \[0-9\]*:\[0-9\]*:\[0-9\]*"
+        set correct "\[.\\\n\]*key usage : Digital Signature, Key Encipherment"
         set out2 [exec cat  $outname]
         if [regexp $correct $out2] then {
-            testmessage "proxy successfully created."
+            testmessage "-keyusage worked correcly."
             return $::PASSTEST
         } else {
             set outname2 [exec mktemp $::SCRATCHDIR/voms-proxy-info-XXXXXX]

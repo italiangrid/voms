@@ -75,7 +75,8 @@ static int fileoutputter(void *data, const char *s)
   if (ld->maxlog) {
     if (position > ld->maxlog) {
       if (!logfile_rotate(ld->name) || !filereopen(ld)) {
-        (void)write(ld->fd, "VOMS: LOGGING ROTATION ERROR\n", 29);
+        UNUSED(int ret);
+	ret= write(ld->fd, "VOMS: LOGGING ROTATION ERROR\n", 29);
       }
     }
   }

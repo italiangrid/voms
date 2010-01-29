@@ -41,3 +41,4 @@ struct error *alloc_error(int n, const char *e)
   free(er);
   return NULL;
 }
+
