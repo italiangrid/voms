@@ -308,8 +308,6 @@ static const char *proxy_type(X509 *cert)
   char *point1 = findlast(buffer,"CN=proxy");
   char *point2 = findlast(buffer,"CN=limited proxy");
 
-  int len = strlen(buffer);
-
   OPENSSL_free(buffer);
 
   /*
@@ -700,7 +698,7 @@ static std::string getKeyUsage(X509 *cert)
 
   confs = NULL;
   usage = (ASN1_BIT_STRING*)X509_get_ext_d2i(cert, NID_key_usage, NULL, NULL);
-  confs = i2v_ASN1_BIT_STRING((X509V3_EXT_METHOD*)&v3_key_usage, usage, confs);
+  confs = v3_key_usage.i2v((X509V3_EXT_METHOD*)&v3_key_usage, usage, confs);
   for (int i =0; i < sk_CONF_VALUE_num(confs); i ++) {
     CONF_VALUE *conf = (CONF_VALUE*)sk_CONF_VALUE_value(confs, i);
     keyusage += std::string(conf->name);
