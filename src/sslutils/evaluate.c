@@ -30,6 +30,16 @@ static int restriction_evaluate_namespace(STACK_OF(X509) *chain, struct policy *
 static int restriction_evaluate_signing(STACK_OF(X509) *chain, struct policy **signings);
 static FILE *open_from_dir(char *path, char *file);
 
+extern int  signinglex_init (void** scanner);
+extern void signingset_in  (FILE * in_str ,void *yyscanner );
+extern int  signinglex_destroy (void* yyscanner );
+extern int  signingparse(struct policy ***policies, void *scanner);
+
+extern int  namespaceslex_init (void** scanner);
+extern void namespacesset_in  (FILE * in_str ,void *yyscanner );
+extern int  namespaceslex_destroy (void* yyscanner );
+extern int  namespacesparse(struct policy ***policies, void *scanner);
+
 static int find_policy(struct policy **policies, X509 *cert, int current)
 {
   int i = (current == -1 ? 0 : current + 1);
@@ -337,7 +347,7 @@ void read_pathrestriction(STACK_OF(X509) *chain, char *path,
 
       signinglex_init(&scanner);
       signingset_in(file, scanner);
-      signingparse(signs, scanner);
+      (void)signingparse(signs, scanner);
       signinglex_destroy(scanner);
       fclose(file);
     }
@@ -357,7 +367,7 @@ void read_pathrestriction(STACK_OF(X509) *chain, char *path,
 
       namespaceslex_init(&scanner);
       namespacesset_in(file, scanner);
-      namespacesparse(names, scanner);
+      (void)namespacesparse(names, scanner);
       namespaceslex_destroy(scanner);
       fclose(file);
     }
