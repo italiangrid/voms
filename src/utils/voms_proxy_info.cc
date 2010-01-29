@@ -38,6 +38,7 @@ extern "C" {
 #include "openssl/asn1.h"
 #include "openssl/evp.h"
 #include "openssl/x509.h"
+#include "openssl/x509v3.h"
 #include "openssl/pem.h"
 #include "openssl/ssl.h"
 #include "openssl/rsa.h"
@@ -59,8 +60,6 @@ extern int AC_Init(void);
 
 #include <string>
 #include "voms_api.h"
-
-extern const X509V3_EXT_METHOD v3_key_usage;
 
 #include <vector>
 #include <iostream>
@@ -696,21 +695,26 @@ static std::string getKeyUsage(X509 *cert)
 
   std::string keyusage;
 
-  confs = NULL;
-  usage = (ASN1_BIT_STRING*)X509_get_ext_d2i(cert, NID_key_usage, NULL, NULL);
-  confs = v3_key_usage.i2v((X509V3_EXT_METHOD*)&v3_key_usage, usage, confs);
-  for (int i =0; i < sk_CONF_VALUE_num(confs); i ++) {
-    CONF_VALUE *conf = (CONF_VALUE*)sk_CONF_VALUE_value(confs, i);
-    keyusage += std::string(conf->name);
-    if (i != (sk_CONF_VALUE_num(confs) -1))
-      keyusage += ", ";
+  X509V3_EXT_METHOD *method = X509V3_EXT_get_nid(NID_key_usage);
+
+  if (method) {
+    confs = NULL;
+    usage = (ASN1_BIT_STRING*)X509_get_ext_d2i(cert, NID_key_usage, NULL, NULL);
+    confs = method->i2v(method, usage, confs);
+
+    for (int i =0; i < sk_CONF_VALUE_num(confs); i ++) {
+      CONF_VALUE *conf = (CONF_VALUE*)sk_CONF_VALUE_value(confs, i);
+      keyusage += std::string(conf->name);
+      if (i != (sk_CONF_VALUE_num(confs) -1))
+        keyusage += ", ";
+    }
+
+    ASN1_BIT_STRING_free(usage);
+
+    // Do not free it.  CONF_VALUE_free() is not defined.  The program
+    //  ends, so the loss of memory is irrelevant.
+    //  sk_CONF_VALUE_pop_free(confs, CONF_VALUE_free);
   }
-
-  ASN1_BIT_STRING_free(usage);
-
-  // Do not free it.  CONF_VALUE_free() is not defined.  The program
-  //  ends, so the loss of memory is irrelevant.
-  //  sk_CONF_VALUE_pop_free(confs, CONF_VALUE_free);
 
   return keyusage;
 }
