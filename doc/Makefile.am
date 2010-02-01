@@ -226,7 +226,6 @@ userdoc: userdoc-local userdoc-recursive
 if BUILD_JAVA_ONLY
 install-data-hook:
 else
-if BUILD_DOCS
 install-data-hook:
 	(cd $(DESTDIR)$(mandir)/man1; \
 	for file in *.1; do \
@@ -251,9 +250,6 @@ if ENABLE_GLITE
 	-ln -s voms-proxy-fake.1.gz    $(DESTDIR)$(mandir)/man1/glite-voms-proxy-fake.1.gz
 	-ln -s voms.8.gz               $(DESTDIR)$(mandir)/man8/glite-voms.8.gz
 	-ln -s voms-install-replica.8.gz $(DESTDIR)$(mandir)/man8/glite-voms-install-replica.8.gz
-endif
-else
-install-data-hook:
 endif
 endif
 
