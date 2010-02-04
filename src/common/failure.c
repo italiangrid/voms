@@ -62,12 +62,18 @@ void signal_segv(int signum, siginfo_t* info, void*ptr) {
 	Dl_info dlinfo;
 	void **bp = 0;
 	void *ip = 0;
+	static const char *si_codes[3] = {"", "SEGV_MAPERR", "SEGV_ACCERR"};
 
   FILE *outfile = fopen("/tmp/sigsegv_report", "a");
 
   if (!outfile)
     outfile = stderr;
+
 	sigsegv_outp("Segmentation Fault!");
+	sigsegv_outp("info.si_signo = %d", signum);
+	sigsegv_outp("info.si_errno = %d", info->si_errno);
+	sigsegv_outp("info.si_code  = %d (%s)", info->si_code, si_codes[info->si_code]);
+	sigsegv_outp("info.si_addr  = %p", info->si_addr);
 
 #if  defined(SIGSEGV_STACK_IA64) || defined(SIGSEGV_STACK_X86)
 #if defined(SIGSEGV_STACK_IA64)
@@ -132,7 +138,7 @@ void signal_segv(int signum, siginfo_t* info, void*ptr) {
   if (outfile != stderr)
     fclose(outfile);
 
-  fprintf(stderr, "Segmentation Fault!\n The program had a serious failure.  If you wish to help the developers fix it,\nplease send the /tmp/sigsegv_report file to the a@cnaf.infn.it.  The file contains no personally identifying informations.\nThanks for your help!\n");
+  fprintf(stderr, "Segmentation Fault!\nThe program had a serious failure.\nIf you wish to help the developers fix it,\nplease send the /tmp/sigsegv_report file\n to a@cnaf.infn.it.\nThe file contains no personally identifying informations.\nThanks for your help!\n");
 	_exit (-1);
 }
 
