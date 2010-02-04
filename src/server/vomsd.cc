@@ -71,7 +71,7 @@ extern char *Encode(const char *, int, int *, int);
 
 #include "dbwrap.h"
 
-#include "voms_api.h"
+#include "voms_api_nog.h"
 
 extern int AC_Init(void);
 

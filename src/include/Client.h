@@ -113,8 +113,6 @@ private:
   int port;
   int version;
    /** The Secure Shell context identifier. */
-  gss_ctx_id_t context; 
-  gss_cred_id_t credential;
   std::string _server_contact;
    //bool _do_mutual_authentication;
   FILE *gsi_logfile;

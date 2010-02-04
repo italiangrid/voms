@@ -49,7 +49,7 @@ VOLIST *volist = NULL;
   extern FILE *yyin;
 }
 
-#include <voms_api.h>
+#include <voms_api_nog.h>
 
 #include "vomsfake.h"
 #include "ccwrite.h"

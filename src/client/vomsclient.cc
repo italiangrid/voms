@@ -44,7 +44,7 @@ extern "C" {
 #include "vomsxml.h"
 
 
-#include <voms_api.h>
+#include <voms_api_nog.h>
 
 #include "vomsclient.h"
 #include "fqan.h"

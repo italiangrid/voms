@@ -32,7 +32,7 @@ extern "C" {
 #include <time.h>
 #include <netinet/in.h>
 #include <netdb.h>
-#include "credentials.h"
+
 #include <openssl/buffer.h>
 #include <openssl/crypto.h>
 #include <openssl/objects.h>
@@ -64,8 +64,8 @@ extern "C" {
  * @param b the backlog, that is the maximum number of outstanding connection requests.
  */
 GSISocketClient::GSISocketClient(const std::string &h, int p, int v) :
-  host(h), port(p), version(v), context(0L),
-  credential(0L), _server_contact(""), /* conflags(0),*/
+  host(h), port(p), version(v),
+  _server_contact(""), /* conflags(0),*/
   opened(false), own_subject(""), own_ca(""),
   upkey(NULL), ucert(NULL), cacertdir(NULL),
   peer_subject(""), peer_ca(""), 
@@ -442,9 +442,6 @@ void
 GSISocketClient::Close()
 {
   if (opened) {
-    context = 0L;
-    credential = 0L;
-
     EVP_PKEY_free(peer_key);
     peer_key = upkey = NULL;
     peer_cert = ucert = NULL;

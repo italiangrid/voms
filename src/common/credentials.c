@@ -18,7 +18,7 @@
 #include <sys/types.h>
 #include <string.h>
 #include <stdlib.h>
-#include "gssapi_compat.h"
+
 
 #include <openssl/asn1.h>
 #include <openssl/x509.h>
@@ -51,15 +51,6 @@ globus(int version)
 }
 
 
-X509 *
-decouple_cred(gss_cred_id_t credential, STACK_OF(X509) **stk)
-{
-  if (!stk || (credential == 0L))
-    return NULL;
-
-  *stk = ((gss2_cred_id_desc *)credential)->cred_handle->cert_chain;
-  return ((gss2_cred_id_desc *)credential)->cred_handle->cert;
-}
 
 X509 *
 get_real_cert(X509 *base, STACK_OF(X509) *stk)

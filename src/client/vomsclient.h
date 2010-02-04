@@ -20,7 +20,7 @@
 #include <vector>
 #include <ostream>
 #include <exception>
-#include "voms_api.h"
+#include "voms_api_nog.h"
 
 extern "C" {
 

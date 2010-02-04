@@ -44,6 +44,7 @@ extern "C" {
 #include <openssl/evp.h>
 #include "credentials.h"
 #include "sslutils.h"
+#include "gssapi_compat.h"
 
 #ifndef NOGLOBUS
 #ifdef HAVE_GLOBUS_MODULE_ACTIVATE
@@ -75,6 +76,16 @@ extern bool retrieve(X509 *cert, STACK_OF(X509) *chain, recurse_type how,
 extern "C" {
 extern char *Decode(const char *, int, int *);
 extern char *Encode(const char *, int, int *, int);
+}
+
+static X509 *
+decouple_cred(gss_cred_id_t credential, STACK_OF(X509) **stk)
+{
+  if (!stk || (credential == 0L))
+    return NULL;
+
+  *stk = ((gss2_cred_id_desc *)credential)->cred_handle->cert_chain;
+  return ((gss2_cred_id_desc *)credential)->cred_handle->cert;
 }
 
 extern int AC_Init(void);
