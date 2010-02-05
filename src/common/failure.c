@@ -16,6 +16,7 @@
  *
  * Copyright (C) 2005 - 2009 Jaco Kroon
  */
+#ifdef RUN_ON_LINUX
 #ifndef _GNU_SOURCE
 #define _GNU_SOURCE
 #endif
@@ -64,7 +65,7 @@ void signal_segv(int signum, siginfo_t* info, void*ptr) {
 	void *ip = 0;
 	static const char *si_codes[3] = {"", "SEGV_MAPERR", "SEGV_ACCERR"};
 
-  FILE *outfile = fopen("/tmp/sigsegv_report", "a");
+  FILE *outfile = fopen("/tmp/sigsegv_report", "w");
 
   if (!outfile)
     outfile = stderr;
@@ -89,27 +90,29 @@ void signal_segv(int signum, siginfo_t* info, void*ptr) {
 		if(!dladdr(ip, &dlinfo))
 			break;
 
-		const char *symname = dlinfo.dli_sname;
+    {
+      const char *symname = dlinfo.dli_sname;
 
 #ifndef NO_CPP_DEMANGLE
-		int status;
-		char * tmp = __cxa_demangle(symname, NULL, 0, &status);
+      int status;
+      char * tmp = __cxa_demangle(symname, NULL, 0, &status);
 
-		if (status == 0 && tmp)
-			symname = tmp;
+      if (status == 0 && tmp)
+        symname = tmp;
 #endif
 
-		sigsegv_outp("% 2d: %p <%s+%lu> (%s)",
-				++f,
-				ip,
-				symname,
-				(unsigned long)ip - (unsigned long)dlinfo.dli_saddr,
-				dlinfo.dli_fname);
+      sigsegv_outp("% 2d: %p <%s+%lu> (%s)",
+                   ++f,
+                   ip,
+                   symname,
+                   (unsigned long)ip - (unsigned long)dlinfo.dli_saddr,
+                   dlinfo.dli_fname);
 
 #ifndef NO_CPP_DEMANGLE
-		if (tmp)
-			free(tmp);
+      if (tmp)
+        free(tmp);
 #endif
+    }
 
 		if(dlinfo.dli_sname && !strcmp(dlinfo.dli_sname, "main"))
 			break;
@@ -119,14 +122,16 @@ void signal_segv(int signum, siginfo_t* info, void*ptr) {
 	}
 #else
 	sigsegv_outp("Stack trace (non-dedicated):");
-  int sz;
-  char *bt[21];
-  char **strings;
+  {
+    int sz;
+    char *bt[21];
+    char **strings;
 
-	sz = backtrace(bt, 20);
-	strings = backtrace_symbols(bt, sz);
-	for(i = 0; i < sz; ++i) {
-		sigsegv_outp("%s", strings[i]);
+    sz = backtrace(bt, 20);
+    strings = backtrace_symbols(bt, sz);
+    for(i = 0; i < sz; ++i) {
+      sigsegv_outp("%s", strings[i]);
+    }
   }
 #endif
 	sigsegv_outp("End of stack trace.");
@@ -150,3 +155,6 @@ void __attribute__((constructor)) setup_sigsegv() {
 	if(sigaction(SIGSEGV, &action, NULL) < 0)
 		perror("sigaction");
 }
+#else
+static int dummy = 0;
+#endif
