@@ -310,10 +310,9 @@ DOCS = capi.pdf c++api.pdf software.pdf AC-RFC.pdf
 EXTRA_DIST = $(SGML_INCLUDES) $(SGML_DIST) $(LATEX_DIST)
 MAINTAINERCLEANFILES = Makefile.in \
                        manpage.links \
-                       manpage.refs \
-                       $(man_MANS)
+                       manpage.refs
 
-CLEANFILES = $(man_MANS) $(DOCS) $(SERVER) $(CLIENT) $(UTILS) *toc *aux *log
+CLEANFILES = $(DOCS) $(SERVER) $(CLIENT) $(UTILS) *toc *aux *log
 APIPDOCS = apidoc/api/VOMS_C_API/latex/refman.pdf \
 	apidoc/api/VOMS_C_API/latex/refman.ps \
 	apidoc/api/VOMS_CC_API/latex/refman.pdf \
