@@ -94,15 +94,6 @@ Description:
 #include "scutils.h"
 #endif
 
-#ifndef BUILD_FOR_K5CERT_ONLY
-#ifndef NO_OLDGAA_API
-#include "globus_oldgaa.h"
-#include "globus_oldgaa_utils.h"
-#else
-#include "ca_policy_file_parse.h"
-#endif
-#endif
-
 static int fix_add_entry_asn1_set_param = 0;
 
 
