@@ -55,8 +55,6 @@ extern "C" {
 
 /** This class header file. */
 #include "Client.h"
-/** The tokens transission and reception features definitions. */
-#include "tokens.h"
 
 /**
  * Constructor.

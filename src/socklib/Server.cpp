@@ -57,9 +57,6 @@ extern "C" {
 
 #include "data.h"
 
-/** Functionalities for transmitting and receiveing tokens. */
-#include "tokens.h"
-
 /** This class header file. */
 #include "Server.h"
 
