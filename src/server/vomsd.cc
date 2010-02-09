@@ -118,9 +118,6 @@ static void CreateURI(std::string &uri, int port);
 std::string
 makeACSSL(SSL *ssl, void *logh, char **FQANs, int size, char **targets, int targsize, int requested, VOMSServer *v);
 
-std::string
-makeACSOAP(struct soap *soap, void *logh, char **FQANs, int size, char **targets, int targsize, int requested);
-
 int
 makeACREST(struct soap *soap, void *logh, char **FQANs, int size, int requested, int unknown);
 
@@ -449,7 +446,6 @@ VOMSServer::VOMSServer(int argc, char *argv[]) : sock(0,NULL,50,false),
   }
 
   if ((logh = LogInit())) {
-    //    if ((logger = FileNameStreamerAdd(logh, logfile.c_str(), logmax, code, 0))) {
       loglevels lev;
 
       switch(loglev) {
@@ -481,7 +477,6 @@ VOMSServer::VOMSServer(int argc, char *argv[]) : sock(0,NULL,50,false),
       (void)LogOption(logh, "NAME", logfile.c_str());
       (void)LogOptionInt(logh, "MAXSIZE", logmax);
       (void)LogOption(logh, "DATEFORMAT", logdf.c_str());
-      //    }
   }
   else
     throw VOMSInitException("logging startup failure");
@@ -1418,17 +1413,6 @@ static bool determine_group_and_role(std::string command, char *comm, char **gro
 static bool checkinside(gattrib g, std::vector<std::string> list) {
   return !g.qualifier.empty() && (find(list.begin(), list.end(), g.qualifier) == list.end());
 }
-                                   
-std::string
-makeACSOAP(struct soap *soap, void *logh, 
-           char **FQANs, int size, 
-           char **targets, int targsize, 
-           int requested)
-{
-  return makeACSSL(soap->ssl, logh, FQANs, size, 
-                   targets, 
-                   targsize, requested, selfpointer);
-}
 
 std::string
 makeACSSL(SSL *ssl, void *logh, char **FQANs, int size, char **targets, int targsize, int requested, VOMSServer *v)
@@ -1570,9 +1554,9 @@ int http_get(soap *soap)
           orderstring += ", " + std::string(cvalue);
       }
       else {
-	/* purposefully ignore other parameters */
-	/* but put it in an otherwise positive response */
-	unknown = 1;
+        /* purposefully ignore other parameters */
+        /* but put it in an otherwise positive response */
+        unknown = 1;
       }
       if (next)
         basis = next+1;
