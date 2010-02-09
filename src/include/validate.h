@@ -17,7 +17,6 @@
 
 #include "newformat.h"
 #include <stddef.h>
-/* #include "voms_apic.h" */
 
 
 struct att {

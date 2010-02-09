@@ -19,8 +19,6 @@
 #include <openssl/x509.h>
 #include <openssl/evp.h>
 
-//#include "gssapi_compat.h"
-
 extern int globus(int);
 extern X509 *get_real_cert(X509 *base, STACK_OF(X509) *stk);
 extern char *get_peer_serial(X509 *);

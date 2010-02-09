@@ -249,7 +249,7 @@ options.h pass.h Server.h streamers.h fqan.h \
 xml.h vomsxml.h errors.h log.h sslutils.h \
 listfunc.h errortype.h credentials.h newformat.h myproxycertinfo.h \
 acstack.h validate.h ccac.h init.h ccwrite.h getopts.h replace.h dbwrap.h \
-format.h stamp-h.in stamp-h1.in
+stamp-h.in stamp-h1.in
 
 MAINTAINERCLEANFILES = Makefile.in
 all: all-am
