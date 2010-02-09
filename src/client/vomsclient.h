@@ -149,5 +149,6 @@ class Client {
   bool checkstats(char *file, int mode);
   void ProxyCreationError(int, void *);
   AC *ReadSeparate(const std::string&);
+  void PrintConnectResult(int status, const std::string& contact);
 };
 #endif
