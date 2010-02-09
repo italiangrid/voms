@@ -15,6 +15,10 @@
 #include "config.h"
 #include "replace.h"
 
+#ifndef NOGLOBUS
+#include "gssapi.h"
+#endif
+
 #include "voms_api.h"
 
 /*Interface routines from C++ API to C API */

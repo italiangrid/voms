@@ -13,10 +13,6 @@
  *
  *********************************************************************/
 
-#ifndef NOGLOBUS
-#define NOGLOBUS
-#endif
-
 extern "C" {
 #ifdef NOGLOBUS
 #include <pthread.h>
@@ -129,13 +125,8 @@ vomsdata::vomsdata(std::string voms_dir, std::string cert_dir) :  ca_cert_dir(ce
                                                                   retry_count(1),
                                                                   verificationtime(0)
 {
-#ifndef NOGLOBUS
-   (void)globus_thread_once(&l_globus_once_control, l_init_globus_once_func);
-#endif
-
    if (!initialized) {
      initialized = 1;
-#ifdef NOGLOBUS
      SSL_library_init();
      SSLeay_add_all_algorithms();
      ERR_load_crypto_strings();
@@ -143,7 +134,6 @@ vomsdata::vomsdata(std::string voms_dir, std::string cert_dir) :  ca_cert_dir(ce
 
      (void)AC_Init();
      InitProxyCertInfoExtension(1);
-#endif
    }
 
   if (voms_cert_dir.empty()) {
