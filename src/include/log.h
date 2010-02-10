@@ -37,7 +37,6 @@ extern const char *LogService(void *, const char *);
 extern const char *LogFormat(void *, const char *);
 extern int         LogMessage(void *, loglevels, logtypes, const char *, const char *, int, const char *);
 extern int         LogMessageF(const char *, int, const char *, void *, loglevels, logtypes, const char *, ...);
-extern int         LogBuffer(FILE *, void *, loglevels, logtypes, const char *);
 extern logtypes    SetCurLogType(void *, logtypes);
 extern void        LogActivate(void *, const char *);
 extern void        LogDeactivate(void *, const char *);

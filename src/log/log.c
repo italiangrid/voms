@@ -86,26 +86,6 @@ void *LogInit()
   return info;
 }
 
-int LogBuffer(FILE *f, void *logh, loglevels lev, logtypes type, const char *format)
-{
-  int id;
-  struct stat st;
-  char *mem;
-
-  if (!f || !logh || !format) return 1;
-
-  id = fileno(f);
-
-  if (!fstat(id, &st)) {
-    if ((mem = (char *)mmap(0, st.st_size, PROT_READ, 0, id, 0))) {
-      LOGM(VARP, logh, type, lev, format, mem);
-      munmap(mem, st.st_size);
-      return 1;
-    }
-  }
-  return 0;
-}
-
 void LogOption(void *data, const char *name, const char *value)
 {
   struct LogInfo *li=(struct LogInfo *)data;
