@@ -29,7 +29,6 @@ extern void       *LogAddStreamer(void *, const char *,
                                   int (*)(void *, const char *), 
                                   void (*)(void *),
                                   void (*)(void *, const char *, const char*));
-extern void        StartLogger(void *, int);
 extern void        LogDestroy(void *);
 extern loglevels   LogLevel(void *, loglevels);
 extern logtypes    LogType(void *, int);
@@ -44,7 +43,6 @@ extern void        LogActivate(void *, const char *);
 extern void        LogDeactivate(void *, const char *);
 extern void        LogOption(void *, const char *, const char *);
 extern void        LogOptionInt(void *, const char *, int);
-extern void        SetOwner(pid_t);
 
 #define LOG(h, lev, type, str) \
 LogMessage((h), (lev), (type), (str), FUNC_NAME, __LINE__, __FILE__)

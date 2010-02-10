@@ -46,29 +46,8 @@ static char *typenames[] = { "STARTUP", "REQUEST", "RESULT" };
 
 static char *levnames[] = { "LOG_ERROR", "LOG_WARN", "LOG_INFO", "LOG_DEBUG", "NONE"};
 
-static pid_t loggerprocess = 0;
-static pid_t ownerprocess = 0;
-
-static void killogger(void);
-
 extern void *FILEStreamerAdd(void *h);
 extern void *SYSLOGStreamerAdd(void *h);
-
-void SetOwner(pid_t pid)
-{
-  ownerprocess = pid;
-  atexit(killogger);
-}
-
-static void killogger(void)
-{
-  int status;
-
-  if (loggerprocess && (ownerprocess == getpid())) {
-    kill(loggerprocess, SIGKILL);
-    waitpid(loggerprocess, &status, 0);
-  }
-}
 
 struct OutputStream {
   void   *userdata;
@@ -92,13 +71,6 @@ struct LogInfo {
   int         fd;
   struct OutputStream *streamers;
 };
-
-static void Logger(void *data, int fd);
-static void Evaluate(struct LogInfo *li, char *buffer);
-static void Activate(struct LogInfo *li, char *name);
-static void Deactivate(struct LogInfo *li, char *name);
-static void SetOption(struct LogInfo *li, char *name, char *value);
-static void LogCommand(struct LogInfo *li, char *message);
 
 void *LogInit()
 {
@@ -134,195 +106,16 @@ int LogBuffer(FILE *f, void *logh, loglevels lev, logtypes type, const char *for
   return 0;
 }
 
-static int bwrite(int fd, const char * s) 
-{
-  int ret = -1;
-  
-  int slen = strlen(s);
-  int blen = sizeof(int) + slen;
-  
-  char * buffer = malloc(blen);
-  if(buffer) {
-    memcpy(buffer, &slen, sizeof(int));
-    memcpy(buffer + sizeof(int), s, strlen(s));
-    ret = write(fd, buffer, blen);
-  }
-  free(buffer);
-
-  return (ret != -1);
-}
-
-static int bread(int fd, char** buffer)
-{
-  int reload = 0;
-  int offset = 0;
-  int slen = 0;
-  ssize_t readbytes = -1;
-
-  do {
-    readbytes = read(fd, &slen, sizeof(int));
-  } while (readbytes < 0 && (errno == EINTR
-#ifdef ERESTART
-                               || errno == ERESTART
-#endif
-                               ));
-
-  if (readbytes != sizeof(int))
-    return 0;
-
-
-  *buffer = malloc(slen * sizeof(char) + 1);
-
-  if (*buffer) {
-    while (offset < slen) {
-      do {
-#ifdef PIPE_BUF
-        readbytes = read(fd, *buffer + offset, (slen - offset > PIPE_BUF ? PIPE_BUF : slen - offset));
-#else
-        readbytes = read(fd, *buffer + offset, (slen - offset > fpathconf(fd, _PC_PIPE_BUF) ? fpathconf(fd, _PC_PIPE_BUF) : slen - offset));
-#endif
-      } while (readbytes < 0 && (errno == EINTR
-#ifdef ERESTART
-                                   || errno == ERESTART
-#endif
-                                   ));
-      offset += readbytes;      
-    }
-
-    (*buffer)[offset] = '\0';
-  }
-  return (reload ? -1 : offset);
-}
-
-void StartLogger(void *data, int code)
-{
-  struct LogInfo * li = (struct LogInfo *)data;
-
-  int in = -1, out = -1;
-
-#ifdef HAVE_MKFIFO
-  char fifo[30];
-
-  sprintf(fifo, "/tmp/voms_log_fifo_%i", code);
-  
-  if(mkfifo(fifo, S_IRUSR | S_IWUSR))
-  {
-    if(errno != EEXIST)
-    {
-      printf("Unable to make fifo : %s\n", strerror(errno));
-      exit(1);
-    }
-  }
-#else
-  int fd[2];
-
-  if (pipe(fd))
-  {
-    printf("Unable to open pipe : %s\n", strerror(errno));
-    exit(1);
-  }
-  in = fd[0];
-  out = fd[1];
-#endif
-
-  pid_t pid = fork();
-
-  if (pid) {
-    loggerprocess = pid;
-/*     ownerprocess = getpid(); */
-/*     atexit(killogger); */
-    if (out == -1)
-      out = open(fifo, O_WRONLY);
-    li->fd = out;
-    if (in != -1)
-      close(in);
-  }
-  else {
-    signal(SIGHUP,SIG_IGN);
-
-    if (out != -1)
-      close(out);
-    if (in == -1)
-      in  = open(fifo, O_RDONLY);
-    Logger(data, in);
-  }
-}
-
-static void Logger(void *data, int fd) 
-{
-  char *buffer = NULL;
-  int result;
-
-  struct LogInfo *li = data;
-
-  if (!li)
-    return;
-
-  while(1) {
-    result = bread(fd, &buffer);
-
-    if (result) {
-      if (buffer) {
-        Evaluate(li, buffer);
-        free(buffer);
-        buffer = NULL;
-      }
-    }
-  }
-}
-
-static void Evaluate(struct LogInfo *li, char *buffer)
-{
-  char *name = NULL;
-  char *pos = NULL;
-
-  switch(*buffer) {
-  case ACTIVATE_BUFFER:
-    name = buffer+1;
-    Activate(li, name);
-    break;
-
-  case DEACTIVATE_BUFFER:
-    name = buffer+1;
-    Deactivate(li, name);
-    break;
-
-  case SET_OPTION:
-    name = buffer+1;
-    pos = strchr(name, '=');
-    if (pos) {
-      *pos++ = '\0';
-      SetOption(li, name, pos);
-    }
-    break;
-
-  case LOG_COMMAND:
-    name = buffer+1;
-    LogCommand(li, name);
-    break;
-
-  default:
-    LogCommand(li, "Unknown logging command: ");
-    LogCommand(li, buffer);
-    break;
-  }
-}
-
 void LogOption(void *data, const char *name, const char *value)
 {
   struct LogInfo *li=(struct LogInfo *)data;
-  char *buffer = NULL;
 
-  buffer = malloc(strlen(name)+strlen(value)+3);
-  buffer[0]=SET_OPTION;
-  buffer[1]='\0';
+  struct OutputStream *stream = li->streamers;
 
-  buffer = strcat(buffer, name);
-  buffer = strcat(buffer, "=");
-  buffer = strcat(buffer, value);
-  bwrite(li->fd, buffer);
-  free(buffer);
-
+  while (stream) {
+    stream->optioner(stream->userdata, name, value);
+    stream = stream->next;
+  }
 }
 
 void LogOptionInt(void *data, const char *name, int value)
@@ -340,35 +133,6 @@ void LogOptionInt(void *data, const char *name, int value)
 void LogActivate(void *data, const char *name)
 {
   struct LogInfo *li=(struct LogInfo *)data;
-
-  char *buffer = NULL;
-
-  buffer = malloc(strlen(name)+2);
-  buffer[0]=ACTIVATE_BUFFER;
-  buffer[1]='\0';
-
-  buffer = strcat(buffer, name);
-  bwrite(li->fd, buffer);
-  free(buffer);
-}
-
-void LogDeactivate(void *data, const char *name)
-{
-  struct LogInfo *li=(struct LogInfo *)data;
-
-  char *buffer = NULL;
-
-  buffer = malloc(strlen(name)+2);
-  buffer[0] = DEACTIVATE_BUFFER;
-  buffer[1] = '\0';
-
-  buffer = strcat(buffer, name);
-  bwrite(li->fd, buffer);
-  free(buffer);
-}
-
-static void Activate(struct LogInfo *li, char *name)
-{
   struct OutputStream *stream;
 
   if (!li)
@@ -386,8 +150,9 @@ static void Activate(struct LogInfo *li, char *name)
   }
 }
 
-static void Deactivate(struct LogInfo *li, char *name)
+void LogDeactivate(void *data, const char *name)
 {
+  struct LogInfo *li=(struct LogInfo *)data;
   struct OutputStream *stream;
 
   if (!li)
@@ -404,29 +169,6 @@ static void Deactivate(struct LogInfo *li, char *name)
     stream = stream->next;
   }
 }
-
-
-static void SetOption(struct LogInfo *li, char *name, char *value)
-{
-  struct OutputStream *stream = li->streamers;
-
-  while (stream) {
-    stream->optioner(stream->userdata, name, value);
-    stream = stream->next;
-  }
-}
-
-static void LogCommand(struct LogInfo *li, char *message)
-{
-  struct OutputStream *stream = li->streamers;
-
-  while (stream) {
-    if (stream->active)
-      stream->outputter(stream->userdata, message);
-    stream = stream->next;
-  }
-}
-
 
 void *LogAddStreamer(void *data, const char *name,
                      void * (*i)(),
@@ -544,19 +286,15 @@ const char *LogFormat(void *data, const char *format)
 
 static int LogOutput(void *data, const char *str)
 {
-
   struct LogInfo *li=(struct LogInfo *)data;
 
-  char *buffer = NULL;
+  struct OutputStream *stream = li->streamers;
 
-  buffer = malloc(strlen(str)+2);
-  buffer[0] = LOG_COMMAND;
-  buffer[1] = '\0';
-
-  buffer = strcat(buffer, str);
-  bwrite(li->fd, buffer);
-  free(buffer);
-
+  while (stream) {
+    if (stream->active)
+      stream->outputter(stream->userdata, str);
+    stream = stream->next;
+  }
   return 1;
 }
 
