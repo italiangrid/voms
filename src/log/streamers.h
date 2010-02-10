@@ -14,7 +14,6 @@
  *********************************************************************/
 #ifndef VOMS_STREAMERS_H
 #define VOMS_STREAMERS_H
-#include <stdio.h>
 
 extern void *FILEStreamerAdd(void *h);
 extern void *SYSLOGStreamerAdd(void *h);
