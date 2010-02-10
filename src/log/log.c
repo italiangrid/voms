@@ -41,9 +41,6 @@ static char *typenames[] = { "STARTUP", "REQUEST", "RESULT" };
 
 static char *levnames[] = { "LOG_ERROR", "LOG_WARN", "LOG_INFO", "LOG_DEBUG", "NONE"};
 
-extern void *FILEStreamerAdd(void *h);
-extern void *SYSLOGStreamerAdd(void *h);
-
 struct OutputStream {
   void   *userdata;
   char   *name;

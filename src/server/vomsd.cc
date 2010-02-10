@@ -34,7 +34,7 @@ extern "C" {
 #include "credentials.h"
 
 #include "log.h"
-#include "streamers.h"
+
 #include "sslutils.h"
 
 static int reload = 0;
