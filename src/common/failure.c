@@ -16,6 +16,9 @@
  *
  * Copyright (C) 2005 - 2009 Jaco Kroon
  */
+
+#include "config.h"
+
 #ifdef RUN_ON_LINUX
 #ifndef _GNU_SOURCE
 #define _GNU_SOURCE
@@ -65,30 +68,30 @@ void signal_segv(int signum, siginfo_t* info, void*ptr) {
 	void *ip = 0;
 	static const char *si_codes[3] = {"", "SEGV_MAPERR", "SEGV_ACCERR"};
 
-  FILE *outfile = fopen("/tmp/sigsegv_report", "w");
+  FILE *outfile = fopen("/tmp/sigsegv_report", "w+");
 
   if (!outfile)
     outfile = stderr;
 
-	sigsegv_outp("Segmentation Fault!");
-	sigsegv_outp("info.si_signo = %d", signum);
-	sigsegv_outp("info.si_errno = %d", info->si_errno);
-	sigsegv_outp("info.si_code  = %d (%s)", info->si_code, si_codes[info->si_code]);
-	sigsegv_outp("info.si_addr  = %p", info->si_addr);
+  sigsegv_outp("Segmentation Fault!");
+  sigsegv_outp("info.si_signo = %d", signum);
+  sigsegv_outp("info.si_errno = %d", info->si_errno);
+  sigsegv_outp("info.si_code  = %d (%s)", info->si_code, si_codes[info->si_code]);
+  sigsegv_outp("info.si_addr  = %p", info->si_addr);
 
 #if  defined(SIGSEGV_STACK_IA64) || defined(SIGSEGV_STACK_X86)
 #if defined(SIGSEGV_STACK_IA64)
-	ip = (void*)ucontext->uc_mcontext.gregs[REG_RIP];
-	bp = (void**)ucontext->uc_mcontext.gregs[REG_RBP];
+  ip = (void*)ucontext->uc_mcontext.gregs[REG_RIP];
+  bp = (void**)ucontext->uc_mcontext.gregs[REG_RBP];
 #elif defined(SIGSEGV_STACK_X86)
-	ip = (void*)ucontext->uc_mcontext.gregs[REG_EIP];
-	bp = (void**)ucontext->uc_mcontext.gregs[REG_EBP];
+  ip = (void*)ucontext->uc_mcontext.gregs[REG_EIP];
+  bp = (void**)ucontext->uc_mcontext.gregs[REG_EBP];
 #endif
 
-	sigsegv_outp("Stack trace:");
-	while(bp && ip) {
-		if(!dladdr(ip, &dlinfo))
-			break;
+  sigsegv_outp("Stack trace:");
+  while(bp && ip) {
+    if(!dladdr(ip, &dlinfo))
+      break;
 
     {
       const char *symname = dlinfo.dli_sname;
@@ -114,14 +117,14 @@ void signal_segv(int signum, siginfo_t* info, void*ptr) {
 #endif
     }
 
-		if(dlinfo.dli_sname && !strcmp(dlinfo.dli_sname, "main"))
-			break;
+    if(dlinfo.dli_sname && !strcmp(dlinfo.dli_sname, "main"))
+      break;
 
-		ip = bp[1];
-		bp = (void**)bp[0];
-	}
+    ip = bp[1];
+    bp = (void**)bp[0];
+  }
 #else
-	sigsegv_outp("Stack trace (non-dedicated):");
+  sigsegv_outp("Stack trace (non-dedicated):");
   {
     int sz;
     char *bt[21];
@@ -134,7 +137,7 @@ void signal_segv(int signum, siginfo_t* info, void*ptr) {
     }
   }
 #endif
-	sigsegv_outp("End of stack trace.");
+  sigsegv_outp("End of stack trace.");
 
 /*   sigsegv_outp("Command line: "); */
 /*   for (i = 0; i < argc; i++) */
@@ -142,8 +145,10 @@ void signal_segv(int signum, siginfo_t* info, void*ptr) {
 /*   sigsegv_outp("\n"); */
   if (outfile != stderr)
     fclose(outfile);
+  
 
   fprintf(stderr, "Segmentation Fault!\nThe program had a serious failure.\nIf you wish to help the developers fix it,\nplease send the /tmp/sigsegv_report file\n to a@cnaf.infn.it.\nThe file contains no personally identifying informations.\nThanks for your help!\n");
+
 	_exit (-1);
 }
 
