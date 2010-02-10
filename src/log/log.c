@@ -37,11 +37,6 @@
 #include "log.h"
 #include "streamers.h"
 
-#define LOG_COMMAND       'L'
-#define SET_OPTION        'O'
-#define ACTIVATE_BUFFER   'A'
-#define DEACTIVATE_BUFFER 'D'
-
 static char *typenames[] = { "STARTUP", "REQUEST", "RESULT" };
 
 static char *levnames[] = { "LOG_ERROR", "LOG_WARN", "LOG_INFO", "LOG_DEBUG", "NONE"};
