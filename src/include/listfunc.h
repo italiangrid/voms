@@ -18,7 +18,6 @@
 
 typedef void (*freefn)(void *);
 
-extern char **listjoin(char **base, char **addon, int size);
 extern char **listadd(char **vect, char *data, int size);
 extern void   listfree(char **vect, freefn f);
 #endif
