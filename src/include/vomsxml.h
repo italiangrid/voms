@@ -37,7 +37,6 @@ struct answer {
   int version;
 };
 
-std::string XML_Req_Encode(const request &);
 std::string XML_Req_Encode(const std::string&, const std::string&, 
                            const std::string&, const int);
 std::string XML_Ans_Encode(const std::string&, 
@@ -45,6 +44,5 @@ std::string XML_Ans_Encode(const std::string&,
 std::string XML_Ans_Encode(const std::string&,  const std::string&,
                            const std::vector<errorp>, bool);
 bool XML_Req_Decode(const std::string&, request &);
-bool XML_Req_Decode(const std::string&, std::string &, std::string &, int &);
 bool XML_Ans_Decode(const std::string&, answer &);
 #endif

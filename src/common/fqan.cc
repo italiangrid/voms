@@ -16,10 +16,6 @@
 
 #include "config.h"
 
-extern "C" {
-#include <stdlib.h>
-}
-
 #include <iostream>
 #include "fqan.h"
 
