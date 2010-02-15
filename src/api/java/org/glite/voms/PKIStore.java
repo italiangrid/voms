@@ -56,7 +56,7 @@ public class PKIStore implements VOMSTrustStore {
     private Hashtable lscfiles     = null;
     private Hashtable vomscerts    = null;
     private Hashtable namespaces   = null;
-    private long      lastmodified = 0;
+
     private int       instances    = 1;
 
     private static Logger logger = Logger.getLogger(PKIStore.class.getName());
@@ -162,13 +162,13 @@ public class PKIStore implements VOMSTrustStore {
     public synchronized void refresh() {
         PKIStore newReader = null;
 
-        File f = new File(certDir);
-
         /* The code below did not work.  In place changes to a file do not 
            change the lastmodified date of the directory, only the 
            lastaccessed, and java does not provide a way to determine the
            latter. */
         /*
+        File f = new File(certDir);
+
         if (f.lastModified() == lastmodified) {
             logger.debug("No changes to directory -- Do not refresh");
             return;
@@ -211,7 +211,7 @@ public class PKIStore implements VOMSTrustStore {
             namespaces = newReader.namespaces;
             newReader.namespaces = null;
 
-            lastmodified = f.lastModified();
+
         }
         finally {
             newReader = null;
@@ -225,7 +225,7 @@ public class PKIStore implements VOMSTrustStore {
         signings     = new Hashtable(HASHCAPACITY);
         lscfiles     = new Hashtable(HASHCAPACITY);
         vomscerts    = new Hashtable(HASHCAPACITY);
-	namespaces   = new Hashtable(HASHCAPACITY);
+        namespaces   = new Hashtable(HASHCAPACITY);
 
         if (type != TYPE_VOMSDIR &&
             type != TYPE_CADIR)
@@ -252,7 +252,7 @@ public class PKIStore implements VOMSTrustStore {
         if (!theDir.exists()){
          
             if (type == TYPE_CADIR) {
-                StringBuffer message = new StringBuffer();
+                StringBuilder message = new StringBuilder();
                 message.append("Directory ");
                 message.append(dir);
                 message.append(" doesn't exist on this machine!");
@@ -292,7 +292,7 @@ public class PKIStore implements VOMSTrustStore {
         if (theDir.exists())
             load();
 
-        lastmodified = theDir.lastModified();
+
 
         if (timer) {
             theTimer = new Timer(true);

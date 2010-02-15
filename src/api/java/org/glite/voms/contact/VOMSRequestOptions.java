@@ -207,7 +207,7 @@ public class VOMSRequestOptions {
 
         Iterator i = l.iterator();
 
-        StringBuffer result = new StringBuffer();
+        StringBuilder result = new StringBuilder();
 
         while ( i.hasNext() ) {
             Object o = i.next();

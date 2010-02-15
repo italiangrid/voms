@@ -12,7 +12,9 @@
  * follows.
  *
  *********************************************************************/
-
+/*********************************************************************
+ * Parts of this code shamelessly stolen from Joni's code.
+ *********************************************************************/
 package org.glite.voms;
 
 import java.io.BufferedReader;
@@ -58,44 +60,44 @@ public class Namespace
 
     do {
       do {
-	s = theBuffer.readLine();
+          s = theBuffer.readLine();
 
-	if (s != null) {
-	  // ignore comments
-	  if (s.trim().startsWith("~"))
-	    continue;
+          if (s != null) {
+              // ignore comments
+              if (s.trim().startsWith("~"))
+                  continue;
  
-	  theLine.append(s);
-	}
+              theLine.append(s);
+          }
       } while (s != null && s.endsWith("\\"));
 
       String finalLine = theLine.toString().trim();
 
-      // Idea for the splitting shamelessly taken fron Joni.
+      // Idea for the splitting shamelessly taken from Joni.
       // Thanks, Joni!
       String[] strings = splitPattern.split(finalLine, 0);
 
       if (strings.length == 4) {
-	String permitCode = "";
+          String permitCode = "";
 
-	if (finalLine.toLowerCase().contains(" deny ")) {
-	  permitCode = "DENY";
-	} else if (finalLine.toLowerCase().contains(" permit ")) {
-	  permitCode = "PERMIT";
-	}
+          if (finalLine.toLowerCase().contains(" deny ")) {
+              permitCode = "DENY";
+          } else if (finalLine.toLowerCase().contains(" permit ")) {
+              permitCode = "PERMIT";
+          }
 
-	if (!permitCode.equals("")) {
-	  String tempIssuer = strings[1];
-	  // First one should be the subject
-	  if (tempIssuer.toLowerCase().equals("self"))
-	    issuer.add("SELF");
-	  else
-	    issuer.add(tempIssuer.substring(1, strings[1].length()));
+          if (!permitCode.equals("")) {
+              String tempIssuer = strings[1];
+              // First one should be the subject
+              if (tempIssuer.toLowerCase().equals("self"))
+                  issuer.add("SELF");
+              else
+                  issuer.add(tempIssuer.substring(1, strings[1].length()));
 
-	  // third one should be subject
-	  subject.add(strings[3].substring(1, strings[3].length()));
-	  permit.add(permitCode);
-	}
+              // third one should be subject
+              subject.add(strings[3].substring(1, strings[3].length()));
+              permit.add(permitCode);
+          }
       }
     } while (s != null);
   }
@@ -119,7 +121,7 @@ public class Namespace
     if (index == -1) {
       String hash = PKIUtils.getHash(issuerCert);
       if ((hash+".namespace").equals(gname))
-	return issuer.indexOf("SELF", previous+1);
+          return issuer.indexOf("SELF", previous+1);
     }
     return index;
   }

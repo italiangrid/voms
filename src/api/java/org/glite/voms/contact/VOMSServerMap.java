@@ -90,7 +90,7 @@ public class VOMSServerMap {
         if (map == null || map.isEmpty())
             return "[]";
         
-        StringBuffer buf = new StringBuffer();
+        StringBuilder buf = new StringBuilder();
         
         Iterator i = map.entrySet().iterator();
         buf.append( "VOMSServerMap:[\n");

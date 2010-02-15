@@ -39,6 +39,7 @@ import java.security.cert.CertificateFactory;
 import java.security.cert.X509CRL;
 import java.security.cert.X509Certificate;
 import java.util.Arrays;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.ListIterator;
 import java.util.Vector;
@@ -199,7 +200,7 @@ public class PKIUtils {
             catch(NoSuchAlgorithmException e) {
                 logger.fatal("NO MD5! " + e.getMessage(), e);
 
-                throw new IllegalStateException("NO MD5! " + e.getMessage());
+                throw new IllegalStateException("NO MD5! " + e.getMessage(), e);
             }
 
             md.update(name);
@@ -357,7 +358,7 @@ public class PKIUtils {
 
     static private GeneralName[] getNames(GeneralNames gns) {
         DERObject obj = gns.getDERObject();
-        Vector v = new Vector();
+        ArrayList v = new ArrayList();
 
         ASN1Sequence seq = (ASN1Sequence)obj;
 
@@ -425,7 +426,7 @@ public class PKIUtils {
                         if (logger.isDebugEnabled()) {
                             logger.debug("skid");
 
-                            StringBuffer str = new StringBuffer();
+                            StringBuilder str = new StringBuilder();
                             for (int i = 0; i < skidValue.length; i++) {
                                 str.append(Integer.toHexString(skidValue[i]));
                                 str.append(' ');
@@ -437,7 +438,7 @@ public class PKIUtils {
                         if (logger.isDebugEnabled()) {
                             logger.debug("akid");
 
-                            StringBuffer str = new StringBuffer();
+                            StringBuilder str = new StringBuilder();
                             for (int i = 0; i < akidValue.length; i++) {
                                 str.append(Integer.toHexString(akidValue[i]));
                                 str.append(' ');
@@ -491,7 +492,7 @@ public class PKIUtils {
 
         if (logger.isDebugEnabled()) {
             if (keybytes != null) {
-                StringBuffer str = new StringBuffer();
+                StringBuilder str = new StringBuilder();
                 str.append("Real value : ");
                 for (int j =0; j < keybytes.length; j++) {
                     str.append(Integer.toHexString(keybytes[j]));
@@ -598,10 +599,10 @@ public class PKIUtils {
                     dobj = new ASN1InputStream(new ByteArrayInputStream(((DEROctetString)dobj).getOctets())).readObject();
                 }
                 catch (ClassCastException e) {
-                    throw new IllegalArgumentException("Erroneous encoding in Authority Key Identifier " + e.getMessage());
+                    throw new IllegalArgumentException("Erroneous encoding in Authority Key Identifier " + e.getMessage(), e);
                 }
                 catch (Exception e) {
-                    throw new IllegalArgumentException("While extracting Authority Key Identifier " + e.getMessage());
+                    throw new IllegalArgumentException("While extracting Authority Key Identifier " + e.getMessage(), e);
                 }
                 
                 return new AuthorityKeyIdentifier(ASN1Sequence.getInstance(dobj));
@@ -627,7 +628,7 @@ public class PKIUtils {
                     dobj = new ASN1InputStream(new ByteArrayInputStream(((DEROctetString)dobj).getOctets())).readObject();
                 }
                 catch (Exception e) {
-                    throw new IllegalArgumentException("While extracting Subject Key Identifier " + e.getMessage());
+                    throw new IllegalArgumentException("While extracting Subject Key Identifier " + e.getMessage(), e);
                 }
 
                 return SubjectKeyIdentifier.getInstance(dobj);
@@ -759,7 +760,7 @@ public class PKIUtils {
      * @throws IllegalArgumentException if the file cannot be found.
      */
     static private X509Certificate[] loadCertificates(BufferedInputStream bis) throws CertificateException, IOException {
-        List certificates = new Vector();
+        ArrayList certificates = new ArrayList();
 
         int type;
 

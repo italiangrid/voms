@@ -734,7 +734,7 @@ public class VOMSValidator {
             rc = new RoleCaps();
 
             StringTokenizer tok = new StringTokenizer(voGroup, "/", true);
-            StringBuffer sb = new StringBuffer();
+            StringBuilder sb = new StringBuilder();
 
             while (tok.hasMoreTokens()) {
                 sb.append(tok.nextToken());
