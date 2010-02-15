@@ -59,8 +59,7 @@ class Parameters {
         hash = hash * 31 + (dir == null ? 0 : dir.hashCode());
         hash = hash * 31 + type;
         hash = hash * 31 + (aggressive ? 1 : 0);
-        hash = hash * 31 + (timer ? 1 : 0);
-        return hash;
+        return hash * 31 + (timer ? 1 : 0);
     }
 
     public String toString() {
