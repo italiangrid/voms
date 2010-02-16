@@ -772,21 +772,18 @@ cb(int ok, X509_STORE_CTX *ctx)
 
 bool
 vomsdata::my_conn(const std::string &hostname, int port, const std::string &contact,
-	int version, const std::string &command, std::string &u, std::string &uc,
+	const std::string &command, std::string &u, std::string &uc,
                   std::string &buf)
 {
-  return my_conn(hostname, port, contact, version, command, u, uc, buf, -1);
+  return my_conn(hostname, port, contact, command, u, uc, buf, -1);
 }
 
 bool
 vomsdata::my_conn(const std::string &hostname, int port, const std::string &contact,
-	int version, const std::string &command, std::string &u, std::string &uc,
+	const std::string &command, std::string &u, std::string &uc,
                   std::string &buf, int timeout)
 {
-  GSISocketClient sock(hostname, port, version);
-
-  sock.RedirectGSIOutput(stderr);
-  sock.ServerContact(contact);
+  GSISocketClient sock(hostname, port);
 
   char *cacert = NULL;
   char *certdir = NULL;
@@ -857,7 +854,7 @@ vomsdata::contact(const std::string &hostname, int port, const std::string &cont
 	const std::string &command, std::string &buffer, std::string &username,
                   std::string &ca, int timeout)
 {
-  return my_conn(hostname, port, contact, globus(0), command, username, ca,
+  return my_conn(hostname, port, contact, command, username, ca,
                  buffer, timeout);
 }   
 
@@ -866,7 +863,7 @@ vomsdata::contact(const std::string &hostname, int port, const std::string &cont
 	const std::string &command, std::string &buffer, std::string &username,
                   std::string &ca)
 {
-  return my_conn(hostname, port, contact, globus(0), command, username, ca,
+  return my_conn(hostname, port, contact, command, username, ca,
                  buffer, -1);
 }   
 

@@ -32,8 +32,6 @@
 #ifndef VOMS_GSISOCKETCLIENT
 #define VOMS_GSISOCKETCLIENT
 
-
-
 /** This super class header file. */
 #include <openssl/evp.h>
 #include <openssl/x509.h>
@@ -43,8 +41,6 @@
 
 #include <sys/types.h>
 #include <sys/socket.h>
-#include <netinet/in.h>
-#include <netdb.h>
 
 extern "C" {
 #include "sslutils.h"
@@ -66,24 +62,11 @@ public:
    * @param p the secure server port.
    * @param b the backlog, that is the maximum number of outstanding connection requests.
    */
-  GSISocketClient(const std::string&, int, int);
+  GSISocketClient(const std::string&, int);
   /**
    * Destructor.
    */  
   ~GSISocketClient();
-
-  void RedirectGSIOutput(FILE *fp) { gsi_logfile = fp; }
-  /**
-   * Set the server contact. 
-   * @param contact the server contact string to set.
-   */
-  void ServerContact(const std::string& contact) { _server_contact = contact; }
-  /**
-   * Sets required connection flags.
-   * @param flags is a bitwise or of all the flags required.
-   */
-  //  void SetFlags(int flags);
-
 
   /**
    * Open the connection.
@@ -111,11 +94,7 @@ protected:
 private:
   std::string host;
   int port;
-  int version;
-   /** The Secure Shell context identifier. */
-  std::string _server_contact;
-   //bool _do_mutual_authentication;
-  FILE *gsi_logfile;
+
   bool opened;
   int sck;
 
@@ -133,13 +112,11 @@ public:
   SSL *ssl;
   SSL_CTX *ctx;
   BIO *conn;
-  void *pvd;
 
   bool Send(const std::string &s);
   bool Receive(std::string &s);
 
 private:
-  struct sockaddr_in peeraddr_in;	/**< Address for peer socket.*/
   std::string error;
   void SetError(const std::string&);
   void SetErrorGlobus(const std::string&, int, int, int);

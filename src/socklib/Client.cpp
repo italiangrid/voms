@@ -44,7 +44,6 @@ extern "C" {
 #include <unistd.h>
 #include <fcntl.h>
 
-#include "log.h"
 #include "sslutils.h"
 }
 
@@ -61,14 +60,13 @@ extern "C" {
  * @param p the secure server port.
  * @param b the backlog, that is the maximum number of outstanding connection requests.
  */
-GSISocketClient::GSISocketClient(const std::string &h, int p, int v) :
-  host(h), port(p), version(v),
-  _server_contact(""), /* conflags(0),*/
+GSISocketClient::GSISocketClient(const std::string &h, int p) :
+  host(h), port(p),
   opened(false), own_subject(""), own_ca(""),
   upkey(NULL), ucert(NULL), cacertdir(NULL),
   peer_subject(""), peer_ca(""), 
   peer_key(NULL), peer_cert(NULL), ssl(NULL), ctx(NULL),
-  conn(NULL), pvd(NULL), error(""), timeout(-1)
+  conn(NULL), error(""), timeout(-1)
 {
   OBJ_create("0.9.2342.19200300.100.1.1","USERID","userId");
 }
@@ -124,10 +122,10 @@ void GSISocketClient::SetErrorOpenSSL(const std::string &message)
     default:
       message = (char*)ERR_reason_error_string(l);
       error += std::string(ERR_error_string(l, buf))+ ":" + 
-	std::string(file) + ":" + stringify(line, temp) + "\n";
+        std::string(file) + ":" + stringify(line, temp) + "\n";
       if (message)
-	error += std::string(ERR_reason_error_string(l)) + ":" + 
-	  std::string(ERR_func_error_string(l)) + "\n";
+        error += std::string(ERR_reason_error_string(l)) + ":" + 
+          std::string(ERR_func_error_string(l)) + "\n";
       break;
     }
   }
@@ -238,7 +236,6 @@ static void destroy_initializers(void *data)
 extern "C" {
 int proxy_verify_callback_server(X509_STORE_CTX *ctx, UNUSED(void *empty))
 {
-
   return proxy_app_verify_callback(ctx, NULL);
 }
 
