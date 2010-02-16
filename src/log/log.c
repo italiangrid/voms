@@ -17,8 +17,6 @@
 #include <sys/types.h>
 #include <sys/utsname.h>
 #include <sys/stat.h>
-#include <sys/mman.h>
-#include <sys/wait.h>
 #include <unistd.h>
 #include <stdlib.h>
 #include <time.h>
@@ -30,7 +28,6 @@
 #include <ctype.h>
 #include <fcntl.h>
 #include <errno.h>
-#include <signal.h>
 #include <stdio.h>
 #include <signal.h>
 
