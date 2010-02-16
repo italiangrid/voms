@@ -1058,13 +1058,15 @@ std::string makeAC(EVP_PKEY *key, X509 *issuer, X509 *holder,
   if (!fqans.empty()) {
     // test logging retrieved attributes
 
-    if(result && !attributes.empty()) {
-      for(std::vector<gattrib>::iterator i = attributes.begin(); i != attributes.end(); ++i)
-        LOGM(VARP, logh, LEV_DEBUG, T_PRE,  "User got attributes: %s", i->str().c_str());
+    if (LogLevelMin(logh, LEV_DEBUG)) {
+      if(result && !attributes.empty()) {
+        for(std::vector<gattrib>::iterator i = attributes.begin(); i != attributes.end(); ++i)
+          LOGM(VARP, logh, LEV_DEBUG, T_PRE,  "User got attributes: %s", i->str().c_str());
+      }
+      else
+        LOGM(VARP, logh, LEV_DEBUG, T_PRE,  "User got no attributes or something went wrong searching for them.");
     }
-    else
-      LOGM(VARP, logh, LEV_DEBUG, T_PRE,  "User got no attributes or something went wrong searching for them.");
-  
+
     std::vector<std::string> attributes_compact;
     for(std::vector<gattrib>::iterator i = attribs.begin(); i != attribs.end(); ++i)
       attributes_compact.push_back(i->str());

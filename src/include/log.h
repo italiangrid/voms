@@ -45,6 +45,7 @@ extern void        LogDeactivate(void *, const char *);
 extern void        LogOption(void *, const char *, const char *);
 extern void        LogOptionInt(void *, const char *, int);
 extern void        SetOwner(pid_t);
+extern int         LogLevelMin(void *, loglevels);
 
 #define LOG(h, lev, type, str) \
 LogMessage((h), (lev), (type), (str), FUNC_NAME, __LINE__, __FILE__)
