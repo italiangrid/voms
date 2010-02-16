@@ -76,7 +76,7 @@ static int fileoutputter(void *data, const char *s)
     if (position > ld->maxlog) {
       if (!logfile_rotate(ld->name) || !filereopen(ld)) {
         UNUSED(int ret);
-	ret= write(ld->fd, "VOMS: LOGGING ROTATION ERROR\n", 29);
+        ret= write(ld->fd, "VOMS: LOGGING ROTATION ERROR\n", 29);
       }
     }
   }
@@ -212,15 +212,16 @@ static int logfile_rotate(const char * name)
   char *fname = NULL;
   int res = 1;
   int fd;
+  int namelen = strlen(name);
 
   pos = dirname = fname = newname = oldname = NULL;
 
-/*   // get the name of the directory and of the file */
+  /* get the name of the directory and of the file */
 
-  newname = malloc(strlen(name)+26);
-  oldname = malloc(strlen(name)+26);
-  fname   = malloc(strlen(name)+5);
-  dirname = malloc(strlen(name)+2);
+  newname = malloc(namelen+26);
+  oldname = malloc(namelen+26);
+  fname   = malloc(namelen+5);
+  dirname = malloc(namelen+2);
 
   if (!fname || !newname || !oldname || !dirname)
     goto err;
@@ -261,26 +262,28 @@ static int logfile_rotate(const char * name)
     closedir(dir);
     
 
-/*     // rename each file increasing the suffix */
+    /* rename each file increasing the suffix */
+
+    strcpy(newname, name);
+    newname[namelen]='.';
+
+    strcpy(oldname, name);
+    oldname[namelen]='.';
   
     if (max) {
       for(i = max; i > 0 ; --i) {
         char s[24];
         
-        strcpy(newname, name);
-        strcat(newname, ".");
         sprintf(s, "%d", i+1);
-        strcat(newname, s);
+        strcpy(newname + namelen +1, s);
 
-        strcpy(oldname, name);
-        strcat(oldname, ".");
         sprintf(s, "%d", i);
-        strcat(oldname, s);
+        strcpy(oldname + namelen +1, s);
     
         (void)rename(oldname, newname);
       }
     }
-/*     // rename the main file to .1  */
+    /* rename the main file to .1  */
 
     newname = (char *)malloc((strlen(name) + 3) * sizeof(char));
     if (newname) {
