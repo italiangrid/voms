@@ -1188,9 +1188,7 @@ bool Client::pcdInit() {
 
 void Client::Error() 
 {
-  std::string output = OpenSSLError(debug);
-  
-  Print(ERROR) << output;
+  Print(ERROR) << OpenSSLError(debug);
 }
 
 static AC *getAC(const std::string& data)
