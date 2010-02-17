@@ -39,9 +39,6 @@ public class SigningPolicy {
     private static final Pattern remove_single_quotes  = Pattern.compile("'(.*)'");
     private static final Pattern remove_double_quotes  = Pattern.compile("\"(.*)\"");
     private static final Pattern get_subject_pattern   = Pattern.compile("(['\"]?)(.*?)\\1\\s*?");
-    private String access_id_ca = null;
-    private String pos_rights   = null;
-    private Vector subjects = null;
     private String gname = null;
 
     private Vector access_id_ca_list = new Vector();
@@ -225,9 +222,9 @@ public class SigningPolicy {
 
         gname = PKIUtils.getBaseName(theFile);
 
-        access_id_ca = null;
-        pos_rights   = null;
-        subjects     = null;
+        String access_id_ca = null;
+        String pos_rights   = null;
+        Vector subjects     = null;
 
         boolean error = false;
 

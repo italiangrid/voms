@@ -85,10 +85,11 @@ public class VOMSSocket {
      * @author Vincenzo Ciaschini
      */
     private SSLContext context = null;
-    private SSLSocketFactory socketFactory = null;
     private SSLSocket socket = null;
 
     protected void connect(String host, int port) throws IOException, GeneralSecurityException{
+
+        SSLSocketFactory socketFactory = null;
 
         if (Security.getProvider("BC") == null) {
             Security.addProvider(new BouncyCastleProvider());
