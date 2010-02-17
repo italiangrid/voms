@@ -584,13 +584,12 @@ static char *StringAdd(char *dest, const char *src, signed int len)
   return tmp;
 }
 
-int LogLevelMin(void *data, loglevel lev)
+int LogLevelMin(void *data, loglevels lev)
 {
   struct LogInfo *li=(struct LogInfo *)data;
 
-  if (li)
-    if (li->currlev >= lev)
-      return 1;
+  if (li && ((li->currlev >= lev) && (li->currlev != LEV_NONE)))
+    return 1;
 
   return 0;
 }

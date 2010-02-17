@@ -357,10 +357,10 @@ GSISocketServer::AcceptGSIAuthentication()
   ssl = SSL_new(ctx);
   setup_SSL_proxy_handler(ssl, cacertdir);
 
-   writeb = bio->method->bwrite;
-   readb  = bio->method->bread;
-   bio->method->bwrite = globusf_write;
-   bio->method->bread  = globusf_read;
+  writeb = bio->method->bwrite;
+  readb  = bio->method->bread;
+  bio->method->bwrite = globusf_write;
+  bio->method->bread  = globusf_read;
 
   SSL_set_bio(ssl, bio, bio);
 
@@ -396,11 +396,13 @@ GSISocketServer::AcceptGSIAuthentication()
 
   char buffer[1000];
 
-  LOGM(VARP, logh, LEV_DEBUG, T_PRE, "Certificate DN: %s",
-       X509_NAME_oneline(X509_get_subject_name(actual_cert), buffer, 999));
-  LOGM(VARP, logh, LEV_DEBUG, T_PRE, "Certificate CA: %s",
-       X509_NAME_oneline(X509_get_issuer_name(actual_cert), buffer, 999));
-  LOGM(VARP, logh, LEV_DEBUG, T_PRE, "Stack Size: %d", sk_X509_num(peer_stack));
+  if (LogLevelMin(logh, LEV_DEBUG)) {
+      LOGM(VARP, logh, LEV_DEBUG, T_PRE, "Certificate DN: %s",
+           X509_NAME_oneline(X509_get_subject_name(actual_cert), buffer, 999));
+      LOGM(VARP, logh, LEV_DEBUG, T_PRE, "Certificate CA: %s",
+           X509_NAME_oneline(X509_get_issuer_name(actual_cert), buffer, 999));
+      LOGM(VARP, logh, LEV_DEBUG, T_PRE, "Stack Size: %d", sk_X509_num(peer_stack));
+  }
 
   identitycert = get_real_cert(actual_cert, peer_stack);
 
@@ -410,12 +412,14 @@ GSISocketServer::AcceptGSIAuthentication()
     OPENSSL_free(name);
   }
 
-  for (int i = 0; i < sk_X509_num(peer_stack); i++) {
-    X509 *cert = sk_X509_value(peer_stack, i);
-    LOGM(VARP, logh, LEV_DEBUG, T_PRE, "Certificate DN: %s",
-         X509_NAME_oneline(X509_get_subject_name(cert), buffer, 999));
-    LOGM(VARP, logh, LEV_DEBUG, T_PRE, "Certificate CA: %s",
-         X509_NAME_oneline(X509_get_issuer_name(cert), buffer, 999));
+  if (LogLevelMin(logh, LEV_DEBUG)) {
+    for (int i = 0; i < sk_X509_num(peer_stack); i++) {
+      X509 *cert = sk_X509_value(peer_stack, i);
+      LOGM(VARP, logh, LEV_DEBUG, T_PRE, "Certificate DN: %s",
+           X509_NAME_oneline(X509_get_subject_name(cert), buffer, 999));
+      LOGM(VARP, logh, LEV_DEBUG, T_PRE, "Certificate CA: %s",
+           X509_NAME_oneline(X509_get_issuer_name(cert), buffer, 999));
+    }
   }
 
   tmp = NULL;
