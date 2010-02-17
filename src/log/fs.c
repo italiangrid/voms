@@ -250,20 +250,20 @@ static int logfile_rotate(const char * name)
 
     dir = opendir(dirname);
     if (dir) {
+      baselen = strlen(basename);
+
       while ((de = readdir(dir))) {
         pos = strrchr(de->d_name, '.');
-        if (pos && 
-            (size_t)(pos - de->d_name) == strlen(basename) &&
-            strncmp(basename, de->d_name, strlen(basename)) == 0 &&
-            atoi((++pos)) > max)
-          max = atoi(pos);
+        if (pos && atoi(pos+1) > max &&
+            (size_t)(pos - de->d_name) == baselen &&
+            strncmp(basename, de->d_name, baselen) == 0)
+          max = atoi(pos+1);
       }
     }
     closedir(dir);
     
 
     /* rename each file increasing the suffix */
-
     strcpy(newname, name);
     newname[namelen]='.';
 
@@ -283,12 +283,11 @@ static int logfile_rotate(const char * name)
         (void)rename(oldname, newname);
       }
     }
-    /* rename the main file to .1  */
 
-    newname = (char *)malloc((strlen(name) + 3) * sizeof(char));
+    /* rename the main file to .1  */
     if (newname) {
-      strcpy(newname, name);
-      strcat(newname, ".1");
+      newname[namelen+1]='1';
+      newname[namelen+2]='\0';
       if (rename(name, newname) == -1)
         res = 0;
       result = 1;
