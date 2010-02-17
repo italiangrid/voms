@@ -128,6 +128,8 @@ class Fake {
   void exitError(const char *message);
   std::ostream& Print(message_type type);
   bool rfc;
+  std::string pastac;
+  std::string pastproxy;
 };
 
 #endif

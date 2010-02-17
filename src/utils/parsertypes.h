@@ -37,6 +37,7 @@ typedef struct vo {
   char *targets;
   char *uri;
   int   newformat;
+  char *pastac;
   PARAMLIST *params;
 } VO;
 

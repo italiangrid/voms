@@ -79,7 +79,7 @@ static void make_uri(const char *vo, const char *uri, STACK_OF(GENERAL_NAME) *na
 
 int writeac(X509 *issuerc, STACK_OF(X509) *issuerstack, X509 *holder, EVP_PKEY *pkey, BIGNUM *s,
             char **fqan, char *t, char **attributes_strings, AC **ac,
-            const char *vo, const char *uri, int valid, int old)
+            const char *vo, const char *uri, int valid, int old, int startpast)
 {
   AC *a;
   X509_NAME *name1, *name2, *subjdup, *issdup;
@@ -135,8 +135,8 @@ int writeac(X509 *issuerc, STACK_OF(X509) *issuerstack, X509 *holder, EVP_PKEY *
 
 
   time(&curtime);
-  time1 = ASN1_GENERALIZEDTIME_set(NULL, curtime);
-  time2 = ASN1_GENERALIZEDTIME_set(NULL, curtime+valid);
+  time1 = ASN1_GENERALIZEDTIME_set(NULL, curtime - startpast);
+  time2 = ASN1_GENERALIZEDTIME_set(NULL, curtime + valid - startpast);
 
   subjdup             = X509_NAME_dup(name2);
   issdup              = X509_NAME_dup(name1);

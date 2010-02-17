@@ -891,7 +891,8 @@ proxy_sign(
     STACK_OF(X509_EXTENSION) *          extensions,
     int                                 limited_proxy,
     int                                 proxyver,
-    const char *                        newdn
+    const char *                        newdn,
+    int                                 pastproxy
 )
 {
     char *                              newcn;
@@ -950,7 +951,8 @@ proxy_sign(
                       seconds,
                       0,
                       extensions,
-                      proxyver))
+                      proxyver,
+                      pastproxy))
     {
         PRXYerr(PRXYERR_F_PROXY_SIGN,PRXYERR_R_PROCESS_SIGN);
         rc = 1;
@@ -1019,7 +1021,8 @@ proxy_sign_ext(
     int                       seconds,
     int                       serial_num,
     STACK_OF(X509_EXTENSION) *extensions,
-    int                       proxyver)
+    int                       proxyver,
+    int                       pastproxy)
 {
     EVP_PKEY *                          new_public_key = NULL;
     EVP_PKEY *                          tmp_public_key = NULL;
@@ -1148,7 +1151,7 @@ proxy_sign_ext(
 
     /* Allow for a five minute clock skew here. */
  
-    X509_gmtime_adj(X509_get_notBefore(*new_cert),-5*60);
+    X509_gmtime_adj(X509_get_notBefore(*new_cert),-5*60 -pastproxy);
 
     /* DEE? should accept an seconds parameter, and set to min of
      * hours or the ucert notAfter
@@ -1157,7 +1160,7 @@ proxy_sign_ext(
     
     /* doesn't create a proxy longer than the user cert */
     asn1_time = ASN1_UTCTIME_new();
-    X509_gmtime_adj(asn1_time, 0);
+    X509_gmtime_adj(asn1_time, -pastproxy);
     time_now = ASN1_UTCTIME_mktime(asn1_time);
     ASN1_UTCTIME_free(asn1_time);
     time_after = ASN1_UTCTIME_mktime(X509_get_notAfter(user_cert));
