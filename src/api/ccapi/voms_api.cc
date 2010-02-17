@@ -88,19 +88,6 @@ extern int AC_Init(void);
 
 std::map<vomsdata*, vomsspace::internal*> privatedata;
 
-
-vomsdata::Initializer::Initializer(Initializer &) {}
-vomsdata::Initializer::Initializer()
-{
-#ifdef NOGLOBUS
-  SSLeay_add_all_algorithms();
-  ERR_load_crypto_strings();
-
-  (void)AC_Init();
-  InitProxyCertInfoExtension(1);
-#endif
-}
-
 static bool initialized = false;
 
 void vomsdata::seterror(verror_type err, std::string message)
