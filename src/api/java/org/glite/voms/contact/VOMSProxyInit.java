@@ -20,6 +20,7 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.text.ParseException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Date;
 import java.util.Iterator;
@@ -206,9 +207,9 @@ public class VOMSProxyInit {
 
                     if (response.hasWarnings())
                         logAndSetWarningMessages(response);
-                    
+
                     byte[] data = response.getData();
-                    log.info( "Got Data from VOMS server "+data );
+                    log.info( "Got Data from VOMS server "+Arrays.toString(data) );
                     return new String(data);
                 }
                 

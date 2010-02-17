@@ -283,8 +283,7 @@ public class PKIUtils {
 
     public static String Normalize(String dn) {
         String newdn = emailPattern.matcher(dn).replaceAll("/Email");
-        newdn = uidPattern.matcher(newdn).replaceAll("/UID");
-        return newdn;
+        return uidPattern.matcher(newdn).replaceAll("/UID");
     }
 
     public static boolean DNCompare(String dn1, String dn2) {

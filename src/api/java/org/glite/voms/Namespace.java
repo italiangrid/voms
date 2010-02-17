@@ -154,7 +154,7 @@ public class Namespace
 
   public boolean getPermit() {
     if (current != -1)
-      return subject.elementAt(current).equals("PERMIT") ? true : false;
+      return subject.elementAt(current).equals("PERMIT");
     else
       throw new IllegalArgumentException("Current record must be set in Namespace object " + gname);
   }
