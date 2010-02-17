@@ -13,8 +13,8 @@
  * follows.
  *
  *********************************************************************/
-#ifndef VOMS_CLIENT_FQAN_H
-#define VOMS_CLIENT_FQAN_H
+#ifndef VOMS_COMMON_FQAN_H
+#define VOMS_COMMON_FQAN_H
 
 #include <string>
 #include <vector>

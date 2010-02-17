@@ -158,13 +158,13 @@ std::string OpenSSLError(bool debug)
       l = ERR_get_error_line(&file, &line);
 
       if (debug) {
-	std::string temp;
+        std::string temp;
         outstring += std::string(ERR_error_string(l,buf)) + ":" +
-	  file + ":" + stringify(line, temp) + dat + "\n";
+          file + ":" + stringify(line, temp) + dat + "\n";
       }
       else
         outstring += std::string(ERR_reason_error_string(l)) + dat +
-	  "\nFunction: " + ERR_func_error_string(l) + "\n";
+          "\nFunction: " + ERR_func_error_string(l) + "\n";
     }
     
     free(dat);
