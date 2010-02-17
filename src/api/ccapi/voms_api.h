@@ -378,13 +378,13 @@ private:
   bool verifyac(X509 *, X509 *, AC*, voms&);
   bool check_sig_ac(X509 *, void *);
   X509 *check(void *);
-  bool my_conn(const std::string&, int, const std::string&, int,
+  bool my_conn(const std::string&, int, const std::string&, 
                const std::string&, std::string&, std::string&,
                std::string&);
   bool contact(const std::string&, int, const std::string&,
                const std::string&, std::string&, std::string&,
                std::string&);
-  bool my_conn(const std::string&, int, const std::string&, int,
+  bool my_conn(const std::string&, int, const std::string&, 
                const std::string&, std::string&, std::string&,
                std::string&, int timeout);
   bool contact(const std::string&, int, const std::string&,
