@@ -282,6 +282,7 @@ static int logfile_rotate(const char * name)
     }
 /*     // rename the main file to .1  */
 
+    free(newname);
     newname = (char *)malloc((strlen(name) + 3) * sizeof(char));
     if (newname) {
       strcpy(newname, name);
