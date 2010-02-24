@@ -1413,7 +1413,7 @@ static bool determine_group_and_role(std::string command, char *comm, char **gro
 
 
 static bool checkinside(gattrib g, std::vector<std::string> list) {
-  return !g.qualifier.empty() && (find(list.begin(), list.end(), g.qualifier) == list.end());
+  return !g.qualifier.empty() && not_in(g.qualifier, list);
 }
 
 std::string
@@ -1476,7 +1476,7 @@ int http_get(soap *soap)
   char *path = strdup(soap->path);
   int unknown = 0;
 
-  LOGM(VARP, logh, LEV_DEBUG, T_PRE, "REST Request: %s", path);
+  LOGM(VARP, logh, LEV_DEBUG, T_PRE, "REST Request: %s", soap->path);
 
   if (!path)
     return SOAP_GET_METHOD;
