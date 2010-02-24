@@ -849,20 +849,20 @@ static int time_to_sec(std::string timestring)
 
   if (pos == std::string::npos) {
     /* Seconds format */
-    seconds = mystrtol(timestring.c_str(), LONG_MAX);
+    seconds = mystrtol((char*)timestring.c_str(), LONG_MAX);
   } 
   else {
     /* hours:minutes(:seconds) format */
-    hours   = mystrtol(timestring.substr(0, pos).c_str(), LONG_MAX);
+    hours   = mystrtol((char*)timestring.substr(0, pos).c_str(), LONG_MAX);
 
     std::string::size_type pos2 = timestring.substr(pos+1).find(':');
 
     if (pos2 == std::string::npos) {
-      minutes = mystrtol(timestring.substr(pos+1).c_str(), 59);
+      minutes = mystrtol((char*)timestring.substr(pos+1).c_str(), 59);
     }
     else {
-      minutes = mystrtol(timestring.substr(pos+1, pos2).c_str(), 59);
-      seconds = mystrtol(timestring.substr(pos2+1).c_str(), 59);
+      minutes = mystrtol((char*)timestring.substr(pos+1, pos2).c_str(), 59);
+      seconds = mystrtol((char*)timestring.substr(pos2+1).c_str(), 59);
     }
   }
 
