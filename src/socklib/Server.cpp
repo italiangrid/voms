@@ -52,6 +52,7 @@ extern "C" {
 }
 
 #include "ipv6sock.h"
+#include "io.h"
 
 #include "data.h"
 
@@ -478,71 +479,15 @@ GSISocketServer::Listen()
 bool 
 GSISocketServer::Send(const std::string &s)
 {
-  if (!ssl) {
-    SetError("No connection established");
-    return false;
-  }
+  std::string error;
 
-  ERR_clear_error();
+  bool result = do_write(ssl, timeout, s, error);
 
-  int ret = 0, nwritten=0;
+  if (!result)
+    SetError(error);
 
-  const char *str = s.c_str();
-
-  int fd = BIO_get_fd(SSL_get_rbio(ssl), NULL);
-  time_t starttime, curtime;
-
-  fd_set rset;
-  fd_set wset;
-  bool do_continue = false;
-  int expected = 0;
-
-  curtime = starttime = time(NULL);
-
-  do {
-    ret = do_select(fd, &rset, &wset, starttime, timeout, expected);
-    do_continue = false;
-    if (ret > 0) {
-      ret = SSL_write(ssl, str + nwritten, strlen(str) - nwritten);
-      curtime = time(NULL);
-      switch (SSL_get_error(ssl, ret)) {
-      case SSL_ERROR_NONE:
-        nwritten += ret;
-        if ((size_t)nwritten == strlen(str))
-          do_continue = false;
-        else
-          do_continue = true;
-        break;
-
-      case SSL_ERROR_WANT_READ:
-        expected = SSL_ERROR_WANT_READ;
-        ret = 1;
-        do_continue = true;
-        break;
-        
-      case SSL_ERROR_WANT_WRITE:
-        expected = SSL_ERROR_WANT_WRITE;
-        ret = 1;
-        do_continue = true;
-        break;
-
-      default:
-        do_continue = false;
-      }
-    }
-  } while (ret <= 0 && do_continue);
-            
-  if (ret <=0) {
-    if (timeout != -1 && (curtime - starttime <= timeout))
-      SetError("Connection stuck during write: timeout reached.");
-    else
-      SetErrorOpenSSL("Error during SSL write:");
-    return false;
-  }
-
-  return true;
+  return result;
 }
-
 
 bool GSISocketServer::Peek(int bufsize, std::string& s)
 {
@@ -599,6 +544,7 @@ bool GSISocketServer::Peek(int bufsize, std::string& s)
   return true;
 
 }
+
 /**
  * Receive a string value.
  * @param s the string to fill.
@@ -607,59 +553,15 @@ bool GSISocketServer::Peek(int bufsize, std::string& s)
 bool 
 GSISocketServer::Receive(std::string& s)
 {
-  if (!ssl) {
-    SetError("No connection established");
-    return false;
-  }
+  std::string output;
+  bool result = do_read(ssl, timeout, output);
 
-  ERR_clear_error();
+  if (result)
+    s = output;
+  else
+    SetError(output);
 
-  int ret = -1, ret2 = -1;
-
-  int bufsize=8192;
-
-  char *buffer = (char *)OPENSSL_malloc(bufsize);
-
-  int fd = BIO_get_fd(SSL_get_rbio(ssl), NULL);
-  time_t starttime, curtime;
-
-  fd_set rset;
-  fd_set wset;
-  int error = 0;
-  int expected = 0;
-
-  starttime = time(NULL);
-
-  do {
-    ret = do_select(fd, &rset, &wset, starttime, timeout, expected);
-    curtime = time(NULL);
-
-    if (ret > 0) {
-      ret2 = SSL_read(ssl, buffer, bufsize);
-
-      if (ret2 <= 0)
-        expected = error = SSL_get_error(ssl, ret2);
-    }
-  } while ((ret > 0) && 
-           ((ret2 <= 0) && 
-            (((timeout == -1) ||
-              ((timeout != -1) && 
-               (curtime - starttime < timeout))) &&
-             ((error == SSL_ERROR_WANT_READ) ||
-              (error == SSL_ERROR_WANT_WRITE)))));
-            
-  if (ret <= 0 || ret2 <= 0) {
-    if (timeout != -1 && (curtime - starttime <= timeout))
-      SetError("Connection stuck during read: timeout reached.");
-    else
-      SetErrorOpenSSL("Error during SSL read:");
-    OPENSSL_free(buffer);
-    return false;
-  }
-
-  s = std::string(buffer, ret2);
-  OPENSSL_free(buffer);
-  return true;
+  return result;
 }
 
 void GSISocketServer::SetError(const std::string &g)

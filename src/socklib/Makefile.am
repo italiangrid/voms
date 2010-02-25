@@ -8,8 +8,8 @@ noinst_LTLIBRARIES = \
 
 SOURCES = Client.cpp ipv6sock.cc
 
-libsock_la_SOURCES = 	Client.cpp ipv6sock.cc
-libsock_nog_la_SOURCES = Client.cpp Server.cpp ipv6sock.cc
+libsock_la_SOURCES = 	Client.cpp ipv6sock.cc io.cc
+libsock_nog_la_SOURCES = Client.cpp Server.cpp ipv6sock.cc io.cc
 
 libsock_nog_la_CXXFLAGS = \
 	$(NO_GLOBUS_FLAGS) \
