@@ -289,29 +289,31 @@ GSISocketClient::Open()
   snprintf(portstring, 35, "%ld", (long int)port);
   fd = sock_connect(host.c_str(), portstring);
 
-  flags = fcntl(fd, F_GETFL, 0);
-  (void)fcntl(fd, F_SETFL, flags | O_NONBLOCK);
+  if (sock != -1) {
+    flags = fcntl(fd, F_GETFL, 0);
+    (void)fcntl(fd, F_SETFL, flags | O_NONBLOCK);
 
-  conn = BIO_new_socket(fd, BIO_NOCLOSE);
-  (void)BIO_set_nbio(conn,1);
+    conn = BIO_new_socket(fd, BIO_NOCLOSE);
+    (void)BIO_set_nbio(conn,1);
 
-  ssl = SSL_new(ctx);
-  setup_SSL_proxy_handler(ssl, cacertdir);
-  SSL_set_bio(ssl, conn, conn);
+    ssl = SSL_new(ctx);
+    setup_SSL_proxy_handler(ssl, cacertdir);
+    SSL_set_bio(ssl, conn, conn);
 
-  conn = NULL;
+    conn = NULL;
 
-  curtime = starttime = time(NULL);
+    curtime = starttime = time(NULL);
 
-  if (!do_connect(ssl, fd, timeout, error)) {
-    SetError(error);
-    goto err;
-  }
+    if (!do_connect(ssl, fd, timeout, error)) {
+      SetError(error);
+      goto err;
+    }
 
-  if (post_connection_check(ssl)) {
-    opened = true;
-    (void)Send("0");
-    return true;
+    if (post_connection_check(ssl)) {
+      opened = true;
+      (void)Send("0");
+      return true;
+    }
   }
 
  err:
