@@ -99,7 +99,7 @@ int do_select(int fd, time_t starttime, int timeout, int wanted)
                  ((errorcode) == SSL_ERROR_WANT_READ ||                 \
                   (errorcode) == SSL_ERROR_WANT_WRITE)))
 
-bool do_connect(SSL *ssl, int fd, int timeout,  std::string& error)
+bool do_connect(SSL *ssl, int fd, int timeout, std::string& error)
 {
   time_t starttime, curtime;
   int ret = -1, ret2 = -1;

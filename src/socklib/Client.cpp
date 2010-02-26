@@ -28,10 +28,6 @@ extern "C" {
 #include <errno.h>
 #include <sys/types.h>
 #include <sys/socket.h>
-#include <sys/select.h>
-#include <time.h>
-#include <netinet/in.h>
-#include <netdb.h>
 
 #include <openssl/buffer.h>
 #include <openssl/crypto.h>
@@ -63,10 +59,9 @@ extern "C" {
  */
 GSISocketClient::GSISocketClient(const std::string &h, int p) :
   host(h), port(p),
-  opened(false), own_subject(""), own_ca(""),
+  opened(false), own_subject(""),
   upkey(NULL), ucert(NULL), cacertdir(NULL),
-  peer_subject(""), peer_ca(""), 
-  peer_key(NULL), peer_cert(NULL), ssl(NULL), ctx(NULL),
+  ssl(NULL), ctx(NULL),
   conn(NULL), error(""), timeout(-1)
 {
   OBJ_create("0.9.2342.19200300.100.1.1","USERID","userId");
@@ -116,11 +111,6 @@ GSISocketClient::post_connection_check(SSL *ssl)
   if (!peer_cert)
     return false;
 
-  char *name = X509_NAME_oneline(X509_get_subject_name(peer_cert), NULL, 0);
-  peer_subject = std::string(name);
-  OPENSSL_free(name);
-  X509_free(peer_cert);
-
   return true;
 }
 
@@ -139,10 +129,6 @@ bool GSISocketClient::LoadCredentials(const char *cadir, X509 *cert, STACK_OF(X5
 
   name = X509_NAME_oneline(X509_get_subject_name(ucert), NULL, 0);
   own_subject = std::string(name);
-  OPENSSL_free(name);
-
-  name = X509_NAME_oneline(X509_get_issuer_name(ucert), NULL, 0);
-  own_ca = std::string(name);
   OPENSSL_free(name);
 
   return true;
@@ -235,11 +221,7 @@ bool
 GSISocketClient::Open()
 {
   SSL_METHOD *meth = NULL;
-  time_t starttime, curtime;
   int fd = -1;
-  std::string hostport;
-  std::string temp;
-  int expected = 0;
   char portstring[36];
   int flags;
   std::string error;
@@ -289,7 +271,7 @@ GSISocketClient::Open()
   snprintf(portstring, 35, "%ld", (long int)port);
   fd = sock_connect(host.c_str(), portstring);
 
-  if (sock != -1) {
+  if (fd != -1) {
     flags = fcntl(fd, F_GETFL, 0);
     (void)fcntl(fd, F_SETFL, flags | O_NONBLOCK);
 
@@ -301,8 +283,6 @@ GSISocketClient::Open()
     SSL_set_bio(ssl, conn, conn);
 
     conn = NULL;
-
-    curtime = starttime = time(NULL);
 
     if (!do_connect(ssl, fd, timeout, error)) {
       SetError(error);
@@ -334,9 +314,8 @@ void
 GSISocketClient::Close()
 {
   if (opened) {
-    EVP_PKEY_free(peer_key);
-    peer_key = upkey = NULL;
-    peer_cert = ucert = NULL;
+    upkey = NULL;
+    ucert = NULL;
     cert_chain = NULL;
 
     SSL_clear(ssl);

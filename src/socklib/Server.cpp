@@ -179,11 +179,6 @@ void GSISocketServer::SetTimeout(int sec)
   timeout = sec;
 }
 
-int GSISocketServer::GetTimeout()
-{
-  return timeout;
-}
-
 bool
 GSISocketServer::ReOpen(int p, int b, bool m)
 {
