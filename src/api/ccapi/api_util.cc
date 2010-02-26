@@ -827,7 +827,7 @@ vomsdata::my_conn(const std::string &hostname, int port, const std::string &cont
   u  = sock.own_subject;
   uc = "";
 
-  if (uc.empty()) {
+  if (u.empty()) {
     seterror(VERR_NOIDENT, sock.GetError());
     sock.Close();
     return false;
