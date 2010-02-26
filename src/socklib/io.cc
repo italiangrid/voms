@@ -46,15 +46,18 @@ extern "C" {
  *     = 0 : timeout reached.
  *     < 0 : error.
  */
-int do_select(int fd, fd_set *rset, fd_set *wset, int starttime, int timeout, int wanted)
+int do_select(int fd, time_t starttime, int timeout, int wanted)
 {
-  FD_ZERO(rset);
-  FD_ZERO(wset);
+  fd_set rset;
+  fd_set wset;
+
+  FD_ZERO(&rset);
+  FD_ZERO(&wset);
 
   if (wanted == 0 || wanted == SSL_ERROR_WANT_READ)
-    FD_SET(fd, rset);
+    FD_SET(fd, &rset);
   if (wanted == 0 || wanted == SSL_ERROR_WANT_WRITE)
-    FD_SET(fd, wset);
+    FD_SET(fd, &wset);
 
   int ret = 0;
 
@@ -69,20 +72,20 @@ int do_select(int fd, fd_set *rset, fd_set *wset, int starttime, int timeout, in
     endtime.tv_sec = timeout - (curtime - starttime);
     endtime.tv_usec = 0;
 
-    ret = select(fd+1, rset, wset, NULL, &endtime);
+    ret = select(fd+1, &rset, &wset, NULL, &endtime);
   }
   else {
-    ret = select(fd+1, rset, wset, NULL, NULL);
+    ret = select(fd+1, &rset, &wset, NULL, NULL);
   }
 
   if (ret == 0)
     return 0;
 
-  if ((wanted == SSL_ERROR_WANT_READ && !FD_ISSET(fd, rset)) ||
-      (wanted == SSL_ERROR_WANT_WRITE && !FD_ISSET(fd,wset)))
+  if ((wanted == SSL_ERROR_WANT_READ && !FD_ISSET(fd, &rset)) ||
+      (wanted == SSL_ERROR_WANT_WRITE && !FD_ISSET(fd, &wset)))
     return -1;
 
-  if (ret < 0 && (!FD_ISSET(fd, rset) || !FD_ISSET(fd, wset)))
+  if (ret < 0 && (!FD_ISSET(fd, &rset) || !FD_ISSET(fd, &wset)))
     return 1;
 
   return ret;
@@ -101,14 +104,12 @@ bool do_connect(SSL *ssl, int fd, int timeout,  std::string& error)
   time_t starttime, curtime;
   int ret = -1, ret2 = -1;
   long errorcode = 0;
-  fd_set rset;
-  fd_set wset;
   int expected = 0;
 
   curtime = starttime = time(NULL);
 
   do {
-    ret = do_select(fd, &rset, &wset, starttime, timeout, expected);
+    ret = do_select(fd, starttime, timeout, expected);
     if (ret > 0) {
       ret2 = SSL_connect(ssl);
       curtime = time(NULL);
@@ -146,15 +147,13 @@ bool do_write(SSL *ssl, int timeout, const std::string& text, std::string &error
   int fd = BIO_get_fd(SSL_get_rbio(ssl), NULL);
   time_t starttime, curtime;
 
-  fd_set rset;
-  fd_set wset;
   bool do_continue = false;
   int expected = 0;
 
   curtime = starttime = time(NULL);
 
   do {
-    ret = do_select(fd, &rset, &wset, starttime, timeout, expected);
+    ret = do_select(fd, starttime, timeout, expected);
     do_continue = false;
     if (ret > 0) {
       ret = SSL_write(ssl, str + nwritten, strlen(str) - nwritten);
@@ -215,8 +214,6 @@ bool do_read(SSL *ssl, int timeout, std::string& output)
   int fd = BIO_get_fd(SSL_get_rbio(ssl), NULL);
   time_t starttime, curtime;
 
-  fd_set rset;
-  fd_set wset;
   int error = 0;
   int expected = 0;
   long errorcode = 0;
@@ -224,7 +221,7 @@ bool do_read(SSL *ssl, int timeout, std::string& output)
   starttime = time(NULL);
 
   do {
-    ret = do_select(fd, &rset, &wset, starttime, timeout, expected);
+    ret = do_select(fd, starttime, timeout, expected);
     curtime = time(NULL);
 
     if (ret > 0) {
