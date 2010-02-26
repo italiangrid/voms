@@ -105,7 +105,6 @@ public:
   std::string    peer_ca;
   std::string    peer_serial;
   EVP_PKEY *own_key;
-  EVP_PKEY *peer_key;
   X509 *own_cert;
   X509 *peer_cert;
   X509 *actual_cert;
@@ -118,7 +117,6 @@ public:
   char           *cacertdir;
   EVP_PKEY       *upkey;
   X509           *ucert;
-  STACK_OF(X509) *cert_chain;
   std::string error;
 
 public:
