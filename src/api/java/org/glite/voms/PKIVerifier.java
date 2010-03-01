@@ -627,7 +627,7 @@ public class PKIVerifier {
         // now verifies it
         int stackSize = certStack.size();
         int stackPos = stackSize+1;
-	Stack constructedStack = new Stack();
+        Stack constructedStack = new Stack();
 
         while ( !certStack.isEmpty() ) {
             currentCert = (X509Certificate) certStack.pop();
@@ -716,11 +716,11 @@ public class PKIVerifier {
 
             logger.debug( "Checking CA " + isCA );
             if ( isCA ) {
-	        if ( !allowsPath( currentCert, issuerCert, constructedStack ) ) {
+                if ( !allowsPath( currentCert, issuerCert, constructedStack ) ) {
                     logger.error( "Certificate verification: subject '"
-                            + currentCert.getSubjectDN().getName()
-                            + "' not allowed by CA '"
-                            + issuerCert.getSubjectDN().getName() + "'" );
+                                  + currentCert.getSubjectDN().getName()
+                                  + "' not allowed by CA '"
+                                  + issuerCert.getSubjectDN().getName() + "'" );
                     return false;
                 }
 
@@ -762,7 +762,7 @@ public class PKIVerifier {
             issuerCert = currentCert;
             candidatePublicKey = currentCert.getPublicKey();
             currentLength++;
-	    constructedStack.push(currentCert);
+            constructedStack.push(currentCert);
         }
 
         if ( !success )
@@ -771,55 +771,55 @@ public class PKIVerifier {
         return true;
     }
 
-  private boolean allowsNamespaces(X509Certificate cert, X509Certificate issuer,
-				   Stack certStack) {
+    private boolean allowsNamespaces(X509Certificate cert, X509Certificate issuer,
+                                     Stack certStack) {
 
-    // self signed certificates always pass.
-    if (PKIUtils.selfIssued(cert))
-      return true;
+        // self signed certificates always pass.
+        if (PKIUtils.selfIssued(cert))
+            return true;
 
-    Hashtable namespaces = caStore.getNamespaces();
-    Namespace namespaceCandidate = (Namespace) namespaces.get(PKIUtils.getHash(issuer));
+        Hashtable namespaces = caStore.getNamespaces();
+        Namespace namespaceCandidate = (Namespace) namespaces.get(PKIUtils.getHash(issuer));
 	  
-    if (namespaceCandidate == null) {
-      // specification says to travel up the chain in this case
-      int size = certStack.size();
-      int current = size;
+        if (namespaceCandidate == null) {
+            // specification says to travel up the chain in this case
+            int size = certStack.size();
+            int current = size;
 
-      if (size > 0) {
-	do {
-	  namespaceCandidate = (Namespace)namespaces.get(PKIUtils.getHash(
-				  (X509Certificate)certStack.elementAt(current)));
-	  current -= 1;
-	} while (namespaceCandidate == null && current != -1);
-      }
+            if (size > 0) {
+                do {
+                    namespaceCandidate = (Namespace)namespaces.get(PKIUtils.getHash(
+                                          (X509Certificate)certStack.elementAt(current)));
+                    current -= 1;
+                } while (namespaceCandidate == null && current != -1);
+            }
 
-      if (namespaceCandidate == null) {
-	//no candidates were found.  According to the rules, this is a permit
-	return true;
-      }
+            if (namespaceCandidate == null) {
+                //no candidates were found.  According to the rules, this is a permit
+                return true;
+            }
+        }
+        // at this point, namespaceCandidate != null
+
+        int index = namespaceCandidate.findIssuer(issuer);
+
+        while (index != -1) {
+            logger.debug("looking inside namespace");
+            namespaceCandidate.setCurrent(index);
+            String subject = namespaceCandidate.getSubject();
+            boolean permit = namespaceCandidate.getPermit();
+            String currentSubj = PKIUtils.getOpenSSLFormatPrincipal(issuer.getSubjectDN());
+            String currentSubjReversed = PKIUtils.getOpenSSLFormatPrincipal(issuer.getSubjectDN(), true);
+            if (subject.equals(currentSubj) || subject.equals(currentSubjReversed)) {
+                // this is the right policy
+                return permit;
+            }
+            // no decision as of yet.  Look for other rules
+            index = namespaceCandidate.findIssuer(issuer, index);
+        }
+        // candidates found, but no rule applies.  This is a deny
+        return false;
     }
-    // at this point, namespaceCandidate != null
-
-    int index = namespaceCandidate.findIssuer(issuer);
-
-    while (index != -1) {
-      logger.debug("looking inside namespace");
-      namespaceCandidate.setCurrent(index);
-      String subject = namespaceCandidate.getSubject();
-      boolean permit = namespaceCandidate.getPermit();
-      String currentSubj = PKIUtils.getOpenSSLFormatPrincipal(issuer.getSubjectDN());
-      String currentSubjReversed = PKIUtils.getOpenSSLFormatPrincipal(issuer.getSubjectDN(), true);
-      if (subject.equals(currentSubj) || subject.equals(currentSubjReversed)) {
-	// this is the right policy
-	return permit;
-      }
-      // no decision as of yet.  Look for other rules
-      index = namespaceCandidate.findIssuer(issuer, index);
-    }
-    // candidates found, but no rule applies.  This is a deny
-    return false;
-  }
 
     private boolean allowsPath( X509Certificate cert, X509Certificate issuer,
 				Stack certStack) {
@@ -836,8 +836,8 @@ public class PKIVerifier {
         logger.debug("signCandidate is: " + signCandidate);
         boolean matched = false;
 
-	if (signCandidate == null)
-	  return allowsNamespaces(cert, issuer, certStack);
+        if (signCandidate == null)
+            return allowsNamespaces(cert, issuer, certStack);
 
         if ( signCandidate != null ) {
             logger.debug("Class of issuer is : " + issuer.getClass());
@@ -949,43 +949,42 @@ public class PKIVerifier {
                     } catch ( Exception e ) {
                         continue;
                     }
-                    {
-                        Set criticalExts = candidateCRL.getCriticalExtensionOIDs();
 
-                        Set permittedCriticals = new HashSet();
-                        permittedCriticals.add("2.5.29.28");
+                    Set criticalExts = candidateCRL.getCriticalExtensionOIDs();
 
-                        if ( criticalExts == null || criticalExts.isEmpty() ||
-                             (!criticalExts.isEmpty() && permittedCriticals.containsAll(criticalExts))) {
-                            if ( candidateCRL.getIssuerX500Principal().equals(
-                                    issuer.getSubjectX500Principal() ) ) {
-                                if ( candidateCRL.getNextUpdate().compareTo(
+                    Set permittedCriticals = new HashSet();
+                    permittedCriticals.add("2.5.29.28");
+
+                    if ( criticalExts == null || criticalExts.isEmpty() ||
+                         (!criticalExts.isEmpty() && permittedCriticals.containsAll(criticalExts))) {
+                        if ( candidateCRL.getIssuerX500Principal().equals(
+                                          issuer.getSubjectX500Principal() ) ) {
+                            if ( candidateCRL.getNextUpdate().compareTo(
                                         new Date() ) >= 0
-                                        && candidateCRL.getThisUpdate()
-                                                .compareTo( new Date() ) <= 0 ) {
+                                 && candidateCRL.getThisUpdate()
+                                 .compareTo( new Date() ) <= 0 ) {
 
-                                    X509CRLEntry entry = candidateCRL
-                                            .getRevokedCertificate( cert
-                                                    .getSerialNumber() );
-                                    if ( entry == null ) {
-                                        return false;
-                                    }
-                                }
-                                else {
-                                    logger.error( "CRL for CA '"+issuer.getSubjectDN().toString()+"' has expired!" );
+                                X509CRLEntry entry = candidateCRL
+                                    .getRevokedCertificate( cert
+                                        .getSerialNumber() );
+                                if ( entry == null ) {
+                                    return false;
                                 }
                             }
-                        }
-                        else {
-                            logger.error("Critical extension found in crl!");
-                            for (Iterator ii = criticalExts.iterator(); ii.hasNext();) {
-                                logger.debug("Critical CRL Extension: " +
-                                             (String)ii.next());
+                            else {
+                                logger.error( "CRL for CA '"+issuer.getSubjectDN().toString()+"' has expired!" );
                             }
-
                         }
-                        issued = true;
                     }
+                    else {
+                        logger.error("Critical extension found in crl!");
+                        for (Iterator ii = criticalExts.iterator(); ii.hasNext();) {
+                            logger.debug("Critical CRL Extension: " +
+                                         (String)ii.next());
+                        }
+
+                    }
+                    issued = true;
                 }
             }
         }
