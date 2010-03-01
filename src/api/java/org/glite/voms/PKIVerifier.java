@@ -951,7 +951,12 @@ public class PKIVerifier {
                     }
                     {
                         Set criticalExts = candidateCRL.getCriticalExtensionOIDs();
-                        if ( criticalExts == null || criticalExts.isEmpty() ) {
+
+                        Set permittedCriticals = new HashSet();
+                        permittedCriticals.add("2.5.29.28");
+
+                        if ( criticalExts == null || criticalExts.isEmpty() ||
+                             (!criticalExts.isEmpty() && permittedCriticals.containsAll(criticalExts))) {
                             if ( candidateCRL.getIssuerX500Principal().equals(
                                     issuer.getSubjectX500Principal() ) ) {
                                 if ( candidateCRL.getNextUpdate().compareTo(
