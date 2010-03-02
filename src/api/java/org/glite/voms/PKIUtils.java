@@ -388,8 +388,6 @@ public class PKIUtils {
 
             logger.debug("Is: " + issuedIssuer.getName() +
                          " issued by " + issuerSubject.getName() + "?");
-            logger.debug("Is: " + issued.getSubjectDN().getName() +
-                         " issued by " + issuer.getSubjectDN().getName());
             logger.debug("[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[");
         }
 
@@ -397,63 +395,70 @@ public class PKIUtils {
             logger.debug("================================");
             logger.debug("issuersSubject = issuedIssuer");
 
-            //            String buggySwissSignCA="EMAILADDRESS=ca@SwissSign.com, CN=SwissSign CA (RSA IK May 6 1999 18:00:58), O=SwissSign, C=CH";
-            String buggySwissSignCA="1.2.840.113549.1.9.1=#161063614053776973735369676e2e636f6d,CN=SwissSign CA (RSA IK May 6 1999 18:00:58),O=SwissSign,C=CH";
-            String buggyRomanianCA="CN=RomanianGRID CA,OU=Certification Authority,O=ROSA,DC=RomanianGRID,DC=RO";
+            boolean needtoskip = false;
+            AuthorityKeyIdentifier akid = null;
 
-            logger.debug("--"+buggySwissSignCA+"--");
-            logger.debug("--"+issuerSubject.getName()+"--"+issuerSubject.getName().getClass().getName());
-            if (!buggySwissSignCA.equals(issuerSubject.getName()) &&
-                !buggyRomanianCA.equals(issuerSubject.getName())) {
-                /* Skip check due to bugs in bc and SwissSign and Romanian */ 
-                AuthorityKeyIdentifier akid = PKIUtils.getAKID(issued);
+            try {
+                akid = PKIUtils.getAKID(issued);
+                String s;
 
-                if (akid != null) {
-                    if (logger.isDebugEnabled())
-                        logger.debug("akid = " + akid);
+                /*  The following may throw an exception if the KeyID field 
+                    of the Authority Key Identifier is empty. */
+                if (akid != null)
+                    s = akid.toString();
+
+                needtoskip = false;
+            }
+            catch (Exception e) {
+                logger.warn("CA: " + issuerSubject.getName() + " needs to skip akid checks due to incorrectly formatted Authority Key Identifier Extension");
+                needtoskip = true;
+            }
+
+            if (!needtoskip && (akid != null)) {
+                if (logger.isDebugEnabled())
+                    logger.debug("akid = " + akid);
                 
-                    logger.debug("Authority Key Identifier extension found in issued certificate.");
+                logger.debug("Authority Key Identifier extension found in issued certificate.");
 
-                    logger.debug("Entered.");
-                    SubjectKeyIdentifier skid = PKIUtils.getSKID(issuer);
+                logger.debug("Entered.");
+                SubjectKeyIdentifier skid = PKIUtils.getSKID(issuer);
 
-                    if (logger.isDebugEnabled())
-                        logger.debug("sid = " + skid);
+                if (logger.isDebugEnabled())
+                    logger.debug("sid = " + skid);
 
-                    if (skid != null) {
-                        logger.debug("subject Key Identifier extensions found in issuer certificate.");
-                        logger.debug("comparing skid to akid");
+                if (skid != null) {
+                    logger.debug("subject Key Identifier extension found in issuer certificate.");
+                    logger.debug("comparing skid to akid");
 
-                        byte[] skidValue = skid.getKeyIdentifier();
-                        if (logger.isDebugEnabled()) {
-                            logger.debug("skid");
+                    byte[] skidValue = skid.getKeyIdentifier();
+                    if (logger.isDebugEnabled()) {
+                        logger.debug("skid");
 
-                            StringBuilder str = new StringBuilder();
-                            for (int i = 0; i < skidValue.length; i++) {
-                                str.append(Integer.toHexString(skidValue[i]));
-                                str.append(' ');
-                            }
-                            logger.debug(str.toString());
+                        StringBuilder str = new StringBuilder();
+                        for (int i = 0; i < skidValue.length; i++) {
+                            str.append(Integer.toHexString(skidValue[i]));
+                            str.append(' ');
                         }
-
-                        byte[] akidValue = akid.getKeyIdentifier();
-                        if (logger.isDebugEnabled()) {
-                            logger.debug("akid");
-
-                            StringBuilder str = new StringBuilder();
-                            for (int i = 0; i < akidValue.length; i++) {
-                                str.append(Integer.toHexString(akidValue[i]));
-                                str.append(' ');
-                            }
-                            logger.debug(str.toString());
-                        }
-
-                        logger.debug("skid/akid checking.");
-                        if (!Arrays.equals(skidValue, akidValue))
-                            return false;
-
-                        logger.debug("skid/akid check passed.");
+                        logger.debug(str.toString());
                     }
+
+                    byte[] akidValue = akid.getKeyIdentifier();
+                    if (logger.isDebugEnabled()) {
+                        logger.debug("akid");
+
+                        StringBuilder str = new StringBuilder();
+                        for (int i = 0; i < akidValue.length; i++) {
+                            str.append(Integer.toHexString(akidValue[i]));
+                            str.append(' ');
+                        }
+                        logger.debug(str.toString());
+                    }
+
+                    logger.debug("skid/akid checking.");
+                    if (!Arrays.equals(skidValue, akidValue))
+                        return false;
+
+                    logger.debug("skid/akid check passed.");
                 }
             }
             logger.debug("]]]]]]]]]]]]]]]]]]]]]]]]");
