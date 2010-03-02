@@ -41,17 +41,6 @@ Description:
 
 #include "openssl/stack.h"
 
-#if 1
-#ifdef NOGLOBUS
-#ifndef GSSAPI_H_
-typedef void *gss_ctx_id_t;
-typedef void *gss_cred_id_t;
-#endif
-#else
-#include "gssapi.h"
-#endif
-#endif
-
 typedef void *globus_gsi_callback_data_t;
 
 typedef struct globus_l_gsi_cred_handle_s
@@ -81,4 +70,8 @@ typedef struct gss2_ctx_id_desc_struct{
     gss2_cred_id_desc *                 peer_cred_handle;
 } gss2_ctx_id_desc;
 
+#ifndef GSSAPI_H_
+typedef void *gss_ctx_id_t;
+typedef void *gss_cred_id_t;
+#endif
 #endif /* VOMS_GSSAPI_COMPAT_H */
