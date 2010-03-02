@@ -129,6 +129,24 @@ This forces the server to generate ACs in the new (correct) format\&. This is me
 The created proxy will have newdn as subject rather than what is would normally have depending on the specific version of proxy created\&.
 
 .PP
+\fB\-pastac\fR  \fItimespec\fR
+
+.PP
+The created AC will have its validity start in the past, as specified by timespec\&.
+
+.PP
+The format of timespec is one of: seconds, hours:minutes, hours:minutes:seconds
+
+.PP
+\fB\-pastproxy\fR  \fItimespec\fR
+
+.PP
+The created proxy will have its validity start in the past as specified by timespec
+
+.PP
+The format of timespec is one of: seconds, hours:minutes, hours:minutes:seconds
+
+.PP
 \fB\-voinfo\fR  \fIfile\fR
 
 .PP
