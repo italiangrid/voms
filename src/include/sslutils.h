@@ -40,11 +40,13 @@ EXTERN_C_BEGIN
 /**********************************************************************
                              Include header files
 **********************************************************************/
+#include "config.h"
 
 #include <stdio.h>
 #include <stdlib.h>
 #include <time.h>
 #include "openssl/crypto.h"
+
 
 
 #if SSLEAY_VERSION_NUMBER < 0x0090581fL

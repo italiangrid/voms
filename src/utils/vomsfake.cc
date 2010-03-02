@@ -25,6 +25,8 @@
 #include <sstream>
 #include <algorithm>
 
+#include <voms_api_nog.h>
+
 extern "C" {
 #include <stdio.h>
 #include <unistd.h>

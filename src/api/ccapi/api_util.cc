@@ -13,6 +13,8 @@
  *
  *********************************************************************/
 
+#include "api_util.h"
+
 extern "C" {
 #include "config.h"
 #include "replace.h"
@@ -41,14 +43,10 @@ extern "C" {
 
 #include "Client.h"
 
-#include "voms_api.h"
-
 #include <iostream>
 #include <iomanip>
 #include <fstream>
 #include <map>
-
-#include "api_util.h"
 
 #include "vomsxml.h"
 #include "ccval.h"

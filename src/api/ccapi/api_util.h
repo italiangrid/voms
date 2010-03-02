@@ -16,6 +16,8 @@
 #ifndef VOMS_API_UTIL_H
 #define VOMS_API_UTIL_H
 
+#include "voms_api.h"
+
 extern "C" {
 #include <openssl/pem.h>
 #include <openssl/asn1.h>
@@ -36,7 +38,6 @@ extern "C" {
 #include "credentials.h"
 
 #include <netdb.h>
-#include <string>
 #include <dirent.h>
 #include <netinet/in.h>
 #include <sys/types.h>
@@ -47,7 +48,7 @@ extern "C" {
 
 #include "Client.h"
 
-#include "voms_api.h"
+#include <string>
 
 #include <iostream>
 #include <iomanip>
