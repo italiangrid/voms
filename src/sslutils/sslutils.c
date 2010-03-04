@@ -71,6 +71,7 @@ Description:
 #include <sys/stat.h>
 #include <fcntl.h>
 #include <string.h>
+#include <ctype.h>
 
 #include "openssl/buffer.h"
 #include "openssl/crypto.h"
@@ -3843,6 +3844,59 @@ end:
   return(ret);
 }
 
+static char hextoint(char r, char s)
+{
+  int v = 0;
+  if (isxdigit(r) && isxdigit(s)) {
+    if (isdigit(r))
+      v = r - '0';
+    else
+      v = 10 + r -'a';
+    v << 4;
+
+    if (isdigit(s))
+      v += s -'0';
+    else
+      v += 10 + s - 'a';
+  }
+  return v;
+}
+
+static char *reencode_string(char *string, int *len)
+{
+  int templen = strlen(string);
+  char *temp = string;
+  char *pos  = string;
+  char t = '\0';
+  char r = '\0';
+  *len = 0;
+
+  while(*string) {
+    switch (*string) {
+    case '\\':
+      t = *++string;
+
+      if (t == '\\') {
+        *pos++ = '\\';
+        ++(*len);
+      }
+      else {
+        r = *++string;
+        *pos++ = hextoint(tolower(t), tolower(r));
+        ++(*len);
+      }
+      break;
+
+    default:
+      ++(*len);
+      *pos++ = *string++;
+      break;
+    }
+  }
+
+  return temp;
+}
+
 static X509_NAME *make_DN(const char *dnstring)
 {
   char *buffername = (char*)malloc(strlen(dnstring)+1);
@@ -3850,6 +3904,7 @@ static X509_NAME *make_DN(const char *dnstring)
   char *currentname = buffername;
   unsigned char *currentvalue = buffervalue;
   X509_NAME *name = NULL;
+  int valuelen = 0;
 
   name = X509_NAME_new();
 
@@ -3917,9 +3972,11 @@ static X509_NAME *make_DN(const char *dnstring)
 
       /* Now we have both type and value.  Add to the X509_NAME_ENTRY */
 
+      buffervalue = reencode_string(buffervalue, &valuelen);
+
       X509_NAME_add_entry_by_txt(name, buffername+1,  /* skip initial '/' */
                                  V_ASN1_APP_CHOOSE,
-                                 buffervalue, -1, X509_NAME_entry_count(name),
+                                 buffervalue, valuelen, X509_NAME_entry_count(name),
                                  0);
       status = 0;
       break;
