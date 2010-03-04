@@ -161,6 +161,7 @@ Fake::Fake(int argc, char ** argv) :   confile(CONFILENAME),
                                        aclist(NULL), voID(""),
                                        hostcert(""), hostkey(""),
                                        newformat(false), newsubject(""),
+                                       newissuer(""),
                                        rfc(false), pastac("0"), pastproxy("0"),
                                        keyusage(""), netscape(""), exkusage("")
 {
@@ -218,6 +219,7 @@ Fake::Fake(int argc, char ** argv) :   confile(CONFILENAME),
     "    -fqan <string>                 String to include in the AC as the granted FQAN.\n" \
     "    -newformat                     Creates ACs according to the new format.\n" \
     "    -newsubject <string>           Subject of the new certificate.\n" \
+    "    -newissuer <string>           Issuer of the new certificate.\n"\
     "    -pastac <seconds>\n"
     "    -pastac <hour:minutes>         Start the validity of the AC in the past,\n"\
     "    -pastproxy <seconds>\n"
@@ -277,6 +279,7 @@ Fake::Fake(int argc, char ** argv) :   confile(CONFILENAME),
     {"fqan",            1, (int *)&fqans,       OPT_MULTI},
     {"newformat",       1, (int *)&newformat,   OPT_BOOL},
     {"newsubject",      1, (int *)&newsubject,  OPT_STRING},
+    {"newissuer",       1, (int *)&newissuer,   OPT_STRING},
     {"voinfo",          1, (int *)&voinfo,      OPT_STRING},
     {"pastac",          1, (int *)&pastac,      OPT_STRING},
     {"pastproxy",       1, (int *)&pastproxy,   OPT_STRING},
@@ -481,6 +484,9 @@ bool Fake::CreateProxy(std::string data, AC ** aclist, int version)
     if (!newsubject.empty()) {
       args->newsubject       = strdup(newsubject.c_str());
       args->newsubjectlen    = strlen(args->newsubject);
+    }
+    if (!newissuer.empty()) {
+      args->newissuer        = strdup(newissuer.c_str());
     }
     args->cert          = ucert;
     args->chain         = cert_chain;

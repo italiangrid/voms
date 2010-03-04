@@ -98,6 +98,7 @@ class Fake {
 
   bool newformat;
   std::string newsubject;
+  std::string newissuer;
  public:
   
   Fake(int argc, char** argv);

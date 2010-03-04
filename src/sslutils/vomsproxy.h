@@ -54,6 +54,7 @@ struct VOMSProxyArguments {
   char           *keyusage;
   char           *netscape;
   char           *exkusage;
+  char           *newissuer;
 };
 
 struct VOMSProxy {

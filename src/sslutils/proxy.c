@@ -122,16 +122,19 @@ struct VOMSProxy *VOMS_MakeProxy(struct VOMSProxyArguments *args, int *warning, 
 
   X509_EXTENSION *ex1 = NULL, *ex2 = NULL, *ex3 = NULL, 
     *ex4 = NULL, *ex5 = NULL, *ex6 = NULL, *ex7 = NULL, 
-    *ex8 = NULL, *ex9 = NULL, *ex10 = NULL;
+    *ex8 = NULL, *ex9 = NULL, *ex10 = NULL, *ex11 = NULL;
 
   int voms = 0, classadd = 0, file = 0, vo = 0, acs = 0, info = 0, 
-    kusg = 0, order = 0, extku = 0, nscert = 0;
+    kusg = 0, order = 0, extku = 0, nscert = 0, akey = 0;
   int i = 0;
   int proxyindex;
   
   struct VOMSProxy *proxy = NULL;
 
   static int init = 0;
+
+  AUTHORITY_KEYID *akeyid = NULL;
+  ASN1_OCTET_STRING *ikeyid = NULL;
 
   int (*cback)();
 
@@ -326,6 +329,43 @@ struct VOMSProxy *VOMS_MakeProxy(struct VOMSProxyArguments *args, int *warning, 
     vo = 1;
   }
   
+  /* authority key identifier extension */
+
+  {
+    int i = 0;
+    X509_EXTENSION *ext = NULL;
+    X509V3_CTX ctx;
+    
+    X509V3_set_ctx(&ctx, args->cert, NULL, NULL, NULL, 0);
+    i = X509_get_ext_by_NID(args->cert, NID_subject_key_identifier, -1);
+
+    if (i >= 0) {
+      ext = X509_get_ext(args->cert, i);
+      if (ext) {
+        ikeyid = X509V3_EXT_d2i(ext);
+
+        akeyid = AUTHORITY_KEYID_new();
+        if (akeyid) {
+          akeyid->keyid = ikeyid;
+
+          
+          ex11 = X509V3_EXT_conf_nid(NULL, &ctx, NID_authority_key_identifier, "keyid");
+          if (!ex11) {
+            PRXYerr(PRXYERR_F_PROXY_SIGN,PRXYERR_R_CLASS_ADD_EXT);
+            goto err;
+          }
+          
+          if (!sk_X509_EXTENSION_push(extensions, ex11)) {
+            PRXYerr(PRXYERR_F_PROXY_SIGN,PRXYERR_R_CLASS_ADD_EXT);
+            goto err;
+          }
+
+          akey = 1;
+        }
+      }
+    }
+  }
+
 
   /* class_add extension */
 
@@ -517,6 +557,7 @@ struct VOMSProxy *VOMS_MakeProxy(struct VOMSProxyArguments *args, int *warning, 
                  args->limited,
                  args->proxyversion,
                  args->newsubject ? args->newsubject : NULL,
+                 args->newissuer,
                  args->pastproxy)) {
     goto err;
   }
@@ -544,11 +585,13 @@ struct VOMSProxy *VOMS_MakeProxy(struct VOMSProxyArguments *args, int *warning, 
 
   if (extensions) {
     sk_X509_EXTENSION_pop_free(extensions, X509_EXTENSION_free);
-    extku = nscert = order = kusg = voms = classadd = file = vo = acs = info = 0;
+    akey = extku = nscert = order = kusg = voms = classadd = file = vo = acs = info = 0;
   }
   if (!args->proxyrequest)
     X509_REQ_free(req);
 
+  if (akey)
+    X509_EXTENSION_free(ex11);
   if (extku)
     X509_EXTENSION_free(ex10);
   if (nscert)

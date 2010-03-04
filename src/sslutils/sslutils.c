@@ -893,12 +893,14 @@ proxy_sign(
     int                                 limited_proxy,
     int                                 proxyver,
     const char *                        newdn,
+    const char *                        newissuer,
     int                                 pastproxy
 )
 {
     char *                              newcn;
     EVP_PKEY *                          user_public_key;
     X509_NAME *                         subject_name = NULL;
+    X509_NAME *                         issuer_name = NULL;
     int                                 rc = 0;
 
     unsigned char                       md[SHA_DIGEST_LENGTH];
@@ -941,14 +943,19 @@ proxy_sign(
     }
     else
       subject_name = make_DN(newdn);
-    
+
+    if (newissuer)
+      issuer_name = make_DN(newissuer);
+    else
+      issuer_name = NULL;
+
     if(proxy_sign_ext(user_cert,
                       user_private_key,
                       EVP_sha1(), 
                       req,
                       new_cert,
                       subject_name,
-                      NULL,
+                      issuer_name,
                       seconds,
                       0,
                       extensions,
@@ -960,6 +967,10 @@ proxy_sign(
     }
 
     X509_NAME_free(subject_name);
+
+    if (issuer_name)
+      X509_NAME_free(issuer_name);
+
     if (proxyver >= 3)
       free(newcn);
 

@@ -465,6 +465,7 @@ proxy_sign(
     int                                 limited_proxy,
     int                                 proxyver,
     const char *                        newdn,
+    const char *                        newissuer,
     int                                 pastproxy
 );
 
