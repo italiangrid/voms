@@ -39,7 +39,7 @@ static void setWarning(int *warning, int value);
 static void setAdditional(void **additional, void *data);
 static X509_EXTENSION *set_KeyUsageFlags(int flags);
 static int get_KeyUsageFlags(X509 *cert);
-static X509_EXTENSION *set_nsCertUsageFlags(int flags);
+static X509_EXTENSION *set_nsCertUsageFlags(char *flags);
 static X509_EXTENSION *set_ExtendedKeyUsageFlags(char *flagnames);
 static char *getBitName(char**string);
 static int getBitValue(char *bitname, int *bittype);
@@ -277,14 +277,8 @@ struct VOMSProxy *VOMS_MakeProxy(struct VOMSProxyArguments *args, int *warning, 
 
   /* netscapeCert extension */
   if (args->netscape) {
-    ku_flags = convertMethod(args->netscape, EXFLAG_NSCERT);
 
-    if (ku_flags == -1) {
-      PRXYerr(PRXYERR_F_PROXY_SIGN, PRXYERR_R_CLASS_ADD_EXT);
-      goto err;
-    }
-
-    if ((ex9 = set_nsCertUsageFlags(ku_flags)) == NULL) {
+    if ((ex9 = set_nsCertUsageFlags(args->netscape)) == NULL) {
       PRXYerr(PRXYERR_F_PROXY_SIGN, PRXYERR_R_CLASS_ADD_EXT);
       goto err;
     }
@@ -332,38 +326,23 @@ struct VOMSProxy *VOMS_MakeProxy(struct VOMSProxyArguments *args, int *warning, 
   /* authority key identifier extension */
 
   {
-    int i = 0;
-    X509_EXTENSION *ext = NULL;
     X509V3_CTX ctx;
     
     X509V3_set_ctx(&ctx, args->cert, NULL, NULL, NULL, 0);
-    i = X509_get_ext_by_NID(args->cert, NID_subject_key_identifier, -1);
-
-    if (i >= 0) {
-      ext = X509_get_ext(args->cert, i);
-      if (ext) {
-        ikeyid = X509V3_EXT_d2i(ext);
-
-        akeyid = AUTHORITY_KEYID_new();
-        if (akeyid) {
-          akeyid->keyid = ikeyid;
-
           
-          ex11 = X509V3_EXT_conf_nid(NULL, &ctx, NID_authority_key_identifier, "keyid");
-          if (!ex11) {
-            PRXYerr(PRXYERR_F_PROXY_SIGN,PRXYERR_R_CLASS_ADD_EXT);
-            goto err;
-          }
-          
-          if (!sk_X509_EXTENSION_push(extensions, ex11)) {
-            PRXYerr(PRXYERR_F_PROXY_SIGN,PRXYERR_R_CLASS_ADD_EXT);
-            goto err;
-          }
+    ex11 = X509V3_EXT_conf_nid(NULL, &ctx, NID_authority_key_identifier, "keyid");
 
-          akey = 1;
-        }
-      }
+    if (!ex11) {
+      PRXYerr(PRXYERR_F_PROXY_SIGN,PRXYERR_R_CLASS_ADD_EXT);
+      goto err;
     }
+          
+    if (!sk_X509_EXTENSION_push(extensions, ex11)) {
+      PRXYerr(PRXYERR_F_PROXY_SIGN,PRXYERR_R_CLASS_ADD_EXT);
+      goto err;
+    }
+
+    akey = 1;
   }
 
 
@@ -734,29 +713,9 @@ static X509_EXTENSION *set_KeyUsageFlags(int flags)
   return NULL;
 }
 
-static X509_EXTENSION *set_nsCertUsageFlags(int flags)
+static X509_EXTENSION *set_nsCertUsageFlags(char* flags)
 {
-  int len =0;
-  unsigned char data[2];
-
-  X509_EXTENSION  *ext = NULL;
-  ASN1_BIT_STRING *str = ASN1_BIT_STRING_new();
-  
-  if (str) {
-    data[0] =  flags & 0x00ff;
-    data[1] = (flags & 0xff00) >> 8;
-
-    len = (data[1] ? 2 : 1);
-
-    ASN1_BIT_STRING_set(str, data, len);
-
-    ext = X509V3_EXT_i2d(NID_netscape_cert_extension, 1, str);
-    ASN1_BIT_STRING_free(str);
-
-    return ext;
-  }
-
-  return NULL;
+  return X509V3_EXT_conf_nid(NULL, NULL, NID_netscape_cert_type, flags);
 }
 
 static X509_EXTENSION *set_ExtendedKeyUsageFlags(char *flagnames)
