@@ -228,7 +228,7 @@ Fake::Fake(int argc, char ** argv) :   confile(CONFILENAME),
     "                                   keyCertSign,cRLSign,encipherOnly,decipherOnly.\n"\
     "    -nscert <bit<,bit<..>>>        Specify the bits to put in the Netscape Certificate\n"\
     "                                   extension.  Allowed values: client,server,email,\n"\
-    "                                   objsign,sslCA,emailCA,ojbCA."
+    "                                   objsign,sslCA,emailCA,ojbCA.\n"
     "    -extkeyusage <bit<,bit<..>>>   Specify the bits to put in the extended key usage\n"\
     "                                   field.  Allowed values: serverAuth,clientAuth,\n"\
     "                                   codeSigning,emailProtection,timeStamping,msCodeInd,\n"\
