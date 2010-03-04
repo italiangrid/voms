@@ -3880,10 +3880,16 @@ static char *reencode_string(char *string, int *len)
         *pos++ = '\\';
         ++(*len);
       }
-      else {
+      else if (isxdigit(t)) {
         r = *++string;
         *pos++ = hextoint(tolower(t), tolower(r));
         ++(*len);
+        ++string;
+      }
+      else {
+        *pos++ = t;
+        ++(*len);
+        ++string;
       }
       break;
 
@@ -3905,6 +3911,7 @@ static X509_NAME *make_DN(const char *dnstring)
   unsigned char *currentvalue = buffervalue;
   X509_NAME *name = NULL;
   int valuelen = 0;
+  char next = 0;
 
   name = X509_NAME_new();
 
@@ -3948,9 +3955,16 @@ static X509_NAME *make_DN(const char *dnstring)
       currentvalue=buffervalue;
       while (*dnstring) {
         if (*dnstring == '\\') {
-          *currentvalue++ = *++dnstring;
-          if (*dnstring == '\0') {
+          next = *++dnstring;
+          if (next == '\0') {
             break;
+          }
+          else if (next != '/') {
+            *currentvalue++ = '\\';
+            *currentvalue++ = next;
+          }
+          else {
+            *currentvalue++ = '/';
           }
           dnstring++;
         }
