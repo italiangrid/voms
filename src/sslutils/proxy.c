@@ -24,6 +24,7 @@
 #include <unistd.h>
 
 #include <openssl/x509.h>
+#include <openssl/x509v3.h>
 #include <openssl/stack.h>
 #include <openssl/evp.h>
 #include <openssl/bio.h>
@@ -38,6 +39,11 @@ static void setWarning(int *warning, int value);
 static void setAdditional(void **additional, void *data);
 static X509_EXTENSION *set_KeyUsageFlags(int flags);
 static int get_KeyUsageFlags(X509 *cert);
+static X509_EXTENSION *set_nsCertUsageFlags(int flags);
+static X509_EXTENSION *set_ExtendedKeyUsageFlags(char *flagnames);
+static char *getBitName(char**string);
+static int getBitValue(char *bitname, int *bittype);
+static int convertMethod(char *bits, int type);
 
 struct VOMSProxyArguments *VOMS_MakeProxyArguments()
 {
@@ -116,10 +122,10 @@ struct VOMSProxy *VOMS_MakeProxy(struct VOMSProxyArguments *args, int *warning, 
 
   X509_EXTENSION *ex1 = NULL, *ex2 = NULL, *ex3 = NULL, 
     *ex4 = NULL, *ex5 = NULL, *ex6 = NULL, *ex7 = NULL, 
-    *ex8 = NULL;
+    *ex8 = NULL, *ex9 = NULL, *ex10 = NULL;
 
   int voms = 0, classadd = 0, file = 0, vo = 0, acs = 0, info = 0, 
-    kusg = 0, order = 0;
+    kusg = 0, order = 0, extku = 0, nscert = 0;
   int i = 0;
   int proxyindex;
   
@@ -236,16 +242,27 @@ struct VOMSProxy *VOMS_MakeProxy(struct VOMSProxyArguments *args, int *warning, 
     acs = 1;
   }
 
-  ku_flags = get_KeyUsageFlags(args->cert);
+  /* keyUsage extension */
 
-  ku_flags &= ~X509v3_KU_KEY_CERT_SIGN;
-  ku_flags &= ~X509v3_KU_NON_REPUDIATION;
+  if (!args->keyusage) {
+    ku_flags = get_KeyUsageFlags(args->cert);
+    ku_flags &= ~X509v3_KU_KEY_CERT_SIGN;
+    ku_flags &= ~X509v3_KU_NON_REPUDIATION;
+  }
+  else {
+    ku_flags = convertMethod(args->keyusage, EXFLAG_KUSAGE);
+    if (ku_flags == -1) {
+      PRXYerr(PRXYERR_F_PROXY_SIGN, PRXYERR_R_CLASS_ADD_EXT);
+      goto err;
+    }
+  }
 
-  confstr = "digitalSignature: hu, keyEncipherment: hu, dataEncipherment: hu";
+  //    confstr = "digitalSignature: hu, keyEncipherment: hu, dataEncipherment: hu";
   if ((ex8 = set_KeyUsageFlags(ku_flags)) == NULL) {
     PRXYerr(PRXYERR_F_PROXY_SIGN, PRXYERR_R_CLASS_ADD_EXT);
     goto err;
   }
+
   X509_EXTENSION_set_critical(ex8, 1);
 
   if (!sk_X509_EXTENSION_push(extensions, ex8)) {
@@ -254,6 +271,44 @@ struct VOMSProxy *VOMS_MakeProxy(struct VOMSProxyArguments *args, int *warning, 
   }
 
   kusg = 1;
+
+  /* netscapeCert extension */
+  if (args->netscape) {
+    ku_flags = convertMethod(args->netscape, EXFLAG_NSCERT);
+
+    if (ku_flags == -1) {
+      PRXYerr(PRXYERR_F_PROXY_SIGN, PRXYERR_R_CLASS_ADD_EXT);
+      goto err;
+    }
+
+    if ((ex9 = set_nsCertUsageFlags(ku_flags)) == NULL) {
+      PRXYerr(PRXYERR_F_PROXY_SIGN, PRXYERR_R_CLASS_ADD_EXT);
+      goto err;
+    }
+
+    if (!sk_X509_EXTENSION_push(extensions, ex9)) {
+      PRXYerr(PRXYERR_F_PROXY_SIGN,PRXYERR_R_CLASS_ADD_EXT);
+      goto err;
+    }
+
+    nscert = 1;
+  }
+
+  /* extended key usage */
+
+  if (args->exkusage) {
+    if ((ex10 = set_ExtendedKeyUsageFlags(args->exkusage)) == NULL) {
+      PRXYerr(PRXYERR_F_PROXY_SIGN, PRXYERR_R_CLASS_ADD_EXT);
+      goto err;
+    }
+
+    if (!sk_X509_EXTENSION_push(extensions, ex10)) {
+      PRXYerr(PRXYERR_F_PROXY_SIGN,PRXYERR_R_CLASS_ADD_EXT);
+      goto err;
+    }
+
+    extku = 1;
+  }
 
   /* vo extension */
   
@@ -489,11 +544,15 @@ struct VOMSProxy *VOMS_MakeProxy(struct VOMSProxyArguments *args, int *warning, 
 
   if (extensions) {
     sk_X509_EXTENSION_pop_free(extensions, X509_EXTENSION_free);
-    order = kusg = voms = classadd = file = vo = acs = info = 0;
+    extku = nscert = order = kusg = voms = classadd = file = vo = acs = info = 0;
   }
   if (!args->proxyrequest)
     X509_REQ_free(req);
 
+  if (extku)
+    X509_EXTENSION_free(ex10);
+  if (nscert)
+    X509_EXTENSION_free(ex9);
   if (kusg)
     X509_EXTENSION_free(ex8);
   if (order)
@@ -632,6 +691,39 @@ static X509_EXTENSION *set_KeyUsageFlags(int flags)
   return NULL;
 }
 
+static X509_EXTENSION *set_nsCertUsageFlags(int flags)
+{
+  int len =0;
+  unsigned char data[2];
+
+  X509_EXTENSION  *ext = NULL;
+  ASN1_BIT_STRING *str = ASN1_BIT_STRING_new();
+  
+  if (str) {
+    data[0] =  flags & 0x00ff;
+    data[1] = (flags & 0xff00) >> 8;
+
+    len = (data[1] ? 2 : 1);
+
+    ASN1_BIT_STRING_set(str, data, len);
+
+    ext = X509V3_EXT_i2d(NID_netscape_cert_extension, 1, str);
+    ASN1_BIT_STRING_free(str);
+
+    return ext;
+  }
+
+  return NULL;
+}
+
+static X509_EXTENSION *set_ExtendedKeyUsageFlags(char *flagnames)
+{
+  if (!flagnames)
+    return NULL;
+
+  return X509V3_EXT_conf_nid(NULL, NULL, NID_ext_key_usage, flagnames);
+}
+
 static int get_KeyUsageFlags(X509 *cert)
 {
   int keyusage = 0;
@@ -648,4 +740,90 @@ static int get_KeyUsageFlags(X509 *cert)
   }
 
   return keyusage;
+}
+
+static char *getBitName(char**string)
+{
+  char *div = NULL; 
+  char *temp = NULL;
+
+  if (!string || !(*string) || (*(*string) == '\0'))
+    return NULL;
+
+  div = strchr(*string, ',');
+
+  if (div) {
+    temp = *string;
+    *div++ = '\0';
+    *string = div;
+  }
+  else {
+    temp = *string;
+    *string = *string + strlen(*string);
+  }
+
+  return temp;
+}
+
+static int getBitValue(char *bitname, int *bittype)
+{
+
+  *bittype = EXFLAG_KUSAGE;
+  if (!strcmp(bitname, "digitalSignature"))
+    return KU_DIGITAL_SIGNATURE;
+  else if (!strcmp(bitname, "nonRepudiation"))
+    return KU_NON_REPUDIATION;
+  else if (!strcmp(bitname, "keyEncipherment"))
+    return KU_KEY_ENCIPHERMENT;
+  else if (!strcmp(bitname, "dataEncipherment"))
+    return KU_DATA_ENCIPHERMENT;
+  else if (!strcmp(bitname, "keyAgreement"))
+    return KU_KEY_AGREEMENT;
+  else if (!strcmp(bitname, "keyCertSign"))
+    return KU_KEY_CERT_SIGN;
+  else if (!strcmp(bitname, "cRLSign"))
+    return KU_CRL_SIGN;
+  else if (!strcmp(bitname, "encipherOnly"))
+    return KU_ENCIPHER_ONLY;
+  else if (!strcmp(bitname, "decipherOnly"))
+    return KU_DECIPHER_ONLY;
+
+  *bittype = EXFLAG_NSCERT;
+
+  if (!strcmp(bitname, "client"))
+    return NS_SSL_CLIENT;
+  else if (!strcmp(bitname, "server"))
+    return NS_SSL_SERVER;
+  else if (!strcmp(bitname, "email"))
+    return NS_SMIME;
+  else if (!strcmp(bitname, "objsign"))
+    return NS_OBJSIGN;
+  else if (!strcmp(bitname, "sslCA"))
+    return NS_SSL_CA;
+  else if (!strcmp(bitname, "emailCA"))
+    return NS_SMIME_CA;
+  else if (!strcmp(bitname, "objCA"))
+    return NS_OBJSIGN_CA;
+
+  *bittype = EXFLAG_XKUSAGE;
+
+  return 0;
+}
+
+
+static int convertMethod(char *bits, int type)
+{
+  char *bitname = NULL;
+  int realtype = 0;
+  int value = 0;
+  int total = 0;
+
+  while (bitname = getBitName(&bits)) {
+    value = getBitValue(bitname, &realtype);
+    if (value == 0 || type != realtype)
+      return -1;
+    total |= value;
+  }
+
+  return total;
 }

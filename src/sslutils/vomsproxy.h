@@ -51,6 +51,9 @@ struct VOMSProxyArguments {
   STACK_OF(X509_EXTENSION) *extensions;
   STACK_OF(X509) *chain;
   int             pastproxy;
+  char           *keyusage;
+  char           *netscape;
+  char           *exkusage;
 };
 
 struct VOMSProxy {

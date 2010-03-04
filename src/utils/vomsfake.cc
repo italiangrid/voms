@@ -161,7 +161,8 @@ Fake::Fake(int argc, char ** argv) :   confile(CONFILENAME),
                                        aclist(NULL), voID(""),
                                        hostcert(""), hostkey(""),
                                        newformat(false), newsubject(""),
-                                       rfc(false), pastac("0"), pastproxy("0")
+                                       rfc(false), pastac("0"), pastproxy("0"),
+                                       keyusage(""), netscape(""), exkusage("")
 {
   
   bool progversion = false;
@@ -221,6 +222,18 @@ Fake::Fake(int argc, char ** argv) :   confile(CONFILENAME),
     "    -pastac <hour:minutes>         Start the validity of the AC in the past,\n"\
     "    -pastproxy <seconds>\n"
     "    -pastproxy <hour:minutes>      Start the validity of the proxy in the past,\n"\
+    "    -keyusage <bit<,bit<..>>>      Specify the bits to put in the keyusage field.\n"\
+    "                                   Allowed values: digitalSignature,nonRepudiation,\n"\
+    "                                   keyEncipherment,dataEncipherment,keyAgreement,\n"\
+    "                                   keyCertSign,cRLSign,encipherOnly,decipherOnly.\n"\
+    "    -nscert <bit<,bit<..>>>        Specify the bits to put in the Netscape Certificate\n"\
+    "                                   extension.  Allowed values: client,server,email,\n"\
+    "                                   objsign,sslCA,emailCA,ojbCA."
+    "    -extkeyusage <bit<,bit<..>>>   Specify the bits to put in the extended key usage\n"\
+    "                                   field.  Allowed values: serverAuth,clientAuth,\n"\
+    "                                   codeSigning,emailProtection,timeStamping,msCodeInd,\n"\
+    "                                   msCodeCom,msCTLSign,msSGC,msEFS,nsSGC,deltaCRL\n"\
+    "                                   CRLReason,invalidityDate,SXNetID,OCSPSigning.\n"\
     "\n";
 
   set_usage(LONG_USAGE);
@@ -267,6 +280,9 @@ Fake::Fake(int argc, char ** argv) :   confile(CONFILENAME),
     {"voinfo",          1, (int *)&voinfo,      OPT_STRING},
     {"pastac",          1, (int *)&pastac,      OPT_STRING},
     {"pastproxy",       1, (int *)&pastproxy,   OPT_STRING},
+    {"keyusage",        1, (int *)&keyusage,    OPT_STRING},
+    {"nscert",          1, (int *)&netscape,    OPT_STRING},
+    {"extkeyusage",     1, (int *)&exkusage,    OPT_STRING},
 #ifdef CLASS_ADD
     {"classadd",        1, (int *)class_add_buf,OPT_STRING},
 #endif
@@ -481,6 +497,15 @@ bool Fake::CreateProxy(std::string data, AC ** aclist, int version)
     args->voID          = strdup(voID.c_str());
     args->callback      = (int (*)())kpcallback;
     args->pastproxy     = time_to_sec(pastproxy);
+
+    if (!keyusage.empty())
+      args->keyusage      = strdup(keyusage.c_str());
+
+    if (!netscape.empty())
+      args->netscape      = strdup(netscape.c_str());
+
+    if (!exkusage.empty())
+      args->exkusage      = strdup(exkusage.c_str());
 
     if (args->pastproxy == -1) {
       Print(ERROR) << "Minutes and seconds should be < 59 and >= 0" << std::endl;

@@ -130,6 +130,9 @@ class Fake {
   bool rfc;
   std::string pastac;
   std::string pastproxy;
+  std::string keyusage;
+  std::string netscape;
+  std::string exkusage;
 };
 
 #endif
