@@ -39,7 +39,6 @@ static void setWarning(int *warning, int value);
 static void setAdditional(void **additional, void *data);
 static X509_EXTENSION *set_KeyUsageFlags(int flags);
 static int get_KeyUsageFlags(X509 *cert);
-static X509_EXTENSION *set_nsCertUsageFlags(char *flags);
 static X509_EXTENSION *set_ExtendedKeyUsageFlags(char *flagnames);
 static char *getBitName(char**string);
 static int getBitValue(char *bitname, int *bittype);
@@ -260,7 +259,6 @@ struct VOMSProxy *VOMS_MakeProxy(struct VOMSProxyArguments *args, int *warning, 
     }
   }
 
-  //    confstr = "digitalSignature: hu, keyEncipherment: hu, dataEncipherment: hu";
   if ((ex8 = set_KeyUsageFlags(ku_flags)) == NULL) {
     PRXYerr(PRXYERR_F_PROXY_SIGN, PRXYERR_R_CLASS_ADD_EXT);
     goto err;
@@ -278,8 +276,8 @@ struct VOMSProxy *VOMS_MakeProxy(struct VOMSProxyArguments *args, int *warning, 
   /* netscapeCert extension */
   if (args->netscape) {
 
-    if ((ex9 = set_nsCertUsageFlags(args->netscape)) == NULL) {
-      PRXYerr(PRXYERR_F_PROXY_SIGN, PRXYERR_R_CLASS_ADD_EXT);
+    if ((ex9 = X509V3_EXT_conf_nid(NULL, NULL, NID_netscape_cert_type, args->netscape)) == NULL) {
+      //      PRXYerr(PRXYERR_F_PROXY_SIGN, PRXYERR_R_CLASS_ADD_EXT);
       goto err;
     }
 
@@ -711,11 +709,6 @@ static X509_EXTENSION *set_KeyUsageFlags(int flags)
   }
 
   return NULL;
-}
-
-static X509_EXTENSION *set_nsCertUsageFlags(char* flags)
-{
-  return X509V3_EXT_conf_nid(NULL, NULL, NID_netscape_cert_type, flags);
 }
 
 static X509_EXTENSION *set_ExtendedKeyUsageFlags(char *flagnames)
