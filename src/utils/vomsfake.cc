@@ -39,6 +39,7 @@ extern "C" {
 #include <sys/mman.h>
 #include <fcntl.h>
 #include <errno.h>
+#include <ctype.h>
 
 #include "listfunc.h"
 #include "credentials.h"
@@ -163,7 +164,8 @@ Fake::Fake(int argc, char ** argv) :   confile(CONFILENAME),
                                        newformat(false), newsubject(""),
                                        newissuer(""),
                                        rfc(false), pastac("0"), pastproxy("0"),
-                                       keyusage(""), netscape(""), exkusage("")
+                                       keyusage(""), netscape(""), exkusage(""),
+                                       newserial("")
 {
   
   bool progversion = false;
@@ -219,23 +221,26 @@ Fake::Fake(int argc, char ** argv) :   confile(CONFILENAME),
     "    -fqan <string>                 String to include in the AC as the granted FQAN.\n" \
     "    -newformat                     Creates ACs according to the new format.\n" \
     "    -newsubject <string>           Subject of the new certificate.\n" \
-    "    -newissuer <string>           Issuer of the new certificate.\n"\
+    "    -newissuer <string>            Issuer of the new certificate.\n"\
     "    -pastac <seconds>\n"
     "    -pastac <hour:minutes>         Start the validity of the AC in the past,\n"\
     "    -pastproxy <seconds>\n"
     "    -pastproxy <hour:minutes>      Start the validity of the proxy in the past,\n"\
-    "    -keyusage <bit<,bit<..>>>      Specify the bits to put in the keyusage field.\n"\
+    "    -keyusage <bit<,bit<..>>>      Specifies the bits to put in the keyusage field.\n"\
     "                                   Allowed values: digitalSignature,nonRepudiation,\n"\
     "                                   keyEncipherment,dataEncipherment,keyAgreement,\n"\
     "                                   keyCertSign,cRLSign,encipherOnly,decipherOnly.\n"\
-    "    -nscert <bit<,bit<..>>>        Specify the bits to put in the Netscape Certificate\n"\
+    "    -nscert <bit<,bit<..>>>        Specifies the bits to put in the Netscape Certificate\n"\
     "                                   extension.  Allowed values: client,server,email,\n"\
     "                                   objsign,sslCA,emailCA,ojbCA.\n"
-    "    -extkeyusage <bit<,bit<..>>>   Specify the bits to put in the extended key usage\n"\
+    "    -extkeyusage <bit<,bit<..>>>   Specifies the bits to put in the extended key usage\n"\
     "                                   field.  Allowed values: serverAuth,clientAuth,\n"\
     "                                   codeSigning,emailProtection,timeStamping,msCodeInd,\n"\
     "                                   msCodeCom,msCTLSign,msSGC,msEFS,nsSGC,deltaCRL\n"\
     "                                   CRLReason,invalidityDate,SXNetID,OCSPSigning.\n"\
+    "   -newserial <num>                Specifies the serial number of the generated proxy\n"\
+    "                                   in hex notation.  Any length is possible.\n"\
+    "                                   Default: let voms-proxy-fake choose.\n"\
     "\n";
 
   set_usage(LONG_USAGE);
@@ -286,6 +291,7 @@ Fake::Fake(int argc, char ** argv) :   confile(CONFILENAME),
     {"keyusage",        1, (int *)&keyusage,    OPT_STRING},
     {"nscert",          1, (int *)&netscape,    OPT_STRING},
     {"extkeyusage",     1, (int *)&exkusage,    OPT_STRING},
+    {"newserial",       1, (int *)&newserial,   OPT_STRING},
 #ifdef CLASS_ADD
     {"classadd",        1, (int *)class_add_buf,OPT_STRING},
 #endif
@@ -517,6 +523,8 @@ bool Fake::CreateProxy(std::string data, AC ** aclist, int version)
       Print(ERROR) << "Minutes and seconds should be < 59 and >= 0" << std::endl;
       exit(1);
     }
+
+    args->newserial = strdup(newserial.c_str());
 
     int warn = 0;
     void *additional = NULL;
@@ -839,6 +847,12 @@ bool Fake::VerifyOptions()
         exitError("Error: Duration of AC must be positive.");
     }
   }
+
+  /* newserial option */
+  if (!newserial.empty())
+    for (int i = 0; i < newserial.length(); i++)
+      if (!isxdigit(newserial[i]))
+        exitError("Error: Serial number should be an hexadecimal string.");
 
   return true;
 }

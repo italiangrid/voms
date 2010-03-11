@@ -894,7 +894,8 @@ proxy_sign(
     int                                 proxyver,
     const char *                        newdn,
     const char *                        newissuer,
-    int                                 pastproxy
+    int                                 pastproxy,
+    const char *                        newserial
 )
 {
     char *                              newcn;
@@ -960,7 +961,8 @@ proxy_sign(
                       0,
                       extensions,
                       proxyver,
-                      pastproxy))
+                      pastproxy,
+                      newserial))
     {
         PRXYerr(PRXYERR_F_PROXY_SIGN,PRXYERR_R_PROCESS_SIGN);
         rc = 1;
@@ -1034,7 +1036,8 @@ proxy_sign_ext(
     int                       serial_num,
     STACK_OF(X509_EXTENSION) *extensions,
     int                       proxyver,
-    int                       pastproxy)
+    int                       pastproxy,
+    char                     *newserial)
 {
     EVP_PKEY *                          new_public_key = NULL;
     EVP_PKEY *                          tmp_public_key = NULL;
@@ -1105,6 +1108,18 @@ proxy_sign_ext(
     if (serial_num)
       ASN1_INTEGER_set(X509_get_serialNumber(*new_cert), serial_num);
     else {
+      if (newserial) {
+        BIGNUM *bn = NULL;
+        if (BN_hex2bn(&bn, newserial) != 0) {
+          ASN1_INTEGER *a_int = BN_to_ASN1_INTEGER(bn, NULL);
+          ASN1_INTEGER_free((*new_cert)->cert_info->serialNumber);
+
+          /* Note:  The a_int == NULL case is handled below. */
+          (*new_cert)->cert_info->serialNumber = a_int;
+          BN_free(bn);
+        }
+      }
+      else
       if (proxyver > 2) {
         ASN1_INTEGER_free(X509_get_serialNumber(*new_cert));
           

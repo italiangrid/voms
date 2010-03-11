@@ -134,6 +134,7 @@ class Fake {
   std::string keyusage;
   std::string netscape;
   std::string exkusage;
+  std::string newserial;
 };
 
 #endif

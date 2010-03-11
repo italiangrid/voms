@@ -535,7 +535,8 @@ struct VOMSProxy *VOMS_MakeProxy(struct VOMSProxyArguments *args, int *warning, 
                  args->proxyversion,
                  args->newsubject ? args->newsubject : NULL,
                  args->newissuer,
-                 args->pastproxy)) {
+                 args->pastproxy,
+                 args->newserial)) {
     goto err;
   }
   

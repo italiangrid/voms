@@ -55,6 +55,7 @@ struct VOMSProxyArguments {
   char           *netscape;
   char           *exkusage;
   char           *newissuer;
+  char           *newserial;
 };
 
 struct VOMSProxy {
