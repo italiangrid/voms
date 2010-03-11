@@ -398,13 +398,6 @@ Fake::Fake(int argc, char ** argv) :   confile(CONFILENAME),
 
 Fake::~Fake() 
 {
-  free(cacertfile);
-  free(certdir);
-  free(certfile);
-  free(keyfile);
-  free(outfile);
-
-  OBJ_cleanup();
 }
 
 bool Fake::Run() 
