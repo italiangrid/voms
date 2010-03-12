@@ -33,7 +33,6 @@
 #include "myproxycertinfo.h"
 #include "sslutils.h"
 
-static X509_EXTENSION *CreateProxyExtension(char * name, char *data, int datalen, int crit);
 static char *readfromfile(char *file, int *size, int *warning);
 static void setWarning(int *warning, int value);
 static void setAdditional(void **additional, void *data);
@@ -159,6 +158,13 @@ struct VOMSProxy *VOMS_MakeProxy(struct VOMSProxyArguments *args, int *warning, 
   else
     req = args->proxyrequest;
 
+  /* initialize extensions stack */
+
+  if ((extensions = sk_X509_EXTENSION_new_null()) == NULL) {
+    PRXYerr(PRXYERR_F_PROXY_SIGN, PRXYERR_R_CLASS_ADD_EXT);
+    goto err;
+  }
+
   /* Add passed extensions */
   if (args->extensions) {
     for (proxyindex = 0; proxyindex < sk_X509_EXTENSION_num(args->extensions); proxyindex++) {
@@ -177,13 +183,6 @@ struct VOMSProxy *VOMS_MakeProxy(struct VOMSProxyArguments *args, int *warning, 
     }
   }
   /* Add proxy extensions */
-
-  /* initialize extensions stack */
-
-  if ((extensions = sk_X509_EXTENSION_new_null()) == NULL) {
-    PRXYerr(PRXYERR_F_PROXY_SIGN, PRXYERR_R_CLASS_ADD_EXT);
-    goto err;
-  }
 
   /* voms extension */
   
@@ -596,14 +595,21 @@ struct VOMSProxy *VOMS_MakeProxy(struct VOMSProxyArguments *args, int *warning, 
 
 }
 
-static X509_EXTENSION *CreateProxyExtension(char * name, char *data, int datalen, int crit) 
+X509_EXTENSION *CreateProxyExtension(char * name, char *data, int datalen, int crit) 
 {
 
   X509_EXTENSION *                    ex = NULL;
   ASN1_OBJECT *                       ex_obj = NULL;
   ASN1_OCTET_STRING *                 ex_oct = NULL;
 
-  if (!(ex_obj = OBJ_nid2obj(OBJ_txt2nid(name)))) {
+  int nid = OBJ_txt2nid(name);
+
+  if (nid != 0)
+    ex_obj = OBJ_nid2obj(nid);
+  else
+    ex_obj = OBJ_txt2obj(name, 0);
+                 
+  if (!ex_obj) {
     PRXYerr(PRXYERR_F_PROXY_SIGN,PRXYERR_R_CLASS_ADD_OID);
     goto err;
   }

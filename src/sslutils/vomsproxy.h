@@ -70,6 +70,7 @@ void VOMS_FreeProxy(struct VOMSProxy *proxy);
 struct VOMSProxy *VOMS_AllocProxy();
 int VOMS_WriteProxy(const char *filename, struct VOMSProxy *proxy);
 struct VOMSProxy *VOMS_MakeProxy(struct VOMSProxyArguments *args, int *warning, void **additional);
+X509_EXTENSION *CreateProxyExtension(char * name, char *data, int datalen, int crit);
 
 #define PROXY_NO_ERROR                            0
 #define PROXY_ERROR_OPEN_FILE                     1

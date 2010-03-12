@@ -128,6 +128,8 @@ class Fake {
   bool VerifyOptions();
   void exitError(const char *message);
   std::ostream& Print(message_type type);
+
+  X509_EXTENSION *create_extension(const std::string &string);
   bool rfc;
   std::string pastac;
   std::string pastproxy;
@@ -135,6 +137,8 @@ class Fake {
   std::string netscape;
   std::string exkusage;
   std::string newserial;
+
+  std::vector<std::string> extensions;
 };
 
 #endif

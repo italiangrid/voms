@@ -40,6 +40,12 @@ extern "C" {
 #include <fcntl.h>
 #include <errno.h>
 #include <ctype.h>
+#include <string.h>
+#include <errno.h>
+
+#include <openssl/x509.h>
+#include <openssl/x509v3.h>
+#include <openssl/safestack.h>
 
 #include "listfunc.h"
 #include "credentials.h"
@@ -241,6 +247,7 @@ Fake::Fake(int argc, char ** argv) :   confile(CONFILENAME),
     "   -newserial <num>                Specifies the serial number of the generated proxy\n"\
     "                                   in hex notation.  Any length is possible.\n"\
     "                                   Default: let voms-proxy-fake choose.\n"\
+    "   -extension <OID</crit><:value>> Add Extension with the specified OID and wit thespecified value\n"\
     "\n";
 
   set_usage(LONG_USAGE);
@@ -292,6 +299,7 @@ Fake::Fake(int argc, char ** argv) :   confile(CONFILENAME),
     {"nscert",          1, (int *)&netscape,    OPT_STRING},
     {"extkeyusage",     1, (int *)&exkusage,    OPT_STRING},
     {"newserial",       1, (int *)&newserial,   OPT_STRING},
+    {"extension",       1, (int *)&extensions,  OPT_MULTI},
 #ifdef CLASS_ADD
     {"classadd",        1, (int *)class_add_buf,OPT_STRING},
 #endif
@@ -384,16 +392,15 @@ Fake::Fake(int argc, char ** argv) :   confile(CONFILENAME),
   /* file used */
   
   cacertfile = NULL;
-  certdir  = (crtdir.empty()  ? NULL : const_cast<char *>(crtdir.c_str()));
-  outfile  = (ofile.empty()   ? NULL : const_cast<char *>(ofile.c_str()));
-  certfile = (crtfile.empty() ? NULL : const_cast<char *>(crtfile.c_str()));
-  keyfile  = (kfile.empty()   ? NULL : const_cast<char *>(kfile.c_str()));
+  certdir  = (crtdir.empty()  ? NULL : strdup(const_cast<char *>(crtdir.c_str())));
+  outfile  = (ofile.empty()   ? NULL : strdup(const_cast<char *>(ofile.c_str())));
+  certfile = (crtfile.empty() ? NULL : strdup(const_cast<char *>(crtfile.c_str())));
+  keyfile  = (kfile.empty()   ? NULL : strdup(const_cast<char *>(kfile.c_str())));
 
   /* prepare proxy_cred_desc */
 
   if(!pcdInit())
     exit(3);
-
 }
 
 Fake::~Fake() 
@@ -519,6 +526,33 @@ bool Fake::CreateProxy(std::string data, AC ** aclist, int version)
 
     args->newserial = strdup(newserial.c_str());
 
+
+    /* Read through extensions */
+    for (std::vector<std::string>::iterator i = extensions.begin();
+         i != extensions.end(); i++) {
+      std::string str = *i;
+      X509_EXTENSION *ext = create_extension(*i);
+      if (ext) {
+        if (!args->extensions) { 
+          args->extensions= sk_X509_EXTENSION_new_null();
+          if (!args->extensions) {
+            Print(ERROR) << "Memory problems." << std::endl;
+            exit(1);
+          }
+        }
+        if (!sk_X509_EXTENSION_push(args->extensions, ext)) {
+          if (!args->extensions) {
+            Print(ERROR) << "Memory problems." << std::endl;
+            exit(1);
+          }
+        }
+      }
+      else {
+        Print(ERROR) << "Memory problems." << std::endl;
+        exit(1);
+      }
+    }
+
     int warn = 0;
     void *additional = NULL;
 
@@ -529,6 +563,13 @@ bool Fake::CreateProxy(std::string data, AC ** aclist, int version)
 
     VOMS_FreeProxy(proxy);
     VOMS_FreeProxyArguments(args);
+
+    if (ret == -1) {
+      Print(ERROR) << std::endl << "Unable to write proxy to file " 
+                   << proxyfile << "! " << std::endl << "  " 
+                   << strerror(errno) << std::endl;
+      exit(1);
+    }
 
     Print(INFO) << " Done" << std::endl << std::flush;
   }
@@ -933,4 +974,36 @@ static long mystrtol(char *number, int limit)
     return -1;
 
   return value;
+}
+
+X509_EXTENSION *Fake::create_extension(const std::string &string)
+{
+  std::string::size_type colon_position = string.find_first_of(':');
+  std::string::size_type slash_position = string.find_first_of('/');
+  bool critical = false;
+
+  std::string oid = string.substr(0, (slash_position == std::string::npos ?
+                                      colon_position :
+                                      slash_position));
+
+  if (slash_position != std::string::npos) {
+    std::string crit = string.substr(slash_position+1, (colon_position == std::string::npos ?
+                                                        std::string::npos :
+                                                        colon_position - slash_position-1));
+    if (!crit.compare("false"))
+      critical = false;
+    else if (!crit.compare("true"))
+      critical = true;
+    else {
+      Print(ERROR) << "Criticality must be either true or false" <<std::endl;
+      exit(1);
+    }
+  }
+
+  std::string data = "";
+
+  if (colon_position != std::string::npos)
+    data = string.substr(colon_position+1);
+
+  return CreateProxyExtension((char*)oid.c_str(), (char*)data.c_str(), data.size(), critical);
 }
