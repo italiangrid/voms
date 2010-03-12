@@ -39,6 +39,8 @@ typedef struct vo {
   int   newformat;
   char *pastac;
   PARAMLIST *params;
+  char **extensions;
+  int   extsize;
 } VO;
 
 typedef struct volist {

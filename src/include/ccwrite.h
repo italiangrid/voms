@@ -28,5 +28,6 @@ extern "C" {
 
 extern int createac(X509 *, STACK_OF(X509) *, X509 *, EVP_PKEY *, BIGNUM *,
                     std::vector<std::string> &, std::vector<std::string> &, std::vector<std::string>& attributes, 
-                    AC **, std::string, std::string, int valid, bool old);
+                    AC **, std::string, std::string, int valid, bool old,
+                    STACK_OF(X509_EXTENSION) *extensions);
 #endif

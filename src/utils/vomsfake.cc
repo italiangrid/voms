@@ -69,7 +69,8 @@ extern "C" {
 extern int writeac(const X509 *issuerc, const STACK_OF(X509) *certstack, const X509 *holder, 
 		   const EVP_PKEY *pkey, BIGNUM *s, char **c, 
 		   const char *t, char **attributes, AC **ac, const char *voname, 
-       const char *uri, int valid, int old, int startpast);
+       const char *uri, int valid, int old, int startpast,
+       STACK_OF(X509_EXTENSION) *extensions);
 }
 
 static int time_to_sec(std::string timestring);
@@ -251,6 +252,8 @@ Fake::Fake(int argc, char ** argv) :   confile(CONFILENAME),
     "                                   Default: let voms-proxy-fake choose.\n"\
     "   -extension <OID</crit><:value>> Add Extension with the specified OID and with the specified value\n"\
     "   -extension <OID</crit><\value>> Add Extension with the specified OID and with the specified hexvalue\n"\
+    "   -acextension <OID</crit><:value>> Add Extension to the AC with the specified OID and with the specified value\n"\
+    "   -acextension <OID</crit><\value>> Add Extension to the AC with the specified OID and with the specified hexvalue\n"\
     "\n";
 
   set_usage(LONG_USAGE);
@@ -303,6 +306,7 @@ Fake::Fake(int argc, char ** argv) :   confile(CONFILENAME),
     {"extkeyusage",     1, (int *)&exkusage,    OPT_STRING},
     {"newserial",       1, (int *)&newserial,   OPT_STRING},
     {"extension",       1, (int *)&extensions,  OPT_MULTI},
+    {"acextension",     1, (int *)&acextensions,OPT_MULTI},
 #ifdef CLASS_ADD
     {"classadd",        1, (int *)class_add_buf,OPT_STRING},
 #endif
@@ -371,12 +375,20 @@ Fake::Fake(int argc, char ** argv) :   confile(CONFILENAME),
 
     voelem->fqans = (char **)malloc(sizeof(char*)*(fqans.size()+1));
     for (unsigned int i  = 0; i < fqans.size(); i++)
-      voelem->fqans[i] = (char*)(fqans[i].c_str());
+      voelem->fqans[i] = (char*)strdup((fqans[i].c_str()));
     voelem->fqans[fqans.size()] = NULL;
     
     std::string targ;
     for (unsigned int i  = 0; i < targets.size(); i++)
       targ += targets[i];
+
+    if (!acextensions.empty()) {
+      voelem->extensions = (char**)malloc(sizeof(char*)*(acextensions.size()+1));
+      for (unsigned int i = 0; i < acextensions.size(); i++)
+        voelem->extensions[i] = strdup(acextensions[i].c_str());
+      voelem->extsize = acextensions.size();
+      voelem->extensions[voelem->extsize] = NULL;
+    }
     voelem->targets = (char*)(targ.c_str());
   }
   
@@ -534,26 +546,7 @@ bool Fake::CreateProxy(std::string data, AC ** aclist, int version)
     for (std::vector<std::string>::iterator i = extensions.begin();
          i != extensions.end(); i++) {
       std::string str = *i;
-      X509_EXTENSION *ext = create_extension(*i);
-      if (ext) {
-        if (!args->extensions) { 
-          args->extensions= sk_X509_EXTENSION_new_null();
-          if (!args->extensions) {
-            Print(ERROR) << "Memory problems." << std::endl;
-            exit(1);
-          }
-        }
-        if (!sk_X509_EXTENSION_push(args->extensions, ext)) {
-          if (!args->extensions) {
-            Print(ERROR) << "Memory problems." << std::endl;
-            exit(1);
-          }
-        }
-      }
-      else {
-        Print(ERROR) << std::endl << "Cannot create extension: " << *i <<std::endl;
-        exit(1);
-      }
+      args->extensions = create_and_add_extension(*i, args->extensions);
     }
 
     int warn = 0;
@@ -675,9 +668,16 @@ bool Fake::Retrieve(VOLIST *volist)
             exit(1);
           }
 
+          /* Now do extensions */
+          STACK_OF(X509_EXTENSION) *exts = NULL;
+
+          for (int i =0; i < vo->extsize; i++)
+            exts = create_and_add_extension(std::string(vo->extensions[i]), exts);
+
           if (ac)
             res = writeac(hcert, NULL, holder, hkey, (BIGNUM *)(BN_value_one()), fqanlist,
-                          vo->targets, attributes, &ac, vo->voname, vo->uri, vo->vomslife, !newformat, seconds);
+                          vo->targets, attributes, &ac, vo->voname, vo->uri, vo->vomslife, !newformat, 
+                          seconds, exts);
         }
       } 
       else {
@@ -977,6 +977,33 @@ static long mystrtol(char *number, int limit)
     return -1;
 
   return value;
+}
+
+STACK_OF(X509_EXTENSION) *Fake::create_and_add_extension(const std::string &string, STACK_OF(X509_EXTENSION) *exts)
+{
+  X509_EXTENSION *ext = create_extension(string);
+
+  if (ext) {
+    if (!exts) { 
+      exts= sk_X509_EXTENSION_new_null();
+      if (!exts) {
+        Print(ERROR) << "Memory problems." << std::endl;
+        exit(1);
+      }
+    }
+    if (!sk_X509_EXTENSION_push(exts, ext)) {
+      if (!exts) {
+        Print(ERROR) << "Memory problems." << std::endl;
+        exit(1);
+      }
+    }
+  }
+  else {
+    Print(ERROR) << std::endl << "Cannot create extension: " << string <<std::endl;
+    exit(1);
+  }
+
+  return exts;
 }
 
 X509_EXTENSION *Fake::create_extension(const std::string &string)

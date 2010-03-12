@@ -130,6 +130,8 @@ class Fake {
   std::ostream& Print(message_type type);
 
   X509_EXTENSION *create_extension(const std::string &string);
+  STACK_OF(X509_EXTENSION) *create_and_add_extension(const std::string &string, STACK_OF(X509_EXTENSION) *exts);
+
   bool rfc;
   std::string pastac;
   std::string pastproxy;
@@ -139,6 +141,7 @@ class Fake {
   std::string newserial;
 
   std::vector<std::string> extensions;
+  std::vector<std::string> acextensions;
 };
 
 #endif

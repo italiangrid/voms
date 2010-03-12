@@ -1088,7 +1088,8 @@ std::string makeAC(EVP_PKEY *key, X509 *issuer, X509 *holder,
         LOGM(VARP, logh, LEV_DEBUG, T_PRE, "length = %d", i2d_AC(a, NULL));
         if (a)
           res = createac(issuer, v->sock.own_stack, holder, key, serial,
-                         fqans, targs, attributes_compact, &a, v->voname, v->uri, requested, !v->newformat);
+                         fqans, targs, attributes_compact, &a, v->voname, v->uri, requested, !v->newformat,
+                         NULL);
 
         if (!res) {
           unsigned int len = i2d_AC(a, NULL);

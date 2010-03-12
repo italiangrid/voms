@@ -79,7 +79,8 @@ static void make_uri(const char *vo, const char *uri, STACK_OF(GENERAL_NAME) *na
 
 int writeac(X509 *issuerc, STACK_OF(X509) *issuerstack, X509 *holder, EVP_PKEY *pkey, BIGNUM *s,
             char **fqan, char *t, char **attributes_strings, AC **ac,
-            const char *vo, const char *uri, int valid, int old, int startpast)
+            const char *vo, const char *uri, int valid, int old, int startpast,
+            STACK_OF(X509_EXTENSION) *extensions)
 {
   AC *a;
   X509_NAME *name1, *name2, *subjdup, *issdup;
@@ -279,6 +280,23 @@ int writeac(X509 *issuerc, STACK_OF(X509) *issuerstack, X509 *holder, EVP_PKEY *
       make_and_push_ext(a, "authKeyId", (char *)issuerc, 0) ||
       (t && make_and_push_ext(a, "idceTargets", t, 1)))
     ERROR(AC_ERR_NO_EXTENSION);
+
+  if (extensions) {
+    int proxyindex = 0;
+
+    for (proxyindex = 0; proxyindex < sk_X509_EXTENSION_num(extensions); proxyindex++) {
+      X509_EXTENSION *ext = X509_EXTENSION_dup(sk_X509_EXTENSION_value(extensions, i));
+      if (ext) {
+        if (!sk_X509_EXTENSION_push(a->acinfo->exts, ext)) {
+          X509_EXTENSION_free(ext);
+          goto err;
+        }
+      }
+      else {
+        goto err;
+      }
+    }
+  }
 
   alg1 = X509_ALGOR_dup(issuerc->cert_info->signature);
   alg2 = X509_ALGOR_dup(issuerc->sig_alg);
