@@ -74,6 +74,8 @@ extern int writeac(const X509 *issuerc, const STACK_OF(X509) *certstack, const X
 
 static int time_to_sec(std::string timestring);
 static long mystrtol(char *number, int limit);
+static std::string hextostring(const std::string &data);
+static int hex2value(char c);
 
 extern int AC_Init();
 
@@ -247,7 +249,8 @@ Fake::Fake(int argc, char ** argv) :   confile(CONFILENAME),
     "   -newserial <num>                Specifies the serial number of the generated proxy\n"\
     "                                   in hex notation.  Any length is possible.\n"\
     "                                   Default: let voms-proxy-fake choose.\n"\
-    "   -extension <OID</crit><:value>> Add Extension with the specified OID and wit thespecified value\n"\
+    "   -extension <OID</crit><:value>> Add Extension with the specified OID and with the specified value\n"\
+    "   -extension <OID</crit><\value>> Add Extension with the specified OID and with the specified hexvalue\n"\
     "\n";
 
   set_usage(LONG_USAGE);
@@ -548,7 +551,7 @@ bool Fake::CreateProxy(std::string data, AC ** aclist, int version)
         }
       }
       else {
-        Print(ERROR) << "Memory problems." << std::endl;
+        Print(ERROR) << std::endl << "Cannot create extension: " << *i <<std::endl;
         exit(1);
       }
     }
@@ -980,6 +983,9 @@ X509_EXTENSION *Fake::create_extension(const std::string &string)
 {
   std::string::size_type colon_position = string.find_first_of(':');
   std::string::size_type slash_position = string.find_first_of('/');
+  std::string::size_type gate_position = string.find_first_of('#');
+  std::string::size_type data_position = (colon_position != std::string::npos ?
+                                          colon_position : gate_position);
   bool critical = false;
 
   std::string oid = string.substr(0, (slash_position == std::string::npos ?
@@ -987,9 +993,9 @@ X509_EXTENSION *Fake::create_extension(const std::string &string)
                                       slash_position));
 
   if (slash_position != std::string::npos) {
-    std::string crit = string.substr(slash_position+1, (colon_position == std::string::npos ?
+    std::string crit = string.substr(slash_position+1, (data_position == std::string::npos ?
                                                         std::string::npos :
-                                                        colon_position - slash_position-1));
+                                                        data_position - slash_position-1));
     if (!crit.compare("false"))
       critical = false;
     else if (!crit.compare("true"))
@@ -1000,10 +1006,53 @@ X509_EXTENSION *Fake::create_extension(const std::string &string)
     }
   }
 
-  std::string data = "";
+  std::string data = " ";
 
-  if (colon_position != std::string::npos)
-    data = string.substr(colon_position+1);
+  if (data_position != std::string::npos)
+    data = string.substr(data_position+1);
+
+  if (gate_position != std::string::npos)
+    data = hextostring(data);
 
   return CreateProxyExtension((char*)oid.c_str(), (char*)data.c_str(), data.size(), critical);
+}
+
+static int hex2value(char c)
+{
+  if (c >= '0' && c <= '9')
+    return c - '0';
+  else if (tolower(c) >= 'a' && tolower(c) <= 'f')
+    return tolower(c) - 'a' + 10;
+  return -1;
+}
+
+static std::string hextostring(const std::string &data)
+{
+  std::string temp = data;
+
+  /* Add initial 0 if needed */
+  if ((temp.length() %2) == 1) 
+    temp = std::string("0") + temp;
+
+  int len = temp.length()/2;
+
+  char *newdata= new char[len];
+
+  for (int i =0; i < len; i++) {
+    char first = temp[i*2];
+    char second = temp[i*2+1];
+
+    if (isxdigit(first) && isxdigit(second))
+      newdata[i] = (hex2value(first) << 4) +hex2value(second);
+    else {
+      delete[] newdata;
+      return "";
+    }
+  }
+
+  std::string value = std::string(newdata, len);
+
+  delete[] newdata;
+
+  return value;
 }
