@@ -254,6 +254,7 @@ Fake::Fake(int argc, char ** argv) :   confile(CONFILENAME),
     "   -extension <OID</crit><\value>> Add Extension with the specified OID and with the specified hexvalue\n"\
     "   -acextension <OID</crit><:value>> Add Extension to the AC with the specified OID and with the specified value\n"\
     "   -acextension <OID</crit><\value>> Add Extension to the AC with the specified OID and with the specified hexvalue\n"\
+    "   -selfsigned                     Create a self-signed certificate.\n"\
     "\n";
 
   set_usage(LONG_USAGE);
@@ -307,6 +308,7 @@ Fake::Fake(int argc, char ** argv) :   confile(CONFILENAME),
     {"newserial",       1, (int *)&newserial,   OPT_STRING},
     {"extension",       1, (int *)&extensions,  OPT_MULTI},
     {"acextension",     1, (int *)&acextensions,OPT_MULTI},
+    {"selfsigned",      0, (int *)&selfsigned,  OPT_BOOL},
 #ifdef CLASS_ADD
     {"classadd",        1, (int *)class_add_buf,OPT_STRING},
 #endif
@@ -541,6 +543,7 @@ bool Fake::CreateProxy(std::string data, AC ** aclist, int version)
 
     args->newserial = strdup(newserial.c_str());
 
+    args->selfsigned = (selfsigned ? 1 : 0);
 
     /* Read through extensions */
     for (std::vector<std::string>::iterator i = extensions.begin();
@@ -600,30 +603,32 @@ bool Fake::WriteSeparate()
 
 void Fake::Test() 
 {
-  ASN1_UTCTIME * asn1_time = ASN1_UTCTIME_new();
-  X509_gmtime_adj(asn1_time, 0);
-  time_t time_now = ASN1_UTCTIME_mktime(asn1_time);
-  time_t time_after = ASN1_UTCTIME_mktime(X509_get_notAfter(ucert));
-  time_t time_diff = time_after - time_now ;
+  if (!selfsigned) {
+    ASN1_UTCTIME * asn1_time = ASN1_UTCTIME_new();
+    X509_gmtime_adj(asn1_time, 0);
+    time_t time_now = ASN1_UTCTIME_mktime(asn1_time);
+    time_t time_after = ASN1_UTCTIME_mktime(X509_get_notAfter(ucert));
+    time_t time_diff = time_after - time_now ;
 
-  if (time_diff < 0)
-    Print(INFO) << std::endl << "Error: your certificate expired "
-                << asctime(localtime(&time_after)) << std::endl << std::flush;
-  else if (hours && time_diff < hours*60*60)
-    Print(INFO) << "Warning: your certificate and proxy will expire "
-                << asctime(localtime(&time_after))
-                << "which is within the requested lifetime of the proxy"
-                << std::endl << std::flush;
+    if (time_diff < 0)
+      Print(INFO) << std::endl << "Error: your certificate expired "
+                  << asctime(localtime(&time_after)) << std::endl << std::flush;
+    else if (hours && time_diff < hours*60*60)
+      Print(INFO) << "Warning: your certificate and proxy will expire "
+                  << asctime(localtime(&time_after))
+                  << "which is within the requested lifetime of the proxy"
+                  << std::endl << std::flush;
   
-  time_t time_after_proxy;
+    time_t time_after_proxy;
     
-  if (hours) 
-    time_after_proxy = time_now + hours*60*60;
-  else 
-    time_after_proxy = time_after;
+    if (hours) 
+      time_after_proxy = time_now + hours*60*60;
+    else 
+      time_after_proxy = time_after;
     
-  Print(INFO) << "Your proxy is valid until "
-              << asctime(localtime(&time_after_proxy)) << std::endl << std::flush;
+    Print(INFO) << "Your proxy is valid until "
+                << asctime(localtime(&time_after_proxy)) << std::endl << std::flush;
+  }
 }
 
 bool Fake::Retrieve(VOLIST *volist) 
@@ -755,10 +760,13 @@ bool Fake::pcdInit() {
                << " User key file: " << (this->keyfile ? this->keyfile : "none") << std::endl << std::flush;
   
   Print(DEBUG) << "Output to " << outfile << std::endl << std::flush;
-  
-  if (!load_credentials(certfile, keyfile, &ucert, &cert_chain, &upkey, pw_cb))
-    goto err;
-  
+
+  /* No need to load certificates if we are creating a self-signed cert. */
+  if (!selfsigned) {
+    if (!load_credentials(certfile, keyfile, &ucert, &cert_chain, &upkey, pw_cb))
+      goto err;
+  }
+
   status = true;
   
  err:
@@ -810,49 +818,69 @@ bool Fake::VerifyOptions()
   else 
     Print(DEBUG) << "Detected Globus version: " << version << std::endl;
 
-  if (rfc && proxyver != 0) 
-    exitError("Used both -rfc and --proxyver!\nChoose one or the other.");
+  if (!selfsigned) {
+    /* proxyversion is only significant if this is not a selfsigned certificate */
+    if (rfc && proxyver != 0) 
+      exitError("Used both -rfc and --proxyver!\nChoose one or the other.");
 
-  if (rfc)
-    proxyver = 4;
-
-  /* set proxy version */
-  
-  if (proxyver!=2 && proxyver!=3 && proxyver!=4 && proxyver!=0)
-    exitError("Error: proxyver must be 2 or 3 or 4");
-  else if (proxyver==0) {
-    Print(DEBUG) << "Unspecified proxy version, settling on version: ";
-
-    if (version<30)
-      proxyver = 2;
-    else if (version<40)
-      proxyver = 3;
-    else
+    if (rfc)
       proxyver = 4;
 
-    Print(DEBUG) << proxyver << std::endl;
-  }
-
-  /* PCI extension option */ 
+    /* set proxy version */
   
-  if (proxyver>3) {
-    if (!policylang.empty())
+    if (proxyver!=2 && proxyver!=3 && proxyver!=4 && proxyver!=0)
+      exitError("Error: proxyver must be 2 or 3 or 4");
+    else if (proxyver==0) {
+      Print(DEBUG) << "Unspecified proxy version, settling on version: ";
+
+      if (version<30)
+        proxyver = 2;
+      else if (version<40)
+        proxyver = 3;
+      else
+        proxyver = 4;
+
+      Print(DEBUG) << proxyver << std::endl;
+    }
+
+    /* PCI extension option */ 
+  
+    if (proxyver>3) {
+      if (!policylang.empty())
+        if (policyfile.empty())
+          exitError("Error: if you specify a policy language you also need to specify a policy file");
+    }
+  
+    if (proxyver>3) {
+      Print(DEBUG) << "PCI extension info: " << std::endl << " Path length: " << pathlength << std::endl;
+
+      if (policylang.empty())
+        Print(DEBUG) << " Policy language not specified." << std::endl;
+      else 
+        Print(DEBUG) << " Policy language: " << policylang << std::endl;
+      
       if (policyfile.empty())
-        exitError("Error: if you specify a policy language you also need to specify a policy file");
+        Print(DEBUG) << " Policy file not specified." << std::endl;
+      else 
+        Print(DEBUG) << " Policy file: " << policyfile << std::endl;
+    }
   }
-  
-  if (proxyver>3) {
-    Print(DEBUG) << "PCI extension info: " << std::endl << " Path length: " << pathlength << std::endl;
+  else {
+    /* selfsigned is specified */
+    if (proxyver != 0 || noregen || rfc || !policyfile.empty() || !policylang.empty())
+      exitError("Error: --proxyver, --rfc, --policyfile, --policylang, --noregen are only significant when --selfsignd is not specified.");
 
-    if (policylang.empty())
-      Print(DEBUG) << " Policy language not specified." << std::endl;
-    else 
-      Print(DEBUG) << " Policy language: " << policylang << std::endl;
+    if (newsubject.empty() && newissuer.empty())
+      exitError("Error: At least one of --newsubject and --newissuer must be specified for --selfsigned.");
 
-    if (policyfile.empty())
-      Print(DEBUG) << " Policy file not specified." << std::endl;
-    else 
-      Print(DEBUG) << " Policy file: " << policyfile << std::endl;
+    if (newsubject.empty())
+      newsubject = newissuer;
+
+    if (newissuer.empty())
+      newissuer = newsubject;
+
+    if (newissuer != newsubject)
+      exitError("Error: --newsubject and --newissuer should be the same for self-signed certificates.");
   }
 
   /* controls that number of bits for the key is appropiate */

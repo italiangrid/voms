@@ -895,7 +895,8 @@ proxy_sign(
     const char *                        newdn,
     const char *                        newissuer,
     int                                 pastproxy,
-    const char *                        newserial
+    const char *                        newserial,
+    int                                 selfsigned
 )
 {
     char *                              newcn;
@@ -962,7 +963,8 @@ proxy_sign(
                       extensions,
                       proxyver,
                       pastproxy,
-                      newserial))
+                      newserial,
+                      selfsigned))
     {
         PRXYerr(PRXYERR_F_PROXY_SIGN,PRXYERR_R_PROCESS_SIGN);
         rc = 1;
@@ -1037,7 +1039,8 @@ proxy_sign_ext(
     STACK_OF(X509_EXTENSION) *extensions,
     int                       proxyver,
     int                       pastproxy,
-    char                     *newserial)
+    char                     *newserial,
+    int                       selfsigned)
 {
     EVP_PKEY *                          new_public_key = NULL;
     EVP_PKEY *                          tmp_public_key = NULL;
@@ -1050,7 +1053,9 @@ proxy_sign_ext(
     unsigned char                       md[SHA_DIGEST_LENGTH];
     unsigned int                        len;
 
-    user_cert_info = user_cert->cert_info;
+    if (!selfsigned)
+      user_cert_info = user_cert->cert_info;
+
     *new_cert = NULL;
     
     if ((req->req_info == NULL) ||
@@ -1119,8 +1124,7 @@ proxy_sign_ext(
           BN_free(bn);
         }
       }
-      else
-      if (proxyver > 2) {
+      else if (proxyver > 2) {
         ASN1_INTEGER_free(X509_get_serialNumber(*new_cert));
           
         new_public_key = X509_REQ_get_pubkey(req);
@@ -1142,6 +1146,17 @@ proxy_sign_ext(
         memcpy((*new_cert)->cert_info->serialNumber->data, md, SHA_DIGEST_LENGTH);
 
       } 
+      else if (selfsigned) {
+        ASN1_INTEGER *copy = ASN1_INTEGER_new();
+        if (copy) {
+          ASN1_INTEGER_set(copy, 1);
+          ASN1_INTEGER_free((*new_cert)->cert_info->serialNumber);
+
+        (*new_cert)->cert_info->serialNumber = copy;
+        }
+        else
+          goto err;
+      }
       else {
         ASN1_INTEGER *copy = ASN1_INTEGER_dup(X509_get_serialNumber(user_cert));
         ASN1_INTEGER_free((*new_cert)->cert_info->serialNumber);
@@ -1185,21 +1200,24 @@ proxy_sign_ext(
      * for now use seconds if not zero. 
      */
     
-    /* doesn't create a proxy longer than the user cert */
-    asn1_time = ASN1_UTCTIME_new();
-    X509_gmtime_adj(asn1_time, -pastproxy);
-    time_now = ASN1_UTCTIME_mktime(asn1_time);
-    ASN1_UTCTIME_free(asn1_time);
-    time_after = ASN1_UTCTIME_mktime(X509_get_notAfter(user_cert));
-    time_diff = time_after - time_now;
-
-    if(time_diff > seconds)
-    {
+    if (selfsigned) {
       X509_gmtime_adj(X509_get_notAfter(*new_cert),(long) seconds);
     }
-    else
-    {
+    else {
+      /* doesn't create a proxy longer than the user cert */
+      asn1_time = ASN1_UTCTIME_new();
+      X509_gmtime_adj(asn1_time, -pastproxy);
+      time_now = ASN1_UTCTIME_mktime(asn1_time);
+      ASN1_UTCTIME_free(asn1_time);
+      time_after = ASN1_UTCTIME_mktime(X509_get_notAfter(user_cert));
+      time_diff = time_after - time_now;
+
+      if(time_diff > seconds) {
+        X509_gmtime_adj(X509_get_notAfter(*new_cert),(long) seconds);
+      }
+      else {
         X509_set_notAfter(*new_cert, user_cert_info->validity->notAfter);
+      }
     }
 
     /* transfer the public key from req to new cert */
@@ -1223,8 +1241,6 @@ proxy_sign_ext(
         }
     }
 
-    /* Why is version set to 2 when we have a version 3 cert? - Sam */
-    
     ASN1_INTEGER_set(new_cert_info->version,2); /* version 3 certificate */
 
     /* Free the current entries if any, there should not

@@ -56,6 +56,7 @@ struct VOMSProxyArguments {
   char           *exkusage;
   char           *newissuer;
   char           *newserial;
+  int             selfsigned;
 };
 
 struct VOMSProxy {

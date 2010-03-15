@@ -467,7 +467,8 @@ proxy_sign(
     const char *                        newdn,
     const char *                        newissuer,
     int                                 pastproxy,
-    const char *                        newserial
+    const char *                        newserial,
+    int                                 selfsigned
 );
 
 int
@@ -482,9 +483,10 @@ proxy_sign_ext(
     int                                 seconds,
     int                                 serial_num,
     STACK_OF(X509_EXTENSION) *          extensions,
-    int proxyver,
-    int pastproxy,
-    char *newserial);
+    int                                 proxyver,
+    int                                 pastproxy,
+    char *                              newserial,
+    int                                 selfsigned);
 
 int
 proxy_check_subject_name(
