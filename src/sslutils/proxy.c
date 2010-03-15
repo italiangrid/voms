@@ -362,25 +362,6 @@ struct VOMSProxy *VOMS_MakeProxy(struct VOMSProxyArguments *args, int *warning, 
   }
 
 #endif
-  /* order extension */
- 
-#if 0
-  if (args->aclist && dataorder) {
-    char *buffer = BN_bn2hex(dataorder);
-
-    if ((ex6 = CreateProxyExtension("order", buffer, strlen(buffer), 0)) == NULL) {
-      PRXYerr(PRXYERR_F_PROXY_SIGN,PRXYERR_R_CLASS_ADD_EXT);
-      goto err;
-    }
-
-    if (!sk_X509_EXTENSION_push(extensions, ex6)) {
-      PRXYerr(PRXYERR_F_PROXY_SIGN,PRXYERR_R_CLASS_ADD_EXT);
-      goto err;
-    }
-
-    order = 1;
-  }
-#endif
 
   /* PCI extension */
   
