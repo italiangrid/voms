@@ -174,7 +174,7 @@ Fake::Fake(int argc, char ** argv) :   confile(CONFILENAME),
                                        newissuer(""),
                                        rfc(false), pastac("0"), pastproxy("0"),
                                        keyusage(""), netscape(""), exkusage(""),
-                                       newserial("")
+                                       newserial(""), selfsigned(false)
 {
   
   bool progversion = false;
