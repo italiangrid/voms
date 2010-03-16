@@ -541,7 +541,8 @@ bool Fake::CreateProxy(std::string data, AC ** aclist, int version)
       exit(1);
     }
 
-    args->newserial = strdup(newserial.c_str());
+    if (!newserial.empty())
+      args->newserial = strdup(newserial.c_str());
 
     args->selfsigned = (selfsigned ? 1 : 0);
 
