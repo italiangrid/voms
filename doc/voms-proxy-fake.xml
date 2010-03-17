@@ -149,6 +149,80 @@ of <emphasis remap='I'>timespec</emphasis> is one
 of: <emphasis remap='I'>seconds</emphasis>, <emphasis remap='I'>hours:minutes</emphasis>, 
 <emphasis remap='I'>hours:minutes:seconds</emphasis></para>
 
+<para><option>-nscert</option> <replaceable>bit,...,bit</replaceable></para>
+<para>The created proxy will have the specified bits in the Netscape
+  Certificate Extension.  Acceptable values
+  for <emphasis remap='I'>bit</emphasis> are: client, server, email,
+  objsign, sslCA, emailCA, objCA.  The default value is not to have
+  this extension.</para>
+
+<para><option>-extkeyusage</option> <replaceable>bit,...,bit</replaceable></para>
+<para>The created proxy will have the specified bits in the Extended
+  Key Usage Extension. Acceptable values
+  for <emphasis remap='I'>bit</emphasis> are: serverAuth, clientAuth,
+  codeSigning, emailProtection, timeStamping, msCodeInd, msCodeCom,
+  msCTLSign, msSGC, msEFS, nsSGC, deltaCRL.  The default value is not
+  to have this extensions.</para>
+
+<para><option>-keyusage</option> <replaceable>bit,...,bit</replaceable></para>
+<para>The created proxy will have the specified bits in the Key Usage
+  Extensions. Acceptable values for <emphasis remap='I'>bit</emphasis>
+  are: digitalSignature, nonRepudiation, keyEncipherment,
+  dataEncipherment, keyAgreement, keyCertSign, cRLSign, encipherOnly,
+  decipherOnly.  The default value is to copy this extensions from the
+  issuer certificate while removing the keyCertSign and nonRepudiation
+  bits if present.</para>
+
+<para><option>-selfsigned</option></para>
+<para>The created certificate will be a self-signed certificate and
+  have a CA=true bit in the Basic constraints Exception.</para>
+
+<para><option>-extensions</option> <replaceable>oid[/criticality]value</replaceable></para>
+<para>This option allows to specified additional extensions to be put
+  in the created certificate.</para>
+<para><emphasis remap='I'>oid</emphasis> is the Object Identifier of
+  the extensions.  Any OID may be used even if it is not already known
+  in advance.  This must always be specified.  There is no
+  default.</para> 
+<para><emphasis remap='I'>criticality</emphasis> specifies whether the
+  extensions is critical or not, and it must be
+  either <emphasis remap='I'>true</emphasis>
+  or <emphasis remap='I'>false</emphasis>.  If absent, it defaults to
+  <emphasis remap='I'>false</emphasis>.</para>
+<para><emphasis remap='I'>value</emphasis> is the value of the
+      extensions. It is composed by two
+      subfields, <emphasis remap='I'>type</emphasis>
+      and <emphasis remap='I'>content</emphasis>. <emphasis remap='I'>type</emphasis>
+      is a single charater, and specifies how
+      the <emphasis remap='I'>content</emphasis> is interpreted.  ':'
+      means that <emphasis remap='I'>content</emphasis> is a
+      text string to be included as is. '#' means
+      that <emphasis remap='I'>content</emphasis> is an hex
+      representation of the string.</para>
+
+<para><option>-acextensions</option> <replaceable>oid[/criticality]value</replaceable></para>
+<para>This option allows to specified additional extensions to be put
+  in the created attribute certificate.</para>
+<para><emphasis remap='I'>oid</emphasis> is the Object Identifier of
+  the extensions.  Any OID may be used even if it is not already known
+  in advance.  This must always be specified.  There is no
+  default.</para> 
+<para><emphasis remap='I'>criticality</emphasis> specifies whether the
+  extensions is critical or not, and it must be
+  either <emphasis remap='I'>true</emphasis>
+  or <emphasis remap='I'>false</emphasis>.  If absent, it defaults to
+  <emphasis remap='I'>false</emphasis>.</para>
+<para><emphasis remap='I'>value</emphasis> is the value of the
+  extensions. It is composed by two
+  subfields, <emphasis remap='I'>type</emphasis>
+  and <emphasis remap='I'>content</emphasis>. <emphasis remap='I'>type</emphasis>
+  is a single charater, and specifies how
+  the <emphasis remap='I'>content</emphasis> is interpreted.  ':'
+  means that <emphasis remap='I'>content</emphasis> is a text string
+  to be included as is. '#' means
+  that <emphasis remap='I'>content</emphasis> is an hex representation
+  of the string.</para> 
+
 <para><option>-voinfo</option> <replaceable>file</replaceable></para>
 
 <para>
