@@ -913,7 +913,7 @@ bool Fake::VerifyOptions()
 
   /* newserial option */
   if (!newserial.empty())
-    for (int i = 0; i < newserial.length(); i++)
+    for (unsigned int i = 0; i < newserial.length(); i++)
       if (!isxdigit(newserial[i]))
         exitError("Error: Serial number should be an hexadecimal string.");
 
@@ -991,7 +991,7 @@ static long mystrtol(char *number, int limit)
   long value = strtol(number, &end, 10);
 
   /* Was there extraneous data at the end ? */
-  if (end - number != strlen(number))
+  if ((size_t)(end - number) != strlen(number))
     return -1;
 
   /* Conversion errors of some kind */
