@@ -1075,7 +1075,8 @@ X509_EXTENSION *Fake::create_extension(const std::string &string)
     else if (!crit.compare("true"))
       critical = true;
     else {
-      Print(ERROR) << "Criticality must be either true or false" <<std::endl;
+      Print(ERROR) << "\nCriticality must be either true or false.  Found" 
+                   << crit << std::endl;
       exit(1);
     }
   }
@@ -1093,7 +1094,7 @@ X509_EXTENSION *Fake::create_extension(const std::string &string)
       data = readfile(file);
 
       if (data.empty()) {
-        Print(ERROR) << "Problem in reading file: "
+        Print(ERROR) << "\nProblem in reading file: "
                      << file << ": " << strerror(errno)
                      << std::endl;
         exit(1);
