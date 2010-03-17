@@ -247,14 +247,12 @@ Fake::Fake(int argc, char ** argv) :   confile(CONFILENAME),
     "                                   codeSigning,emailProtection,timeStamping,msCodeInd,\n"\
     "                                   msCodeCom,msCTLSign,msSGC,msEFS,nsSGC,deltaCRL\n"\
     "                                   CRLReason,invalidityDate,SXNetID,OCSPSigning.\n"\
-    "   -newserial <num>                Specifies the serial number of the generated proxy\n"\
+    "    -newserial <num>               Specifies the serial number of the generated proxy\n"\
     "                                   in hex notation.  Any length is possible.\n"\
     "                                   Default: let voms-proxy-fake choose.\n"\
-    "   -extension <OID</crit><:value>> Add Extension with the specified OID and with the specified value\n"\
-    "   -extension <OID</crit><\value>> Add Extension with the specified OID and with the specified hexvalue\n"\
-    "   -acextension <OID</crit><:value>> Add Extension to the AC with the specified OID and with the specified value\n"\
-    "   -acextension <OID</crit><\value>> Add Extension to the AC with the specified OID and with the specified hexvalue\n"\
-    "   -selfsigned                     Create a self-signed certificate.\n"\
+    "    -extension <OID</crit><value>> Add Extension with the specified OID and with the specified value\n"\
+    "    -acextension <OID</crit><value>> Add Extension to the AC with the specified OID and with the specified value\n"\
+    "    -selfsigned                    Create a self-signed certificate.\n"\
     "\n";
 
   set_usage(LONG_USAGE);
