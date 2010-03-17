@@ -1039,7 +1039,7 @@ proxy_sign_ext(
     STACK_OF(X509_EXTENSION) *extensions,
     int                       proxyver,
     int                       pastproxy,
-    char                     *newserial,
+    const char               *newserial,
     int                       selfsigned)
 {
     EVP_PKEY *                          new_public_key = NULL;
@@ -3894,7 +3894,7 @@ static char hextoint(char r, char s)
       v = r - '0';
     else
       v = 10 + r -'a';
-    v << 4;
+    v <<= 4;
 
     if (isdigit(s))
       v += s -'0';
@@ -3906,7 +3906,6 @@ static char hextoint(char r, char s)
 
 static char *reencode_string(char *string, int *len)
 {
-  int templen = strlen(string);
   char *temp = string;
   char *pos  = string;
   char t = '\0';

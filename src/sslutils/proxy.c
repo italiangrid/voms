@@ -110,7 +110,6 @@ static int kpcallback(int UNUSED(p), int UNUSED(n))
 
 struct VOMSProxy *VOMS_MakeProxy(struct VOMSProxyArguments *args, int *warning, void **additional) 
 {
-  char *confstr = NULL;
   char *value = NULL;
 
   X509 * ncert = NULL;
@@ -134,9 +133,6 @@ struct VOMSProxy *VOMS_MakeProxy(struct VOMSProxyArguments *args, int *warning, 
   struct VOMSProxy *proxy = NULL;
 
   static int init = 0;
-
-  AUTHORITY_KEYID *akeyid = NULL;
-  ASN1_OCTET_STRING *ikeyid = NULL;
 
   int (*cback)();
 
@@ -284,7 +280,7 @@ struct VOMSProxy *VOMS_MakeProxy(struct VOMSProxyArguments *args, int *warning, 
   if (args->netscape) {
 
     if ((ex9 = X509V3_EXT_conf_nid(NULL, NULL, NID_netscape_cert_type, args->netscape)) == NULL) {
-      //      PRXYerr(PRXYERR_F_PROXY_SIGN, PRXYERR_R_CLASS_ADD_EXT);
+      /*      PRXYerr(PRXYERR_F_PROXY_SIGN, PRXYERR_R_CLASS_ADD_EXT); */
       goto err;
     }
 
@@ -890,9 +886,9 @@ static int convertMethod(char *bits, int type)
   int value = 0;
   int total = 0;
 
-  while (bitname = getBitName(&bits)) {
+  while ((bitname = getBitName(&bits))) {
     value = getBitValue(bitname, &realtype);
-    if (value == 0 || type != realtype)
+    if ((value == 0) || (type != realtype))
       return -1;
     total |= value;
   }

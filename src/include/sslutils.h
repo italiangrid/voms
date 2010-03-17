@@ -475,7 +475,7 @@ int
 proxy_sign_ext(
     X509 *                              user_cert,
     EVP_PKEY *                          user_private_key,
-    const EVP_MD *                            method,
+    const EVP_MD *                      method,
     X509_REQ *                          req,
     X509 **                             new_cert,
     X509_NAME *                         subject_name,
@@ -485,7 +485,7 @@ proxy_sign_ext(
     STACK_OF(X509_EXTENSION) *          extensions,
     int                                 proxyver,
     int                                 pastproxy,
-    char *                              newserial,
+    const char *                        newserial,
     int                                 selfsigned);
 
 int
