@@ -1033,20 +1033,40 @@ STACK_OF(X509_EXTENSION) *Fake::create_and_add_extension(const std::string &stri
   return exts;
 }
 
+static std::string::size_type get_minimum(std::string::size_type s1,
+                                          std::string::size_type s2,
+                                          std::string::size_type s3)
+{
+  std::string::size_type minimum = std::string::npos;
+
+  if (s1 < minimum)
+    minimum = s1;
+  if (s2 < minimum)
+    minimum = s2;
+  if (s3 < minimum)
+    minimum = s3;
+
+  return minimum;
+}
+
 X509_EXTENSION *Fake::create_extension(const std::string &string)
 {
   std::string::size_type colon_position = string.find_first_of(':');
   std::string::size_type slash_position = string.find_first_of('/');
-  std::string::size_type gate_position = string.find_first_of('#');
-  std::string::size_type data_position = (colon_position != std::string::npos ?
-                                          colon_position : gate_position);
+  std::string::size_type gate_position = string.find_first_of('~');
+  std::string::size_type file_position = string.find_first_of('+');
+  std::string::size_type data_position = get_minimum(colon_position,
+                                                     gate_position,
+                                                     file_position);
   bool critical = false;
 
-  std::string oid = string.substr(0, (slash_position == std::string::npos ?
-                                      colon_position :
-                                      slash_position));
+  bool critical_present = slash_position < data_position;
 
-  if (slash_position != std::string::npos) {
+  std::string oid = string.substr(0, (critical_present ?
+                                      slash_position :
+                                      data_position));
+
+  if (critical_present) {
     std::string crit = string.substr(slash_position+1, (data_position == std::string::npos ?
                                                         std::string::npos :
                                                         data_position - slash_position-1));
@@ -1062,11 +1082,24 @@ X509_EXTENSION *Fake::create_extension(const std::string &string)
 
   std::string data = " ";
 
-  if (data_position != std::string::npos)
+  if (data_position != std::string::npos) {
     data = string.substr(data_position+1);
 
-  if (gate_position != std::string::npos)
-    data = hextostring(data);
+    if (gate_position == data_position)
+      data = hextostring(data);
+
+    if (file_position == data_position) {
+      std::string file = data;
+      data = readfile(file);
+
+      if (data.empty()) {
+        Print(ERROR) << "Problem in reading file: "
+                     << file << ": " << strerror(errno)
+                     << std::endl;
+        exit(1);
+      }
+    }
+  }
 
   return CreateProxyExtension((char*)oid.c_str(), (char*)data.c_str(), data.size(), critical);
 }
