@@ -29,6 +29,8 @@ Description:
                              Include header files
 **********************************************************************/
 
+#include "config.h"
+
 #include "openssl/ssl.h"
 #include "openssl/err.h"
 #include "openssl/bio.h"
@@ -71,7 +73,8 @@ typedef struct gss2_ctx_id_desc_struct{
 } gss2_ctx_id_desc;
 
 #ifndef GSSAPI_H_
-typedef void *gss_ctx_id_t;
-typedef void *gss_cred_id_t;
+typedef void * gss_cred_id_t;
+typedef void * gss_ctx_id_t;
 #endif
+
 #endif /* VOMS_GSSAPI_COMPAT_H */

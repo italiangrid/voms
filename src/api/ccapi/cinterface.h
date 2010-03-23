@@ -20,8 +20,6 @@
 
 #include "newformat.h"
 
-/* #include "voms_api.h" */
-
 /*!< \brief User's characteristics: can be repeated. 
 */
 struct datar {

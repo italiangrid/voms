@@ -22,9 +22,13 @@
 
 
 extern "C" {
+#ifdef NOGLOBUS
 #ifndef GSSAPI_H_
 typedef void * gss_cred_id_t;
 typedef void * gss_ctx_id_t;
+#endif
+#else
+#include "gssapi.h"
 #endif
 
 #include <openssl/x509.h>
@@ -394,6 +398,8 @@ public:
 
   std::string ErrorMessage(void); /*!< Gets a textual description of the error.
             \return A string containg the error message. */
+
+#ifdef NOGLOBUS
   bool RetrieveFromCtx(gss_ctx_id_t context, recurse_type how); /*!< Gets VOMS information from the given globus context
              \param context The context from which to retrieve the certificate.
              \param how Recursion type
@@ -403,6 +409,30 @@ public:
              \param credential The credential from which to retrieve the certificate.
              \param how Recursion type
              \return failure (F) or success (T)*/
+#else
+  bool RetrieveFromCtx(void *context, recurse_type how); /*!< Gets VOMS information from the given globus context
+             \param context The context from which to retrieve the certificate.
+             \param how Recursion type
+             \return failure (F) or success (T)*/
+
+  bool RetrieveFromCred(void *credential, recurse_type how);  /*!< Gets VOMS information from the given globus credential
+             \param credential The credential from which to retrieve the certificate.
+             \param how Recursion type
+             \return failure (F) or success (T)*/
+  bool RetrieveFromCtx(gss_ctx_id_t context, recurse_type how) {
+    return RetrieveFromCtx((void*)context,how);
+  }/*!< Gets VOMS information from the given globus context
+             \param context The context from which to retrieve the certificate.
+             \param how Recursion type
+             \return failure (F) or success (T)*/
+
+  bool RetrieveFromCred(gss_cred_id_t credential, recurse_type how) {
+    return RetrieveFromCred((void*)credential, how);
+  } /*!< Gets VOMS information from the given globus credential
+             \param credential The credential from which to retrieve the certificate.
+             \param how Recursion type
+             \return failure (F) or success (T)*/
+#endif
 
   bool Retrieve(X509_EXTENSION *ext); /*!< Gets VOMS information from the given extension
              \param ext The extension to parse.
