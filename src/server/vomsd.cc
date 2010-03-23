@@ -1001,6 +1001,24 @@ std::string makeAC(EVP_PKEY *key, X509 *issuer, X509 *holder,
                      index->fqan.end());
     }
   
+    // Adjust for long/short format
+    if (!short_flags && !fqans.empty()) {
+      std::vector<std::string> newfqans(fqans);
+      fqans.clear();
+      std::vector<std::string>::iterator i = newfqans.begin();
+      while (i != newfqans.end()) {
+        std::string fqan = *i;
+        LOGM(VARP, logh, LEV_DEBUG, T_PRE, "Initial FQAN: %s", fqan.c_str());
+        if (fqan.find("/Role=") != std::string::npos)
+          fqan += "/Capability=NULL";
+        else
+          fqan += "/Role=NULL/Capability=NULL";
+        LOGM(VARP, logh, LEV_DEBUG, T_PRE, "Processed FQAN: %s", fqan.c_str());
+        fqans.push_back(fqan);
+        i++;
+      }
+    }
+
     /* if attributes were found, only release an intersection beetween the requested and the owned */
     std::vector<std::string>::iterator end = fqans.end();
     bool subset = false;
@@ -1019,23 +1037,6 @@ std::string makeAC(EVP_PKEY *key, X509 *issuer, X509 *holder,
                     attribs.end());
     }
 
-    // Adjust for long/short format
-    if (!short_flags && !fqans.empty()) {
-      std::vector<std::string> newfqans(fqans);
-      fqans.clear();
-      std::vector<std::string>::iterator i = newfqans.begin();
-      while (i != newfqans.end()) {
-        std::string fqan = *i;
-        LOGM(VARP, logh, LEV_DEBUG, T_PRE, "Initial FQAN: %s", fqan.c_str());
-        if (fqan.find("/Role=") != std::string::npos)
-          fqan += "/Capability=NULL";
-        else
-          fqan += "/Role=NULL/Capability=NULL";
-        LOGM(VARP, logh, LEV_DEBUG, T_PRE, "Processed FQAN: %s", fqan.c_str());
-        fqans.push_back(fqan);
-        i++;
-      }
-    }
 
     // no attributes can be send
     if (fqans.empty()) {
