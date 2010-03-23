@@ -94,7 +94,6 @@ class GSISocketServer
   void AdjustBacklog(int b);
   bool ReOpen(int, int=5, bool=true);
   void SetTimeout(int);
-  int  GetTimeout();
 
   void SetError(const std::string &g);
   void SetErrorOpenSSL(const std::string &message);

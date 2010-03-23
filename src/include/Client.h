@@ -100,15 +100,10 @@ private:
 
 public:
   std::string     own_subject;
-  std::string     own_ca;
   EVP_PKEY       *upkey;
   X509           *ucert;
   STACK_OF(X509) *cert_chain;
   char           *cacertdir;
-  std::string     peer_subject;
-  std::string     peer_ca;
-  EVP_PKEY       *peer_key;
-  X509           *peer_cert;
   SSL *ssl;
   SSL_CTX *ctx;
   BIO *conn;
