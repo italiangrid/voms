@@ -163,10 +163,10 @@ static int globusf_write(BIO *b, const char *in, int inl)
  */
 GSISocketServer::GSISocketServer(int p, void *l, int b, bool m) :
   own_subject(""), own_ca(""), peer_subject(""), 
-  peer_ca(""), peer_serial(""), own_key(NULL), peer_key(NULL), own_cert(NULL), 
+  peer_ca(""), peer_serial(""), own_key(NULL), own_cert(NULL), 
   peer_cert(NULL), own_stack(NULL), peer_stack(NULL), 
   ssl(NULL), ctx(NULL), conn(NULL), pvd(NULL), cacertdir(NULL),
-  upkey(NULL), ucert(NULL), cert_chain(NULL), error(""),
+  upkey(NULL), ucert(NULL), error(""),
   port(p), opened(false), sck(-1), backlog(b), newsock(-1), timeout(30),
   newopened(false), mustclose(m), logh(l)
 {
@@ -245,9 +245,7 @@ GSISocketServer::Close()
     close(sck);
   opened = false;
 
-  EVP_PKEY_free(peer_key);
-
-  own_key = peer_key = NULL;
+  own_key = NULL;
   own_cert = peer_cert = NULL;
 
   opened=false;
@@ -283,7 +281,6 @@ GSISocketServer::AcceptGSIAuthentication()
 {
   char *name = NULL;
   long  errorcode = 0;
-  char *tmp = NULL;
   int   flags;
 
   time_t curtime, starttime;
@@ -292,12 +289,11 @@ GSISocketServer::AcceptGSIAuthentication()
   BIO *bio = NULL;
   char *cert_file, *user_cert, *user_key, *user_proxy;
   char *serial=NULL;
-  X509 *identitycert = NULL;
 
   cert_file = user_cert = user_key = user_proxy = NULL;
 
   if (proxy_get_filenames(0, &cert_file, &cacertdir, &user_proxy, &user_cert, &user_key) == 0) {
-    (void)load_credentials(user_cert, user_key, &ucert, &cert_chain, &upkey, NULL);
+    (void)load_credentials(user_cert, user_key, &ucert, &own_stack, &upkey, NULL);
   }
 
   free(cert_file);
@@ -306,7 +302,6 @@ GSISocketServer::AcceptGSIAuthentication()
   free(user_proxy);
 
   own_cert = ucert;
-  own_stack = cert_chain;
   own_key = upkey;
   ctx = SSL_CTX_new(SSLv23_method());
   SSL_CTX_load_verify_locations(ctx, NULL, cacertdir);
@@ -319,14 +314,14 @@ GSISocketServer::AcceptGSIAuthentication()
   SSL_CTX_set_verify_depth(ctx, 100);
   SSL_CTX_set_cert_verify_callback(ctx, proxy_app_verify_callback, 0);
 
-  if (cert_chain) {
+  if (own_stack) {
     /*
      * Certificate was a proxy with a cert. chain.
      * Add the certificates one by one to the chain.
      */
     X509_STORE_add_cert(ctx->cert_store, ucert);
-    for (int i = 0; i <sk_X509_num(cert_chain); ++i) {
-      X509 *cert = (sk_X509_value(cert_chain,i));
+    for (int i = 0; i <sk_X509_num(own_stack); ++i) {
+      X509 *cert = (sk_X509_value(own_stack,i));
 
       if (!X509_STORE_add_cert(ctx->cert_store, cert)) {
         if (ERR_GET_REASON(ERR_peek_error()) == X509_R_CERT_ALREADY_IN_HASH_TABLE) {
@@ -397,10 +392,10 @@ GSISocketServer::AcceptGSIAuthentication()
       LOGM(VARP, logh, LEV_DEBUG, T_PRE, "Stack Size: %d", sk_X509_num(peer_stack));
   }
 
-  identitycert = get_real_cert(actual_cert, peer_stack);
+  peer_cert = get_real_cert(actual_cert, peer_stack);
 
-  if (identitycert) {
-    char *name = X509_NAME_oneline(X509_get_subject_name(identitycert), NULL, 0);
+  if (peer_cert) {
+    char *name = X509_NAME_oneline(X509_get_subject_name(peer_cert), NULL, 0);
     own_subject = std::string(name);
     OPENSSL_free(name);
   }
@@ -415,24 +410,17 @@ GSISocketServer::AcceptGSIAuthentication()
     }
   }
 
-  tmp = NULL;
-
-  peer_cert = identitycert;
-  peer_key = X509_extract_key(peer_cert);
-
   name = X509_NAME_oneline(X509_get_subject_name(peer_cert), NULL, 0);
   if (name)
     peer_subject = std::string(name); 
   OPENSSL_free(name);
 
-  tmp = NULL;
-
-  if (tmp)
-    peer_ca = std::string(tmp);
-  free(tmp);
+  name = X509_NAME_oneline(X509_get_issuer_name(peer_cert), NULL, 0);
+  if (name)
+    peer_ca = std::string(name);
+  OPENSSL_free(name);
 
   serial = get_peer_serial(actual_cert);
-
   peer_serial = std::string(serial ? serial : "");
   free(serial);
 
