@@ -130,7 +130,27 @@ as a compatibility feature to ease migration while the servers upgrade to the ne
 subject rather  than what is would normally have depending on the
 specific version of proxy created.</para>
 
+<para><option>-pastac</option> <replaceable>timespec</replaceable></para>
+<para>
+The created AC will have its validity start in the past, as specified
+by <emphasis remap='I'>timespec</emphasis>.</para>
+
+<para>The format
+of <emphasis remap='I'>timespec</emphasis> is one
+of: <emphasis remap='I'>seconds</emphasis>, <emphasis remap='I'>hours:minutes</emphasis>, 
+<emphasis remap='I'>hours:minutes:seconds</emphasis></para>
+
+<para><option>-pastproxy</option> <replaceable>timespec</replaceable></para>
+<para>The created proxy will have its validity start in the past as
+  specified by <emphasis remap='I'>timespec</emphasis></para>
+
+<para>The format
+of <emphasis remap='I'>timespec</emphasis> is one
+of: <emphasis remap='I'>seconds</emphasis>, <emphasis remap='I'>hours:minutes</emphasis>, 
+<emphasis remap='I'>hours:minutes:seconds</emphasis></para>
+
 <para><option>-voinfo</option> <replaceable>file</replaceable></para>
+
 <para>
 The file <emphasis remap='I'>file</emphasis> contains informations for
   additional ACs that should be included in the created proxy.  ACs
