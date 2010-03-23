@@ -64,6 +64,7 @@ extern int writeac(const X509 *issuerc, const STACK_OF(X509) *certstack, const X
 }
 
 static int time_to_sec(std::string timestring);
+static long mystrtol(char *number, int limit);
 
 extern int AC_Init();
 
@@ -479,6 +480,11 @@ bool Fake::CreateProxy(std::string data, AC ** aclist, int version)
     args->callback      = (int (*)())kpcallback;
     args->pastproxy     = time_to_sec(pastproxy);
 
+    if (args->pastproxy == -1) {
+      Print(ERROR) << "Minutes and seconds should be < 59 and >= 0" << std::endl;
+      exit(1);
+    }
+
     int warn = 0;
     void *additional = NULL;
 
@@ -583,10 +589,17 @@ bool Fake::Retrieve(VOLIST *volist)
           // without any FQAN.
           char *vector[1] = {NULL };
           char **fqanlist = vo->fqans ? vo->fqans : vector;
+          int seconds = time_to_sec(vo->pastac);
+
+          if (seconds == -1) {
+            Print(ERROR) << "Minutes and seconds for VO: " << vo->voname <<
+              " should be < 59 and >= 0" << std::endl;
+            exit(1);
+          }
 
           if (ac)
             res = writeac(hcert, NULL, holder, hkey, (BIGNUM *)(BN_value_one()), fqanlist,
-                          vo->targets, attributes, &ac, vo->voname, vo->uri, vo->vomslife, !newformat, time_to_sec(vo->pastac));
+                          vo->targets, attributes, &ac, vo->voname, vo->uri, vo->vomslife, !newformat, seconds);
         }
       } 
       else {
@@ -829,22 +842,55 @@ std::ostream& Fake::Print(message_type type)
 static int time_to_sec(std::string timestring)
 {
   int seconds = 0;
+  int hours   = 0;
+  int minutes = 0;
 
   std::string::size_type pos = timestring.find(':');
 
   if (pos == std::string::npos) {
     /* Seconds format */
-    seconds = atoi(timestring.c_str());
+    seconds = mystrtol(timestring.c_str(), LONG_MAX);
   } 
   else {
-    /* hours:minuts format */
-    int hours, minutes;
+    /* hours:minutes(:seconds) format */
+    hours   = mystrtol(timestring.substr(0, pos).c_str(), LONG_MAX);
 
-    hours   = atoi(timestring.substr(0, pos).c_str());
-    minutes = atoi(timestring.substr(pos+1).c_str());
+    std::string::size_type pos2 = timestring.substr(pos+1).find(':');
 
-    seconds = minutes * 60 + hours * 3600;
+    if (pos2 == std::string::npos) {
+      minutes = mystrtol(timestring.substr(pos+1).c_str(), 59);
+    }
+    else {
+      minutes = mystrtol(timestring.substr(pos+1, pos2).c_str(), 59);
+      seconds = mystrtol(timestring.substr(pos2+1).c_str(), 59);
+    }
   }
 
-  return seconds;
+  if (seconds == -1 || minutes == -1 || hours == -1)
+    return -1;
+
+  return seconds + minutes * 60 + hours * 3600;
+}
+
+static long mystrtol(char *number, int limit)
+{
+  char *end = NULL;
+
+  errno = 0;
+
+  long value = strtol(number, &end, 10);
+
+  /* Was there extraneous data at the end ? */
+  if (end - number != strlen(number))
+    return -1;
+
+  /* Conversion errors of some kind */
+  if (errno != 0 || value < 0)
+    return -1;
+
+  /* Value greater than maximum */
+  if (value > limit)
+    return -1;
+
+  return value;
 }
