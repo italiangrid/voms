@@ -453,9 +453,8 @@ public:
 };
 
 
-extern "C" {
 int getMajorVersionNumber(void);
 int getMinorVersionNumber(void);
 int getPatchVersionNumber(void);
-}
+
 #endif
