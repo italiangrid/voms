@@ -124,7 +124,7 @@ public class VOMSKeyManager implements X509KeyManager {
 
         try {
             if (key != null)
-                pkey = reader.readPrivateKey(cert);
+                pkey = reader.readPrivateKey(key);
             else
                 throw new VOMSException("Cannot load the private key.");
         }
