@@ -23,6 +23,7 @@ extern "C" {
 #include <limits.h>
 
 #include <openssl/err.h>
+#include <openssl/ssl.h>
 }
 
 #include <string>
@@ -136,6 +137,7 @@ std::string OpenSSLError(bool debug)
   int line;
 
   std::string outstring;
+  char *msgstring = NULL;
     
   /* WIN32 does not have the ERR_get_error_line_data */ 
   /* exported, so simulate it till it is fixed */
@@ -148,23 +150,39 @@ std::string OpenSSLError(bool debug)
       
     es = ERR_get_state();
     i = (es->bottom+1)%ERR_NUM_ERRORS;
-    
+
     if (es->err_data[i] == NULL)
       dat = strdup("");
     else
       dat = strdup(es->err_data[i]);
 
-    if (dat) {
-      l = ERR_get_error_line(&file, &line);
 
-      if (debug) {
-        std::string temp;
-        outstring += std::string(ERR_error_string(l,buf)) + ":" +
-          file + ":" + stringify(line, temp) + dat + "\n";
+    if (dat) {
+      int code = 0;
+
+      l = ERR_get_error_line(&file, &line);
+      code = ERR_GET_REASON(l);
+
+      switch (code) {
+      case SSL_R_SSLV3_ALERT_CERTIFICATE_EXPIRED:
+        outstring += "Either proxy or user certificate are expired.";
+        break;
+
+      default:
+        if (debug) {
+          std::string temp;
+          
+          outstring += std::string(ERR_error_string(l,buf)) + ":" +
+            file + ":" + stringify(line, temp) + dat + "\n";
+        }
+
+        msgstring = (char*)ERR_reason_error_string(l);
+
+        if (msgstring)
+          outstring += std::string(msgstring) + dat +
+            "\nFunction: " + ERR_func_error_string(l) + "\n";
+        break;
       }
-      else
-        outstring += std::string(ERR_reason_error_string(l)) + dat +
-          "\nFunction: " + ERR_func_error_string(l) + "\n";
     }
     
     free(dat);

@@ -671,44 +671,6 @@ void GSISocketServer::SetErrorOpenSSL(const std::string &message)
 {
   error = message;
 
-  unsigned long l;
-  char buf[256];
-#if SSLEAY_VERSION_NUMBER  >= 0x00904100L
-  const char *file;
-#else
-  char *file;
-#endif
-  int line;
-    
-  /* WIN32 does not have the ERR_get_error_line_data */ 
-  /* exported, so simulate it till it is fixed */
-  /* in SSLeay-0.9.0 */
-  
-  while ( ERR_peek_error() != 0 ) {
-    
-    l = ERR_get_error_line(&file, &line);
-
-    std::string temp;
-    int code = ERR_GET_REASON(l);
-    char *message = NULL;
-
-    switch (code) {
-    case SSL_R_SSLV3_ALERT_CERTIFICATE_EXPIRED:
-      error += "Either proxy or user certificate are expired.";
-      break;
-
-    default:
-      message = (char*)ERR_reason_error_string(l);
-
-      error += std::string(ERR_error_string(l, buf))+ ":" + 
-        std::string(file) + ":" + stringify(line, temp) + "\n";
-
-      if (message)
-        error += std::string(ERR_reason_error_string(l)) + ":" + 
-          std::string(ERR_func_error_string(l)) + "\n";
-
-      break;
-    }
-  }
+  error += OpenSSLError(true);
 }
 
