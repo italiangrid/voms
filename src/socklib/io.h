@@ -20,26 +20,13 @@
 
 extern "C" {
 #include "replace.h"
-
-#include <errno.h>
-#include <sys/types.h>
-#include <sys/socket.h>
-#include <sys/select.h>
 #include <time.h>
-#include <netinet/in.h>
-#include <netdb.h>
-
-#include <openssl/buffer.h>
 #include <openssl/ssl.h>
-#include <openssl/err.h>
-#include <openssl/bio.h>
-#include <unistd.h>
-#include <fcntl.h>
 }
 
 #include <string>
 
-extern int do_select(int fd, fd_set *rset, fd_set *wset, int starttime, int timeout, int wanted);
+extern int do_select(int fd, time_t starttime, int timeout, int wanted);
 extern bool do_connect(SSL *ssl, int fd, int timeout,  std::string& error);
 extern bool do_write(SSL *ssl, int timeout, const std::string& text, std::string &error);
 extern bool do_read(SSL *ssl, int timeout, std::string& output);

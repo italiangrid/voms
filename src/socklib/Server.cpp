@@ -59,7 +59,6 @@ extern "C" {
 /** This class header file. */
 #include "Server.h"
 
-extern int do_select(int fd, fd_set *rset, fd_set *wset, int starttime, int timeout, int wanted);
 static int globusf_read(BIO *b, char *out, int outl);
 static int globusf_write(BIO *b, const char *in, int inl);
 
@@ -293,8 +292,6 @@ GSISocketServer::AcceptGSIAuthentication()
   int   flags;
 
   time_t curtime, starttime;
-  fd_set rset;
-  fd_set wset;
   int ret, ret2;
   int expected = 0;
   BIO *bio = NULL;
@@ -371,7 +368,7 @@ GSISocketServer::AcceptGSIAuthentication()
   expected = 0;
 
   do {
-    ret = do_select(newsock, &rset, &wset, starttime, timeout, expected);
+    ret = do_select(newsock, starttime, timeout, expected);
     if (ret > 0) {
       ret2 = SSL_accept(ssl);
       curtime = time(NULL);
@@ -505,15 +502,13 @@ bool GSISocketServer::Peek(int bufsize, std::string& s)
   int fd = BIO_get_fd(SSL_get_rbio(ssl), NULL);
   time_t starttime, curtime;
 
-  fd_set rset;
-  fd_set wset;
   int error = 0;
   int expected = 0;
 
   starttime = time(NULL);
 
   do {
-    ret = do_select(fd, &rset, &wset, starttime, timeout, expected);
+    ret = do_select(fd, starttime, timeout, expected);
     curtime = time(NULL);
 
     if (ret > 0) {
