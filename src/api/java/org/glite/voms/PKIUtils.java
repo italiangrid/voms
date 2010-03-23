@@ -399,11 +399,13 @@ public class PKIUtils {
 
             //            String buggySwissSignCA="EMAILADDRESS=ca@SwissSign.com, CN=SwissSign CA (RSA IK May 6 1999 18:00:58), O=SwissSign, C=CH";
             String buggySwissSignCA="1.2.840.113549.1.9.1=#161063614053776973735369676e2e636f6d,CN=SwissSign CA (RSA IK May 6 1999 18:00:58),O=SwissSign,C=CH";
+            String buggyRomanianCA="CN=RomanianGRID CA,OU=Certification Authority,O=ROSA,DC=RomanianGRID,DC=RO";
 
             logger.debug("--"+buggySwissSignCA+"--");
             logger.debug("--"+issuerSubject.getName()+"--"+issuerSubject.getName().getClass().getName());
-            if (!buggySwissSignCA.equals(issuerSubject.getName())) {
-                /* Skip check due to bugs in bc and SwissSign */ 
+            if (!buggySwissSignCA.equals(issuerSubject.getName()) &&
+                !buggyRomanianCA.equals(issuerSubject.getName())) {
+                /* Skip check due to bugs in bc and SwissSign and Romanian */ 
                 AuthorityKeyIdentifier akid = PKIUtils.getAKID(issued);
 
                 if (akid != null) {
