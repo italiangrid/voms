@@ -462,7 +462,8 @@ proxy_sign(
     STACK_OF(X509_EXTENSION) *          extensions,
     int                                 limited_proxy,
     int                                 proxyver,
-    const char *                        newdn
+    const char *                        newdn,
+    int                                 pastproxy
 );
 
 int
@@ -477,7 +478,8 @@ proxy_sign_ext(
     int                                 seconds,
     int                                 serial_num,
     STACK_OF(X509_EXTENSION) *          extensions,
-    int proxyver);
+    int proxyver,
+    int pastproxy);
 
 int
 proxy_check_subject_name(

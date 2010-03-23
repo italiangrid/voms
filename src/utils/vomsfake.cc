@@ -60,8 +60,10 @@ extern "C" {
 extern int writeac(const X509 *issuerc, const STACK_OF(X509) *certstack, const X509 *holder, 
 		   const EVP_PKEY *pkey, BIGNUM *s, char **c, 
 		   const char *t, char **attributes, AC **ac, const char *voname, 
-		   const char *uri, int valid, int old);
+       const char *uri, int valid, int old, int startpast);
 }
+
+static int time_to_sec(std::string timestring);
 
 extern int AC_Init();
 
@@ -156,7 +158,7 @@ Fake::Fake(int argc, char ** argv) :   confile(CONFILENAME),
                                        aclist(NULL), voID(""),
                                        hostcert(""), hostkey(""),
                                        newformat(false), newsubject(""),
-                                       rfc(false)
+                                       rfc(false), pastac("0"), pastproxy("0")
 {
   
   bool progversion = false;
@@ -212,6 +214,10 @@ Fake::Fake(int argc, char ** argv) :   confile(CONFILENAME),
     "    -fqan <string>                 String to include in the AC as the granted FQAN.\n" \
     "    -newformat                     Creates ACs according to the new format.\n" \
     "    -newsubject <string>           Subject of the new certificate.\n" \
+    "    -pastac <seconds>\n"
+    "    -pastac <hour:minutes>         Start the validity of the AC in the past,\n"\
+    "    -pastproxy <seconds>\n"
+    "    -pastproxy <hour:minutes>      Start the validity of the proxy in the past,\n"\
     "\n";
 
   set_usage(LONG_USAGE);
@@ -256,6 +262,8 @@ Fake::Fake(int argc, char ** argv) :   confile(CONFILENAME),
     {"newformat",       1, (int *)&newformat,   OPT_BOOL},
     {"newsubject",      1, (int *)&newsubject,  OPT_STRING},
     {"voinfo",          1, (int *)&voinfo,      OPT_STRING},
+    {"pastac",          1, (int *)&pastac,      OPT_STRING},
+    {"pastproxy",       1, (int *)&pastproxy,   OPT_STRING},
 #ifdef CLASS_ADD
     {"classadd",        1, (int *)class_add_buf,OPT_STRING},
 #endif
@@ -320,12 +328,13 @@ Fake::Fake(int argc, char ** argv) :   confile(CONFILENAME),
     voelem->uri = (char*)uri.c_str();
     voelem->voname = (char*)voms.c_str();
     voelem->vomslife = vomslife;
-  
+    voelem->pastac = (char*)pastac.c_str();
+
     voelem->fqans = (char **)malloc(sizeof(char*)*(fqans.size()+1));
     for (unsigned int i  = 0; i < fqans.size(); i++)
       voelem->fqans[i] = (char*)(fqans[i].c_str());
     voelem->fqans[fqans.size()] = NULL;
-
+    
     std::string targ;
     for (unsigned int i  = 0; i < targets.size(); i++)
       targ += targets[i];
@@ -468,6 +477,7 @@ bool Fake::CreateProxy(std::string data, AC ** aclist, int version)
     args->limited       = limit_proxy;
     args->voID          = strdup(voID.c_str());
     args->callback      = (int (*)())kpcallback;
+    args->pastproxy     = time_to_sec(pastproxy);
 
     int warn = 0;
     void *additional = NULL;
@@ -576,7 +586,7 @@ bool Fake::Retrieve(VOLIST *volist)
 
           if (ac)
             res = writeac(hcert, NULL, holder, hkey, (BIGNUM *)(BN_value_one()), fqanlist,
-                          vo->targets, attributes, &ac, vo->voname, vo->uri, vo->vomslife, !newformat);
+                          vo->targets, attributes, &ac, vo->voname, vo->uri, vo->vomslife, !newformat, time_to_sec(vo->pastac));
         }
       } 
       else {
@@ -710,7 +720,7 @@ bool Fake::VerifyOptions()
     Print(DEBUG) << "Detected Globus version: " << version << std::endl;
 
   if (rfc && proxyver != 0) 
-    exitError("Usedboth -rfc and --proxyver!\nChoose one or the other.");
+    exitError("Used both -rfc and --proxyver!\nChoose one or the other.");
 
   if (rfc)
     proxyver = 4;
@@ -814,4 +824,27 @@ std::ostream& Fake::Print(message_type type)
     return voidstream;
 
   return std::cout;
+}
+
+static int time_to_sec(std::string timestring)
+{
+  int seconds = 0;
+
+  std::string::size_type pos = timestring.find(':');
+
+  if (pos == std::string::npos) {
+    /* Seconds format */
+    seconds = atoi(timestring.c_str());
+  } 
+  else {
+    /* hours:minuts format */
+    int hours, minutes;
+
+    hours   = atoi(timestring.substr(0, pos).c_str());
+    minutes = atoi(timestring.substr(pos+1).c_str());
+
+    seconds = minutes * 60 + hours * 3600;
+  }
+
+  return seconds;
 }

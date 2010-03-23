@@ -91,7 +91,7 @@ int createac(X509 *issuerc, STACK_OF(X509) *issuerstack, X509 *holder, EVP_PKEY 
     
     int res = writeac(issuerc, issuerstack, holder, pkey, serial, array,
                       (complete.empty() ? NULL : const_cast<char *>(complete.c_str())), array2, 
-                      ac, const_cast<char *>(vo.c_str()), const_cast<char *>(uri.c_str()), valid, (old ? 1 : 0));
+                      ac, const_cast<char *>(vo.c_str()), const_cast<char *>(uri.c_str()), valid, (old ? 1 : 0), 0);
 
     deallocate(array, size+1, array2, attributes.size() + 1);
     

@@ -133,6 +133,9 @@ static void convertparam(VO *vo, PARAM* param)
   else if (strcmp(param->name, "-vomslife") == 0) {
     vo->vomslife = atoi(param->value)*3600;
   }
+  else if (strcmp(param->name, "-pastac") == 0) {
+    vo->pastac = strdup(param->value);
+  }
   else if (strcmp(param->name, "-target") == 0) {
     {
       int do_add = 1;

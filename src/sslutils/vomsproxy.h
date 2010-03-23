@@ -50,6 +50,7 @@ struct VOMSProxyArguments {
   int (*callback)();
   STACK_OF(X509_EXTENSION) *extensions;
   STACK_OF(X509) *chain;
+  int             pastproxy;
 };
 
 struct VOMSProxy {
