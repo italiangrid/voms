@@ -429,6 +429,8 @@ struct VOMSProxy *VOMS_MakeProxy(struct VOMSProxyArguments *args, int *warning, 
         X509V3_CTX ctx;
         X509V3_set_ctx(&ctx, NULL, NULL, NULL, NULL, 0L);
         ctx.db = (void*)&ctx;
+        X509V3_CONF_METHOD method = { NULL, NULL, NULL, NULL };
+        ctx.db_meth = &method;
         ex7 = X509V3_EXT_conf_nid(NULL, &ctx, OBJ_obj2nid(OBJ_txt2obj(PROXYCERTINFO_V4,1)), (char*)value);
         free(value);
         value = NULL;
