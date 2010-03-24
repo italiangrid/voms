@@ -17,7 +17,7 @@
 #include "config.h"
 
 #include <iostream>
-#include <cstdlib.h>
+#include <cstdlib>
 #include "fqan.h"
 
 std::string parse_fqan(const std::vector<std::string>& fqans)
