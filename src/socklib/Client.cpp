@@ -164,7 +164,7 @@ proxy_verify_desc *setup_initializers(char *cadir)
 
 }
 
-static void destroy_initializers(void *data) 
+void destroy_initializers(void *data) 
 {
   proxy_verify_desc *pvd = (proxy_verify_desc *)data;
 

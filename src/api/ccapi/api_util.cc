@@ -34,6 +34,7 @@ extern "C" {
 #include <openssl/pem.h>
 #include <openssl/evp.h>
 #include "credentials.h"
+#include "sslutils.h"
 }
 
 #include <string>
@@ -55,9 +56,10 @@ extern "C" {
 
 #include "internal.h"
 
+extern proxy_verify_desc *setup_initializers(char *cadir);
+extern void destroy_initializers(void *data);
 static bool dncompare(const std::string &mut, const std::string &fixed);
 static bool readdn(std::ifstream &file, char *buffer, int buflen);
-static int MS_CALLBACK cb(int ok, X509_STORE_CTX *ctx);
 
 extern std::map<vomsdata*, vomsspace::internal*> privatedata;
 
@@ -723,7 +725,8 @@ vomsdata::check_cert(STACK_OF(X509) *stack)
   ctx = X509_STORE_new();
   error = VERR_MEM;
   if (ctx && csc) {
-    X509_STORE_set_verify_cb_func(ctx,cb);
+    proxy_verify_desc *pvd = setup_initializers(strdup((char*)ca_cert_dir.c_str()));
+    X509_STORE_set_verify_cb_func(ctx,proxy_verify_callback);
 #ifdef SIGPIPE
     signal(SIGPIPE,SIG_IGN);
 #endif
@@ -737,9 +740,11 @@ vomsdata::check_cert(STACK_OF(X509) *stack)
         ERR_clear_error();
         error = VERR_VERIFY;
         X509_STORE_CTX_init(csc, ctx, sk_X509_value(stack, 0), NULL);
+        X509_STORE_CTX_set_ex_data(csc, PVD_STORE_EX_DATA_IDX, pvd);
         index = X509_verify_cert(csc);
       }
     }
+    destroy_initializers(pvd);
   }
   X509_STORE_free(ctx);
 
@@ -747,25 +752,6 @@ vomsdata::check_cert(STACK_OF(X509) *stack)
     X509_STORE_CTX_free(csc);
 
   return (index != 0);
-}
-
-static int MS_CALLBACK 
-cb(int ok, X509_STORE_CTX *ctx)
-{
-  if (!ok) {
-    if (ctx->error == X509_V_ERR_CERT_HAS_EXPIRED) ok=1;
-    /* since we are just checking the certificates, it is
-     * ok if they are self signed. But we should still warn
-     * the user.
-     */
-    if (ctx->error == X509_V_ERR_DEPTH_ZERO_SELF_SIGNED_CERT) ok=1;
-    /* Continue after extension errors too */
-    if (ctx->error == X509_V_ERR_INVALID_CA) ok=1;
-    if (ctx->error == X509_V_ERR_PATH_LENGTH_EXCEEDED) ok=1;
-    if (ctx->error == X509_V_ERR_INVALID_PURPOSE) ok=1;
-    if (ctx->error == X509_V_ERR_DEPTH_ZERO_SELF_SIGNED_CERT) ok=1;
-  }
-  return(ok);
 }
 
 bool
