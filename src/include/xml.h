@@ -17,30 +17,17 @@
 #include "errortype.h"
 
 struct req {
-  char *order;
-  char **command;
-  int  n;
-  char *targets;
-  char *value;
+  struct request *r;
+  std::string value;
   int   error;
-  int   lifetime;
   int   depth;
-  int   base64;
-  int   version;
 };
 
 struct ans {
-  char *data;
-  int   datalen;
-  char *ac;
-  int   aclen;
-  struct error **list;
-
-  struct error  *err;
-  char *value;
+  struct answer *a;
+  std::string *value;
   int error;
   int depth;
-  int version;
 };
 
 extern char *XMLEncodeReq(const char *, const char *, const char *, int);

@@ -422,7 +422,7 @@ GSISocketServer::AcceptGSIAuthentication()
 
   serial = get_peer_serial(actual_cert);
   peer_serial = std::string(serial ? serial : "");
-  free(serial);
+  OPENSSL_free(serial);
 
   return true;
 

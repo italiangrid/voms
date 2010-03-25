@@ -26,13 +26,36 @@ extern "C" {
 std::string XML_Req_Encode(const std::string &command, const std::string &order,
                           const std::string &targets, const int lifetime)
 {
-  char *ret = XMLEncodeReq(command.c_str(), order.c_str(),
-                          targets.c_str(), lifetime);
-  std::string res;
+  std::string res = "<?xml version=\"1.0\" encoding = \"US-ASCII\"?><voms>";
 
-  if (ret)
-    res = std::string(ret);
-  free(ret);
+  char str[15];
+
+  std::string::size_type begin = 0;
+  std::string::size_type pos = command.find_first_of(',');
+
+  do {
+    res += "<command>";
+    if (pos != std::string::npos) {
+      res += command.substr(begin, pos);
+      begin = pos + 1;
+      pos = command.find_first_of(',', begin);
+    }
+    else
+      res += command.substr(begin);
+    res += "</command>";
+  } while (pos != std::string::npos);
+
+  if (!order.empty())
+    res += "<order>"+order+"</order>";
+
+  if (!targets.empty())
+    res += "<targets>"+targets+"</targets";
+
+  res += "<base64>1</base64><version>4</version>";
+
+  sprintf(str, "%d", lifetime);
+
+  res += "<lifetime>"+str+"</lifetime></voms>";
 
   return res;
 }
@@ -42,38 +65,62 @@ std::string XML_Ans_Encode(const std::string &ac, const std::vector<errorp> e, b
   return XML_Ans_Encode(ac, "", e, base64);
 }
 
+std::string Encode(std::string data, int base64)
+{
+  int j = 0;
+  char *tmp = NULL;
+  std::string result;
+
+  if (base64)
+    tmp = base64Encode(data.data(), data.size(), &j);
+  else
+    tmp = MyEncode(data.data(), date.size(), &j);
+
+  if (tmp) {
+    result = std::string(tmp, j);
+    free(tmp);
+  }
+
+  return result;
+}
+
 std::string XML_Ans_Encode(const std::string &ac, const std::string &data, const std::vector<errorp> e, bool base64)
 {
-  struct error **vect = NULL, **tmp;
-  char *ret = NULL;
+  char str[15];
 
-  for (std::vector<errorp>::const_iterator i = e.begin(); i != e.end(); i++) {
-    error *t = alloc_error((*i).num, (*i).message.c_str());
-    if (t) {
-      tmp = (struct error **)listadd((char **)vect, (char *)t, sizeof(struct error *));
-      if (tmp)
-        vect = tmp;
-      else {
-        free(t);
-        goto err;
-      }
+  if (ac.empty())
+    return "";
+
+  std::string codedac   = Encode(ac, base64);
+  std::string codeddata = Encode(data, base64);
+
+  if ((codedac.empty() && !ac.empty()) && (codeddata.empty() && !data.empty())) {
+    return "";
+  }
+
+  std::string res="<?xml version=\"1.0\" encoding = \"US-ASCII\"?><vomsans><version>3</version>";
+
+  if (!e.empty) {
+    res += "<error>";
+
+    for (std::vector<errorp>::const_iterator i = e.begin(); i != e.end(); i++) {
+      res +="<item><number>";
+      sprintf(str, "%d", (*i).num);
+      res += str;
+      res += "</number><message>" + (*i).message + "</message></item";
     }
-    else
-      goto err;
+    res +="</error>";
   }
 
-  ret = XMLEncodeAns(vect, ac.data(), ac.size(), data.data(), data.size(), base64);
-  listfree((char **)vect, (freefn)free);
-  vect = NULL;
-  if (ret) {
-    std::string s = std::string(ret);
-    free(ret);
-    return s;
-  }
+  if (!codeddata.empty())
+    res += "<bitstr>" + codeddata + "</bitstr>";
 
- err:
-  listfree((char **)vect, (freefn)free_error);
-  return "";
+  if (!codedac.empty())
+    res += "<ac>" + codedac + "</ac>";
+
+  res + "</vomsans>";
+
+  return res;
 }
 
 bool XML_Req_Decode(const std::string &message, request &r)

@@ -19,7 +19,6 @@
 #include <string>
 #include <vector>
 
-std::string parse_fqan(const std::vector<std::string>& fqans);
-std::string FQANParse(std::string fqan);
+extern std::string parse_fqan(const std::vector<std::string>& fqans, bool clean = false);
 
 #endif

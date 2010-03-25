@@ -110,14 +110,6 @@ static char *base64Decode(const char *data, int size, int *j)
   return buffer;
 }
 
-char *Encode(const char *data, int size, int *j, int base64)
-{
-  if (base64)
-    return base64Encode(data, size, j);
-  else
-    return MyEncode(data, size, j);
-}
-
 char *Decode(const char *data, int size, int *j)
 {
   int i = 0;
@@ -227,150 +219,7 @@ static char *MyDecode(const char *data, int size, int *n)
   return NULL;
 }
 
-char *XMLEncodeReq(const char *command, const char *order, const char *targets,
-                  int lifetime)
-{
-  char *res;
-  int size;
-  char str[15];
-  const char *tmp;
-  int count = 0;
-
-  if (!command)
-    return NULL;
-
-  size = strlen(command) + (order ? strlen(order) : 0) +
-    (targets ? strlen(targets) : 0) + 187;
-
-  /* count the number of commands -1*/
-  tmp = command;
-
-  while ((tmp = strchr(tmp, ',')))  {
-    count ++;
-    tmp++;
-  }
-    
-  size += (count * 19);
-
-  if ((res = (char *)malloc(size))) {
-    const char * prev = command;
-    const char *next = prev;
-
-    strcpy(res, "<?xml version=\"1.0\" encoding = \"US-ASCII\"?><voms>");
-
-    while(next != 0)
-    { 
-      next = strchr(prev, ',');
-
-      strcat(res, "<command>");
-      strncat(res, prev, (next ? next - prev : command + strlen(command) - prev));
-      strcat(res, "</command>");
-
-      prev = next + 1;
-    }
-
-    if (order && strlen(order)) {
-      strcat(res, "<order>");
-      strcat(res, order);
-      strcat(res, "</order>");
-    }
-
-    if (targets && strlen(targets)) {
-      strcat(res, "<targets>");
-      strcat(res, targets);
-      strcat(res, "</targets>");
-    }
-
-    strcat(res,"<base64>1</base64>");
-    strcat(res,"<version>4</version>");
-
-    sprintf(str, "%d", lifetime);
-    strcat(res, "<lifetime>");
-    strcat(res, str);
-    strcat(res, "</lifetime></voms>");
-
-
-    return res;
-  }
-  return NULL;
-}
-
-char *XMLEncodeAns(struct error **wande, const char *ac, int lenac,
-                   const char *data, int lendata, int base64)
-{
-  char *res;
-  int size;
-  char str[15];
-  char *codeddata;
-  char *codedac;
-  int newdata;
-  int newac;
-
-  if (!ac)
-    return NULL;
-
-  if (!ac)  lenac  = 0;
-
-  codedac   = Encode(ac, lenac, &newac, base64);
-  codeddata = Encode(data, lendata, &newdata, base64);
-
-  if ((!codedac && ac) && (!codeddata && data)) {
-    free(codedac);
-    free(codeddata);
-    return NULL;
-  }
-
-  size = newac + newdata + 115;
-
-  if (wande) {
-    struct error **tmp = wande;
-    size += 15;
-    while (*tmp) {
-      size += strlen((*tmp)->message) + 64;
-      tmp++;
-    }
-  }
-
-  if ((res = (char *)malloc(size))) {
-    strcpy(res, "<?xml version=\"1.0\" encoding = \"US-ASCII\"?><vomsans>");
-
-    strcat(res, "<version>3</version>");
-    if (wande) {
-      struct error **tmp = wande;
-      strcat(res, "<error>");
-      while (*tmp) {
-        strcat(res, "<item><number>");
-        sprintf(str, "%d", (*tmp)->num);
-        strcat(res, str);
-        strcat(res, "</number><message>");
-        strcat(res, (*tmp)->message);
-        strcat(res, "</message></item>");
-        tmp++;
-      }
-      strcat(res, "</error>");
-    }
-
-    if (codeddata) {
-      strcat(res, "<bitstr>");
-      strncat(res, codeddata, newdata);
-      strcat(res, "</bitstr>");
-      free(codeddata);
-    }
-
-    if (codedac) {
-      strcat(res, "<ac>");
-      strncat(res, codedac, newac);
-      strcat(res, "</ac>");
-      free(codedac);
-    }
-    strcat(res, "</vomsans>");
-
-    return res;
-  }
-  return NULL;
-}
-
-static void  startans(void *userdata, UNUSED(const char *name), UNUSED(const char **attrs))
+static void startans(void *userdata, UNUSED(const char *name), UNUSED(const char **attrs))
 {
   struct ans *a = (struct ans *)userdata;
 
@@ -378,13 +227,14 @@ static void  startans(void *userdata, UNUSED(const char *name), UNUSED(const cha
     a->error = 1;
   else {
     a->depth++;
-    a->value = NULL;
+    a->value = "";
   }
 }
 
-static void  startreq(void *userdata, UNUSED(const char *name), UNUSED(const char **attrs))
+static void startreq(void *userdata, UNUSED(const char *name), UNUSED(const char **attrs))
 {
   struct req *d = (struct req *)userdata;
+
   if (!d || d->error)
     return;
 
@@ -394,10 +244,10 @@ static void  startreq(void *userdata, UNUSED(const char *name), UNUSED(const cha
   }
 
   d->depth++;
-  d->value = NULL;
+  d->value = "";
 }
 
-static void  endreq(void *userdata, const char *name)
+static void endreq(void *userdata, const char *name)
 {
   struct req *d = (struct req *)userdata;
 
@@ -411,32 +261,23 @@ static void  endreq(void *userdata, const char *name)
 
   d->depth--;
   if (strcmp(name, "order") == 0)
-    d->order = d->value;
+    d->r->order = d->value;
   else if (strcmp(name, "targets") == 0)
-    d->targets = d->value;
+    d->r->targets = d->value;
   else if (strcmp(name, "command") == 0)
-  {
-    d->command = listadd(d->command, d->value, sizeof(char *));
-  }  
-  else if (strcmp(name, "lifetime") == 0) {
-    d->lifetime = atoi(d->value);
-    free(d->value);
-  }
-  else if (strcmp(name, "base64") == 0) {
-    d->base64 = 1;
-    free(d->value);
-  }
-  else if (strcmp(name, "version") == 0) {
-    d->version = atoi(d->value);
-    free(d->value);
-  }
-  d->value=NULL;
+    d->r->command.push_back(d->value);
+  else if (strcmp(name, "lifetime") == 0)
+    d->r->lifetime = atoi(d->value.c_str());
+  else if (strcmp(name, "base64") == 0)
+    d->r->base64 = 1;
+  else if (strcmp(name, "version") == 0)
+    d->r->version = atoi(d->value.c_str());
+  d->value="";
 }
 
-static void  endans(void *userdata, const char *name)
+static void endans(void *userdata, const char *name)
 {
   struct ans *a = (struct ans *)userdata;
-  struct error *e;
 
   if (!a)
     return;
@@ -448,99 +289,62 @@ static void  endans(void *userdata, const char *name)
 
   a->depth--;
   if (!strcmp(name,"ac")) {
-    int size;
-    char *dec = Decode(a->value, strlen(a->value), &size);
-    free(a->value);
-    if (dec) {
-      a->ac = dec;
-      a->aclen = size;
-    }
-    else
+    a->a->ac = Decode(a->value);
+    if (a->a->ac.empty())
       a->error=1;
   }
   else if (!strcmp(name, "bitstr")) {
-    int size;
-    char *dec = Decode(a->value, strlen(a->value), &size);
-    free(a->value);
-    if (dec) {
-      a->data = dec;
-      a->datalen = size;
-    }
-    else
+    a->a->data = Decode(a->value);
+    if (a->a->data.empty())
       a->error=1;
   }
   else if (!strcmp(name, "error")) {
-    struct error **tmp;
-    tmp = (struct error **)listadd((char **)(a->list), (char *)(a->err), sizeof(struct error *));
-/*     free(a->err->message); */
-/*     free_error(a->err); */
-    free(a->value);
-    a->err = NULL;
-    if (tmp)
-      a->list = tmp;
-    else {
-      listfree((char **)tmp, (void (*)(void *))free_error);
-      a->error=1;
-    }
+    struct errorp e;
+    e->num     = a->num;
+    e->message = a->message;
+    a->a->errs.push_back(e);
   }
   else if ((!strcmp(name, "number")) && 
-	   (a->depth == 3) && 
-	   (e = (struct error *)malloc(sizeof(struct error)))) {
-    if (a->err)
-      free(e);
-    else
-      a->err = e;
-    a->err->num = atoi(a->value);
-    free(a->value);
+           (a->depth == 3)) {
+    a->num = atoi(a->value.c_str());
   }
   else if ((!strcmp(name, "message")) && 
-	   (a->depth == 3) && 
-	   (e = (struct error *)malloc(sizeof(struct error)))) {
-    if (a->err)
-      free(e);
-    else
-      a->err = e;
-    a->err->message = strdup(a->value);
-    free(a->value);
+           (a->depth == 3)) {
+    a->message = a->value;
   }
   else if ((!strcmp(name, "version"))) {
-    a->version = atoi(a->value);
-    free(a->value);
+    a->a->version = atoi(a->value.c_str());
   }
-  a->value = NULL;
+  a->value = "";
 }
       
-static void  handlerreq(void *userdata, const char *s, int len)
+static void handlerreq(void *userdata, const char *s, int len)
 {
   struct req *d = (struct req *)userdata;
 
   if (!d || d->error)
     return;
 
-  d->value = strndup(s, len);
-  if (!d->value && len)
+  d->value = std::string(s, len);
+
+  if (d->value.empty() && len)
     d->error = 1;
 }
 
-static void  handlerans(void *userdata, const char *s, int len)
+static void handlerans(void *userdata, const char *s, int len)
 {
   struct ans *a = (struct ans *)userdata;
 
   if (!a || a->error)
     return;
 
-  if (!a->value)
-    a->value = strndup(s, len);
+  if (a->value.empty())
+    a->value = std::string(s, len);
   else {
-    a->value = (char*)realloc(a->value, strlen(a->value) + len + 1);
-
-    if (a->value)
-      a->value = strncat(a->value, s, len);
-    else if (len)
-      a->error = 1;
+    a->value += std::string(s, len);
   }
 
-  if (!a->value && len)
+  if (a->value.empty() && len)
     a->error = 1;
 }
 
@@ -550,7 +354,7 @@ int XMLDecodeReq(const char *message, struct req *d)
   int res;
   d->command = NULL;
   d->order = d->targets = d->value = NULL;
-  d->error = d->depth = d->n = 0;
+  d->error = d->depth = 0;
   d->lifetime = -1;
   d->version = d->base64 = 0;
 

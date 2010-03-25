@@ -561,8 +561,7 @@ Client::Client(int argc, char ** argv) :
   
     /* parse order and target vector to a comma-separated list */
   
-    for (std::vector<std::string>::iterator i = order.begin(); i != order.end(); i++)
-      ordering += (i == order.begin() ? std::string("") : std::string(",")) + FQANParse(*i).substr(1);
+    ordering = parse_fqan(order, true);
 
     for (std::vector<std::string>::iterator i = targets.begin(); i != targets.end(); i++)
       targetlist += (i == targets.begin() ? ("") : std::string(",")) + *i;
