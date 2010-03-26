@@ -45,12 +45,11 @@ CONFIG_HEADER = $(top_builddir)/src/autogen/config.h
 CONFIG_CLEAN_FILES =
 LTLIBRARIES = $(noinst_LTLIBRARIES)
 libutilc_la_LIBADD =
-am_libutilc_la_OBJECTS = list.lo error.lo failure.lo credentials.lo
+am_libutilc_la_OBJECTS = list.lo failure.lo credentials.lo
 libutilc_la_OBJECTS = $(am_libutilc_la_OBJECTS)
 libutilc_nog_la_LIBADD =
 am_libutilc_nog_la_OBJECTS = libutilc_nog_la-list.lo \
-	libutilc_nog_la-error.lo libutilc_nog_la-failure.lo \
-	libutilc_nog_la-credentials.lo
+	libutilc_nog_la-failure.lo libutilc_nog_la-credentials.lo
 libutilc_nog_la_OBJECTS = $(am_libutilc_nog_la_OBJECTS)
 libutilities_la_LIBADD =
 am_libutilities_la_OBJECTS = data.lo options.lo pass.lo fqan.lo \
@@ -300,7 +299,6 @@ libutilities_nog_la_CFLAGS = \
 
 libutilc_la_SOURCES = \
 	list.c \
-	error.c \
 	failure.c \
 	credentials.c
 
@@ -322,7 +320,6 @@ libutilc_nog_la_CPPFLAGS = \
 
 libutilc_nog_la_SOURCES = \
 	list.c \
-	error.c \
 	failure.c \
 	credentials.c
 
@@ -385,11 +382,9 @@ distclean-compile:
 
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/credentials.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/data.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/error.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/failure.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/fqan.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libutilc_nog_la-credentials.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libutilc_nog_la-error.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libutilc_nog_la-failure.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libutilc_nog_la-list.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/list.Plo@am__quote@
@@ -424,13 +419,6 @@ libutilc_nog_la-list.lo: list.c
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	source='list.c' object='libutilc_nog_la-list.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libutilc_nog_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o libutilc_nog_la-list.lo `test -f 'list.c' || echo '$(srcdir)/'`list.c
-
-libutilc_nog_la-error.lo: error.c
-@am__fastdepCC_TRUE@	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libutilc_nog_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT libutilc_nog_la-error.lo -MD -MP -MF $(DEPDIR)/libutilc_nog_la-error.Tpo -c -o libutilc_nog_la-error.lo `test -f 'error.c' || echo '$(srcdir)/'`error.c
-@am__fastdepCC_TRUE@	mv -f $(DEPDIR)/libutilc_nog_la-error.Tpo $(DEPDIR)/libutilc_nog_la-error.Plo
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='error.c' object='libutilc_nog_la-error.lo' libtool=yes @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libutilc_nog_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o libutilc_nog_la-error.lo `test -f 'error.c' || echo '$(srcdir)/'`error.c
 
 libutilc_nog_la-failure.lo: failure.c
 @am__fastdepCC_TRUE@	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libutilc_nog_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT libutilc_nog_la-failure.lo -MD -MP -MF $(DEPDIR)/libutilc_nog_la-failure.Tpo -c -o libutilc_nog_la-failure.lo `test -f 'failure.c' || echo '$(srcdir)/'`failure.c

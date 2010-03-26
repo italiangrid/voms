@@ -17,13 +17,21 @@
 
 #include <string>
 
-extern "C" {
-#include "errortype.h"
-}
-
 struct errorp {
   int num;
   std::string message;
 };
+
+#define ERROR_OFFSET 1000
+#define WARN_OFFSET     0
+
+#define WARN_NO_FIRST_SELECT (WARN_OFFSET + 1)
+#define WARN_SHORT_VALIDITY  (WARN_OFFSET + 2)
+#define WARN_ATTR_SUBSET     (WARN_OFFSET + 3)
+
+#define ERR_WITH_DB         (ERROR_OFFSET + 3)
+#define ERR_NOT_MEMBER      (ERROR_OFFSET + 1)
+#define ERR_ATTR_EMPTY      (ERROR_OFFSET + 2)
+#define ERR_SUSPENDED       (ERROR_OFFSET + 4)
 
 #endif
