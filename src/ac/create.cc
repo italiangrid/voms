@@ -29,11 +29,8 @@ extern "C" {
 #include "write.h"
 #include <stdlib.h>
 #include "acerrors.h"
-
-extern char *Encode(const char *, int, int *);
-extern char *Decode(const char *, int, int *);
-
 }
+
 #include <cstring>
 
 static void deallocate(char **v1, int s1, char **v2, int s2) 

@@ -29,7 +29,6 @@ libutilities_nog_la_CFLAGS = \
 
 libutilc_la_SOURCES = \
 	list.c \
-	xml.c \
 	error.c \
 	failure.c \
 	credentials.c
@@ -52,7 +51,6 @@ libutilc_nog_la_CPPFLAGS = \
 
 libutilc_nog_la_SOURCES = \
 	list.c \
-	xml.c \
 	error.c \
 	failure.c \
 	credentials.c

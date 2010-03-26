@@ -56,11 +56,6 @@ void *logh = NULL;
 #include "vomsxml.h"
 #include "fqan.h"
 
-extern "C" {
-extern char *Decode(const char *, int, int *);
-extern char *Encode(const char *, int, int *, int);
-}
-
 #include <map>
 #include <set>
 #include <string>
@@ -1639,17 +1634,15 @@ static int EncodeAnswerForRest(const std::string& input, int unknown, std::strin
 
   if (XML_Ans_Decode(input, a)) {
     if (!a.ac.empty() && a.ac != "A") {
-      int len = 0;
-      char *ac = Encode(a.ac.c_str(), a.ac.length(), &len, !a.base64);
+      std::string ac = Encode(a.ac, !a.base64);
 
-      output = "<?xml version=\"1.0\" encoding=\"UTF-8\"?><voms><ac>" +std::string(ac, len) +"</ac>";
+      output = "<?xml version=\"1.0\" encoding=\"UTF-8\"?><voms><ac>" + ac + "</ac>";
       std::vector<errorp> errs = a.errs;
       for (std::vector<errorp>::iterator i = errs.begin(); i != errs.end(); i++)
         output +="<warning>"+i->message+"</warning>";
       if (unknown) 
         output +="<warning>Unknown parameters in the request were ignored!</warning>";
       output += "</voms>";
-      free(ac);
       return SOAP_HTML;
     }
     else {
