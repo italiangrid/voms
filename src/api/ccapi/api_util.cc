@@ -183,7 +183,8 @@ vomsdata::retrieve(X509 *cert, STACK_OF(X509) *chain, recurse_type how,
    */
   int chain_length;
   int position = 0;
-  ca = subject = "";
+  ca.clear();
+  subject.clear();
 
   X509 *h = get_real_cert(cert, chain);
   if (!h) {
@@ -809,7 +810,7 @@ vomsdata::my_conn(const std::string &hostname, int port, const std::string &cont
   }
   
   u  = sock.own_subject;
-  uc = "";
+  uc.clear();
 
   if (u.empty()) {
     seterror(VERR_NOIDENT, sock.GetError());

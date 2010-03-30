@@ -160,8 +160,6 @@ vomsdata::vomsdata(std::string voms_dir, std::string cert_dir) :  ca_cert_dir(ce
   if (vdir)
     (void)closedir(vdir);
 
-  duration = 0;
-
   vomsspace::internal *data = new vomsspace::internal();
   privatedata[this] = data;
 }
@@ -177,7 +175,7 @@ vomsdata::~vomsdata()
 std::string vomsdata::ServerErrors(void)
 {
   std::string err = serverrors;
-  serverrors="";
+  serverrors.clear();
 
   return err;
 }
@@ -209,7 +207,7 @@ void vomsdata::SetVerificationType(verify_type t)
 
 void vomsdata::ResetOrder(void)
 {
-  ordering="";
+  ordering.clear();
 }
 
 void vomsdata::Order(std::string att)
@@ -486,7 +484,7 @@ bool vomsdata::Export(std::string &buffer)
   std::string temp;
 
   if (data.empty()) {
-    buffer= "";
+    buffer.clear();
     return true;
   }
 
