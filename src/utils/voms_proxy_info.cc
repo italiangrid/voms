@@ -305,7 +305,7 @@ static char *findlast(char *haystack, char *needle)
   while (tmp) {
     tmp = strstr(tmp+1, needle);
     if (tmp)
-      point = tmp;
+      point = (char*)tmp;
   }
 
   return point;

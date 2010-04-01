@@ -49,6 +49,7 @@ extern "C" {
 #include <sys/mman.h>
 #include <fcntl.h>
 #include <errno.h>
+#include <limits.h>
 
 #include "listfunc.h"
 #include "credentials.h"
