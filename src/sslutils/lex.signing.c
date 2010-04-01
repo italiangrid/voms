@@ -77,6 +77,7 @@ typedef int flex_int32_t;
 typedef unsigned char flex_uint8_t; 
 typedef unsigned short int flex_uint16_t;
 typedef unsigned int flex_uint32_t;
+#endif /* ! C99 */
 
 /* Limits of integral types. */
 #ifndef INT8_MIN
@@ -106,8 +107,6 @@ typedef unsigned int flex_uint32_t;
 #ifndef UINT32_MAX
 #define UINT32_MAX             (4294967295U)
 #endif
-
-#endif /* ! C99 */
 
 #endif /* ! FLEXINT_H */
 
@@ -200,15 +199,7 @@ typedef void* yyscan_t;
 
 /* Size of default input buffer. */
 #ifndef YY_BUF_SIZE
-#ifdef __ia64__
-/* On IA-64, the buffer size is 16k, not 8k.
- * Moreover, YY_BUF_SIZE is 2*YY_READ_BUF_SIZE in the general case.
- * Ditto for the __ia64__ case accordingly.
- */
-#define YY_BUF_SIZE 32768
-#else
 #define YY_BUF_SIZE 16384
-#endif /* __ia64__ */
 #endif
 
 /* The state buf must be large enough to hold one state per character in the main buffer.
@@ -2338,8 +2329,8 @@ static yyconst yy_state_type yy_NUL_trans[107] =
 
 static yyconst flex_int16_t yy_rule_linenum[17] =
     {   0,
-       37,   38,   40,   42,   43,   46,   47,   48,   49,   50,
-       51,   52,   53,   54,   56,   57
+       47,   48,   50,   52,   53,   56,   57,   58,   59,   60,
+       61,   62,   63,   64,   66,   67
     } ;
 
 /* The intent behind this definition is that it'll catch
@@ -2355,10 +2346,20 @@ static yyconst flex_int16_t yy_rule_linenum[17] =
  *
  * Authors: Vincenzo Ciaschini - Vincenzo.Ciaschini@cnaf.infn.it 
  *
- * Copyright (c) 2002-2009 INFN-CNAF on behalf of the EU DataGrid
- * and EGEE I, II and III
- * For license conditions see LICENSE file or
- * http://www.apache.org/licenses/LICENSE-2.0.txt
+ * Copyright (c) Members of the EGEE Collaboration. 2004-2010.
+ * See http://www.eu-egee.org/partners/ for details on the copyright holders.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *    http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  *
  * Parts of this code may be based upon or even include verbatim pieces,
  * originally written by other people, in which case the original header
@@ -2376,7 +2377,7 @@ static yyconst flex_int16_t yy_rule_linenum[17] =
 extern char *strndup(char*, size_t);
 
 
-#line 2380 "lex.signing.c"
+#line 2381 "lex.signing.c"
 
 #define INITIAL 0
 #define SINGLE_QUOTED 1
@@ -2542,12 +2543,7 @@ static int input (yyscan_t yyscanner );
 
 /* Amount of stuff to slurp up with each read. */
 #ifndef YY_READ_BUF_SIZE
-#ifdef __ia64__
-/* On IA-64, the buffer size is 16k, not 8k */
-#define YY_READ_BUF_SIZE 16384
-#else
 #define YY_READ_BUF_SIZE 8192
-#endif /* __ia64__ */
 #endif
 
 /* Copy whatever the last rule matched to the standard output. */
@@ -2556,7 +2552,7 @@ static int input (yyscan_t yyscanner );
 /* This used to be an fputs(), but since the string might contain NUL's,
  * we now use fwrite().
  */
-#define ECHO do { if (fwrite( yytext, yyleng, 1, yyout )) {} } while (0)
+#define ECHO fwrite( yytext, yyleng, 1, yyout )
 /* %endif */
 /* %if-c++-only C++ definition */
 /* %endif */
@@ -2665,10 +2661,10 @@ YY_DECL
     struct yyguts_t * yyg = (struct yyguts_t*)yyscanner;
 
 /* %% [7.0] user's declarations go here */
-#line 35 "signing_policy.l"
+#line 45 "signing_policy.l"
 
 
-#line 2672 "lex.signing.c"
+#line 2668 "lex.signing.c"
 
     yylval = yylval_param;
 
@@ -2774,91 +2770,91 @@ do_action:	/* This label is used only to access EOF actions. */
 
 case 1:
 YY_RULE_SETUP
-#line 37 "signing_policy.l"
+#line 47 "signing_policy.l"
 /* ignore comments */
 	YY_BREAK
 case 2:
 YY_RULE_SETUP
-#line 38 "signing_policy.l"
+#line 48 "signing_policy.l"
 BEGIN(SINGLE_QUOTED);
 	YY_BREAK
 case 3:
 YY_RULE_SETUP
-#line 40 "signing_policy.l"
+#line 50 "signing_policy.l"
 yylval_param->string = yytext; BEGIN(INITIAL); return SUBJECTS;
 	YY_BREAK
 case 4:
 YY_RULE_SETUP
-#line 42 "signing_policy.l"
+#line 52 "signing_policy.l"
 BEGIN(DOUBLE_QUOTED);
 	YY_BREAK
 case 5:
 YY_RULE_SETUP
-#line 43 "signing_policy.l"
+#line 53 "signing_policy.l"
 yylval_param->string = yytext; BEGIN(INITIAL); return SUBJECTS;
 	YY_BREAK
 case 6:
 YY_RULE_SETUP
-#line 46 "signing_policy.l"
+#line 56 "signing_policy.l"
 return COND_SUBJECTS;
 	YY_BREAK
 case 7:
 YY_RULE_SETUP
-#line 47 "signing_policy.l"
+#line 57 "signing_policy.l"
 return COND_BANNED;
 	YY_BREAK
 case 8:
 YY_RULE_SETUP
-#line 48 "signing_policy.l"
+#line 58 "signing_policy.l"
 return GLOBUS;
 	YY_BREAK
 case 9:
 YY_RULE_SETUP
-#line 49 "signing_policy.l"
+#line 59 "signing_policy.l"
 return POS_RIGHTS;
 	YY_BREAK
 case 10:
 YY_RULE_SETUP
-#line 50 "signing_policy.l"
+#line 60 "signing_policy.l"
 return NEG_RIGHTS;
 	YY_BREAK
 case 11:
 YY_RULE_SETUP
-#line 51 "signing_policy.l"
+#line 61 "signing_policy.l"
 return CA_SIGN;
 	YY_BREAK
 case 12:
 YY_RULE_SETUP
-#line 52 "signing_policy.l"
+#line 62 "signing_policy.l"
 return ACCESS_ID_CA;
 	YY_BREAK
 case 13:
 YY_RULE_SETUP
-#line 53 "signing_policy.l"
+#line 63 "signing_policy.l"
 return ACCESS_ID_ANYBODY;    
 	YY_BREAK
 case 14:
 YY_RULE_SETUP
-#line 54 "signing_policy.l"
+#line 64 "signing_policy.l"
 return X509;
 	YY_BREAK
 case 15:
 /* rule 15 can match eol */
 YY_RULE_SETUP
-#line 56 "signing_policy.l"
+#line 66 "signing_policy.l"
 
 	YY_BREAK
 case 16:
 YY_RULE_SETUP
-#line 57 "signing_policy.l"
+#line 67 "signing_policy.l"
 
 	YY_BREAK
 case 17:
 YY_RULE_SETUP
-#line 59 "signing_policy.l"
+#line 69 "signing_policy.l"
 ECHO;
 	YY_BREAK
-#line 2862 "lex.signing.c"
+#line 2858 "lex.signing.c"
 case YY_STATE_EOF(INITIAL):
 case YY_STATE_EOF(SINGLE_QUOTED):
 case YY_STATE_EOF(DOUBLE_QUOTED):
@@ -3734,8 +3730,8 @@ YY_BUFFER_STATE signing_scan_string (yyconst char * yystr , yyscan_t yyscanner)
 /* %if-c-only */
 /** Setup the input buffer state to scan the given bytes. The next call to signinglex() will
  * scan from a @e copy of @a bytes.
- * @param yybytes the byte buffer to scan
- * @param _yybytes_len the number of bytes in the buffer pointed to by @a bytes.
+ * @param bytes the byte buffer to scan
+ * @param len the number of bytes in the buffer pointed to by @a bytes.
  * @param yyscanner The scanner object.
  * @return the newly allocated buffer state object.
  */
@@ -4163,4 +4159,4 @@ void signingfree (void * ptr , yyscan_t yyscanner)
 
 /* %ok-for-header */
 
-#line 59 "signing_policy.l"
+#line 69 "signing_policy.l"
