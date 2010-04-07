@@ -6,7 +6,7 @@ include_HEADERS = \
 noinst_LTLIBRARIES = \
 	$(WANTED_SOCK_LIBS) # may add the libraries defined in EXTRA_LTLIBRARIES
 
-SOURCES = Client.cpp ipv6sock.cc
+SOURCES = Client.cpp ipv6sock.cc io.cc
 
 libsock_la_SOURCES = 	Client.cpp ipv6sock.cc io.cc
 libsock_nog_la_SOURCES = Client.cpp Server.cpp ipv6sock.cc io.cc
