@@ -51,7 +51,7 @@ typedef union YYSTYPE
 {
 
 /* Line 1676 of yacc.c  */
-#line 16 "vomsfake.y"
+#line 31 "vomsfake.y"
 
   char *string;
   char *input;
