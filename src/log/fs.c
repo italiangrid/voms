@@ -246,7 +246,7 @@ static int logfile_rotate(const char * name)
 
     dir = opendir(dirname);
     if (dir) {
-      baselen = strlen(basename);
+      int baselen = strlen(basename);
 
       while ((de = readdir(dir))) {
         pos = strrchr(de->d_name, '.');
