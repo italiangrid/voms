@@ -57,7 +57,6 @@ struct LogInfo {
   const char *format;
   const char *dateformat;
   const char *service;
-  int         fd;
   struct OutputStream *streamers;
 };
 
@@ -66,7 +65,7 @@ void *LogInit()
   struct LogInfo *info = NULL;
 
   info = calloc(1, sizeof(struct LogInfo));
-  info->fd = -1;
+
   if (info) {
     FILEStreamerAdd(info);
     SYSLOGStreamerAdd(info);
