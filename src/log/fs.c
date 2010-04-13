@@ -32,7 +32,6 @@ struct localdata {
   char *dateformat;
   int maxlog;
   int fd;
-  int level;
 };
 
 static int filereopen(struct localdata *ld);
@@ -152,7 +151,6 @@ static void *fileinit(void)
     ld->dateformat = NULL;
     ld->fd       = -1;
     ld->maxlog   = 0;
-    ld->level    = -1;
   }
 
   return ld;
@@ -165,9 +163,7 @@ static void fileoptioner(void *data, const char *name, const char *value)
   if (!ld)
     return;
 
-  if (strcmp(name, "LEVEL") == 0)
-    ld->level=atoi(value);
-  else if (strcmp(name, "NAME") == 0) {
+  if (strcmp(name, "NAME") == 0) {
     int fd = open(value, O_WRONLY|O_CREAT|O_APPEND, S_IRUSR|S_IWUSR);
 
     if (fd != -1) {
