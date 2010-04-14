@@ -42,6 +42,7 @@ extern "C" {
 #include <openssl/bio.h>
 #include <unistd.h>
 #include <fcntl.h>
+#include <string.h>
 }
 
 #include <string>
