@@ -24,12 +24,8 @@
  *********************************************************************/
 #ifndef VOMS_STREAMERS_H
 #define VOMS_STREAMERS_H
-#include <stdio.h>
 
 extern void *FILEStreamerAdd(void *h);
-extern int   FILEStreamerRem(void *h, void *f);
-extern void *FileNameStreamerAdd(void *h, const char *name, int maxlog, int code, int reload);
-extern int   FileNameStreamerRem(void *h, void *f);
 extern void *SYSLOGStreamerAdd(void *h);
-extern int   SYSLOGStreamerRem(void *h, void *f);
+
 #endif

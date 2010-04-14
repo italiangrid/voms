@@ -44,7 +44,7 @@ extern "C" {
 #include "credentials.h"
 
 #include "log.h"
-#include "streamers.h"
+
 #include "sslutils.h"
 
 static int reload = 0;
@@ -478,7 +478,6 @@ VOMSServer::VOMSServer(int argc, char *argv[]) : sock(0,NULL,50,false),
       (void)LogService(logh, "vomsd");
       (void)LogFormat(logh, logf.c_str());
       //      (void)LogDateFormat(logh, logdf.c_str());
-      (void)StartLogger(logh, code);
       if (!nologfile)
         (void)LogActivate(logh, "FILE");
       if (do_syslog)
@@ -653,8 +652,6 @@ void VOMSServer::Run()
   if (!debug)
     if (daemon(0,0))
       exit(0);
-
-  SetOwner(getpid());
 
   fd_set rset;
   FD_ZERO(&rset);
