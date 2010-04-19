@@ -126,7 +126,13 @@ This forces the server to generate ACs in the new (correct) format\&. This is me
 \fB\-newsubject\fR  \fInewdn\fR
 
 .PP
-The created proxy will have newdn as subject rather than what is would normally have depending on the specific version of proxy created\&.
+The created proxy will have newdn as subject rather than what is would normally have depending on the specific version of proxy created\&. Non\-printable characters may be specified via the '\\XX' encoding, where XX are two hexadecimal characters\&.
+
+.PP
+\fB\-newissuer\fR  \fInewdn\fR
+
+.PP
+The created proxy will have newdn as issuer rather than what is would normally have depending on the specific version of proxy created\&. Non\-printable characters may be specified via the '\\XX' encoding, where XX are two hexadecimal characters\&.
 
 .PP
 \fB\-newserial\fR  \fInewserial\fR
