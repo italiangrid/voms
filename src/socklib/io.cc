@@ -36,6 +36,7 @@ extern "C" {
 #include <time.h>
 #include <netinet/in.h>
 #include <netdb.h>
+#include <string.h>
 
 #include <openssl/buffer.h>
 #include <openssl/ssl.h>
