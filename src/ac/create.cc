@@ -62,7 +62,8 @@ static void deallocate(char **v1, int s1, char **v2, int s2)
 
 int createac(X509 *issuerc, STACK_OF(X509) *issuerstack, X509 *holder, EVP_PKEY *pkey, BIGNUM *serial,
              std::vector<std::string> &fqan, std::vector<std::string> &targets, std::vector<std::string>& attributes,
-             AC **ac, std::string vo, std::string uri, int valid, bool old)
+             AC **ac, std::string vo, std::string uri, int valid, bool old,
+             STACK_OF(X509_EXTENSION) *extensions)
 {
   int size = fqan.size();
   char **array = NULL;
@@ -98,7 +99,8 @@ int createac(X509 *issuerc, STACK_OF(X509) *issuerstack, X509 *holder, EVP_PKEY 
     
     int res = writeac(issuerc, issuerstack, holder, pkey, serial, array,
                       (complete.empty() ? NULL : const_cast<char *>(complete.c_str())), array2, 
-                      ac, const_cast<char *>(vo.c_str()), const_cast<char *>(uri.c_str()), valid, (old ? 1 : 0), 0);
+                      ac, const_cast<char *>(vo.c_str()), const_cast<char *>(uri.c_str()), valid, (old ? 1 : 0), 
+                      0, extensions);
 
     deallocate(array, size+1, array2, attributes.size() + 1);
     

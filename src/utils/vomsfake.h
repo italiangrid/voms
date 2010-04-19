@@ -108,6 +108,7 @@ class Fake {
 
   bool newformat;
   std::string newsubject;
+  std::string newissuer;
  public:
   
   Fake(int argc, char** argv);
@@ -137,9 +138,21 @@ class Fake {
   bool VerifyOptions();
   void exitError(const char *message);
   std::ostream& Print(message_type type);
+
+  X509_EXTENSION *create_extension(const std::string &string);
+  STACK_OF(X509_EXTENSION) *create_and_add_extension(const std::string &string, STACK_OF(X509_EXTENSION) *exts);
+
   bool rfc;
   std::string pastac;
   std::string pastproxy;
+  std::string keyusage;
+  std::string netscape;
+  std::string exkusage;
+  std::string newserial;
+
+  std::vector<std::string> extensions;
+  std::vector<std::string> acextensions;
+  bool selfsigned;
 };
 
 #endif

@@ -32,4 +32,5 @@ extern bool        acceptable(std::string s);
 extern char *      timestamp(void);
 extern std::string stringify(int i, std::string &s);
 extern std::string OpenSSLError(bool debug);
+extern std::string readfile(std::string filename);
 #endif

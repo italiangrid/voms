@@ -25,12 +25,16 @@
 #include "config.h"
 
 extern "C" {
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <fcntl.h>
 #include <stdio.h>
 #include <stdarg.h>
 #include <ctype.h>
 #include <string.h>
 #include <time.h>
 #include <limits.h>
+#include <unistd.h>
 
 #include <openssl/err.h>
 #include <openssl/ssl.h>
@@ -199,4 +203,54 @@ std::string OpenSSLError(bool debug)
   }
 
   return outstring;
+}
+
+static char *readfile(const char *file, int *size)
+{
+  int fd = open(file,O_RDONLY);
+  char *buffer = NULL;
+
+  if (fd != -1) {
+    struct stat filestats;
+
+    if (!fstat(fd, &filestats)) {
+      *size = filestats.st_size;
+
+      buffer = (char *)malloc(*size);
+
+      if (buffer) {
+        int offset = 0;
+        int ret = 0;
+
+        do {
+          ret = read(fd, buffer+offset, *size - offset);
+          offset += ret;
+        } while ( ret > 0);
+
+        if (ret < 0) {
+          free(buffer);
+          buffer = NULL;
+        }
+      }
+    }
+    close(fd);
+  }
+
+  return buffer;
+}
+
+std::string readfile(std::string filename)
+{
+  int len = 0;
+  char *buffer = NULL;
+  std::string result = "";
+
+  buffer = readfile(filename.c_str(), &len);
+
+  if (buffer) {
+    result = std::string(buffer, len);
+    free(buffer);
+  }
+
+  return result;
 }

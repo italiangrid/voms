@@ -70,6 +70,8 @@ vo: '[' ID ']' voparams {
   $$->gasize = 0;
   $$->targets = NULL;
   $$->voname = $2;
+  $$->extensions = (char**)malloc(sizeof(char*)*MAX_SIZE);
+  $$->extsize = 0;
   $$->params = $4;
   {
     int i =0;
@@ -85,6 +87,8 @@ vo: '[' ID ']' voparams {
   $$->gasize = 0;
   $$->targets = NULL;
   $$->voname = $2;
+  $$->extensions = NULL;
+  $$->extsize = 0;
   $$->params = NULL;
 
   }
@@ -173,5 +177,8 @@ static void convertparam(VO *vo, PARAM* param)
   else if (strcmp(param->name, "-ga") == 0) {
     vo->gas[vo->gasize++] = strdup(param->value);
     vo->gas[vo->gasize] = NULL;
+  }
+  else if (strcmp(param->name, "-acextension") == 0) {
+    vo->extensions[vo->extsize++] = strdup(param->value);
   }
 }

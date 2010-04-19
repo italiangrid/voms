@@ -34,6 +34,7 @@
 #include <unistd.h>
 
 #include <openssl/x509.h>
+#include <openssl/x509v3.h>
 #include <openssl/stack.h>
 #include <openssl/evp.h>
 #include <openssl/bio.h>
@@ -42,12 +43,16 @@
 #include "myproxycertinfo.h"
 #include "sslutils.h"
 
-static X509_EXTENSION *CreateProxyExtension(char * name, char *data, int datalen, int crit);
 static char *readfromfile(char *file, int *size, int *warning);
 static void setWarning(int *warning, int value);
 static void setAdditional(void **additional, void *data);
 static X509_EXTENSION *set_KeyUsageFlags(int flags);
 static int get_KeyUsageFlags(X509 *cert);
+static X509_EXTENSION *set_ExtendedKeyUsageFlags(char *flagnames);
+static char *getBitName(char**string);
+static int getBitValue(char *bitname, int *bittype);
+static int convertMethod(char *bits, int type);
+static X509_EXTENSION *get_BasicConstraints(int ca);
 
 struct VOMSProxyArguments *VOMS_MakeProxyArguments()
 {
@@ -115,7 +120,6 @@ static int kpcallback(int UNUSED(p), int UNUSED(n))
 
 struct VOMSProxy *VOMS_MakeProxy(struct VOMSProxyArguments *args, int *warning, void **additional) 
 {
-  char *confstr = NULL;
   char *value = NULL;
 
   X509 * ncert = NULL;
@@ -126,10 +130,13 @@ struct VOMSProxy *VOMS_MakeProxy(struct VOMSProxyArguments *args, int *warning, 
 
   X509_EXTENSION *ex1 = NULL, *ex2 = NULL, *ex3 = NULL, 
     *ex4 = NULL, *ex5 = NULL, *ex6 = NULL, *ex7 = NULL, 
-    *ex8 = NULL;
+    *ex8 = NULL, *ex9 = NULL, *ex10 = NULL, *ex11 = NULL,
+    *ex12 = NULL, *ex13 = NULL;
 
   int voms = 0, classadd = 0, file = 0, vo = 0, acs = 0, info = 0, 
-    kusg = 0, order = 0;
+    kusg = 0, order = 0, extku = 0, nscert = 0, akey = 0, extbc = 0,
+    skey = 0;
+
   int i = 0;
   int proxyindex;
   
@@ -161,6 +168,13 @@ struct VOMSProxy *VOMS_MakeProxy(struct VOMSProxyArguments *args, int *warning, 
   else
     req = args->proxyrequest;
 
+  /* initialize extensions stack */
+
+  if ((extensions = sk_X509_EXTENSION_new_null()) == NULL) {
+    PRXYerr(PRXYERR_F_PROXY_SIGN, PRXYERR_R_CLASS_ADD_EXT);
+    goto err;
+  }
+
   /* Add passed extensions */
   if (args->extensions) {
     for (proxyindex = 0; proxyindex < sk_X509_EXTENSION_num(args->extensions); proxyindex++) {
@@ -179,13 +193,6 @@ struct VOMSProxy *VOMS_MakeProxy(struct VOMSProxyArguments *args, int *warning, 
     }
   }
   /* Add proxy extensions */
-
-  /* initialize extensions stack */
-
-  if ((extensions = sk_X509_EXTENSION_new_null()) == NULL) {
-    PRXYerr(PRXYERR_F_PROXY_SIGN, PRXYERR_R_CLASS_ADD_EXT);
-    goto err;
-  }
 
   /* voms extension */
   
@@ -246,16 +253,30 @@ struct VOMSProxy *VOMS_MakeProxy(struct VOMSProxyArguments *args, int *warning, 
     acs = 1;
   }
 
-  ku_flags = get_KeyUsageFlags(args->cert);
+  /* keyUsage extension */
 
-  ku_flags &= ~X509v3_KU_KEY_CERT_SIGN;
-  ku_flags &= ~X509v3_KU_NON_REPUDIATION;
+  if (args->keyusage) {
+    ku_flags = convertMethod(args->keyusage, EXFLAG_KUSAGE);
+    if (ku_flags == -1) {
+      PRXYerr(PRXYERR_F_PROXY_SIGN, PRXYERR_R_CLASS_ADD_EXT);
+      goto err;
+    }
+  }
+  else if (args->selfsigned) {
+    ku_flags = X509v3_KU_DIGITAL_SIGNATURE | X509v3_KU_KEY_CERT_SIGN |
+      X509v3_KU_CRL_SIGN;
+  }
+  else {
+    ku_flags = get_KeyUsageFlags(args->cert);
+    ku_flags &= ~X509v3_KU_KEY_CERT_SIGN;
+    ku_flags &= ~X509v3_KU_NON_REPUDIATION;
+  }
 
-  confstr = "digitalSignature: hu, keyEncipherment: hu, dataEncipherment: hu";
   if ((ex8 = set_KeyUsageFlags(ku_flags)) == NULL) {
     PRXYerr(PRXYERR_F_PROXY_SIGN, PRXYERR_R_CLASS_ADD_EXT);
     goto err;
   }
+
   X509_EXTENSION_set_critical(ex8, 1);
 
   if (!sk_X509_EXTENSION_push(extensions, ex8)) {
@@ -265,6 +286,54 @@ struct VOMSProxy *VOMS_MakeProxy(struct VOMSProxyArguments *args, int *warning, 
 
   kusg = 1;
 
+  /* netscapeCert extension */
+  if (args->netscape) {
+
+    if ((ex9 = X509V3_EXT_conf_nid(NULL, NULL, NID_netscape_cert_type, args->netscape)) == NULL) {
+      /*      PRXYerr(PRXYERR_F_PROXY_SIGN, PRXYERR_R_CLASS_ADD_EXT); */
+      goto err;
+    }
+
+    if (!sk_X509_EXTENSION_push(extensions, ex9)) {
+      PRXYerr(PRXYERR_F_PROXY_SIGN,PRXYERR_R_CLASS_ADD_EXT);
+      goto err;
+    }
+
+    nscert = 1;
+  }
+
+  /* extended key usage */
+
+  if (args->exkusage) {
+    if ((ex10 = set_ExtendedKeyUsageFlags(args->exkusage)) == NULL) {
+      PRXYerr(PRXYERR_F_PROXY_SIGN, PRXYERR_R_CLASS_ADD_EXT);
+      goto err;
+    }
+
+    if (!sk_X509_EXTENSION_push(extensions, ex10)) {
+      PRXYerr(PRXYERR_F_PROXY_SIGN,PRXYERR_R_CLASS_ADD_EXT);
+      goto err;
+    }
+
+    extku = 1;
+  }
+
+  /* Basic Constraints */
+
+  if ((ex12 = get_BasicConstraints(args->selfsigned ? 1 : 0)) == NULL) {
+      PRXYerr(PRXYERR_F_PROXY_SIGN, PRXYERR_R_CLASS_ADD_EXT);
+      goto err;
+    }
+
+  X509_EXTENSION_set_critical(ex12, 1);
+
+  if (!sk_X509_EXTENSION_push(extensions, ex12)) {
+    PRXYerr(PRXYERR_F_PROXY_SIGN,PRXYERR_R_CLASS_ADD_EXT);
+    goto err;
+  }
+
+  extbc = 1;
+ 
   /* vo extension */
   
   if (!args->voID) {
@@ -281,6 +350,62 @@ struct VOMSProxy *VOMS_MakeProxy(struct VOMSProxyArguments *args, int *warning, 
     vo = 1;
   }
   
+  /* authority key identifier and subject key identifier extension */
+
+  {
+    X509V3_CTX ctx;
+    
+    X509V3_set_ctx(&ctx, (args->selfsigned ? NULL : args->cert), NULL, req, NULL, 0);
+
+    if (args->selfsigned) {
+      X509 *tmpcert = NULL;
+      ex13 = X509V3_EXT_conf_nid(NULL, &ctx, NID_subject_key_identifier, "hash");
+
+      if (!ex13) {
+        PRXYerr(PRXYERR_F_PROXY_SIGN,PRXYERR_R_CLASS_ADD_EXT);
+        goto err;
+      }
+          
+      if (!sk_X509_EXTENSION_push(extensions, ex13)) {
+        PRXYerr(PRXYERR_F_PROXY_SIGN,PRXYERR_R_CLASS_ADD_EXT);
+        goto err;
+      }
+
+      skey = 1;
+
+      tmpcert = X509_new();
+      if (tmpcert) {
+        X509_set_pubkey(tmpcert, X509_REQ_get_pubkey(req));
+        X509_add_ext(tmpcert, ex13, -1);
+        X509V3_set_ctx(&ctx, tmpcert, tmpcert, req, NULL, 0);
+        ex11 = X509V3_EXT_conf_nid(NULL, &ctx, NID_authority_key_identifier, "keyid");
+        X509_free(tmpcert);
+      }
+      else
+        ex11 = NULL;
+    }
+    else {
+      ex11 = X509V3_EXT_conf_nid(NULL, &ctx, NID_authority_key_identifier, "keyid");
+    }
+
+    if (!ex11) {
+      PRXYerr(PRXYERR_F_PROXY_SIGN,PRXYERR_R_CLASS_ADD_EXT);
+      goto err;
+    }
+          
+    if (!sk_X509_EXTENSION_push(extensions, ex11)) {
+      PRXYerr(PRXYERR_F_PROXY_SIGN,PRXYERR_R_CLASS_ADD_EXT);
+      goto err;
+    }
+
+    akey = 1;
+  }
+
+  {
+    X509V3_CTX ctx;
+    X509V3_set_ctx(&ctx, (args->selfsigned ? NULL : args->cert), NULL, req, NULL, 0);
+
+  }
 
   /* class_add extension */
 
@@ -300,25 +425,6 @@ struct VOMSProxy *VOMS_MakeProxy(struct VOMSProxyArguments *args, int *warning, 
     classadd = 1;
   }
 
-#endif
-  /* order extension */
- 
-#if 0
-  if (args->aclist && dataorder) {
-    char *buffer = BN_bn2hex(dataorder);
-
-    if ((ex6 = CreateProxyExtension("order", buffer, strlen(buffer), 0)) == NULL) {
-      PRXYerr(PRXYERR_F_PROXY_SIGN,PRXYERR_R_CLASS_ADD_EXT);
-      goto err;
-    }
-
-    if (!sk_X509_EXTENSION_push(extensions, ex6)) {
-      PRXYerr(PRXYERR_F_PROXY_SIGN,PRXYERR_R_CLASS_ADD_EXT);
-      goto err;
-    }
-
-    order = 1;
-  }
 #endif
 
   /* PCI extension */
@@ -465,19 +571,40 @@ struct VOMSProxy *VOMS_MakeProxy(struct VOMSProxyArguments *args, int *warning, 
     }
   }
   
-  if (proxy_sign(args->cert,
-                 args->key,
-                 req,
-                 &ncert,
-                 args->hours*60*60 + args->minutes*60,
-                 extensions,
-                 args->limited,
-                 args->proxyversion,
-                 args->newsubject ? args->newsubject : NULL,
-                 args->pastproxy)) {
-    goto err;
+  if (!args->selfsigned)  {
+    if (proxy_sign(args->cert,
+                   args->key,
+                   req,
+                   &ncert,
+                   args->hours*60*60 + args->minutes*60,
+                   extensions,
+                   args->limited,
+                   args->proxyversion,
+                   args->newsubject,
+                   args->newissuer,
+                   args->pastproxy,
+                   args->newserial,
+                   args->selfsigned)) {
+      goto err;
+    }
   }
-  
+  else  {
+    if (proxy_sign(NULL,
+                   npkey,
+                   req,
+                   &ncert,
+                   args->hours*60*60 + args->minutes*60,
+                   extensions,
+                   args->limited,
+                   0,
+                   args->newsubject,
+                   args->newsubject,
+                   args->pastproxy,
+                   NULL,
+                   args->selfsigned)) {
+      goto err;
+    }
+  }
 
   proxy = (struct VOMSProxy*)malloc(sizeof(struct VOMSProxy));
 
@@ -486,7 +613,8 @@ struct VOMSProxy *VOMS_MakeProxy(struct VOMSProxyArguments *args, int *warning, 
     proxy->key = npkey;
     proxy->chain = sk_X509_new_null();
 
-    sk_X509_push(proxy->chain, X509_dup(args->cert));
+    if (args->cert)
+      sk_X509_push(proxy->chain, X509_dup(args->cert));
 
     for (i = 0; i < sk_X509_num(args->chain); i++)
       sk_X509_push(proxy->chain, X509_dup(sk_X509_value(args->chain, i)));
@@ -501,11 +629,23 @@ struct VOMSProxy *VOMS_MakeProxy(struct VOMSProxyArguments *args, int *warning, 
 
   if (extensions) {
     sk_X509_EXTENSION_pop_free(extensions, X509_EXTENSION_free);
-    order = kusg = voms = classadd = file = vo = acs = info = 0;
+    akey = extku = nscert = order = kusg = voms = classadd = 
+      file = vo = acs = info = extbc = skey = 0;
   }
   if (!args->proxyrequest)
     X509_REQ_free(req);
 
+
+  if (skey)
+    X509_EXTENSION_free(ex13);
+  if (extbc)
+    X509_EXTENSION_free(ex12);
+  if (akey)
+    X509_EXTENSION_free(ex11);
+  if (extku)
+    X509_EXTENSION_free(ex10);
+  if (nscert)
+    X509_EXTENSION_free(ex9);
   if (kusg)
     X509_EXTENSION_free(ex8);
   if (order)
@@ -528,14 +668,21 @@ struct VOMSProxy *VOMS_MakeProxy(struct VOMSProxyArguments *args, int *warning, 
 
 }
 
-static X509_EXTENSION *CreateProxyExtension(char * name, char *data, int datalen, int crit) 
+X509_EXTENSION *CreateProxyExtension(char * name, char *data, int datalen, int crit) 
 {
 
   X509_EXTENSION *                    ex = NULL;
   ASN1_OBJECT *                       ex_obj = NULL;
   ASN1_OCTET_STRING *                 ex_oct = NULL;
 
-  if (!(ex_obj = OBJ_nid2obj(OBJ_txt2nid(name)))) {
+  int nid = OBJ_txt2nid(name);
+
+  if (nid != 0)
+    ex_obj = OBJ_nid2obj(nid);
+  else
+    ex_obj = OBJ_txt2obj(name, 0);
+                 
+  if (!ex_obj) {
     PRXYerr(PRXYERR_F_PROXY_SIGN,PRXYERR_R_CLASS_ADD_OID);
     goto err;
   }
@@ -644,6 +791,19 @@ static X509_EXTENSION *set_KeyUsageFlags(int flags)
   return NULL;
 }
 
+static X509_EXTENSION *set_ExtendedKeyUsageFlags(char *flagnames)
+{
+  if (!flagnames)
+    return NULL;
+
+  return X509V3_EXT_conf_nid(NULL, NULL, NID_ext_key_usage, flagnames);
+}
+
+static X509_EXTENSION *get_BasicConstraints(int ca) 
+{
+  return X509V3_EXT_conf_nid(NULL, NULL, NID_basic_constraints, (ca ? "CA:true" : "CA:false"));
+}
+
 static int get_KeyUsageFlags(X509 *cert)
 {
   int keyusage = 0;
@@ -660,4 +820,90 @@ static int get_KeyUsageFlags(X509 *cert)
   }
 
   return keyusage;
+}
+
+static char *getBitName(char**string)
+{
+  char *div = NULL; 
+  char *temp = NULL;
+
+  if (!string || !(*string) || (*(*string) == '\0'))
+    return NULL;
+
+  div = strchr(*string, ',');
+
+  if (div) {
+    temp = *string;
+    *div++ = '\0';
+    *string = div;
+  }
+  else {
+    temp = *string;
+    *string = *string + strlen(*string);
+  }
+
+  return temp;
+}
+
+static int getBitValue(char *bitname, int *bittype)
+{
+
+  *bittype = EXFLAG_KUSAGE;
+  if (!strcmp(bitname, "digitalSignature"))
+    return KU_DIGITAL_SIGNATURE;
+  else if (!strcmp(bitname, "nonRepudiation"))
+    return KU_NON_REPUDIATION;
+  else if (!strcmp(bitname, "keyEncipherment"))
+    return KU_KEY_ENCIPHERMENT;
+  else if (!strcmp(bitname, "dataEncipherment"))
+    return KU_DATA_ENCIPHERMENT;
+  else if (!strcmp(bitname, "keyAgreement"))
+    return KU_KEY_AGREEMENT;
+  else if (!strcmp(bitname, "keyCertSign"))
+    return KU_KEY_CERT_SIGN;
+  else if (!strcmp(bitname, "cRLSign"))
+    return KU_CRL_SIGN;
+  else if (!strcmp(bitname, "encipherOnly"))
+    return KU_ENCIPHER_ONLY;
+  else if (!strcmp(bitname, "decipherOnly"))
+    return KU_DECIPHER_ONLY;
+
+  *bittype = EXFLAG_NSCERT;
+
+  if (!strcmp(bitname, "client"))
+    return NS_SSL_CLIENT;
+  else if (!strcmp(bitname, "server"))
+    return NS_SSL_SERVER;
+  else if (!strcmp(bitname, "email"))
+    return NS_SMIME;
+  else if (!strcmp(bitname, "objsign"))
+    return NS_OBJSIGN;
+  else if (!strcmp(bitname, "sslCA"))
+    return NS_SSL_CA;
+  else if (!strcmp(bitname, "emailCA"))
+    return NS_SMIME_CA;
+  else if (!strcmp(bitname, "objCA"))
+    return NS_OBJSIGN_CA;
+
+  *bittype = EXFLAG_XKUSAGE;
+
+  return 0;
+}
+
+
+static int convertMethod(char *bits, int type)
+{
+  char *bitname = NULL;
+  int realtype = 0;
+  int value = 0;
+  int total = 0;
+
+  while ((bitname = getBitName(&bits))) {
+    value = getBitValue(bitname, &realtype);
+    if ((value == 0) || (type != realtype))
+      return -1;
+    total |= value;
+  }
+
+  return total;
 }

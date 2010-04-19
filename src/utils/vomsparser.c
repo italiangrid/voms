@@ -447,8 +447,8 @@ static const yytype_int8 yyrhs[] =
 /* YYRLINE[YYN] -- source line where rule number YYN was defined.  */
 static const yytype_uint8 yyrline[] =
 {
-       0,    51,    51,    58,    65,    80,    93,    99,   105,   110,
-     119,   131,   132
+       0,    51,    51,    58,    65,    82,    97,   103,   109,   114,
+     123,   135,   136
 };
 #endif
 
@@ -1387,6 +1387,8 @@ yyreduce:
   (yyval.vo)->gasize = 0;
   (yyval.vo)->targets = NULL;
   (yyval.vo)->voname = (yyvsp[(2) - (4)].string);
+  (yyval.vo)->extensions = (char**)malloc(sizeof(char*)*MAX_SIZE);
+  (yyval.vo)->extsize = 0;
   (yyval.vo)->params = (yyvsp[(4) - (4)].params);
   {
     int i =0;
@@ -1399,7 +1401,7 @@ yyreduce:
   case 5:
 
 /* Line 1455 of yacc.c  */
-#line 80 "vomsfake.y"
+#line 82 "vomsfake.y"
     {
   (yyval.vo) = (VO *)calloc(1,sizeof(VO));
   (yyval.vo)->fqans = NULL;
@@ -1408,6 +1410,8 @@ yyreduce:
   (yyval.vo)->gasize = 0;
   (yyval.vo)->targets = NULL;
   (yyval.vo)->voname = (yyvsp[(2) - (3)].string);
+  (yyval.vo)->extensions = NULL;
+  (yyval.vo)->extsize = 0;
   (yyval.vo)->params = NULL;
 
   }
@@ -1416,7 +1420,7 @@ yyreduce:
   case 6:
 
 /* Line 1455 of yacc.c  */
-#line 93 "vomsfake.y"
+#line 97 "vomsfake.y"
     {
   (yyval.params) = (PARAMLIST *)malloc(sizeof(PARAMLIST));
   (yyval.params)->params = (PARAM**)malloc(sizeof(PARAM*)*MAX_SIZE);
@@ -1428,7 +1432,7 @@ yyreduce:
   case 7:
 
 /* Line 1455 of yacc.c  */
-#line 99 "vomsfake.y"
+#line 103 "vomsfake.y"
     {
   (yyval.params) = (yyvsp[(1) - (2)].params);
   (yyval.params)->params[(yyval.params)->current++] = (yyvsp[(2) - (2)].param);  
@@ -1438,7 +1442,7 @@ yyreduce:
   case 8:
 
 /* Line 1455 of yacc.c  */
-#line 105 "vomsfake.y"
+#line 109 "vomsfake.y"
     {
   (yyval.param) = (PARAM *)calloc(1,sizeof(PARAM));
   (yyval.param)->name = (yyvsp[(1) - (3)].string);
@@ -1449,7 +1453,7 @@ yyreduce:
   case 9:
 
 /* Line 1455 of yacc.c  */
-#line 110 "vomsfake.y"
+#line 114 "vomsfake.y"
     {
   (yyval.param) = (PARAM *)calloc(1,sizeof(PARAM));
   (yyval.param)->name = (yyvsp[(1) - (5)].string);
@@ -1464,7 +1468,7 @@ yyreduce:
   case 10:
 
 /* Line 1455 of yacc.c  */
-#line 119 "vomsfake.y"
+#line 123 "vomsfake.y"
     {
   (yyval.param) = (PARAM *)calloc(1,sizeof(PARAM));
   (yyval.param)->name = (yyvsp[(1) - (8)].string);
@@ -1480,21 +1484,21 @@ yyreduce:
   case 11:
 
 /* Line 1455 of yacc.c  */
-#line 131 "vomsfake.y"
+#line 135 "vomsfake.y"
     { (yyval.input) = (yyvsp[(1) - (1)].string); }
     break;
 
   case 12:
 
 /* Line 1455 of yacc.c  */
-#line 132 "vomsfake.y"
+#line 136 "vomsfake.y"
     { (yyval.input) = (yyvsp[(1) - (1)].string); }
     break;
 
 
 
 /* Line 1455 of yacc.c  */
-#line 1498 "vomsparser.c"
+#line 1502 "vomsparser.c"
       default: break;
     }
   YY_SYMBOL_PRINT ("-> $$ =", yyr1[yyn], &yyval, &yyloc);
@@ -1706,7 +1710,7 @@ yyreturn:
 
 
 /* Line 1675 of yacc.c  */
-#line 135 "vomsfake.y"
+#line 139 "vomsfake.y"
 
 
 static void convertparam(VO *vo, PARAM* param)
@@ -1748,6 +1752,9 @@ static void convertparam(VO *vo, PARAM* param)
   else if (strcmp(param->name, "-ga") == 0) {
     vo->gas[vo->gasize++] = strdup(param->value);
     vo->gas[vo->gasize] = NULL;
+  }
+  else if (strcmp(param->name, "-acextension") == 0) {
+    vo->extensions[vo->extsize++] = strdup(param->value);
   }
 }
 

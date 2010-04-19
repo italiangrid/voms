@@ -71,6 +71,7 @@ Description:
 #include <sys/stat.h>
 #include <fcntl.h>
 #include <string.h>
+#include <ctype.h>
 
 #include "openssl/buffer.h"
 #include "openssl/crypto.h"
@@ -892,12 +893,16 @@ proxy_sign(
     int                                 limited_proxy,
     int                                 proxyver,
     const char *                        newdn,
-    int                                 pastproxy
+    const char *                        newissuer,
+    int                                 pastproxy,
+    const char *                        newserial,
+    int                                 selfsigned
 )
 {
     char *                              newcn;
     EVP_PKEY *                          user_public_key;
     X509_NAME *                         subject_name = NULL;
+    X509_NAME *                         issuer_name = NULL;
     int                                 rc = 0;
 
     unsigned char                       md[SHA_DIGEST_LENGTH];
@@ -940,25 +945,36 @@ proxy_sign(
     }
     else
       subject_name = make_DN(newdn);
-    
+
+    if (newissuer)
+      issuer_name = make_DN(newissuer);
+    else
+      issuer_name = NULL;
+
     if(proxy_sign_ext(user_cert,
                       user_private_key,
                       EVP_sha1(), 
                       req,
                       new_cert,
                       subject_name,
-                      NULL,
+                      issuer_name,
                       seconds,
                       0,
                       extensions,
                       proxyver,
-                      pastproxy))
+                      pastproxy,
+                      newserial,
+                      selfsigned))
     {
         PRXYerr(PRXYERR_F_PROXY_SIGN,PRXYERR_R_PROCESS_SIGN);
         rc = 1;
     }
 
     X509_NAME_free(subject_name);
+
+    if (issuer_name)
+      X509_NAME_free(issuer_name);
+
     if (proxyver >= 3)
       free(newcn);
 
@@ -1022,7 +1038,9 @@ proxy_sign_ext(
     int                       serial_num,
     STACK_OF(X509_EXTENSION) *extensions,
     int                       proxyver,
-    int                       pastproxy)
+    int                       pastproxy,
+    const char               *newserial,
+    int                       selfsigned)
 {
     EVP_PKEY *                          new_public_key = NULL;
     EVP_PKEY *                          tmp_public_key = NULL;
@@ -1035,7 +1053,9 @@ proxy_sign_ext(
     unsigned char                       md[SHA_DIGEST_LENGTH];
     unsigned int                        len;
 
-    user_cert_info = user_cert->cert_info;
+    if (!selfsigned)
+      user_cert_info = user_cert->cert_info;
+
     *new_cert = NULL;
     
     if ((req->req_info == NULL) ||
@@ -1093,7 +1113,18 @@ proxy_sign_ext(
     if (serial_num)
       ASN1_INTEGER_set(X509_get_serialNumber(*new_cert), serial_num);
     else {
-      if (proxyver > 2) {
+      if (newserial) {
+        BIGNUM *bn = NULL;
+        if (BN_hex2bn(&bn, newserial) != 0) {
+          ASN1_INTEGER *a_int = BN_to_ASN1_INTEGER(bn, NULL);
+          ASN1_INTEGER_free((*new_cert)->cert_info->serialNumber);
+
+          /* Note:  The a_int == NULL case is handled below. */
+          (*new_cert)->cert_info->serialNumber = a_int;
+          BN_free(bn);
+        }
+      }
+      else if (proxyver > 2) {
         ASN1_INTEGER_free(X509_get_serialNumber(*new_cert));
           
         new_public_key = X509_REQ_get_pubkey(req);
@@ -1115,6 +1146,17 @@ proxy_sign_ext(
         memcpy((*new_cert)->cert_info->serialNumber->data, md, SHA_DIGEST_LENGTH);
 
       } 
+      else if (selfsigned) {
+        ASN1_INTEGER *copy = ASN1_INTEGER_new();
+        if (copy) {
+          ASN1_INTEGER_set(copy, 1);
+          ASN1_INTEGER_free((*new_cert)->cert_info->serialNumber);
+
+        (*new_cert)->cert_info->serialNumber = copy;
+        }
+        else
+          goto err;
+      }
       else {
         ASN1_INTEGER *copy = ASN1_INTEGER_dup(X509_get_serialNumber(user_cert));
         ASN1_INTEGER_free((*new_cert)->cert_info->serialNumber);
@@ -1158,21 +1200,24 @@ proxy_sign_ext(
      * for now use seconds if not zero. 
      */
     
-    /* doesn't create a proxy longer than the user cert */
-    asn1_time = ASN1_UTCTIME_new();
-    X509_gmtime_adj(asn1_time, -pastproxy);
-    time_now = ASN1_UTCTIME_mktime(asn1_time);
-    ASN1_UTCTIME_free(asn1_time);
-    time_after = ASN1_UTCTIME_mktime(X509_get_notAfter(user_cert));
-    time_diff = time_after - time_now;
-
-    if(time_diff > seconds)
-    {
+    if (selfsigned) {
       X509_gmtime_adj(X509_get_notAfter(*new_cert),(long) seconds);
     }
-    else
-    {
+    else {
+      /* doesn't create a proxy longer than the user cert */
+      asn1_time = ASN1_UTCTIME_new();
+      X509_gmtime_adj(asn1_time, -pastproxy);
+      time_now = ASN1_UTCTIME_mktime(asn1_time);
+      ASN1_UTCTIME_free(asn1_time);
+      time_after = ASN1_UTCTIME_mktime(X509_get_notAfter(user_cert));
+      time_diff = time_after - time_now;
+
+      if(time_diff > seconds) {
+        X509_gmtime_adj(X509_get_notAfter(*new_cert),(long) seconds);
+      }
+      else {
         X509_set_notAfter(*new_cert, user_cert_info->validity->notAfter);
+      }
     }
 
     /* transfer the public key from req to new cert */
@@ -1196,8 +1241,6 @@ proxy_sign_ext(
         }
     }
 
-    /* Why is version set to 2 when we have a version 3 cert? - Sam */
-    
     ASN1_INTEGER_set(new_cert_info->version,2); /* version 3 certificate */
 
     /* Free the current entries if any, there should not
@@ -3843,6 +3886,64 @@ end:
   return(ret);
 }
 
+static char hextoint(char r, char s)
+{
+  int v = 0;
+  if (isxdigit(r) && isxdigit(s)) {
+    if (isdigit(r))
+      v = r - '0';
+    else
+      v = 10 + r -'a';
+    v <<= 4;
+
+    if (isdigit(s))
+      v += s -'0';
+    else
+      v += 10 + s - 'a';
+  }
+  return v;
+}
+
+static char *reencode_string(char *string, int *len)
+{
+  char *temp = string;
+  char *pos  = string;
+  char t = '\0';
+  char r = '\0';
+  *len = 0;
+
+  while(*string) {
+    switch (*string) {
+    case '\\':
+      t = *++string;
+
+      if (t == '\\') {
+        *pos++ = '\\';
+        ++(*len);
+      }
+      else if (isxdigit(t)) {
+        r = *++string;
+        *pos++ = hextoint(tolower(t), tolower(r));
+        ++(*len);
+        ++string;
+      }
+      else {
+        *pos++ = t;
+        ++(*len);
+        ++string;
+      }
+      break;
+
+    default:
+      ++(*len);
+      *pos++ = *string++;
+      break;
+    }
+  }
+
+  return temp;
+}
+
 static X509_NAME *make_DN(const char *dnstring)
 {
   char *buffername = (char*)malloc(strlen(dnstring)+1);
@@ -3850,6 +3951,8 @@ static X509_NAME *make_DN(const char *dnstring)
   char *currentname = buffername;
   unsigned char *currentvalue = buffervalue;
   X509_NAME *name = NULL;
+  int valuelen = 0;
+  char next = 0;
 
   name = X509_NAME_new();
 
@@ -3893,9 +3996,16 @@ static X509_NAME *make_DN(const char *dnstring)
       currentvalue=buffervalue;
       while (*dnstring) {
         if (*dnstring == '\\') {
-          *currentvalue++ = *++dnstring;
-          if (*dnstring == '\0') {
+          next = *++dnstring;
+          if (next == '\0') {
             break;
+          }
+          else if (next != '/') {
+            *currentvalue++ = '\\';
+            *currentvalue++ = next;
+          }
+          else {
+            *currentvalue++ = '/';
           }
           dnstring++;
         }
@@ -3917,9 +4027,11 @@ static X509_NAME *make_DN(const char *dnstring)
 
       /* Now we have both type and value.  Add to the X509_NAME_ENTRY */
 
+      buffervalue = reencode_string(buffervalue, &valuelen);
+
       X509_NAME_add_entry_by_txt(name, buffername+1,  /* skip initial '/' */
                                  V_ASN1_APP_CHOOSE,
-                                 buffervalue, -1, X509_NAME_entry_count(name),
+                                 buffervalue, valuelen, X509_NAME_entry_count(name),
                                  0);
       status = 0;
       break;
