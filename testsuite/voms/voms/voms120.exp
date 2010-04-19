@@ -1,6 +1,6 @@
 load_lib vomstest.exp
 
-testheader "See if voms-proxy-fake -extensions works."
+testheader "See if voms-proxy-fake -acextensions works."
 
 proc mytest {} {
     _activateCert mycert2
