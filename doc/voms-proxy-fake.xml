@@ -128,7 +128,14 @@ as a compatibility feature to ease migration while the servers upgrade to the ne
 <para><option>-newsubject</option> <replaceable>newdn</replaceable></para>
 <para>The created proxy will have <emphasis remap='I'>newdn</emphasis> as
 subject rather  than what is would normally have depending on the
-specific version of proxy created.</para>
+specific version of proxy created. Non-printable characters may be specified
+via the '\XX' encoding, where XX are two hexadecimal characters.</para>
+
+<para><option>-newissuer</option> <replaceable>newdn</replaceable></para>
+<para>The created proxy will have <emphasis remap='I'>newdn</emphasis> as
+issuer rather  than what is would normally have depending on the
+specific version of proxy created. Non-printable characters may be specified
+via the '\XX' encoding, where XX are two hexadecimal characters.</para>
 
 <para><option>-newserial</option> <replaceable>newserial</replaceable></para>
 <para>The created proxy will have
