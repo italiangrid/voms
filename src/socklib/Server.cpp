@@ -72,6 +72,10 @@ extern "C" {
 static int globusf_read(BIO *b, char *out, int outl);
 static int globusf_write(BIO *b, const char *in, int inl);
 
+extern "C" {
+extern int proxy_app_verify_callback(X509_STORE_CTX *ctx, UNUSED(void *empty));
+}
+
 typedef enum { UNKNOWN, GSI, SSL2, TLS, SSL_GLOBUS} mode_type;
 
 static mode_type mode = UNKNOWN; /* Global, since it needs to be shared between 
@@ -432,7 +436,7 @@ GSISocketServer::AcceptGSIAuthentication()
 
   serial = get_peer_serial(actual_cert);
   peer_serial = std::string(serial ? serial : "");
-  free(serial);
+  OPENSSL_free(serial);
 
   return true;
 

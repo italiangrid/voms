@@ -28,6 +28,7 @@
 extern "C" {
 #include "replace.h"
 
+#include <stdio.h>
 #include <errno.h>
 #include <sys/types.h>
 #include <sys/socket.h>
@@ -144,6 +145,8 @@ bool do_connect(SSL *ssl, int fd, int timeout, std::string& error)
 
 bool do_write(SSL *ssl, int timeout, const std::string& text, std::string &error)
 {
+  errno = 0;
+
   if (!ssl) {
     error = "No connection established";
     return false;
@@ -165,11 +168,16 @@ bool do_write(SSL *ssl, int timeout, const std::string& text, std::string &error
 
   do {
     ret = do_select(fd, starttime, timeout, expected);
+
     do_continue = false;
     if (ret > 0) {
+      int v;
+      errno = 0;
       ret = SSL_write(ssl, str + nwritten, strlen(str) - nwritten);
       curtime = time(NULL);
-      switch (SSL_get_error(ssl, ret)) {
+      v = SSL_get_error(ssl, ret);
+
+      switch (v) {
       case SSL_ERROR_NONE:
         nwritten += ret;
         if ((size_t)nwritten == strlen(str))
@@ -195,7 +203,7 @@ bool do_write(SSL *ssl, int timeout, const std::string& text, std::string &error
       }
     }
   } while (ret <= 0 && do_continue);
-            
+           
   if (ret <=0) {
     if (timeout != -1 && (curtime - starttime <= timeout))
       error ="Connection stuck during write: timeout reached.";
@@ -226,8 +234,7 @@ bool do_read(SSL *ssl, int timeout, std::string& output)
   time_t starttime, curtime;
 
   int error = 0;
-  int expected = 0;
-  long errorcode = 0;
+  long int expected = 0;
 
   starttime = time(NULL);
 
@@ -238,10 +245,11 @@ bool do_read(SSL *ssl, int timeout, std::string& output)
     if (ret > 0) {
       ret2 = SSL_read(ssl, buffer, bufsize);
 
-      if (ret2 <= 0)
+      if (ret2 <= 0) {
         expected = error = SSL_get_error(ssl, ret2);
+      }        
     }
-  } while (TEST_SELECT(ret, ret2, timeout, curtime, starttime, errorcode)); 
+  } while (TEST_SELECT(ret, ret2, timeout, curtime, starttime, expected)); 
             
   if (ret <= 0 || ret2 <= 0) {
     if (timeout != -1 && (curtime - starttime <= timeout))

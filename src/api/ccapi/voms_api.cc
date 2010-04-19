@@ -83,10 +83,6 @@ extern int InitProxyCertInfoExtension(int);
 extern bool retrieve(X509 *cert, STACK_OF(X509) *chain, recurse_type how, 
 		     std::string &buffer, std::string &vo, std::string &file, 
 		     std::string &subject, std::string &ca, verror_type &error);
-extern "C" {
-extern char *Decode(const char *, int, int *);
-extern char *Encode(const char *, int, int *, int);
-}
 
 static X509 *
 decouple_cred(gss_cred_id_t credential, STACK_OF(X509) **stk)
@@ -175,8 +171,6 @@ vomsdata::vomsdata(std::string voms_dir, std::string cert_dir) :  ca_cert_dir(ce
   if (vdir)
     (void)closedir(vdir);
 
-  duration = 0;
-
   vomsspace::internal *data = new vomsspace::internal();
   pthread_mutex_lock(&privatelock);
   privatedata[this] = data;
@@ -196,7 +190,7 @@ vomsdata::~vomsdata()
 std::string vomsdata::ServerErrors(void)
 {
   std::string err = serverrors;
-  serverrors="";
+  serverrors.clear();
 
   return err;
 }
@@ -228,7 +222,7 @@ void vomsdata::SetVerificationType(verify_type t)
 
 void vomsdata::ResetOrder(void)
 {
-  ordering="";
+  ordering.clear();
 }
 
 void vomsdata::Order(std::string att)
@@ -464,15 +458,9 @@ bool vomsdata::Import(std::string buffer)
   unsigned char *buftmp, *copy;
 #endif
 
-  char *str;
-  int len;
+  buffer = Decode(buffer);
 
-  str = Decode(buffer.c_str(), buffer.size(), &len);
-  if (str) {
-    buffer = std::string(str, len);
-    free(str);
-  }
-  else {
+  if (buffer.empty()) {
     seterror(VERR_FORMAT, "Malformed input data.");
     return false;
   }
@@ -515,7 +503,7 @@ bool vomsdata::Export(std::string &buffer)
   std::string temp;
 
   if (data.empty()) {
-    buffer= "";
+    buffer.clear();
     return true;
   }
 
@@ -554,14 +542,10 @@ bool vomsdata::Export(std::string &buffer)
     }
   }
 
-  char *str;
-  int len;
-  str = Encode(result.c_str(), result.size(), &len, 0);
-  if (str) {
-    buffer = std::string(str, len);
-    free(str);
+  buffer = Encode(result, 0);
+
+  if (!buffer.empty())
     return true;
-  }
   else
     return false;
 }

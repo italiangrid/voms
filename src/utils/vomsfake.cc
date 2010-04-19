@@ -602,7 +602,7 @@ bool Fake::Retrieve(VOLIST *volist)
           // without any FQAN.
           char *vector[1] = {NULL };
           char **fqanlist = vo->fqans ? vo->fqans : vector;
-          int seconds = time_to_sec(vo->pastac);
+          int seconds = vo->pastac ? time_to_sec(vo->pastac) : 0;
 
           if (seconds == -1) {
             Print(ERROR) << "Minutes and seconds for VO: " << vo->voname <<

@@ -66,11 +66,6 @@ void *logh = NULL;
 #include "vomsxml.h"
 #include "fqan.h"
 
-extern "C" {
-extern char *Decode(const char *, int, int *);
-extern char *Encode(const char *, int, int *, int);
-}
-
 #include <map>
 #include <set>
 #include <string>
@@ -126,10 +121,10 @@ static bool checkinside(gattrib g, std::vector<std::string> list);
 static void CreateURI(std::string &uri, int port);
 
 std::string
-makeACSSL(SSL *ssl, void *logh, char **FQANs, int size, char **targets, int targsize, int requested, VOMSServer *v);
+makeACSSL(SSL *ssl, void *logh, const std::string& command, char **targets, int targsize, int requested, VOMSServer *v);
 
 int
-makeACREST(struct soap *soap, void *logh, char **FQANs, int size, int requested, int unknown);
+makeACREST(struct soap *soap, void *logh, const std::string& command, int requested, int unknown);
 
 std::string makeAC(EVP_PKEY *key, X509 *issuer, X509 *holder, 
                    const std::string &message, void *logh, VOMSServer *v);
@@ -1425,7 +1420,7 @@ static bool checkinside(gattrib g, std::vector<std::string> list) {
 }
 
 std::string
-makeACSSL(SSL *ssl, void *logh, char **FQANs, int size, char **targets, int targsize, int requested, VOMSServer *v)
+makeACSSL(SSL *ssl, void *logh, const std::string& command, char **targets, int targsize, int requested, VOMSServer *v)
 {
   X509 *holder = SSL_get_peer_certificate(ssl);
   X509 *issuer = NULL;
@@ -1447,22 +1442,9 @@ makeACSSL(SSL *ssl, void *logh, char **FQANs, int size, char **targets, int targ
     return "";
   }
 
-  std::string command = "";
-
-  int i = 0;
-  while (i < size) {
-    if (i != 0)
-      command +=",";
-
-    command += FQANParse(FQANs[i]);
-
-    i++;
-  }
-
-
   std::string targs = "";
 
-  i = 0;
+  int i = 0;
   while (i <targsize) {
     if (i != 0)
       targs += ",";
@@ -1550,7 +1532,7 @@ int http_get(soap *soap)
           fqans.push_back(std::string(cvalue));
           cvalue = ++position;
           position = strchr(cvalue, ',');
-	  size ++;
+          size ++;
         }
         fqans.push_back(std::string(cvalue));
 
@@ -1573,21 +1555,12 @@ int http_get(soap *soap)
     } while (next);
   }
 
-  char **FQANS = NULL;
-  if (size) {
-    FQANS = (char**)malloc(sizeof(char*)*size);
+  if (!size)
+    fqans.push_back(maingroup);
 
-    for (int i = 0; i < size; i++)
-      FQANS[i] = (char*)(fqans[i].c_str());
-  }
-  else {
-    FQANS = (char**)malloc(sizeof(char*));
-    FQANS[0]=maingroup;
-    size = 1;
-  }
-  int res = makeACREST(soap, logh, FQANS, size, lifetime, unknown);
+  std::string command = parse_fqan(fqans);
 
-  free(FQANS);
+  int res = makeACREST(soap, logh, command, lifetime, unknown);
 
   free(path);
 
@@ -1645,11 +1618,11 @@ static char *canonicalize_string(char *original)
 static int EncodeAnswerForRest(const std::string& input, int unknown, std::string& output);
 
 int
-makeACREST(struct soap *soap, void *logh, char **FQANs, int size, int requested, int unknown)
+makeACREST(struct soap *soap, void *logh, const std::string& command, int requested, int unknown)
 {
   char *targets = NULL;
 
-  std::string result = makeACSSL(soap->ssl, logh, FQANs, size, &targets, 0, requested, selfpointer);
+  std::string result = makeACSSL(soap->ssl, logh, command, &targets, 0, requested, selfpointer);
 
   std::string output;
 
@@ -1668,17 +1641,15 @@ static int EncodeAnswerForRest(const std::string& input, int unknown, std::strin
 
   if (XML_Ans_Decode(input, a)) {
     if (!a.ac.empty() && a.ac != "A") {
-      int len = 0;
-      char *ac = Encode(a.ac.c_str(), a.ac.length(), &len, !a.base64);
+      std::string ac = Encode(a.ac, !a.base64);
 
-      output = "<?xml version=\"1.0\" encoding=\"UTF-8\"?><voms><ac>" +std::string(ac, len) +"</ac>";
+      output = "<?xml version=\"1.0\" encoding=\"UTF-8\"?><voms><ac>" + ac + "</ac>";
       std::vector<errorp> errs = a.errs;
       for (std::vector<errorp>::iterator i = errs.begin(); i != errs.end(); i++)
         output +="<warning>"+i->message+"</warning>";
       if (unknown) 
         output +="<warning>Unknown parameters in the request were ignored!</warning>";
       output += "</voms>";
-      free(ac);
       return SOAP_HTML;
     }
     else {

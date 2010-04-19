@@ -27,7 +27,6 @@
 #include <string>
 #include <vector>
 
-#include "xml.h"
 #include "errors.h"
 
 struct request {
@@ -47,12 +46,14 @@ struct answer {
   int version;
 };
 
-std::string XML_Req_Encode(const std::string&, const std::string&, 
-                           const std::string&, const int);
-std::string XML_Ans_Encode(const std::string&, 
-                           const std::vector<errorp>, bool);
-std::string XML_Ans_Encode(const std::string&,  const std::string&,
-                           const std::vector<errorp>, bool);
-bool XML_Req_Decode(const std::string&, request &);
-bool XML_Ans_Decode(const std::string&, answer &);
+extern std::string XML_Req_Encode(const std::string&, const std::string&, 
+                                  const std::string&, const int);
+extern std::string XML_Ans_Encode(const std::string&, 
+                                  const std::vector<errorp>, bool);
+extern std::string XML_Ans_Encode(const std::string&,  const std::string&,
+                                  const std::vector<errorp>, bool);
+extern bool XML_Req_Decode(const std::string&, request &);
+extern bool XML_Ans_Decode(const std::string&, answer &);
+extern std::string Encode(std::string data, int base64);
+extern std::string Decode(const std::string data);
 #endif
