@@ -130,6 +130,13 @@ as a compatibility feature to ease migration while the servers upgrade to the ne
 subject rather  than what is would normally have depending on the
 specific version of proxy created.</para>
 
+<para><option>-newserial</option> <replaceable>newserial</replaceable></para>
+<para>The created proxy will have
+  the <emphasis remap='I'>newserial</emphasis> as its serial number.
+  The new serial number will have to be specified as an hex
+  representation.  Any length is possible.  If this option is not
+  specified, voms-proxy-fake will choose the serial number.</para>
+
 <para><option>-pastac</option> <replaceable>timespec</replaceable></para>
 <para>
 The created AC will have its validity start in the past, as specified
@@ -177,7 +184,7 @@ of: <emphasis remap='I'>seconds</emphasis>, <emphasis remap='I'>hours:minutes</e
 <para>The created certificate will be a self-signed certificate and
   have a CA=true bit in the Basic constraints Exception.</para>
 
-<para><option>-extensions</option> <replaceable>oid[/criticality]value</replaceable></para>
+<para><option>-extension</option> <replaceable>oid[/criticality]value</replaceable></para>
 <para>This option allows to specified additional extensions to be put
   in the created certificate.</para>
 <para><emphasis remap='I'>oid</emphasis> is the Object Identifier of
@@ -202,7 +209,7 @@ of: <emphasis remap='I'>seconds</emphasis>, <emphasis remap='I'>hours:minutes</e
   that <emphasis remap='I'>content</emphasis> is the name of a file
   which will contain the actual data.</para>  
 
-<para><option>-acextensions</option> <replaceable>oid[/criticality]value</replaceable></para>
+<para><option>-acextension</option> <replaceable>oid[/criticality]value</replaceable></para>
 <para>This option allows to specified additional extensions to be put
   in the created attribute certificate.</para>
 <para><emphasis remap='I'>oid</emphasis> is the Object Identifier of

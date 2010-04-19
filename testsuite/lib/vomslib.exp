@@ -15,6 +15,11 @@ proc _cleanproxy {} {
     set filename "/tmp/x509up_u[exec id -u]"
     file delete $filename
 }
+
+proc _proxyname {} {
+    return "/tmp/x509up_u[exec id -u]"
+}
+
 proc _activateCert {cert} {
     file mkdir $::env(HOME)/.globus2
     file copy -force "$::_certdir/$cert-cert.pem" $::env(HOME)/.globus2/usercert.pem

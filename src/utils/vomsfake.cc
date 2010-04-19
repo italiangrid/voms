@@ -393,6 +393,8 @@ Fake::Fake(int argc, char ** argv) :   confile(CONFILENAME),
     for (unsigned int i  = 0; i < targets.size(); i++)
       targ += targets[i];
 
+    voelem->targets = targ.empty() ? NULL : (char*)(targ.c_str());
+
     if (!acextensions.empty()) {
       voelem->extensions = (char**)malloc(sizeof(char*)*(acextensions.size()+1));
       for (unsigned int i = 0; i < acextensions.size(); i++)
@@ -400,7 +402,6 @@ Fake::Fake(int argc, char ** argv) :   confile(CONFILENAME),
       voelem->extsize = acextensions.size();
       voelem->extensions[voelem->extsize] = NULL;
     }
-    voelem->targets = (char*)(targ.c_str());
   }
   
   /* A failure here exits the program entirely */
@@ -690,7 +691,7 @@ bool Fake::Retrieve(VOLIST *volist)
 
           if (ac)
             res = writeac(hcert, NULL, holder, hkey, (BIGNUM *)(BN_value_one()), fqanlist,
-                          vo->targets, attributes, &ac, vo->voname, vo->uri, vo->vomslife, !newformat, 
+                          vo->targets, attributes, &ac, vo->voname, vo->uri, vo->vomslife * 3600, !newformat, 
                           seconds, exts);
         }
       } 

@@ -1201,7 +1201,7 @@ proxy_sign_ext(
      */
     
     if (selfsigned) {
-      X509_gmtime_adj(X509_get_notAfter(*new_cert),(long) seconds);
+      X509_gmtime_adj(X509_get_notAfter(*new_cert),(long) seconds - pastproxy);
     }
     else {
       /* doesn't create a proxy longer than the user cert */
@@ -1212,8 +1212,8 @@ proxy_sign_ext(
       time_after = ASN1_UTCTIME_mktime(X509_get_notAfter(user_cert));
       time_diff = time_after - time_now;
 
-      if(time_diff > seconds) {
-        X509_gmtime_adj(X509_get_notAfter(*new_cert),(long) seconds);
+      if(time_diff > (seconds - pastproxy)) {
+        X509_gmtime_adj(X509_get_notAfter(*new_cert),(long) seconds - pastproxy);
       }
       else {
         X509_set_notAfter(*new_cert, user_cert_info->validity->notAfter);
