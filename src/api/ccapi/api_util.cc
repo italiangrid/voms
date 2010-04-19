@@ -72,6 +72,7 @@ static bool dncompare(const std::string &mut, const std::string &fixed);
 static bool readdn(std::ifstream &file, char *buffer, int buflen);
 
 extern std::map<vomsdata*, vomsspace::internal*> privatedata;
+extern pthread_mutex_t privatelock;
 
 /*
  * this change the substring FROM into TO in NAME
@@ -790,7 +791,9 @@ vomsdata::my_conn(const std::string &hostname, int port, const std::string &cont
   STACK_OF(X509) *cert_chain = NULL;
   EVP_PKEY       *upkey = NULL;
 
+  pthread_mutex_lock(&privatelock);
   vomsspace::internal *data = privatedata[this];
+  pthread_mutex_unlock(&privatelock);
 
   ucert      = data->cert;
   cert_chain = data->chain;

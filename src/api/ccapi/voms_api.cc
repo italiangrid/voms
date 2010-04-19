@@ -101,6 +101,7 @@ decouple_cred(gss_cred_id_t credential, STACK_OF(X509) **stk)
 extern int AC_Init(void);
 
 std::map<vomsdata*, vomsspace::internal*> privatedata;
+pthread_mutex_t privatelock = PTHREAD_MUTEX_INITIALIZER;
 
 static bool initialized = false;
 
@@ -177,14 +178,18 @@ vomsdata::vomsdata(std::string voms_dir, std::string cert_dir) :  ca_cert_dir(ce
   duration = 0;
 
   vomsspace::internal *data = new vomsspace::internal();
+  pthread_mutex_lock(&privatelock);
   privatedata[this] = data;
+  pthread_mutex_unlock(&privatelock);
 }
 
 
 vomsdata::~vomsdata()
 {
+  pthread_mutex_lock(&privatelock);
   vomsspace::internal *data = privatedata[this];
   (void)privatedata.erase(this);
+  pthread_mutex_unlock(&privatelock);
   delete data;
 }
 
@@ -372,8 +377,11 @@ bool vomsdata::Retrieve(FILE *file, recurse_type how)
   else
     seterror(VERR_PARAM, "File parameter invalid.");
 
-  sk_X509_pop_free(chain, X509_free);
-  X509_free(x);
+  if (chain)
+    sk_X509_pop_free(chain, X509_free);
+
+  if (x)
+    X509_free(x);
 
   return res;
 }
@@ -434,8 +442,10 @@ bool vomsdata::Retrieve(X509 *cert, STACK_OF(X509) *chain, recurse_type how)
     ok = evaluate(acs, subject, ca, holder);
   }
 
-  AC_SEQ_free(acs);
-  X509_free(holder);
+  if (acs)
+    AC_SEQ_free(acs);
+  if (holder)
+    X509_free(holder);
 
   return ok;
 }
@@ -477,7 +487,6 @@ bool vomsdata::Import(std::string buffer)
       if (buf) 
         subject = std::string(buf);
       OPENSSL_free(buf);
-
       buf = X509_NAME_oneline(X509_get_issuer_name(holder), NULL, 0);
       if (buf)
         ca = std::string(buf);
@@ -633,7 +642,6 @@ static bool empty(std::string c)
   for (unsigned int i = 0; i < c.size(); i++)
     if (!isspace(c[i]))
       return false;
-
   return true;
 }
 
@@ -900,7 +908,13 @@ std::vector<std::string> voms::GetTargets()
 
 bool vomsdata::LoadCredentials(X509 *cert, EVP_PKEY *pkey, STACK_OF(X509) *chain)
 {
+  X509           *ucert = NULL;
+  STACK_OF(X509) *cert_chain = NULL;
+  EVP_PKEY       *upkey = NULL;
+
+  pthread_mutex_lock(&privatelock);
   vomsspace::internal *data = privatedata[this];
+  pthread_mutex_unlock(&privatelock);
 
   /* The condition below should never be true. */
   if (!data)
@@ -922,7 +936,6 @@ bool vomsdata::LoadCredentials(X509 *cert, EVP_PKEY *pkey, STACK_OF(X509) *chain
     if (data->chain) {
       for (int i =0; i < sk_X509_num(chain); i++) {
         X509 *newcert = X509_dup(sk_X509_value(chain, i));
-
         if (!newcert) {
           sk_X509_pop_free(data->chain, X509_free);
           data->chain = NULL;
