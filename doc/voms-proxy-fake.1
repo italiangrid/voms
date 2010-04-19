@@ -129,6 +129,12 @@ This forces the server to generate ACs in the new (correct) format\&. This is me
 The created proxy will have newdn as subject rather than what is would normally have depending on the specific version of proxy created\&.
 
 .PP
+\fB\-newserial\fR  \fInewserial\fR
+
+.PP
+The created proxy will have the newserial as its serial number\&. The new serial number will have to be specified as an hex representation\&. Any length is possible\&. If this option is not specified, voms\-proxy\-fake will choose the serial number\&.
+
+.PP
 \fB\-pastac\fR  \fItimespec\fR
 
 .PP
@@ -171,7 +177,7 @@ The created proxy will have the specified bits in the Key Usage Extensions\&. Ac
 The created certificate will be a self\-signed certificate and have a CA=true bit in the Basic constraints Exception\&.
 
 .PP
-\fB\-extensions\fR  \fIoid[/criticality]value\fR
+\fB\-extension\fR  \fIoid[/criticality]value\fR
 
 .PP
 This option allows to specified additional extensions to be put in the created certificate\&.
@@ -186,7 +192,7 @@ criticality specifies whether the extensions is critical or not, and it must be 
 value is the value of the extensions\&. It is composed by two subfields, type and content\&. type is a single charater, and specifies how the content is interpreted\&. ':' means that content is a text string to be included as is\&. '~' means that content is an hex representation of the string\&. '+' means that content is the name of a file which will contain the actual data\&.
 
 .PP
-\fB\-acextensions\fR  \fIoid[/criticality]value\fR
+\fB\-acextension\fR  \fIoid[/criticality]value\fR
 
 .PP
 This option allows to specified additional extensions to be put in the created attribute certificate\&.
