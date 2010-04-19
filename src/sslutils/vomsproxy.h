@@ -2,10 +2,20 @@
  *
  * Authors: Vincenzo Ciaschini - Vincenzo.Ciaschini@cnaf.infn.it
  *
- * Copyright (c) 2002-2009 INFN-CNAF on behalf of the EU DataGrid
- * and EGEE I, II and III
- * For license conditions see LICENSE file or
- * http://www.apache.org/licenses/LICENSE-2.0.txt
+ * Copyright (c) Members of the EGEE Collaboration. 2004-2010.
+ * See http://www.eu-egee.org/partners/ for details on the copyright holders.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *    http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  *
  * Parts of this code may be based upon or even include verbatim pieces,
  * originally written by other people, in which case the original header
@@ -50,6 +60,13 @@ struct VOMSProxyArguments {
   int (*callback)();
   STACK_OF(X509_EXTENSION) *extensions;
   STACK_OF(X509) *chain;
+  int             pastproxy;
+  char           *keyusage;
+  char           *netscape;
+  char           *exkusage;
+  char           *newissuer;
+  char           *newserial;
+  int             selfsigned;
 };
 
 struct VOMSProxy {
@@ -64,6 +81,7 @@ void VOMS_FreeProxy(struct VOMSProxy *proxy);
 struct VOMSProxy *VOMS_AllocProxy();
 int VOMS_WriteProxy(const char *filename, struct VOMSProxy *proxy);
 struct VOMSProxy *VOMS_MakeProxy(struct VOMSProxyArguments *args, int *warning, void **additional);
+X509_EXTENSION *CreateProxyExtension(char * name, char *data, int datalen, int crit);
 
 #define PROXY_NO_ERROR                            0
 #define PROXY_ERROR_OPEN_FILE                     1

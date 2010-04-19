@@ -3,10 +3,20 @@
  *
  * Authors: Vincenzo Ciaschini - Vincenzo.Ciaschini@cnaf.infn.it 
  *
- * Copyright (c) 2002-2009 INFN-CNAF on behalf of the EU DataGrid
- * and EGEE I, II and III
- * For license conditions see LICENSE file or
- * http://www.apache.org/licenses/LICENSE-2.0.txt
+ * Copyright (c) Members of the EGEE Collaboration. 2004-2010.
+ * See http://www.eu-egee.org/partners/ for details on the copyright holders.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *    http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  *
  * Parts of this code may be based upon or even include verbatim pieces,
  * originally written by other people, in which case the original header
@@ -79,7 +89,8 @@ static void make_uri(const char *vo, const char *uri, STACK_OF(GENERAL_NAME) *na
 
 int writeac(X509 *issuerc, STACK_OF(X509) *issuerstack, X509 *holder, EVP_PKEY *pkey, BIGNUM *s,
             char **fqan, char *t, char **attributes_strings, AC **ac,
-            const char *vo, const char *uri, int valid, int old)
+            const char *vo, const char *uri, int valid, int old, int startpast,
+            STACK_OF(X509_EXTENSION) *extensions)
 {
   AC *a;
   X509_NAME *name1, *name2, *subjdup, *issdup;
@@ -135,8 +146,8 @@ int writeac(X509 *issuerc, STACK_OF(X509) *issuerstack, X509 *holder, EVP_PKEY *
 
 
   time(&curtime);
-  time1 = ASN1_GENERALIZEDTIME_set(NULL, curtime);
-  time2 = ASN1_GENERALIZEDTIME_set(NULL, curtime+valid);
+  time1 = ASN1_GENERALIZEDTIME_set(NULL, curtime - startpast);
+  time2 = ASN1_GENERALIZEDTIME_set(NULL, curtime + valid - startpast);
 
   subjdup             = X509_NAME_dup(name2);
   issdup              = X509_NAME_dup(name1);
@@ -279,6 +290,23 @@ int writeac(X509 *issuerc, STACK_OF(X509) *issuerstack, X509 *holder, EVP_PKEY *
       make_and_push_ext(a, "authKeyId", (char *)issuerc, 0) ||
       (t && make_and_push_ext(a, "idceTargets", t, 1)))
     ERROR(AC_ERR_NO_EXTENSION);
+
+  if (extensions) {
+    int proxyindex = 0;
+
+    for (proxyindex = 0; proxyindex < sk_X509_EXTENSION_num(extensions); proxyindex++) {
+      X509_EXTENSION *ext = X509_EXTENSION_dup(sk_X509_EXTENSION_value(extensions, i));
+      if (ext) {
+        if (!sk_X509_EXTENSION_push(a->acinfo->exts, ext)) {
+          X509_EXTENSION_free(ext);
+          goto err;
+        }
+      }
+      else {
+        goto err;
+      }
+    }
+  }
 
   alg1 = X509_ALGOR_dup(issuerc->cert_info->signature);
   alg2 = X509_ALGOR_dup(issuerc->sig_alg);

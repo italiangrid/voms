@@ -1,24 +1,23 @@
-/* A Bison parser, made by GNU Bison 2.3.  */
+
+/* A Bison parser, made by GNU Bison 2.4.  */
 
 /* Skeleton implementation for Bison's Yacc-like parsers in C
-
-   Copyright (C) 1984, 1989, 1990, 2000, 2001, 2002, 2003, 2004, 2005, 2006
+   
+      Copyright (C) 1984, 1989, 1990, 2000, 2001, 2002, 2003, 2004, 2005, 2006
    Free Software Foundation, Inc.
-
-   This program is free software; you can redistribute it and/or modify
+   
+   This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
-   the Free Software Foundation; either version 2, or (at your option)
-   any later version.
-
+   the Free Software Foundation, either version 3 of the License, or
+   (at your option) any later version.
+   
    This program is distributed in the hope that it will be useful,
    but WITHOUT ANY WARRANTY; without even the implied warranty of
    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
    GNU General Public License for more details.
-
+   
    You should have received a copy of the GNU General Public License
-   along with this program; if not, write to the Free Software
-   Foundation, Inc., 51 Franklin Street, Fifth Floor,
-   Boston, MA 02110-1301, USA.  */
+   along with this program.  If not, see <http://www.gnu.org/licenses/>.  */
 
 /* As a special exception, you may create a larger work that contains
    part or all of the Bison parser skeleton and distribute that work
@@ -29,7 +28,7 @@
    special exception, which will cause the skeleton and the resulting
    Bison output files to be licensed under the GNU General Public
    License without this special exception.
-
+   
    This special exception was added by the Free Software Foundation in
    version 2.2 of Bison.  */
 
@@ -47,7 +46,7 @@
 #define YYBISON 1
 
 /* Bison version.  */
-#define YYBISON_VERSION "2.3"
+#define YYBISON_VERSION "2.4"
 
 /* Skeleton name.  */
 #define YYSKELETON_NAME "yacc.c"
@@ -55,17 +54,88 @@
 /* Pure parsers.  */
 #define YYPURE 1
 
+/* Push parsers.  */
+#define YYPUSH 0
+
+/* Pull parsers.  */
+#define YYPULL 1
+
 /* Using locations.  */
 #define YYLSP_NEEDED 0
 
 /* Substitute the variable and function names.  */
-#define yyparse signingparse
-#define yylex   signinglex
-#define yyerror signingerror
-#define yylval  signinglval
-#define yychar  signingchar
-#define yydebug signingdebug
-#define yynerrs signingnerrs
+#define yyparse         signingparse
+#define yylex           signinglex
+#define yyerror         signingerror
+#define yylval          signinglval
+#define yychar          signingchar
+#define yydebug         signingdebug
+#define yynerrs         signingnerrs
+
+
+/* Copy the first part of user declarations.  */
+
+/* Line 189 of yacc.c  */
+#line 1 "signing_policy.y"
+
+/*********************************************************************
+ *
+ * Authors: Vincenzo Ciaschini - Vincenzo.Ciaschini@cnaf.infn.it 
+ *          Valerio Venturi    - Valerio.Venturi@cnaf.infn.it
+ *
+ * Copyright (c) Members of the EGEE Collaboration. 2004-2010.
+ * See http://www.eu-egee.org/partners/ for details on the copyright holders.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *    http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *
+ * Parts of this code may be based upon or even include verbatim pieces,
+ * originally written by other people, in which case the original header
+ * follows.
+ *
+ *********************************************************************/
+#include "config.h"
+#include <stdio.h>
+#include <string.h>
+#include <stdlib.h>
+#include <ctype.h>
+
+#include "parsertypes.h"
+
+char **splistadd(char **vect, char *data, int size);
+char **parse_subjects(char *string);
+void signingerror(void *policies, void *scanner, char const *msg);
+
+
+/* Line 189 of yacc.c  */
+#line 121 "signing_policy.c"
+
+/* Enabling traces.  */
+#ifndef YYDEBUG
+# define YYDEBUG 1
+#endif
+
+/* Enabling verbose error messages.  */
+#ifdef YYERROR_VERBOSE
+# undef YYERROR_VERBOSE
+# define YYERROR_VERBOSE 1
+#else
+# define YYERROR_VERBOSE 1
+#endif
+
+/* Enabling the token table.  */
+#ifndef YYTOKEN_TABLE
+# define YYTOKEN_TABLE 0
+#endif
 
 
 /* Tokens.  */
@@ -86,94 +156,37 @@
      X509 = 267
    };
 #endif
-/* Tokens.  */
-#define SUBJECTS 258
-#define COND_SUBJECTS 259
-#define COND_BANNED 260
-#define GLOBUS 261
-#define POS_RIGHTS 262
-#define NEG_RIGHTS 263
-#define CA_SIGN 264
-#define ACCESS_ID_CA 265
-#define ACCESS_ID_ANYBODY 266
-#define X509 267
 
 
-
-
-/* Copy the first part of user declarations.  */
-#line 1 "signing_policy.y"
-
-/*********************************************************************
- *
- * Authors: Vincenzo Ciaschini - Vincenzo.Ciaschini@cnaf.infn.it 
- *          Valerio Venturi    - Valerio.Venturi@cnaf.infn.it
- *
- * Copyright (c) 2002-2009 INFN-CNAF on behalf of the EU DataGrid
- * and EGEE I, II and III
- * For license conditions see LICENSE file or
- * http://www.apache.org/licenses/LICENSE-2.0.txt
- *
- * Parts of this code may be based upon or even include verbatim pieces,
- * originally written by other people, in which case the original header
- * follows.
- *
- *********************************************************************/
-#include "config.h"
-#include <stdio.h>
-#include <string.h>
-#include <stdlib.h>
-#include <ctype.h>
-
-#include "parsertypes.h"
-
-char **splistadd(char **vect, char *data, int size);
-char **parse_subjects(char *string);
-void signingerror(void *policies, void *scanner, char const *msg);
-
-
-/* Enabling traces.  */
-#ifndef YYDEBUG
-# define YYDEBUG 1
-#endif
-
-/* Enabling verbose error messages.  */
-#ifdef YYERROR_VERBOSE
-# undef YYERROR_VERBOSE
-# define YYERROR_VERBOSE 1
-#else
-# define YYERROR_VERBOSE 1
-#endif
-
-/* Enabling the token table.  */
-#ifndef YYTOKEN_TABLE
-# define YYTOKEN_TABLE 0
-#endif
 
 #if ! defined YYSTYPE && ! defined YYSTYPE_IS_DECLARED
 typedef union YYSTYPE
-#line 37 "signing_policy.y"
 {
+
+/* Line 214 of yacc.c  */
+#line 47 "signing_policy.y"
+
   char *string;
   struct condition *cond;
   struct policy *policy;
   void *array;
-}
-/* Line 187 of yacc.c.  */
-#line 164 "signing_policy.c"
-	YYSTYPE;
+
+
+
+/* Line 214 of yacc.c  */
+#line 178 "signing_policy.c"
+} YYSTYPE;
+# define YYSTYPE_IS_TRIVIAL 1
 # define yystype YYSTYPE /* obsolescent; will be withdrawn */
 # define YYSTYPE_IS_DECLARED 1
-# define YYSTYPE_IS_TRIVIAL 1
 #endif
-
 
 
 /* Copy the second part of user declarations.  */
 
 
-/* Line 216 of yacc.c.  */
-#line 177 "signing_policy.c"
+/* Line 264 of yacc.c  */
+#line 190 "signing_policy.c"
 
 #ifdef short
 # undef short
@@ -248,14 +261,14 @@ typedef short int yytype_int16;
 #if (defined __STDC__ || defined __C99__FUNC__ \
      || defined __cplusplus || defined _MSC_VER)
 static int
-YYID (int i)
+YYID (int yyi)
 #else
 static int
-YYID (i)
-    int i;
+YYID (yyi)
+    int yyi;
 #endif
 {
-  return i;
+  return yyi;
 }
 #endif
 
@@ -336,9 +349,9 @@ void free (void *); /* INFRINGES ON USER NAME SPACE */
 /* A type that is properly aligned for any stack member.  */
 union yyalloc
 {
-  yytype_int16 yyss;
-  YYSTYPE yyvs;
-  };
+  yytype_int16 yyss_alloc;
+  YYSTYPE yyvs_alloc;
+};
 
 /* The size of the maximum gap between one aligned stack and the next.  */
 # define YYSTACK_GAP_MAXIMUM (sizeof (union yyalloc) - 1)
@@ -372,12 +385,12 @@ union yyalloc
    elements in the stack, and YYPTR gives the new location of the
    stack.  Advance YYPTR to a properly aligned location for the next
    stack.  */
-# define YYSTACK_RELOCATE(Stack)					\
+# define YYSTACK_RELOCATE(Stack_alloc, Stack)				\
     do									\
       {									\
 	YYSIZE_T yynewbytes;						\
-	YYCOPY (&yyptr->Stack, Stack, yysize);				\
-	Stack = &yyptr->Stack;						\
+	YYCOPY (&yyptr->Stack_alloc, Stack, yysize);			\
+	Stack = &yyptr->Stack_alloc;					\
 	yynewbytes = yystacksize * sizeof (*Stack) + YYSTACK_GAP_MAXIMUM; \
 	yyptr += yynewbytes / sizeof (*yyptr);				\
       }									\
@@ -460,8 +473,8 @@ static const yytype_int8 yyrhs[] =
 /* YYRLINE[YYN] -- source line where rule number YYN was defined.  */
 static const yytype_uint8 yyrline[] =
 {
-       0,    62,    62,    63,    65,    71,    77,    81,    84,    89,
-     104,   108,   121
+       0,    72,    72,    73,    75,    81,    87,    91,    94,    99,
+     114,   118,   131
 };
 #endif
 
@@ -750,17 +763,20 @@ yy_symbol_print (yyoutput, yytype, yyvaluep, policies, scanner)
 #if (defined __STDC__ || defined __C99__FUNC__ \
      || defined __cplusplus || defined _MSC_VER)
 static void
-yy_stack_print (yytype_int16 *bottom, yytype_int16 *top)
+yy_stack_print (yytype_int16 *yybottom, yytype_int16 *yytop)
 #else
 static void
-yy_stack_print (bottom, top)
-    yytype_int16 *bottom;
-    yytype_int16 *top;
+yy_stack_print (yybottom, yytop)
+    yytype_int16 *yybottom;
+    yytype_int16 *yytop;
 #endif
 {
   YYFPRINTF (stderr, "Stack now");
-  for (; bottom <= top; ++bottom)
-    YYFPRINTF (stderr, " %d", *bottom);
+  for (; yybottom <= yytop; yybottom++)
+    {
+      int yybot = *yybottom;
+      YYFPRINTF (stderr, " %d", yybot);
+    }
   YYFPRINTF (stderr, "\n");
 }
 
@@ -796,11 +812,11 @@ yy_reduce_print (yyvsp, yyrule, policies, scanner)
   /* The symbols being reduced.  */
   for (yyi = 0; yyi < yynrhs; yyi++)
     {
-      fprintf (stderr, "   $%d = ", yyi + 1);
+      YYFPRINTF (stderr, "   $%d = ", yyi + 1);
       yy_symbol_print (stderr, yyrhs[yyprhs[yyrule] + yyi],
 		       &(yyvsp[(yyi + 1) - (yynrhs)])
 		       		       , policies, scanner);
-      fprintf (stderr, "\n");
+      YYFPRINTF (stderr, "\n");
     }
 }
 
@@ -1084,10 +1100,8 @@ yydestruct (yymsg, yytype, yyvaluep, policies, scanner)
 	break;
     }
 }
-
 
 /* Prevent warnings from -Wmissing-prototypes.  */
-
 #ifdef YYPARSE_PARAM
 #if defined __STDC__ || defined __cplusplus
 int yyparse (void *YYPARSE_PARAM);
@@ -1106,10 +1120,9 @@ int yyparse ();
 
 
 
-
-/*----------.
-| yyparse.  |
-`----------*/
+/*-------------------------.
+| yyparse or yypush_parse.  |
+`-------------------------*/
 
 #ifdef YYPARSE_PARAM
 #if (defined __STDC__ || defined __C99__FUNC__ \
@@ -1134,22 +1147,46 @@ yyparse (policies, scanner)
 #endif
 #endif
 {
-  /* The look-ahead symbol.  */
+/* The lookahead symbol.  */
 int yychar;
 
-/* The semantic value of the look-ahead symbol.  */
+/* The semantic value of the lookahead symbol.  */
 YYSTYPE yylval;
 
-/* Number of syntax errors so far.  */
-int yynerrs;
+    /* Number of syntax errors so far.  */
+    int yynerrs;
 
-  int yystate;
+    int yystate;
+    /* Number of tokens to shift before error messages enabled.  */
+    int yyerrstatus;
+
+    /* The stacks and their tools:
+       `yyss': related to states.
+       `yyvs': related to semantic values.
+
+       Refer to the stacks thru separate pointers, to allow yyoverflow
+       to reallocate them elsewhere.  */
+
+    /* The state stack.  */
+    yytype_int16 yyssa[YYINITDEPTH];
+    yytype_int16 *yyss;
+    yytype_int16 *yyssp;
+
+    /* The semantic value stack.  */
+    YYSTYPE yyvsa[YYINITDEPTH];
+    YYSTYPE *yyvs;
+    YYSTYPE *yyvsp;
+
+    YYSIZE_T yystacksize;
+
   int yyn;
   int yyresult;
-  /* Number of tokens to shift before error messages enabled.  */
-  int yyerrstatus;
-  /* Look-ahead token as an internal (translated) token number.  */
-  int yytoken = 0;
+  /* Lookahead token as an internal (translated) token number.  */
+  int yytoken;
+  /* The variables used to return semantic value and location from the
+     action routines.  */
+  YYSTYPE yyval;
+
 #if YYERROR_VERBOSE
   /* Buffer for error messages, and its allocated size.  */
   char yymsgbuf[128];
@@ -1157,51 +1194,28 @@ int yynerrs;
   YYSIZE_T yymsg_alloc = sizeof yymsgbuf;
 #endif
 
-  /* Three stacks and their tools:
-     `yyss': related to states,
-     `yyvs': related to semantic values,
-     `yyls': related to locations.
-
-     Refer to the stacks thru separate pointers, to allow yyoverflow
-     to reallocate them elsewhere.  */
-
-  /* The state stack.  */
-  yytype_int16 yyssa[YYINITDEPTH];
-  yytype_int16 *yyss = yyssa;
-  yytype_int16 *yyssp;
-
-  /* The semantic value stack.  */
-  YYSTYPE yyvsa[YYINITDEPTH];
-  YYSTYPE *yyvs = yyvsa;
-  YYSTYPE *yyvsp;
-
-
-
 #define YYPOPSTACK(N)   (yyvsp -= (N), yyssp -= (N))
-
-  YYSIZE_T yystacksize = YYINITDEPTH;
-
-  /* The variables used to return semantic value and location from the
-     action routines.  */
-  YYSTYPE yyval;
-
 
   /* The number of symbols on the RHS of the reduced rule.
      Keep to zero when no symbol should be popped.  */
   int yylen = 0;
+
+  yytoken = 0;
+  yyss = yyssa;
+  yyvs = yyvsa;
+  yystacksize = YYINITDEPTH;
 
   YYDPRINTF ((stderr, "Starting parse\n"));
 
   yystate = 0;
   yyerrstatus = 0;
   yynerrs = 0;
-  yychar = YYEMPTY;		/* Cause a token to be read.  */
+  yychar = YYEMPTY; /* Cause a token to be read.  */
 
   /* Initialize stack pointers.
      Waste one element of value and location stack
      so that they stay on the same level as the state stack.
      The wasted elements are never initialized.  */
-
   yyssp = yyss;
   yyvsp = yyvs;
 
@@ -1231,7 +1245,6 @@ int yynerrs;
 	YYSTYPE *yyvs1 = yyvs;
 	yytype_int16 *yyss1 = yyss;
 
-
 	/* Each stack pointer address is followed by the size of the
 	   data in use in that stack, in bytes.  This used to be a
 	   conditional around just the two extra args, but that might
@@ -1239,7 +1252,6 @@ int yynerrs;
 	yyoverflow (YY_("memory exhausted"),
 		    &yyss1, yysize * sizeof (*yyssp),
 		    &yyvs1, yysize * sizeof (*yyvsp),
-
 		    &yystacksize);
 
 	yyss = yyss1;
@@ -1262,9 +1274,8 @@ int yynerrs;
 	  (union yyalloc *) YYSTACK_ALLOC (YYSTACK_BYTES (yystacksize));
 	if (! yyptr)
 	  goto yyexhaustedlab;
-	YYSTACK_RELOCATE (yyss);
-	YYSTACK_RELOCATE (yyvs);
-
+	YYSTACK_RELOCATE (yyss_alloc, yyss);
+	YYSTACK_RELOCATE (yyvs_alloc, yyvs);
 #  undef YYSTACK_RELOCATE
 	if (yyss1 != yyssa)
 	  YYSTACK_FREE (yyss1);
@@ -1275,7 +1286,6 @@ int yynerrs;
       yyssp = yyss + yysize - 1;
       yyvsp = yyvs + yysize - 1;
 
-
       YYDPRINTF ((stderr, "Stack size increased to %lu\n",
 		  (unsigned long int) yystacksize));
 
@@ -1285,6 +1295,9 @@ int yynerrs;
 
   YYDPRINTF ((stderr, "Entering state %d\n", yystate));
 
+  if (yystate == YYFINAL)
+    YYACCEPT;
+
   goto yybackup;
 
 /*-----------.
@@ -1293,16 +1306,16 @@ int yynerrs;
 yybackup:
 
   /* Do appropriate processing given the current state.  Read a
-     look-ahead token if we need one and don't already have one.  */
+     lookahead token if we need one and don't already have one.  */
 
-  /* First try to decide what to do without reference to look-ahead token.  */
+  /* First try to decide what to do without reference to lookahead token.  */
   yyn = yypact[yystate];
   if (yyn == YYPACT_NINF)
     goto yydefault;
 
-  /* Not known => get a look-ahead token if don't already have one.  */
+  /* Not known => get a lookahead token if don't already have one.  */
 
-  /* YYCHAR is either YYEMPTY or YYEOF or a valid look-ahead symbol.  */
+  /* YYCHAR is either YYEMPTY or YYEOF or a valid lookahead symbol.  */
   if (yychar == YYEMPTY)
     {
       YYDPRINTF ((stderr, "Reading a token: "));
@@ -1334,20 +1347,16 @@ yybackup:
       goto yyreduce;
     }
 
-  if (yyn == YYFINAL)
-    YYACCEPT;
-
   /* Count tokens shifted since error; after three, turn off error
      status.  */
   if (yyerrstatus)
     yyerrstatus--;
 
-  /* Shift the look-ahead token.  */
+  /* Shift the lookahead token.  */
   YY_SYMBOL_PRINT ("Shifting", yytoken, &yylval, &yylloc);
 
-  /* Discard the shifted token unless it is eof.  */
-  if (yychar != YYEOF)
-    yychar = YYEMPTY;
+  /* Discard the shifted token.  */
+  yychar = YYEMPTY;
 
   yystate = yyn;
   *++yyvsp = yylval;
@@ -1387,57 +1396,73 @@ yyreduce:
   switch (yyn)
     {
         case 2:
-#line 62 "signing_policy.y"
-    { *policies = (struct policy **)splistadd((char**)(*policies), (char*)((yyvsp[(1) - (1)].policy)), sizeof((yyvsp[(1) - (1)].policy))); ;}
+
+/* Line 1455 of yacc.c  */
+#line 72 "signing_policy.y"
+    { *policies = (struct policy **)splistadd((char**)(*policies), (char*)((yyvsp[(1) - (1)].policy)), sizeof((yyvsp[(1) - (1)].policy))); }
     break;
 
   case 3:
-#line 63 "signing_policy.y"
-    { *policies = (struct policy **)splistadd((char**)(*policies), (char*)((yyvsp[(2) - (2)].policy)), sizeof((yyvsp[(2) - (2)].policy))); ;}
+
+/* Line 1455 of yacc.c  */
+#line 73 "signing_policy.y"
+    { *policies = (struct policy **)splistadd((char**)(*policies), (char*)((yyvsp[(2) - (2)].policy)), sizeof((yyvsp[(2) - (2)].policy))); }
     break;
 
   case 4:
-#line 65 "signing_policy.y"
+
+/* Line 1455 of yacc.c  */
+#line 75 "signing_policy.y"
     {
   if ((yyvsp[(1) - (5)].policy)) {
     (yyval.policy)->conds = (struct condition**)((yyvsp[(5) - (5)].array));
   }
   (yyval.policy) = (yyvsp[(1) - (5)].policy);
-;}
+}
     break;
 
   case 5:
-#line 71 "signing_policy.y"
+
+/* Line 1455 of yacc.c  */
+#line 81 "signing_policy.y"
     {
   /* Ignore this.  Globus does. */
   free((yyvsp[(1) - (5)].policy));
   (yyval.policy) = NULL;
-;}
+}
     break;
 
   case 6:
-#line 77 "signing_policy.y"
+
+/* Line 1455 of yacc.c  */
+#line 87 "signing_policy.y"
     {
   (yyval.policy) = (yyvsp[(1) - (1)].policy);
-;}
+}
     break;
 
   case 7:
-#line 81 "signing_policy.y"
+
+/* Line 1455 of yacc.c  */
+#line 91 "signing_policy.y"
     {
   (yyval.array) = splistadd(NULL, (char*)((yyvsp[(1) - (1)].cond)), sizeof((yyvsp[(1) - (1)].cond)));
-;}
+}
     break;
 
   case 8:
-#line 84 "signing_policy.y"
+
+/* Line 1455 of yacc.c  */
+#line 94 "signing_policy.y"
     {
   (yyval.array) = splistadd((yyvsp[(2) - (2)].array), (char*)((yyvsp[(1) - (2)].cond)), sizeof((yyvsp[(1) - (2)].cond)));
-;}
+}
     break;
 
   case 9:
-#line 89 "signing_policy.y"
+
+/* Line 1455 of yacc.c  */
+#line 99 "signing_policy.y"
     {
   (yyval.policy) = (struct policy *)calloc(1, sizeof(struct policy));
 
@@ -1452,18 +1477,22 @@ yyreduce:
     free((yyval.policy));
     (yyval.policy) = NULL;
   }
-;}
+}
     break;
 
   case 10:
-#line 104 "signing_policy.y"
+
+/* Line 1455 of yacc.c  */
+#line 114 "signing_policy.y"
     {
   (yyval.policy) = (struct policy *)calloc(1, sizeof(struct policy));
-;}
+}
     break;
 
   case 11:
-#line 108 "signing_policy.y"
+
+/* Line 1455 of yacc.c  */
+#line 118 "signing_policy.y"
     { 
     (yyval.cond) = (struct condition*)malloc(sizeof(struct condition));
     if ((yyval.cond)) {
@@ -1476,11 +1505,13 @@ yyreduce:
         (yyval.cond) = NULL;
       }
     }
-;}
+}
     break;
 
   case 12:
-#line 121 "signing_policy.y"
+
+/* Line 1455 of yacc.c  */
+#line 131 "signing_policy.y"
     {
     (yyval.cond) = (struct condition*)malloc(sizeof(struct condition));
 
@@ -1494,12 +1525,13 @@ yyreduce:
         (yyval.cond) = NULL;
       }
     }
-;}
+}
     break;
 
 
-/* Line 1267 of yacc.c.  */
-#line 1503 "signing_policy.c"
+
+/* Line 1455 of yacc.c  */
+#line 1535 "signing_policy.c"
       default: break;
     }
   YY_SYMBOL_PRINT ("-> $$ =", yyr1[yyn], &yyval, &yyloc);
@@ -1509,7 +1541,6 @@ yyreduce:
   YY_STACK_PRINT (yyss, yyssp);
 
   *++yyvsp = yyval;
-
 
   /* Now `shift' the result of the reduction.  Determine what state
      that goes to, based on the state we popped back to and the rule
@@ -1575,7 +1606,7 @@ yyerrlab:
 
   if (yyerrstatus == 3)
     {
-      /* If just tried and failed to reuse look-ahead token after an
+      /* If just tried and failed to reuse lookahead token after an
 	 error, discard it.  */
 
       if (yychar <= YYEOF)
@@ -1592,7 +1623,7 @@ yyerrlab:
 	}
     }
 
-  /* Else will try to reuse look-ahead token after shifting the error
+  /* Else will try to reuse lookahead token after shifting the error
      token.  */
   goto yyerrlab1;
 
@@ -1649,9 +1680,6 @@ yyerrlab1:
       YY_STACK_PRINT (yyss, yyssp);
     }
 
-  if (yyn == YYFINAL)
-    YYACCEPT;
-
   *++yyvsp = yylval;
 
 
@@ -1676,7 +1704,7 @@ yyabortlab:
   yyresult = 1;
   goto yyreturn;
 
-#ifndef yyoverflow
+#if !defined(yyoverflow) || YYERROR_VERBOSE
 /*-------------------------------------------------.
 | yyexhaustedlab -- memory exhaustion comes here.  |
 `-------------------------------------------------*/
@@ -1687,7 +1715,7 @@ yyexhaustedlab:
 #endif
 
 yyreturn:
-  if (yychar != YYEOF && yychar != YYEMPTY)
+  if (yychar != YYEMPTY)
      yydestruct ("Cleanup: discarding lookahead",
 		 yytoken, &yylval, policies, scanner);
   /* Do not reclaim the symbols of the rule which action triggered
@@ -1713,7 +1741,9 @@ yyreturn:
 }
 
 
-#line 137 "signing_policy.y"
+
+/* Line 1675 of yacc.c  */
+#line 147 "signing_policy.y"
 
 
 char **splistadd(char **vect, char *data, int size)

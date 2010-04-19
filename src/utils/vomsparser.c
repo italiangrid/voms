@@ -70,7 +70,22 @@
 /* Line 189 of yacc.c  */
 #line 1 "vomsfake.y"
 
-#include "config.h"
+/*
+ * Copyright (c) Members of the EGEE Collaboration. 2004-2010.
+ * See http://www.eu-egee.org/partners/ for details on the copyright holders.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *    http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 #include <stdlib.h>
 #include <string.h>
 
@@ -83,7 +98,7 @@ static void convertparam(VO *vo, PARAM* param);
 
 
 /* Line 189 of yacc.c  */
-#line 87 "vomsparser.c"
+#line 102 "vomsparser.c"
 
 /* Enabling traces.  */
 #ifndef YYDEBUG
@@ -122,7 +137,7 @@ typedef union YYSTYPE
 {
 
 /* Line 214 of yacc.c  */
-#line 16 "vomsfake.y"
+#line 31 "vomsfake.y"
 
   char *string;
   char *input;
@@ -134,7 +149,7 @@ typedef union YYSTYPE
 
 
 /* Line 214 of yacc.c  */
-#line 138 "vomsparser.c"
+#line 153 "vomsparser.c"
 } YYSTYPE;
 # define YYSTYPE_IS_TRIVIAL 1
 # define yystype YYSTYPE /* obsolescent; will be withdrawn */
@@ -146,7 +161,7 @@ typedef union YYSTYPE
 
 
 /* Line 264 of yacc.c  */
-#line 150 "vomsparser.c"
+#line 165 "vomsparser.c"
 
 #ifdef short
 # undef short
@@ -432,8 +447,8 @@ static const yytype_int8 yyrhs[] =
 /* YYRLINE[YYN] -- source line where rule number YYN was defined.  */
 static const yytype_uint8 yyrline[] =
 {
-       0,    36,    36,    43,    50,    65,    78,    84,    90,    95,
-     104,   116,   117
+       0,    51,    51,    58,    65,    82,    97,   103,   109,   114,
+     123,   135,   136
 };
 #endif
 
@@ -1339,7 +1354,7 @@ yyreduce:
         case 2:
 
 /* Line 1455 of yacc.c  */
-#line 36 "vomsfake.y"
+#line 51 "vomsfake.y"
     {
   (yyval.vos) = (VOLIST*)malloc(sizeof(VOLIST));
   (yyval.vos)->vos= (VO**)malloc(sizeof(VO*)*MAX_SIZE);
@@ -1352,7 +1367,7 @@ yyreduce:
   case 3:
 
 /* Line 1455 of yacc.c  */
-#line 43 "vomsfake.y"
+#line 58 "vomsfake.y"
     {
   (yyval.vos) = (yyvsp[(1) - (2)].vos);
   (yyval.vos)->vos[(yyval.vos)->current++] = (yyvsp[(2) - (2)].vo);
@@ -1363,7 +1378,7 @@ yyreduce:
   case 4:
 
 /* Line 1455 of yacc.c  */
-#line 50 "vomsfake.y"
+#line 65 "vomsfake.y"
     {
   (yyval.vo) = (VO *)calloc(1,sizeof(VO));
   (yyval.vo)->fqans = (char**)malloc(sizeof(char*)*MAX_SIZE);
@@ -1372,6 +1387,8 @@ yyreduce:
   (yyval.vo)->gasize = 0;
   (yyval.vo)->targets = NULL;
   (yyval.vo)->voname = (yyvsp[(2) - (4)].string);
+  (yyval.vo)->extensions = (char**)malloc(sizeof(char*)*MAX_SIZE);
+  (yyval.vo)->extsize = 0;
   (yyval.vo)->params = (yyvsp[(4) - (4)].params);
   {
     int i =0;
@@ -1384,7 +1401,7 @@ yyreduce:
   case 5:
 
 /* Line 1455 of yacc.c  */
-#line 65 "vomsfake.y"
+#line 82 "vomsfake.y"
     {
   (yyval.vo) = (VO *)calloc(1,sizeof(VO));
   (yyval.vo)->fqans = NULL;
@@ -1393,6 +1410,8 @@ yyreduce:
   (yyval.vo)->gasize = 0;
   (yyval.vo)->targets = NULL;
   (yyval.vo)->voname = (yyvsp[(2) - (3)].string);
+  (yyval.vo)->extensions = NULL;
+  (yyval.vo)->extsize = 0;
   (yyval.vo)->params = NULL;
 
   }
@@ -1401,7 +1420,7 @@ yyreduce:
   case 6:
 
 /* Line 1455 of yacc.c  */
-#line 78 "vomsfake.y"
+#line 97 "vomsfake.y"
     {
   (yyval.params) = (PARAMLIST *)malloc(sizeof(PARAMLIST));
   (yyval.params)->params = (PARAM**)malloc(sizeof(PARAM*)*MAX_SIZE);
@@ -1413,7 +1432,7 @@ yyreduce:
   case 7:
 
 /* Line 1455 of yacc.c  */
-#line 84 "vomsfake.y"
+#line 103 "vomsfake.y"
     {
   (yyval.params) = (yyvsp[(1) - (2)].params);
   (yyval.params)->params[(yyval.params)->current++] = (yyvsp[(2) - (2)].param);  
@@ -1423,7 +1442,7 @@ yyreduce:
   case 8:
 
 /* Line 1455 of yacc.c  */
-#line 90 "vomsfake.y"
+#line 109 "vomsfake.y"
     {
   (yyval.param) = (PARAM *)calloc(1,sizeof(PARAM));
   (yyval.param)->name = (yyvsp[(1) - (3)].string);
@@ -1434,7 +1453,7 @@ yyreduce:
   case 9:
 
 /* Line 1455 of yacc.c  */
-#line 95 "vomsfake.y"
+#line 114 "vomsfake.y"
     {
   (yyval.param) = (PARAM *)calloc(1,sizeof(PARAM));
   (yyval.param)->name = (yyvsp[(1) - (5)].string);
@@ -1449,7 +1468,7 @@ yyreduce:
   case 10:
 
 /* Line 1455 of yacc.c  */
-#line 104 "vomsfake.y"
+#line 123 "vomsfake.y"
     {
   (yyval.param) = (PARAM *)calloc(1,sizeof(PARAM));
   (yyval.param)->name = (yyvsp[(1) - (8)].string);
@@ -1465,21 +1484,21 @@ yyreduce:
   case 11:
 
 /* Line 1455 of yacc.c  */
-#line 116 "vomsfake.y"
+#line 135 "vomsfake.y"
     { (yyval.input) = (yyvsp[(1) - (1)].string); }
     break;
 
   case 12:
 
 /* Line 1455 of yacc.c  */
-#line 117 "vomsfake.y"
+#line 136 "vomsfake.y"
     { (yyval.input) = (yyvsp[(1) - (1)].string); }
     break;
 
 
 
 /* Line 1455 of yacc.c  */
-#line 1483 "vomsparser.c"
+#line 1502 "vomsparser.c"
       default: break;
     }
   YY_SYMBOL_PRINT ("-> $$ =", yyr1[yyn], &yyval, &yyloc);
@@ -1691,7 +1710,7 @@ yyreturn:
 
 
 /* Line 1675 of yacc.c  */
-#line 120 "vomsfake.y"
+#line 139 "vomsfake.y"
 
 
 static void convertparam(VO *vo, PARAM* param)
@@ -1707,6 +1726,9 @@ static void convertparam(VO *vo, PARAM* param)
   }
   else if (strcmp(param->name, "-vomslife") == 0) {
     vo->vomslife = atoi(param->value)*3600;
+  }
+  else if (strcmp(param->name, "-pastac") == 0) {
+    vo->pastac = strdup(param->value);
   }
   else if (strcmp(param->name, "-target") == 0) {
     {
@@ -1730,6 +1752,9 @@ static void convertparam(VO *vo, PARAM* param)
   else if (strcmp(param->name, "-ga") == 0) {
     vo->gas[vo->gasize++] = strdup(param->value);
     vo->gas[vo->gasize] = NULL;
+  }
+  else if (strcmp(param->name, "-acextension") == 0) {
+    vo->extensions[vo->extsize++] = strdup(param->value);
   }
 }
 

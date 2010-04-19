@@ -76,7 +76,6 @@ mandir = $(datadir)/man
 if BUILD_JAVA_ONLY
 man_MANS =
 else
-if BUILD_DOCS
 man_MANS = \
 	voms.8 \
 	voms-proxy-init.1 \
@@ -86,19 +85,15 @@ man_MANS = \
 	voms-install-replica.8 \
 	voms-proxy-fake.1 \
 	voms-proxy-list.1
-else
-man_MANS = 
-endif
 endif
 
 EXTRA_DIST = $(SGML_INCLUDES) $(SGML_DIST) $(LATEX_DIST)
 
 MAINTAINERCLEANFILES = Makefile.in \
                        manpage.links \
-                       manpage.refs \
-                       $(man_MANS)
+                       manpage.refs
 
-CLEANFILES = $(man_MANS) $(DOCS) $(SERVER) $(CLIENT) $(UTILS) *toc *aux *log
+CLEANFILES = $(DOCS) $(SERVER) $(CLIENT) $(UTILS) *toc *aux *log
 
 $(USERDOC_DIR)/server/html/%.html: %.sgml $(SGML_INCLUDES)
 	echo $(USERDOC_DIR)/
@@ -226,8 +221,7 @@ userdoc: userdoc-local userdoc-recursive
 if BUILD_JAVA_ONLY
 install-data-hook:
 else
-if BUILD_DOCS
-install-data-hook:
+install-data-hook: install-man1 install-man8
 	(cd $(DESTDIR)$(mandir)/man1; \
 	for file in *.1; do \
 	  GZIP=$(GZIP_ENV) gzip -f $${file}; \
@@ -252,13 +246,11 @@ if ENABLE_GLITE
 	-ln -s voms.8.gz               $(DESTDIR)$(mandir)/man8/glite-voms.8.gz
 	-ln -s voms-install-replica.8.gz $(DESTDIR)$(mandir)/man8/glite-voms-install-replica.8.gz
 endif
-else
-install-data-hook:
-endif
 endif
 
 MAN_STYLESHEET = http://docbook.sourceforge.net/release/xsl/current/manpages/docbook.xsl
 
+if BUILD_DOCS
 if HAVE_DOCBOOK_MAN
 
 %.1: %.xml $(COMMON_XMLFILES)
@@ -270,5 +262,11 @@ if HAVE_DOCBOOK_MAN
 %.html: %.xml
 	$(XSLTPROC) $(XSLTPROCFLAGS) -o $@ $(HTML_STYLESHEET) $<
 endif
+else
+%1: %.xml
+	touch $@
 
+%8: %.xml
+	touch $@
+endif
 .PHONY: userdoc

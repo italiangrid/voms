@@ -2,10 +2,20 @@
  *
  * Authors: Vincenzo Ciaschini - Vincenzo.Ciaschini@cnaf.infn.it 
  *
- * Copyright (c) 2002-2009 INFN-CNAF on behalf of the EU DataGrid
- * and EGEE I, II and III
- * For license conditions see LICENSE file or
- * http://www.apache.org/licenses/LICENSE-2.0.txt
+ * Copyright (c) Members of the EGEE Collaboration. 2004-2010.
+ * See http://www.eu-egee.org/partners/ for details on the copyright holders.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *    http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  *
  * Parts of this code may be based upon or even include verbatim pieces,
  * originally written by other people, in which case the original header
@@ -29,7 +39,6 @@ extern void       *LogAddStreamer(void *, const char *,
                                   int (*)(void *, const char *), 
                                   void (*)(void *),
                                   void (*)(void *, const char *, const char*));
-extern void        StartLogger(void *, int);
 extern void        LogDestroy(void *);
 extern loglevels   LogLevel(void *, loglevels);
 extern logtypes    LogType(void *, int);
@@ -38,13 +47,12 @@ extern const char *LogService(void *, const char *);
 extern const char *LogFormat(void *, const char *);
 extern int         LogMessage(void *, loglevels, logtypes, const char *, const char *, int, const char *);
 extern int         LogMessageF(const char *, int, const char *, void *, loglevels, logtypes, const char *, ...);
-extern int         LogBuffer(FILE *, void *, loglevels, logtypes, const char *);
 extern logtypes    SetCurLogType(void *, logtypes);
 extern void        LogActivate(void *, const char *);
 extern void        LogDeactivate(void *, const char *);
 extern void        LogOption(void *, const char *, const char *);
 extern void        LogOptionInt(void *, const char *, int);
-extern void        SetOwner(pid_t);
+extern int         LogLevelMin(void *, loglevels);
 
 #define LOG(h, lev, type, str) \
 LogMessage((h), (lev), (type), (str), FUNC_NAME, __LINE__, __FILE__)

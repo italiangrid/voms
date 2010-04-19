@@ -1,5 +1,20 @@
 %{
-#include "config.h"
+/*
+ * Copyright (c) Members of the EGEE Collaboration. 2004-2010.
+ * See http://www.eu-egee.org/partners/ for details on the copyright holders.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *    http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 #include <stdlib.h>
 #include <string.h>
 
@@ -55,6 +70,8 @@ vo: '[' ID ']' voparams {
   $$->gasize = 0;
   $$->targets = NULL;
   $$->voname = $2;
+  $$->extensions = (char**)malloc(sizeof(char*)*MAX_SIZE);
+  $$->extsize = 0;
   $$->params = $4;
   {
     int i =0;
@@ -70,6 +87,8 @@ vo: '[' ID ']' voparams {
   $$->gasize = 0;
   $$->targets = NULL;
   $$->voname = $2;
+  $$->extensions = NULL;
+  $$->extsize = 0;
   $$->params = NULL;
 
   }
@@ -133,6 +152,9 @@ static void convertparam(VO *vo, PARAM* param)
   else if (strcmp(param->name, "-vomslife") == 0) {
     vo->vomslife = atoi(param->value)*3600;
   }
+  else if (strcmp(param->name, "-pastac") == 0) {
+    vo->pastac = strdup(param->value);
+  }
   else if (strcmp(param->name, "-target") == 0) {
     {
       int do_add = 1;
@@ -155,5 +177,8 @@ static void convertparam(VO *vo, PARAM* param)
   else if (strcmp(param->name, "-ga") == 0) {
     vo->gas[vo->gasize++] = strdup(param->value);
     vo->gas[vo->gasize] = NULL;
+  }
+  else if (strcmp(param->name, "-acextension") == 0) {
+    vo->extensions[vo->extsize++] = strdup(param->value);
   }
 }

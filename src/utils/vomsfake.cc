@@ -3,10 +3,20 @@
  * Authors: Vincenzo Ciaschini - Vincenzo.Ciaschini@cnaf.infn.it 
  *          Valerio Venturi - Valerio.Venturi@cnaf.infn.it 
  *
- * Copyright (c) 2002-2009 INFN-CNAF on behalf of the EU DataGrid
- * and EGEE I, II and III
- * For license conditions see LICENSE file or
- * http://www.apache.org/licenses/LICENSE-2.0.txt
+ * Copyright (c) Members of the EGEE Collaboration. 2004-2010.
+ * See http://www.eu-egee.org/partners/ for details on the copyright holders.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *    http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  *
  * Parts of this code may be based upon or even include verbatim pieces,
  * originally written by other people, in which case the original header
@@ -25,6 +35,8 @@
 #include <sstream>
 #include <algorithm>
 
+#include <voms_api_nog.h>
+
 extern "C" {
 #include <stdio.h>
 #include <unistd.h>
@@ -37,6 +49,14 @@ extern "C" {
 #include <sys/mman.h>
 #include <fcntl.h>
 #include <errno.h>
+#include <limits.h>
+#include <ctype.h>
+#include <string.h>
+#include <errno.h>
+
+#include <openssl/x509.h>
+#include <openssl/x509v3.h>
+#include <openssl/safestack.h>
 
 #include "listfunc.h"
 #include "credentials.h"
@@ -49,7 +69,7 @@ VOLIST *volist = NULL;
   extern FILE *yyin;
 }
 
-#include <voms_api.h>
+#include <voms_api_nog.h>
 
 #include "vomsfake.h"
 #include "ccwrite.h"
@@ -60,8 +80,14 @@ extern "C" {
 extern int writeac(const X509 *issuerc, const STACK_OF(X509) *certstack, const X509 *holder, 
 		   const EVP_PKEY *pkey, BIGNUM *s, char **c, 
 		   const char *t, char **attributes, AC **ac, const char *voname, 
-		   const char *uri, int valid, int old);
+       const char *uri, int valid, int old, int startpast,
+       STACK_OF(X509_EXTENSION) *extensions);
 }
+
+static int time_to_sec(std::string timestring);
+static long mystrtol(char *number, int limit);
+static std::string hextostring(const std::string &data);
+static int hex2value(char c);
 
 extern int AC_Init();
 
@@ -156,7 +182,10 @@ Fake::Fake(int argc, char ** argv) :   confile(CONFILENAME),
                                        aclist(NULL), voID(""),
                                        hostcert(""), hostkey(""),
                                        newformat(false), newsubject(""),
-                                       rfc(false)
+                                       newissuer(""),
+                                       rfc(false), pastac("0"), pastproxy("0"),
+                                       keyusage(""), netscape(""), exkusage(""),
+                                       newserial(""), selfsigned(false)
 {
   
   bool progversion = false;
@@ -212,6 +241,29 @@ Fake::Fake(int argc, char ** argv) :   confile(CONFILENAME),
     "    -fqan <string>                 String to include in the AC as the granted FQAN.\n" \
     "    -newformat                     Creates ACs according to the new format.\n" \
     "    -newsubject <string>           Subject of the new certificate.\n" \
+    "    -newissuer <string>            Issuer of the new certificate.\n"\
+    "    -pastac <seconds>\n"
+    "    -pastac <hour:minutes>         Start the validity of the AC in the past,\n"\
+    "    -pastproxy <seconds>\n"
+    "    -pastproxy <hour:minutes>      Start the validity of the proxy in the past,\n"\
+    "    -keyusage <bit<,bit<..>>>      Specifies the bits to put in the keyusage field.\n"\
+    "                                   Allowed values: digitalSignature,nonRepudiation,\n"\
+    "                                   keyEncipherment,dataEncipherment,keyAgreement,\n"\
+    "                                   keyCertSign,cRLSign,encipherOnly,decipherOnly.\n"\
+    "    -nscert <bit<,bit<..>>>        Specifies the bits to put in the Netscape Certificate\n"\
+    "                                   extension.  Allowed values: client,server,email,\n"\
+    "                                   objsign,sslCA,emailCA,ojbCA.\n"
+    "    -extkeyusage <bit<,bit<..>>>   Specifies the bits to put in the extended key usage\n"\
+    "                                   field.  Allowed values: serverAuth,clientAuth,\n"\
+    "                                   codeSigning,emailProtection,timeStamping,msCodeInd,\n"\
+    "                                   msCodeCom,msCTLSign,msSGC,msEFS,nsSGC,deltaCRL\n"\
+    "                                   CRLReason,invalidityDate,SXNetID,OCSPSigning.\n"\
+    "    -newserial <num>               Specifies the serial number of the generated proxy\n"\
+    "                                   in hex notation.  Any length is possible.\n"\
+    "                                   Default: let voms-proxy-fake choose.\n"\
+    "    -extension <OID</crit><value>> Add Extension with the specified OID and with the specified value\n"\
+    "    -acextension <OID</crit><value>> Add Extension to the AC with the specified OID and with the specified value\n"\
+    "    -selfsigned                    Create a self-signed certificate.\n"\
     "\n";
 
   set_usage(LONG_USAGE);
@@ -255,7 +307,17 @@ Fake::Fake(int argc, char ** argv) :   confile(CONFILENAME),
     {"fqan",            1, (int *)&fqans,       OPT_MULTI},
     {"newformat",       1, (int *)&newformat,   OPT_BOOL},
     {"newsubject",      1, (int *)&newsubject,  OPT_STRING},
+    {"newissuer",       1, (int *)&newissuer,   OPT_STRING},
     {"voinfo",          1, (int *)&voinfo,      OPT_STRING},
+    {"pastac",          1, (int *)&pastac,      OPT_STRING},
+    {"pastproxy",       1, (int *)&pastproxy,   OPT_STRING},
+    {"keyusage",        1, (int *)&keyusage,    OPT_STRING},
+    {"nscert",          1, (int *)&netscape,    OPT_STRING},
+    {"extkeyusage",     1, (int *)&exkusage,    OPT_STRING},
+    {"newserial",       1, (int *)&newserial,   OPT_STRING},
+    {"extension",       1, (int *)&extensions,  OPT_MULTI},
+    {"acextension",     1, (int *)&acextensions,OPT_MULTI},
+    {"selfsigned",      0, (int *)&selfsigned,  OPT_BOOL},
 #ifdef CLASS_ADD
     {"classadd",        1, (int *)class_add_buf,OPT_STRING},
 #endif
@@ -320,16 +382,26 @@ Fake::Fake(int argc, char ** argv) :   confile(CONFILENAME),
     voelem->uri = (char*)uri.c_str();
     voelem->voname = (char*)voms.c_str();
     voelem->vomslife = vomslife;
-  
+    voelem->pastac = (char*)pastac.c_str();
+
     voelem->fqans = (char **)malloc(sizeof(char*)*(fqans.size()+1));
     for (unsigned int i  = 0; i < fqans.size(); i++)
-      voelem->fqans[i] = (char*)(fqans[i].c_str());
+      voelem->fqans[i] = (char*)strdup((fqans[i].c_str()));
     voelem->fqans[fqans.size()] = NULL;
-
+    
     std::string targ;
     for (unsigned int i  = 0; i < targets.size(); i++)
       targ += targets[i];
-    voelem->targets = (char*)(targ.c_str());
+
+    voelem->targets = targ.empty() ? NULL : (char*)(targ.c_str());
+
+    if (!acextensions.empty()) {
+      voelem->extensions = (char**)malloc(sizeof(char*)*(acextensions.size()+1));
+      for (unsigned int i = 0; i < acextensions.size(); i++)
+        voelem->extensions[i] = strdup(acextensions[i].c_str());
+      voelem->extsize = acextensions.size();
+      voelem->extensions[voelem->extsize] = NULL;
+    }
   }
   
   /* A failure here exits the program entirely */
@@ -347,27 +419,19 @@ Fake::Fake(int argc, char ** argv) :   confile(CONFILENAME),
   /* file used */
   
   cacertfile = NULL;
-  certdir  = (crtdir.empty()  ? NULL : const_cast<char *>(crtdir.c_str()));
-  outfile  = (ofile.empty()   ? NULL : const_cast<char *>(ofile.c_str()));
-  certfile = (crtfile.empty() ? NULL : const_cast<char *>(crtfile.c_str()));
-  keyfile  = (kfile.empty()   ? NULL : const_cast<char *>(kfile.c_str()));
+  certdir  = (crtdir.empty()  ? NULL : strdup(const_cast<char *>(crtdir.c_str())));
+  outfile  = (ofile.empty()   ? NULL : strdup(const_cast<char *>(ofile.c_str())));
+  certfile = (crtfile.empty() ? NULL : strdup(const_cast<char *>(crtfile.c_str())));
+  keyfile  = (kfile.empty()   ? NULL : strdup(const_cast<char *>(kfile.c_str())));
 
   /* prepare proxy_cred_desc */
 
   if(!pcdInit())
     exit(3);
-
 }
 
 Fake::~Fake() 
 {
-  free(cacertfile);
-  free(certdir);
-  free(certfile);
-  free(keyfile);
-  free(outfile);
-
-  OBJ_cleanup();
 }
 
 bool Fake::Run() 
@@ -454,6 +518,9 @@ bool Fake::CreateProxy(std::string data, AC ** aclist, int version)
       args->newsubject       = strdup(newsubject.c_str());
       args->newsubjectlen    = strlen(args->newsubject);
     }
+    if (!newissuer.empty()) {
+      args->newissuer        = strdup(newissuer.c_str());
+    }
     args->cert          = ucert;
     args->chain         = cert_chain;
     args->key           = upkey;
@@ -468,6 +535,32 @@ bool Fake::CreateProxy(std::string data, AC ** aclist, int version)
     args->limited       = limit_proxy;
     args->voID          = strdup(voID.c_str());
     args->callback      = (int (*)())kpcallback;
+    args->pastproxy     = time_to_sec(pastproxy);
+
+    if (!keyusage.empty())
+      args->keyusage      = strdup(keyusage.c_str());
+
+    if (!netscape.empty())
+      args->netscape      = strdup(netscape.c_str());
+
+    if (!exkusage.empty())
+      args->exkusage      = strdup(exkusage.c_str());
+
+    if (args->pastproxy == -1) {
+      Print(ERROR) << "Minutes and seconds should be < 59 and >= 0" << std::endl;
+      exit(1);
+    }
+
+    if (!newserial.empty())
+      args->newserial = strdup(newserial.c_str());
+
+    args->selfsigned = (selfsigned ? 1 : 0);
+
+    /* Read through extensions */
+    for (std::vector<std::string>::iterator i = extensions.begin();
+         i != extensions.end(); i++) {
+      args->extensions = create_and_add_extension(*i, args->extensions);
+    }
 
     int warn = 0;
     void *additional = NULL;
@@ -479,6 +572,13 @@ bool Fake::CreateProxy(std::string data, AC ** aclist, int version)
 
     VOMS_FreeProxy(proxy);
     VOMS_FreeProxyArguments(args);
+
+    if (ret == -1) {
+      Print(ERROR) << std::endl << "Unable to write proxy to file " 
+                   << proxyfile << "! " << std::endl << "  " 
+                   << strerror(errno) << std::endl;
+      exit(1);
+    }
 
     Print(INFO) << " Done" << std::endl << std::flush;
   }
@@ -513,30 +613,32 @@ bool Fake::WriteSeparate()
 
 void Fake::Test() 
 {
-  ASN1_UTCTIME * asn1_time = ASN1_UTCTIME_new();
-  X509_gmtime_adj(asn1_time, 0);
-  time_t time_now = ASN1_UTCTIME_mktime(asn1_time);
-  time_t time_after = ASN1_UTCTIME_mktime(X509_get_notAfter(ucert));
-  time_t time_diff = time_after - time_now ;
+  if (!selfsigned) {
+    ASN1_UTCTIME * asn1_time = ASN1_UTCTIME_new();
+    X509_gmtime_adj(asn1_time, 0);
+    time_t time_now = ASN1_UTCTIME_mktime(asn1_time);
+    time_t time_after = ASN1_UTCTIME_mktime(X509_get_notAfter(ucert));
+    time_t time_diff = time_after - time_now ;
 
-  if (time_diff < 0)
-    Print(INFO) << std::endl << "Error: your certificate expired "
-                << asctime(localtime(&time_after)) << std::endl << std::flush;
-  else if (hours && time_diff < hours*60*60)
-    Print(INFO) << "Warning: your certificate and proxy will expire "
-                << asctime(localtime(&time_after))
-                << "which is within the requested lifetime of the proxy"
-                << std::endl << std::flush;
+    if (time_diff < 0)
+      Print(INFO) << std::endl << "Error: your certificate expired "
+                  << asctime(localtime(&time_after)) << std::endl << std::flush;
+    else if (hours && time_diff < hours*60*60)
+      Print(INFO) << "Warning: your certificate and proxy will expire "
+                  << asctime(localtime(&time_after))
+                  << "which is within the requested lifetime of the proxy"
+                  << std::endl << std::flush;
   
-  time_t time_after_proxy;
+    time_t time_after_proxy;
     
-  if (hours) 
-    time_after_proxy = time_now + hours*60*60;
-  else 
-    time_after_proxy = time_after;
+    if (hours) 
+      time_after_proxy = time_now + hours*60*60;
+    else 
+      time_after_proxy = time_after;
     
-  Print(INFO) << "Your proxy is valid until "
-              << asctime(localtime(&time_after_proxy)) << std::endl << std::flush;
+    Print(INFO) << "Your proxy is valid until "
+                << asctime(localtime(&time_after_proxy)) << std::endl << std::flush;
+  }
 }
 
 bool Fake::Retrieve(VOLIST *volist) 
@@ -573,10 +675,24 @@ bool Fake::Retrieve(VOLIST *volist)
           // without any FQAN.
           char *vector[1] = {NULL };
           char **fqanlist = vo->fqans ? vo->fqans : vector;
+          int seconds = vo->pastac ? time_to_sec(vo->pastac) : 0;
+
+          if (seconds == -1) {
+            Print(ERROR) << "Minutes and seconds for VO: " << vo->voname <<
+              " should be < 59 and >= 0" << std::endl;
+            exit(1);
+          }
+
+          /* Now do extensions */
+          STACK_OF(X509_EXTENSION) *exts = NULL;
+
+          for (int i =0; i < vo->extsize; i++)
+            exts = create_and_add_extension(std::string(vo->extensions[i]), exts);
 
           if (ac)
             res = writeac(hcert, NULL, holder, hkey, (BIGNUM *)(BN_value_one()), fqanlist,
-                          vo->targets, attributes, &ac, vo->voname, vo->uri, vo->vomslife, !newformat);
+                          vo->targets, attributes, &ac, vo->voname, vo->uri, vo->vomslife * 3600, !newformat, 
+                          seconds, exts);
         }
       } 
       else {
@@ -654,10 +770,13 @@ bool Fake::pcdInit() {
                << " User key file: " << (this->keyfile ? this->keyfile : "none") << std::endl << std::flush;
   
   Print(DEBUG) << "Output to " << outfile << std::endl << std::flush;
-  
-  if (!load_credentials(certfile, keyfile, &ucert, &cert_chain, &upkey, pw_cb))
-    goto err;
-  
+
+  /* No need to load certificates if we are creating a self-signed cert. */
+  if (!selfsigned) {
+    if (!load_credentials(certfile, keyfile, &ucert, &cert_chain, &upkey, pw_cb))
+      goto err;
+  }
+
   status = true;
   
  err:
@@ -709,49 +828,69 @@ bool Fake::VerifyOptions()
   else 
     Print(DEBUG) << "Detected Globus version: " << version << std::endl;
 
-  if (rfc && proxyver != 0) 
-    exitError("Usedboth -rfc and --proxyver!\nChoose one or the other.");
+  if (!selfsigned) {
+    /* proxyversion is only significant if this is not a selfsigned certificate */
+    if (rfc && proxyver != 0) 
+      exitError("Used both -rfc and --proxyver!\nChoose one or the other.");
 
-  if (rfc)
-    proxyver = 4;
-
-  /* set proxy version */
-  
-  if (proxyver!=2 && proxyver!=3 && proxyver!=4 && proxyver!=0)
-    exitError("Error: proxyver must be 2 or 3 or 4");
-  else if (proxyver==0) {
-    Print(DEBUG) << "Unspecified proxy version, settling on version: ";
-
-    if (version<30)
-      proxyver = 2;
-    else if (version<40)
-      proxyver = 3;
-    else
+    if (rfc)
       proxyver = 4;
 
-    Print(DEBUG) << proxyver << std::endl;
-  }
-
-  /* PCI extension option */ 
+    /* set proxy version */
   
-  if (proxyver>3) {
-    if (!policylang.empty())
+    if (proxyver!=2 && proxyver!=3 && proxyver!=4 && proxyver!=0)
+      exitError("Error: proxyver must be 2 or 3 or 4");
+    else if (proxyver==0) {
+      Print(DEBUG) << "Unspecified proxy version, settling on version: ";
+
+      if (version<30)
+        proxyver = 2;
+      else if (version<40)
+        proxyver = 3;
+      else
+        proxyver = 4;
+
+      Print(DEBUG) << proxyver << std::endl;
+    }
+
+    /* PCI extension option */ 
+  
+    if (proxyver>3) {
+      if (!policylang.empty())
+        if (policyfile.empty())
+          exitError("Error: if you specify a policy language you also need to specify a policy file");
+    }
+  
+    if (proxyver>3) {
+      Print(DEBUG) << "PCI extension info: " << std::endl << " Path length: " << pathlength << std::endl;
+
+      if (policylang.empty())
+        Print(DEBUG) << " Policy language not specified." << std::endl;
+      else 
+        Print(DEBUG) << " Policy language: " << policylang << std::endl;
+      
       if (policyfile.empty())
-        exitError("Error: if you specify a policy language you also need to specify a policy file");
+        Print(DEBUG) << " Policy file not specified." << std::endl;
+      else 
+        Print(DEBUG) << " Policy file: " << policyfile << std::endl;
+    }
   }
-  
-  if (proxyver>3) {
-    Print(DEBUG) << "PCI extension info: " << std::endl << " Path length: " << pathlength << std::endl;
+  else {
+    /* selfsigned is specified */
+    if (proxyver != 0 || noregen || rfc || !policyfile.empty() || !policylang.empty())
+      exitError("Error: --proxyver, --rfc, --policyfile, --policylang, --noregen are only significant when --selfsignd is not specified.");
 
-    if (policylang.empty())
-      Print(DEBUG) << " Policy language not specified." << std::endl;
-    else 
-      Print(DEBUG) << " Policy language: " << policylang << std::endl;
+    if (newsubject.empty() && newissuer.empty())
+      exitError("Error: At least one of --newsubject and --newissuer must be specified for --selfsigned.");
 
-    if (policyfile.empty())
-      Print(DEBUG) << " Policy file not specified." << std::endl;
-    else 
-      Print(DEBUG) << " Policy file: " << policyfile << std::endl;
+    if (newsubject.empty())
+      newsubject = newissuer;
+
+    if (newissuer.empty())
+      newissuer = newsubject;
+
+    if (newissuer != newsubject)
+      exitError("Error: --newsubject and --newissuer should be the same for self-signed certificates.");
   }
 
   /* controls that number of bits for the key is appropiate */
@@ -784,6 +923,12 @@ bool Fake::VerifyOptions()
     }
   }
 
+  /* newserial option */
+  if (!newserial.empty())
+    for (unsigned int i = 0; i < newserial.length(); i++)
+      if (!isxdigit(newserial[i]))
+        exitError("Error: Serial number should be an hexadecimal string.");
+
   return true;
 }
 
@@ -814,4 +959,199 @@ std::ostream& Fake::Print(message_type type)
     return voidstream;
 
   return std::cout;
+}
+
+static int time_to_sec(std::string timestring)
+{
+  int seconds = 0;
+  int hours   = 0;
+  int minutes = 0;
+
+  std::string::size_type pos = timestring.find(':');
+
+  if (pos == std::string::npos) {
+    /* Seconds format */
+    seconds = mystrtol((char*)timestring.c_str(), LONG_MAX);
+  } 
+  else {
+    /* hours:minutes(:seconds) format */
+    hours   = mystrtol((char*)timestring.substr(0, pos).c_str(), LONG_MAX);
+
+    std::string::size_type pos2 = timestring.substr(pos+1).find(':');
+
+    if (pos2 == std::string::npos) {
+      minutes = mystrtol((char*)timestring.substr(pos+1).c_str(), 59);
+    }
+    else {
+      minutes = mystrtol((char*)timestring.substr(pos+1, pos2).c_str(), 59);
+      seconds = mystrtol((char*)timestring.substr(pos2+1).c_str(), 59);
+    }
+  }
+
+  if (seconds == -1 || minutes == -1 || hours == -1)
+    return -1;
+
+  return seconds + minutes * 60 + hours * 3600;
+}
+
+static long mystrtol(char *number, int limit)
+{
+  char *end = NULL;
+
+  errno = 0;
+
+  long value = strtol(number, &end, 10);
+
+  /* Was there extraneous data at the end ? */
+  if ((size_t)(end - number) != strlen(number))
+    return -1;
+
+  /* Conversion errors of some kind */
+  if (errno != 0 || value < 0)
+    return -1;
+
+  /* Value greater than maximum */
+  if (value > limit)
+    return -1;
+
+  return value;
+}
+
+STACK_OF(X509_EXTENSION) *Fake::create_and_add_extension(const std::string &string, STACK_OF(X509_EXTENSION) *exts)
+{
+  X509_EXTENSION *ext = create_extension(string);
+
+  if (ext) {
+    if (!exts) { 
+      exts= sk_X509_EXTENSION_new_null();
+      if (!exts) {
+        Print(ERROR) << "Memory problems." << std::endl;
+        exit(1);
+      }
+    }
+    if (!sk_X509_EXTENSION_push(exts, ext)) {
+      if (!exts) {
+        Print(ERROR) << "Memory problems." << std::endl;
+        exit(1);
+      }
+    }
+  }
+  else {
+    Print(ERROR) << std::endl << "Cannot create extension: " << string <<std::endl;
+    exit(1);
+  }
+
+  return exts;
+}
+
+static std::string::size_type get_minimum(std::string::size_type s1,
+                                          std::string::size_type s2,
+                                          std::string::size_type s3)
+{
+  std::string::size_type minimum = std::string::npos;
+
+  if (s1 < minimum)
+    minimum = s1;
+  if (s2 < minimum)
+    minimum = s2;
+  if (s3 < minimum)
+    minimum = s3;
+
+  return minimum;
+}
+
+X509_EXTENSION *Fake::create_extension(const std::string &string)
+{
+  std::string::size_type colon_position = string.find_first_of(':');
+  std::string::size_type slash_position = string.find_first_of('/');
+  std::string::size_type gate_position = string.find_first_of('~');
+  std::string::size_type file_position = string.find_first_of('+');
+  std::string::size_type data_position = get_minimum(colon_position,
+                                                     gate_position,
+                                                     file_position);
+  bool critical = false;
+
+  bool critical_present = slash_position < data_position;
+
+  std::string oid = string.substr(0, (critical_present ?
+                                      slash_position :
+                                      data_position));
+
+  if (critical_present) {
+    std::string crit = string.substr(slash_position+1, (data_position == std::string::npos ?
+                                                        std::string::npos :
+                                                        data_position - slash_position-1));
+    if (!crit.compare("false"))
+      critical = false;
+    else if (!crit.compare("true"))
+      critical = true;
+    else {
+      Print(ERROR) << "\nCriticality must be either true or false.  Found" 
+                   << crit << std::endl;
+      exit(1);
+    }
+  }
+
+  std::string data = " ";
+
+  if (data_position != std::string::npos) {
+    data = string.substr(data_position+1);
+
+    if (gate_position == data_position)
+      data = hextostring(data);
+
+    if (file_position == data_position) {
+      std::string file = data;
+      data = readfile(file);
+
+      if (data.empty()) {
+        Print(ERROR) << "\nProblem in reading file: "
+                     << file << ": " << strerror(errno)
+                     << std::endl;
+        exit(1);
+      }
+    }
+  }
+
+  return CreateProxyExtension((char*)oid.c_str(), (char*)data.c_str(), data.size(), critical);
+}
+
+static int hex2value(char c)
+{
+  if (c >= '0' && c <= '9')
+    return c - '0';
+  else if (tolower(c) >= 'a' && tolower(c) <= 'f')
+    return tolower(c) - 'a' + 10;
+  return -1;
+}
+
+static std::string hextostring(const std::string &data)
+{
+  std::string temp = data;
+
+  /* Add initial 0 if needed */
+  if ((temp.length() %2) == 1) 
+    temp = std::string("0") + temp;
+
+  int len = temp.length()/2;
+
+  char *newdata= new char[len];
+
+  for (int i =0; i < len; i++) {
+    char first = temp[i*2];
+    char second = temp[i*2+1];
+
+    if (isxdigit(first) && isxdigit(second))
+      newdata[i] = (hex2value(first) << 4) +hex2value(second);
+    else {
+      delete[] newdata;
+      return "";
+    }
+  }
+
+  std::string value = std::string(newdata, len);
+
+  delete[] newdata;
+
+  return value;
 }

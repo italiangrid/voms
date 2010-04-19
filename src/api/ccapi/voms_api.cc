@@ -2,10 +2,20 @@
  *
  * Authors: Vincenzo Ciaschini - Vincenzo.Ciaschini@cnaf.infn.it 
  *
- * Copyright (c) 2002-2009 INFN-CNAF on behalf of the EU DataGrid
- * and EGEE I, II and III
- * For license conditions see LICENSE file or
- * http://www.apache.org/licenses/LICENSE-2.0.txt
+ * Copyright (c) Members of the EGEE Collaboration. 2004-2010.
+ * See http://www.eu-egee.org/partners/ for details on the copyright holders.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *    http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  *
  * Parts of this code may be based upon or even include verbatim pieces,
  * originally written by other people, in which case the original header
@@ -44,6 +54,7 @@ extern "C" {
 #include <openssl/evp.h>
 #include "credentials.h"
 #include "sslutils.h"
+#include "gssapi_compat.h"
 
 #ifndef NOGLOBUS
 #ifdef HAVE_GLOBUS_MODULE_ACTIVATE
@@ -72,27 +83,21 @@ extern int InitProxyCertInfoExtension(int);
 extern bool retrieve(X509 *cert, STACK_OF(X509) *chain, recurse_type how, 
 		     std::string &buffer, std::string &vo, std::string &file, 
 		     std::string &subject, std::string &ca, verror_type &error);
-extern "C" {
-extern char *Decode(const char *, int, int *);
-extern char *Encode(const char *, int, int *, int);
+
+static X509 *
+decouple_cred(gss_cred_id_t credential, STACK_OF(X509) **stk)
+{
+  if (!stk || (credential == 0L))
+    return NULL;
+
+  *stk = ((gss2_cred_id_desc *)credential)->cred_handle->cert_chain;
+  return ((gss2_cred_id_desc *)credential)->cred_handle->cert;
 }
 
 extern int AC_Init(void);
 
 std::map<vomsdata*, vomsspace::internal*> privatedata;
-
-
-vomsdata::Initializer::Initializer(Initializer &) {}
-vomsdata::Initializer::Initializer()
-{
-#ifdef NOGLOBUS
-  SSLeay_add_all_algorithms();
-  ERR_load_crypto_strings();
-
-  (void)AC_Init();
-  InitProxyCertInfoExtension(1);
-#endif
-}
+pthread_mutex_t privatelock = PTHREAD_MUTEX_INITIALIZER;
 
 static bool initialized = false;
 
@@ -166,24 +171,26 @@ vomsdata::vomsdata(std::string voms_dir, std::string cert_dir) :  ca_cert_dir(ce
   if (vdir)
     (void)closedir(vdir);
 
-  duration = 0;
-
   vomsspace::internal *data = new vomsspace::internal();
+  pthread_mutex_lock(&privatelock);
   privatedata[this] = data;
+  pthread_mutex_unlock(&privatelock);
 }
 
 
 vomsdata::~vomsdata()
 {
+  pthread_mutex_lock(&privatelock);
   vomsspace::internal *data = privatedata[this];
   (void)privatedata.erase(this);
+  pthread_mutex_unlock(&privatelock);
   delete data;
 }
 
 std::string vomsdata::ServerErrors(void)
 {
   std::string err = serverrors;
-  serverrors="";
+  serverrors.clear();
 
   return err;
 }
@@ -215,7 +222,7 @@ void vomsdata::SetVerificationType(verify_type t)
 
 void vomsdata::ResetOrder(void)
 {
-  ordering="";
+  ordering.clear();
 }
 
 void vomsdata::Order(std::string att)
@@ -364,8 +371,11 @@ bool vomsdata::Retrieve(FILE *file, recurse_type how)
   else
     seterror(VERR_PARAM, "File parameter invalid.");
 
-  sk_X509_pop_free(chain, X509_free);
-  X509_free(x);
+  if (chain)
+    sk_X509_pop_free(chain, X509_free);
+
+  if (x)
+    X509_free(x);
 
   return res;
 }
@@ -426,8 +436,10 @@ bool vomsdata::Retrieve(X509 *cert, STACK_OF(X509) *chain, recurse_type how)
     ok = evaluate(acs, subject, ca, holder);
   }
 
-  AC_SEQ_free(acs);
-  X509_free(holder);
+  if (acs)
+    AC_SEQ_free(acs);
+  if (holder)
+    X509_free(holder);
 
   return ok;
 }
@@ -446,15 +458,9 @@ bool vomsdata::Import(std::string buffer)
   unsigned char *buftmp, *copy;
 #endif
 
-  char *str;
-  int len;
+  buffer = Decode(buffer);
 
-  str = Decode(buffer.c_str(), buffer.size(), &len);
-  if (str) {
-    buffer = std::string(str, len);
-    free(str);
-  }
-  else {
+  if (buffer.empty()) {
     seterror(VERR_FORMAT, "Malformed input data.");
     return false;
   }
@@ -469,7 +475,6 @@ bool vomsdata::Import(std::string buffer)
       if (buf) 
         subject = std::string(buf);
       OPENSSL_free(buf);
-
       buf = X509_NAME_oneline(X509_get_issuer_name(holder), NULL, 0);
       if (buf)
         ca = std::string(buf);
@@ -498,7 +503,7 @@ bool vomsdata::Export(std::string &buffer)
   std::string temp;
 
   if (data.empty()) {
-    buffer= "";
+    buffer.clear();
     return true;
   }
 
@@ -537,14 +542,10 @@ bool vomsdata::Export(std::string &buffer)
     }
   }
 
-  char *str;
-  int len;
-  str = Encode(result.c_str(), result.size(), &len, 0);
-  if (str) {
-    buffer = std::string(str, len);
-    free(str);
+  buffer = Encode(result, 0);
+
+  if (!buffer.empty())
     return true;
-  }
   else
     return false;
 }
@@ -625,7 +626,6 @@ static bool empty(std::string c)
   for (unsigned int i = 0; i < c.size(); i++)
     if (!isspace(c[i]))
       return false;
-
   return true;
 }
 
@@ -892,7 +892,13 @@ std::vector<std::string> voms::GetTargets()
 
 bool vomsdata::LoadCredentials(X509 *cert, EVP_PKEY *pkey, STACK_OF(X509) *chain)
 {
+  X509           *ucert = NULL;
+  STACK_OF(X509) *cert_chain = NULL;
+  EVP_PKEY       *upkey = NULL;
+
+  pthread_mutex_lock(&privatelock);
   vomsspace::internal *data = privatedata[this];
+  pthread_mutex_unlock(&privatelock);
 
   /* The condition below should never be true. */
   if (!data)
@@ -914,7 +920,6 @@ bool vomsdata::LoadCredentials(X509 *cert, EVP_PKEY *pkey, STACK_OF(X509) *chain
     if (data->chain) {
       for (int i =0; i < sk_X509_num(chain); i++) {
         X509 *newcert = X509_dup(sk_X509_value(chain, i));
-
         if (!newcert) {
           sk_X509_pop_free(data->chain, X509_free);
           data->chain = NULL;

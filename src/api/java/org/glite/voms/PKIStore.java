@@ -2,10 +2,20 @@
  *
  * Authors: Vincenzo Ciaschini - Vincenzo.Ciaschini@cnaf.infn.it
  *
- * Copyright (c) 2002-2009 INFN-CNAF on behalf of the EU DataGrid
- * and EGEE I, II and III
- * For license conditions see LICENSE file or
- * http://www.apache.org/licenses/LICENSE-2.0.txt
+ * Copyright (c) Members of the EGEE Collaboration. 2004-2010.
+ * See http://www.eu-egee.org/partners/ for details on the copyright holders.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *    http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  *
  * Parts of this code may be based upon or even include verbatim pieces,
  * originally written by other people, in which case the original header
@@ -56,7 +66,7 @@ public class PKIStore implements VOMSTrustStore {
     private Hashtable lscfiles     = null;
     private Hashtable vomscerts    = null;
     private Hashtable namespaces   = null;
-    private long      lastmodified = 0;
+
     private int       instances    = 1;
 
     private static Logger logger = Logger.getLogger(PKIStore.class.getName());
@@ -162,13 +172,13 @@ public class PKIStore implements VOMSTrustStore {
     public synchronized void refresh() {
         PKIStore newReader = null;
 
-        File f = new File(certDir);
-
         /* The code below did not work.  In place changes to a file do not 
            change the lastmodified date of the directory, only the 
            lastaccessed, and java does not provide a way to determine the
            latter. */
         /*
+        File f = new File(certDir);
+
         if (f.lastModified() == lastmodified) {
             logger.debug("No changes to directory -- Do not refresh");
             return;
@@ -211,7 +221,7 @@ public class PKIStore implements VOMSTrustStore {
             namespaces = newReader.namespaces;
             newReader.namespaces = null;
 
-            lastmodified = f.lastModified();
+
         }
         finally {
             newReader = null;
@@ -225,7 +235,7 @@ public class PKIStore implements VOMSTrustStore {
         signings     = new Hashtable(HASHCAPACITY);
         lscfiles     = new Hashtable(HASHCAPACITY);
         vomscerts    = new Hashtable(HASHCAPACITY);
-	namespaces   = new Hashtable(HASHCAPACITY);
+        namespaces   = new Hashtable(HASHCAPACITY);
 
         if (type != TYPE_VOMSDIR &&
             type != TYPE_CADIR)
@@ -252,7 +262,7 @@ public class PKIStore implements VOMSTrustStore {
         if (!theDir.exists()){
          
             if (type == TYPE_CADIR) {
-                StringBuffer message = new StringBuffer();
+                StringBuilder message = new StringBuilder();
                 message.append("Directory ");
                 message.append(dir);
                 message.append(" doesn't exist on this machine!");
@@ -292,7 +302,7 @@ public class PKIStore implements VOMSTrustStore {
         if (theDir.exists())
             load();
 
-        lastmodified = theDir.lastModified();
+
 
         if (timer) {
             theTimer = new Timer(true);

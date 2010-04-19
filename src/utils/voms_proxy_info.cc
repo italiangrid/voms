@@ -2,10 +2,20 @@
  *
  * Authors: Vincenzo Ciaschini - Vincenzo.Ciaschini@cnaf.infn.it 
  *
- * Copyright (c) 2002-2009 INFN-CNAF on behalf of the EU DataGrid
- * and EGEE I, II and III
- * For license conditions see LICENSE file or
- * http://www.apache.org/licenses/LICENSE-2.0.txt
+ * Copyright (c) Members of the EGEE Collaboration. 2004-2010.
+ * See http://www.eu-egee.org/partners/ for details on the copyright holders.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *    http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  *
  * Parts of this code may be based upon or even include verbatim pieces,
  * originally written by other people, in which case the original header
@@ -38,6 +48,7 @@ extern "C" {
 #include "openssl/asn1.h"
 #include "openssl/evp.h"
 #include "openssl/x509.h"
+#include "openssl/x509v3.h"
 #include "openssl/pem.h"
 #include "openssl/ssl.h"
 #include "openssl/rsa.h"
@@ -58,9 +69,7 @@ extern int AC_Init(void);
 #include "options.h"
 
 #include <string>
-#include "voms_api.h"
-
-extern const X509V3_EXT_METHOD v3_key_usage;
+#include "voms_api_nog.h"
 
 #include <vector>
 #include <iostream>
@@ -296,7 +305,7 @@ static char *findlast(char *haystack, char *needle)
   while (tmp) {
     tmp = strstr(tmp+1, needle);
     if (tmp)
-      point = tmp;
+      point = (char*)tmp;
   }
 
   return point;
@@ -696,21 +705,26 @@ static std::string getKeyUsage(X509 *cert)
 
   std::string keyusage;
 
-  confs = NULL;
-  usage = (ASN1_BIT_STRING*)X509_get_ext_d2i(cert, NID_key_usage, NULL, NULL);
-  confs = v3_key_usage.i2v((X509V3_EXT_METHOD*)&v3_key_usage, usage, confs);
-  for (int i =0; i < sk_CONF_VALUE_num(confs); i ++) {
-    CONF_VALUE *conf = (CONF_VALUE*)sk_CONF_VALUE_value(confs, i);
-    keyusage += std::string(conf->name);
-    if (i != (sk_CONF_VALUE_num(confs) -1))
-      keyusage += ", ";
+  X509V3_EXT_METHOD *method = X509V3_EXT_get_nid(NID_key_usage);
+
+  if (method) {
+    confs = NULL;
+    usage = (ASN1_BIT_STRING*)X509_get_ext_d2i(cert, NID_key_usage, NULL, NULL);
+    confs = method->i2v(method, usage, confs);
+
+    for (int i =0; i < sk_CONF_VALUE_num(confs); i ++) {
+      CONF_VALUE *conf = (CONF_VALUE*)sk_CONF_VALUE_value(confs, i);
+      keyusage += std::string(conf->name);
+      if (i != (sk_CONF_VALUE_num(confs) -1))
+        keyusage += ", ";
+    }
+
+    ASN1_BIT_STRING_free(usage);
+
+    // Do not free it.  CONF_VALUE_free() is not defined.  The program
+    //  ends, so the loss of memory is irrelevant.
+    //  sk_CONF_VALUE_pop_free(confs, CONF_VALUE_free);
   }
-
-  ASN1_BIT_STRING_free(usage);
-
-  // Do not free it.  CONF_VALUE_free() is not defined.  The program
-  //  ends, so the loss of memory is irrelevant.
-  //  sk_CONF_VALUE_pop_free(confs, CONF_VALUE_free);
 
   return keyusage;
 }

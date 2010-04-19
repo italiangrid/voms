@@ -2,10 +2,20 @@
  *
  * Authors: Vincenzo Ciaschini - Vincenzo.Ciaschini@cnaf.infn.it 
  *
- * Copyright (c) 2002-2009 INFN-CNAF on behalf of the EU DataGrid
- * and EGEE I, II and III
- * For license conditions see LICENSE file or
- * http://www.apache.org/licenses/LICENSE-2.0.txt
+ * Copyright (c) Members of the EGEE Collaboration. 2004-2010.
+ * See http://www.eu-egee.org/partners/ for details on the copyright holders.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *    http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  *
  * Parts of this code may be based upon or even include verbatim pieces,
  * originally written by other people, in which case the original header
@@ -22,9 +32,13 @@
 
 
 extern "C" {
+#ifdef NOGLOBUS
 #ifndef GSSAPI_H_
 typedef void * gss_cred_id_t;
 typedef void * gss_ctx_id_t;
+#endif
+#else
+#include "gssapi.h"
 #endif
 
 #include <openssl/x509.h>
@@ -374,13 +388,13 @@ private:
   bool verifyac(X509 *, X509 *, AC*, voms&);
   bool check_sig_ac(X509 *, void *);
   X509 *check(void *);
-  bool my_conn(const std::string&, int, const std::string&, int,
+  bool my_conn(const std::string&, int, const std::string&, 
                const std::string&, std::string&, std::string&,
                std::string&);
   bool contact(const std::string&, int, const std::string&,
                const std::string&, std::string&, std::string&,
                std::string&);
-  bool my_conn(const std::string&, int, const std::string&, int,
+  bool my_conn(const std::string&, int, const std::string&, 
                const std::string&, std::string&, std::string&,
                std::string&, int timeout);
   bool contact(const std::string&, int, const std::string&,
@@ -394,6 +408,8 @@ public:
 
   std::string ErrorMessage(void); /*!< Gets a textual description of the error.
             \return A string containg the error message. */
+
+#ifdef NOGLOBUS
   bool RetrieveFromCtx(gss_ctx_id_t context, recurse_type how); /*!< Gets VOMS information from the given globus context
              \param context The context from which to retrieve the certificate.
              \param how Recursion type
@@ -403,6 +419,30 @@ public:
              \param credential The credential from which to retrieve the certificate.
              \param how Recursion type
              \return failure (F) or success (T)*/
+#else
+  bool RetrieveFromCtx(void *context, recurse_type how); /*!< Gets VOMS information from the given globus context
+             \param context The context from which to retrieve the certificate.
+             \param how Recursion type
+             \return failure (F) or success (T)*/
+
+  bool RetrieveFromCred(void *credential, recurse_type how);  /*!< Gets VOMS information from the given globus credential
+             \param credential The credential from which to retrieve the certificate.
+             \param how Recursion type
+             \return failure (F) or success (T)*/
+  bool RetrieveFromCtx(gss_ctx_id_t context, recurse_type how) {
+    return RetrieveFromCtx((void*)context,how);
+  }/*!< Gets VOMS information from the given globus context
+             \param context The context from which to retrieve the certificate.
+             \param how Recursion type
+             \return failure (F) or success (T)*/
+
+  bool RetrieveFromCred(gss_cred_id_t credential, recurse_type how) {
+    return RetrieveFromCred((void*)credential, how);
+  } /*!< Gets VOMS information from the given globus credential
+             \param credential The credential from which to retrieve the certificate.
+             \param how Recursion type
+             \return failure (F) or success (T)*/
+#endif
 
   bool Retrieve(X509_EXTENSION *ext); /*!< Gets VOMS information from the given extension
              \param ext The extension to parse.

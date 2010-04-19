@@ -2,10 +2,20 @@
  *
  * Authors: Vincenzo Ciaschini - Vincenzo.Ciaschini@cnaf.infn.it 
  *
- * Copyright (c) 2002-2009 INFN-CNAF on behalf of the EU DataGrid
- * and EGEE I, II and III
- * For license conditions see LICENSE file or
- * http://www.apache.org/licenses/LICENSE-2.0.txt
+ * Copyright (c) Members of the EGEE Collaboration. 2004-2010.
+ * See http://www.eu-egee.org/partners/ for details on the copyright holders.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *    http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  *
  * Parts of this code may be based upon or even include verbatim pieces,
  * originally written by other people, in which case the original header
@@ -15,14 +25,19 @@
 #include "config.h"
 
 extern "C" {
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <fcntl.h>
 #include <stdio.h>
 #include <stdarg.h>
 #include <ctype.h>
 #include <string.h>
 #include <time.h>
 #include <limits.h>
+#include <unistd.h>
 
 #include <openssl/err.h>
+#include <openssl/ssl.h>
 }
 
 #include <string>
@@ -136,6 +151,7 @@ std::string OpenSSLError(bool debug)
   int line;
 
   std::string outstring;
+  char *msgstring = NULL;
     
   /* WIN32 does not have the ERR_get_error_line_data */ 
   /* exported, so simulate it till it is fixed */
@@ -148,27 +164,93 @@ std::string OpenSSLError(bool debug)
       
     es = ERR_get_state();
     i = (es->bottom+1)%ERR_NUM_ERRORS;
-    
+
     if (es->err_data[i] == NULL)
       dat = strdup("");
     else
       dat = strdup(es->err_data[i]);
 
-    if (dat) {
-      l = ERR_get_error_line(&file, &line);
 
-      if (debug) {
-	std::string temp;
-        outstring += std::string(ERR_error_string(l,buf)) + ":" +
-	  file + ":" + stringify(line, temp) + dat + "\n";
+    if (dat) {
+      int code = 0;
+
+      l = ERR_get_error_line(&file, &line);
+      code = ERR_GET_REASON(l);
+
+      switch (code) {
+      case SSL_R_SSLV3_ALERT_CERTIFICATE_EXPIRED:
+        outstring += "Either proxy or user certificate are expired.";
+        break;
+
+      default:
+        if (debug) {
+          std::string temp;
+          
+          outstring += std::string(ERR_error_string(l,buf)) + ":" +
+            file + ":" + stringify(line, temp) + dat + "\n";
+        }
+
+        msgstring = (char*)ERR_reason_error_string(l);
+
+        if (msgstring)
+          outstring += std::string(msgstring) + dat +
+            "\nFunction: " + ERR_func_error_string(l) + "\n";
+        break;
       }
-      else
-        outstring += std::string(ERR_reason_error_string(l)) + dat +
-	  "\nFunction: " + ERR_func_error_string(l) + "\n";
     }
     
     free(dat);
   }
 
   return outstring;
+}
+
+static char *readfile(const char *file, int *size)
+{
+  int fd = open(file,O_RDONLY);
+  char *buffer = NULL;
+
+  if (fd != -1) {
+    struct stat filestats;
+
+    if (!fstat(fd, &filestats)) {
+      *size = filestats.st_size;
+
+      buffer = (char *)malloc(*size);
+
+      if (buffer) {
+        int offset = 0;
+        int ret = 0;
+
+        do {
+          ret = read(fd, buffer+offset, *size - offset);
+          offset += ret;
+        } while ( ret > 0);
+
+        if (ret < 0) {
+          free(buffer);
+          buffer = NULL;
+        }
+      }
+    }
+    close(fd);
+  }
+
+  return buffer;
+}
+
+std::string readfile(std::string filename)
+{
+  int len = 0;
+  char *buffer = NULL;
+  std::string result = "";
+
+  buffer = readfile(filename.c_str(), &len);
+
+  if (buffer) {
+    result = std::string(buffer, len);
+    free(buffer);
+  }
+
+  return result;
 }

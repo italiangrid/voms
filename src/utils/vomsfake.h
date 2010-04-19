@@ -3,10 +3,20 @@
  * Authors: Vincenzo Ciaschini - Vincenzo.Ciaschini@cnaf.infn.it 
  *          Valerio Venturi - Valerio.Venturi@cnaf.infn.it 
  *
- * Copyright (c) 2002-2009 INFN-CNAF on behalf of the EU DataGrid
- * and EGEE I, II and III
- * For license conditions see LICENSE file or
- * http://www.apache.org/licenses/LICENSE-2.0.txt
+ * Copyright (c) Members of the EGEE Collaboration. 2004-2010.
+ * See http://www.eu-egee.org/partners/ for details on the copyright holders.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *    http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  *
  * Parts of this code may be based upon or even include verbatim pieces,
  * originally written by other people, in which case the original header
@@ -98,6 +108,7 @@ class Fake {
 
   bool newformat;
   std::string newsubject;
+  std::string newissuer;
  public:
   
   Fake(int argc, char** argv);
@@ -127,7 +138,21 @@ class Fake {
   bool VerifyOptions();
   void exitError(const char *message);
   std::ostream& Print(message_type type);
+
+  X509_EXTENSION *create_extension(const std::string &string);
+  STACK_OF(X509_EXTENSION) *create_and_add_extension(const std::string &string, STACK_OF(X509_EXTENSION) *exts);
+
   bool rfc;
+  std::string pastac;
+  std::string pastproxy;
+  std::string keyusage;
+  std::string netscape;
+  std::string exkusage;
+  std::string newserial;
+
+  std::vector<std::string> extensions;
+  std::vector<std::string> acextensions;
+  bool selfsigned;
 };
 
 #endif

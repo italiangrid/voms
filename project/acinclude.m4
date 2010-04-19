@@ -1,3 +1,14 @@
+AC_DEFUN([AC_LINUX],
+[
+    AC_MSG_CHECKING([if compiling on Linux])
+    if test "x`uname -s`" = "xLinux" ; then
+       AC_MSG_RESULT([yes])
+       AC_DEFINE(RUN_ON_LINUX, 1, [Define to 1 if running on a Linux System])
+    else
+       AC_MSG_RESULT([no])
+    fi
+])
+
 AC_DEFUN([AC_BUILD_PARTS],
 [
   AC_ARG_WITH(clients,

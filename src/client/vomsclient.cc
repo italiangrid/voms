@@ -3,10 +3,20 @@
  * Authors: Vincenzo Ciaschini - Vincenzo.Ciaschini@cnaf.infn.it 
  *          Valerio Venturi - Valerio.Venturi@cnaf.infn.it 
  *
- * Copyright (c) 2002-2009 INFN-CNAF on behalf of the EU DataGrid
- * and EGEE I, II and III
- * For license conditions see LICENSE file or
- * http://www.apache.org/licenses/LICENSE-2.0.txt
+ * Copyright (c) Members of the EGEE Collaboration. 2004-2010.
+ * See http://www.eu-egee.org/partners/ for details on the copyright holders.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *    http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  *
  * Parts of this code may be based upon or even include verbatim pieces,
  * originally written by other people, in which case the original header
@@ -44,7 +54,7 @@ extern "C" {
 #include "vomsxml.h"
 
 
-#include <voms_api.h>
+#include <voms_api_nog.h>
 
 #include "vomsclient.h"
 #include "fqan.h"
@@ -561,8 +571,7 @@ Client::Client(int argc, char ** argv) :
   
     /* parse order and target vector to a comma-separated list */
   
-    for (std::vector<std::string>::iterator i = order.begin(); i != order.end(); i++)
-      ordering += (i == order.begin() ? std::string("") : std::string(",")) + FQANParse(*i).substr(1);
+    ordering = parse_fqan(order, true);
 
     for (std::vector<std::string>::iterator i = targets.begin(); i != targets.end(); i++)
       targetlist += (i == targets.begin() ? ("") : std::string(",")) + *i;
@@ -634,6 +643,7 @@ bool Client::Run()
   /* set output file and environment */
   
   char * oldenv = getenv("X509_USER_PROXY");
+  std::string command;
 
   if (!noregen) {
     std::stringstream tmpproxyname;
@@ -647,7 +657,10 @@ bool Client::Run()
   v->SetLifetime(ac_hours * 3600 + ac_minutes * 60);
   v->Order(ordering);
   v->AddTarget(targetlist);
-  
+
+  (void)v->LoadCredentials(ucert, private_key, cert_chain);
+
+
   /* contacts servers for each vo */
 
   for(std::vector<std::string>::iterator i = vomses.begin(); i != vomses.end(); ++i) {
@@ -670,30 +683,36 @@ bool Client::Run()
     std::string vo = (contact.vo().empty() ? servers[0].vo : contact.vo());
 
     fqans.push_back(contact.fqan().empty() ? "/" + vo : contact.fqan());
-    
-    /* chech if other requests for the same vo exists */
-    for (std::vector<std::string>::iterator j = i + 1; j < vomses.end(); ++j) {
 
-      Contact tmp(*j);
+    /* determine which command to send to the server. */
 
-      if ((tmp.vo() == vo) || (tmp.nick() == contact.nick())) {
-        fqans.push_back(tmp.fqan().empty() ? "/" + vo : tmp.fqan());
-        *j = "";
-      }
+    if (listing) {
+      /* when called as voms-proxy-list or --list is specified */
+      command = "N";
     }
+    else {
+      /* check if other requests for the same vo exists */
+      for (std::vector<std::string>::iterator j = i + 1; j < vomses.end(); ++j) {
 
-    /* parse fqans vector to build the command to send to the server */
-    std::string command = parse_fqan(fqans);
-    
+        Contact tmp(*j);
+
+        if ((tmp.vo() == vo) || (tmp.nick() == contact.nick())) {
+          fqans.push_back(tmp.fqan().empty() ? "/" + vo : tmp.fqan());
+          *j = "";
+        }
+      }
+
+      /* parse fqans vector to build the command to send to the server */
+      command = parse_fqan(fqans);
+    }
     /* and contact them */
 
     std::string buffer;
     int version;
 
-    (void)v->LoadCredentials(ucert, private_key, cert_chain);
-
     /* contact each server until one answers */
     for (std::vector<contactdata>::iterator beg = servers.begin(); beg != servers.end(); beg++) {
+
       /* create a temporary proxy to contact the server */  
       if (!noregen) {
         Print(INFO) << "Creating temporary proxy " << std::flush;
@@ -709,50 +728,11 @@ bool Client::Run()
       /* contact server */
       Print(INFO) << "Contacting " << " " << beg->host << ":" << beg->port
                   << " [" << beg->contact << "] \"" << beg->vo << "\"" << std::flush;
-      
-      /* when called voms-proxy-list */
-      if (listing)
-        command = "N";
 
       int status = v->ContactRaw(beg->host, beg->port, beg->contact, command, buffer, version, timeout);
 
-      /* print status */
-      if (!status) {
-        Print(INFO) << " Failed" << std::endl;
-      }        
-      else {
-        Print(INFO) << " Done" << std::endl;
-      }
-      
-      /* check for socket error */
-
-      if (!status && v->error == VERR_NOSOCKET)
-        Error();
-      
-      /* check for errors from the server */
-      std::string serror = v->ServerErrors();
-      if (!status && !serror.empty()) {
-        Print(ERROR) << std::endl << "Error: " << serror << std::endl;
-      }
-      
-      /* check for warnings from the server */
-      if ((status && !serror.empty()) && !ignorewarn) {
-        Print(WARN) << std::endl << "Warning: " << serror << std::endl << std::endl;
-        
-        if (failonwarn) {
-          Print(WARN) << std::endl << "Error in getting data from VOMS server:" << beg->contact
-                      << " (or in memorizing)" << std::endl;
-          if (!noregen)
-            unlink(proxyfile.c_str()); 
-          exit(1);
-        }
-      }
-      
-      /* check for errors */
-      std::string cerror = v->ErrorMessage();
-      if (!status && serror.empty() && !cerror.empty()) {
-        Print(ERROR) << std::endl << "Error: " << cerror << std::endl;
-      }
+      /* If it returns, all is ok */
+      PrintConnectResult(status, beg->contact);
 
       /* digest AC */
       if (status) {
@@ -761,7 +741,7 @@ bool Client::Run()
         if ((ac = getAC(buffer))) {
           /* retrieve AC and add to list */
           if (!AddToList(ac)) {
-            std::cerr << "Error while handling AC." << std::endl;
+            Print(ERROR) << "Error while handling AC." << std::endl;
             if (!noregen)
               unlink(proxyfile.c_str()); 
             exit(3);
@@ -863,7 +843,6 @@ bool Client::Run()
   Error();
   Print(ERROR) << "ERROR: " << v->ErrorMessage() << std::endl;
   return false;
-
 }
 
 bool Client::CreateProxy(std::string data, AC ** aclist, int version) 
@@ -981,13 +960,13 @@ AC *Client::ReadSeparate(const std::string& file)
 
 bool Client::WriteSeparate() 
 {
+  std::string acfilename = separate + (data.empty() ? "" : ".ac");
+
   if (aclist) {
     
     BIO * out = BIO_new(BIO_s_file());
 
-    if (data.empty())
-      BIO_write_filename(out, (char *)separate.c_str());
-    else BIO_write_filename(out, (char *)(separate+".ac").c_str());
+    BIO_write_filename(out, (char *)(acfilename).c_str());
     
     while(*aclist) {
 #ifdef TYPEDEF_I2D_OF
@@ -1003,20 +982,17 @@ bool Client::WriteSeparate()
 
     BIO_free(out);
   
-    if (data.empty())
-      Print(INFO) << "Wrote ACs to " << separate << std::endl;
+    Print(INFO) << "Wrote ACs to " << acfilename << std::endl;
   }
   
   if (!data.empty()) {
-    if (aclist) {
-      Print(INFO) << "Wrote ACs to " << separate+".ac" << std::endl;      
-    }
-    
     std::ofstream fs;
-    fs.open((separate+".data").c_str());
+    std::string datafilename = separate + ".data";
+
+    fs.open(datafilename.c_str());
 
     if (!fs) {
-      Print(ERROR) << "cannot open file: " << separate+".data" << std::endl;
+      Print(ERROR) << "cannot open file: " << datafilename << std::endl;
       return false;
     }
     else {
@@ -1025,7 +1001,7 @@ bool Client::WriteSeparate()
       fs.close();
     }
     
-    Print(INFO) << "Wrote data to " << separate+".data" << std::endl;
+    Print(INFO) << "Wrote data to " << datafilename << std::endl;
 
   }
 
@@ -1221,9 +1197,7 @@ bool Client::pcdInit() {
 
 void Client::Error() 
 {
-  std::string output = OpenSSLError(debug);
-  
-  std::cerr << output;
+  Print(ERROR) << OpenSSLError(debug);
 }
 
 static AC *getAC(const std::string& data)
@@ -1302,4 +1276,47 @@ std::ostream& Client::Print(message_type type)
     return voidstream;
 
   return std::cout;
+}
+
+void Client::PrintConnectResult(int status, const std::string& contact) 
+{
+  /* print status */
+  Print(INFO) << (status ? " Done" : " Failed") << std::endl;
+      
+  std::string serror = v->ServerErrors();
+
+  /* check for errors from the server */
+  if (!status) {
+
+    /* Something wrong during connection: Is it a socket error? */
+    if (v->error == VERR_NOSOCKET)
+      Error();
+
+    /* Is it a server error? */
+    if (!serror.empty()) {
+      Print(ERROR) << std::endl << "Error: " << serror << std::endl;
+    }
+
+    /* Is it a local error? */
+    std::string cerror = v->ErrorMessage();
+
+    if (!status && serror.empty() && !cerror.empty()) {
+      Print(ERROR) << std::endl << "Error: " << cerror << std::endl;
+    }
+  }
+  /* check for warnings from the server */
+  else if (!serror.empty() && !ignorewarn) {
+    /* No error but errorstring not empty implies a warning. */
+    Print(WARN) << std::endl << "Warning: " << serror << std::endl << std::endl;
+        
+    if (failonwarn) {
+      Print(ERROR) << std::endl << "Error in getting data from VOMS server:" << contact
+                  << " (or in memorizing)" << std::endl;
+
+      /* Remove temporary proxy */
+     if (!noregen)
+        unlink(proxyfile.c_str()); 
+      exit(1);
+    }
+  }
 }

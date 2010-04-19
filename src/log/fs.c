@@ -2,10 +2,20 @@
  *
  * Authors: Vincenzo Ciaschini - Vincenzo.Ciaschini@cnaf.infn.it 
  *
- * Copyright (c) 2002-2009 INFN-CNAF on behalf of the EU DataGrid
- * and EGEE I, II and III
- * For license conditions see LICENSE file or
- * http://www.apache.org/licenses/LICENSE-2.0.txt
+ * Copyright (c) Members of the EGEE Collaboration. 2004-2010.
+ * See http://www.eu-egee.org/partners/ for details on the copyright holders.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *    http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  *
  * Parts of this code may be based upon or even include verbatim pieces,
  * originally written by other people, in which case the original header
@@ -32,7 +42,6 @@ struct localdata {
   char *dateformat;
   int maxlog;
   int fd;
-  int level;
 };
 
 static int filereopen(struct localdata *ld);
@@ -76,7 +85,7 @@ static int fileoutputter(void *data, const char *s)
     if (position > ld->maxlog) {
       if (!logfile_rotate(ld->name) || !filereopen(ld)) {
         UNUSED(int ret);
-	ret= write(ld->fd, "VOMS: LOGGING ROTATION ERROR\n", 29);
+        ret= write(ld->fd, "VOMS: LOGGING ROTATION ERROR\n", 29);
       }
     }
   }
@@ -152,7 +161,6 @@ static void *fileinit(void)
     ld->dateformat = NULL;
     ld->fd       = -1;
     ld->maxlog   = 0;
-    ld->level    = -1;
   }
 
   return ld;
@@ -165,9 +173,7 @@ static void fileoptioner(void *data, const char *name, const char *value)
   if (!ld)
     return;
 
-  if (strcmp(name, "LEVEL") == 0)
-    ld->level=atoi(value);
-  else if (strcmp(name, "NAME") == 0) {
+  if (strcmp(name, "NAME") == 0) {
     int fd = open(value, O_WRONLY|O_CREAT|O_APPEND, S_IRUSR|S_IWUSR);
 
     if (fd != -1) {
@@ -212,15 +218,16 @@ static int logfile_rotate(const char * name)
   char *fname = NULL;
   int res = 1;
   int fd;
+  int namelen = strlen(name);
 
   pos = dirname = fname = newname = oldname = NULL;
 
-/*   // get the name of the directory and of the file */
+  /* get the name of the directory and of the file */
 
-  newname = malloc(strlen(name)+26);
-  oldname = malloc(strlen(name)+26);
-  fname   = malloc(strlen(name)+5);
-  dirname = malloc(strlen(name)+2);
+  newname = malloc(namelen+26);
+  oldname = malloc(namelen+26);
+  fname   = malloc(namelen+5);
+  dirname = malloc(namelen+2);
 
   if (!fname || !newname || !oldname || !dirname)
     goto err;
@@ -249,43 +256,44 @@ static int logfile_rotate(const char * name)
 
     dir = opendir(dirname);
     if (dir) {
+      int baselen = strlen(basename);
+
       while ((de = readdir(dir))) {
         pos = strrchr(de->d_name, '.');
-        if (pos && 
-            (size_t)(pos - de->d_name) == strlen(basename) &&
-            strncmp(basename, de->d_name, strlen(basename)) == 0 &&
-            atoi((++pos)) > max)
-          max = atoi(pos);
+        if (pos && atoi(pos+1) > max &&
+            (size_t)(pos - de->d_name) == baselen &&
+            strncmp(basename, de->d_name, baselen) == 0)
+          max = atoi(pos+1);
       }
     }
     closedir(dir);
     
 
-/*     // rename each file increasing the suffix */
+    /* rename each file increasing the suffix */
+    strcpy(newname, name);
+    newname[namelen]='.';
+
+    strcpy(oldname, name);
+    oldname[namelen]='.';
   
     if (max) {
       for(i = max; i > 0 ; --i) {
         char s[24];
         
-        strcpy(newname, name);
-        strcat(newname, ".");
         sprintf(s, "%d", i+1);
-        strcat(newname, s);
+        strcpy(newname + namelen +1, s);
 
-        strcpy(oldname, name);
-        strcat(oldname, ".");
         sprintf(s, "%d", i);
-        strcat(oldname, s);
+        strcpy(oldname + namelen +1, s);
     
         (void)rename(oldname, newname);
       }
     }
-/*     // rename the main file to .1  */
 
-    newname = (char *)malloc((strlen(name) + 3) * sizeof(char));
+    /* rename the main file to .1  */
     if (newname) {
-      strcpy(newname, name);
-      strcat(newname, ".1");
+      newname[namelen+1]='1';
+      newname[namelen+2]='\0';
       if (rename(name, newname) == -1)
         res = 0;
       result = 1;

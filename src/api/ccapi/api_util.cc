@@ -2,16 +2,28 @@
  *
  * Authors: Vincenzo Ciaschini - Vincenzo.Ciaschini@cnaf.infn.it 
  *
- * Copyright (c) 2002-2009 INFN-CNAF on behalf of the EU DataGrid
- * and EGEE I, II and III
- * For license conditions see LICENSE file or
- * http://www.apache.org/licenses/LICENSE-2.0.txt
+ * Copyright (c) Members of the EGEE Collaboration. 2004-2010.
+ * See http://www.eu-egee.org/partners/ for details on the copyright holders.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *    http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  *
  * Parts of this code may be based upon or even include verbatim pieces,
  * originally written by other people, in which case the original header
  * follows.
  *
  *********************************************************************/
+
+#include "api_util.h"
 
 extern "C" {
 #include "config.h"
@@ -32,6 +44,7 @@ extern "C" {
 #include <openssl/pem.h>
 #include <openssl/evp.h>
 #include "credentials.h"
+#include "sslutils.h"
 }
 
 #include <string>
@@ -41,14 +54,10 @@ extern "C" {
 
 #include "Client.h"
 
-#include "voms_api.h"
-
 #include <iostream>
 #include <iomanip>
 #include <fstream>
 #include <map>
-
-#include "api_util.h"
 
 #include "vomsxml.h"
 #include "ccval.h"
@@ -57,11 +66,13 @@ extern "C" {
 
 #include "internal.h"
 
+extern proxy_verify_desc *setup_initializers(char *cadir);
+extern void destroy_initializers(void *data);
 static bool dncompare(const std::string &mut, const std::string &fixed);
 static bool readdn(std::ifstream &file, char *buffer, int buflen);
-static int MS_CALLBACK cb(int ok, X509_STORE_CTX *ctx);
 
 extern std::map<vomsdata*, vomsspace::internal*> privatedata;
+extern pthread_mutex_t privatelock;
 
 /*
  * this change the substring FROM into TO in NAME
@@ -183,7 +194,8 @@ vomsdata::retrieve(X509 *cert, STACK_OF(X509) *chain, recurse_type how,
    */
   int chain_length;
   int position = 0;
-  ca = subject = "";
+  ca.clear();
+  subject.clear();
 
   X509 *h = get_real_cert(cert, chain);
   if (!h) {
@@ -725,7 +737,8 @@ vomsdata::check_cert(STACK_OF(X509) *stack)
   ctx = X509_STORE_new();
   error = VERR_MEM;
   if (ctx && csc) {
-    X509_STORE_set_verify_cb_func(ctx,cb);
+    proxy_verify_desc *pvd = setup_initializers(strdup((char*)ca_cert_dir.c_str()));
+    X509_STORE_set_verify_cb_func(ctx,proxy_verify_callback);
 #ifdef SIGPIPE
     signal(SIGPIPE,SIG_IGN);
 #endif
@@ -739,9 +752,11 @@ vomsdata::check_cert(STACK_OF(X509) *stack)
         ERR_clear_error();
         error = VERR_VERIFY;
         X509_STORE_CTX_init(csc, ctx, sk_X509_value(stack, 0), NULL);
+        X509_STORE_CTX_set_ex_data(csc, PVD_STORE_EX_DATA_IDX, pvd);
         index = X509_verify_cert(csc);
       }
     }
+    destroy_initializers(pvd);
   }
   X509_STORE_free(ctx);
 
@@ -751,42 +766,20 @@ vomsdata::check_cert(STACK_OF(X509) *stack)
   return (index != 0);
 }
 
-static int MS_CALLBACK 
-cb(int ok, X509_STORE_CTX *ctx)
-{
-  if (!ok) {
-    if (ctx->error == X509_V_ERR_CERT_HAS_EXPIRED) ok=1;
-    /* since we are just checking the certificates, it is
-     * ok if they are self signed. But we should still warn
-     * the user.
-     */
-    if (ctx->error == X509_V_ERR_DEPTH_ZERO_SELF_SIGNED_CERT) ok=1;
-    /* Continue after extension errors too */
-    if (ctx->error == X509_V_ERR_INVALID_CA) ok=1;
-    if (ctx->error == X509_V_ERR_PATH_LENGTH_EXCEEDED) ok=1;
-    if (ctx->error == X509_V_ERR_INVALID_PURPOSE) ok=1;
-    if (ctx->error == X509_V_ERR_DEPTH_ZERO_SELF_SIGNED_CERT) ok=1;
-  }
-  return(ok);
-}
-
 bool
 vomsdata::my_conn(const std::string &hostname, int port, const std::string &contact,
-	int version, const std::string &command, std::string &u, std::string &uc,
+	const std::string &command, std::string &u, std::string &uc,
                   std::string &buf)
 {
-  return my_conn(hostname, port, contact, version, command, u, uc, buf, -1);
+  return my_conn(hostname, port, contact, command, u, uc, buf, -1);
 }
 
 bool
 vomsdata::my_conn(const std::string &hostname, int port, const std::string &contact,
-	int version, const std::string &command, std::string &u, std::string &uc,
+	const std::string &command, std::string &u, std::string &uc,
                   std::string &buf, int timeout)
 {
-  GSISocketClient sock(hostname, port, version);
-
-  sock.RedirectGSIOutput(stderr);
-  sock.ServerContact(contact);
+  GSISocketClient sock(hostname, port);
 
   char *cacert = NULL;
   char *certdir = NULL;
@@ -799,7 +792,9 @@ vomsdata::my_conn(const std::string &hostname, int port, const std::string &cont
   STACK_OF(X509) *cert_chain = NULL;
   EVP_PKEY       *upkey = NULL;
 
+  pthread_mutex_lock(&privatelock);
   vomsspace::internal *data = privatedata[this];
+  pthread_mutex_unlock(&privatelock);
 
   ucert      = data->cert;
   cert_chain = data->chain;
@@ -828,7 +823,7 @@ vomsdata::my_conn(const std::string &hostname, int port, const std::string &cont
   }
   
   u  = sock.own_subject;
-  uc = sock.own_ca;
+  uc.clear();
 
   if (u.empty()) {
     seterror(VERR_NOIDENT, sock.GetError());
@@ -857,7 +852,7 @@ vomsdata::contact(const std::string &hostname, int port, const std::string &cont
 	const std::string &command, std::string &buffer, std::string &username,
                   std::string &ca, int timeout)
 {
-  return my_conn(hostname, port, contact, globus(0), command, username, ca,
+  return my_conn(hostname, port, contact, command, username, ca,
                  buffer, timeout);
 }   
 
@@ -866,7 +861,7 @@ vomsdata::contact(const std::string &hostname, int port, const std::string &cont
 	const std::string &command, std::string &buffer, std::string &username,
                   std::string &ca)
 {
-  return my_conn(hostname, port, contact, globus(0), command, username, ca,
+  return my_conn(hostname, port, contact, command, username, ca,
                  buffer, -1);
 }   
 

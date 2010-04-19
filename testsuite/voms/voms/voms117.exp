@@ -1,0 +1,45 @@
+load_lib vomstest.exp
+
+testheader "See if voms-proxy-fake -extensions works."
+
+proc mytest {} {
+    _activateCert mycert2
+    _cleanproxy
+
+    set outname [exec mktemp $::SCRATCHDIR/voms-proxy-fake-XXXXXX]
+    set res [catch {set out [exec $::INSTALLDIR/bin/voms-proxy-fake --voms voms1 --hostcert $::INSTALLDIR/certs/hostcert.pem --hostkey $::INSTALLDIR/certs/hostkey.pem --extension 1.3.6.1.9.9.9.9.100.100.100.100:prova >& $outname]}]
+
+    if $res then {
+        addlog $outname
+        testmessage "voms-proxy-fake failed."
+        return $::FAILTEST
+    }
+
+    set proxy [_proxyname]
+    if [catch {set out2 [exec openssl x509 -text -noout -in $proxy >& $outname]}] then {
+        addlog $outname
+        testmessage "openssl failed."
+        return $::FAILTEST
+    }
+
+    set correct "\[ \t\]*1.3.6.1.9.9.9.9.100.100.100.100: 
+\[ \t\]*prova"
+
+    set out2 [exec cat $outname]
+    if [regexp $correct $out2] then {
+        testmessage "extension works."
+        return $::PASSTEST
+    }
+
+    set outname2 [exec mktemp $::SCRATCHDIR/openssl-XXXXXX]
+    set id [open $outname2 "w+"]
+    puts $id $correct
+    close $id
+    addlog $outname
+    addlog $outname2
+
+    testmessage "--extension does not work"
+    return $::FAILTEST
+}
+
+do_test

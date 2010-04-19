@@ -2,10 +2,20 @@
  *
  * Authors: Vincenzo Ciaschini - Vincenzo.Ciaschini@cnaf.infn.it 
  *
- * Copyright (c) 2002-2009 INFN-CNAF on behalf of the EU DataGrid
- * and EGEE I, II and III
- * For license conditions see LICENSE file or
- * http://www.apache.org/licenses/LICENSE-2.0.txt
+ * Copyright (c) Members of the EGEE Collaboration. 2004-2010.
+ * See http://www.eu-egee.org/partners/ for details on the copyright holders.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *    http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  *
  * Parts of this code may be based upon or even include verbatim pieces,
  * originally written by other people, in which case the original header
@@ -32,8 +42,6 @@
 #ifndef VOMS_GSISOCKETCLIENT
 #define VOMS_GSISOCKETCLIENT
 
-
-
 /** This super class header file. */
 #include <openssl/evp.h>
 #include <openssl/x509.h>
@@ -43,8 +51,6 @@
 
 #include <sys/types.h>
 #include <sys/socket.h>
-#include <netinet/in.h>
-#include <netdb.h>
 
 extern "C" {
 #include "sslutils.h"
@@ -66,24 +72,11 @@ public:
    * @param p the secure server port.
    * @param b the backlog, that is the maximum number of outstanding connection requests.
    */
-  GSISocketClient(const std::string&, int, int);
+  GSISocketClient(const std::string&, int);
   /**
    * Destructor.
    */  
   ~GSISocketClient();
-
-  void RedirectGSIOutput(FILE *fp) { gsi_logfile = fp; }
-  /**
-   * Set the server contact. 
-   * @param contact the server contact string to set.
-   */
-  void ServerContact(const std::string& contact) { _server_contact = contact; }
-  /**
-   * Sets required connection flags.
-   * @param flags is a bitwise or of all the flags required.
-   */
-  //  void SetFlags(int flags);
-
 
   /**
    * Open the connection.
@@ -111,37 +104,24 @@ protected:
 private:
   std::string host;
   int port;
-  int version;
-   /** The Secure Shell context identifier. */
-  gss_ctx_id_t context; 
-  gss_cred_id_t credential;
-  std::string _server_contact;
-   //bool _do_mutual_authentication;
-  FILE *gsi_logfile;
+
   bool opened;
   int sck;
 
 public:
   std::string     own_subject;
-  std::string     own_ca;
   EVP_PKEY       *upkey;
   X509           *ucert;
   STACK_OF(X509) *cert_chain;
   char           *cacertdir;
-  std::string     peer_subject;
-  std::string     peer_ca;
-  EVP_PKEY       *peer_key;
-  X509           *peer_cert;
   SSL *ssl;
   SSL_CTX *ctx;
   BIO *conn;
-  void *pvd;
 
   bool Send(const std::string &s);
   bool Receive(std::string &s);
 
 private:
-  struct sockaddr_in peeraddr_in;	/**< Address for peer socket.*/
   std::string error;
   void SetError(const std::string&);
   void SetErrorGlobus(const std::string&, int, int, int);

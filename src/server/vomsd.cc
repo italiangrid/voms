@@ -2,10 +2,20 @@
  *
  * Authors: Vincenzo Ciaschini - Vincenzo.Ciaschini@cnaf.infn.it
  *
- * Copyright (c) 2002-2009 INFN-CNAF on behalf of the EU DataGrid
- * and EGEE I, II and III
- * For license conditions see LICENSE file or
- * http://www.apache.org/licenses/LICENSE-2.0.txt
+ * Copyright (c) Members of the EGEE Collaboration. 2004-2010.
+ * See http://www.eu-egee.org/partners/ for details on the copyright holders.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *    http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  *
  * Parts of this code may be based upon or even include verbatim pieces,
  * originally written by other people, in which case the original header
@@ -34,7 +44,7 @@ extern "C" {
 #include "credentials.h"
 
 #include "log.h"
-#include "streamers.h"
+
 #include "sslutils.h"
 
 static int reload = 0;
@@ -56,11 +66,6 @@ void *logh = NULL;
 #include "vomsxml.h"
 #include "fqan.h"
 
-extern "C" {
-extern char *Decode(const char *, int, int *);
-extern char *Encode(const char *, int, int *, int);
-}
-
 #include <map>
 #include <set>
 #include <string>
@@ -71,7 +76,7 @@ extern char *Encode(const char *, int, int *, int);
 
 #include "dbwrap.h"
 
-#include "voms_api.h"
+#include "voms_api_nog.h"
 
 extern int AC_Init(void);
 
@@ -116,13 +121,10 @@ static bool checkinside(gattrib g, std::vector<std::string> list);
 static void CreateURI(std::string &uri, int port);
 
 std::string
-makeACSSL(SSL *ssl, void *logh, char **FQANs, int size, char **targets, int targsize, int requested, VOMSServer *v);
-
-std::string
-makeACSOAP(struct soap *soap, void *logh, char **FQANs, int size, char **targets, int targsize, int requested);
+makeACSSL(SSL *ssl, void *logh, const std::string& command, char **targets, int targsize, int requested, VOMSServer *v);
 
 int
-makeACREST(struct soap *soap, void *logh, char **FQANs, int size, int requested, int unknown);
+makeACREST(struct soap *soap, void *logh, const std::string& command, int requested, int unknown);
 
 std::string makeAC(EVP_PKEY *key, X509 *issuer, X509 *holder, 
                    const std::string &message, void *logh, VOMSServer *v);
@@ -449,7 +451,6 @@ VOMSServer::VOMSServer(int argc, char *argv[]) : sock(0,NULL,50,false),
   }
 
   if ((logh = LogInit())) {
-    //    if ((logger = FileNameStreamerAdd(logh, logfile.c_str(), logmax, code, 0))) {
       loglevels lev;
 
       switch(loglev) {
@@ -472,7 +473,6 @@ VOMSServer::VOMSServer(int argc, char *argv[]) : sock(0,NULL,50,false),
       (void)LogService(logh, "vomsd");
       (void)LogFormat(logh, logf.c_str());
       //      (void)LogDateFormat(logh, logdf.c_str());
-      (void)StartLogger(logh, code);
       if (!nologfile)
         (void)LogActivate(logh, "FILE");
       if (do_syslog)
@@ -481,7 +481,6 @@ VOMSServer::VOMSServer(int argc, char *argv[]) : sock(0,NULL,50,false),
       (void)LogOption(logh, "NAME", logfile.c_str());
       (void)LogOptionInt(logh, "MAXSIZE", logmax);
       (void)LogOption(logh, "DATEFORMAT", logdf.c_str());
-      //    }
   }
   else
     throw VOMSInitException("logging startup failure");
@@ -648,8 +647,6 @@ void VOMSServer::Run()
   if (!debug)
     if (daemon(0,0))
       exit(0);
-
-  SetOwner(getpid());
 
   fd_set rset;
   FD_ZERO(&rset);
@@ -1006,6 +1003,24 @@ std::string makeAC(EVP_PKEY *key, X509 *issuer, X509 *holder,
                      index->fqan.end());
     }
   
+    // Adjust for long/short format
+    if (!short_flags && !fqans.empty()) {
+      std::vector<std::string> newfqans(fqans);
+      fqans.clear();
+      std::vector<std::string>::iterator i = newfqans.begin();
+      while (i != newfqans.end()) {
+        std::string fqan = *i;
+        LOGM(VARP, logh, LEV_DEBUG, T_PRE, "Initial FQAN: %s", fqan.c_str());
+        if (fqan.find("/Role=") != std::string::npos)
+          fqan += "/Capability=NULL";
+        else
+          fqan += "/Role=NULL/Capability=NULL";
+        LOGM(VARP, logh, LEV_DEBUG, T_PRE, "Processed FQAN: %s", fqan.c_str());
+        fqans.push_back(fqan);
+        i++;
+      }
+    }
+
     /* if attributes were found, only release an intersection beetween the requested and the owned */
     std::vector<std::string>::iterator end = fqans.end();
     bool subset = false;
@@ -1024,23 +1039,6 @@ std::string makeAC(EVP_PKEY *key, X509 *issuer, X509 *holder,
                     attribs.end());
     }
 
-    // Adjust for long/short format
-    if (!short_flags && !fqans.empty()) {
-      std::vector<std::string> newfqans(fqans);
-      fqans.clear();
-      std::vector<std::string>::iterator i = newfqans.begin();
-      while (i != newfqans.end()) {
-        std::string fqan = *i;
-        LOGM(VARP, logh, LEV_DEBUG, T_PRE, "Initial FQAN: %s", fqan.c_str());
-        if (fqan.find("/Role=") != std::string::npos)
-          fqan += "/Capability=NULL";
-        else
-          fqan += "/Role=NULL/Capability=NULL";
-        LOGM(VARP, logh, LEV_DEBUG, T_PRE, "Processed FQAN: %s", fqan.c_str());
-        fqans.push_back(fqan);
-        i++;
-      }
-    }
 
     // no attributes can be send
     if (fqans.empty()) {
@@ -1063,13 +1061,15 @@ std::string makeAC(EVP_PKEY *key, X509 *issuer, X509 *holder,
   if (!fqans.empty()) {
     // test logging retrieved attributes
 
-    if(result && !attributes.empty()) {
-      for(std::vector<gattrib>::iterator i = attributes.begin(); i != attributes.end(); ++i)
-        LOGM(VARP, logh, LEV_DEBUG, T_PRE,  "User got attributes: %s", i->str().c_str());
+    if (LogLevelMin(logh, LEV_DEBUG)) {
+      if(result && !attributes.empty()) {
+        for(std::vector<gattrib>::iterator i = attributes.begin(); i != attributes.end(); ++i)
+          LOGM(VARP, logh, LEV_DEBUG, T_PRE,  "User got attributes: %s", i->str().c_str());
+      }
+      else
+        LOGM(VARP, logh, LEV_DEBUG, T_PRE,  "User got no attributes or something went wrong searching for them.");
     }
-    else
-      LOGM(VARP, logh, LEV_DEBUG, T_PRE,  "User got no attributes or something went wrong searching for them.");
-  
+
     std::vector<std::string> attributes_compact;
     for(std::vector<gattrib>::iterator i = attribs.begin(); i != attribs.end(); ++i)
       attributes_compact.push_back(i->str());
@@ -1091,7 +1091,8 @@ std::string makeAC(EVP_PKEY *key, X509 *issuer, X509 *holder,
         LOGM(VARP, logh, LEV_DEBUG, T_PRE, "length = %d", i2d_AC(a, NULL));
         if (a)
           res = createac(issuer, v->sock.own_stack, holder, key, serial,
-                         fqans, targs, attributes_compact, &a, v->voname, v->uri, requested, !v->newformat);
+                         fqans, targs, attributes_compact, &a, v->voname, v->uri, requested, !v->newformat,
+                         NULL);
 
         if (!res) {
           unsigned int len = i2d_AC(a, NULL);
@@ -1416,22 +1417,11 @@ static bool determine_group_and_role(std::string command, char *comm, char **gro
 
 
 static bool checkinside(gattrib g, std::vector<std::string> list) {
-  return !g.qualifier.empty() && (find(list.begin(), list.end(), g.qualifier) == list.end());
-}
-                                   
-std::string
-makeACSOAP(struct soap *soap, void *logh, 
-           char **FQANs, int size, 
-           char **targets, int targsize, 
-           int requested)
-{
-  return makeACSSL(soap->ssl, logh, FQANs, size, 
-                   targets, 
-                   targsize, requested, selfpointer);
+  return !g.qualifier.empty() && not_in(g.qualifier, list);
 }
 
 std::string
-makeACSSL(SSL *ssl, void *logh, char **FQANs, int size, char **targets, int targsize, int requested, VOMSServer *v)
+makeACSSL(SSL *ssl, void *logh, const std::string& command, char **targets, int targsize, int requested, VOMSServer *v)
 {
   X509 *holder = SSL_get_peer_certificate(ssl);
   X509 *issuer = NULL;
@@ -1453,22 +1443,9 @@ makeACSSL(SSL *ssl, void *logh, char **FQANs, int size, char **targets, int targ
     return "";
   }
 
-  std::string command = "";
-
-  int i = 0;
-  while (i < size) {
-    if (i != 0)
-      command +=",";
-
-    command += FQANParse(FQANs[i]);
-
-    i++;
-  }
-
-
   std::string targs = "";
 
-  i = 0;
+  int i = 0;
   while (i <targsize) {
     if (i != 0)
       targs += ",";
@@ -1490,7 +1467,7 @@ int http_get(soap *soap)
   char *path = strdup(soap->path);
   int unknown = 0;
 
-  LOGM(VARP, logh, LEV_DEBUG, T_PRE, "REST Request: %s", path);
+  LOGM(VARP, logh, LEV_DEBUG, T_PRE, "REST Request: %s", soap->path);
 
   if (!path)
     return SOAP_GET_METHOD;
@@ -1556,7 +1533,7 @@ int http_get(soap *soap)
           fqans.push_back(std::string(cvalue));
           cvalue = ++position;
           position = strchr(cvalue, ',');
-	  size ++;
+          size ++;
         }
         fqans.push_back(std::string(cvalue));
 
@@ -1570,30 +1547,21 @@ int http_get(soap *soap)
           orderstring += ", " + std::string(cvalue);
       }
       else {
-	/* purposefully ignore other parameters */
-	/* but put it in an otherwise positive response */
-	unknown = 1;
+        /* purposefully ignore other parameters */
+        /* but put it in an otherwise positive response */
+        unknown = 1;
       }
       if (next)
         basis = next+1;
     } while (next);
   }
 
-  char **FQANS = NULL;
-  if (size) {
-    FQANS = (char**)malloc(sizeof(char*)*size);
+  if (!size)
+    fqans.push_back(maingroup);
 
-    for (int i = 0; i < size; i++)
-      FQANS[i] = (char*)(fqans[i].c_str());
-  }
-  else {
-    FQANS = (char**)malloc(sizeof(char*));
-    FQANS[0]=maingroup;
-    size = 1;
-  }
-  int res = makeACREST(soap, logh, FQANS, size, lifetime, unknown);
+  std::string command = parse_fqan(fqans);
 
-  free(FQANS);
+  int res = makeACREST(soap, logh, command, lifetime, unknown);
 
   free(path);
 
@@ -1651,11 +1619,11 @@ static char *canonicalize_string(char *original)
 static int EncodeAnswerForRest(const std::string& input, int unknown, std::string& output);
 
 int
-makeACREST(struct soap *soap, void *logh, char **FQANs, int size, int requested, int unknown)
+makeACREST(struct soap *soap, void *logh, const std::string& command, int requested, int unknown)
 {
   char *targets = NULL;
 
-  std::string result = makeACSSL(soap->ssl, logh, FQANs, size, &targets, 0, requested, selfpointer);
+  std::string result = makeACSSL(soap->ssl, logh, command, &targets, 0, requested, selfpointer);
 
   std::string output;
 
@@ -1674,17 +1642,15 @@ static int EncodeAnswerForRest(const std::string& input, int unknown, std::strin
 
   if (XML_Ans_Decode(input, a)) {
     if (!a.ac.empty() && a.ac != "A") {
-      int len = 0;
-      char *ac = Encode(a.ac.c_str(), a.ac.length(), &len, !a.base64);
+      std::string ac = Encode(a.ac, !a.base64);
 
-      output = "<?xml version=\"1.0\" encoding=\"UTF-8\"?><voms><ac>" +std::string(ac, len) +"</ac>";
+      output = "<?xml version=\"1.0\" encoding=\"UTF-8\"?><voms><ac>" + ac + "</ac>";
       std::vector<errorp> errs = a.errs;
       for (std::vector<errorp>::iterator i = errs.begin(); i != errs.end(); i++)
         output +="<warning>"+i->message+"</warning>";
       if (unknown) 
         output +="<warning>Unknown parameters in the request were ignored!</warning>";
       output += "</voms>";
-      free(ac);
       return SOAP_HTML;
     }
     else {

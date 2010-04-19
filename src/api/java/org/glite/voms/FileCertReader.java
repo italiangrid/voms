@@ -3,10 +3,20 @@
  * Authors: Vincenzo Ciaschini - Vincenzo.Ciaschini@cnaf.infn.it 
  *          Valerio Venturi    - Valerio.Venturi@cnaf.infn.it
  *
- * Copyright (c) 2002-2009 INFN-CNAF on behalf of the EU DataGrid
- * and EGEE I, II and III
- * For license conditions see LICENSE file or
- * http://www.apache.org/licenses/LICENSE-2.0.txt
+ * Copyright (c) Members of the EGEE Collaboration. 2004-2010.
+ * See http://www.eu-egee.org/partners/ for details on the copyright holders.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *    http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  *
  * Parts of this code may be based upon or even include verbatim pieces,
  * originally written by other people, in which case the original header
@@ -98,7 +108,7 @@ class FileCertReader {
         } catch (Exception e) {
             logger.error("Error while creating a FileCertReader: " + e.getMessage());
             throw new CertificateException("Error while creating a FileCertReader: " +
-                e.getMessage());
+                                           e.getMessage(), e);
         }
     }
 
@@ -115,7 +125,7 @@ class FileCertReader {
         } catch (Exception e) {
             logger.error("Error while creating a FileCertReader: " + e.getMessage());
             throw new CertificateException("Error while creating a FileCertReader: " +
-                e.getMessage());
+                                           e.getMessage(), e);
         }
     }
 
@@ -132,7 +142,7 @@ class FileCertReader {
         } catch (Exception e) {
             logger.error("Error while creating a FileCertReader: " + e.getMessage());
             throw new CertificateException("Error while creating a FileCertReader: " +
-                e.getMessage());
+                                           e.getMessage(), e);
         }
     }
 
@@ -247,7 +257,7 @@ class FileCertReader {
             logger.fatal("Error while reading certificates or CRLs: " + e.getMessage());
 
             throw new CertificateException("Error while reading certificates or CRLs: " +
-                e.getMessage());
+                                           e.getMessage(), e);
         }
 
         return storeVector;
@@ -282,7 +292,7 @@ class FileCertReader {
                 certFile.toString() + "error was: " + e.getMessage());
 
             throw new IOException("Error while reading certificates or crls from file " +
-                certFile.toString() + "error was: " + e.getMessage());
+                                  certFile.toString() + "error was: " + e.getMessage());
         } finally {
             if (binStream != null) {
                 binStream.close();
@@ -326,7 +336,7 @@ class FileCertReader {
                 if (errors != 0) { // if the error persists after first pass, fail
                     logger.error("Certificate or CRL reading failed: " + e.getMessage());
                     throw new CertificateException("Certificate or CRL reading failed: " +
-                        e.getMessage());
+                                                   e.getMessage(), e);
                 }
 
                 errors = 1; // first try failed, try again with skipping
@@ -353,7 +363,7 @@ class FileCertReader {
                 obj = certFactory.generateCRL(binStream);
             } catch (CRLException e) {
                 logger.error("CRL loading failed: " + e.getMessage());
-                throw new CertificateException(e.getMessage());
+                throw new CertificateException(e.getMessage(), e);
             }
         } else { // reading certs or trust anchors
 
@@ -373,7 +383,7 @@ class FileCertReader {
                     logger.fatal("Internal error: Invalid data type " + type +
                         " when trying to read certificate");
                     throw new CertificateParsingException("Internal error: Invalid data type " +
-                        type + " when trying to read certificate");
+                                                          type + " when trying to read certificate");
                 }
             }
         }

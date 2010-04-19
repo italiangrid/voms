@@ -2,10 +2,20 @@
  *
  * Authors: Vincenzo Ciaschini - Vincenzo.Ciaschini@cnaf.infn.it
  *
- * Copyright (c) 2002-2009 INFN-CNAF on behalf of the EU DataGrid
- * and EGEE I, II and III
- * For license conditions see LICENSE file or
- * http://www.apache.org/licenses/LICENSE-2.0.txt
+ * Copyright (c) Members of the EGEE Collaboration. 2004-2010.
+ * See http://www.eu-egee.org/partners/ for details on the copyright holders.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *    http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  *
  * Parts of this code may be based upon or even include verbatim pieces,
  * originally written by other people, in which case the original header
@@ -39,6 +49,7 @@ import java.security.cert.CertificateFactory;
 import java.security.cert.X509CRL;
 import java.security.cert.X509Certificate;
 import java.util.Arrays;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.ListIterator;
 import java.util.Vector;
@@ -199,7 +210,7 @@ public class PKIUtils {
             catch(NoSuchAlgorithmException e) {
                 logger.fatal("NO MD5! " + e.getMessage(), e);
 
-                throw new IllegalStateException("NO MD5! " + e.getMessage());
+                throw new IllegalStateException("NO MD5! " + e.getMessage(), e);
             }
 
             md.update(name);
@@ -283,8 +294,7 @@ public class PKIUtils {
 
     public static String Normalize(String dn) {
         String newdn = emailPattern.matcher(dn).replaceAll("/Email");
-        newdn = uidPattern.matcher(newdn).replaceAll("/UID");
-        return newdn;
+        return uidPattern.matcher(newdn).replaceAll("/UID");
     }
 
     public static boolean DNCompare(String dn1, String dn2) {
@@ -358,7 +368,7 @@ public class PKIUtils {
 
     static private GeneralName[] getNames(GeneralNames gns) {
         DERObject obj = gns.getDERObject();
-        Vector v = new Vector();
+        ArrayList v = new ArrayList();
 
         ASN1Sequence seq = (ASN1Sequence)obj;
 
@@ -388,8 +398,6 @@ public class PKIUtils {
 
             logger.debug("Is: " + issuedIssuer.getName() +
                          " issued by " + issuerSubject.getName() + "?");
-            logger.debug("Is: " + issued.getSubjectDN().getName() +
-                         " issued by " + issuer.getSubjectDN().getName());
             logger.debug("[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[");
         }
 
@@ -397,61 +405,70 @@ public class PKIUtils {
             logger.debug("================================");
             logger.debug("issuersSubject = issuedIssuer");
 
-            //            String buggySwissSignCA="EMAILADDRESS=ca@SwissSign.com, CN=SwissSign CA (RSA IK May 6 1999 18:00:58), O=SwissSign, C=CH";
-            String buggySwissSignCA="1.2.840.113549.1.9.1=#161063614053776973735369676e2e636f6d,CN=SwissSign CA (RSA IK May 6 1999 18:00:58),O=SwissSign,C=CH";
+            boolean needtoskip = false;
+            AuthorityKeyIdentifier akid = null;
 
-            logger.debug("--"+buggySwissSignCA+"--");
-            logger.debug("--"+issuerSubject.getName()+"--"+issuerSubject.getName().getClass().getName());
-            if (!buggySwissSignCA.equals(issuerSubject.getName())) {
-                /* Skip check due to bugs in bc and SwissSign */ 
-                AuthorityKeyIdentifier akid = PKIUtils.getAKID(issued);
+            try {
+                akid = PKIUtils.getAKID(issued);
+                String s;
 
-                if (akid != null) {
-                    if (logger.isDebugEnabled())
-                        logger.debug("akid = " + akid);
+                /*  The following may throw an exception if the KeyID field 
+                    of the Authority Key Identifier is empty. */
+                if (akid != null)
+                    s = akid.toString();
+
+                needtoskip = false;
+            }
+            catch (Exception e) {
+                logger.warn("CA: " + issuerSubject.getName() + " needs to skip akid checks due to incorrectly formatted Authority Key Identifier Extension");
+                needtoskip = true;
+            }
+
+            if (!needtoskip && (akid != null)) {
+                if (logger.isDebugEnabled())
+                    logger.debug("akid = " + akid);
                 
-                    logger.debug("Authority Key Identifier extension found in issued certificate.");
+                logger.debug("Authority Key Identifier extension found in issued certificate.");
 
-                    logger.debug("Entered.");
-                    SubjectKeyIdentifier skid = PKIUtils.getSKID(issuer);
+                logger.debug("Entered.");
+                SubjectKeyIdentifier skid = PKIUtils.getSKID(issuer);
 
-                    if (logger.isDebugEnabled())
-                        logger.debug("sid = " + skid);
+                if (logger.isDebugEnabled())
+                    logger.debug("sid = " + skid);
 
-                    if (skid != null) {
-                        logger.debug("subject Key Identifier extensions found in issuer certificate.");
-                        logger.debug("comparing skid to akid");
+                if (skid != null) {
+                    logger.debug("subject Key Identifier extension found in issuer certificate.");
+                    logger.debug("comparing skid to akid");
 
-                        byte[] skidValue = skid.getKeyIdentifier();
-                        if (logger.isDebugEnabled()) {
-                            logger.debug("skid");
+                    byte[] skidValue = skid.getKeyIdentifier();
+                    if (logger.isDebugEnabled()) {
+                        logger.debug("skid");
 
-                            StringBuffer str = new StringBuffer();
-                            for (int i = 0; i < skidValue.length; i++) {
-                                str.append(Integer.toHexString(skidValue[i]));
-                                str.append(' ');
-                            }
-                            logger.debug(str.toString());
+                        StringBuilder str = new StringBuilder();
+                        for (int i = 0; i < skidValue.length; i++) {
+                            str.append(Integer.toHexString(skidValue[i]));
+                            str.append(' ');
                         }
-
-                        byte[] akidValue = akid.getKeyIdentifier();
-                        if (logger.isDebugEnabled()) {
-                            logger.debug("akid");
-
-                            StringBuffer str = new StringBuffer();
-                            for (int i = 0; i < akidValue.length; i++) {
-                                str.append(Integer.toHexString(akidValue[i]));
-                                str.append(' ');
-                            }
-                            logger.debug(str.toString());
-                        }
-
-                        logger.debug("skid/akid checking.");
-                        if (!Arrays.equals(skidValue, akidValue))
-                            return false;
-
-                        logger.debug("skid/akid check passed.");
+                        logger.debug(str.toString());
                     }
+
+                    byte[] akidValue = akid.getKeyIdentifier();
+                    if (logger.isDebugEnabled()) {
+                        logger.debug("akid");
+
+                        StringBuilder str = new StringBuilder();
+                        for (int i = 0; i < akidValue.length; i++) {
+                            str.append(Integer.toHexString(akidValue[i]));
+                            str.append(' ');
+                        }
+                        logger.debug(str.toString());
+                    }
+
+                    logger.debug("skid/akid checking.");
+                    if (!Arrays.equals(skidValue, akidValue))
+                        return false;
+
+                    logger.debug("skid/akid check passed.");
                 }
             }
             logger.debug("]]]]]]]]]]]]]]]]]]]]]]]]");
@@ -492,7 +509,7 @@ public class PKIUtils {
 
         if (logger.isDebugEnabled()) {
             if (keybytes != null) {
-                StringBuffer str = new StringBuffer();
+                StringBuilder str = new StringBuilder();
                 str.append("Real value : ");
                 for (int j =0; j < keybytes.length; j++) {
                     str.append(Integer.toHexString(keybytes[j]));
@@ -599,10 +616,10 @@ public class PKIUtils {
                     dobj = new ASN1InputStream(new ByteArrayInputStream(((DEROctetString)dobj).getOctets())).readObject();
                 }
                 catch (ClassCastException e) {
-                    throw new IllegalArgumentException("Erroneous encoding in Authority Key Identifier " + e.getMessage());
+                    throw new IllegalArgumentException("Erroneous encoding in Authority Key Identifier " + e.getMessage(), e);
                 }
                 catch (Exception e) {
-                    throw new IllegalArgumentException("While extracting Authority Key Identifier " + e.getMessage());
+                    throw new IllegalArgumentException("While extracting Authority Key Identifier " + e.getMessage(), e);
                 }
                 
                 return new AuthorityKeyIdentifier(ASN1Sequence.getInstance(dobj));
@@ -628,7 +645,7 @@ public class PKIUtils {
                     dobj = new ASN1InputStream(new ByteArrayInputStream(((DEROctetString)dobj).getOctets())).readObject();
                 }
                 catch (Exception e) {
-                    throw new IllegalArgumentException("While extracting Subject Key Identifier " + e.getMessage());
+                    throw new IllegalArgumentException("While extracting Subject Key Identifier " + e.getMessage(), e);
                 }
 
                 return SubjectKeyIdentifier.getInstance(dobj);
@@ -760,7 +777,7 @@ public class PKIUtils {
      * @throws IllegalArgumentException if the file cannot be found.
      */
     static private X509Certificate[] loadCertificates(BufferedInputStream bis) throws CertificateException, IOException {
-        List certificates = new Vector();
+        ArrayList certificates = new ArrayList();
 
         int type;
 
