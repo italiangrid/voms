@@ -10,7 +10,6 @@ proc mytest {} {
     set res [log_exec outname {voms-proxy-init --vrms voms1}]
     _vomsStop voms1
 
-    exec cat $outname
     addlog $outname
 
     if $res then {
