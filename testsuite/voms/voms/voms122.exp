@@ -1,27 +1,27 @@
 load_lib vomstest.exp
-testheader "See if voms-proxy-list with two --voms fails."
 
 proc mytest {} {
+    testheader "See if voms-proxy-init --out <wrongfile> fails correctly."
     _activateCert mycert2
     _cleanproxy
 
     _vomsStart voms1
     set outname [exec mktemp $::SCRATCHDIR/voms-proxy-list-XXXXXX]
-    set res [catch {set out [exec $::INSTALLDIR/bin/voms-proxy-list --voms voms1 --voms voms1 >& $outname]}]
+    set res [catch {set out [exec $::INSTALLDIR/bin/voms-proxy-init --voms voms1 --out /tfhasdfbk/fregio >& $outname]}]
     _vomsStop voms1
 
     addlog $outname
 
     if $res then {
-        set correct "Exactly ONE voms server must be specified!"
+        set correct "ERROR: Cannot write proxy to: /tfhasdfbk/fregio"
 
         set out2 [exec cat $outname]
 
         if [regexp $correct $out2] then {
-            testmessage "voms-proxy-list failed with correct message."
+            testmessage "voms-proxy-init failed with correct message."
             return $::PASSTEST
         } else {
-            testmessage "voms-proxy-list failed with wrong message."
+            testmessage "voms-proxy-init failed with wrong message."
             return $::FAILTEST
         }
     }

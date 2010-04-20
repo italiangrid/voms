@@ -1,0 +1,44 @@
+load_lib vomstest.exp
+
+proc mytest {} {
+    testheader "See if voms-proxy-init --debug works."
+    _activateCert mycert2
+    _cleanproxy
+
+    _vomsStart voms1
+    set outname [exec mktemp $::SCRATCHDIR/voms-proxy-init-XXXXXX]
+
+    set res [catch {set out [exec $::INSTALLDIR/bin/voms-proxy-init --voms voms1 --debug >& $outname]}]
+    _vomsStop voms1
+
+    addlog $outname
+
+    if $res then {
+        testmessage "voms-proxy-init failed."
+        return $::FAILTEST
+    } 
+
+    set correct "Detected Globus version: 2.2
+Unspecified proxy version, settling on Globus version: 2
+Number of bits in key :1024
+Files being used:
+ CA certificate file: none
+ Trusted certificates directory : /home/marotta/installs/voms19/etc/grid-security/certificates
+ Proxy certificate file : /tmp/x509up_u500
+ User certificate file: /home/marotta/.globus2/usercert.pem
+ User key file: /home/marotta/.globus2/userkey.pem
+Output to /tmp/x509up_u500"
+
+    set out2 [exec cat $outname]
+
+    if [regexp $correct $out2] then {
+        testmessage "output correct"
+        return $::PASSTEST
+    }
+
+    logvar correct
+    testmessage "unexpected output"
+    return $::FAILTEST
+}
+
+do_test

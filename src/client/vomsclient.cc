@@ -312,11 +312,6 @@ Client::Client(int argc, char ** argv) :
 
     if (!getopts(argc, argv, opts))
       exit(1);
-
-    if (!progversion && listing && vomses.size() != 1) {
-      Print(ERROR) << "Exactly ONE voms server must be specified!\n" << std::endl;
-      exit(1);
-    }
   }
   else { /* listing mode */
     LONG_USAGE = \
@@ -380,11 +375,11 @@ Client::Client(int argc, char ** argv) :
 
     if (!getopts(argc, argv, opts))
       exit(1);
+  }
 
-    if (!progversion && vomses.size() != 1) {
-      Print(ERROR) << "Exactly ONE voms server must be specified!\n" << std::endl;
-      exit(1);
-    }
+  if (!progversion && listing && vomses.size() != 1) {
+    Print(ERROR) << "Exactly ONE voms server must be specified!\n" << std::endl;
+    exit(1);
   }
   
   /* wouldn't make sense */
@@ -841,14 +836,15 @@ bool Client::Run()
  err:
   
   Error();
-  Print(ERROR) << "ERROR: " << v->ErrorMessage() << std::endl;
+  if (!v->ErrorMessage().empty())
+    Print(ERROR) << "ERROR: " << v->ErrorMessage() << std::endl;
   return false;
 }
 
 bool Client::CreateProxy(std::string data, AC ** aclist, int version) 
 {
   struct VOMSProxyArguments *args = VOMS_MakeProxyArguments();
-  int ret = -1;
+  int ret = 0;
 
   if (args) {
     args->proxyfilename = strdup(proxyfile.c_str());
@@ -884,15 +880,18 @@ bool Client::CreateProxy(std::string data, AC ** aclist, int version)
 
     ProxyCreationError(warn, additional);
 
-    if (proxy)
+    if (proxy) {
       ret = VOMS_WriteProxy(proxyfile.c_str(), proxy);
+      if (ret == -1) 
+        Print(ERROR) << "\nERROR: Cannot write proxy to: " << proxyfile << std::endl << std::flush;
+    }
+    
 
-    Print(INFO) << " Done" << std::endl << std::flush;
+    if (ret != -1)
+      Print(INFO) << " Done" << std::endl << std::flush;
 
     VOMS_FreeProxy(proxy);
     VOMS_FreeProxyArguments(args);
-
-
   }
 
   return ret == -1;

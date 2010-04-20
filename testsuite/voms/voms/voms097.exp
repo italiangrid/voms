@@ -1,29 +1,32 @@
 load_lib vomstest.exp
 
 proc mytest {} {
-    testheader "See if -pwstdin works with a voms server."
-    _activateCert passcert
+    testheader "See if voms-proxy-init --proxyver 10 fails correctly."
+    _activateCert mycert2
+    _cleanproxy
 
     _vomsStart voms1
-    set timeout 100
-    set dopass 0
-
-    spawn $::INSTALLDIR/bin/voms-proxy-init --voms voms1 --pwstdin
-    send "password\r"
-    expect {
-        eof { set dopass 1 }
-        timeout { set dopass 0 }
-    }
+    set outname [exec mktemp $::SCRATCHDIR/voms-proxy-list-XXXXXX]
+    set res [catch {set out [exec $::INSTALLDIR/bin/voms-proxy-init --proxyver 10 >& $outname]}]
     _vomsStop voms1
 
-    if $dopass then {
-        testmessage "proxy successfully created."
-        return $::PASSTEST
-    } else {
-        addlog $::INSTALLDIR/var/log/voms.voms1
-        testmessage "voms proxy init returned error message."
-        return $::FAILTEST
+    addlog $outname
+
+    if $res then {
+        set correct "Error: proxyver must be 2, 3 or 4"
+
+        set out2 [exec cat $outname]
+
+        if [regexp $correct $out2] then {
+            testmessage "voms-proxy-init failed with correct message."
+            return $::PASSTEST
+        } else {
+            testmessage "voms-proxy-init failed with wrong message."
+            return $::FAILTEST
+        }
     }
+
+    return $::FAILTEST
 }
 
 do_test
