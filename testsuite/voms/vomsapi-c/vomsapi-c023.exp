@@ -21,17 +21,12 @@ proc mytest {} {
     } else {
         set correct "targets: prova.it,prova.com"
 
-        set out [exec cat $::_buildout]
+        loadvar out $::_buildout
         if [regexp $correct $out] then {
             testmessage "output correct"
             return $::PASSTEST
         } else {
-            set outname2 [exec mktemp $::SCRATCHDIR/voms-api-c-XXXXXX]
-            set id [open $outname2 "w+"]
-            puts $id $correct
-            close $id
-
-            addlog $outname2
+            logvar correct
             testmessage "output wrong"
             return $::FAILTEST
         }

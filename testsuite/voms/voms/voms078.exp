@@ -4,8 +4,8 @@ testheader "See if voms-proxy-info fails when no ac is present in proxy."
 proc mytest {} {
     _activateCert mycert2
     _cleanproxy
-    set outname [exec mktemp $::SCRATCHDIR/voms-proxy-fake-XXXXXX]
-    set res [catch {set out [exec $::INSTALLDIR/bin/voms-proxy-fake >& $outname]}]
+
+    set res [log_exec outname {voms-proxy-fake}]
 
     if $res then {
         addlog $outname
@@ -13,7 +13,7 @@ proc mytest {} {
         return $::FAILTEST
     }
 
-    if [catch {set out2 [exec $::INSTALLDIR/bin/voms-proxy-info >& $outname]}] then {
+    if [log_exec outname {voms-proxy-info}] then {
         addlog $outname
         testmessage "voms-proxy-info failed."
         return $::FAILTEST

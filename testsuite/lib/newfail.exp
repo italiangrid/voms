@@ -89,6 +89,27 @@ proc logvar {pattern} {
     addlog $outname
 }
 
+proc loadvar {var file} {
+    upvar $var temp
+    set temp [exec cat $file]
+}
+
+proc log_exec {outname command} {
+    upvar 1 $outname myname
+# The following (complicated) code ensures that the output file name
+# starts with the name of the command being executed 
+    set idx [string first " " $command]
+    if [expr {$idx != -1}] then {
+        set cname [string range $command 0 [expr {$idx-1}]]
+    } else {
+        set cname $command
+    }
+    set cname "$cname-XXXXXX"
+# end output file name creation
+    set myname [exec mktemp $::SCRATCHDIR/$cname]
+    return [catch {set out [uplevel exec $::INSTALLDIR/bin/$command >& $myname]}]
+}
+
 proc cleanup {} {
     _cleanup
     puts $::_logdescriptor "</table>"
@@ -105,15 +126,7 @@ proc cleanup {} {
 #    exec rm app1.info zero1.info
 #    exec lcov -r total.info "/usr*" "*/mystack.c" "*/lex.yy.c" "*/vomsfake.tab.c" "*/vomsparser.c" "soapC.c" stdsoap2.c lex.namespaces.c lex.signing.c namespaces.c signing_policy.c -o voms.info 2>/dev/null
 #    exec rm total.info
-#    exec genhtml --show-details --legend --highlight -o $::REPORTDIR/coverage voms.info >/dev/null
-#    exec rm voms.info
-
-#    exec lcov --directory ../src --capture -o app.info -q >/dev/null
-#    exec lcov -a zero.info -a app.info -o total.info >/dev/null
-#    exec rm app1.info zero1.info
-#    exec lcov -r total.info "/usr*" "*/mystack.c" "*/lex.*.c" "*/vomsfake.tab.c" "*/*soap*.c" "*/vomsparser.c" -o voms.info >/dev/null
-#    exec rm total.info
-#    exec genhtml --show-details --legend --highlight -o $::REPORTDIR/coverage voms.info 2>/dev/null
+#    exec genhtml --no-branch-coverage --show-details --legend --highlight -o $::REPORTDIR/coverage voms.info >/dev/null
 #    exec rm voms.info
 
     catch {exec rm -rf $::INSTALLDIR/ca}

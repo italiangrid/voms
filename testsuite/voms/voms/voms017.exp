@@ -5,8 +5,7 @@ proc mytest {} {
     _activateCert mycert2
 
     _vomsStart voms1
-    set outname [exec mktemp $::SCRATCHDIR/voms-proxy-init-XXXXXX]
-    set res [catch {set out [exec $::INSTALLDIR/bin/voms-proxy-init --voms voms1 --vomslife 100:00 >& $outname]}]
+    set res [log_exec outname {voms-proxy-init --voms voms1 --vomslife 100:00}]
     _vomsStop voms1
 
     if $res then {
@@ -22,14 +21,14 @@ Warning: .* 86400 seconds.*
 
 .*
 .*"
-    set out2 [exec cat $outname]
+    loadvar out2 $outname
 
     if [regexp $correct $out2] then {
         testmessage "voms-proxy-init correctly returned a warning."
         return $::PASSTEST
     } else {
         addlog $outname
-        testmessage "voms-proxy-init incorrectly suceeded."
+        testmessage "voms-proxy-init incorrectly succeeded."
         return $::FAILTEST
     }
 }

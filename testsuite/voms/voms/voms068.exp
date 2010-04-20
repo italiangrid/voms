@@ -8,7 +8,7 @@ proc mytest {} {
     file delete $::INSTALLDIR/var/log/voms.voms1
     set outname [exec mktemp $::SCRATCHDIR/voms-proxy-init-XXXXXX]
     set res [catch {set out [_vomsStart voms1]}]
-    set res [expr $res + [catch {set out [exec $::INSTALLDIR/bin/voms-proxy-init --voms voms1 >>& $outname]}]]
+    set res [expr $res + [log_exec outname {voms-proxy-init --voms voms1}]]
     _vomsStop voms1
 
     addlog $::INSTALLDIR/etc/voms/voms1/voms.conf

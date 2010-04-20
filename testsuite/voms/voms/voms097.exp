@@ -3,11 +3,9 @@ load_lib vomstest.exp
 proc mytest {} {
     testheader "See if voms-proxy-init --proxyver 10 fails correctly."
     _activateCert mycert2
-    _cleanproxy
 
     _vomsStart voms1
-    set outname [exec mktemp $::SCRATCHDIR/voms-proxy-list-XXXXXX]
-    set res [catch {set out [exec $::INSTALLDIR/bin/voms-proxy-init --proxyver 10 >& $outname]}]
+    set res [log_exec outname {voms-proxy-init --proxyver 10}]
     _vomsStop voms1
 
     addlog $outname
@@ -15,7 +13,7 @@ proc mytest {} {
     if $res then {
         set correct "Error: proxyver must be 2, 3 or 4"
 
-        set out2 [exec cat $outname]
+        loadvar out2 $outname
 
         if [regexp $correct $out2] then {
             testmessage "voms-proxy-init failed with correct message."

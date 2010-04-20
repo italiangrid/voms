@@ -4,8 +4,8 @@ testheader "See if voms-proxy-fake works."
 proc mytest {} {
     _activateCert mycert2
     _cleanproxy
-    set outname [exec mktemp $::SCRATCHDIR/voms-proxy-fake-XXXXXX]
-    set res [catch {set out [exec $::INSTALLDIR/bin/voms-proxy-fake >& $outname]}]
+
+    set res [log_exec outname {voms-proxy-fake}]
 
     if $res then {
         addlog $outname

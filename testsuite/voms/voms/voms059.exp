@@ -5,8 +5,7 @@ proc mytest {} {
     _activateCert mycert2
 
     _vomsStart voms1
-    set outname [exec mktemp $::SCRATCHDIR/voms-proxy-init-XXXXXX]
-    set res [catch {set out [exec $::INSTALLDIR/bin/voms-proxy-init --voms voms1:/voms1/group1/Role=TestRole >& $outname]}]
+    set res [log_exec outname {voms-proxy-init --voms voms1:/voms1/group1/Role=TestRole}]
     _vomsStop voms1
 
     if $res then {
@@ -15,9 +14,7 @@ proc mytest {} {
         return $::FAILTEST
     }
 
-    set outname [exec mktemp $::SCRATCHDIR/voms-proxy-info-XXXXXX]
-
-    if [catch {set out2 [exec $::INSTALLDIR/bin/voms-proxy-info --all >& $outname]}] then {
+    if [log_exec outname {voms-proxy-info --all}] then {
         addlog $outname
         testmessage "voms-proxy-info failed."
         return $::FAILTEST
@@ -36,17 +33,13 @@ VO        : voms1
 subject   : /C=IT/CN=001
 issuer    : /C=IT/CN=003
 attribute : /voms1/group1/Role=TestRole"
-        set out2 [exec cat  $outname]
+        loadvar out2 $outname
         if [regexp $correct $out2] then {
             testmessage "role is first."
             return $::PASSTEST
         } else {
-            set outname2 [exec mktemp $::SCRATCHDIR/voms-proxy-info-XXXXXX]
-            set id [open $outname2 "w+"]
-            puts $id $correct
-            close $id
+            logvar correct
             addlog $outname 
-            addlog $outname2
             testmessage "Role is not first"
             return $::FAILTEST
         }

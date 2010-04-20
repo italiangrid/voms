@@ -5,8 +5,7 @@ proc mytest {} {
     _activateCert mycert2
 
     _vomsStart voms1
-    set outname [exec mktemp $::SCRATCHDIR/voms-api-c-XXXXXX]
-    set res [catch {set out [exec $::INSTALLDIR/bin/voms-proxy-init -rfc --voms voms1 >& $outname]}]
+    set res [log_exec outname {voms-proxy-init -rfc --voms voms1}]
     _vomsStop voms1
 
     if $res then {
@@ -36,17 +35,12 @@ fqan1: /voms1
 fqan1: /voms1/group1
 version1: 1"
 
-        set out [exec cat $::_buildout]
+        loadvar out $::_buildout
         if [regexp $correct $out] then {
             testmessage "output correct"
             return $::PASSTEST
         } else {
-            set outname2 [exec mktemp $::SCRATCHDIR/voms-api-c-XXXXXX]
-            set id [open $outname2 "w+"]
-            puts $id $correct
-            close $id
-
-            addlog $outname2
+            logvar correct
             testmessage "output wrong"
             return $::FAILTEST
         }

@@ -6,8 +6,7 @@ proc mytest {} {
     _activateCert mycert2
     _cleanproxy
 
-    set outname [exec mktemp $::SCRATCHDIR/voms-proxy-fake-XXXXXX]
-    set res [catch {set out [exec $::INSTALLDIR/bin/voms-proxy-fake --voms voms1 --hostcert $::INSTALLDIR/certs/hostcert.pem --hostkey $::INSTALLDIR/certs/hostkey.pem --nscert email,objCA >& $outname]}]
+    set res [log_exec outname {voms-proxy-fake --voms voms1 --hostcert $::INSTALLDIR/certs/hostcert.pem --hostkey $::INSTALLDIR/certs/hostkey.pem --nscert email,objCA}]
 
     if $res then {
         addlog $outname
@@ -24,18 +23,14 @@ proc mytest {} {
 
     set correct "S/MIME, Object Signing CA"
 
-    set out2 [exec cat $outname]
+    loadvar out2 $outname
     if [regexp $correct $out2] then {
         testmessage "extkeyusage correctly set."
         return $::PASSTEST
     }
 
-    set outname2 [exec mktemp $::SCRATCHDIR/openssl-XXXXXX]
-    set id [open $outname2 "w+"]
-    puts $id $correct
-    close $id
+    logvar correct
     addlog $outname
-    addlog $outname2
 
     testmessage "extkeyusage not set"
     return $::FAILTEST

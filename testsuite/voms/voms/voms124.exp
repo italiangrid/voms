@@ -6,9 +6,7 @@ proc mytest {} {
     _cleanproxy
 
     _vomsStart voms1
-    set outname [exec mktemp $::SCRATCHDIR/voms-proxy-init-XXXXXX]
-
-    set res [catch {set out [exec $::INSTALLDIR/bin/voms-proxy-init --voms voms1 --debug >& $outname]}]
+    set res [log_exec outname {voms-proxy-init --voms voms1 --debug}]
     _vomsStop voms1
 
     addlog $outname
@@ -29,7 +27,7 @@ Files being used:
  User key file: /home/marotta/.globus2/userkey.pem
 Output to /tmp/x509up_u500"
 
-    set out2 [exec cat $outname]
+    loadvar out2 $outname
 
     if [regexp $correct $out2] then {
         testmessage "output correct"

@@ -5,8 +5,7 @@ proc mytest {} {
     _activateCert mycert2
 
     _vomsStart voms1
-    set outname [exec mktemp $::SCRATCHDIR/voms-proxy-init-XXXXXX]
-    set res [catch {set out [exec $::INSTALLDIR/bin/voms-proxy-init --voms voms1 >& $outname]}]
+    set res [log_exec outname {voms-proxy-init --voms voms1}]
     _vomsStop voms1
 
     if $res then {
@@ -15,8 +14,7 @@ proc mytest {} {
         return $::FAILTEST
     }
 
-    set outname [exec mktemp $::SCRATCHDIR/voms-proxy-info-XXXXXX]
-    set res [catch {set out2 [exec $::INSTALLDIR/bin/voms-proxy-info --exists --valid 10000:50 >& $outname]}]
+    set res [log_exec outname {voms-proxy-info --exists --valid 10000:50}]
 
     if $res then {
         testmessage "correctly failed."

@@ -11,17 +11,12 @@ proc mytest {} {
 
     if $res then {
         set correct "Cannot find match among allowed hosts."
-        set out [exec cat $::_buildout]
+        loadvar out $::_buildout
         if [regexp $correct $out] then {
             testmessage "validation correctly failed"
             return $::PASSTEST
         } else {
-            set outname2 [exec mktemp $::SCRATCHDIR/voms-api-c-XXXXXX]
-            set id [open $outname2 "w+"]
-            puts $id $correct
-            close $id
-
-            addlog $outname2
+            logvar correct
             addlog $::_buildout
             testmessage "wrong error message"
             return $::FAILTEST

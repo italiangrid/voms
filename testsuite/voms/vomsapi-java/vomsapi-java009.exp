@@ -22,12 +22,13 @@ proc mytest {} {
 
     set correct "The validity of this VOMS AC in your proxy is shortened"
 
-    set out [exec cat $::_buildout]
+    loadvar out $::_buildout
 
     if [regexp $correct $out] then {
         testmessage "Warning recognized."
         return $::PASSTEST
     } else {
+        logvar correct
         addlog $::INSTALLDIR/var/log/voms.voms1
         testmessage "Unexpected output."
         return $::FAILTEST

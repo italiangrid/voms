@@ -6,10 +6,9 @@ proc mytest {} {
     _cleanproxy
 
     _vomsStart voms1
-    set outname [exec mktemp $::SCRATCHDIR/voms-proxy-init-XXXXXX]
     set listname [exec mktemp $::SCRATCHDIR/voms-proxy-init-XXXXXX]
 
-    set res [catch {set out [exec $::INSTALLDIR/bin/voms-proxy-init --list --voms voms1 --separate $listname >& $outname]}]
+    set res [log_exec outname {voms-proxy-init --list --voms voms1 --separate $listname}]
     _vomsStop voms1
 
     addlog $outname
@@ -25,13 +24,14 @@ proc mytest {} {
 
     addlog $listname
     addlog $listname.data
-    set out2 [exec cat $listname.data]
+    loadvar out2 $listname.data
 
     if [regexp $correct $out2] then {
         testmessage "output correct"
         return $::PASSTEST
     }
 
+    logvar correct
     testmessage "unexpected output"
     return $::FAILTEST
 }

@@ -9,8 +9,7 @@ proc mytest {} {
     close $id
 
     _vomsStart voms1
-    set outname [exec mktemp $::SCRATCHDIR/voms-proxy-init-XXXXXX]
-    set res [catch {set out [exec $::INSTALLDIR/bin/voms-proxy-init --voms voms1 --rfc --pl 1.3.6.1.5.5.100.100.101 --policy $::SCRATCHDIR/file >& $outname]}]
+    set res [log_exec outname {voms-proxy-init --voms voms1 --rfc --pl 1.3.6.1.5.5.100.100.101 --policy $::SCRATCHDIR/file}]
     _vomsStop voms1
 
     if $res then {
@@ -19,8 +18,7 @@ proc mytest {} {
         return $::FAILTEST
     }
 
-    set outname [exec mktemp $::SCRATCHDIR/voms-proxy-info-XXXXXX]
-    if [catch {set out2 [exec $::INSTALLDIR/bin/voms-proxy-info --text >& $outname]}] then {
+    if [log_exec outname {voms-proxy-info --text}] then {
         addlog $outname
         testmessage "voms-proxy-info failed."
         return $::FAILTEST
@@ -28,28 +26,22 @@ proc mytest {} {
         #match against known (correct) output
         set correct ".*Policy Language: 1.3.6.1.5.5.100.100.101"
         set correct2 ".*Policy Text:.*prova"
-        set out2 [exec cat  $outname]
+        loadvar out2 $outname
         if [regexp $correct $out2] then {
             if [regexp $correct2 $out2] then {
                 testmessage "voms-proxy-init --path-length worked successfully."
                 return $::PASSTEST
             } else {
-                set outname2 [exec mktemp $::SCRATCHDIR/voms-proxy-info-XXXXXX]
-                set id [open $outname2 "w+"]
-                puts $id $correct
-                close $id
+                logvar correct
+                logvar correct2
                 addlog $outname 
-                addlog $outname2
                 testmessage "--pl and --policy did not work."
                 return $::FAILTEST
             }
         } else {
-            set outname2 [exec mktemp $::SCRATCHDIR/voms-proxy-info-XXXXXX]
-            set id [open $outname2 "w+"]
-            puts $id $correct
-            close $id
+            logvar correct
+            logvar correct2
             addlog $outname 
-            addlog $outname2
             testmessage "Unexpected output in voms-proxy-info"
             return $::FAILTEST
         }

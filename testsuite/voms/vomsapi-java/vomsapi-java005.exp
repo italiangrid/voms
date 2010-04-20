@@ -22,12 +22,13 @@ proc mytest {} {
     set correct "FQAN:/voms1
 FQAN:/voms1/group1"
 
-    set out [exec cat $::_buildout]
+    loadvar out $::_buildout
 
     if [regexp $correct $out] then {
         testmessage "Obtained list of FQANs."
         return $::PASSTEST
     } else {
+        logvar correct
         testmessage "Unexepected output."
         return $::FAILTEST
     }

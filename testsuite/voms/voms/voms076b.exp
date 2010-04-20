@@ -20,7 +20,7 @@ proc mytest {} {
     }
 
     set res [catch {set out [exec killall a.out]}]
-    set out2 [exec cat $outname]
+    loadvar out2 $outname
 
     if $dopass then {
         testmessage "Timeout worked"
