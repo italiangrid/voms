@@ -188,13 +188,8 @@ bool do_write(SSL *ssl, int timeout, const std::string& text, std::string &error
         break;
 
       case SSL_ERROR_WANT_READ:
-        expected = SSL_ERROR_WANT_READ;
-        ret = 1;
-        do_continue = true;
-        break;
-        
       case SSL_ERROR_WANT_WRITE:
-        expected = SSL_ERROR_WANT_WRITE;
+        expected = v;
         ret = 1;
         do_continue = true;
         break;
