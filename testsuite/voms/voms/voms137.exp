@@ -1,7 +1,7 @@
 load_lib vomstest.exp
 
 proc my_prolog {} {
-    file copy $::INSTALLDIR/etc/voms/voms1/voms.pass $::SCRATCHDIR/temp.pass
+    file copy -force $::INSTALLDIR/etc/voms/voms1/voms.pass $::SCRATCHDIR/temp.pass
     file delete $::INSTALLDIR/etc/voms/voms1/voms.pass
     set id [open $::INSTALLDIR/etc/voms/voms1/voms.pass "w+"]
     puts -nonewline $id "pppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppp"
@@ -24,7 +24,7 @@ proc my_prolog {} {
 
 proc my_epilog {} {
     file delete $::INSTALLDIR/etc/voms/voms1/voms.pass
-    file copy $::SCRATCHDIR/temp.pass $::INSTALLDIR/etc/voms/voms1/voms.pass 
+    file copy -force $::SCRATCHDIR/temp.pass $::INSTALLDIR/etc/voms/voms1/voms.pass 
     file attributes $::INSTALLDIR/etc/voms/voms1/voms.pass -permissions 00640
 }
 

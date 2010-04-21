@@ -7,14 +7,14 @@ proc mytest {} {
     _cleanproxy
 
     _vomsStart voms1
-    set res [log_exec outname {voms-proxy-init --voms voms1 --separate /fref/gree}]
+    set res [log_exec outname {voms-proxy-init --voms voms1 --separate $::SCRATCHDIR/gree/pol}]
     _vomsStop voms1
 
     addlog $outname
 
     if $res then {
         set correct "Unable to write to BIO
-Wasn't able to write to /fref/gre"
+Wasn't able to write to $::SCRATCHDIR/gree/pol"
 
         loadvar out2 $outname
         if [regexp $correct $out2] then {
