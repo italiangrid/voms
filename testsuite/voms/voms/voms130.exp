@@ -63,7 +63,7 @@ proc mytest {} {
     }
 
     testmessage "voms-proxy-init failed correctly in all cases."
-    return $::PASSTES
+    return $::PASSTEST
 }
 
 do_test
