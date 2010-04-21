@@ -1,5 +1,5 @@
 load_lib vomstest.exp
-testheader "See if voms --logmax works."
+testheader "See if voms log rotation fails when prevously rotated logs are missing."
 
 proc mytest {} {
     _activateCert mycert2

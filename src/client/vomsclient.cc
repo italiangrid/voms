@@ -171,7 +171,6 @@ Client::Client(int argc, char ** argv) :
                                          class_add_buf(NULL),
                                          class_add_buf_len(0),
 #endif 
-                                         dataorder(NULL),
                                          aclist(NULL),
                                          voID(""),
                                          listing(false),
@@ -475,50 +474,11 @@ Client::Client(int argc, char ** argv) :
   
   /* parse valid options */
 
-  if (!valid.empty()) {
-    std::string::size_type pos = valid.find(':');
-    if (pos != std::string::npos && pos > 0) {
-      hours  = ac_hours = atoi(valid.substr(0, pos).c_str());
-      minutes = ac_minutes = atoi(valid.substr(pos+1).c_str());
-    }
-    else {
-      Print(ERROR) << "-valid argument must be in the format: h:m" << std::endl;
-      exit(1);
-    }
-    if (hours < 0) {
-      Print(ERROR) << "-valid argument must be in the format: h:m" << std::endl;
-      exit(1);
-    }    
-    if (minutes < 0 || minutes > 59) {
-      Print(ERROR) << "specified minutes must be in the range 0-59" << std::endl;
-      exit(1);
-    }
-  }
-
-  /* parse vomslife options */
-
-  if (!vomslife.empty()) {
-    std::string::size_type pos = vomslife.find(':');
-
-    if (pos != std::string::npos && pos > 0) {
-      ac_hours   = atoi(vomslife.substr(0, pos).c_str());
-      ac_minutes = atoi(vomslife.substr(pos+1).c_str());
-    }
-    else {
-      Print(ERROR) << "-vomslife argument must be in the format: h:m" << std::endl;
-      exit(1);
-    }
-
-    if (ac_hours < 0) {
-      Print(ERROR) << "specified hours must be in the range 0-23" << std::endl;
-      exit(1);
-    }    
-
-    if (ac_minutes < 0 || ac_minutes >59) {
-      Print(ERROR) << "specified minutes must be in the range 0-59" << std::endl;
-      exit(1);
-    }
-  }
+  /* parse_time exits directly in case of errors */
+  parse_time(valid, "valid", hours, minutes);
+  ac_hours = hours;
+  ac_minutes = minutes;
+  parse_time(vomslife, "vomslife", ac_hours, ac_minutes);
 
   /* allow password from stdin */
   
@@ -573,7 +533,7 @@ Client::Client(int argc, char ** argv) :
   
     /* preliminary checks if at least a server for each 
        vo is known, else exit */
-  
+
     if (confiles.empty()) {
       confiles.push_back(userconf);
       confiles.push_back(CONFILENAME);
@@ -585,18 +545,18 @@ Client::Client(int argc, char ** argv) :
       exit(1);
 
     for (unsigned int i = 0; i < vomses.size(); i++) {
-  
+
       Contact contact(vomses[i]);
-    
+
       /* exit if any server for that vo known */
-    
+
       std::vector<contactdata> servers;
       servers = v->FindByAlias(contact.vo().empty() ? contact.nick() : contact.vo());
       if (servers.empty()) {
         Print(ERROR) << "VOMS Server for " << vomses[i] << " not known!" << std::endl;
         exit(1);
       }
-    
+
       if (listing)
         break;
     }
@@ -604,13 +564,6 @@ Client::Client(int argc, char ** argv) :
 
   if (!certdir.empty())
     setenv("X509_CERT_DIR", certdir.c_str(), 1);
-
-  /* prepare dataorder */
-   
-  dataorder = BN_new();
-  if (!dataorder) 
-    exit(1);
-  BN_one(dataorder);
 }
 
 Client::~Client() {
@@ -626,8 +579,6 @@ Client::~Client() {
 
   if (v)
     delete v;
-
-  BN_free(dataorder);
 
   OBJ_cleanup();
 
@@ -1099,8 +1050,6 @@ bool Client::AddToList(AC *ac)
     /* Only for comaptibility with APIs version <= 1.5 */
 
     aclist = actmplist;
-    (void)BN_lshift1(dataorder, dataorder);
-    (void)BN_set_bit(dataorder, 0);
     return true;
   }
   else {
@@ -1315,6 +1264,31 @@ void Client::PrintConnectResult(int status, const std::string& contact)
       /* Remove temporary proxy */
      if (!noregen)
         unlink(proxyfile.c_str()); 
+      exit(1);
+    }
+  }
+}
+
+void Client::parse_time(const std::string& timespec, const std::string& option, int& hours, int& minutes)
+{
+  if (!timespec.empty()) {
+    std::string::size_type pos = timespec.find(':');
+
+    if (pos != std::string::npos && pos > 0) {
+      hours   = atoi(timespec.substr(0, pos).c_str());
+      minutes = atoi(timespec.substr(pos+1).c_str());
+    }
+    else {
+      Print(ERROR) << "-" << option << " argument must be in the format: h:m" << std::endl;
+      exit(1);
+    }
+
+    if (hours < 0) {
+      Print(ERROR) << "specified hours must be positive" << std::endl;
+      exit(1);
+    }    
+    if (minutes < 0 || minutes > 59) {
+      Print(ERROR) << "specified minutes must be in the range 0-59" << std::endl;
       exit(1);
     }
   }

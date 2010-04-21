@@ -13,15 +13,12 @@ proc mytest {} {
         testmessage "voms-proxy-init failed."
         return $::FAILTEST
     }
-    #match against known (correct) output
-    set correct "s"
 
     loadvar out2 $outname
     if ![string compare $out2 ""] then {
         testmessage "--quiet worked."
         return $::PASSTEST
     } else {
-        logvar correct
         addlog $outname 
         testmessage "Unexpected output in voms-proxy-info"
         return $::FAILTEST

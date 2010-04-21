@@ -109,7 +109,6 @@ class Client {
   size_t                   class_add_buf_len;
 #endif
 
-  BIGNUM *                 dataorder;
   //  proxy_cred_desc *        pcd;
   proxy_verify_desc        pvd;
   proxy_verify_ctx_desc    pvxd;
@@ -160,5 +159,6 @@ class Client {
   void ProxyCreationError(int, void *);
   AC *ReadSeparate(const std::string&);
   void PrintConnectResult(int status, const std::string& contact);
+  void parse_time(const std::string& timespec, const std::string& option, int& hours, int& minutes);
 };
 #endif

@@ -1,11 +1,11 @@
 load_lib vomstest.exp
-testheader "See if voms-proxy-info fails when no ac is present in proxy."
+testheader "See if voms-proxy-fake --version works."
 
 proc mytest {} {
     _activateCert mycert2
     _cleanproxy
 
-    set res [log_exec outname {voms-proxy-fake}]
+    set res [log_exec outname {voms-proxy-fake --version}]
 
     if $res then {
         addlog $outname
@@ -13,13 +13,20 @@ proc mytest {} {
         return $::FAILTEST
     }
 
-    if [log_exec outname {voms-proxy-info}] then {
-        addlog $outname
-        testmessage "voms-proxy-info failed."
-        return $::FAILTEST
+    set correct "voms-proxy-fake
+Version: .*
+Compiled: .*"
+
+    loadvar out $outname
+    if [regexp $correct $out] then {
+        testmessage "voms-proxy-fake --version succeeded."
+        return $::PASSTEST
     }
 
-    return $::PASSTEST
+    addlog $outname
+    logvar correct
+    testmessage "voms-proxy-fake --version failed."
+    return $::FAILTEST
 }
 
 do_test

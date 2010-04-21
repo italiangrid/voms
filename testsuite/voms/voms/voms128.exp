@@ -1,0 +1,31 @@
+load_lib vomstest.exp
+
+proc mytest {} {
+    testheader "See if voms-proxy-init -proxyver 3 --pl fails when --policy is absent."
+
+    _activateCert mycert2
+    _cleanproxy
+
+    set res [log_exec outname {voms-proxy-init --proxyver 4 --pl 1.3.6.1.4.5.9.10.100.100}]
+
+    addlog $outname
+
+    if $res then {
+        set correct "Error: if you specify a policy language you also need to specify a policy file"
+
+        loadvar out2 $outname
+        if [regexp $correct $out2] then {
+            testmessage "voms-proxy-init failed correctly."
+            return $::PASSTEST
+        } else {
+            logvar correct
+            testmessage "voms-proxy-init returned wrong message."
+            return $::FAILTEST
+        }
+    } 
+
+    testmessage "voms-proxy-init incorrectly succeeded."
+    return $::FAILTEST
+}
+
+do_test
