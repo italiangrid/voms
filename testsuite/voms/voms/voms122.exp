@@ -6,13 +6,13 @@ proc mytest {} {
     _cleanproxy
 
     _vomsStart voms1
-    set res [log_exec outname {voms-proxy-init --voms voms1 --out /tfhasdfbk/fregio}]
+    set res [log_exec outname {voms-proxy-init --voms voms1 --out $::SCRATCHDIR/tfhasdfbk/fregio}]
     _vomsStop voms1
 
     addlog $outname
 
     if $res then {
-        set correct "ERROR: Cannot write proxy to: /tfhasdfbk/fregio"
+        set correct "ERROR: Cannot write proxy to: $::SCRATCHDIR/tfhasdfbk/fregio"
 
         loadvar out2 $outname
 
