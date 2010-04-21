@@ -1,0 +1,67 @@
+load_lib vomstest.exp
+
+proc my_prolog {} {
+    file copy $::INSTALLDIR/etc/voms/voms1/voms.pass $::SCRATCHDIR/temp.pass
+    file delete $::INSTALLDIR/etc/voms/voms1/voms.pass
+    set id [open $::INSTALLDIR/etc/voms/voms1/voms.pass "w+"]
+    puts -nonewline $id "pppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppp"
+    puts -nonewline $id "pppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppp"
+    puts -nonewline $id "pppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppp"
+    puts -nonewline $id "pppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppp"
+    puts -nonewline $id "pppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppp"
+    puts -nonewline $id "pppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppp"
+    puts -nonewline $id "pppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppp"
+    puts -nonewline $id "pppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppp"
+    puts -nonewline $id "pppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppp"
+    puts -nonewline $id "pppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppp"
+    puts -nonewline $id "pppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppp"
+    puts -nonewline $id "pppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppp"
+    puts -nonewline $id "pppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppp"
+    puts -nonewline $id "pppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppp"
+    close $id
+    file attributes $::INSTALLDIR/etc/voms/voms1/voms.pass -permissions 00640
+}
+
+proc my_epilog {} {
+    file delete $::INSTALLDIR/etc/voms/voms1/voms.pass
+    file copy $::SCRATCHDIR/temp.pass $::INSTALLDIR/etc/voms/voms1/voms.pass 
+    file attributes $::INSTALLDIR/etc/voms/voms1/voms.pass -permissions 00640
+}
+
+proc mytest {} {
+    testheader "See if voms correctly exits when the password is not terminated by a newline."
+
+    _activateCert mycert2
+    _cleanproxy
+
+    set out ""
+    catch {set val [_vomsStart voms1]} newout
+    catch {set out [exec ps aux | grep voms1 | grep -v grep | grep etc/voms/voms1]}
+
+    _vomsStop voms1
+
+    logvar out
+
+    if {[string equal $out ""] } then {
+        #VOMS did not run.  Let's check the logs
+        set correct ".*Missing new line at end of file\!"
+
+        loadvar logs $::INSTALLDIR/var/log/voms.voms1
+
+        if [regexp $correct $logs] then {
+            testmessage "the reason for failure was the correct one."
+            return $::PASSTEST
+        }
+        logvar correct
+        testmessage "the reason for failure was incorrect."
+        return $::FAILTEST
+    }
+
+    testmessage "VOMS did start when it should not have done so."
+    return $::FAILTEST
+}
+
+test_set_prolog my_prolog
+test_set_epilog my_epilog
+
+do_test
