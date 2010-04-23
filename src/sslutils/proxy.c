@@ -42,6 +42,7 @@
 #include "vomsproxy.h"
 #include "myproxycertinfo.h"
 #include "sslutils.h"
+#include "doio.h"
 
 static char *readfromfile(char *file, int *size, int *warning);
 static void setWarning(int *warning, int value);
@@ -511,30 +512,24 @@ struct VOMSProxy *VOMS_MakeProxy(struct VOMSProxyArguments *args, int *warning, 
       value = (char *)proxycertinfo;
     }
     else {
-      if (policysize == 0)
-        if (args->policytext)
-          policysize = strlen(args->policytext);
-
-      value = (char*)calloc(1, policysize + strlen(policylang) + 
-                            31 + 1 + 30);
-
       if (args->pathlength != -1) {
-        char buffer[31];
-      
-        snprintf(buffer, 30, "%d", args->pathlength);
-        buffer[30]='\0';
+        char *buffer = snprintf_wrap("%d", args->pathlength);
+
         if (!args->policytext) {
-          sprintf(value, "language:%s,pathlen:%s,policy:text:%s", policylang, buffer, policy);
+          value = snprintf_wrap("language:%s,pathlen:%s,policy:text:%s", policylang, buffer, policy);
           free(policy);
         }
         else 
-          sprintf(value, "language:%s,pathlen:%s,policy:text:%s", policylang, buffer, args->policytext);
+          value = snprintf_wrap("language:%s,pathlen:%s,policy:text:%s", policylang, buffer, args->policytext);
+
+        free(buffer);
       }
-      else
+      else {
         if (!args->policytext)
-          sprintf(value, "language:%s,policy:text:%s", policylang, policy);
+          value = snprintf_wrap("language:%s,policy:text:%s", policylang, policy);
         else
-          sprintf(value, "language:%s,policy:text:%s", policylang, args->policytext);
+          value = snprintf_wrap("language:%s,policy:text:%s", policylang, args->policytext);
+      }
     }
 
     if (args->proxyversion == 3) {
@@ -889,28 +884,6 @@ static int convertMethod(char *bits, int *warning, void **additional)
   return total;
 }
 
-static char *vsnprintf_wrap(char *format, ...)
-{
-  va_list v, w;
-  char *str = NULL;
-  int plen = 0;
-
-  va_start(v, format);
-  plen = vsnprintf(str, 0, format, v);
-  va_end(v);
-
-  if (plen > 0) {
-    str = (char *)malloc(plen+1);
-    if (str) {
-      va_start(w, format);
-      (void)vsnprintf(str, plen+1, format, w);
-      va_end(w);
-    }
-  }
-
-  return str;
-}
-
 char *ProxyCreationError(int error, void *additional)
 {
   char *str = NULL;
@@ -921,35 +894,35 @@ char *ProxyCreationError(int error, void *additional)
     break;
 
   case PROXY_ERROR_OPEN_FILE:
-    return vsnprintf_wrap("Error: cannot open file: %s\n%s\n", additional, strerror(errno));
+    return snprintf_wrap("Error: cannot open file: %s\n%s\n", additional, strerror(errno));
     break;
 
   case PROXY_ERROR_FILE_READ:
-    return vsnprintf_wrap("Error: cannot read from file: %s\n%s\n", additional, strerror(errno));
+    return snprintf_wrap("Error: cannot read from file: %s\n%s\n", additional, strerror(errno));
     break;
 
   case PROXY_ERROR_STAT_FILE:
-    return vsnprintf_wrap("Error: cannot stat file: %s\n%s\n", additional, strerror(errno));
+    return snprintf_wrap("Error: cannot stat file: %s\n%s\n", additional, strerror(errno));
     break;
 
   case PROXY_ERROR_OUT_OF_MEMORY:
-    return vsnprintf_wrap("Error: out of memory");
+    return snprintf_wrap("Error: out of memory");
     break;
 
   case PROXY_ERROR_UNKNOWN_BIT:
-    return vsnprintf_wrap("KeyUsage bit: %s unknown\n", additional);
+    return snprintf_wrap("KeyUsage bit: %s unknown\n", additional);
     break;
 
   case PROXY_WARNING_GSI_ASSUMED:
-    return vsnprintf_wrap("\nNo policy language specified, Gsi impersonation proxy assumed.");
+    return snprintf_wrap("\nNo policy language specified, Gsi impersonation proxy assumed.");
     break;
 
   case PROXY_WARNING_GENERIC_LANGUAGE_ASSUMED:
-    return vsnprintf_wrap("\nNo policy language specified with policy file, assuming generic.");
+    return snprintf_wrap("\nNo policy language specified with policy file, assuming generic.");
     break;
 
   default:
-    return vsnprintf_wrap("Unknown error");
+    return snprintf_wrap("Unknown error");
     break;
   }
 }

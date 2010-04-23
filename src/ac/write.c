@@ -37,6 +37,7 @@
 #include "newformat.h"
 #include "acerrors.h"
 #include "attributes.h"
+#include "doio.h"
 
 #define ERROR(e) do { err = (e); goto err; } while (0)
 
@@ -59,9 +60,7 @@ static void make_uri(const char *vo, const char *uri, STACK_OF(GENERAL_NAME) *na
   ASN1_IA5STRING *tmpr = NULL;
 
   if (vo || uri) {
-    int len = (vo ? strlen(vo) : 0) +
-      (uri ? strlen(uri) : 0) + 4;
-    char *buffer=(char *)malloc(len);
+    char *buffer=snprintf_wrap("%s://%s", vo ? vo : "", uri ? uri : "");
 
     g = GENERAL_NAME_new();
     tmpr = ASN1_IA5STRING_new();
@@ -72,12 +71,6 @@ static void make_uri(const char *vo, const char *uri, STACK_OF(GENERAL_NAME) *na
       free(buffer);
       return;
     }
-
-    /* Note: the buffer is *always* large enough to accomodate
-       the whole string.
-    */
-    (void)snprintf(buffer, len, "%s://%s", vo ? vo : "",
-                   uri ? uri : "");
 
     ASN1_STRING_set(tmpr, buffer, strlen(buffer));
     free(buffer);

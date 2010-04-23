@@ -892,10 +892,6 @@ std::vector<std::string> voms::GetTargets()
 
 bool vomsdata::LoadCredentials(X509 *cert, EVP_PKEY *pkey, STACK_OF(X509) *chain)
 {
-  X509           *ucert = NULL;
-  STACK_OF(X509) *cert_chain = NULL;
-  EVP_PKEY       *upkey = NULL;
-
   pthread_mutex_lock(&privatelock);
   vomsspace::internal *data = privatedata[this];
   pthread_mutex_unlock(&privatelock);
