@@ -172,7 +172,6 @@ static bool findexts(X509 *cert , AC_SEQ **listnew, std::string &extra_data, std
   ext = get_ext(cert, "vo");
   if (ext) {
     workvo = std::string((char *)(ext->value->data),ext->value->length);
-    found = true;
   }
 
   return found;
@@ -775,7 +774,7 @@ vomsdata::my_conn(const std::string &hostname, int port, const std::string &cont
 }
 
 bool
-vomsdata::my_conn(const std::string &hostname, int port, const std::string &contact,
+vomsdata::my_conn(const std::string &hostname, int port, UNUSED(const std::string &contact),
 	const std::string &command, std::string &u, std::string &uc,
                   std::string &buf, int timeout)
 {
