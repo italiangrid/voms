@@ -50,8 +50,8 @@ static X509_EXTENSION *set_KeyUsageFlags(int flags);
 static int get_KeyUsageFlags(X509 *cert);
 static X509_EXTENSION *set_ExtendedKeyUsageFlags(char *flagnames);
 static char *getBitName(char**string);
-static int getBitValue(char *bitname, int *bittype);
-static int convertMethod(char *bits, int type);
+static int getBitValue(char *bitname);
+static int convertMethod(char *bits, int *warning, void **additional);
 static X509_EXTENSION *get_BasicConstraints(int ca);
 
 struct VOMSProxyArguments *VOMS_MakeProxyArguments()
@@ -256,7 +256,7 @@ struct VOMSProxy *VOMS_MakeProxy(struct VOMSProxyArguments *args, int *warning, 
   /* keyUsage extension */
 
   if (args->keyusage) {
-    ku_flags = convertMethod(args->keyusage, EXFLAG_KUSAGE);
+    ku_flags = convertMethod(args->keyusage, warning, additional);
     if (ku_flags == -1) {
       PRXYerr(PRXYERR_F_PROXY_SIGN, PRXYERR_R_CLASS_ADD_EXT);
       goto err;
@@ -336,7 +336,7 @@ struct VOMSProxy *VOMS_MakeProxy(struct VOMSProxyArguments *args, int *warning, 
  
   /* vo extension */
   
-  if (!args->voID) {
+  if (strlen(args->voID)) {
     if ((ex4 = CreateProxyExtension("vo", args->voID, strlen(args->voID), 0)) == NULL) {
       PRXYerr(PRXYERR_F_PROXY_SIGN,PRXYERR_R_CLASS_ADD_EXT);
       goto err;
@@ -845,10 +845,8 @@ static char *getBitName(char**string)
   return temp;
 }
 
-static int getBitValue(char *bitname, int *bittype)
+static int getBitValue(char *bitname)
 {
-
-  *bittype = EXFLAG_KUSAGE;
   if (!strcmp(bitname, "digitalSignature"))
     return KU_DIGITAL_SIGNATURE;
   else if (!strcmp(bitname, "nonRepudiation"))
@@ -868,42 +866,90 @@ static int getBitValue(char *bitname, int *bittype)
   else if (!strcmp(bitname, "decipherOnly"))
     return KU_DECIPHER_ONLY;
 
-  *bittype = EXFLAG_NSCERT;
-
-  if (!strcmp(bitname, "client"))
-    return NS_SSL_CLIENT;
-  else if (!strcmp(bitname, "server"))
-    return NS_SSL_SERVER;
-  else if (!strcmp(bitname, "email"))
-    return NS_SMIME;
-  else if (!strcmp(bitname, "objsign"))
-    return NS_OBJSIGN;
-  else if (!strcmp(bitname, "sslCA"))
-    return NS_SSL_CA;
-  else if (!strcmp(bitname, "emailCA"))
-    return NS_SMIME_CA;
-  else if (!strcmp(bitname, "objCA"))
-    return NS_OBJSIGN_CA;
-
-  *bittype = EXFLAG_XKUSAGE;
-
   return 0;
 }
 
 
-static int convertMethod(char *bits, int type)
+static int convertMethod(char *bits, int *warning, void **additional)
 {
   char *bitname = NULL;
-  int realtype = 0;
   int value = 0;
   int total = 0;
 
   while ((bitname = getBitName(&bits))) {
-    value = getBitValue(bitname, &realtype);
-    if ((value == 0) || (type != realtype))
+    value = getBitValue(bitname);
+    if (value == 0) {
+      setWarning(warning, PROXY_ERROR_UNKNOWN_BIT);
+      setAdditional(additional, bitname);
       return -1;
+    }
     total |= value;
   }
 
   return total;
+}
+
+static char *vsnprintf_wrap(char *format, ...)
+{
+  va_list v, w;
+  char *str = NULL;
+  int plen = 0;
+
+  va_start(v, format);
+  plen = vsnprintf(str, 0, format, v);
+  va_end(v);
+
+  if (plen > 0) {
+    str = (char *)malloc(plen+1);
+    if (str) {
+      va_start(w, format);
+      (void)vsnprintf(str, plen+1, format, w);
+      va_end(w);
+    }
+  }
+
+  return str;
+}
+
+char *ProxyCreationError(int error, void *additional)
+{
+  char *str = NULL;
+
+  switch (error) {
+  case PROXY_NO_ERROR:
+    return NULL;
+    break;
+
+  case PROXY_ERROR_OPEN_FILE:
+    return vsnprintf_wrap("Error: cannot open file: %s\n%s\n", additional, strerror(errno));
+    break;
+
+  case PROXY_ERROR_FILE_READ:
+    return vsnprintf_wrap("Error: cannot read from file: %s\n%s\n", additional, strerror(errno));
+    break;
+
+  case PROXY_ERROR_STAT_FILE:
+    return vsnprintf_wrap("Error: cannot stat file: %s\n%s\n", additional, strerror(errno));
+    break;
+
+  case PROXY_ERROR_OUT_OF_MEMORY:
+    return vsnprintf_wrap("Error: out of memory");
+    break;
+
+  case PROXY_ERROR_UNKNOWN_BIT:
+    return vsnprintf_wrap("KeyUsage bit: %s unknown\n", additional);
+    break;
+
+  case PROXY_WARNING_GSI_ASSUMED:
+    return vsnprintf_wrap("\nNo policy language specified, Gsi impersonation proxy assumed.");
+    break;
+
+  case PROXY_WARNING_GENERIC_LANGUAGE_ASSUMED:
+    return vsnprintf_wrap("\nNo policy language specified with policy file, assuming generic.");
+    break;
+
+  default:
+    return vsnprintf_wrap("Unknown error");
+    break;
+  }
 }

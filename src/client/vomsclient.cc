@@ -829,7 +829,7 @@ bool Client::CreateProxy(std::string data, AC ** aclist, int version)
 
     struct VOMSProxy *proxy = VOMS_MakeProxy(args, &warn, &additional);
 
-    ProxyCreationError(warn, additional);
+    PrintProxyCreationError(warn, additional);
 
     if (proxy) {
       ret = VOMS_WriteProxy(proxyfile.c_str(), proxy);
@@ -848,45 +848,16 @@ bool Client::CreateProxy(std::string data, AC ** aclist, int version)
   return ret == -1;
 }
 
-void Client::ProxyCreationError(int error, void *additional)
+void Client::PrintProxyCreationError(int error, void *additional)
 {
-  switch (error) {
-  case PROXY_NO_ERROR:
-    break;
+  char *msg = ProxyCreationError(error, additional);
 
-  case PROXY_ERROR_OPEN_FILE:
-    Print(ERROR) << "Error: cannot open file: " 
-                 << (char *)additional << std::endl;
-    Print(ERROR) << strerror(errno) << std::endl;
-    break;
-
-  case PROXY_ERROR_FILE_READ:
-    Print(ERROR) << "Error: cannot read from file: "
-                 << (char *)additional << std::endl;
-    Print(ERROR) << strerror(errno) << std::endl;
-    break;
-
-  case PROXY_ERROR_STAT_FILE:
-    Print(ERROR) << "Error: cannot stat file: " 
-                 << (char *)additional << std::endl;
-    Print(ERROR) << strerror(errno) << std::endl;
-    break;
-
-  case PROXY_ERROR_OUT_OF_MEMORY:
-    Print(ERROR) << "Error: out of memory" << std::endl;
-    break;
-
-  case PROXY_WARNING_GSI_ASSUMED:
-    Print(DEBUG) << "\nNo policy language specified, Gsi impersonation proxy assumed." << std::endl;
-    break;
-
-  case PROXY_WARNING_GENERIC_LANGUAGE_ASSUMED:
-    Print (DEBUG) << "\nNo policy language specified with policy file, assuming generic." << std::endl;
-    break;
-
-  default:
-    Print(ERROR) << "Unknown error" << std::endl;
-    break;
+  if (msg) {
+    if (PROXY_ERROR_IS_WARNING(error))
+      Print(DEBUG) << msg;
+    else
+      Print(ERROR) << msg;
+    free(msg);
   }
 }
 

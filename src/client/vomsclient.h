@@ -156,7 +156,7 @@ class Client {
   bool LoadVomses();
   std::ostream& Print(message_type type);
   bool checkstats(char *file, int mode);
-  void ProxyCreationError(int, void *);
+  void PrintProxyCreationError(int, void *);
   AC *ReadSeparate(const std::string&);
   void PrintConnectResult(int status, const std::string& contact);
   void parse_time(const std::string& timespec, const std::string& option, int& hours, int& minutes);
