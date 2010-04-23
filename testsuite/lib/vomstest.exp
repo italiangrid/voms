@@ -77,8 +77,11 @@ proc _inittests {} {
                 <th align=\"left\">result</th>
                 <th align=\"left\">comment</th>
                 <th align=\"left\">artifacts</th><tr>"
-#        exec lcov --directory ../src/common --directory ../src/ac --directory ../src/sslutils --directory ../src/socklib --directory ../src/server --directory ../src/client --directory ../src/api/ccapi --directory ../src/utils -z -q
-#        exec lcov --directory ../src/common --directory ../src/ac --directory ../src/sslutils --directory ../src/socklib --directory ../src/server --directory ../src/client --directory ../src/api/ccapi --directory ../src/utils -i --capture -o zero.info -q
+        puts -nonewline "."
+        if [string equal $::DOCOVERAGE "yes"] then {
+            exec lcov --directory ../src/common --directory ../src/ac --directory ../src/sslutils --directory ../src/socklib --directory ../src/server --directory ../src/client --directory ../src/api/ccapi --directory ../src/utils -z -q >/dev/null
+            exec lcov --directory ../src/common --directory ../src/ac --directory ../src/sslutils --directory ../src/socklib --directory ../src/server --directory ../src/client --directory ../src/api/ccapi --directory ../src/utils -i --capture -o zero.info -q 2>/dev/null
+        }
         puts -nonewline "."
         _setupPKI
         puts -nonewline "."
