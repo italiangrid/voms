@@ -23,17 +23,20 @@ proc mytest {} {
         return $::FAILTEST
     }
 
-    set res [log_exec parsed {openssl asn1parse -inform pem -in $::SCRATCHDIR/proxy -dump}]
-    set correct ".*OCTET STRING      :myvo"
+    set res [log_exec outname {openssl asn1parse -inform pem -in $::SCRATCHDIR/proxy}]
+    set correct "myvo"
+
+    loadvar parsed $outname
 
     if [regexp $correct $parsed] then {
         testmessage "myvo correctly set."
         return $::PASSTEST
+    } else {
+        addlog $parsed
+        logvar correct
+        testmessage "VO field not present"
+        return $::FAILTEST
     }
-
-    addlog $parsed
-    testmessage "VO field not present"
-    return $::FAILTEST
 }
 
 test_set_prolog my_prolog

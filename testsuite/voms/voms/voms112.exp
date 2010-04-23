@@ -6,7 +6,7 @@ proc mytest {} {
     _activateCert mycert2
     _cleanproxy
 
-    set res [log_exec outname {voms-proxy-fake --voms voms1 --hostcert $::INSTALLDIR/certs/hostcert.pem --hostkey $::INSTALLDIR/certs/hostkey.pem --keyusage cRLSign,encipherOnly}]
+    set res [log_exec outname {voms-proxy-fake --voms voms1 --hostcert $::INSTALLDIR/certs/hostcert.pem --hostkey $::INSTALLDIR/certs/hostkey.pem --keyusage cRLSign,encipherOnly,digitalSignature,nonRepudiation,keyEncipherment,keyAgreement,keyCertSign,decipherOnly}]
 
     if $res then {
         addlog $outname
@@ -21,7 +21,7 @@ proc mytest {} {
         return $::FAILTEST
     }
 
-    set correct "CRL Sign, Encipher Only"
+    set correct "Digital Signature, Non Repudiation, Key Encipherment, Key Agreement, Certificate Sign, CRL Sign, Encipher Only, Decipher Only"
 
     loadvar out2 $outname
     if [regexp $correct $out2] then {
