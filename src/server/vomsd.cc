@@ -214,6 +214,7 @@ static void parse_order(const std::string &message, ordermap &ordering)
   bool init = true;
 
   LOGM(VARP, logh, LEV_DEBUG, T_PRE, "Initiating parse order: %s",message.c_str());
+
   while (position != std::string::npos) {
     LOG(logh, LEV_DEBUG, T_PRE, "Entered loop");
 
@@ -227,11 +228,14 @@ static void parse_order(const std::string &message, ordermap &ordering)
     /* There is a specified ordering */
     std::string::size_type end_token = message.find_first_of(',', position);
     std::string attribute;
+
     if (end_token == std::string::npos)
       attribute = message.substr(position);
     else
       attribute = message.substr(position, end_token - position);
+
     LOGM(VARP, logh, LEV_DEBUG, T_PRE, "Attrib: %s",attribute.c_str());
+
     std::string::size_type divider = attribute.find(':');
     std::string fqan;
 
@@ -294,7 +298,6 @@ VOMSServer::VOMSServer(int argc, char *argv[]) : sock(0,NULL,50,false),
                                                  gatekeeper_test(false),
                                                  daemon_port(DEFAULT_PORT),
                                                  foreground(false),
-                                                 globuspwd(""), globusid(""),
                                                  x509_cert_dir(""),
                                                  x509_cert_file(""),
                                                  x509_user_proxy(""),
@@ -393,7 +396,7 @@ VOMSServer::VOMSServer(int argc, char *argv[]) : sock(0,NULL,50,false),
 
   set_usage("[-help] [-usage] [-conf parmfile] [-foreground] [-port port]\n"
             "[-logfile file] [-passfile file] [-vo voname]\n"
-            "[-globusid globusid] [-globuspwd file] [-globus version]\n"
+            "[-globus version]\n"
             "[-x509_cert_dir path] [-x509_cert_file file]\n"
             "[-x509_user_cert file] [-x509_user_key file]\n"
             "[-dbname name] [-username name] [-contactstring name]\n"
@@ -584,18 +587,12 @@ VOMSServer::VOMSServer(int argc, char *argv[]) : sock(0,NULL,50,false),
 
   sock = GSISocketServer(daemon_port, NULL, backlog);
 
-  setenv("GLOBUSID", globusid.c_str(), 1);
-
   /*
    * Dont use default env proxy cert for gatekeeper if run as root
    * this might get left over. You can still use -x509_user_proxy
    */
 
   unsetenv("X509_USER_PROXY");
-
-  if (!globuspwd.empty()) {
-    setenv("GLOBUSPWD", globuspwd.c_str(), 1);
-  }
 
   if (!x509_cert_dir.empty()) {
     setenv("X509_CERT_DIR", x509_cert_dir.c_str(), 1);
@@ -1284,14 +1281,8 @@ void VOMSServer::UpdateOpts(void)
   uri = fakeuri;
   CreateURI(uri, daemon_port);
 
-  setenv("GLOBUSID", globusid.c_str(), 1);
-
   if (!getpasswd(passfile, logh)){
     throw VOMSInitException("can't read password file!");
-  }
-
-  if (!globuspwd.empty()) {
-    setenv("GLOBUSPWD", globuspwd.c_str(), 1);
   }
 
   if (!x509_cert_dir.empty()) {
