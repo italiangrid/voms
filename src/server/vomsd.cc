@@ -94,6 +94,8 @@ SOAP_NMAC struct Namespace namespaces[] =
 static const int DEFAULT_PORT    = 15000;
 static const int DEFAULT_TIMEOUT = 60;
 
+static std::string dummy;
+
 sqliface::interface *db = NULL;
 
 typedef std::map<std::string, int> ordermap;
@@ -350,8 +352,8 @@ VOMSServer::VOMSServer(int argc, char *argv[]) : sock(0,NULL,50,false),
     {"conf",            1, NULL,                      OPT_CONFIG},
     {"port",            1, &daemon_port,              OPT_NUM},
     {"logfile",         1, (int *)&logfile,           OPT_STRING},
-    {"globusid",        1, (int *)&globusid,          OPT_STRING},
-    {"globuspwd",       1, (int *)&globuspwd,         OPT_STRING},
+    {"globusid",        1, (int *)&dummy,             OPT_STRING},
+    {"globuspwd",       1, (int *)&dummy,             OPT_STRING},
     {"x509_cert_dir",   1, (int *)&x509_cert_dir,     OPT_STRING},
     {"x509_cert_file",  1, (int *)&x509_cert_file,    OPT_STRING},
     {"x509_user_proxy", 1, (int *)&x509_user_proxy,   OPT_STRING},
@@ -1184,8 +1186,8 @@ void VOMSServer::UpdateOpts(void)
     {"conf",            1, NULL,                      OPT_CONFIG},
     {"port",            1, &nport,                    OPT_NUM},
     {"logfile",         1, (int *)&nlogfile,          OPT_STRING},
-    {"globusid",        1, (int *)&globusid,          OPT_STRING},
-    {"globuspwd",       1, (int *)&globuspwd,         OPT_STRING},
+    {"globusid",        1, (int *)&dummy,             OPT_STRING},
+    {"globuspwd",       1, (int *)&dummy,             OPT_STRING},
     {"x509_cert_dir",   1, (int *)&x509_cert_dir,     OPT_STRING},
     {"x509_cert_file",  1, (int *)&x509_cert_file,    OPT_STRING},
     {"x509_user_proxy", 1, (int *)&x509_user_proxy,   OPT_STRING},
