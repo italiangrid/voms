@@ -82,6 +82,109 @@ extern int AC_Init(void);
 
 #include "ccwrite.h"
 
+
+class vomsresult {
+private:
+  std::string ac;
+  std::string data;
+  std::vector<errorp> errs;
+  bool base64;
+
+public:
+  vomsresult() : ac("A"), base64(true) {};
+
+  void setError(int num, std::string message) 
+  {
+    errorp t;
+    t.num = num;
+    t.message = message;
+    errs.push_back(t);
+  }
+
+  void setError(errorp p) 
+  {
+    errs.push_back(p);
+  }
+
+  void setBase64(bool b64)
+  {
+    base64 = b64;
+  }
+
+  void setAC(std::string ac)
+  {
+    this->ac = ac;
+  }
+
+  void setData(std::string data)
+  {
+    this->data = data;
+  }
+
+  std::string makeXMLAnswer(void)
+  {
+    return XML_Ans_Encode(ac, data, errs, base64);
+  }
+
+  std::string makeRESTAnswer(int& value);
+};
+
+std::string vomsresult::makeRESTAnswer(int& code)
+{
+  std::string output = "<?xml version=\"1.0\" encoding=\"UTF-8\"?><voms>";
+  code = SOAP_HTML;
+
+  if (ac != "A") {
+    std::string newac = Encode(ac, true);
+    output += "<ac>"+newac+"</ac>";
+  }
+
+  for (std::vector<errorp>::iterator i = errs.begin(); i != errs.end(); i++) {
+    bool warning = i->num < ERROR_OFFSET ? true : false;
+    
+    std::string strcode;
+
+    switch (i->num) {
+    case ERR_SUSPENDED:
+      strcode = "SuspendedUser";
+      code = 403;
+      break;
+
+    case ERR_NOT_MEMBER:
+      if (strstr(i->message.c_str(), "Unable to satisfy") == NULL) {
+        strcode = "NoSuchUser"; 
+        code = 403;
+      }
+      else {
+        strcode = "BadRequest";
+        code = 400;
+      }
+      break;
+
+    case ERR_NO_COMMAND:
+      strcode="BadRequest";
+      code = 400;
+      break;
+
+    default:
+      strcode = "InternalError";
+      code = 500;
+    }
+
+    if (warning)
+      output += "<warning>" + i->message + "</warning>";
+    else
+      output += "<error><code>" + strcode + "</code><message>" + i->message +
+        "</message></error>";
+
+    if (code != SOAP_HTML)
+      break;
+  }
+  output += "</voms>";
+
+  return output;
+}
+
 extern "C" {
   extern char *get_error(int);
 }
@@ -122,14 +225,14 @@ bool short_flags = false;
 static bool checkinside(gattrib g, std::vector<std::string> list);
 static void CreateURI(std::string &uri, int port);
 
-std::string
-makeACSSL(SSL *ssl, void *logh, const std::string& command, char **targets, int targsize, int requested, VOMSServer *v);
+bool
+makeACSSL(vomsresult &vr, SSL *ssl, void *logh, const std::string& command, char **targets, int targsize, int requested, VOMSServer *v);
 
 int
 makeACREST(struct soap *soap, void *logh, const std::string& command, int requested, int unknown);
 
-std::string makeAC(EVP_PKEY *key, X509 *issuer, X509 *holder, 
-                   const std::string &message, void *logh, VOMSServer *v);
+bool makeAC(vomsresult &vr, EVP_PKEY *key, X509 *issuer, X509 *holder, 
+            const std::string &message, void *logh, VOMSServer *v);
 
 int http_get(soap *soap);
 
@@ -477,7 +580,7 @@ VOMSServer::VOMSServer(int argc, char *argv[]) : sock(0,NULL,50,false),
       (void)SetCurLogType(logh, T_STARTUP);
       (void)LogService(logh, "vomsd");
       (void)LogFormat(logh, logf.c_str());
-      //      (void)LogDateFormat(logh, logdf.c_str());
+
       if (!nologfile)
         (void)LogActivate(logh, "FILE");
       if (do_syslog)
@@ -756,8 +859,8 @@ void VOMSServer::Run()
   catch (...) {}
 }
 
-std::string makeAC(EVP_PKEY *key, X509 *issuer, X509 *holder, 
-                   const std::string &message, void *logh, VOMSServer *v)
+bool makeAC(vomsresult& vr, EVP_PKEY *key, X509 *issuer, X509 *holder, 
+            const std::string &message, void *logh, VOMSServer *v)
 {
   LOGM(VARP, logh, LEV_DEBUG, T_PRE, "Received Request: %s", message.c_str());
 
@@ -765,12 +868,14 @@ std::string makeAC(EVP_PKEY *key, X509 *issuer, X509 *holder,
 
   if (!XML_Req_Decode(message, r)) {
     LOGM(VARP, logh, LEV_ERROR, T_PRE, "Unable to interpret command: %s",message.c_str());
+    vr.setError(ERR_NO_COMMAND, "Unable to intepret command: " + message);
     return false;
   }
 
   std::vector<std::string> comm = r.command;
 
-  bool dobase64 = v->base64encoding | r.base64;
+  vr.setBase64(v->base64encoding | r.base64);
+
   int requested = r.lifetime;
 
   std::vector<std::string> targs;
@@ -786,8 +891,6 @@ std::string makeAC(EVP_PKEY *key, X509 *issuer, X509 *holder,
   std::string command=comm[0];
   bool result = true;
   bool result2 = true;
-  std::vector<errorp> errs;
-  errorp err;
 
   /* Interpret user requests */
 
@@ -795,10 +898,9 @@ std::string makeAC(EVP_PKEY *key, X509 *issuer, X509 *holder,
     if (requested == -1)
       requested = v->validity;
     else if (v->validity < requested) {
-      err.num = WARN_SHORT_VALIDITY;
-      err.message = v->uri + ": The validity of this VOMS AC in your proxy is shortened to " +
-        stringify(v->validity, tmp) + " seconds!";
-      errs.push_back(err);
+      vr.setError(WARN_SHORT_VALIDITY,
+                  v->uri + ": The validity of this VOMS AC in your proxy is shortened to " +
+                  stringify(v->validity, tmp) + " seconds!");
       requested = v->validity;
     }
   }
@@ -810,12 +912,9 @@ std::string makeAC(EVP_PKEY *key, X509 *issuer, X509 *holder,
   sqliface::interface *newdb = db->getSession();
 
   if (!newdb) {
-    err.num = ERR_WITH_DB;
-    err.message = v->voname + ": Problems in DB communication.";
-
-    LOG(logh, LEV_ERROR, T_PRE, err.message.c_str());
-    errs.push_back(err);
-    return XML_Ans_Encode("A", errs, dobase64);
+    vr.setError(ERR_WITH_DB, v->voname + ": Problems in DB communication.");
+    LOGM(VARP, logh, LEV_ERROR, T_PRE, "%s: Problems in DB communication.", v->voname.c_str());
+    return false;
   }
 
   if (!newdb->operation(OPERATION_GET_USER, &uid, holder)) {
@@ -832,22 +931,24 @@ std::string makeAC(EVP_PKEY *key, X509 *issuer, X509 *holder,
   
     db->releaseSession(newdb);
 
+    std::string msg = "";
+
     if (code == ERR_USER_SUSPENDED) {
-      err.num = ERR_SUSPENDED;
-      err.message = std::string("User is currently suspended!\nSuspension reason: ") + message;
-    } else if (code != ERR_NO_DB) {
-      err.num = ERR_NOT_MEMBER;
-      err.message = v->voname + ": User unknown to this VO.";
+      msg = "User is currently suspended!\nSuspension reason: " + message;
+      vr.setError(ERR_SUSPENDED, msg);
+    }
+    else if (code != ERR_NO_DB) {
+      msg = v->voname + ": User unknown to this VO.";
+      vr.setError(ERR_NOT_MEMBER, msg);
     }
     else {
-      err.num = ERR_WITH_DB;
-      err.message = v->voname + ": Problems in DB communication.";
+      msg = v->voname + ": Problems in DB communication.";
+      vr.setError(ERR_WITH_DB, msg);
     }
 
 
-    LOG(logh, LEV_ERROR, T_PRE, err.message.c_str());
-    errs.push_back(err);
-    return XML_Ans_Encode("A", errs, dobase64);
+    LOG(logh, LEV_ERROR, T_PRE, msg.c_str());
+    return false;
   }
 
   LOGM(VARP, logh, LEV_INFO, T_PRE, "Userid = \"%ld\"", uid);
@@ -963,26 +1064,27 @@ std::string makeAC(EVP_PKEY *key, X509 *issuer, X509 *holder,
 
   if (!result) {
     LOG(logh, LEV_ERROR, T_PRE, "Error in executing request!");
-    err.num = ERR_NOT_MEMBER;
-    if (command == (std::string("G/")+ v->voname))
-      err.message = v->voname + ": User unknown to this VO.";
-    else
-      err.message = v->voname + ": Unable to satisfy " + command + " Request!";
 
-    LOG(logh, LEV_ERROR, T_PRE, err.message.c_str());
-    errs.push_back(err);
-    return XML_Ans_Encode("A", errs, dobase64);
+    std::string msg;
+
+    if (command == (std::string("G/")+ v->voname))
+      msg = v->voname + ": User unknown to this VO.";
+    else
+      msg = v->voname + ": Unable to satisfy " + command + " Request!";
+
+    vr.setError(ERR_NOT_MEMBER, msg);
+
+    LOG(logh, LEV_ERROR, T_PRE, msg.c_str());
+
+    return false;
   }
 
   if (!firstfqan.empty()) {
     std::vector<std::string>::iterator i = fqans.begin();
     if (i != fqans.end()) {
       LOGM(VARP, logh, LEV_DEBUG, T_PRE,  "fq = %s", firstfqan.c_str());
-      if (*i != firstfqan) {
-        err.num = WARN_NO_FIRST_SELECT;
-        err.message = "FQAN: " + *i + " is not the first selected!\n";
-        errs.push_back(err);
-      }
+      if (*i != firstfqan)
+        vr.setError(WARN_NO_FIRST_SELECT, "FQAN: " + *i + " is not the first selected!\n");
     }
   }
 
@@ -1042,18 +1144,14 @@ std::string makeAC(EVP_PKEY *key, X509 *issuer, X509 *holder,
     // no attributes can be send
     if (fqans.empty()) {
       LOG(logh, LEV_ERROR, T_PRE, "Error in executing request!");
-      err.num = ERR_ATTR_EMPTY;
-      err.message = v->voname + " : your certificate already contains attributes, only a subset of them can be issued.";
-      errs.push_back(err);
-      return XML_Ans_Encode("A", errs, dobase64);
+      vr.setError(ERR_ATTR_EMPTY, v->voname + " : your certificate already contains attributes, only a subset of them can be issued.");
+      return false;
     }
 
     // some attributes can't be send
     if(subset) {
       LOG(logh, LEV_ERROR, T_PRE, "Error in executing request!");
-      err.num = WARN_ATTR_SUBSET;
-      err.message = v->voname + " : your certificate already contains attributes, only a subset of them can be issued.";
-      errs.push_back(err);
+      vr.setError(WARN_ATTR_SUBSET, v->voname + " : your certificate already contains attributes, only a subset of them can be issued.");
     }
   }
 
@@ -1107,20 +1205,17 @@ std::string makeAC(EVP_PKEY *key, X509 *issuer, X509 *holder,
           }
           free(ttmp);
         }
-        else {
-          err.num = ERR_NOT_MEMBER;
-          err.message = std::string(get_error(res));
-          errs.push_back(err);
-        }
+        else
+          vr.setError(ERR_NOT_MEMBER, std::string(get_error(res)));
+
         AC_free(a);
       }
 
       if (res || codedac.empty()) {
         LOG(logh, LEV_ERROR, T_PRE, "Error in executing request!");
-        err.message = v->voname + ": Unable to satisfy " + command + " request due to database error.";
-        errs.push_back(err);
+        vr.setError(ERR_NOT_MEMBER, ": Unable to satisfy " + command + " request due to database error.");
         BN_free(serial);
-        return XML_Ans_Encode("A", errs, dobase64);
+        return false;
       }
     }
 
@@ -1137,16 +1232,16 @@ std::string makeAC(EVP_PKEY *key, X509 *issuer, X509 *holder,
         data += (*i).c_str() + std::string("\n");
     }
 
-    return XML_Ans_Encode(codedac, data, errs, dobase64);
+    vr.setAC(codedac);
+    vr.setData(data);
+    return true;
   }
   else if (!data.empty()) {
-    return XML_Ans_Encode("", data, errs, dobase64);
+    return false;
   }
   else {
-    err.num = ERR_NOT_MEMBER;
-    err.message = std::string("You are not a member of the ") + v->voname + " VO!";
-    errs.push_back(err);
-    return XML_Ans_Encode("", errs, dobase64);
+    vr.setError(ERR_NOT_MEMBER, std::string("You are not a member of the ") + v->voname + " VO!");
+    return false;
   }
 }
 
@@ -1168,7 +1263,10 @@ VOMSServer::Execute(EVP_PKEY *key, X509 *issuer, X509 *holder)
     }
   }
 
-  std::string answer = makeAC(key, issuer, holder, message, logh, this);
+  vomsresult vr;
+  (void)makeAC(vr, key, issuer, holder, message, logh, this);
+  std::string answer = vr.makeXMLAnswer();
+
   LOGM(VARP, logh, LEV_DEBUG, T_PRE, "Sending: %s", answer.c_str());
   sock.Send(answer);
 }
@@ -1413,8 +1511,8 @@ static bool checkinside(gattrib g, std::vector<std::string> list) {
   return !g.qualifier.empty() && not_in(g.qualifier, list);
 }
 
-std::string
-makeACSSL(SSL *ssl, void *logh, const std::string& command, char **targets, int targsize, int requested, VOMSServer *v)
+bool
+makeACSSL(vomsresult &vr, SSL *ssl, void *logh, const std::string& command, char **targets, int targsize, int requested, VOMSServer *v)
 {
   X509 *holder = SSL_get_peer_certificate(ssl);
   X509 *issuer = NULL;
@@ -1433,7 +1531,7 @@ makeACSSL(SSL *ssl, void *logh, const std::string& command, char **targets, int 
                         &issuer, NULL,  &key, pw_cb)) {
     X509_free(issuer);
     EVP_PKEY_free(key);
-    return "";
+    return false;
   }
 
   std::string targs = "";
@@ -1448,7 +1546,7 @@ makeACSSL(SSL *ssl, void *logh, const std::string& command, char **targets, int 
 
   std::string message = XML_Req_Encode(command, std::string(""), targs, requested);
 
-  std::string ret = makeAC(key, issuer, holder, message, logh, selfpointer);
+  bool ret = makeAC(vr, key, issuer, holder, message, logh, selfpointer);
   X509_free(issuer);
   EVP_PKEY_free(key);
 
@@ -1609,77 +1707,27 @@ static char *canonicalize_string(char *original)
   return original;
 }
 
-static int EncodeAnswerForRest(const std::string& input, int unknown, std::string& output);
-
 int
 makeACREST(struct soap *soap, void *logh, const std::string& command, int requested, int unknown)
 {
   char *targets = NULL;
 
-  std::string result = makeACSSL(soap->ssl, logh, command, &targets, 0, requested, selfpointer);
+  vomsresult vr;
 
-  std::string output;
+  if (unknown)
+    vr.setError(WARN_UNKNOWN_COMMAND, "Unknown parameters in the request were ignored!");
 
-  int value = EncodeAnswerForRest(result, unknown, output);
+  (void)makeACSSL(vr, soap->ssl, logh, command, &targets, 0, requested, selfpointer);
+
+  int value;
+  std::string output = vr.makeRESTAnswer(value);
+
   soap->http_content = "text/xml";
   soap_response(soap, value);
   soap_send(soap, output.c_str());
   soap_end_send(soap);
 
   return SOAP_OK;
-}
-
-static int EncodeAnswerForRest(const std::string& input, int unknown, std::string& output)
-{
-  answer a;
-
-  if (XML_Ans_Decode(input, a)) {
-    if (!a.ac.empty() && a.ac != "A") {
-      std::string ac = Encode(a.ac, !a.base64);
-
-      output = "<?xml version=\"1.0\" encoding=\"UTF-8\"?><voms><ac>" + ac + "</ac>";
-      std::vector<errorp> errs = a.errs;
-      for (std::vector<errorp>::iterator i = errs.begin(); i != errs.end(); i++)
-        output +="<warning>"+i->message+"</warning>";
-      if (unknown) 
-        output +="<warning>Unknown parameters in the request were ignored!</warning>";
-      output += "</voms>";
-      return SOAP_HTML;
-    }
-    else {
-      // some error occured.  Look inside
-      output = "<?xml version=\"1.0\" encoding=\"UTF-8\"?><voms><error>";
-      std::vector<errorp> errs = a.errs;
-      int value = 500;
-
-      for (std::vector<errorp>::iterator i = errs.begin(); i != errs.end(); i++) {
-        if (i->num == ERR_NOT_MEMBER) {
-          const char *msg = i->message.c_str();
-
-          if (strstr(msg, "Unable to satisfy") == NULL) {
-            output += "<code>NoSuchUser</code><message>" +
-              i->message + "</message>";
-            value = 403;
-          }
-          else {
-            output += "<code>BadRequest</code><message>"+i->message + "</message>";
-            value = 400;
-          }
-        }
-        else if (i->num == ERR_SUSPENDED) {
-          value = 403;
-          output +="<code>SuspendedUser</code><message>"+i->message+"</message>";
-        }
-      }
-      output +="</error></voms>";
-      return value;
-    }
-  }
-  else {
-      output = "<?xml version=\"1.0\" encoding=\"UTF-8\"?><voms><error>"
-        "<code>InternalError</code><message>Internal Error</message></voms>";
-      return 500;
-  }
 }
 
 static void CreateURI(std::string &uri, int port)
