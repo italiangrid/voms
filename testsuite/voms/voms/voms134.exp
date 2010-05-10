@@ -27,7 +27,7 @@ proc mytest {} {
 
     if {[string equal $out ""] } then {
         #VOMS did not run.  Let's check the logs
-        set correct ".*LOG_ERROR:STARTUP:VOMSServer \\(vomsd.cc:535\\):can\'t read password file\!.\""
+        set correct ".*LOG_ERROR:STARTUP:VOMSServer \\(vomsd.cc:\[0-9\]*\\):can\'t read password file\!.\""
 
         loadvar logs $::INSTALLDIR/var/log/voms.voms1
 
