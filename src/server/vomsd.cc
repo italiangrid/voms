@@ -123,10 +123,10 @@ static bool checkinside(gattrib g, std::vector<std::string> list);
 static void CreateURI(std::string &uri, int port);
 
 std::string
-makeACSSL(SSL *ssl, void *logh, const std::string& command, char **targets, int targsize, int requested, VOMSServer *v);
+makeACSSL(SSL *ssl, void *logh, const std::string& command, const std::string& orderstring, char **targets, int targsize, int requested, VOMSServer *v);
 
 int
-makeACREST(struct soap *soap, void *logh, const std::string& command, int requested, int unknown);
+makeACREST(struct soap *soap, void *logh, const std::string& command, const std::string& orderstring, int requested, int unknown);
 
 std::string makeAC(EVP_PKEY *key, X509 *issuer, X509 *holder, 
                    const std::string &message, void *logh, VOMSServer *v);
@@ -719,7 +719,16 @@ void VOMSServer::Run()
 
               (void)sock.Peek(3, peek);
 
-              LOGM(VARP, logh, LEV_INFO, T_PRE, "peek data: %s", peek.c_str());
+              LOGM(VARP, logh, LEV_DEBUG, T_PRE, "peek data: %s", peek.c_str());
+
+              if (peek == "0") {
+                LOG(logh, LEV_DEBUG, T_PRE, "worhtless message for GSI compatibility. Discard");
+                std::string tmp;
+                sock.Receive(tmp); 
+                LOGM(VARP, logh, LEV_DEBUG, T_PRE, " discarded: %s", tmp.c_str());
+                (void)sock.Peek(3, peek);
+                LOGM(VARP, logh, LEV_DEBUG, T_PRE, "peek data: %s", peek.c_str());
+              }
 
               if (peek == "GET") {
                 sop->socket = sock.newsock;
@@ -1414,7 +1423,7 @@ static bool checkinside(gattrib g, std::vector<std::string> list) {
 }
 
 std::string
-makeACSSL(SSL *ssl, void *logh, const std::string& command, char **targets, int targsize, int requested, VOMSServer *v)
+makeACSSL(SSL *ssl, void *logh, const std::string& command, const std::string &orderstring, char **targets, int targsize, int requested, VOMSServer *v)
 {
   X509 *holder = SSL_get_peer_certificate(ssl);
   X509 *issuer = NULL;
@@ -1446,7 +1455,7 @@ makeACSSL(SSL *ssl, void *logh, const std::string& command, char **targets, int 
     i++;
   }
 
-  std::string message = XML_Req_Encode(command, std::string(""), targs, requested);
+  std::string message = XML_Req_Encode(command, orderstring, targs, requested);
 
   std::string ret = makeAC(key, issuer, holder, message, logh, selfpointer);
   X509_free(issuer);
@@ -1554,7 +1563,7 @@ int http_get(soap *soap)
 
   std::string command = parse_fqan(fqans);
 
-  int res = makeACREST(soap, logh, command, lifetime, unknown);
+  int res = makeACREST(soap, logh, command, orderstring, lifetime, unknown);
 
   free(path);
 
@@ -1612,11 +1621,11 @@ static char *canonicalize_string(char *original)
 static int EncodeAnswerForRest(const std::string& input, int unknown, std::string& output);
 
 int
-makeACREST(struct soap *soap, void *logh, const std::string& command, int requested, int unknown)
+makeACREST(struct soap *soap, void *logh, const std::string& command, const std::string& orderstring, int requested, int unknown)
 {
   char *targets = NULL;
 
-  std::string result = makeACSSL(soap->ssl, logh, command, &targets, 0, requested, selfpointer);
+  std::string result = makeACSSL(soap->ssl, logh, command, orderstring, &targets, 0, requested, selfpointer);
 
   std::string output;
 

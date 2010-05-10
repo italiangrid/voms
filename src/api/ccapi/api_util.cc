@@ -836,11 +836,18 @@ vomsdata::my_conn(const std::string &hostname, int port, UNUSED(const std::strin
     return false;
   }
 
-  if (!sock.Receive(buf)) {
-    seterror(VERR_COMM, sock.GetError());
-    sock.Close();
-    return false;
-  }
+  std::string msg;
+  bool ret;
+
+  do {
+    ret = sock.Receive(msg);
+    if (!ret) {
+      seterror(VERR_COMM, sock.GetError());
+      sock.Close();
+      return false;
+    }
+    buf += msg;
+  } while (ret && ! msg.empty());
 
   sock.Close();
   return true;

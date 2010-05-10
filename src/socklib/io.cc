@@ -243,21 +243,23 @@ bool do_read(SSL *ssl, int timeout, std::string& output)
 
       if (ret2 <= 0) {
         expected = error = SSL_get_error(ssl, ret2);
-      }        
+      }
     }
   } while (TEST_SELECT(ret, ret2, timeout, curtime, starttime, expected)); 
             
-  if (ret <= 0 || ret2 <= 0) {
+  if (ret <= 0 || ret2 < 0) {
     if (timeout != -1 && (curtime - starttime <= timeout))
       output = "Connection stuck during read: timeout reached.";
     else
       output = "Error during SSL read:" + OpenSSLError(true);
     OPENSSL_free(buffer);
+    ERR_clear_error();
     return false;
   }
 
   output = std::string(buffer, ret2);
   OPENSSL_free(buffer);
+  ERR_clear_error();
   return true;
 
 }
