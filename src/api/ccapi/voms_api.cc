@@ -332,6 +332,20 @@ bool vomsdata::ContactRESTRaw(const std::string& hostname, int port, const std::
   if (!ordering.empty())
     realCommand +="&order=" + ordering;
 
+  if (targets.size() != 0) {
+    std::string targs;
+
+    for (std::vector<std::string>::iterator i = targets.begin(); 
+         i != targets.end(); i++) {
+      if (i == targets.begin())
+        targs = *i;
+      else
+        targs += std::string(",") + *i;
+    }
+
+    realCommand +="&targets="+targs;
+  }
+
   realCommand += std::string(" HTTP/1.0\n") + 
     "User-Agent: voms APIs 2.0\nAccept: */*\nHost: "+
     hostname+":"+ stringify(port,temp) +"\n\n";
@@ -373,7 +387,7 @@ bool vomsdata::Contact(std::string hostname, int port, UNUSED(std::string servsu
 
   for (int i=0; i < retry_count; ++i)
   {
-    if (ContactRESTRaw(hostname, port, command, message, version, timeout)) {
+    if (ContactRaw(hostname, port, servsubject, command, message, version, timeout)) {
 
       X509 *holder = get_own_cert();
 

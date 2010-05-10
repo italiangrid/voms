@@ -123,10 +123,10 @@ static bool checkinside(gattrib g, std::vector<std::string> list);
 static void CreateURI(std::string &uri, int port);
 
 std::string
-makeACSSL(SSL *ssl, void *logh, const std::string& command, const std::string& orderstring, char **targets, int targsize, int requested, VOMSServer *v);
+makeACSSL(SSL *ssl, void *logh, const std::string& command, const std::string& orderstring, const std::string& targets, int requested, VOMSServer *v);
 
 int
-makeACREST(struct soap *soap, void *logh, const std::string& command, const std::string& orderstring, int requested, int unknown);
+makeACREST(struct soap *soap, void *logh, const std::string& command, const std::string& orderstring, const std::string& targets, int requested, int unknown);
 
 std::string makeAC(EVP_PKEY *key, X509 *issuer, X509 *holder, 
                    const std::string &message, void *logh, VOMSServer *v);
@@ -139,8 +139,8 @@ static int (*pw_cb)() = NULL;
 
 static char *canonicalize_string(char *original);
 
-static int pwstdin_callback(char * buf, int num, UNUSED(int w)) {
-  
+static int pwstdin_callback(char * buf, int num, UNUSED(int w)) 
+{
   int i;
   
   if (!(fgets(buf, num, stdin))) {
@@ -1423,7 +1423,7 @@ static bool checkinside(gattrib g, std::vector<std::string> list) {
 }
 
 std::string
-makeACSSL(SSL *ssl, void *logh, const std::string& command, const std::string &orderstring, char **targets, int targsize, int requested, VOMSServer *v)
+makeACSSL(SSL *ssl, void *logh, const std::string& command, const std::string &orderstring, const std::string& targets, int requested, VOMSServer *v)
 {
   X509 *holder = SSL_get_peer_certificate(ssl);
   X509 *issuer = NULL;
@@ -1445,17 +1445,7 @@ makeACSSL(SSL *ssl, void *logh, const std::string& command, const std::string &o
     return "";
   }
 
-  std::string targs = "";
-
-  int i = 0;
-  while (i <targsize) {
-    if (i != 0)
-      targs += ",";
-    targs += std::string(targets[i]);
-    i++;
-  }
-
-  std::string message = XML_Req_Encode(command, orderstring, targs, requested);
+  std::string message = XML_Req_Encode(command, orderstring, targets, requested);
 
   std::string ret = makeAC(key, issuer, holder, message, logh, selfpointer);
   X509_free(issuer);
@@ -1493,6 +1483,7 @@ int http_get(soap *soap)
   std::vector<std::string> fqans;
   int lifetime = -1;
   std::string orderstring;
+  std::string targetstring;
   int size = 0;
 
   if (s) {
@@ -1548,6 +1539,9 @@ int http_get(soap *soap)
         else
           orderstring += ", " + std::string(cvalue);
       }
+      else if (strcmp(cname, "targets") == 0) {
+        targetstring = std::string(cvalue);
+      }
       else {
         /* purposefully ignore other parameters */
         /* but put it in an otherwise positive response */
@@ -1563,7 +1557,7 @@ int http_get(soap *soap)
 
   std::string command = parse_fqan(fqans);
 
-  int res = makeACREST(soap, logh, command, orderstring, lifetime, unknown);
+  int res = makeACREST(soap, logh, command, orderstring, targetstring, lifetime, unknown);
 
   free(path);
 
@@ -1621,11 +1615,9 @@ static char *canonicalize_string(char *original)
 static int EncodeAnswerForRest(const std::string& input, int unknown, std::string& output);
 
 int
-makeACREST(struct soap *soap, void *logh, const std::string& command, const std::string& orderstring, int requested, int unknown)
+makeACREST(struct soap *soap, void *logh, const std::string& command, const std::string& orderstring, const std::string& targets, int requested, int unknown)
 {
-  char *targets = NULL;
-
-  std::string result = makeACSSL(soap->ssl, logh, command, orderstring, &targets, 0, requested, selfpointer);
+  std::string result = makeACSSL(soap->ssl, logh, command, orderstring, targets, requested, selfpointer);
 
   std::string output;
 
