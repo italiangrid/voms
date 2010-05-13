@@ -91,7 +91,7 @@ private:
   bool base64;
 
 public:
-  vomsresult() : ac("A"), base64(true) {};
+  vomsresult() : ac("A"), data(""), base64(true) {};
 
   void setError(int num, std::string message) 
   {
@@ -126,7 +126,7 @@ public:
     return XML_Ans_Encode(ac, data, errs, base64);
   }
 
-  std::string makeRESTAnswer(int& value);
+  std::string makeRESTAnswer(int& code);
 };
 
 std::string vomsresult::makeRESTAnswer(int& code)
@@ -223,27 +223,31 @@ bool compat_flag = false;
 bool short_flags = false;
 
 static bool checkinside(gattrib g, std::vector<std::string> list);
-static void CreateURI(std::string &uri, int port);
-
-bool
-makeACSSL(vomsresult &vr, SSL *ssl, void *logh, const std::string& command, char **targets, int targsize, int requested, VOMSServer *v);
-
-int
-makeACREST(struct soap *soap, void *logh, const std::string& command, int requested, int unknown);
-
-bool makeAC(vomsresult &vr, EVP_PKEY *key, X509 *issuer, X509 *holder, 
-            const std::string &message, void *logh, VOMSServer *v);
-
-int http_get(soap *soap);
-
+static void AdjustURI(std::string &uri, int port);
+static bool get_parameter(char **path, char **name, char **value);
+static signed long int get_userid(sqliface::interface *db, X509 *cert, vomsresult &vr);
+static std::string addtoorder(std::string previous, char *group, char *role);
 static bool determine_group_and_role(std::string command, char *comm, char **group, char **role);
-
 static int (*pw_cb)() = NULL;
-
 static char *canonicalize_string(char *original);
+static bool makeACSSL(vomsresult &vr, SSL *ssl, const std::string& command, char **targets, int targsize, int requested, VOMSServer *v);
+static int makeACREST(struct soap *soap, const std::string& command, int requested, int unknown);
+static bool makeAC(vomsresult &vr, EVP_PKEY *key, X509 *issuer, X509 *holder, const std::string &message, VOMSServer *v);
+static int http_get(soap *soap);
+static BIGNUM *get_serial();
+static int pwstdin_callback(char * buf, int num, UNUSED(int w));
+static void sigchld_handler(UNUSED(int sig));
+static void sighup_handler(UNUSED(int sig));
+static void sigterm_handler(UNUSED(int sig));
+static bool compare(const std::string &lhs, const std::string &rhs);
+static void orderattribs(std::vector<std::string> &v);
+static void parse_order(const std::string &message, ordermap &ordering);
+static void parse_targets(const std::string &message, std::vector<std::string> &target);
+static bool not_in(std::string fqan, std::vector<std::string> fqans);
+static int hexint(char c);
 
-static int pwstdin_callback(char * buf, int num, UNUSED(int w)) {
-  
+static int pwstdin_callback(char * buf, int num, UNUSED(int w)) 
+{
   int i;
   
   if (!(fgets(buf, num, stdin))) {
@@ -273,7 +277,6 @@ sigchld_handler(UNUSED(int sig))
   signal(SIGCHLD, sigchld_handler);
   errno = save_errno;
 }
-static BIGNUM *get_serial();
 
 static void
 sighup_handler(UNUSED(int sig))
@@ -315,20 +318,12 @@ static void orderattribs(std::vector<std::string> &v)
 static void parse_order(const std::string &message, ordermap &ordering)
 {
   int order = 0;
-  std::string::size_type position = 0;
-  bool init = true;
+  std::string::size_type position = 0; // Will be set to 0 at first iteration
 
   LOGM(VARP, logh, LEV_DEBUG, T_PRE, "Initiating parse order: %s",message.c_str());
 
   while (position != std::string::npos) {
     LOG(logh, LEV_DEBUG, T_PRE, "Entered loop");
-
-    if (init) {
-      position = 0;
-      init = false;
-    }
-    else
-      position++;
 
     /* There is a specified ordering */
     std::string::size_type end_token = message.find_first_of(',', position);
@@ -344,53 +339,50 @@ static void parse_order(const std::string &message, ordermap &ordering)
     std::string::size_type divider = attribute.find(':');
     std::string fqan;
 
-    if (divider == std::string::npos) {
+    if (divider == std::string::npos)
       fqan = attribute;
-      if (firstfqan.empty()) {
-        firstfqan = fqan;
-      }
-    }
-    else {
+    else
       fqan = attribute.substr(0, divider) +
         "/Role=" + attribute.substr(divider+1);
 
-      if (firstfqan.empty())
-        firstfqan = fqan;
-    }
+    if (firstfqan.empty())
+      firstfqan = fqan;
 
     LOGM(VARP, logh, LEV_DEBUG, T_PRE, "Order: %s",fqan.c_str());
     ordering.insert(std::make_pair<std::string, int>(fqan,order));
     order++;
     position = end_token;
+
+    if (position != std::string::npos)
+      position ++;
   }
 }
 
 static void parse_targets(const std::string &message,
                           std::vector<std::string> &target)
 {
-  std::string::size_type position = 0;
-
-  bool init = true;
+  std::string::size_type position = 0; // Will be set to 0 at first iteration
 
   while (position != std::string::npos) {
-    if (!init)
-      position++;
-    else
-      init = false;
 
     /* There is a specified ordering */
     std::string::size_type end_token = message.find_first_of(',',position);
     std::string attribute;
+
     if (end_token == std::string::npos)
       attribute = message.substr(position);
     else
       attribute = message.substr(position, end_token - position);
+
     target.push_back(attribute);
     position = end_token;
+
+    if (position != std::string::npos)
+      position ++;
   }
 }
 
-bool not_in(std::string fqan, std::vector<std::string> fqans)
+static bool not_in(std::string fqan, std::vector<std::string> fqans)
 {
   return (find(fqans.begin(), fqans.end(), fqan) == fqans.end());
 }
@@ -445,7 +437,6 @@ VOMSServer::VOMSServer(int argc, char *argv[]) : sock(0,NULL,50,false),
 
   InitProxyCertInfoExtension(1);
 
-  std::string fakeuri = "";
   bool progversion = false;
 
   struct option opts[] = {
@@ -472,7 +463,7 @@ VOMSServer::VOMSServer(int argc, char *argv[]) : sock(0,NULL,50,false),
     {"mysql-socket",    1, (int *)&mysql_socket,      OPT_STRING},
     {"passfile",        1, (int *)&passfile,          OPT_STRING},
     {"vo",              1, (int *)&voname,            OPT_STRING},
-    {"uri",             1, (int *)&fakeuri,           OPT_STRING},
+    {"uri",             1, (int *)&uri,               OPT_STRING},
     {"globus",          1, &version,                  OPT_NUM},
     {"version",         0, (int *)&progversion,       OPT_BOOL},
     {"backlog",         1, &backlog,                  OPT_NUM},
@@ -687,8 +678,7 @@ VOMSServer::VOMSServer(int argc, char *argv[]) : sock(0,NULL,50,false),
     throw VOMSInitException((std::string("Error connecting to the database : ") + errormessage));
   }
 
-  uri = fakeuri;
-  CreateURI(uri, daemon_port);
+  AdjustURI(uri, daemon_port);
 
   sock = GSISocketServer(daemon_port, NULL, backlog);
 
@@ -859,8 +849,8 @@ void VOMSServer::Run()
   catch (...) {}
 }
 
-bool makeAC(vomsresult& vr, EVP_PKEY *key, X509 *issuer, X509 *holder, 
-            const std::string &message, void *logh, VOMSServer *v)
+static bool makeAC(vomsresult& vr, EVP_PKEY *key, X509 *issuer, X509 *holder, 
+                   const std::string &message, VOMSServer *v)
 {
   LOGM(VARP, logh, LEV_DEBUG, T_PRE, "Received Request: %s", message.c_str());
 
@@ -886,13 +876,14 @@ bool makeAC(vomsresult& vr, EVP_PKEY *key, X509 *issuer, X509 *holder,
   parse_targets(r.targets, targs);
 
   std::vector<gattrib> attributes;
-  std::string data = "";
   std::string tmp="";
   std::string command=comm[0];
   bool result = true;
   bool result2 = true;
 
   /* Interpret user requests */
+
+  /* Shorten validity if needed */
 
   if (requested != 0) {
     if (requested == -1)
@@ -917,37 +908,10 @@ bool makeAC(vomsresult& vr, EVP_PKEY *key, X509 *issuer, X509 *holder,
     return false;
   }
 
-  if (!newdb->operation(OPERATION_GET_USER, &uid, holder)) {
-    int code;
-    std::string message;
-    LOG(logh, LEV_ERROR, T_PRE, "Error in executing request!");
-    LOG(logh, LEV_ERROR, T_PRE, newdb->errorMessage());
-    code = newdb->error();
-    char *mes = newdb->errorMessage();
-    if (mes) 
-      message = std::string(mes);
-    else
-      message = "unknown";
-  
+  /* Determine user ID in the DB */
+
+  if ((uid = get_userid(newdb, holder, vr)) == -1) {
     db->releaseSession(newdb);
-
-    std::string msg = "";
-
-    if (code == ERR_USER_SUSPENDED) {
-      msg = "User is currently suspended!\nSuspension reason: " + message;
-      vr.setError(ERR_SUSPENDED, msg);
-    }
-    else if (code != ERR_NO_DB) {
-      msg = v->voname + ": User unknown to this VO.";
-      vr.setError(ERR_NOT_MEMBER, msg);
-    }
-    else {
-      msg = v->voname + ": Problems in DB communication.";
-      vr.setError(ERR_WITH_DB, msg);
-    }
-
-
-    LOG(logh, LEV_ERROR, T_PRE, msg.c_str());
     return false;
   }
 
@@ -959,6 +923,9 @@ bool makeAC(vomsresult& vr, EVP_PKEY *key, X509 *issuer, X509 *holder,
     setuporder = true;
 
   int k = 0;
+
+
+  /* Parse and execute requests */
 
   for(std::vector<std::string>::iterator i = comm.begin(); i != comm.end(); ++i) {
     char commletter = '\0';
@@ -982,12 +949,6 @@ bool makeAC(vomsresult& vr, EVP_PKEY *key, X509 *issuer, X509 *holder,
         if ((result = newdb->operation(OPERATION_GET_ROLE, &fqans, uid, role)))
           result2 = newdb->operation(OPERATION_GET_ROLE_ATTRIBS, &attribs, uid, role);
         result2 |= newdb->operation(OPERATION_GET_GROUPS_ATTRIBS, &attribs, uid);
-
-        if (setuporder) {
-          if (!r.order.empty())
-            r.order += ",";
-        r.order += std::string("/Role=") + role;
-        }
         break;
 
       case 'G':
@@ -997,26 +958,12 @@ bool makeAC(vomsresult& vr, EVP_PKEY *key, X509 *issuer, X509 *holder,
           else
             result2 = newdb->operation(OPERATION_GET_GROUPS_ATTRIBS, &attribs, uid);
         }
-
-        if (setuporder) {
-          if (!r.order.empty())
-            r.order += ",";
-          r.order += group;
-        }
-
         break;
 
       case 'B':
         if ((result = newdb->operation(OPERATION_GET_GROUPS_AND_ROLE, &fqans, uid, group, role)))
           result2 = newdb->operation(OPERATION_GET_GROUPS_AND_ROLE_ATTRIBS, &attribs, uid, group, role);
         result2 |= newdb->operation(OPERATION_GET_GROUPS_ATTRIBS, &attribs, uid);
-
-        if (setuporder) {
-          if (!r.order.empty())
-            r.order += ",";
-        r.order += group + std::string("/Role=") + role;
-        }
-
         break;
 
       case 'N':
@@ -1028,6 +975,9 @@ bool makeAC(vomsresult& vr, EVP_PKEY *key, X509 *issuer, X509 *holder,
         LOGM(VARP, logh, LEV_ERROR, T_PRE, "Unknown Command \"%c\"", commletter);
         break;
       }
+
+      if (setuporder)
+        r.order = addtoorder(r.order, group, role);
     }
     else
       result = false;
@@ -1041,10 +991,30 @@ bool makeAC(vomsresult& vr, EVP_PKEY *key, X509 *issuer, X509 *holder,
 
     if (!result2)
       LOGM(VARP, logh, LEV_DEBUG, T_PRE, "While retrieving attributes: %s", newdb->errorMessage());
-
   }
+
   db->releaseSession(newdb);
 
+  /* Error in executing queries ? */
+  if (!result) {
+    LOG(logh, LEV_ERROR, T_PRE, "Error in executing request!");
+
+    std::string msg;
+
+    if (command == (std::string("G/")+ v->voname) ||
+        command == (std::string("/") + v->voname))
+      msg = v->voname + ": User unknown to this VO.";
+    else
+      msg = v->voname + ": Unable to satisfy " + command + " Request!";
+
+    vr.setError(ERR_NOT_MEMBER, msg);
+
+    LOG(logh, LEV_ERROR, T_PRE, msg.c_str());
+
+    return false;
+  }
+
+  /* do ordering */
   LOGM(VARP, logh, LEV_DEBUG,T_PRE, "ordering: %s", r.order.c_str());
 
   parse_order(r.order, ordering);
@@ -1060,23 +1030,6 @@ bool makeAC(vomsresult& vr, EVP_PKEY *key, X509 *issuer, X509 *holder,
 
   if(result && !fqans.empty()) {
     orderattribs(fqans);
-  }
-
-  if (!result) {
-    LOG(logh, LEV_ERROR, T_PRE, "Error in executing request!");
-
-    std::string msg;
-
-    if (command == (std::string("G/")+ v->voname))
-      msg = v->voname + ": User unknown to this VO.";
-    else
-      msg = v->voname + ": Unable to satisfy " + command + " Request!";
-
-    vr.setError(ERR_NOT_MEMBER, msg);
-
-    LOG(logh, LEV_ERROR, T_PRE, msg.c_str());
-
-    return false;
   }
 
   if (!firstfqan.empty()) {
@@ -1136,7 +1089,7 @@ bool makeAC(vomsresult& vr, EVP_PKEY *key, X509 *issuer, X509 *holder,
     if (subset) {
       // remove attributes for qualifier which had been removed
       attribs.erase(remove_if(attribs.begin(), attribs.end(),
-                              bind2nd(ptr_fun(checkinside), fqans)),
+                              bind2nd(std::ptr_fun(checkinside), fqans)),
                     attribs.end());
     }
 
@@ -1158,6 +1111,9 @@ bool makeAC(vomsresult& vr, EVP_PKEY *key, X509 *issuer, X509 *holder,
   if (!fqans.empty()) {
     // test logging retrieved attributes
 
+    for (std::vector<std::string>::iterator i = fqans.begin(); i != fqans.end(); i++)
+      LOGM(VARP, logh, LEV_INFO, T_PRE, "Request Result: %s",  (*i).c_str());
+
     if (LogLevelMin(logh, LEV_DEBUG)) {
       if(result && !attributes.empty()) {
         for(std::vector<gattrib>::iterator i = attributes.begin(); i != attributes.end(); ++i)
@@ -1167,30 +1123,34 @@ bool makeAC(vomsresult& vr, EVP_PKEY *key, X509 *issuer, X509 *holder,
         LOGM(VARP, logh, LEV_DEBUG, T_PRE,  "User got no attributes or something went wrong searching for them.");
     }
 
-    std::vector<std::string> attributes_compact;
-    for(std::vector<gattrib>::iterator i = attribs.begin(); i != attribs.end(); ++i)
-      attributes_compact.push_back(i->str());
-
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-    BIGNUM * serial = get_serial();
 
     int res = 1;
     std::string codedac;
+    std::string data;
 
     if (comm[0] != "N") {
+      BIGNUM * serial = get_serial();
+
       if (!serial)
         LOG(logh, LEV_ERROR, T_PRE, "Can't get Serial Number!");
-
-      if (serial) {
+      else {
+        /* Make AC */
         AC *a = AC_new();
 
         LOGM(VARP, logh, LEV_DEBUG, T_PRE, "length = %d", i2d_AC(a, NULL));
-        if (a)
+        if (a) {
+          std::vector<std::string> attributes_compact;
+
+          for(std::vector<gattrib>::iterator i = attribs.begin(); i != attribs.end(); ++i)
+            attributes_compact.push_back(i->str());
+
           res = createac(issuer, v->sock.own_stack, holder, key, serial,
                          fqans, targs, attributes_compact, &a, v->voname, v->uri, requested, !v->newformat,
                          NULL);
+        }
 
+        /* Encode AC */
         if (!res) {
           unsigned int len = i2d_AC(a, NULL);
 
@@ -1209,35 +1169,27 @@ bool makeAC(vomsresult& vr, EVP_PKEY *key, X509 *issuer, X509 *holder,
           vr.setError(ERR_NOT_MEMBER, std::string(get_error(res)));
 
         AC_free(a);
+        BN_free(serial);
       }
 
       if (res || codedac.empty()) {
         LOG(logh, LEV_ERROR, T_PRE, "Error in executing request!");
         vr.setError(ERR_NOT_MEMBER, ": Unable to satisfy " + command + " request due to database error.");
-        BN_free(serial);
         return false;
       }
     }
+    else {
+      /* comm[0] == "N" */
 
-    BN_free(serial);
-    serial = NULL;
-    (void)SetCurLogType(logh, T_RESULT);
-
-    if (comm[0] == "N")
-      data = "";
-
-    for (std::vector<std::string>::iterator i = fqans.begin(); i != fqans.end(); i++) {
-      LOGM(VARP, logh, LEV_INFO, T_PRE, "Request Result: %s",  (*i).c_str());
-      if (comm[0] == "N")
+      for (std::vector<std::string>::iterator i = fqans.begin(); i != fqans.end(); i++)
         data += (*i).c_str() + std::string("\n");
     }
+
+    (void)SetCurLogType(logh, T_RESULT);
 
     vr.setAC(codedac);
     vr.setData(data);
     return true;
-  }
-  else if (!data.empty()) {
-    return false;
   }
   else {
     vr.setError(ERR_NOT_MEMBER, std::string("You are not a member of the ") + v->voname + " VO!");
@@ -1264,7 +1216,7 @@ VOMSServer::Execute(EVP_PKEY *key, X509 *issuer, X509 *holder)
   }
 
   vomsresult vr;
-  (void)makeAC(vr, key, issuer, holder, message, logh, this);
+  (void)makeAC(vr, key, issuer, holder, message, this);
   std::string answer = vr.makeXMLAnswer();
 
   LOGM(VARP, logh, LEV_DEBUG, T_PRE, "Sending: %s", answer.c_str());
@@ -1274,7 +1226,6 @@ VOMSServer::Execute(EVP_PKEY *key, X509 *issuer, X509 *holder)
 void VOMSServer::UpdateOpts(void)
 {
   std::string nlogfile = logfile;
-  std::string fakeuri = "";
   int nblog = 50;
   bool progversion = false;
   int nport;
@@ -1301,7 +1252,7 @@ void VOMSServer::UpdateOpts(void)
     {"mysql-socket",    1, (int *)&mysql_socket,      OPT_STRING},
     {"passfile",        1, (int *)&passfile,          OPT_STRING},
     {"vo",              1, (int *)&voname,            OPT_STRING},
-    {"uri",             1, (int *)&fakeuri,           OPT_STRING},
+    {"uri",             1, (int *)&uri,               OPT_STRING},
     {"globus",          1, &version,                  OPT_NUM},
     {"version",         0, (int *)&progversion,       OPT_BOOL},
     {"backlog",         1, &nblog,                    OPT_NUM},
@@ -1364,7 +1315,6 @@ void VOMSServer::UpdateOpts(void)
     if (lev == LEV_DEBUG)
       logt = T_STARTUP|T_REQUEST|T_RESULT;
 
-
     (void)LogType(logh, logt);
     (void)SetCurLogType(logh, T_STARTUP);
     (void)LogService(logh, "vomsd");
@@ -1378,8 +1328,7 @@ void VOMSServer::UpdateOpts(void)
   else if (nblog != backlog)
     sock.AdjustBacklog(backlog = nblog);
 
-  uri = fakeuri;
-  CreateURI(uri, daemon_port);
+  AdjustURI(uri, daemon_port);
 
   if (!getpasswd(passfile, logh)){
     throw VOMSInitException("can't read password file!");
@@ -1456,7 +1405,7 @@ static bool determine_group_and_role(std::string command, char *comm, char **gro
     char *divider2 = strstr(string, ":");
     if (divider) {
       if (divider == string) {
-        *group = string;
+        *group = NULL;
         *role = divider + 6;
         *comm = 'R';
       }
@@ -1469,7 +1418,7 @@ static bool determine_group_and_role(std::string command, char *comm, char **gro
     }
     else if (divider2) {
       if (divider2 == string) {
-        *group = string;
+        *group = NULL;
         *role = divider2+1;
         *comm = 'R';
       }
@@ -1507,12 +1456,13 @@ static bool determine_group_and_role(std::string command, char *comm, char **gro
 }
 
 
-static bool checkinside(gattrib g, std::vector<std::string> list) {
+static bool checkinside(gattrib g, std::vector<std::string> list) 
+{
   return !g.qualifier.empty() && not_in(g.qualifier, list);
 }
 
-bool
-makeACSSL(vomsresult &vr, SSL *ssl, void *logh, const std::string& command, char **targets, int targsize, int requested, VOMSServer *v)
+static bool
+makeACSSL(vomsresult &vr, SSL *ssl, const std::string& command, char **targets, int targsize, int requested, VOMSServer *v)
 {
   X509 *holder = SSL_get_peer_certificate(ssl);
   X509 *issuer = NULL;
@@ -1537,7 +1487,8 @@ makeACSSL(vomsresult &vr, SSL *ssl, void *logh, const std::string& command, char
   std::string targs = "";
 
   int i = 0;
-  while (i <targsize) {
+
+  while (i < targsize) {
     if (i != 0)
       targs += ",";
     targs += std::string(targets[i]);
@@ -1546,14 +1497,14 @@ makeACSSL(vomsresult &vr, SSL *ssl, void *logh, const std::string& command, char
 
   std::string message = XML_Req_Encode(command, std::string(""), targs, requested);
 
-  bool ret = makeAC(vr, key, issuer, holder, message, logh, selfpointer);
+  bool ret = makeAC(vr, key, issuer, holder, message, selfpointer);
   X509_free(issuer);
   EVP_PKEY_free(key);
 
   return ret;
 }
 
-int http_get(soap *soap)
+static int http_get(soap *soap)
 {
   char *path = strdup(soap->path);
   int unknown = 0;
@@ -1571,6 +1522,7 @@ int http_get(soap *soap)
   char *prepath=canonicalize_string(path);
 
   if (strcmp(prepath, "/generate-ac") != 0) {
+    free(path);
     soap_response(soap,404);
     soap_end_send(soap);
     return 404;
@@ -1582,7 +1534,6 @@ int http_get(soap *soap)
   std::vector<std::string> fqans;
   int lifetime = -1;
   std::string orderstring;
-  int size = 0;
 
   if (s) {
     ++s;
@@ -1595,23 +1546,17 @@ int http_get(soap *soap)
     }
 
     char *basis = s;
-    char *next = NULL;
 
     do {
-      next = strchr(basis, '&');
+      char *cname;
+      char *cvalue;
 
-      if (next)
-        *next='\0';
-
-      char *equal = strchr(basis, '=');
-      if (!equal)
+      if (!get_parameter(&basis, &cname, &cvalue)) {
+        free(path);
+        soap_response(soap, 404);
+        soap_end_send(soap);
         return 500;
-      *equal='\0';
-
-      char *name   = basis;
-      char *value  = equal+1;
-      char *cname  = canonicalize_string(name);
-      char *cvalue = canonicalize_string(value);
+      }
 
       if (strcmp(cname, "lifetime") == 0)
         lifetime = atoi(cvalue);
@@ -1624,11 +1569,8 @@ int http_get(soap *soap)
           fqans.push_back(std::string(cvalue));
           cvalue = ++position;
           position = strchr(cvalue, ',');
-          size ++;
         }
         fqans.push_back(std::string(cvalue));
-
-        size++;
       }
 
       else if (strcmp(cname, "order") == 0) {
@@ -1642,21 +1584,47 @@ int http_get(soap *soap)
         /* but put it in an otherwise positive response */
         unknown = 1;
       }
-      if (next)
-        basis = next+1;
-    } while (next);
+    } while (basis);
   }
 
-  if (!size)
+  if (fqans.size()==0)
     fqans.push_back(maingroup);
 
   std::string command = parse_fqan(fqans);
 
-  int res = makeACREST(soap, logh, command, lifetime, unknown);
+  int res = makeACREST(soap, command, lifetime, unknown);
 
   free(path);
 
   return res;
+}
+
+static bool get_parameter(char **path, char **name, char **value)
+{
+  if (!path || !name || !value)
+    return false;
+
+  char* next = strchr(*path, '&');
+
+  if (next)
+    *next='\0';
+
+  char *equal = strchr(*path, '=');
+
+  if (!equal)
+    return false;
+
+  *equal='\0';
+
+  *name = *path;
+  *value = equal+1;
+
+  if (next)
+    *path = ++next;
+  else 
+    *path = next;
+
+  return true;
 }
 
 static int hexint(char c)
@@ -1707,8 +1675,8 @@ static char *canonicalize_string(char *original)
   return original;
 }
 
-int
-makeACREST(struct soap *soap, void *logh, const std::string& command, int requested, int unknown)
+static int
+makeACREST(struct soap *soap, const std::string& command, int requested, int unknown)
 {
   char *targets = NULL;
 
@@ -1717,7 +1685,7 @@ makeACREST(struct soap *soap, void *logh, const std::string& command, int reques
   if (unknown)
     vr.setError(WARN_UNKNOWN_COMMAND, "Unknown parameters in the request were ignored!");
 
-  (void)makeACSSL(vr, soap->ssl, logh, command, &targets, 0, requested, selfpointer);
+  (void)makeACSSL(vr, soap->ssl, command, &targets, 0, requested, selfpointer);
 
   int value;
   std::string output = vr.makeRESTAnswer(value);
@@ -1730,7 +1698,7 @@ makeACREST(struct soap *soap, void *logh, const std::string& command, int reques
   return SOAP_OK;
 }
 
-static void CreateURI(std::string &uri, int port)
+static void AdjustURI(std::string &uri, int port)
 {
   if (uri.empty()) {
     int   hostnamesize = 50;
@@ -1749,4 +1717,53 @@ static void CreateURI(std::string &uri, int port)
 
     delete[] hostname;
   }
+}
+
+static signed long int get_userid(sqliface::interface *db, X509 *cert, vomsresult &vr)
+{
+  signed long int uid = -1;
+
+  if (!db->operation(OPERATION_GET_USER, &uid, cert)) {
+    std::string message = db->errorMessage() ? db->errorMessage() : "unknown";
+
+    LOG(logh, LEV_ERROR, T_PRE, "Error in executing request!");
+    LOG(logh, LEV_ERROR, T_PRE, message.c_str());
+
+    int code = db->error();
+  
+    std::string msg;
+
+    if (code == ERR_USER_SUSPENDED) {
+      msg = "User is currently suspended!\nSuspension reason: " + 
+        std::string(message);
+
+      vr.setError(ERR_SUSPENDED, msg);
+    }
+    else if (code != ERR_NO_DB) {
+      msg = VOName + ": User unknown to this VO.";
+      vr.setError(ERR_NOT_MEMBER, msg);
+    }
+    else {
+      msg = VOName + ": Problems in DB communication.";
+      vr.setError(ERR_WITH_DB, msg);
+    }
+
+    LOG(logh, LEV_ERROR, T_PRE, msg.c_str());
+  }
+  return uid;
+}
+
+static std::string addtoorder(std::string previous, char *group, char *role)
+{
+  if (!group && !role)
+    return previous;
+
+  if (!previous.empty())
+    previous += ",";
+
+  previous +=
+    (group ? std::string(group) : "") +
+    (role  ? std::string("/Role=") + role : "");
+
+  return previous;
 }
