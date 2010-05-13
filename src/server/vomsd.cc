@@ -134,15 +134,11 @@ std::string vomsresult::makeRESTAnswer(int& code)
   std::string output = "<?xml version=\"1.0\" encoding=\"UTF-8\"?><voms>";
   code = SOAP_HTML;
 
-  if (ac != "A" && !ac.empty()) {
-    std::string newac = Encode(ac, true);
-    output += "<ac>"+newac+"</ac>";
-  }
+  if (ac != "A" && !ac.empty())
+    output += "<ac>"+Encode(ac, true)+"</ac>";
 
-  if (!data.empty()) {
-    std::string newdata = Encode(newdata, true);
-    output += "<bitstr>"+newdata+"</bitstr>";
-  }
+  if (!data.empty())
+    output += "<bitstr>"+Encode(data, true)+"</bitstr>";
 
   for (std::vector<errorp>::iterator i = errs.begin(); i != errs.end(); i++) {
     bool warning = i->num < ERROR_OFFSET ? true : false;
