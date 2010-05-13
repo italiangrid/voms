@@ -36,7 +36,7 @@ Target: [exec hostname]"
             addlog $::_buildout 
 
             testmessage "read from file incorrect"
-            reurn $::FAILTEST
+            return $::FAILTEST
         }
     }
 }

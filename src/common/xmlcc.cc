@@ -495,6 +495,25 @@ static void endans(void *userdata, const char *name)
            (a->depth == 3)) {
     a->message = a->value;
   }
+  else if (!strcmp(name, "warning")) {
+    struct errorp e;
+    e.num = WARN_OFFSET;
+    e.message = a->value;
+    a->a->errs.push_back(e);
+  }
+  else if ((!strcmp(name, "code")) && 
+           (a->depth == 3)) {
+    const char *msg = a->value.c_str();
+
+    if (!strcmp(msg, "NoSuchUser"))
+      a->num = ERR_NOT_MEMBER;
+    else if (!strcmp(msg, "SuspendedUser"))
+      a->num = ERR_SUSPENDED;
+    else if (!strcmp(msg, "BadReqquest"))
+      a->num = ERR_WITH_DB;
+    else
+      a->num = ERR_UNEXPECTED_ERROR;
+  }
   else if ((!strcmp(name, "version"))) {
     a->a->version = atoi(a->value.c_str());
   }

@@ -94,6 +94,8 @@ decouple_cred(gss_cred_id_t credential, STACK_OF(X509) **stk)
   return ((gss2_cred_id_desc *)credential)->cred_handle->cert;
 }
 
+static std::string parse_commands(const std::string& commands);
+
 extern int AC_Init(void);
 
 std::map<vomsdata*, vomsspace::internal*> privatedata;
@@ -234,6 +236,42 @@ bool vomsdata::ContactRaw(std::string hostname, int port, std::string servsubjec
   return ContactRaw(hostname, port, servsubject, command, raw, version, -1);
 }
 
+bool vomsdata::InterpretOutput(const std::string &message, std::string& output)
+{
+  answer a;
+  
+  if (XML_Ans_Decode(message, a)) {
+    bool result = true;
+
+    if (!a.ac.empty()) {
+      output = a.ac;
+      if (a.errs.size() != 0) {
+        for (std::vector<errorp>::iterator i = a.errs.begin();
+             i != a.errs.end(); i++) {
+          serverrors += i->message;
+          if (i->num > ERROR_OFFSET)
+            result = false;
+          if (i->num == WARN_NO_FIRST_SELECT)
+            seterror(VERR_ORDER, "Cannot put requested attributes in the specified order.");
+        }
+      }
+    }
+    else if (!a.data.empty()) {
+      output = a.data;
+    }
+    if (!result && ver_type) {
+      seterror(VERR_SERVERCODE, "The server returned an error.");
+      return false;
+    }
+  }
+  else {
+    seterror(VERR_FORMAT, "Server Answer was incorrectly formatted.");
+    return false;
+  }
+
+  return true;
+}
+
 bool vomsdata::ContactRaw(std::string hostname, int port, std::string servsubject, std::string command, std::string &raw, int& version, int timeout)
 {
   std::string buffer;
@@ -242,7 +280,14 @@ bool vomsdata::ContactRaw(std::string hostname, int port, std::string servsubjec
 
   std::string comm;
   std::string targs;
-  answer a;
+
+  version = 1;
+
+  /* Try REST connection first */
+  bool ret = ContactRESTRaw(hostname, port, command, raw, version, timeout);
+
+  if (ret)
+    return ret;
 
   for (std::vector<std::string>::iterator i = targets.begin(); 
        i != targets.end(); i++) {
@@ -256,38 +301,9 @@ bool vomsdata::ContactRaw(std::string hostname, int port, std::string servsubjec
 
   if (!contact(hostname, port, servsubject, comm, buffer, subject, ca, timeout))
     return false;
-  
-  if (XML_Ans_Decode(buffer, a)) {
-    bool result = true;
-    if (!a.ac.empty()) {
-      buffer = a.ac;
-      if (a.errs.size() != 0) {
-        for (std::vector<errorp>::iterator i = a.errs.begin();
-             i != a.errs.end(); i++) {
-          serverrors += i->message;
-          if (i->num > ERROR_OFFSET)
-            result = false;
-          if (i->num == WARN_NO_FIRST_SELECT)
-            seterror(VERR_ORDER, "Cannot put requested attributes in the specified order.");
-        }
-      }
-    }
-    else if (!a.data.empty()) {
-      buffer = a.data;
-    }
-    if (!result && ver_type) {
-      seterror(VERR_SERVERCODE, "The server returned an error.");
-      return false;
-    }
-    raw = buffer;
-  }
-  else {
-    seterror(VERR_FORMAT, "Server Answer was incorrectly formatted.");
-    return false;
-  }
 
   version = 1;
-  return true;
+  return InterpretOutput(buffer, raw);
 }
 
 static X509 *get_own_cert()
@@ -305,11 +321,62 @@ static X509 *get_own_cert()
 }
 
 
+bool vomsdata::ContactRESTRaw(const std::string& hostname, int port, const std::string& command, std::string& raw, UNUSED(int version), int timeout)
+{
+  std::string temp;
+
+  std::string realCommand = "GET /generate-ac?fqans="+ parse_commands(command);
+
+  realCommand += "&lifetime="+ stringify(duration, temp);
+
+  if (!ordering.empty())
+    realCommand +="&order=" + ordering;
+
+  if (targets.size() != 0) {
+    std::string targs;
+
+    for (std::vector<std::string>::iterator i = targets.begin(); 
+         i != targets.end(); i++) {
+      if (i == targets.begin())
+        targs = *i;
+      else
+        targs += std::string(",") + *i;
+    }
+
+    realCommand +="&targets="+targs;
+  }
+
+  realCommand += std::string(" HTTP/1.0\n") + 
+    "User-Agent: voms APIs 2.0\nAccept: */*\nHost: "+
+    hostname+":"+ stringify(port,temp) +"\n\n";
+
+  std::string user, userca, output;
+  bool res = contact(hostname, port, "", realCommand, output, user, userca, timeout);
+
+  bool ret = false;
+
+  if (res) {
+    std::string::size_type pos = output.find("<?xml");
+
+    if (pos != std::string::npos)
+      ret = InterpretOutput(output.substr(pos), raw);
+
+    if (ret) 
+      if (!(output.substr(0,12) == "HTTP/1.1 200"))
+        return false;
+    
+    return ret;
+  }
+
+  return ret;
+}
+
 bool vomsdata::Contact(std::string hostname, int port, std::string servsubject, std::string command) {
   return Contact(hostname, port, servsubject, command, -1);
 }
 
-bool vomsdata::Contact(std::string hostname, int port, std::string servsubject, std::string command, int timeout)
+
+bool vomsdata::Contact(std::string hostname, int port, UNUSED(std::string servsubject), std::string command, int timeout)
 {
   std::string subject, ca;
   char *s = NULL, *c = NULL;
@@ -940,4 +1007,30 @@ bool vomsdata::LoadCredentials(X509 *cert, EVP_PKEY *pkey, STACK_OF(X509) *chain
     return false;
   }
   return true;
+}
+
+
+static void change(std::string &name, const std::string& from, const std::string& to) 
+{
+  std::string::size_type pos = name.find(from);
+
+  while (pos != std::string::npos) {
+    name = name.substr(0, pos) + to + name.substr(pos+from.length());
+    pos = name.find(from, pos+1);
+  }
+}
+
+static std::string parse_commands(const std::string& commands)
+{
+  if (commands[0] == '/')
+    return commands;
+
+  std::string temp = commands;
+
+  change(temp, ":", "/Role=");
+  change(temp, "G/", "/");
+  change(temp, "B/", "/");
+  change(temp, "R/", "/Role=");
+
+  return temp;
 }

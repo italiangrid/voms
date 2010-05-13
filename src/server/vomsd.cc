@@ -134,9 +134,14 @@ std::string vomsresult::makeRESTAnswer(int& code)
   std::string output = "<?xml version=\"1.0\" encoding=\"UTF-8\"?><voms>";
   code = SOAP_HTML;
 
-  if (ac != "A") {
+  if (ac != "A" && !ac.empty()) {
     std::string newac = Encode(ac, true);
     output += "<ac>"+newac+"</ac>";
+  }
+
+  if (!data.empty()) {
+    std::string newdata = Encode(newdata, true);
+    output += "<bitstr>"+newdata+"</bitstr>";
   }
 
   for (std::vector<errorp>::iterator i = errs.begin(); i != errs.end(); i++) {
@@ -230,8 +235,8 @@ static std::string addtoorder(std::string previous, char *group, char *role);
 static bool determine_group_and_role(std::string command, char *comm, char **group, char **role);
 static int (*pw_cb)() = NULL;
 static char *canonicalize_string(char *original);
-static bool makeACSSL(vomsresult &vr, SSL *ssl, const std::string& command, char **targets, int targsize, int requested, VOMSServer *v);
-static int makeACREST(struct soap *soap, const std::string& command, int requested, int unknown);
+static bool makeACSSL(vomsresult &vr, SSL *ssl, const std::string& command, const std::string &orderstring, const std::string& targets, int requested, VOMSServer *v);
+static int makeACREST(struct soap *soap, const std::string& command, const std::string& orderstring, const std::string& targets, int requested, int unknown);
 static bool makeAC(vomsresult &vr, EVP_PKEY *key, X509 *issuer, X509 *holder, const std::string &message, VOMSServer *v);
 static int http_get(soap *soap);
 static BIGNUM *get_serial();
@@ -812,7 +817,16 @@ void VOMSServer::Run()
 
               (void)sock.Peek(3, peek);
 
-              LOGM(VARP, logh, LEV_INFO, T_PRE, "peek data: %s", peek.c_str());
+              LOGM(VARP, logh, LEV_DEBUG, T_PRE, "peek data: %s", peek.c_str());
+
+              if (peek == "0") {
+                LOG(logh, LEV_DEBUG, T_PRE, "worhtless message for GSI compatibility. Discard");
+                std::string tmp;
+                sock.Receive(tmp); 
+                LOGM(VARP, logh, LEV_DEBUG, T_PRE, " discarded: %s", tmp.c_str());
+                (void)sock.Peek(3, peek);
+                LOGM(VARP, logh, LEV_DEBUG, T_PRE, "peek data: %s", peek.c_str());
+              }
 
               if (peek == "GET") {
                 sop->socket = sock.newsock;
@@ -1462,7 +1476,7 @@ static bool checkinside(gattrib g, std::vector<std::string> list)
 }
 
 static bool
-makeACSSL(vomsresult &vr, SSL *ssl, const std::string& command, char **targets, int targsize, int requested, VOMSServer *v)
+makeACSSL(vomsresult &vr, SSL *ssl, const std::string& command, const std::string &orderstring, const std::string& targets, int requested, VOMSServer *v)
 {
   X509 *holder = SSL_get_peer_certificate(ssl);
   X509 *issuer = NULL;
@@ -1484,18 +1498,7 @@ makeACSSL(vomsresult &vr, SSL *ssl, const std::string& command, char **targets, 
     return false;
   }
 
-  std::string targs = "";
-
-  int i = 0;
-
-  while (i < targsize) {
-    if (i != 0)
-      targs += ",";
-    targs += std::string(targets[i]);
-    i++;
-  }
-
-  std::string message = XML_Req_Encode(command, std::string(""), targs, requested);
+  std::string message = XML_Req_Encode(command, orderstring, targets, requested);
 
   bool ret = makeAC(vr, key, issuer, holder, message, selfpointer);
   X509_free(issuer);
@@ -1534,6 +1537,7 @@ static int http_get(soap *soap)
   std::vector<std::string> fqans;
   int lifetime = -1;
   std::string orderstring;
+  std::string targetstring;
 
   if (s) {
     ++s;
@@ -1579,6 +1583,9 @@ static int http_get(soap *soap)
         else
           orderstring += ", " + std::string(cvalue);
       }
+      else if (strcmp(cname, "targets") == 0) {
+        targetstring = std::string(cvalue);
+      }
       else {
         /* purposefully ignore other parameters */
         /* but put it in an otherwise positive response */
@@ -1592,7 +1599,7 @@ static int http_get(soap *soap)
 
   std::string command = parse_fqan(fqans);
 
-  int res = makeACREST(soap, command, lifetime, unknown);
+  int res = makeACREST(soap, command, orderstring, targetstring, lifetime, unknown);
 
   free(path);
 
@@ -1676,16 +1683,14 @@ static char *canonicalize_string(char *original)
 }
 
 static int
-makeACREST(struct soap *soap, const std::string& command, int requested, int unknown)
+makeACREST(struct soap *soap, const std::string& command, const std::string& orderstring, const std::string& targets, int requested, int unknown)
 {
-  char *targets = NULL;
-
   vomsresult vr;
 
   if (unknown)
     vr.setError(WARN_UNKNOWN_COMMAND, "Unknown parameters in the request were ignored!");
 
-  (void)makeACSSL(vr, soap->ssl, command, &targets, 0, requested, selfpointer);
+  (void)makeACSSL(vr, soap->ssl, command, orderstring, targets, requested, selfpointer);
 
   int value;
   std::string output = vr.makeRESTAnswer(value);

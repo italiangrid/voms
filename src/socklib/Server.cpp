@@ -528,11 +528,13 @@ bool GSISocketServer::Peek(int bufsize, std::string& s)
     else
       SetErrorOpenSSL("Error during SSL read:");
     OPENSSL_free(buffer);
+    ERR_clear_error();
     return false;
   }
 
   s = std::string(buffer, ret2);
   OPENSSL_free(buffer);
+  ERR_clear_error();
   return true;
 
 }
@@ -546,12 +548,15 @@ bool
 GSISocketServer::Receive(std::string& s)
 {
   std::string output;
+
   bool result = do_read(ssl, timeout, output);
 
   if (result)
     s = output;
   else
     SetError(output);
+
+  ERR_clear_error();
 
   return result;
 }
