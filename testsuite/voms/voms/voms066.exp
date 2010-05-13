@@ -5,8 +5,7 @@ proc mytest {} {
     _activateCert mycert2
 
     _vomsStart voms1
-    set outname [exec mktemp $::SCRATCHDIR/voms-proxy-init-XXXXXX]
-    set res [catch {set out [exec $::INSTALLDIR/bin/voms-proxy-init -cert $::env(HOME)/.globus2/usercert.pem -key $::env(HOME)/.globus2/userkey.pem -+debug >& $outname]}]
+    set res [log_exec outname {voms-proxy-init -cert $::env(HOME)/.globus2/usercert.pem -key $::env(HOME)/.globus2/userkey.pem -+debug}]
     _vomsStop voms1
 
     if $res then {

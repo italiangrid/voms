@@ -5,8 +5,7 @@ proc mytest {} {
     _activateCert mycert2
 
     _vomsStart voms1
-    set outname [exec mktemp $::SCRATCHDIR/voms-proxy-init-XXXXXX]
-    set res [catch {set out [exec $::INSTALLDIR/bin/voms-proxy-init --voms voms1 --vomslife 5:00 >& $outname]}]
+    set res [log_exec outname {voms-proxy-init --voms voms1 --vomslife 5:00}]
     _vomsStop voms1
 
     if $res then {
@@ -15,8 +14,7 @@ proc mytest {} {
         return $::FAILTEST
     }
 
-    set outname [exec mktemp $::SCRATCHDIR/voms-proxy-info-XXXXXX]
-    set res [catch {set out2 [exec $::INSTALLDIR/bin/voms-proxy-info --all >& $outname]}]
+    set res [log_exec outname {voms-proxy-info --all}]
 
     if $res then {
         addlog $outname
@@ -41,7 +39,7 @@ attribute : /voms1/group1
 attribute : shortid = mycert2-g \\\(/voms1/group1\\\)
 attribute : shortid = mycert2 \\\(voms1\\\)
 timeleft  : \(\[0-9\]*\):\[0-9\]*:\[0-9\]*"
-        set out2 [exec cat  $outname]
+        loadvar out2 $outname
         set PLENGTH ""
         set ACLENGTH ""
         if [regexp $correct $out2 dummy PLENGTH ACLENGTH] then {
@@ -54,13 +52,8 @@ timeleft  : \(\[0-9\]*\):\[0-9\]*:\[0-9\]*"
                 return $::FAILTEST
             }   
         } else {
-            set outname2 [exec mktemp $::SCRATCHDIR/voms-proxy-info-XXXXXX]
-            set id [open $outname2 "w+"]
-            puts $id $correct
-            close $id
-
+            logvar correct
             addlog $outname 
-            addlog $outname2
             testmessage "Unexpected output in voms-proxy-info"
             return $::FAILTEST
         }

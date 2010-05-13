@@ -43,6 +43,7 @@
 
 #include "log.h"
 #include "streamers.h"
+#include "doio.h"
 
 static char *typenames[] = { "STARTUP", "REQUEST", "RESULT" };
 
@@ -102,8 +103,8 @@ void LogOptionInt(void *data, const char *name, int value)
   static char val[INTSIZE];
 
   memset(val, 0, INTSIZE);
+  (void)snprintf(val, INTSIZE, "%d", value);
 #undef INTSIZE
-  sprintf(val, "%d", value);
 
   LogOption(data, name, val);
 }
@@ -314,8 +315,6 @@ int LogMessageF(const char *func, int line, const char *file, void *data, loglev
 {
   va_list v;
   char *str = NULL;
-  int len = 0;
-  int plen;
   int res = 0;
   struct LogInfo *li=(struct LogInfo *)data;
 
@@ -328,17 +327,10 @@ int LogMessageF(const char *func, int line, const char *file, void *data, loglev
 
   if (li) {
     if ((li->currlev >= lev) || (li->currlev == LEV_DEBUG)) {
-      do {
-        len += 50;
-        str = realloc(str, len);
+      va_start(v, format);
+      str = vsnprintf_wrap(format, v);
+      va_end(v);
 
-        if (str) {
-          va_start(v, format);
-          plen = vsnprintf(str, len, format, v);
-          va_end(v);
-        }
-      } while (str && (plen>=len));
-      
       if (str) {
         res = LogMessage(data, lev, type, str, func, line, file);
         free(str);

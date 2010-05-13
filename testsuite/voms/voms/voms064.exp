@@ -5,19 +5,19 @@ proc mytest {} {
     _activateCert mycert2
 
     _vomsStart voms1
-    set outname [exec mktemp $::SCRATCHDIR/voms-proxy-init-XXXXXX]
-    set res [catch {set out [exec $::INSTALLDIR/bin/voms-proxy-init --voms voms1 --voms voms1:/voms1/Role=product --voms voms1:/Role=rt >& $outname]}]
+    set res [log_exec outname {voms-proxy-init --voms voms1 --voms voms1:/voms1/Role=product --voms voms1:/Role=rt}]
     _vomsStop voms1
 
     if $res then {
         addlog $outname
-#    set correct "\[.\\n\]*Connection closed\[.\\n\]*"
+
         set correct "\[.\\n\]*Unable to satisfy\[.\\n\]*"
-        set out2 [exec cat  $outname]
+        loadvar out2 $outname
         if [regexp $correct $out2] then {
             testmessage "voms-proxy-init failed for the correct reason."
             return $::PASSTEST
         } else {
+            logvar correct
             testmessage "voms-proxy-init failed for the wrong reason."
             return $::FAILTEST
         }

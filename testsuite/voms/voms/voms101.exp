@@ -17,29 +17,31 @@ proc mytest {} {
 
     _vomsStop voms1
 
-    set out [exec cat $outname]
+    loadvar out $outname
 
     if  $res then {
         addlog $outname
-	addlog $errname
+        addlog $errname
         testmessage "openssl s_client incorrectly failed."
 	
         return $::FAILTEST
     } else {
         set correct1 "HTTP/1.1 400 Bad Request"
 
-	if [regexp $correct1 $out] then {
-	    #result is correctly bad request
+        if [regexp $correct1 $out] then {
+            #result is correctly bad request
 
-	    set correct1 "<\\?xml version=\"1.0\" encoding=\"UTF-8\"\\?><voms><error><code>BadRequest</code><message>voms1: Unable to satisfy B/voms1:group9000 Request\\!</message></error></voms>"
+            set correct2 "<\\?xml version=\"1.0\" encoding=\"UTF-8\"\\?><voms><error><code>BadRequest</code><message>voms1: Unable to satisfy B/voms1:group9000 Request\\!</message></error></voms>"
 
-	    if [regexp $correct1 $out] then {
-		testmessage "Output was as intended."
-		return $::PASSTEST
-	    }
-	}
+            if [regexp $correct2 $out] then {
+                testmessage "Output was as intended."
+                return $::PASSTEST
+            }
+            logvar correct2
+        }
 	
-	addlog $outname
+        logvar correct1
+        addlog $outname
         testmessage "REST output was incorrect."
         return $::FAILTEST
     }

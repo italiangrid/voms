@@ -6,8 +6,7 @@ proc mytest {} {
 
     # Create a proxy to validate.
     _vomsStart voms1
-    set outname [exec mktemp $::SCRATCHDIR/voms-proxy-init-XXXXXX]
-    set res [catch {set out [exec $::INSTALLDIR/bin/voms-proxy-init --voms voms1 --out $::SCRATCHDIR/proxy.pem >& $outname]}]
+    set res [log_exec outname {voms-proxy-init --voms voms1 --out $::SCRATCHDIR/proxy.pem}]
     _vomsStop voms1
 
     if $res then {

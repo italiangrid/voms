@@ -4,5 +4,6 @@ HAVEORACLE @enable_oracletests@
 HAVEMYSQL  @enable_mysqltests@
 DBUSERNAME @with_dbuser@
 SCRATCHDIR @with_scratchdir@
+DOCOVERAGE @enable_coverage@
 DBPASSWORD @with_dbpwd@
 MYSQLCONF  @with_mysqlconf@

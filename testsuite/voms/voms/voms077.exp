@@ -1,19 +1,31 @@
 load_lib vomstest.exp
-testheader "See if voms-proxy-fake works."
+testheader "See if voms-proxy-list with two --voms fails."
 
 proc mytest {} {
     _activateCert mycert2
     _cleanproxy
-    set outname [exec mktemp $::SCRATCHDIR/voms-proxy-fake-XXXXXX]
-    set res [catch {set out [exec $::INSTALLDIR/bin/voms-proxy-fake >& $outname]}]
+
+    _vomsStart voms1
+    set res [log_exec outname {voms-proxy-list --voms voms1 --voms voms1}]
+    _vomsStop voms1
+
+    addlog $outname
 
     if $res then {
-        addlog $outname
-        testmessage "voms-proxy-fake failed."
-        return $::FAILTEST
+        set correct "Exactly ONE voms server must be specified!"
+
+        set out2 [exec cat $outname]
+
+        if [regexp $correct $out2] then {
+            testmessage "voms-proxy-list failed with correct message."
+            return $::PASSTEST
+        } else {
+            testmessage "voms-proxy-list failed with wrong message."
+            return $::FAILTEST
+        }
     }
 
-    return $::PASSTEST
+    return $::FAILTEST
 }
 
 do_test

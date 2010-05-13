@@ -82,12 +82,16 @@ struct VOMSProxy *VOMS_AllocProxy();
 int VOMS_WriteProxy(const char *filename, struct VOMSProxy *proxy);
 struct VOMSProxy *VOMS_MakeProxy(struct VOMSProxyArguments *args, int *warning, void **additional);
 X509_EXTENSION *CreateProxyExtension(char * name, char *data, int datalen, int crit);
+char *ProxyCreationError(int error, void *additional);
+
+#define PROXY_ERROR_IS_WARNING(error) (error >= 1000)
 
 #define PROXY_NO_ERROR                            0
 #define PROXY_ERROR_OPEN_FILE                     1
 #define PROXY_ERROR_STAT_FILE                     2
 #define PROXY_ERROR_OUT_OF_MEMORY                 3
 #define PROXY_ERROR_FILE_READ                     4
+#define PROXY_ERROR_UNKNOWN_BIT                   5
 #define PROXY_WARNING_GSI_ASSUMED              1000
 #define PROXY_WARNING_GENERIC_LANGUAGE_ASSUMED 1001
 

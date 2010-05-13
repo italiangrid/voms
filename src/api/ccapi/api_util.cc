@@ -172,7 +172,6 @@ static bool findexts(X509 *cert , AC_SEQ **listnew, std::string &extra_data, std
   ext = get_ext(cert, "vo");
   if (ext) {
     workvo = std::string((char *)(ext->value->data),ext->value->length);
-    found = true;
   }
 
   return found;
@@ -775,7 +774,7 @@ vomsdata::my_conn(const std::string &hostname, int port, const std::string &cont
 }
 
 bool
-vomsdata::my_conn(const std::string &hostname, int port, const std::string &contact,
+vomsdata::my_conn(const std::string &hostname, int port, UNUSED(const std::string &contact),
 	const std::string &command, std::string &u, std::string &uc,
                   std::string &buf, int timeout)
 {
@@ -837,11 +836,18 @@ vomsdata::my_conn(const std::string &hostname, int port, const std::string &cont
     return false;
   }
 
-  if (!sock.Receive(buf)) {
-    seterror(VERR_COMM, sock.GetError());
-    sock.Close();
-    return false;
-  }
+  std::string msg;
+  bool ret;
+
+  do {
+    ret = sock.Receive(msg);
+    if (!ret) {
+      seterror(VERR_COMM, sock.GetError());
+      sock.Close();
+      return false;
+    }
+    buf += msg;
+  } while (ret && ! msg.empty());
 
   sock.Close();
   return true;

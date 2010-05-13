@@ -36,6 +36,7 @@ Description:
 #include "myproxycertinfo.h"
 #include "sslutils.h"
 #include "parsertypes.h"
+#include "doio.h"
 
 #ifdef HAVE_UNISTD_H
 #include <unistd.h>
@@ -922,8 +923,7 @@ proxy_sign(
 
       sub_hash = md[0] + (md[1] + (md[2] + (md[3] >> 1) * 256) * 256) * 256;
  
-      newcn = malloc(sizeof(long)*4 + 1);
-      sprintf(newcn, "%ld", sub_hash);
+      newcn = snprintf_wrap("%ld", sub_hash);
     }
     else {
       if(limited_proxy)
@@ -2628,15 +2628,14 @@ proxy_get_filenames(
 
         if (home) 
         {
-            len = strlen(home) + strlen(X509_DEFAULT_CERT_DIR) + 2;
-            default_cert_dir = (char *)malloc(len);
+            default_cert_dir = snprintf_wrap("%s%s%s",
+                    home, FILE_SEPERATOR, X509_DEFAULT_CERT_DIR);
+
             if (!default_cert_dir)
             {
                 PRXYerr(PRXYERR_F_INIT_CRED, PRXYERR_R_OUT_OF_MEMORY);
                 goto err;
             }
-            sprintf(default_cert_dir, "%s%s%s",
-                    home, FILE_SEPERATOR, X509_DEFAULT_CERT_DIR);
 
             if (checkstat(default_cert_dir) != 1)
             {
@@ -2688,21 +2687,17 @@ proxy_get_filenames(
 
             if (globus_location)
             {
-                len = strlen(globus_location) +
-                    strlen(X509_INSTALLED_CERT_DIR)
-                    + 2 /* NUL and FILE_SEPERATOR */;
-
                 installed_cert_dir = (char *) malloc(len);
+                installed_cert_dir = snprintf_wrap("%s%s%s",
+                        globus_location,
+                        FILE_SEPERATOR,
+                        X509_INSTALLED_CERT_DIR);
+
                 if  (!installed_cert_dir)
                 {
                     PRXYerr(PRXYERR_F_INIT_CRED, PRXYERR_R_OUT_OF_MEMORY);
                     goto err;
                 }
-                sprintf(installed_cert_dir,
-                        "%s%s%s",
-                        globus_location,
-                        FILE_SEPERATOR,
-                        X509_INSTALLED_CERT_DIR);
 
                 /*
                  * Previous code always set cert_dir to
@@ -2768,23 +2763,17 @@ proxy_get_filenames(
 #endif
     if (!user_proxy && !getenv("X509_RUN_AS_SERVER"))
     {
-        unsigned long uid;
-        uid = getuid();
-        len = strlen(DEFAULT_SECURE_TMP_DIR) 
-            + strlen(X509_USER_PROXY_FILE) 
-            + 64; 
-       
-        default_user_proxy = (char *) malloc(len);
+        default_user_proxy = snprintf_wrap("%s%s%s%lu",
+                                           DEFAULT_SECURE_TMP_DIR,
+                                           FILE_SEPERATOR,
+                                           X509_USER_PROXY_FILE,
+                                           getuid());
+
         if (!default_user_proxy)
         {
             PRXYerr(PRXYERR_F_INIT_CRED, PRXYERR_R_OUT_OF_MEMORY);
             goto err;
         }
-        sprintf(default_user_proxy,"%s%s%s%lu",
-                DEFAULT_SECURE_TMP_DIR,
-                FILE_SEPERATOR,
-                X509_USER_PROXY_FILE,
-                uid);
 
 #ifndef WIN32
         if ((!proxy_in || getuid() != 0)
@@ -2892,8 +2881,8 @@ proxy_get_filenames(
 #endif
                 }
                 
-                len = strlen(home) + strlen(X509_DEFAULT_USER_CERT) + 2;
-                default_user_cert = (char *)malloc(len);
+                default_user_cert = snprintf_wrap("%s%s%s",
+                        home, FILE_SEPERATOR, X509_DEFAULT_USER_CERT);
 
                 if (!default_user_cert)
                 {
@@ -2901,18 +2890,15 @@ proxy_get_filenames(
                     goto err;
                 } 
 
-                sprintf(default_user_cert,"%s%s%s",
-                        home, FILE_SEPERATOR, X509_DEFAULT_USER_CERT);
-                len = strlen(home) + strlen(X509_DEFAULT_USER_KEY) + 2;
-                default_user_key = (char *)malloc(len);
+                default_user_key = snprintf_wrap("%s%s%s",
+                        home,FILE_SEPERATOR, X509_DEFAULT_USER_KEY);
+                                                
                 if (!default_user_key)
                 {
                     PRXYerr(PRXYERR_F_INIT_CRED, PRXYERR_R_OUT_OF_MEMORY);
                     goto err;
                 }
-                sprintf(default_user_key, "%s%s%s",
-                        home,FILE_SEPERATOR, X509_DEFAULT_USER_KEY);
-                                                
+
                 user_cert = default_user_cert;
                 user_key = default_user_key;
 
@@ -2929,23 +2915,26 @@ proxy_get_filenames(
 
                     certname = getenv("X509_USER_CRED");
 
-                    len = certname ? strlen(certname) + 1 :
-                      strlen(home) + strlen(X509_DEFAULT_USER_CERT_P12_GT) + 2;
-
-                    default_user_cert = (char *)malloc(len);
-
-                    if (!default_user_cert) {
-                      PRXYerr(PRXYERR_F_INIT_CRED, PRXYERR_R_OUT_OF_MEMORY);
-                      goto err;
-                    } 
-
                     if (!certname) {
-                      sprintf(default_user_cert,"%s%s%s",
+                      default_user_cert = snprintf_wrap("%s%s%s",
                               home, FILE_SEPERATOR, X509_DEFAULT_USER_CERT_P12);
 
-                      if (checkstat(default_user_cert) != 0)
-                        sprintf(default_user_cert,"%s%s%s",
+                      if (!default_user_cert) {
+                        PRXYerr(PRXYERR_F_INIT_CRED, PRXYERR_R_OUT_OF_MEMORY);
+                        goto err;
+                      } 
+
+                      if (checkstat(default_user_cert) != 0) {
+                        free(default_user_cert);
+                        default_user_cert = snprintf_wrap("%s%s%s",
                                 home, FILE_SEPERATOR, X509_DEFAULT_USER_CERT_P12_GT);
+                      }
+
+                      if (!default_user_cert) {
+                        PRXYerr(PRXYERR_F_INIT_CRED, PRXYERR_R_OUT_OF_MEMORY);
+                        goto err;
+                      } 
+
                     }
                     else
                       strcpy(default_user_cert, certname);

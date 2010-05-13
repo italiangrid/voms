@@ -4,7 +4,6 @@ testheader "See if voms-proxy-fake --voinfo works."
 proc mytest {} {
     _activateCert mycert2
     _cleanproxy
-    set outname [exec mktemp $::SCRATCHDIR/voms-proxy-fake-XXXXXX]
     set outinfo [exec mktemp $::SCRATCHDIR/vo-info-XXXXXX]
     set id [open $outinfo "w+"]
     puts $id "\[voms1\]"
@@ -24,7 +23,7 @@ proc mytest {} {
     puts $id "-target = r.f.s.it"
     puts $id "-vomslife = 10"
     close $id
-    set res [catch {set out [exec $::INSTALLDIR/bin/voms-proxy-fake --voinfo $outinfo >& $outname]}]
+    set res [log_exec outname {voms-proxy-fake --voinfo $outinfo}]
 
     if $res then {
         addlog $outname
@@ -33,7 +32,7 @@ proc mytest {} {
         return $::FAILTEST
     }
 
-    if [catch {set out2 [exec $::INSTALLDIR/bin/voms-proxy-info -all >& $outname]}] then {
+    if [log_exec outname {voms-proxy-info -all}] then {
         addlog $outname
         addlog $outinfo
         testmessage "voms-proxy-info failed."
@@ -68,19 +67,15 @@ target    : r.f.c.it
 target    : r.f.s.it
 uri       : testmachine.cnaf.infn.it:5000"
 
-    set out2 [exec cat $outname]
+    loadvar out2 $outname
 
     if [regexp $correct $out2] then {
         testmessage "File voinfo read correctly"
         return $::PASSTEST
     }
 
-    set outname2 [exec mktemp $::SCRATCHDIR/voms-proxy-info-XXXXXX]
-    set id [open $outname2 "w+"]
-    puts $id $correct
-    close $id
+    logvar correct
     addlog $outname
-    addlog $outname2
 
     testmessage "proxy and specification in voinfo do not match"
     return $::FAILTEST

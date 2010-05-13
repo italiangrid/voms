@@ -5,8 +5,7 @@ proc mytest {} {
     _activateCert mycert2
 
     _vomsStart voms1
-    set outname [exec mktemp $::SCRATCHDIR/voms-proxy-init-XXXXXX]
-    set res [catch {set out [exec $::INSTALLDIR/bin/voms-proxy-init --voms voms1 >& $outname]}]
+    set res [log_exec outname {voms-proxy-init --voms voms1}]
     _vomsStop voms1
 
     if $res then {
@@ -15,8 +14,7 @@ proc mytest {} {
         return $::FAILTEST
     }
 
-    set outname [exec mktemp $::SCRATCHDIR/voms-proxy-info-XXXXXX]
-    if [catch {set out2 [exec $::INSTALLDIR/bin/voms-proxy-info --uri >& $outname]}] then {
+    if [log_exec outname {voms-proxy-info --uri}] then {
         addlog $outname
         testmessage "voms-proxy-info failed."
         return $::FAILTEST
@@ -24,17 +22,13 @@ proc mytest {} {
         #match against known (correct) output
         set correct "$::HOSTNAME:33334"
 
-        set out2 [exec cat  $outname]
+        loadvar out2 $outname
         if [regexp $correct $out2] then {
             testmessage "uri correctly reported."
             return $::PASSTEST
         } else {
-            set outname2 [exec mktemp $::SCRATCHDIR/voms-proxy-info-XXXXXX]
-            set id [open $outname2 "w+"]
-            puts $id $correct
-            close $id
+            logvar correct
             addlog $outname 
-            addlog $outname2
             testmessage "Unexpected output in voms-proxy-info"
             return $::FAILTEST
         }

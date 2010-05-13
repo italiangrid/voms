@@ -1,0 +1,32 @@
+load_lib vomstest.exp
+
+proc mytest {} {
+    testheader "See if voms-proxy-init --out <wrongfile> fails correctly."
+    _activateCert mycert2
+    _cleanproxy
+
+    _vomsStart voms1
+    set res [log_exec outname {voms-proxy-init --voms voms1 --out $::SCRATCHDIR/tfhasdfbk/fregio}]
+    _vomsStop voms1
+
+    addlog $outname
+
+    if $res then {
+        set correct "ERROR: Cannot write proxy to: $::SCRATCHDIR/tfhasdfbk/fregio"
+
+        loadvar out2 $outname
+
+        if [regexp $correct $out2] then {
+            testmessage "voms-proxy-init failed with correct message."
+            return $::PASSTEST
+        } else {
+            logvar correct
+            testmessage "voms-proxy-init failed with wrong message."
+            return $::FAILTEST
+        }
+    }
+
+    return $::FAILTEST
+}
+
+do_test

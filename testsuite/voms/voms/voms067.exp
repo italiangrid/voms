@@ -7,8 +7,8 @@ proc mytest {} {
     _vomsStart voms1
     set dirsave $::env(X509_CERT_DIR)
     set ::env(X509_CERT_DIR) $::INSTALLDIR/tmp/tmp/tmp
-    set outname [exec mktemp $::SCRATCHDIR/voms-proxy-init-XXXXXX]
-    set res [catch {set out [exec $::INSTALLDIR/bin/voms-proxy-info --all >& $outname]}]
+
+    set res [log_exec outname {voms-proxy-info --all}]
     set ::env(X509_CERT_DIR) $dirsave
     _vomsStop voms1
 

@@ -20,10 +20,7 @@ proc mytest {} {
         return $::FAILTEST
     }
 
-
-    set outname [exec mktemp $::SCRATCHDIR/voms-proxy-info-XXXXXX]
-
-    if [catch {set out2 [exec $::INSTALLDIR/bin/voms-proxy-info --file $outfile >& $outname]}] then {
+    if [log_exec outname {voms-proxy-info --file $outfile}] then {
         addlog $outname
         testmessage "voms-proxy-info failed."
         return $::FAILTEST
@@ -34,12 +31,13 @@ identity  : /C=IT/CN=001
 type      : proxy
 strength  : 2048 bits"
 
-        set out2 [exec cat $outname]
+        loadvar out2 $outname
 
         if [regexp $correct $out2 dummy] then {
             testmessage "Size was correct."
             return $::PASSTEST
         } else {
+            logvar correct
             addlog $outname
             addlog $outfile
             testmessage "bit size incorrect."

@@ -14,8 +14,7 @@ proc mytest {} {
     _vomsStart voms1
     _addVOMSOption voms1 timeout 10000
     _vomsReload voms1
-    set outname [exec mktemp $::SCRATCHDIR/voms-proxy-init-XXXXXX]
-    set res [catch {set out [exec $::INSTALLDIR/bin/voms-proxy-init --voms voms1 --vomslife 23:50 >& $outname]}]
+    set res [log_exec outname {voms-proxy-init --voms voms1 --vomslife 23:50}]
     _vomsStop voms1
     
     if  $res then {
@@ -24,19 +23,15 @@ proc mytest {} {
         return $::FAILTEST
     } else {
         set correct "The validity of this VOMS AC in your proxy is shortened"
-	set out2 [exec cat $outname]
+        loadvar out2 $outname
 
-	if [regexp $correct $out2] then {
-	    testmessage "Warning correctly returned"
-	    return $::PASSTEST
-	}
+        if [regexp $correct $out2] then {
+            testmessage "Warning correctly returned"
+            return $::PASSTEST
+        }
 
-	set outname2 [exec mktemp $::SCRATCHDIR/voms-proxy-info-XXXXXX]
-	set id [open $outname2 "w+"]
-	puts $id $correct
-	close $id
-	addlog $outname
-	addlog $outname2
+        logvar correct
+        addlog $outname
 
         testmessage "voms-proxy-init incorrectly returned a success."
         return $::FAILTEST

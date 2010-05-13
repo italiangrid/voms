@@ -26,12 +26,7 @@ proc mytest {} {
         testmessage "output correct"
         return $::PASSTEST
     } else {
-        set outname2 [exec mktemp $::SCRATCHDIR/voms-api-c-XXXXXX]
-        set id [open $outname2 "w+"]
-        puts $id $correct
-        close $id
-
-        addlog $outname2
+        logvar correct
         testmessage "output wrong"
         return $::FAILTEST
     }

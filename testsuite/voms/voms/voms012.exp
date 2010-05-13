@@ -5,8 +5,7 @@ proc mytest {} {
     _activateCert mycert2
 
     _vomsStart voms1
-    set outname [exec mktemp $::SCRATCHDIR/voms-proxy-list-XXXXXX]
-    set res [catch {set out [exec $::INSTALLDIR/bin/voms-proxy-list --voms voms1 >& $outname]}]
+    set res [log_exec outname {voms-proxy-list --voms voms1}]
     _vomsStop voms1
 
     if $res then {
@@ -23,18 +22,13 @@ Available attributes:
 /voms1
 /voms1/group1
 /voms1/group1/Role=TestRole"
-    set out2 [exec cat  $outname]
+    loadvar out2 $outname
     if [regexp $correct $out2] then {
         testmessage "voms-proxy-list run successfully."
         return $::PASSTEST
     } else {
-        set outname2 [exec mktemp $::SCRATCHDIR/voms-proxy-list-XXXXXX]
-        set id [open $outname2 "w+"]
-        puts $id $correct
-        close $id
-
+        logvar correct
         addlog $outname 
-        addlog $outname2
         testmessage "Unexpected output in voms-proxy-list"
         return $::FAILTEST
     }

@@ -19,7 +19,7 @@ proc mytest {} {
 
     _vomsStop voms1
 
-    set out [exec cat $outname]
+    loadvar out $outname
 
     if  $res then {
         addlog $outname
@@ -29,59 +29,57 @@ proc mytest {} {
         return $::FAILTEST
     } else {
         set correct1 "HTTP/1.1 200 OK"
-	set out2 [exec cat $outname]
+        loadvar out2 $outname
 
-	if [regexp $correct1 $out] then {
-	    #result is correctly ok
+        if [regexp $correct1 $out] then {
+            #result is correctly ok
 
-	    set correct1 "<\\?xml version=\"1.0\" encoding=\"UTF-8\"\\?><voms><ac>(.*)</ac></voms>"
-	    if [regexp $correct1 $out all ac] then {
-		# Output was as intended.  Is it a valid AC?
-		set acfile [exec mktemp $::SCRATCHDIR/ac-XXXXXX]
-		set acid [open $acfile "w+"]
-		puts $acid "-----BEGIN ATTRIBUTE CERTIFICATE-----"
-		puts $acid [string trim $ac]
-		puts $acid "-----END ATTRIBUTE CERTIFICATE-----"
-		close $acid
-		addlog $acfile
+            set correct1 "<\\?xml version=\"1.0\" encoding=\"UTF-8\"\\?><voms><ac>(.*)</ac></voms>"
+            if [regexp $correct1 $out all ac] then {
+                # Output was as intended.  Is it a valid AC?
+                set acfile [exec mktemp $::SCRATCHDIR/ac-XXXXXX]
+                set acid [open $acfile "w+"]
+                puts $acid "-----BEGIN ATTRIBUTE CERTIFICATE-----"
+                puts $acid [string trim $ac]
+                puts $acid "-----END ATTRIBUTE CERTIFICATE-----"
+                close $acid
+                addlog $acfile
 
-		set vomsout [exec mktemp $::SCRATCHDIR/openssl-output-XXXXXX]
+                set res [log_exec vomsout {voms-proxy-init --includeac $acfile}]
+                addlog $vomsout
 
-		set res [catch {set out [exec $::INSTALLDIR/bin/voms-proxy-init --includeac $acfile >& $vomsout]}]
-		addlog $vomsout
+                if $res then {
+                    testmessage "voms-proxy-init failed."
+                    return $::FAILTEST
+                }
 
-		if $res then {
-		    testmessage "voms-proxy-init failed."
-		    return $::FAILTEST
-		}
+                if [log_exec infoout {voms-proxy-info --all}] then {
+                    addlog $infoout
+                    testmessage "voms-proxy-info failed."
+                    return $::FAILTEST
+                } else {
+                    #match against known (correct) output
+                    set correct3 "attribute : /voms1"
+                    loadvar out3 $infoout
 
-		set infoout [exec mktemp $::SCRATCHDIR/voms-proxy-info-XXXXXX]
-		if [catch {set out2 [exec $::INSTALLDIR/bin/voms-proxy-info --all >& $infoout]}] then {
-		    addlog $infoout
-		    testmessage "voms-proxy-info failed."
-		    return $::FAILTEST
-		} else {
-		    #match against known (correct) output
-		    set correct3 "attribute : /voms1"
-		    set out3 [exec cat  $infoout]
-
-		    if [regexp $correct3 $out3] then {
-			testmessage "AC was valid"
-			
-			return $::PASSTEST
-		    } 
-		    addlog $out3
-		    testmessage "AC did not contain correct information."
-		    return $::FAILTEST
-		}
-	    } else {
-		testmessage "Output was not as intended."
-		addlog $outname
-		return $::FAILTEST
-	    }
-	}
+                    if [regexp $correct3 $out3] then {
+                        testmessage "AC was valid"
+                        return $::PASSTEST
+                    } 
+                    logvar correct3
+                    addlog $out3
+                    testmessage "AC did not contain correct information."
+                    return $::FAILTEST
+                }
+            } else {
+                logvar correct1
+                testmessage "Output was not as intended."
+                addlog $outname
+                return $::FAILTEST
+            }
+        }
 	
-	addlog $outname
+        addlog $outname
         testmessage "REST output was incorrect."
         return $::FAILTEST
     }

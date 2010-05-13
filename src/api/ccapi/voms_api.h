@@ -486,6 +486,10 @@ private:
 
 public:
   bool LoadCredentials(X509*, EVP_PKEY *, STACK_OF(X509) *);
+  bool ContactRESTRaw(const std::string&, int, const std::string&, std::string&, int, int);
+
+private:
+  bool InterpretOutput(const std::string&, std::string&);
 };
 
 

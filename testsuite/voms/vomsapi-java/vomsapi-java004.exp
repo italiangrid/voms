@@ -7,7 +7,6 @@ proc mytest {} {
     # Create a proxy to validate.
     _vomsStart voms1
 
-
     set ::_buildout [exec mktemp $::SCRATCHDIR/program-out-XXXXXX]
     set res [_execJava contactvoms1.java $::_certdir/mycert2-cert.pem $::_certdir/mycert2-key.pem voms1]
     _vomsStop voms1
@@ -24,12 +23,13 @@ proc mytest {} {
 /voms1/group1
 /voms1/group1/Role=TestRole"
 
-    set out [exec cat $::_buildout]
+    loadvar out $::_buildout
 
     if [regexp $correct $out] then {
         testmessage "Obtained list of FQANs."
         return $::PASSTEST
     } else {
+        logvar correct
         testmessage "Unexpected output."
         return $::FAILTEST
     }

@@ -6,8 +6,7 @@ proc mytest {} {
     _activateCert mycert2
     _cleanproxy
 
-    set outname [exec mktemp $::SCRATCHDIR/voms-proxy-fake-XXXXXX]
-    set res [catch {set out [exec $::INSTALLDIR/bin/voms-proxy-fake --voms voms1 --hostcert $::INSTALLDIR/certs/hostcert.pem --hostkey $::INSTALLDIR/certs/hostkey.pem --pastac 11:30 >& $outname]}]
+    set res [log_exec outname {voms-proxy-fake --voms voms1 --hostcert $::INSTALLDIR/certs/hostcert.pem --hostkey $::INSTALLDIR/certs/hostkey.pem --pastac 11:30}]
 
     if $res then {
         addlog $outname
@@ -15,7 +14,7 @@ proc mytest {} {
         return $::FAILTEST
     }
 
-    if [catch {set out2 [exec $::INSTALLDIR/bin/voms-proxy-info -all >& $outname]}] then {
+    if [log_exec outname {voms-proxy-info -all}] then {
         addlog $outname
         testmessage "voms-proxy-info failed."
         return $::FAILTEST
@@ -23,18 +22,14 @@ proc mytest {} {
 
     set correct "timeleft  : 0:\[2-3\]"
 
-    set out2 [exec cat $outname]
+    loadvar out2 $outname
     if [regexp $correct $out2] then {
         testmessage "AC validity backdated correctly"
         return $::PASSTEST
     }
 
-    set outname2 [exec mktemp $::SCRATCHDIR/voms-proxy-info-XXXXXX]
-    set id [open $outname2 "w+"]
-    puts $id $correct
-    close $id
+    logvar correct
     addlog $outname
-    addlog $outname2
 
     testmessage "problems in moving AC validity"
     return $::FAILTEST

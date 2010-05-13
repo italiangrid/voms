@@ -5,8 +5,7 @@ proc mytest {} {
     _activateCert mycert2
 
     _vomsStart voms1
-    set outname [exec mktemp $::SCRATCHDIR/voms-proxy-init-XXXXXX]
-    set res [catch {set out [exec $::INSTALLDIR/bin/voms-proxy-init --voms voms1 --separate $::SCRATCHDIR/tempout >& $outname]}]
+    set res [log_exec outname {voms-proxy-init --voms voms1 --separate $::SCRATCHDIR/tempout}]
     _vomsStop voms1
 
     if $res then {
@@ -15,32 +14,31 @@ proc mytest {} {
         return $::FAILTEST
     }
 
-    set includename [exec mktemp $::SCRATCHDIR/voms-proxy-init-XXXXXX]
-    set res [catch {set out [exec $::INSTALLDIR/bin/voms-proxy-init --includeac $::SCRATCHDIR/tempout >& $includename]}]
+    set res [log_exec includename {voms-proxy-init --includeac $::SCRATCHDIR/tempout}]
 
     if $res then {
-	addlog $includename
-	testmessage "voms-proxy-init --includeac failed."
-	return $::FAILTEST
+        addlog $includename
+        testmessage "voms-proxy-init --includeac failed."
+        return $::FAILTEST
     }
     #match against known (correct) output
     set correct "attribute : /voms1"
 
-    set infoout [exec mktemp $::SCRATCHDIR/voms-proxy-info-XXXXXX]
-    if [catch {set out2 [exec $::INSTALLDIR/bin/voms-proxy-info --all >& $infoout]}] then {
-	addlog $infoout
-	testmessage "voms-proxy-info failed."
-	return $::FAILTEST
+    if [log_exec infoout {voms-proxy-info --all}] then {
+        addlog $infoout
+        testmessage "voms-proxy-info failed."
+        return $::FAILTEST
     }
 
     addlog $infoout
-    set out2 [exec cat $infoout]
+    loadvar out2 $infoout
     if [regexp -- $correct $out2 dummy] then {
-	testmessage "voms-proxy-init --includeac worked successfully."
-	return $::PASSTEST
+        testmessage "voms-proxy-init --includeac worked successfully."
+        return $::PASSTEST
     } else {
-	testmessage "Unexpected output in voms-proxy-info"
-	return $::FAILTEST
+        logvar correct
+        testmessage "Unexpected output in voms-proxy-info"
+        return $::FAILTEST
     }
 }
 

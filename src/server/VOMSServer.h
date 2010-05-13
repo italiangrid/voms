@@ -64,8 +64,6 @@ public:
   bool            gatekeeper_test;
   int             daemon_port;
   bool            foreground;
-  std::string     globuspwd;
-  std::string     globusid;
   std::string     x509_cert_dir;
   std::string     x509_cert_file;
   std::string     x509_user_proxy;

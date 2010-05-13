@@ -1,0 +1,45 @@
+load_lib vomstest.exp
+
+proc my_prolog {} {
+    set ::env(VO) "myvo"
+}
+
+proc my_epilog {} {
+    unset ::env(VO)
+}
+
+proc mytest {} {
+    testheader "See if voms correctly exits when the password is not terminated by a newline."
+
+    _activateCert mycert2
+    _cleanproxy
+
+    set res [log_exec outname {voms-proxy-init --out $::SCRATCHDIR/proxy}]
+
+    addlog $outname
+
+    if $res then {
+        testmessage "Execution of voms-proxy-init failed."
+        return $::FAILTEST
+    }
+
+    set res [log_exec outname {openssl asn1parse -inform pem -in $::SCRATCHDIR/proxy}]
+    set correct "myvo"
+
+    loadvar parsed $outname
+
+    if [regexp $correct $parsed] then {
+        testmessage "myvo correctly set."
+        return $::PASSTEST
+    } else {
+        addlog $parsed
+        logvar correct
+        testmessage "VO field not present"
+        return $::FAILTEST
+    }
+}
+
+test_set_prolog my_prolog
+test_set_epilog my_epilog
+
+do_test
