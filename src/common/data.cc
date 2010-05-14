@@ -152,7 +152,8 @@ std::string OpenSSLError(bool debug)
 
   std::string outstring;
   char *msgstring = NULL;
-    
+  char *errstring = NULL;
+
   /* WIN32 does not have the ERR_get_error_line_data */ 
   /* exported, so simulate it till it is fixed */
   /* in SSLeay-0.9.0 */
@@ -191,10 +192,11 @@ std::string OpenSSLError(bool debug)
         }
 
         msgstring = (char*)ERR_reason_error_string(l);
+        errstring = (char*)ERR_func_error_string(l);
 
         if (msgstring)
-          outstring += std::string(msgstring) + dat +
-            "\nFunction: " + ERR_func_error_string(l) + "\n";
+          outstring += std::string(msgstring) + std::string(dat ? dat : "") +
+            "\nFunction: " + std::string(errstring ? errstring : "") + "\n";
         break;
       }
     }

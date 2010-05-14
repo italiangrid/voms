@@ -14,17 +14,12 @@ proc mytest {} {
 
     set correct "\"voms1\" \"localhost\" \"/C=IT/CN=003\" \"voms1\" \"33334\" \"-1\""
 
-    set out [exec cat $::_buildout]
+    loadvar out $::_buildout
     if [regexp $correct $out] then {
         testmessage "output correct"
         return $::PASSTEST
     } else {
-        set outname2 [exec mktemp $::SCRATCHDIR/voms-api-c-XXXXXX]
-        set id [open $outname2 "w+"]
-        puts $id $correct
-        close $id
-
-        addlog $outname2
+        logvar correct
         testmessage "output wrong"
         return $::FAILTEST
     }

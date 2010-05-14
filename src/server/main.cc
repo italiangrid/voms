@@ -46,22 +46,24 @@ int main(int argc, char *argv[])
     v.Run();
   }
   // VOMS specific exception 
-  catch(VOMSInitException& e){
-    
-    std::cout << "Initialization error: " << e.error << std::endl;
-    return !0;
+  catch(VOMSInitException& e)
+  {
+    std::cout << "Initialization error: " << e.what() << std::endl;
+    return 1;
   }
 
   // std::exception
   catch(std::exception& e)
   {
     std::cout << e.what() << std::endl;
+    return 1;
   }
   
   catch(...)
   {
     std::cout << "Undefined error." << std::endl;
+    return 1;
   }
 
-
+  return 1;
 }

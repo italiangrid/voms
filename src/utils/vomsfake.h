@@ -153,6 +153,7 @@ class Fake {
   std::vector<std::string> extensions;
   std::vector<std::string> acextensions;
   bool selfsigned;
+  void PrintProxyCreationError(int error, void *additional);
 };
 
 #endif

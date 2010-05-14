@@ -391,8 +391,8 @@ AC_DEFUN([AC_COMPILER],
     if test "x$ac_with_debug" = "xyes" ; then
       CFLAGS="-g -O0"
       CXXFLAGS="-g -O0"
-#      CFLAGS="-g -O0 -fprofile-arcs -ftest-coverage"
-#      CXXFLAGS="-g -O0 -fprofile-arcs -ftest-coverage"
+      CFLAGS="-g -O0 -fprofile-arcs -ftest-coverage"
+      CXXFLAGS="-g -O0 -fprofile-arcs -ftest-coverage"
     fi
 
     AC_ARG_WITH(warnings,
@@ -421,7 +421,7 @@ AC_DEFUN([AC_BUILD_API_ONLY],
 
   AM_CONDITIONAL(BUILD_ALL, test x$have_api_only = xno)
 ])
-
+  
 AC_DEFUN([AC_JAVA],
 [
   AC_ARG_ENABLE(java, 
@@ -1043,6 +1043,16 @@ AC_DEFUN([AC_TESTSUITE],
     ],
     [ enable_mysqltests="yes"])
 
+  AC_ARG_ENABLE(coverage,
+    [  --enable-coverage Enable getting coverage info on the testsuite execution],
+    [
+      case "$enableval" in
+      yes) enable_coverage="yes" ;;
+      no)  enable_coverage="no" ;;
+      *)   AC_MSG_ERROR([bad value $(enableval) for --enable-coverage]) ;;
+      esac
+    ],
+    [ enable_coverage="no" ])
 
   AC_SUBST(with_reportdir)
   AC_SUBST(with_scratchdir)
@@ -1051,6 +1061,7 @@ AC_DEFUN([AC_TESTSUITE],
   AC_SUBST(with_mysqlconf)
   AC_SUBST(enable_oracletests)
   AC_SUBST(enable_mysqltests)
+  AC_SUBST(enable_coverage)
 ])
 
 dnl This macro written by:

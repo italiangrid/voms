@@ -6,8 +6,7 @@ proc mytest {} {
 
     _addVOMSOption voms1 logmax 200
     _vomsStart voms1
-    set outname [exec mktemp $::SCRATCHDIR/voms-proxy-init-XXXXXX]
-    set res [catch {set out [exec $::INSTALLDIR/bin/voms-proxy-init --voms voms1 >& $outname]}]
+    set res [log_exec outname {voms-proxy-init --voms voms1}]
     _vomsStop voms1
 
     addlog $::INSTALLDIR/etc/voms/voms1/voms.conf
@@ -23,7 +22,7 @@ proc mytest {} {
             testmessage "--logmax works."
             return $::PASSTEST
         } else {
-            set outname1 [exec mktemp $::SCRATCHDIR/voms-proxy-init-XXXXXX]            
+            set outname1 [exec mktemp $::SCRATCHDIR/voms-proxy-init-XXXXXX]
             set res [catch {set out [exec ls -l $::INSTALLDIR/var/log >& $outname1]}]
             addlog $outname1
             testmessage "file too long"

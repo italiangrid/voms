@@ -1,0 +1,31 @@
+load_lib vomstest.exp
+
+proc mytest {} {
+    testheader "See if voms-proxy-init --voms <notexists> fails correctly."
+
+    _activateCert mycert2
+    _cleanproxy
+
+    set res [log_exec outname {voms-proxy-init --voms ghrei}]
+
+    addlog $outname
+
+    if $res then {
+        set correct "VOMS Server for ghrei not known\!"
+
+        loadvar out2 $outname
+        if [regexp $correct $out2] then {
+            testmessage "voms-proxy-init failed correctly."
+            return $::PASSTEST
+        } else {
+            logvar correct
+            testmessage "voms-proxy-init returned wrong message."
+            return $::FAILTEST
+        }
+    } 
+
+    testmessage "voms-proxy-init incorrectly succeeded."
+    return $::FAILTEST
+}
+
+do_test

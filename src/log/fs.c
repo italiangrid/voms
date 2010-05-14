@@ -278,7 +278,7 @@ static int logfile_rotate(const char * name)
   
     if (max) {
       for(i = max; i > 0 ; --i) {
-        char s[24];
+        char s[24]; /* enough for up to 64 bit numbers */
         
         sprintf(s, "%d", i+1);
         strcpy(newname + namelen +1, s);

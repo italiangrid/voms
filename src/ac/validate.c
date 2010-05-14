@@ -362,7 +362,6 @@ static int checkAttributes(STACK_OF(AC_ATTR) *atts, struct col *voms)
   AC_IETFATTR *capattr;
   AC_IETFATTRVAL *capname;
   GENERAL_NAME *data;
-  GENERAL_NAME *gn;
 
   char **list, **tmp;
 
@@ -371,20 +370,12 @@ static int checkAttributes(STACK_OF(AC_ATTR) *atts, struct col *voms)
   char *g, *r, *c;
   char *rolestart, *capstart;
   struct data **dlist, **dtmp;
-  char *name, *value, *qualifier, *grant;
-  struct att_list *al;
-  struct full_att *fa;
-  struct att *a;
 
   str = str2 = NULL;
   list = tmp = NULL;
   d = NULL;
   dlist = dtmp = NULL;
-  name = value = qualifier = grant = NULL;
-  al = NULL;
-  fa = NULL;
-  a = NULL;
-  data = gn = NULL;
+  data = NULL;
 
   if (!atts)
     return 0;
@@ -503,13 +494,6 @@ static int checkAttributes(STACK_OF(AC_ATTR) *atts, struct col *voms)
     free(dtmp);
     free(str);
     free(str2);
-    free(name);
-    free(value);
-    free(qualifier);
-    free(grant);
-    free_att(a);
-    free_att_list(al);
-    free_full_att(fa);
     if (voms)
       free(voms->voname);
   }

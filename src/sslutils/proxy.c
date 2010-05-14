@@ -42,6 +42,7 @@
 #include "vomsproxy.h"
 #include "myproxycertinfo.h"
 #include "sslutils.h"
+#include "doio.h"
 
 static char *readfromfile(char *file, int *size, int *warning);
 static void setWarning(int *warning, int value);
@@ -50,8 +51,8 @@ static X509_EXTENSION *set_KeyUsageFlags(int flags);
 static int get_KeyUsageFlags(X509 *cert);
 static X509_EXTENSION *set_ExtendedKeyUsageFlags(char *flagnames);
 static char *getBitName(char**string);
-static int getBitValue(char *bitname, int *bittype);
-static int convertMethod(char *bits, int type);
+static int getBitValue(char *bitname);
+static int convertMethod(char *bits, int *warning, void **additional);
 static X509_EXTENSION *get_BasicConstraints(int ca);
 
 struct VOMSProxyArguments *VOMS_MakeProxyArguments()
@@ -256,7 +257,7 @@ struct VOMSProxy *VOMS_MakeProxy(struct VOMSProxyArguments *args, int *warning, 
   /* keyUsage extension */
 
   if (args->keyusage) {
-    ku_flags = convertMethod(args->keyusage, EXFLAG_KUSAGE);
+    ku_flags = convertMethod(args->keyusage, warning, additional);
     if (ku_flags == -1) {
       PRXYerr(PRXYERR_F_PROXY_SIGN, PRXYERR_R_CLASS_ADD_EXT);
       goto err;
@@ -336,7 +337,7 @@ struct VOMSProxy *VOMS_MakeProxy(struct VOMSProxyArguments *args, int *warning, 
  
   /* vo extension */
   
-  if (!args->voID) {
+  if (strlen(args->voID)) {
     if ((ex4 = CreateProxyExtension("vo", args->voID, strlen(args->voID), 0)) == NULL) {
       PRXYerr(PRXYERR_F_PROXY_SIGN,PRXYERR_R_CLASS_ADD_EXT);
       goto err;
@@ -511,30 +512,24 @@ struct VOMSProxy *VOMS_MakeProxy(struct VOMSProxyArguments *args, int *warning, 
       value = (char *)proxycertinfo;
     }
     else {
-      if (policysize == 0)
-        if (args->policytext)
-          policysize = strlen(args->policytext);
-
-      value = (char*)calloc(1, policysize + strlen(policylang) + 
-                            31 + 1 + 30);
-
       if (args->pathlength != -1) {
-        char buffer[31];
-      
-        snprintf(buffer, 30, "%d", args->pathlength);
-        buffer[30]='\0';
+        char *buffer = snprintf_wrap("%d", args->pathlength);
+
         if (!args->policytext) {
-          sprintf(value, "language:%s,pathlen:%s,policy:text:%s", policylang, buffer, policy);
+          value = snprintf_wrap("language:%s,pathlen:%s,policy:text:%s", policylang, buffer, policy);
           free(policy);
         }
         else 
-          sprintf(value, "language:%s,pathlen:%s,policy:text:%s", policylang, buffer, args->policytext);
+          value = snprintf_wrap("language:%s,pathlen:%s,policy:text:%s", policylang, buffer, args->policytext);
+
+        free(buffer);
       }
-      else
+      else {
         if (!args->policytext)
-          sprintf(value, "language:%s,policy:text:%s", policylang, policy);
+          value = snprintf_wrap("language:%s,policy:text:%s", policylang, policy);
         else
-          sprintf(value, "language:%s,policy:text:%s", policylang, args->policytext);
+          value = snprintf_wrap("language:%s,policy:text:%s", policylang, args->policytext);
+      }
     }
 
     if (args->proxyversion == 3) {
@@ -845,10 +840,8 @@ static char *getBitName(char**string)
   return temp;
 }
 
-static int getBitValue(char *bitname, int *bittype)
+static int getBitValue(char *bitname)
 {
-
-  *bittype = EXFLAG_KUSAGE;
   if (!strcmp(bitname, "digitalSignature"))
     return KU_DIGITAL_SIGNATURE;
   else if (!strcmp(bitname, "nonRepudiation"))
@@ -868,42 +861,68 @@ static int getBitValue(char *bitname, int *bittype)
   else if (!strcmp(bitname, "decipherOnly"))
     return KU_DECIPHER_ONLY;
 
-  *bittype = EXFLAG_NSCERT;
-
-  if (!strcmp(bitname, "client"))
-    return NS_SSL_CLIENT;
-  else if (!strcmp(bitname, "server"))
-    return NS_SSL_SERVER;
-  else if (!strcmp(bitname, "email"))
-    return NS_SMIME;
-  else if (!strcmp(bitname, "objsign"))
-    return NS_OBJSIGN;
-  else if (!strcmp(bitname, "sslCA"))
-    return NS_SSL_CA;
-  else if (!strcmp(bitname, "emailCA"))
-    return NS_SMIME_CA;
-  else if (!strcmp(bitname, "objCA"))
-    return NS_OBJSIGN_CA;
-
-  *bittype = EXFLAG_XKUSAGE;
-
   return 0;
 }
 
 
-static int convertMethod(char *bits, int type)
+static int convertMethod(char *bits, int *warning, void **additional)
 {
   char *bitname = NULL;
-  int realtype = 0;
   int value = 0;
   int total = 0;
 
   while ((bitname = getBitName(&bits))) {
-    value = getBitValue(bitname, &realtype);
-    if ((value == 0) || (type != realtype))
+    value = getBitValue(bitname);
+    if (value == 0) {
+      setWarning(warning, PROXY_ERROR_UNKNOWN_BIT);
+      setAdditional(additional, bitname);
       return -1;
+    }
     total |= value;
   }
 
   return total;
+}
+
+char *ProxyCreationError(int error, void *additional)
+{
+  char *str = NULL;
+
+  switch (error) {
+  case PROXY_NO_ERROR:
+    return NULL;
+    break;
+
+  case PROXY_ERROR_OPEN_FILE:
+    return snprintf_wrap("Error: cannot open file: %s\n%s\n", additional, strerror(errno));
+    break;
+
+  case PROXY_ERROR_FILE_READ:
+    return snprintf_wrap("Error: cannot read from file: %s\n%s\n", additional, strerror(errno));
+    break;
+
+  case PROXY_ERROR_STAT_FILE:
+    return snprintf_wrap("Error: cannot stat file: %s\n%s\n", additional, strerror(errno));
+    break;
+
+  case PROXY_ERROR_OUT_OF_MEMORY:
+    return snprintf_wrap("Error: out of memory");
+    break;
+
+  case PROXY_ERROR_UNKNOWN_BIT:
+    return snprintf_wrap("KeyUsage bit: %s unknown\n", additional);
+    break;
+
+  case PROXY_WARNING_GSI_ASSUMED:
+    return snprintf_wrap("\nNo policy language specified, Gsi impersonation proxy assumed.");
+    break;
+
+  case PROXY_WARNING_GENERIC_LANGUAGE_ASSUMED:
+    return snprintf_wrap("\nNo policy language specified with policy file, assuming generic.");
+    break;
+
+  default:
+    return snprintf_wrap("Unknown error");
+    break;
+  }
 }

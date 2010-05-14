@@ -4,8 +4,7 @@ testheader "See if a normal proxy can be created."
 proc mytest {} {
     _activateCert mycert2
 
-    set outname [exec mktemp $::SCRATCHDIR/voms-proxy-init-XXXXXX]
-    set res [catch {set out [exec $::INSTALLDIR/bin/voms-proxy-init >& $outname]}]
+    set res [log_exec outname {voms-proxy-init}]
 
     if $res then {
         addlog $outname

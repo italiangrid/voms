@@ -252,6 +252,7 @@ datadir = @datadir@
 datarootdir = @datarootdir@
 docdir = @docdir@
 dvidir = @dvidir@
+enable_coverage = @enable_coverage@
 enable_mysqltests = @enable_mysqltests@
 enable_oracletests = @enable_oracletests@
 exec_prefix = @exec_prefix@

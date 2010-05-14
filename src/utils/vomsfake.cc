@@ -567,11 +567,20 @@ bool Fake::CreateProxy(std::string data, AC ** aclist, int version)
 
     struct VOMSProxy *proxy = VOMS_MakeProxy(args, &warn, &additional);
 
-    if (proxy)
-      ret = VOMS_WriteProxy(proxyfile.c_str(), proxy);
+    PrintProxyCreationError(warn, additional);
 
-    VOMS_FreeProxy(proxy);
     VOMS_FreeProxyArguments(args);
+
+    if (proxy) {
+      ret = VOMS_WriteProxy(proxyfile.c_str(), proxy);
+      VOMS_FreeProxy(proxy);
+    } 
+    else {
+      Print(ERROR) << std::endl << "Unable to create proxy!" << std::endl;
+      exit (1);
+      ret = -1;
+
+    }
 
     if (ret == -1) {
       Print(ERROR) << std::endl << "Unable to write proxy to file " 
@@ -1154,4 +1163,17 @@ static std::string hextostring(const std::string &data)
   delete[] newdata;
 
   return value;
+}
+
+void Fake::PrintProxyCreationError(int error, void *additional)
+{
+  char *msg = ProxyCreationError(error, additional);
+
+  if (msg) {
+    if (PROXY_ERROR_IS_WARNING(error))
+      Print(DEBUG) << "\n" << msg;
+    else
+      Print(ERROR) << "\n" << msg;
+    free(msg);
+  }
 }

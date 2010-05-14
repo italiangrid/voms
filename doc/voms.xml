@@ -98,10 +98,9 @@ meaning is the following.</para>
 <para>Selects the file for logging. The default is /ver/log/voms.</para>
 
 <para><option>-globusid</option> <replaceable>id</replaceable></para>
-<para>Sets the server's id. The default is the cert's subject.</para>
-
 <para><option>-globuspwd</option> <replaceable>file</replaceable></para>
-<para>Sets the globuspwd variable.</para>
+<para>This options are supported for backwards compatibility only.
+  They have no effect, and indeed do not get listed by the -help option.</para> 
 
 <para><option>-passfile</option> <replaceable>file</replaceable></para>
 <para>Reads the password to access the DB from <emphasis remap='I'>file</emphasis>. The default is to

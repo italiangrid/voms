@@ -20,8 +20,7 @@ proc mytest {} {
         return $::FAILTEST
     }
 
-    set outname [exec mktemp $::SCRATCHDIR/voms-proxy-info-XXXXXX]
-    if [catch {set out2 [exec $::INSTALLDIR/bin/voms-proxy-info --file $proxyout --fqan >& $outname]}] then {
+    if [log_exec outname {voms-proxy-info --file $proxyout --fqan}] then {
         addlog $outname
         testmessage "voms-proxy-info failed."
         return $::FAILTEST
@@ -30,12 +29,13 @@ proc mytest {} {
 /voms1/group1
 /voms1/group1/Role=TestRole"
 
-        set out [exec cat $outname]
+        loadvar out $outname
 
         if [regexp $correct $out] then {
             testmessage "Obtained correctlist of FQANs."
             return $::PASSTEST
         } else {
+            logvar correct
             addlog $outname
             addlog $::INSTALLDIR/var/log/voms.voms1
             testmessage "Unexpected output."

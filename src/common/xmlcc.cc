@@ -34,6 +34,7 @@ extern "C" {
 #include <openssl/bio.h>
 #include <openssl/evp.h>
 
+#include "doio.h"
 static void startans(void *userdata, UNUSED(const char *name), UNUSED(const char **attrs));
 static void startreq(void *userdata, UNUSED(const char *name), UNUSED(const char **attrs));
 static void endreq(void *userdata, const char *name);
@@ -260,7 +261,7 @@ std::string XML_Req_Encode(const std::string &command, const std::string &order,
 {
   std::string res = "<?xml version=\"1.0\" encoding = \"US-ASCII\"?><voms>";
 
-  char str[15];
+  char *str = NULL;
 
   std::string::size_type begin = 0;
   std::string::size_type pos = 0;
@@ -285,9 +286,11 @@ std::string XML_Req_Encode(const std::string &command, const std::string &order,
 
   res += "<base64>1</base64><version>4</version>";
 
-  sprintf(str, "%d", lifetime);
+  str = snprintf_wrap("%d", lifetime);
 
-  res += "<lifetime>"+std::string(str)+"</lifetime></voms>";
+  res += "<lifetime>"+std::string(str ? str : "")+"</lifetime></voms>";
+
+  free(str);
 
   return res;
 }
@@ -318,7 +321,7 @@ std::string Encode(std::string data, int base64)
 
 std::string XML_Ans_Encode(const std::string &ac, const std::string &data, const std::vector<errorp> e, bool base64)
 {
-  char str[15];
+  char *str = NULL;
 
   if (ac.empty() && data.empty())
     return "";
@@ -337,8 +340,9 @@ std::string XML_Ans_Encode(const std::string &ac, const std::string &data, const
 
     for (std::vector<errorp>::const_iterator i = e.begin(); i != e.end(); i++) {
       res +="<item><number>";
-      sprintf(str, "%d", (*i).num);
-      res += str;
+      str = snprintf_wrap("%d", (*i).num);
+      res += std::string(str ? str : "");
+      free(str);
       res += "</number><message>" + (*i).message + "</message></item>";
     }
     res +="</error>";
@@ -490,6 +494,25 @@ static void endans(void *userdata, const char *name)
   else if ((!strcmp(name, "message")) && 
            (a->depth == 3)) {
     a->message = a->value;
+  }
+  else if (!strcmp(name, "warning")) {
+    struct errorp e;
+    e.num = WARN_OFFSET;
+    e.message = a->value;
+    a->a->errs.push_back(e);
+  }
+  else if ((!strcmp(name, "code")) && 
+           (a->depth == 3)) {
+    const char *msg = a->value.c_str();
+
+    if (!strcmp(msg, "NoSuchUser"))
+      a->num = ERR_NOT_MEMBER;
+    else if (!strcmp(msg, "SuspendedUser"))
+      a->num = ERR_SUSPENDED;
+    else if (!strcmp(msg, "BadReqquest"))
+      a->num = ERR_WITH_DB;
+    else
+      a->num = ERR_UNEXPECTED_ERROR;
   }
   else if ((!strcmp(name, "version"))) {
     a->a->version = atoi(a->value.c_str());

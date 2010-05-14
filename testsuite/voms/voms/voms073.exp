@@ -10,8 +10,7 @@ proc mytest {} {
     exec dd if=/dev/zero of=$::INSTALLDIR/var/log/voms.voms1 count=21K >&/dev/null
 
     _vomsStart voms1
-    set outname [exec mktemp $::SCRATCHDIR/voms-proxy-init-XXXXXX]
-    set res [catch {set out [exec $::INSTALLDIR/bin/voms-proxy-init --voms voms1 >& $outname]}]
+    set res [log_exec outname {voms-proxy-init --voms voms1}]
     _vomsStop voms1
 
     if [file exists $::INSTALLDIR/var/log/voms.voms1.1] then {

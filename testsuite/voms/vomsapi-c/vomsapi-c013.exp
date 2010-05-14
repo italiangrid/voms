@@ -5,8 +5,7 @@ proc mytest {} {
     _activateCert mycert2
 
     _vomsStart voms1
-    set outname [exec mktemp $::SCRATCHDIR/voms-proxy-init-XXXXXX]
-    set res [catch {set out [exec $::INSTALLDIR/bin/voms-proxy-init --target testbed.cnaf.infn.it --target prova.cnaf.infn.it --target [exec hostname] --voms voms1 >& $outname]}]
+    set res [log_exec outname {voms-proxy-init --target testbed.cnaf.infn.it --target prova.cnaf.infn.it --target [exec hostname] --voms voms1}]
     _vomsStop voms1
 
     if $res then {
@@ -23,7 +22,7 @@ proc mytest {} {
         testmessage "cannot read credentials from file."
         return $::FAILTEST
     } else {
-        set out [exec cat $::_buildout]
+        loadvar out $::_buildout
 
         set correct "Target: testbed.cnaf.infn.it
 Target: prova.cnaf.infn.it
@@ -33,15 +32,11 @@ Target: [exec hostname]"
             testmessage "targets successfully set"
             return $::PASSTEST
         } else {
-            set outname2 [exec mktemp $::SCRATCHDIR/voms-proxy-info-XXXXXX]
-            set id [open $outname2 "w+"]
-            puts $id $correct
-            close $id
+            logvar correct
             addlog $::_buildout 
-            addlog $outname2
 
             testmessage "read from file incorrect"
-            reurn $::FAILTEST
+            return $::FAILTEST
         }
     }
 }

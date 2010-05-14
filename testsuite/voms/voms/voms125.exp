@@ -1,0 +1,42 @@
+load_lib vomstest.exp
+
+proc mytest {} {
+    testheader "See if voms-proxy-init --vomses <wrong file> fails correctly."
+    _activateCert mycert2
+    _cleanproxy
+
+    set filename [exec mktemp $::SCRATCHDIR/vomses-XXXXXX]
+
+    set id [open $filename "w+"]
+    puts $id "Wrong line"
+    close $id
+
+    addlog $filename
+
+    _vomsStart voms1
+    set res [log_exec outname {voms-proxy-init --voms voms1 --vomses $filename}]
+    _vomsStop voms1
+
+    addlog $outname
+
+    if $res then {
+        set correct "data format in file: $filename incorrect!
+Line: Wrong line"
+
+        loadvar out2 $outname
+
+        if [regexp $correct $out2] then {
+            testmessage "voms-proxy-init failed correctly."
+            return $::PASSTEST
+        } else {
+            logvar correct
+            testmessage "voms-proxy-init returned wrong message."
+            return $::FAILTEST
+        }
+    } 
+
+    testmessage "voms-proxy-init incorrectly succeeded."
+    return $::FAILTEST
+}
+
+do_test
