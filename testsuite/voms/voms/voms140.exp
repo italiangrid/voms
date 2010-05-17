@@ -1,0 +1,33 @@
+load_lib vomstest.exp
+
+proc mytest {} {
+    testheader "See if voms-proxy-init --separate fails correctly when the certificate is expired."
+
+    _activateCert mycertexpired
+    _cleanproxy
+
+    _vomsStart voms1
+    set res [log_exec outname {voms-proxy-init --voms voms1}]
+    _vomsStop voms1
+
+    addlog $outname
+
+    if $res then {
+	set correct ".*Either proxy or user certificate are expired."
+
+	loadvar out2 $outname
+
+	if [regexp $correct $out2] then {
+	    testmessage "voms-proxy-init failed correctly."
+	    return $::PASSTEST
+	} else {
+	    testmessage "error message incorrect."
+	    return $::FAILTEST
+	}
+    } 
+
+    testmessage "voms-proxy-init incorrectly succeeded."
+    return $::FAILTEST
+}
+
+do_test

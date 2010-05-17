@@ -508,7 +508,7 @@ Client::Client(int argc, char ** argv) :
 
     if (userconf.empty()) {
       char *uc = getenv("VOMS_USERCONF");
-      if (uc) {
+      if (uc && (strlen(uc) != 0)) {
         userconf = uc;
         confiles.push_back(userconf);
       }
@@ -518,7 +518,7 @@ Client::Client(int argc, char ** argv) :
        was not defined */
     if (userconf.empty()) {
       char *uc = getenv("HOME");
-      if (uc)
+      if (uc && (strlen(uc) != 0))
         userconf = std::string(uc) + "/" + USERCONFILENAME;
       else
         userconf = std::string("~/") + USERCONFILENAME;

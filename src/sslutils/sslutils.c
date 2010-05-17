@@ -3639,6 +3639,8 @@ proxy_password_callback_no_prompt(
     return(-1);
 }
 
+#ifdef CLASS_ADD
+
 /**********************************************************************
 Function: proxy_extension_class_add_create()
 
@@ -3702,7 +3704,7 @@ err:
     }
     return NULL;
 }
-
+#endif
 
 
 int PRIVATE determine_filenames(char **cacert, char **certdir, char **outfile,
