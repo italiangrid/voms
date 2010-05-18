@@ -52,6 +52,8 @@ extern "C" {
 #include <openssl/objects.h>
 #include <openssl/asn1.h>
 #include <openssl/evp.h>
+#include <openssl/pkcs12.h>
+
 #include "credentials.h"
 #include "sslutils.h"
 #include "gssapi_compat.h"
@@ -130,7 +132,7 @@ vomsdata::vomsdata(std::string voms_dir, std::string cert_dir) :  ca_cert_dir(ce
 #endif
 
    if (!initialized) {
-     initialized = 1;
+     initialized = true;
 #ifdef NOGLOBUS
      SSL_library_init();
      SSLeay_add_all_algorithms();
@@ -140,6 +142,7 @@ vomsdata::vomsdata(std::string voms_dir, std::string cert_dir) :  ca_cert_dir(ce
      (void)AC_Init();
      InitProxyCertInfoExtension(1);
 #endif
+     PKCS12_PBE_add();
    }
 
   if (voms_cert_dir.empty()) {

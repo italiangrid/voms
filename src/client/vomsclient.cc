@@ -43,6 +43,8 @@ extern "C" {
 #include "listfunc.h"
 #include "credentials.h"
 #include "replace.h"
+
+#include <openssl/pkcs12.h>
 }
 #include <iostream>
 #include <fstream>
@@ -1059,7 +1061,7 @@ bool Client::pcdInit() {
 
   ERR_load_prxyerr_strings(0);
   SSLeay_add_ssl_algorithms();
-
+  PKCS12_PBE_add();
   
   if (!determine_filenames(&cacertfile, &certdir, &outfile, &certfile, &keyfile, noregen ? 1 : 0))
     goto err;

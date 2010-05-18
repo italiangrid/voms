@@ -1,0 +1,36 @@
+load_lib vomstest.exp
+
+proc myepilog {} {
+    file delete $::SCRATCHDIR/mycert.p12
+}
+
+proc mytest {} {
+    testheader "See if voms-proxy-init read pkcs12 certificates correctly."
+
+    _activateCert mycert2
+
+    set res [log_exec outname {openssl pkcs12 -in $::env(X509_USER_CERT) -inkey $::env(X509_USER_KEY) -export -password pass: -out $::SCRATCHDIR/mycert.p12}]
+
+    if $res then {
+	testmessage "Creation of pkcs12 certificate failed."
+	addlog $outname
+	return $::FAILTEST
+    }
+
+    file attributes $::SCRATCHDIR/mycert.p12 -permissions 00600
+
+    set res [log_exec outname2 {voms-proxy-init --cert $::SCRATCHDIR/mycert.p12}]
+
+    addlog $outname2
+
+    if $res then {
+	testmessage "voms-proxy-init failed."
+	return $::FAILTEST
+    } 
+
+    testmessage "voms-proxy-init correctly succeeded."
+    return $::PASSTEST
+}
+
+test_set_epilog myepilog
+do_test

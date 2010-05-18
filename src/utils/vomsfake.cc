@@ -57,6 +57,7 @@ extern "C" {
 #include <openssl/x509.h>
 #include <openssl/x509v3.h>
 #include <openssl/safestack.h>
+#include <openssl/pkcs12.h>
 
 #include "listfunc.h"
 #include "credentials.h"
@@ -762,6 +763,7 @@ bool Fake::pcdInit() {
 
   ERR_load_prxyerr_strings(0);
   SSLeay_add_ssl_algorithms();
+  PKCS12_PBE_add();
   
   BIO * bio_err;
   if ((bio_err = BIO_new(BIO_s_file())) != NULL)

@@ -25,6 +25,7 @@
 extern "C" {
 #include "init.h"
 #include "extensions.h"
+#include <openssl/pkcs12.h>
 
 extern void ERR_load_AC_strings(void);
 }
@@ -36,4 +37,5 @@ int AC_Init(void)
   declareOIDs();
   ERR_load_AC_strings();
   return initEx();
+  PKCS12_PBE_add();
 }
