@@ -143,7 +143,7 @@ proc cleanup {} {
         exec lcov --directory ../src --capture -o app.info -q >/dev/null 2>/dev/null
         exec lcov -a zero.info -a app.info -o total.info >/dev/null
         exec rm app.info zero.info
-        exec lcov -r total.info "/usr*" "*/mystack.c" "*/lex.yy.c" "*/vomsfake.tab.c" "*/vomsparser.c" "soapC.c" stdsoap2.c lex.namespaces.c lex.signing.c namespaces.c signing_policy.c failure.c -o voms.info 2>/dev/null
+        exec lcov -r total.info "*/../../*" "/usr*" "*/mystack.c" "*/lex.yy.c" "*/vomsfake.tab.c" "*/vomsparser.c" "soapC.c" stdsoap2.c lex.namespaces.c lex.signing.c namespaces.c signing_policy.c failure.c -o voms.info 2>/dev/null
         exec rm total.info
         exec genhtml --no-branch-coverage --show-details --legend --highlight -o $::REPORTDIR/coverage voms.info >/dev/null
         exec rm voms.info
