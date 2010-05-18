@@ -1,0 +1,50 @@
+load_lib vomstest.exp
+testheader "See if vomsdata can be copied."
+
+proc mytest {} {
+    _activateCert mycert2
+
+    _vomsStart voms1
+    set res [log_exec outname {voms-proxy-init --voms voms1}]
+    _vomsStop voms1
+
+    if $res then {
+        addlog $outname
+        testmessage "voms-proxy-init failed."
+        return $::FAILTEST
+    }
+
+    set ::_buildout [exec mktemp $::SCRATCHDIR/voms-api-c-XXXXXX]
+    set res [_exeCC duplication.cc -useproxy]
+
+    addlog $::_buildout
+
+    if $res then {
+        testmessage "parsing failed."
+        return $::FAILTEST
+    } else {
+        set correct "voname1: voms1
+user1: /C=IT/CN=001
+userca1: /C=IT/O=INFN/CN=CAFromthisCN
+server1: /C=IT/CN=003
+serverca1: /C=IT/O=INFN/CN=CAFromthisCN
+uri1: $::HOSTNAME:33334
+begdate1: .*
+enddate1: .*
+fqan1: /voms1
+fqan1: /voms1/group1
+version1: 1"
+
+        loadvar out $::_buildout
+        if [regexp $correct $out] then {
+            testmessage "output correct"
+            return $::PASSTEST
+        } else {
+            logvar correct
+            testmessage "output wrong"
+            return $::FAILTEST
+        }
+    }
+}
+
+do_test

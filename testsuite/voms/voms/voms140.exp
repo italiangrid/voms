@@ -1,7 +1,7 @@
 load_lib vomstest.exp
 
 proc mytest {} {
-    testheader "See if voms-proxy-init --separate fails correctly when the certificate is expired."
+    testheader "See if voms-proxy-init fails correctly when the certificate is expired."
 
     _activateCert mycertexpired
     _cleanproxy
