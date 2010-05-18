@@ -86,16 +86,6 @@ extern bool retrieve(X509 *cert, STACK_OF(X509) *chain, recurse_type how,
 		     std::string &buffer, std::string &vo, std::string &file, 
 		     std::string &subject, std::string &ca, verror_type &error);
 
-static X509 *
-decouple_cred(gss_cred_id_t credential, STACK_OF(X509) **stk)
-{
-  if (!stk || (credential == 0L))
-    return NULL;
-
-  *stk = ((gss2_cred_id_desc *)credential)->cred_handle->cert_chain;
-  return ((gss2_cred_id_desc *)credential)->cred_handle->cert;
-}
-
 static std::string parse_commands(const std::string& commands);
 
 extern int AC_Init(void);
@@ -455,7 +445,8 @@ bool vomsdata::RetrieveFromCred(gss_cred_id_t cred, recurse_type how)
   X509 *cert;
   STACK_OF(X509) *chain;
 
-  cert = decouple_cred(cred, &chain);
+  chain = ((gss2_cred_id_desc *)credential)->cred_handle->cert_chain;
+  cert = ((gss2_cred_id_desc *)credential)->cred_handle->cert;
 
   return Retrieve(cert, chain, how);
 }
@@ -917,9 +908,9 @@ vomsdata::vomsdata(const vomsdata &orig) : ca_cert_dir(orig.ca_cert_dir),
                                            verificationtime(orig.verificationtime)
 {}
 
-int getMajorVersionNumber(void) {return 1;}
-int getMinorVersionNumber(void) {return 9;}
-int getPatchVersionNumber(void) {return 14;}
+int getMajorVersionNumber(void) {return 2;}
+int getMinorVersionNumber(void) {return 0;}
+int getPatchVersionNumber(void) {return 0;}
 
 void vomsdata::SetRetryCount(int retryCount)
 {
