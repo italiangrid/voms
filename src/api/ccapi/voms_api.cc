@@ -445,8 +445,8 @@ bool vomsdata::RetrieveFromCred(gss_cred_id_t cred, recurse_type how)
   X509 *cert;
   STACK_OF(X509) *chain;
 
-  chain = ((gss2_cred_id_desc *)credential)->cred_handle->cert_chain;
-  cert = ((gss2_cred_id_desc *)credential)->cred_handle->cert;
+  chain = ((gss2_cred_id_desc *)cred)->cred_handle->cert_chain;
+  cert = ((gss2_cred_id_desc *)cred)->cred_handle->cert;
 
   return Retrieve(cert, chain, how);
 }
