@@ -27,6 +27,7 @@
 extern "C" {
 #include "replace.h"
 #include "uuid.h"
+#include "doio.h"
 
 #define SUBPACKAGE "voms"
 
@@ -83,51 +84,6 @@ extern int AC_Init(void);
 #include "ccwrite.h"
 
 
-class vomsresult {
-private:
-  std::string ac;
-  std::string data;
-  std::vector<errorp> errs;
-  bool base64;
-
-public:
-  vomsresult() : ac("A"), data(""), base64(true) {};
-
-  void setError(int num, std::string message) 
-  {
-    errorp t;
-    t.num = num;
-    t.message = message;
-    errs.push_back(t);
-  }
-
-  void setError(errorp p) 
-  {
-    errs.push_back(p);
-  }
-
-  void setBase64(bool b64)
-  {
-    base64 = b64;
-  }
-
-  void setAC(std::string ac)
-  {
-    this->ac = ac;
-  }
-
-  void setData(std::string data)
-  {
-    this->data = data;
-  }
-
-  std::string makeXMLAnswer(void)
-  {
-    return XML_Ans_Encode(ac, data, errs, base64);
-  }
-
-  std::string makeRESTAnswer(int& code);
-};
 
 std::string vomsresult::makeRESTAnswer(int& code)
 {
@@ -218,10 +174,8 @@ typedef int (*gv)();
 
 cdb NewDB;
 gv  getlibversion;
-int default_validity = -1;
 
-bool compat_flag = false;
-bool short_flags = false;
+bool dummyb = false;
 
 static bool checkinside(gattrib g, std::vector<std::string> list);
 static void AdjustURI(std::string &uri, int port);
@@ -233,7 +187,6 @@ static int (*pw_cb)() = NULL;
 static char *canonicalize_string(char *original);
 static bool makeACSSL(vomsresult &vr, SSL *ssl, const std::string& command, const std::string &orderstring, const std::string& targets, int requested, VOMSServer *v);
 static int makeACREST(struct soap *soap, const std::string& command, const std::string& orderstring, const std::string& targets, int requested, int unknown);
-static bool makeAC(vomsresult &vr, EVP_PKEY *key, X509 *issuer, X509 *holder, const std::string &message, VOMSServer *v);
 static int http_get(soap *soap);
 static BIGNUM *get_serial();
 static int pwstdin_callback(char * buf, int num, UNUSED(int w));
@@ -475,7 +428,7 @@ VOMSServer::VOMSServer(int argc, char *argv[]) : sock(0,NULL,50,false),
     {"logformat",       1, (int *)&logf,              OPT_STRING},
     {"logdateformat",   1, (int *)&logdf,             OPT_STRING},
     {"sqlloc",          1, (int *)&sqllib,            OPT_STRING},
-    {"compat",          1, (int *)&compat_flag,       OPT_BOOL},
+    {"compat",          1, (int *)&dummyb,            OPT_BOOL},
     {"socktimeout",     1, &socktimeout,              OPT_NUM},
     {"logmax",          1, &logmax,                   OPT_NUM},
     {"newformat",       1, (int *)&newformat,         OPT_BOOL},
@@ -507,12 +460,8 @@ VOMSServer::VOMSServer(int argc, char *argv[]) : sock(0,NULL,50,false),
   if (!getopts(argc, argv, opts))
     throw VOMSInitException("unable to read options");
 
-  short_flags = shortfqans;
-  default_validity = validity;
   VOName = voname;
-  maingroup = (char *)malloc(strlen(voname.c_str())+2);
-  maingroup = strcpy(maingroup, "/");
-  maingroup = strcat(maingroup, voname.c_str());
+  maingroup = snprintf_wrap("/%s", voname.c_str());
 
   if (socktimeout == -1 && debug)
     socktimeout = 0;
@@ -859,8 +808,8 @@ void VOMSServer::Run()
   catch (...) {}
 }
 
-static bool makeAC(vomsresult& vr, EVP_PKEY *key, X509 *issuer, X509 *holder, 
-                   const std::string &message, VOMSServer *v)
+bool VOMSServer::makeAC(vomsresult& vr, EVP_PKEY *key, X509 *issuer, 
+			X509 *holder, const std::string &message)
 {
   LOGM(VARP, logh, LEV_DEBUG, T_PRE, "Received Request: %s", message.c_str());
 
@@ -874,7 +823,7 @@ static bool makeAC(vomsresult& vr, EVP_PKEY *key, X509 *issuer, X509 *holder,
 
   std::vector<std::string> comm = r.command;
 
-  vr.setBase64(v->base64encoding | r.base64);
+  vr.setBase64(base64encoding | r.base64);
 
   int requested = r.lifetime;
 
@@ -897,12 +846,12 @@ static bool makeAC(vomsresult& vr, EVP_PKEY *key, X509 *issuer, X509 *holder,
 
   if (requested != 0) {
     if (requested == -1)
-      requested = v->validity;
-    else if (v->validity < requested) {
+      requested = validity;
+    else if (validity < requested) {
       vr.setError(WARN_SHORT_VALIDITY,
-                  v->uri + ": The validity of this VOMS AC in your proxy is shortened to " +
-                  stringify(v->validity, tmp) + " seconds!");
-      requested = v->validity;
+                  uri + ": The validity of this VOMS AC in your proxy is shortened to " +
+                  stringify(validity, tmp) + " seconds!");
+      requested = validity;
     }
   }
 
@@ -913,8 +862,8 @@ static bool makeAC(vomsresult& vr, EVP_PKEY *key, X509 *issuer, X509 *holder,
   sqliface::interface *newdb = db->getSession();
 
   if (!newdb) {
-    vr.setError(ERR_WITH_DB, v->voname + ": Problems in DB communication.");
-    LOGM(VARP, logh, LEV_ERROR, T_PRE, "%s: Problems in DB communication.", v->voname.c_str());
+    vr.setError(ERR_WITH_DB, voname + ": Problems in DB communication.");
+    LOGM(VARP, logh, LEV_ERROR, T_PRE, "%s: Problems in DB communication.", voname.c_str());
     return false;
   }
 
@@ -1011,11 +960,11 @@ static bool makeAC(vomsresult& vr, EVP_PKEY *key, X509 *issuer, X509 *holder,
 
     std::string msg;
 
-    if (command == (std::string("G/")+ v->voname) ||
-        command == (std::string("/") + v->voname))
-      msg = v->voname + ": User unknown to this VO.";
+    if (command == (std::string("G/")+ voname) ||
+        command == (std::string("/") + voname))
+      msg = voname + ": User unknown to this VO.";
     else
-      msg = v->voname + ": Unable to satisfy " + command + " Request!";
+      msg = voname + ": Unable to satisfy " + command + " Request!";
 
     vr.setError(ERR_NOT_MEMBER, msg);
 
@@ -1056,19 +1005,19 @@ static bool makeAC(vomsresult& vr, EVP_PKEY *key, X509 *issuer, X509 *holder,
     /* check whether the user is allowed to requests those attributes */
     vomsdata vd("", "");
     vd.SetVerificationType((verify_type)(VERIFY_SIGN));
-    vd.Retrieve(v->sock.actual_cert, v->sock.peer_stack, RECURSE_DEEP);
+    vd.Retrieve(sock.actual_cert, sock.peer_stack, RECURSE_DEEP);
 
     /* find the attributes corresponding to the vo */
     std::vector<std::string> existing;
     for(std::vector<voms>::iterator index = (vd.data).begin(); index != (vd.data).end(); ++index) {
-      if(index->voname == v->voname)
+      if(index->voname == voname)
         existing.insert(existing.end(),
                      index->fqan.begin(),
                      index->fqan.end());
     }
   
     // Adjust for long/short format
-    if (!short_flags && !fqans.empty()) {
+    if (!shortfqans && !fqans.empty()) {
       std::vector<std::string> newfqans(fqans);
       fqans.clear();
       std::vector<std::string>::iterator i = newfqans.begin();
@@ -1107,14 +1056,14 @@ static bool makeAC(vomsresult& vr, EVP_PKEY *key, X509 *issuer, X509 *holder,
     // no attributes can be send
     if (fqans.empty()) {
       LOG(logh, LEV_ERROR, T_PRE, "Error in executing request!");
-      vr.setError(ERR_ATTR_EMPTY, v->voname + " : your certificate already contains attributes, only a subset of them can be issued.");
+      vr.setError(ERR_ATTR_EMPTY, voname + " : your certificate already contains attributes, only a subset of them can be issued.");
       return false;
     }
 
     // some attributes can't be send
     if(subset) {
       LOG(logh, LEV_ERROR, T_PRE, "Error in executing request!");
-      vr.setError(WARN_ATTR_SUBSET, v->voname + " : your certificate already contains attributes, only a subset of them can be issued.");
+      vr.setError(WARN_ATTR_SUBSET, voname + " : your certificate already contains attributes, only a subset of them can be issued.");
     }
   }
 
@@ -1155,8 +1104,8 @@ static bool makeAC(vomsresult& vr, EVP_PKEY *key, X509 *issuer, X509 *holder,
           for(std::vector<gattrib>::iterator i = attribs.begin(); i != attribs.end(); ++i)
             attributes_compact.push_back(i->str());
 
-          res = createac(issuer, v->sock.own_stack, holder, key, serial,
-                         fqans, targs, attributes_compact, &a, v->voname, v->uri, requested, !v->newformat,
+          res = createac(issuer, sock.own_stack, holder, key, serial,
+                         fqans, targs, attributes_compact, &a, voname, uri, requested, !newformat,
                          NULL);
         }
 
@@ -1202,7 +1151,7 @@ static bool makeAC(vomsresult& vr, EVP_PKEY *key, X509 *issuer, X509 *holder,
     return true;
   }
   else {
-    vr.setError(ERR_NOT_MEMBER, std::string("You are not a member of the ") + v->voname + " VO!");
+    vr.setError(ERR_NOT_MEMBER, std::string("You are not a member of the ") + voname + " VO!");
     return false;
   }
 }
@@ -1226,7 +1175,7 @@ VOMSServer::Execute(EVP_PKEY *key, X509 *issuer, X509 *holder)
   }
 
   vomsresult vr;
-  (void)makeAC(vr, key, issuer, holder, message, this);
+  (void)makeAC(vr, key, issuer, holder, message);
   std::string answer = vr.makeXMLAnswer();
 
   LOGM(VARP, logh, LEV_DEBUG, T_PRE, "Sending: %s", answer.c_str());
@@ -1273,7 +1222,7 @@ void VOMSServer::UpdateOpts(void)
     {"logformat",       1, (int *)&logf,              OPT_STRING},
     {"logdateformat",   1, (int *)&logdf,             OPT_STRING},
     {"sqlloc",          1, (int *)&sqllib,            OPT_STRING},
-    {"compat",          0, (int *)&compat_flag,       OPT_BOOL},
+    {"compat",          0, (int *)&dummyb,            OPT_BOOL},
     {"socktimeout",     1, &socktimeout,              OPT_NUM},
     {"logmax",          1, &logmax,                   OPT_NUM},
     {"newformat",       0, (int *)&newformat,         OPT_BOOL},
@@ -1293,8 +1242,6 @@ void VOMSServer::UpdateOpts(void)
     LOG(logh, LEV_ERROR, T_PRE, "Unable to read options!");
     throw VOMSInitException("unable to read options");
   }
-
-  short_flags = shortfqans;
 
   if (nlogfile.size() != 0) {
     LOGM(VARP, logh, LEV_INFO, T_PRE, "Attempt redirecting logs to: %s", logfile.c_str());
@@ -1496,7 +1443,7 @@ makeACSSL(vomsresult &vr, SSL *ssl, const std::string& command, const std::strin
 
   std::string message = XML_Req_Encode(command, orderstring, targets, requested);
 
-  bool ret = makeAC(vr, key, issuer, holder, message, selfpointer);
+  bool ret = selfpointer->makeAC(vr, key, issuer, holder, message);
   X509_free(issuer);
   EVP_PKEY_free(key);
 
