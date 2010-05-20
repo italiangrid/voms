@@ -861,17 +861,20 @@ vomsdata::check(UNUSED(check_sig f), UNUSED(void *data))
 }
 
 bool
-vomsdata::my_conn(const std::string &hostname, int port, const std::string &contact,
-	const std::string &command, std::string &u, std::string &uc,
-                  std::string &buf)
+vomsdata::my_conn(UNUSED(const std::string &hostname), UNUSED(int port), 
+		  UNUSED(const std::string &contact),
+		  UNUSED(const std::string &command), UNUSED(std::string &u), 
+		  UNUSED(std::string &uc), UNUSED(std::string &buf))
 {
   return false;
 }
 
 bool
-vomsdata::contact(const std::string &hostname, int port, const std::string &contact,
-	const std::string &command, std::string &buffer, std::string &username,
-                  std::string &ca)
+vomsdata::contact(UNUSED(const std::string &hostname), UNUSED(int port), 
+		  UNUSED(const std::string &contact),
+		  UNUSED(const std::string &command), 
+		  UNUSED(std::string &buffer), UNUSED(std::string &username),
+                  UNUSED(std::string &ca))
 {
   return false;
 }   
