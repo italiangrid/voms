@@ -451,7 +451,7 @@ bool Fake::Run()
   /* contacts servers for each vo */
 
   if (volist)
-    if (!Retrieve(volist))
+    if (!MakeACs(volist))
       exit(1);
 
   /* set output file and environment */
@@ -651,7 +651,7 @@ void Fake::Test()
   }
 }
 
-bool Fake::Retrieve(VOLIST *volist) 
+bool Fake::MakeACs(VOLIST *volist) 
 {
   AC **actmplist = NULL;
   AC *ac = NULL;
@@ -672,6 +672,7 @@ bool Fake::Retrieve(VOLIST *volist)
       int hcertres = BIO_read_filename(hcrt, vo->hostcert);
       int holderres = BIO_read_filename(hckey, vo->hostkey);
       int hkeyres = BIO_read_filename(owncert, certfile);
+
       if ((hcertres  > 0) && (holderres > 0) && (hkeyres > 0)) {
         hcert = PEM_read_bio_X509(hcrt, NULL, 0, NULL);
         holder = PEM_read_bio_X509(owncert, NULL, 0, NULL);
@@ -889,7 +890,7 @@ bool Fake::VerifyOptions()
   else {
     /* selfsigned is specified */
     if (proxyver != 0 || noregen || rfc || !policyfile.empty() || !policylang.empty())
-      exitError("Error: --proxyver, --rfc, --policyfile, --policylang, --noregen are only significant when --selfsignd is not specified.");
+      exitError("Error: --proxyver, --rfc, --policyfile, --policylang, --noregen are only significant when --selfsigned is not specified.");
 
     if (newsubject.empty() && newissuer.empty())
       exitError("Error: At least one of --newsubject and --newissuer must be specified for --selfsigned.");
