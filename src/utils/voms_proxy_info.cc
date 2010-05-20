@@ -297,7 +297,7 @@ int numbits(X509 *cert)
   return bits;
 }
 
-static char *findlast(char *haystack, char *needle)
+static char *findlast(const char *haystack, const char *needle)
 {
   char *point = strstr(haystack, needle);
   char *tmp = point;
