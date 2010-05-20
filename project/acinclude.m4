@@ -391,8 +391,6 @@ AC_DEFUN([AC_COMPILER],
     if test "x$ac_with_debug" = "xyes" ; then
       CFLAGS="-g -O0"
       CXXFLAGS="-g -O0"
-      CFLAGS="-g -O0 -fprofile-arcs -ftest-coverage"
-      CXXFLAGS="-g -O0 -fprofile-arcs -ftest-coverage"
     fi
 
     AC_ARG_WITH(warnings,
@@ -1053,6 +1051,11 @@ AC_DEFUN([AC_TESTSUITE],
       esac
     ],
     [ enable_coverage="no" ])
+
+  if test "x$enable_coverage" = "xyes" ; then
+     CFLAGS="$CFLAGS -fprofile-arcs -ftest-coverage"
+     CXXFLAGS="$CXXFLAGS -fprofile-arcs -ftest-coverage"
+  fi
 
   AC_SUBST(with_reportdir)
   AC_SUBST(with_scratchdir)
