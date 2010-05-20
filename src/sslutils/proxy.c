@@ -119,6 +119,10 @@ static int kpcallback(int UNUSED(p), int UNUSED(n))
   return 0;
 }
 
+#define SET_EXT(ex)  (!sk_X509_EXTENSION_push(extensions, (ex)) ? \
+   (PRXYerr(PRXYERR_F_PROXY_SIGN, PRXYERR_R_CLASS_ADD_EXT), 0) : \
+   ((ex = ((X509_EXTENSION*)NULL)), 1))
+
 struct VOMSProxy *VOMS_MakeProxy(struct VOMSProxyArguments *args, int *warning, void **additional) 
 {
   char *value = NULL;
@@ -133,10 +137,6 @@ struct VOMSProxy *VOMS_MakeProxy(struct VOMSProxyArguments *args, int *warning, 
     *ex4 = NULL, *ex5 = NULL, *ex6 = NULL, *ex7 = NULL, 
     *ex8 = NULL, *ex9 = NULL, *ex10 = NULL, *ex11 = NULL,
     *ex12 = NULL, *ex13 = NULL;
-
-  int voms = 0, classadd = 0, file = 0, vo = 0, acs = 0, info = 0, 
-    kusg = 0, order = 0, extku = 0, nscert = 0, akey = 0, extbc = 0,
-    skey = 0;
 
   int i = 0;
   int proxyindex;
@@ -203,12 +203,8 @@ struct VOMSProxy *VOMS_MakeProxy(struct VOMSProxyArguments *args, int *warning, 
       goto err;
     }
 
-    if (!sk_X509_EXTENSION_push(extensions, ex1)) {
-      PRXYerr(PRXYERR_F_PROXY_SIGN, PRXYERR_R_CLASS_ADD_EXT);
+    if (!SET_EXT(ex1))
       goto err;
-    }
-
-    voms = 1;
   }
 
   /* include extension */
@@ -224,12 +220,8 @@ struct VOMSProxy *VOMS_MakeProxy(struct VOMSProxyArguments *args, int *warning, 
         goto err;
       }
 
-      if (!sk_X509_EXTENSION_push(extensions, ex3)) {
-        PRXYerr(PRXYERR_F_PROXY_SIGN, PRXYERR_R_CLASS_ADD_EXT);
-        goto err;
-      }
-
-      file = 1;
+      if (!SET_EXT(ex3))
+	goto err;
     }
     else {
       setAdditional(additional, args->filename);
@@ -246,12 +238,8 @@ struct VOMSProxy *VOMS_MakeProxy(struct VOMSProxyArguments *args, int *warning, 
       goto err;
     }
     
-    if (!sk_X509_EXTENSION_push(extensions, ex5)) {
-      PRXYerr(PRXYERR_F_PROXY_SIGN, PRXYERR_R_CLASS_ADD_EXT);
+    if (!SET_EXT(ex5))
       goto err;
-    }
-    
-    acs = 1;
   }
 
   /* keyUsage extension */
@@ -280,12 +268,8 @@ struct VOMSProxy *VOMS_MakeProxy(struct VOMSProxyArguments *args, int *warning, 
 
   X509_EXTENSION_set_critical(ex8, 1);
 
-  if (!sk_X509_EXTENSION_push(extensions, ex8)) {
-    PRXYerr(PRXYERR_F_PROXY_SIGN,PRXYERR_R_CLASS_ADD_EXT);
+  if (!SET_EXT(ex8))
     goto err;
-  }
-
-  kusg = 1;
 
   /* netscapeCert extension */
   if (args->netscape) {
@@ -295,12 +279,8 @@ struct VOMSProxy *VOMS_MakeProxy(struct VOMSProxyArguments *args, int *warning, 
       goto err;
     }
 
-    if (!sk_X509_EXTENSION_push(extensions, ex9)) {
-      PRXYerr(PRXYERR_F_PROXY_SIGN,PRXYERR_R_CLASS_ADD_EXT);
+    if (!SET_EXT(ex9))
       goto err;
-    }
-
-    nscert = 1;
   }
 
   /* extended key usage */
@@ -311,12 +291,8 @@ struct VOMSProxy *VOMS_MakeProxy(struct VOMSProxyArguments *args, int *warning, 
       goto err;
     }
 
-    if (!sk_X509_EXTENSION_push(extensions, ex10)) {
-      PRXYerr(PRXYERR_F_PROXY_SIGN,PRXYERR_R_CLASS_ADD_EXT);
+    if (!SET_EXT(ex10))
       goto err;
-    }
-
-    extku = 1;
   }
 
   /* Basic Constraints */
@@ -328,12 +304,8 @@ struct VOMSProxy *VOMS_MakeProxy(struct VOMSProxyArguments *args, int *warning, 
 
   X509_EXTENSION_set_critical(ex12, 1);
 
-  if (!sk_X509_EXTENSION_push(extensions, ex12)) {
-    PRXYerr(PRXYERR_F_PROXY_SIGN,PRXYERR_R_CLASS_ADD_EXT);
+  if (!SET_EXT(ex12))
     goto err;
-  }
-
-  extbc = 1;
  
   /* vo extension */
   
@@ -343,12 +315,8 @@ struct VOMSProxy *VOMS_MakeProxy(struct VOMSProxyArguments *args, int *warning, 
       goto err;
     }
     
-    if (!sk_X509_EXTENSION_push(extensions, ex4)) {
-      PRXYerr(PRXYERR_F_PROXY_SIGN,PRXYERR_R_CLASS_ADD_EXT);
+    if (!SET_EXT(ex4))
       goto err;
-    }
-    
-    vo = 1;
   }
   
   /* authority key identifier and subject key identifier extension */
@@ -367,12 +335,8 @@ struct VOMSProxy *VOMS_MakeProxy(struct VOMSProxyArguments *args, int *warning, 
         goto err;
       }
           
-      if (!sk_X509_EXTENSION_push(extensions, ex13)) {
-        PRXYerr(PRXYERR_F_PROXY_SIGN,PRXYERR_R_CLASS_ADD_EXT);
-        goto err;
-      }
-
-      skey = 1;
+      if (!SET_EXT(ex13))
+	goto err;
 
       tmpcert = X509_new();
       if (tmpcert) {
@@ -394,18 +358,8 @@ struct VOMSProxy *VOMS_MakeProxy(struct VOMSProxyArguments *args, int *warning, 
       goto err;
     }
           
-    if (!sk_X509_EXTENSION_push(extensions, ex11)) {
-      PRXYerr(PRXYERR_F_PROXY_SIGN,PRXYERR_R_CLASS_ADD_EXT);
+    if (!SET_EXT(ex11))
       goto err;
-    }
-
-    akey = 1;
-  }
-
-  {
-    X509V3_CTX ctx;
-    X509V3_set_ctx(&ctx, (args->selfsigned ? NULL : args->cert), NULL, req, NULL, 0);
-
   }
 
   /* class_add extension */
@@ -418,12 +372,8 @@ struct VOMSProxy *VOMS_MakeProxy(struct VOMSProxyArguments *args, int *warning, 
       goto err;
     }
     
-    if (!sk_X509_EXTENSION_push(extensions, ex2)) {
-      PRXYerr(PRXYERR_F_PROXY_SIGN,PRXYERR_R_CLASS_ADD_EXT);
+    if (!SET_EXT(ex2))
       goto err;
-    }
-    
-    classadd = 1;
   }
 
 #endif
@@ -560,10 +510,8 @@ struct VOMSProxy *VOMS_MakeProxy(struct VOMSProxyArguments *args, int *warning, 
       X509_EXTENSION_set_critical(ex7, 1);
     }
 
-    if (!sk_X509_EXTENSION_push(extensions, ex7)) {
-      PRXYerr(PRXYERR_F_PROXY_SIGN,PRXYERR_R_CLASS_ADD_EXT);
+    if (!SET_EXT(ex7))
       goto err;
-    }
   }
   
   if (!args->selfsigned)  {
@@ -624,39 +572,24 @@ struct VOMSProxy *VOMS_MakeProxy(struct VOMSProxyArguments *args, int *warning, 
 
   if (extensions) {
     sk_X509_EXTENSION_pop_free(extensions, X509_EXTENSION_free);
-    akey = extku = nscert = order = kusg = voms = classadd = 
-      file = vo = acs = info = extbc = skey = 0;
   }
   if (!args->proxyrequest)
     X509_REQ_free(req);
 
 
-  if (skey)
-    X509_EXTENSION_free(ex13);
-  if (extbc)
-    X509_EXTENSION_free(ex12);
-  if (akey)
-    X509_EXTENSION_free(ex11);
-  if (extku)
-    X509_EXTENSION_free(ex10);
-  if (nscert)
-    X509_EXTENSION_free(ex9);
-  if (kusg)
-    X509_EXTENSION_free(ex8);
-  if (order)
-    X509_EXTENSION_free(ex6);
-  if (info)
-    X509_EXTENSION_free(ex7);
-  if (acs)
-    X509_EXTENSION_free(ex5);
-  if (voms)
-    X509_EXTENSION_free(ex2);
-  if (file)
-    X509_EXTENSION_free(ex3);
-  if (vo)
-    X509_EXTENSION_free(ex4);
-  if (classadd)
-    X509_EXTENSION_free(ex1);
+  X509_EXTENSION_free(ex13);
+  X509_EXTENSION_free(ex12);
+  X509_EXTENSION_free(ex11);
+  X509_EXTENSION_free(ex10);
+  X509_EXTENSION_free(ex9);
+  X509_EXTENSION_free(ex8);
+  X509_EXTENSION_free(ex6);
+  X509_EXTENSION_free(ex7);
+  X509_EXTENSION_free(ex5);
+  X509_EXTENSION_free(ex2);
+  X509_EXTENSION_free(ex3);
+  X509_EXTENSION_free(ex4);
+  X509_EXTENSION_free(ex1);
 
   free(value);
   return proxy;
@@ -886,8 +819,6 @@ static int convertMethod(char *bits, int *warning, void **additional)
 
 char *ProxyCreationError(int error, void *additional)
 {
-  char *str = NULL;
-
   switch (error) {
   case PROXY_NO_ERROR:
     return NULL;
