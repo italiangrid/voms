@@ -397,20 +397,6 @@ static void *myproxycertinfo_s2i(UNUSED(struct v3_ext_method *method), UNUSED(st
   return (myPROXYCERTINFO*)data;
 }
 
-static char *stradd(char *orig, char *new)
-{
-  char *str = realloc(orig, (orig ? strlen(orig) : 0) + strlen(new) +1);
-
-  if (str) {
-    if (!orig)
-      str[0] = '\0';
-
-    return strcat(str, new);
-  }
-  else
-    return orig;
-}
-
 static char *myproxycertinfo_i2s(UNUSED(struct v3_ext_method *method), void *ext)
 {
   myPROXYCERTINFO *pci = NULL;
