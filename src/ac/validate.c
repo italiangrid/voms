@@ -436,7 +436,7 @@ static int checkAttributes(STACK_OF(AC_ATTR) *atts, struct col *voms)
       if (!str || !str2)
         goto err;
 
-      if (!(tmp=listadd(list, str, sizeof(str))))
+      if (!(tmp=listadd(list, str)))
         goto err;
 
       list = tmp;
@@ -462,7 +462,7 @@ static int checkAttributes(STACK_OF(AC_ATTR) *atts, struct col *voms)
       d->role  = r;
       d->cap   = c;
 
-      if (!(dtmp = (struct data **)listadd((char **)dlist, (char *)d, sizeof(d))))
+      if (!(dtmp = (struct data **)listadd((char **)dlist, (char *)d)))
         goto err;
 
       dlist = dtmp;
@@ -716,7 +716,7 @@ static int interpret_attributes(AC_FULL_ATTRIBUTES *full_attr, struct col *voms)
       a->qual = qualifier;
       name = value = qualifier = NULL;
 
-      tmp = listadd((char **)(al->attrs), (char *)a, sizeof(a));
+      tmp = listadd((char **)(al->attrs), (char *)a);
       if (tmp) {
         al->attrs = (struct att **)tmp;
         a = NULL;
@@ -735,7 +735,7 @@ static int interpret_attributes(AC_FULL_ATTRIBUTES *full_attr, struct col *voms)
     al->grantor = grant;
     grant = NULL;
 
-    tmp = listadd((char **)(fa->list), (char *)al, sizeof(al));
+    tmp = listadd((char **)(fa->list), (char *)al);
     if (tmp) {
       fa->list = (struct att_list **)tmp;
       al = NULL;

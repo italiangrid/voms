@@ -25,6 +25,7 @@
 #include "config.h"
 #include <openssl/x509.h>
 #include "parsertypes.h"
+#include "doio.h"
 
 #include <regex.h>
 #include <stdio.h>
@@ -317,11 +318,8 @@ void free_policies(struct policy **policies)
 
 static FILE *open_from_dir(char *path, char *filename)
 {
-  char *realpath=(char*)malloc(strlen(path) + strlen(filename) +2);
+  char *realpath=snprintf_wrap("%s%s", path, filename);
   FILE *file = NULL;
-
-  strcpy(realpath, path);
-  strcat(realpath, filename);
 
   file = fopen(realpath, "rb");
 

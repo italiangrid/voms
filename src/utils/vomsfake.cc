@@ -376,7 +376,7 @@ Fake::Fake(int argc, char ** argv) :   confile(CONFILENAME),
       volist->vos = NULL;
     }
     voelem = (VO*)calloc(1, sizeof(VO));
-    volist->vos = (VO**)listadd((char**)volist->vos, (char*)voelem, sizeof(VO*));
+    volist->vos = (VO**)listadd((char**)volist->vos, (char*)voelem);
 
     voelem->hostcert = (char*)hostcert.c_str();
     voelem->hostkey = (char*)hostkey.c_str();
@@ -729,7 +729,7 @@ bool Fake::Retrieve(VOLIST *volist)
     }
 
     if (!res)
-      actmplist = (AC **)listadd((char **)aclist, (char *)ac, sizeof(AC *));
+      actmplist = (AC **)listadd((char **)aclist, (char *)ac);
 
     if (actmplist)
       aclist = actmplist;

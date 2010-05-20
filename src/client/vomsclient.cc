@@ -1016,7 +1016,7 @@ bool Client::AddToList(AC *ac)
   if (!ac)
     return false;
 
-  actmplist = (AC **)listadd((char **)aclist, (char *)ac, sizeof(AC *));
+  actmplist = (AC **)listadd((char **)aclist, (char *)ac);
 
 
   if (actmplist) {
