@@ -162,11 +162,8 @@ typedef std::map<std::string, int> ordermap;
 
 static ordermap ordering;
 
-static std::string firstfqan="";
-
 static std::string sqllib = "";
 
-static std::string VOName="";
 static char *maingroup = NULL;
 
 typedef sqliface::interface* (*cdb)();
@@ -180,7 +177,7 @@ bool dummyb = false;
 static bool checkinside(gattrib g, std::vector<std::string> list);
 static void AdjustURI(std::string &uri, int port);
 static bool get_parameter(char **path, char **name, char **value);
-static signed long int get_userid(sqliface::interface *db, X509 *cert, vomsresult &vr);
+static signed long int get_userid(sqliface::interface *db, X509 *cert, const std::string& voname, vomsresult &vr);
 static std::string addtoorder(std::string previous, char *group, char *role);
 static bool determine_group_and_role(std::string command, char *comm, char **group, char **role);
 static int (*pw_cb)() = NULL;
@@ -195,7 +192,7 @@ static void sighup_handler(UNUSED(int sig));
 static void sigterm_handler(UNUSED(int sig));
 static bool compare(const std::string &lhs, const std::string &rhs);
 static void orderattribs(std::vector<std::string> &v);
-static void parse_order(const std::string &message, ordermap &ordering);
+static std::string parse_order(const std::string &message, ordermap &ordering);
 static void parse_targets(const std::string &message, std::vector<std::string> &target);
 static bool not_in(std::string fqan, std::vector<std::string> fqans);
 static int hexint(char c);
@@ -269,9 +266,11 @@ static void orderattribs(std::vector<std::string> &v)
   std::partial_sort(v.begin(), v.begin() + sortsize, v.end(), compare);
 }
 
-static void parse_order(const std::string &message, ordermap &ordering)
+static std::string parse_order(const std::string &message, ordermap &ordering)
 {
   int order = 0;
+  std::string first;
+
   std::string::size_type position = 0; // Will be set to 0 at first iteration
 
   LOGM(VARP, logh, LEV_DEBUG, T_PRE, "Initiating parse order: %s",message.c_str());
@@ -299,8 +298,8 @@ static void parse_order(const std::string &message, ordermap &ordering)
       fqan = attribute.substr(0, divider) +
         "/Role=" + attribute.substr(divider+1);
 
-    if (firstfqan.empty())
-      firstfqan = fqan;
+    if (first.empty())
+      first = fqan;
 
     LOGM(VARP, logh, LEV_DEBUG, T_PRE, "Order: %s",fqan.c_str());
     ordering.insert(std::make_pair<std::string, int>(fqan,order));
@@ -310,6 +309,8 @@ static void parse_order(const std::string &message, ordermap &ordering)
     if (position != std::string::npos)
       position ++;
   }
+
+  return first;
 }
 
 static void parse_targets(const std::string &message,
@@ -460,7 +461,6 @@ VOMSServer::VOMSServer(int argc, char *argv[]) : sock(0,NULL,50,false),
   if (!getopts(argc, argv, opts))
     throw VOMSInitException("unable to read options");
 
-  VOName = voname;
   maingroup = snprintf_wrap("/%s", voname.c_str());
 
   if (socktimeout == -1 && debug)
@@ -829,7 +829,6 @@ bool VOMSServer::makeAC(vomsresult& vr, EVP_PKEY *key, X509 *issuer,
 
   std::vector<std::string> targs;
 
-  firstfqan = "";
   ordering.clear();
 
   parse_targets(r.targets, targs);
@@ -869,7 +868,7 @@ bool VOMSServer::makeAC(vomsresult& vr, EVP_PKEY *key, X509 *issuer,
 
   /* Determine user ID in the DB */
 
-  if ((uid = get_userid(newdb, holder, vr)) == -1) {
+  if ((uid = get_userid(newdb, holder, voname, vr)) == -1) {
     db->releaseSession(newdb);
     return false;
   }
@@ -976,7 +975,7 @@ bool VOMSServer::makeAC(vomsresult& vr, EVP_PKEY *key, X509 *issuer,
   /* do ordering */
   LOGM(VARP, logh, LEV_DEBUG,T_PRE, "ordering: %s", r.order.c_str());
 
-  parse_order(r.order, ordering);
+  std::string firstfqan = parse_order(r.order, ordering);
 
   // remove duplicates
   std::sort(fqans.begin(), fqans.end());
@@ -1652,6 +1651,7 @@ static void AdjustURI(std::string &uri, int port)
     int   hostnamesize = 50;
     char *hostname = new char[1];
     int ok = 0;
+
     do {
       delete[] hostname;
       hostname = new char[hostnamesize];
@@ -1667,7 +1667,7 @@ static void AdjustURI(std::string &uri, int port)
   }
 }
 
-static signed long int get_userid(sqliface::interface *db, X509 *cert, vomsresult &vr)
+static signed long int get_userid(sqliface::interface *db, X509 *cert, const std::string& voname, vomsresult &vr)
 {
   signed long int uid = -1;
 
@@ -1688,11 +1688,11 @@ static signed long int get_userid(sqliface::interface *db, X509 *cert, vomsresul
       vr.setError(ERR_SUSPENDED, msg);
     }
     else if (code != ERR_NO_DB) {
-      msg = VOName + ": User unknown to this VO.";
+      msg = voname + ": User unknown to this VO.";
       vr.setError(ERR_NOT_MEMBER, msg);
     }
     else {
-      msg = VOName + ": Problems in DB communication.";
+      msg = voname + ": Problems in DB communication: " + message;
       vr.setError(ERR_WITH_DB, msg);
     }
 
