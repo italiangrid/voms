@@ -491,7 +491,6 @@ proxy_sign_ext(
     X509_NAME *                         subject_name,
     X509_NAME *                         issuer_name,    
     int                                 seconds,
-    int                                 serial_num,
     STACK_OF(X509_EXTENSION) *          extensions,
     int                                 proxyver,
     int                                 pastproxy,
