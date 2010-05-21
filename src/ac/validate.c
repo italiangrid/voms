@@ -48,7 +48,7 @@
 #include "../api/ccapi/voms_apic.h"
 #include "validate.h"
 #include "listfunc.h"
-
+#include "doio.h"
 
 #include <stdlib.h>
 #include <string.h>
@@ -652,17 +652,10 @@ static char *getfqdn(void)
   name = NULL;
 
   if ((!gethostname(hostname, 255)) && (!getdomainname(domainname, 255))) {
-    if ((name = malloc(strlen(hostname)+strlen(domainname)+2))) {
-      strcpy(name, hostname);
-      if (strcmp(domainname, "(none)")) {
-        if (*domainname == '.')
-          strcat(name, domainname);
-        else {
-          strcat(name, ".");
-          strcat(name, domainname);
-        }
-      }
-      strcat(name, "\0");
+    if (!strcmp(domainname, "(none)")) {
+      domainname[0]='\0';
+
+      name = snprintf_wrap("%s%s%s", hostname, (domainname[0] == '.' ? "." : ""), domainname);
     }
   }
   return name;
