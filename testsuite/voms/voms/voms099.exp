@@ -15,7 +15,7 @@ proc mytest {} {
     close $id
     set out ""
 
-    set res [catch {set out [exec openssl s_client -connect localhost:33334 -CApath $::_cadir -cert $::env(HOME)/.globus2/usercert.pem -key $::env(HOME)/.globus2/userkey.pem -quiet 2>$errname <$tempfile >$outname]}]
+    set res [catch {set out [exec openssl s_client -connect localhost:33334 -CApath $::_cadir -cert $::env(X509_USER_CERT) -key $::env(X509_USER_KEY) -quiet 2>$errname <$tempfile >$outname]}]
 
     _vomsStop voms1
 
