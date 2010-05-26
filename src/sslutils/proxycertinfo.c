@@ -388,6 +388,11 @@ static char *myproxycertinfo_i2s(UNUSED(struct v3_ext_method *method), void *ext
 {
   myPROXYCERTINFO *pci = NULL;
   char *encoding = NULL;
+  char *output = NULL;
+  myPROXYPOLICY *pp;
+  int dooid = 0;
+  char oid[256];
+
   pci = (myPROXYCERTINFO *)ext;
  
   if (!pci)
@@ -397,33 +402,26 @@ static char *myproxycertinfo_i2s(UNUSED(struct v3_ext_method *method), void *ext
     int j = ASN1_INTEGER_get(pci->path_length);
 
     char *buffer = snprintf_wrap("%X", j);
-    encoding = snprintf_wrap("Path Length Constraint: %s%s\n\n", strlen(buffer)%2 ? "0" : "", buffer);
+    output = snprintf_wrap("Path Length Constraint: %s%s\n\n", strlen(buffer)%2 ? "0" : "", buffer);
     free(buffer);
   }
   else
-    encoding = snprintf_wrap("Path Length Constraint: unlimited\n");
+    output = strdup("Path Length Constraint: unlimited\n");
 
-  myPROXYPOLICY *pp = pci->proxypolicy;
+  pp = pci->proxypolicy;
 
-  if (pci) {
-    encoding = snprintf_wrap("%sPolicy Language: ", encoding);
-    char oid[256];
-
-    if (i2t_ASN1_OBJECT(oid, 256, pp->policy_language)) {
-      encoding = snprintf_wrap("%s%s", encoding, oid);
-
-      if (pp->policy) {
-        unsigned char *data = ASN1_STRING_data(pp->policy);
-
-        if (data){
-          encoding = snprintf_wrap("%s\nPolicy Text: %s\n", encoding, (char *)data);
-        }
-      }
-    }
+  if (pp && i2t_ASN1_OBJECT(oid, 256, pp->policy_language)) {
+    dooid  = 1;
   }
 
-  encoding = snprintf_wrap("%s\n",encoding);
+  encoding = snprintf_wrap("%sPolicy Language: %s%s%s%s\n", 
+			   output, 
+			   ( dooid ? oid : ""), 
+			   ( (pp && pp->policy) ? "\nPolicy Text: " : ""), 
+			   ( (pp && pp->policy) ? ASN1_STRING_data(pp->policy) : ""),
+			   ( (pp && pp->policy) ? "\n" : ""));
 
+  free(output);
   return encoding;
 }
 
