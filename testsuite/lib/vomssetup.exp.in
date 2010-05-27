@@ -375,7 +375,11 @@ proc _execJava { name {arg1 ""} {arg2 ""} {arg3 ""}} {
         }
 
         set DIRNAME "[file dirname [info script]]"
-        set VALUE "java [format %s $PROPERTIES] -classpath .:$::INSTALLDIR/share/java/vomsjapi.jar:@JAVA_CLASSPATH2@:@JAVA_CLASSPATH@:$::env(CLASSPATH):$DIRNAME $classname"
+	if [expr ![string equal $::COBERTURA "no"]] then {
+	    set VALUE "java [format %s $PROPERTIES] -classpath $::COBERTURA/cobertura.jar:.:$::INSTALLDIR/share/java/vomsjapi.jar:@JAVA_CLASSPATH2@:@JAVA_CLASSPATH@:$::env(CLASSPATH):$DIRNAME $classname"
+	} else {
+	    set VALUE "java [format %s $PROPERTIES] -classpath .:$::INSTALLDIR/share/java/vomsjapi.jar:@JAVA_CLASSPATH2@:@JAVA_CLASSPATH@:$::env(CLASSPATH):$DIRNAME $classname"
+	}
         if [string equal $arg1 ""] then {
             set VALUE "$VALUE"
         } else {
