@@ -405,12 +405,7 @@ Client::Client(int argc, char ** argv) :
   /* set globus version */
 
   version = globus(version);
-  if (version == 0) {
-    version = 24;
-    Print(DEBUG) << "Unable to discover Globus version: trying for 2.4" << std::endl;
-  }
-  else 
-    Print(DEBUG) << "Detected Globus version: " << version/10 << "." << version % 10 << std::endl;
+  Print(DEBUG) << "Detected Globus version: " << version/10 << "." << version % 10 << std::endl;
   
   /* set proxy version */
   if (rfc)
