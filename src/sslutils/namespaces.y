@@ -142,11 +142,11 @@ char **nmlistadd(char **vect, char *data)
 int main()
 {
   namespacesdebug = 1;
-  void **arg = NULL;
+  struct policy **arg = NULL;
   void *scanner=NULL;
   namespaceslex_init(&scanner);
   namespacesset_debug(1, scanner);
-  return namespacesparse(arg, scanner);
+  return namespacesparse(&arg, scanner);
 }
 #endif
 
