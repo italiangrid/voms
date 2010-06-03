@@ -25,6 +25,9 @@
 
 #ifndef VOMS_DOIO_H
 #define VOMS_DOIO_H
+
+#include <stdarg.h>
+
 extern char *snprintf_wrap(const char *format, ...);
 extern char *vsnprintf_wrap(const char *format, va_list v);
 #endif
