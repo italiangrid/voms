@@ -3,7 +3,7 @@ testheader "See if missing certificate implies an error."
 
 proc myprolog {} {
     _activateCert mycert2
-    file delete -force $::env(HOME)/.globus2/usercert.pem
+    file delete -force $::env(X509_USER_CERT)
 }
 
 proc myepilog {} {

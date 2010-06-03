@@ -43,6 +43,8 @@ extern "C" {
 #include "listfunc.h"
 #include "credentials.h"
 #include "replace.h"
+
+#include <openssl/pkcs12.h>
 }
 #include <iostream>
 #include <fstream>
@@ -403,12 +405,7 @@ Client::Client(int argc, char ** argv) :
   /* set globus version */
 
   version = globus(version);
-  if (version == 0) {
-    version = 24;
-    Print(DEBUG) << "Unable to discover Globus version: trying for 2.4" << std::endl;
-  }
-  else 
-    Print(DEBUG) << "Detected Globus version: " << version/10 << "." << version % 10 << std::endl;
+  Print(DEBUG) << "Detected Globus version: " << version/10 << "." << version % 10 << std::endl;
   
   /* set proxy version */
   if (rfc)
@@ -508,7 +505,7 @@ Client::Client(int argc, char ** argv) :
 
     if (userconf.empty()) {
       char *uc = getenv("VOMS_USERCONF");
-      if (uc) {
+      if (uc && (strlen(uc) != 0)) {
         userconf = uc;
         confiles.push_back(userconf);
       }
@@ -518,7 +515,7 @@ Client::Client(int argc, char ** argv) :
        was not defined */
     if (userconf.empty()) {
       char *uc = getenv("HOME");
-      if (uc)
+      if (uc && (strlen(uc) != 0))
         userconf = std::string(uc) + "/" + USERCONFILENAME;
       else
         userconf = std::string("~/") + USERCONFILENAME;
@@ -1014,7 +1011,7 @@ bool Client::AddToList(AC *ac)
   if (!ac)
     return false;
 
-  actmplist = (AC **)listadd((char **)aclist, (char *)ac, sizeof(AC *));
+  actmplist = (AC **)listadd((char **)aclist, (char *)ac);
 
 
   if (actmplist) {
@@ -1059,7 +1056,7 @@ bool Client::pcdInit() {
 
   ERR_load_prxyerr_strings(0);
   SSLeay_add_ssl_algorithms();
-
+  PKCS12_PBE_add();
   
   if (!determine_filenames(&cacertfile, &certdir, &outfile, &certfile, &keyfile, noregen ? 1 : 0))
     goto err;

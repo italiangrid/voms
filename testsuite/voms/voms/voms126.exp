@@ -13,7 +13,7 @@ proc mytest {} {
     addlog $outname
 
     if $res then {
-        set correct ".*unrecognized option `--vrms'"
+        set correct ".*unrecognized option '--vrms'"
 
         loadvar out2 $outname
         if [regexp $correct $out2] then {

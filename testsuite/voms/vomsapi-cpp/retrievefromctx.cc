@@ -1,7 +1,4 @@
-/*********************************************************************
- *
- * Authors: Vincenzo Ciaschini - Vincenzo.Ciaschini@cnaf.infn.it 
- *
+/*
  * Copyright (c) Members of the EGEE Collaboration. 2004-2010.
  * See http://www.eu-egee.org/partners/ for details on the copyright holders.
  *
@@ -16,26 +13,20 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- *
- * Parts of this code may be based upon or even include verbatim pieces,
- * originally written by other people, in which case the original header
- * follows.
- *
- *********************************************************************/
-extern "C" {
-#include "init.h"
-#include "extensions.h"
-#include <openssl/pkcs12.h>
+ */
+#include "voms_api.h"
 
-extern void ERR_load_AC_strings(void);
-}
+#include <string>
+#include <iostream>
 
+int main(int argc, char *argv[]) {
+  vomsdata vd;
+  int error = 0;
 
+  if (vd.RetrieveFromCtx((void*)0,RECURSE_CHAIN)) {
+    std::cerr << "No error message!" << std::endl;
+    exit(1);
+  }
 
-int AC_Init(void)
-{
-  declareOIDs();
-  ERR_load_AC_strings();
-  return initEx();
-  PKCS12_PBE_add();
+  exit(0);
 }

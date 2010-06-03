@@ -48,7 +48,7 @@
 #include "../api/ccapi/voms_apic.h"
 #include "validate.h"
 #include "listfunc.h"
-
+#include "doio.h"
 
 #include <stdlib.h>
 #include <string.h>
@@ -436,7 +436,7 @@ static int checkAttributes(STACK_OF(AC_ATTR) *atts, struct col *voms)
       if (!str || !str2)
         goto err;
 
-      if (!(tmp=listadd(list, str, sizeof(str))))
+      if (!(tmp=listadd(list, str)))
         goto err;
 
       list = tmp;
@@ -462,7 +462,7 @@ static int checkAttributes(STACK_OF(AC_ATTR) *atts, struct col *voms)
       d->role  = r;
       d->cap   = c;
 
-      if (!(dtmp = (struct data **)listadd((char **)dlist, (char *)d, sizeof(d))))
+      if (!(dtmp = (struct data **)listadd((char **)dlist, (char *)d)))
         goto err;
 
       dlist = dtmp;
@@ -652,17 +652,10 @@ static char *getfqdn(void)
   name = NULL;
 
   if ((!gethostname(hostname, 255)) && (!getdomainname(domainname, 255))) {
-    if ((name = malloc(strlen(hostname)+strlen(domainname)+2))) {
-      strcpy(name, hostname);
-      if (strcmp(domainname, "(none)")) {
-        if (*domainname == '.')
-          strcat(name, domainname);
-        else {
-          strcat(name, ".");
-          strcat(name, domainname);
-        }
-      }
-      strcat(name, "\0");
+    if (!strcmp(domainname, "(none)")) {
+      domainname[0]='\0';
+
+      name = snprintf_wrap("%s%s%s", hostname, (domainname[0] == '.' ? "." : ""), domainname);
     }
   }
   return name;
@@ -716,7 +709,7 @@ static int interpret_attributes(AC_FULL_ATTRIBUTES *full_attr, struct col *voms)
       a->qual = qualifier;
       name = value = qualifier = NULL;
 
-      tmp = listadd((char **)(al->attrs), (char *)a, sizeof(a));
+      tmp = listadd((char **)(al->attrs), (char *)a);
       if (tmp) {
         al->attrs = (struct att **)tmp;
         a = NULL;
@@ -735,7 +728,7 @@ static int interpret_attributes(AC_FULL_ATTRIBUTES *full_attr, struct col *voms)
     al->grantor = grant;
     grant = NULL;
 
-    tmp = listadd((char **)(fa->list), (char *)al, sizeof(al));
+    tmp = listadd((char **)(fa->list), (char *)al);
     if (tmp) {
       fa->list = (struct att_list **)tmp;
       al = NULL;

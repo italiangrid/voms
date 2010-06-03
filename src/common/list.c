@@ -27,22 +27,22 @@
 #include <stdlib.h>
 #include <string.h>
 
-char **listadd(char **vect, char *data, int size)
+char **listadd(char **vect, char *data)
 {
   int i = 0;
   char **newvect;
 
-  if (!data || (size <= 0))
-    return NULL;
+  if (!data)
+    return vect;
 
   if (vect)
     while (vect[i++]) ;
   else
     i=1;
 
-  if ((newvect = (char **)malloc((i+1)*size))) {
+  if ((newvect = (char **)malloc((i+1)*sizeof(char *)))) {
     if (vect) {
-      memcpy(newvect, vect, (size*(i-1)));
+      memcpy(newvect, vect, (sizeof(char*)*(i-1)));
       newvect[i-1] = data;
       newvect[i] = NULL;
       free(vect);

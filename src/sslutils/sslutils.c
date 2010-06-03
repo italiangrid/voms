@@ -959,7 +959,6 @@ proxy_sign(
                       subject_name,
                       issuer_name,
                       seconds,
-                      0,
                       extensions,
                       proxyver,
                       pastproxy,
@@ -1035,7 +1034,6 @@ proxy_sign_ext(
     X509_NAME *               subject_name,
     X509_NAME *               issuer_name,    
     int                       seconds,
-    int                       serial_num,
     STACK_OF(X509_EXTENSION) *extensions,
     int                       proxyver,
     int                       pastproxy,
@@ -1110,60 +1108,55 @@ proxy_sign_ext(
      * with revocations, or may cause problems.
      */
 
-    if (serial_num)
-      ASN1_INTEGER_set(X509_get_serialNumber(*new_cert), serial_num);
-    else {
-      if (newserial) {
-        BIGNUM *bn = NULL;
-        if (BN_hex2bn(&bn, newserial) != 0) {
-          ASN1_INTEGER *a_int = BN_to_ASN1_INTEGER(bn, NULL);
-          ASN1_INTEGER_free((*new_cert)->cert_info->serialNumber);
-
-          /* Note:  The a_int == NULL case is handled below. */
-          (*new_cert)->cert_info->serialNumber = a_int;
-          BN_free(bn);
-        }
-      }
-      else if (proxyver > 2) {
-        ASN1_INTEGER_free(X509_get_serialNumber(*new_cert));
-          
-        new_public_key = X509_REQ_get_pubkey(req);
-#ifdef TYPEDEF_I2D_OF
-        ASN1_digest((i2d_of_void*)i2d_PUBKEY, EVP_sha1(), (char *) new_public_key, md, &len);
-#else
-        ASN1_digest(i2d_PUBKEY, EVP_sha1(), (char *) new_public_key, md, &len);
-#endif
-        new_public_key = NULL;
-
-        (*new_cert)->cert_info->serialNumber = ASN1_INTEGER_new();
-        (*new_cert)->cert_info->serialNumber->length = len;
-        (*new_cert)->cert_info->serialNumber->data   = malloc(len);
-
-        if (!((*new_cert)->cert_info->serialNumber->data)) {
-          PRXYerr(PRXYERR_F_PROXY_SIGN_EXT, PRXYERR_R_PROCESS_PROXY);
-          goto err;
-        }
-        memcpy((*new_cert)->cert_info->serialNumber->data, md, SHA_DIGEST_LENGTH);
-
-      } 
-      else if (selfsigned) {
-        ASN1_INTEGER *copy = ASN1_INTEGER_new();
-        if (copy) {
-          ASN1_INTEGER_set(copy, 1);
-          ASN1_INTEGER_free((*new_cert)->cert_info->serialNumber);
-
-        (*new_cert)->cert_info->serialNumber = copy;
-        }
-        else
-          goto err;
-      }
-      else {
-        ASN1_INTEGER *copy = ASN1_INTEGER_dup(X509_get_serialNumber(user_cert));
+    if (newserial) {
+      BIGNUM *bn = NULL;
+      if (BN_hex2bn(&bn, newserial) != 0) {
+        ASN1_INTEGER *a_int = BN_to_ASN1_INTEGER(bn, NULL);
         ASN1_INTEGER_free((*new_cert)->cert_info->serialNumber);
 
-        /* Note:  The copy == NULL case is handled immediately below. */
+        /* Note:  The a_int == NULL case is handled below. */
+        (*new_cert)->cert_info->serialNumber = a_int;
+        BN_free(bn);
+      }
+    }
+    else if (proxyver > 2) {
+      ASN1_INTEGER_free(X509_get_serialNumber(*new_cert));
+          
+      new_public_key = X509_REQ_get_pubkey(req);
+#ifdef TYPEDEF_I2D_OF
+      ASN1_digest((i2d_of_void*)i2d_PUBKEY, EVP_sha1(), (char *) new_public_key, md, &len);
+#else
+      ASN1_digest(i2d_PUBKEY, EVP_sha1(), (char *) new_public_key, md, &len);
+#endif
+      new_public_key = NULL;
+
+      (*new_cert)->cert_info->serialNumber = ASN1_INTEGER_new();
+      (*new_cert)->cert_info->serialNumber->length = len;
+      (*new_cert)->cert_info->serialNumber->data   = malloc(len);
+
+      if (!((*new_cert)->cert_info->serialNumber->data)) {
+        PRXYerr(PRXYERR_F_PROXY_SIGN_EXT, PRXYERR_R_PROCESS_PROXY);
+        goto err;
+      }
+      memcpy((*new_cert)->cert_info->serialNumber->data, md, SHA_DIGEST_LENGTH);
+    } 
+    else if (selfsigned) {
+      ASN1_INTEGER *copy = ASN1_INTEGER_new();
+      if (copy) {
+        ASN1_INTEGER_set(copy, 1);
+        ASN1_INTEGER_free((*new_cert)->cert_info->serialNumber);
+
         (*new_cert)->cert_info->serialNumber = copy;
       }
+      else
+        goto err;
+    }
+    else {
+      ASN1_INTEGER *copy = ASN1_INTEGER_dup(X509_get_serialNumber(user_cert));
+      ASN1_INTEGER_free((*new_cert)->cert_info->serialNumber);
+
+      /* Note:  The copy == NULL case is handled immediately below. */
+      (*new_cert)->cert_info->serialNumber = copy;
     }
 
     if (!(*new_cert)->cert_info->serialNumber) {
@@ -3639,6 +3632,8 @@ proxy_password_callback_no_prompt(
     return(-1);
 }
 
+#ifdef CLASS_ADD
+
 /**********************************************************************
 Function: proxy_extension_class_add_create()
 
@@ -3702,7 +3697,7 @@ err:
     }
     return NULL;
 }
-
+#endif
 
 
 int PRIVATE determine_filenames(char **cacert, char **certdir, char **outfile,
@@ -3893,10 +3888,10 @@ static char hextoint(char r, char s)
   return v;
 }
 
-static char *reencode_string(char *string, int *len)
+static unsigned char *reencode_string(unsigned char *string, int *len)
 {
-  char *temp = string;
-  char *pos  = string;
+  unsigned char *temp = string;
+  unsigned char *pos  = string;
   char t = '\0';
   char r = '\0';
   *len = 0;

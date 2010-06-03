@@ -81,6 +81,9 @@ proc _inittests {} {
         if [string equal $::DOCOVERAGE "yes"] then {
             exec lcov --directory ../src/common --directory ../src/ac --directory ../src/sslutils --directory ../src/socklib --directory ../src/server --directory ../src/client --directory ../src/api/ccapi --directory ../src/utils -z -q >/dev/null
             exec lcov --directory ../src/common --directory ../src/ac --directory ../src/sslutils --directory ../src/socklib --directory ../src/server --directory ../src/client --directory ../src/api/ccapi --directory ../src/utils -i --capture -o zero.info -q 2>/dev/null
+	    if [expr ![string equal $::COBERTURA "no"]] then {
+		set ::env(CLASSPATH) "$::COBERTURA/cobertura.jar:$::env(CLASSPATH)"
+	    }
         }
         puts -nonewline "."
         _setupPKI
@@ -105,6 +108,7 @@ proc _inittests {} {
         _setJavaProperty CADIR   $::INSTALLDIR/etc/grid-security/certificates
         _setJavaProperty VOMSDIR $::INSTALLDIR/vomsdir
         _setJavaProperty VOMSES_LOCATION $::INSTALLDIR/etc
+	_setJavaProperty net.sourceforge.cobertura.datafile /home/marotta/gits/voms/src/api/java/cobertura.ser
         puts -nonewline "."
 
         set ::vomsproxyinit    $::INSTALLDIR/bin/voms-proxy-init

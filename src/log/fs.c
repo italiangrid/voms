@@ -37,6 +37,8 @@
 #include <unistd.h>
 #include <time.h>
 
+#include "doio.h"
+
 struct localdata {
   char *name;
   char *dateformat;
@@ -53,12 +55,9 @@ static char *translate(char *format, char *date)
   char *newstring = NULL;
 
   while (position) {
-    newstring = malloc(strlen(format) + strlen(date) + 1 - 2);
     *position++='\0';
     position++;
-    newstring = strcpy(newstring, format);
-    newstring = strcat(newstring, date);
-    newstring = strcat(newstring, position);
+    newstring = snprintf_wrap("%s%s%s", format, date, position);
     free(format);
     format = newstring;
     position = strstr(format, "%d");
@@ -104,8 +103,10 @@ static int fileoutputter(void *data, const char *s)
 
     do {
       free(data);
+
       if ((data = malloc(datasize)))
         len = strftime(data, datasize, ld->dateformat, ti);
+
       datasize += 50;
     } while (len == 0 && data);
 
@@ -134,6 +135,7 @@ static int filereopen(struct localdata *ld)
     ld->fd = newfd;
     return 1;
   }
+
   return 0;
 }
 
@@ -146,6 +148,7 @@ static void filedestroy(void *data)
   
   if (ld->fd != -1)
     close(ld->fd);
+
   free (ld->name);
   free(ld);
 }
@@ -216,43 +219,36 @@ static int logfile_rotate(const char * name)
   struct dirent * de = NULL;
   int result = 0;
   char *fname = NULL;
-  int res = 1;
   int fd;
-  int namelen = strlen(name);
 
   pos = dirname = fname = newname = oldname = NULL;
 
   /* get the name of the directory and of the file */
 
-  newname = malloc(namelen+26);
-  oldname = malloc(namelen+26);
-  fname   = malloc(namelen+5);
-  dirname = malloc(namelen+2);
+  fname   = snprintf_wrap("%s-lck", name);
 
-  if (!fname || !newname || !oldname || !dirname)
+  if (!fname)
     goto err;
-
-  strcpy(fname, name);
-  strcat(fname, "-lck");
 
   if ((fd = open(fname, O_CREAT|O_EXCL|O_RDONLY, S_IRUSR|S_IWUSR)) != -1) {
     pos = strrchr(name, '/');
   
     if (pos == NULL) {
-      dirname[0] = '.';
-      dirname[1] = '\0';
+      dirname = snprintf_wrap(".");
       basename = pos;
     }
     else if (pos == name) {
-      dirname[0]='/';
-      dirname[1]='\0';
+      dirname = snprintf_wrap("/");
       basename = ++pos;
     }
     else {
-      strncpy(dirname, name, pos - name);
+      dirname = snprintf_wrap("%s", name);
       dirname[pos-name] = '\0';
       basename = ++pos;
     }
+
+    if (!dirname)
+      goto err;
 
     dir = opendir(dirname);
     if (dir) {
@@ -260,6 +256,7 @@ static int logfile_rotate(const char * name)
 
       while ((de = readdir(dir))) {
         pos = strrchr(de->d_name, '.');
+
         if (pos && atoi(pos+1) > max &&
             (size_t)(pos - de->d_name) == baselen &&
             strncmp(basename, de->d_name, baselen) == 0)
@@ -267,50 +264,38 @@ static int logfile_rotate(const char * name)
       }
     }
     closedir(dir);
-    
+    free(dirname);
 
     /* rename each file increasing the suffix */
-    strcpy(newname, name);
-    newname[namelen]='.';
-
-    strcpy(oldname, name);
-    oldname[namelen]='.';
-  
     if (max) {
       for(i = max; i > 0 ; --i) {
-        char s[24]; /* enough for up to 64 bit numbers */
-        
-        sprintf(s, "%d", i+1);
-        strcpy(newname + namelen +1, s);
-
-        sprintf(s, "%d", i);
-        strcpy(oldname + namelen +1, s);
+	newname = snprintf_wrap("%s.%d", name, i+1);
+	oldname = snprintf_wrap("%s.%d", name, i);
     
-        (void)rename(oldname, newname);
+	if (newname && oldname)
+	  (void)rename(oldname, newname);
+
+	free(oldname);
+	free(newname);
       }
     }
 
+    newname = snprintf_wrap("%s.1", name);
+
     /* rename the main file to .1  */
     if (newname) {
-      newname[namelen+1]='1';
-      newname[namelen+2]='\0';
-      if (rename(name, newname) == -1)
-        res = 0;
-      result = 1;
+      if (rename(name, newname) != -1)
+	result = 1;
     }
-    
+
+    free(newname);
+
     unlink(fname);
     close(fd);
   }
 
  err:
-  free(dirname);
   free(fname);
-  free(newname);
-  free(oldname);
 
-  if (result && res)
-    return 1;
-  else
-    return 0;
+  return result;
 }

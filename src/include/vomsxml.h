@@ -48,8 +48,6 @@ struct answer {
 
 extern std::string XML_Req_Encode(const std::string&, const std::string&, 
                                   const std::string&, const int);
-extern std::string XML_Ans_Encode(const std::string&, 
-                                  const std::vector<errorp>, bool);
 extern std::string XML_Ans_Encode(const std::string&,  const std::string&,
                                   const std::vector<errorp>, bool);
 extern bool XML_Req_Decode(const std::string&, request &);

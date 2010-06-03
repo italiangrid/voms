@@ -391,8 +391,6 @@ AC_DEFUN([AC_COMPILER],
     if test "x$ac_with_debug" = "xyes" ; then
       CFLAGS="-g -O0"
       CXXFLAGS="-g -O0"
-      CFLAGS="-g -O0 -fprofile-arcs -ftest-coverage"
-      CXXFLAGS="-g -O0 -fprofile-arcs -ftest-coverage"
     fi
 
     AC_ARG_WITH(warnings,
@@ -1054,6 +1052,17 @@ AC_DEFUN([AC_TESTSUITE],
     ],
     [ enable_coverage="no" ])
 
+  if test "x$enable_coverage" = "xyes" ; then
+     CFLAGS="$CFLAGS -fprofile-arcs -ftest-coverage"
+     CXXFLAGS="$CXXFLAGS -fprofile-arcs -ftest-coverage"
+  fi
+
+  AC_ARG_WITH(cobertura,
+	      [ --with-cobertura=PFX    prefix where cobertura is placed (no default)],
+	      [with_cobertura_prefix="$withval"],
+	      [with_cobertura_prefix="no"])
+
+  AM_CONDITIONAL(USE_COBERTURA, test ! x$with_cobertura_prefix = xno)
   AC_SUBST(with_reportdir)
   AC_SUBST(with_scratchdir)
   AC_SUBST(with_dbuser)
@@ -1062,6 +1071,7 @@ AC_DEFUN([AC_TESTSUITE],
   AC_SUBST(enable_oracletests)
   AC_SUBST(enable_mysqltests)
   AC_SUBST(enable_coverage)
+  AC_SUBST(with_cobertura_prefix)
 ])
 
 dnl This macro written by:

@@ -57,6 +57,7 @@ extern "C" {
 #include <openssl/x509.h>
 #include <openssl/x509v3.h>
 #include <openssl/safestack.h>
+#include <openssl/pkcs12.h>
 
 #include "listfunc.h"
 #include "credentials.h"
@@ -375,7 +376,7 @@ Fake::Fake(int argc, char ** argv) :   confile(CONFILENAME),
       volist->vos = NULL;
     }
     voelem = (VO*)calloc(1, sizeof(VO));
-    volist->vos = (VO**)listadd((char**)volist->vos, (char*)voelem, sizeof(VO*));
+    volist->vos = (VO**)listadd((char**)volist->vos, (char*)voelem);
 
     voelem->hostcert = (char*)hostcert.c_str();
     voelem->hostkey = (char*)hostkey.c_str();
@@ -450,7 +451,7 @@ bool Fake::Run()
   /* contacts servers for each vo */
 
   if (volist)
-    if (!Retrieve(volist))
+    if (!MakeACs(volist))
       exit(1);
 
   /* set output file and environment */
@@ -650,7 +651,7 @@ void Fake::Test()
   }
 }
 
-bool Fake::Retrieve(VOLIST *volist) 
+bool Fake::MakeACs(VOLIST *volist) 
 {
   AC **actmplist = NULL;
   AC *ac = NULL;
@@ -671,6 +672,7 @@ bool Fake::Retrieve(VOLIST *volist)
       int hcertres = BIO_read_filename(hcrt, vo->hostcert);
       int holderres = BIO_read_filename(hckey, vo->hostkey);
       int hkeyres = BIO_read_filename(owncert, certfile);
+
       if ((hcertres  > 0) && (holderres > 0) && (hkeyres > 0)) {
         hcert = PEM_read_bio_X509(hcrt, NULL, 0, NULL);
         holder = PEM_read_bio_X509(owncert, NULL, 0, NULL);
@@ -728,7 +730,7 @@ bool Fake::Retrieve(VOLIST *volist)
     }
 
     if (!res)
-      actmplist = (AC **)listadd((char **)aclist, (char *)ac, sizeof(AC *));
+      actmplist = (AC **)listadd((char **)aclist, (char *)ac);
 
     if (actmplist)
       aclist = actmplist;
@@ -762,6 +764,7 @@ bool Fake::pcdInit() {
 
   ERR_load_prxyerr_strings(0);
   SSLeay_add_ssl_algorithms();
+  PKCS12_PBE_add();
   
   BIO * bio_err;
   if ((bio_err = BIO_new(BIO_s_file())) != NULL)
@@ -887,7 +890,7 @@ bool Fake::VerifyOptions()
   else {
     /* selfsigned is specified */
     if (proxyver != 0 || noregen || rfc || !policyfile.empty() || !policylang.empty())
-      exitError("Error: --proxyver, --rfc, --policyfile, --policylang, --noregen are only significant when --selfsignd is not specified.");
+      exitError("Error: --proxyver, --rfc, --policyfile, --policylang, --noregen are only significant when --selfsigned is not specified.");
 
     if (newsubject.empty() && newissuer.empty())
       exitError("Error: At least one of --newsubject and --newissuer must be specified for --selfsigned.");

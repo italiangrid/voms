@@ -65,11 +65,16 @@ JAVA_CLASSES = org/glite/voms/BasicVOMSTrustStore.class \
 all-local: $(top_builddir)/src/api/java/vomsjapi.jar
 
 %.class : %.java
-	$(JAVAC) -sourcepath $(top_srcdir)/src/api/java -classpath $(JAVA_CLASSPATH):$(JAVA_CLASSPATH2):$(CLASSPATH) -d $(top_builddir)/src/api/java $<
+	$(JAVAC) -sourcepath $(top_srcdir)/src/api/java -classpath $(JAVA_CLASSPATH):$(JAVA_CLASSPATH2):$(CLASSPATH) -d $(top_builddir)/src/api/java $< 
 
+if USE_COBERTURA
+$(top_builddir)/src/api/java/vomsjapi.jar: makedirs $(JAVA_CLASSES)
+	$(with_cobertura_prefix)/cobertura-instrument.sh --basedir $(top_srcdir)/src/api/java --destination $(top_builddir)/src/api/java/ `find $(top_srcdir)/src/api/java -name '*.class' -printf "%P "`
+	$(JAR) -cfm $(top_builddir)/src/api/java/vomsjapi.jar $(top_srcdir)/src/api/java/Manifest.add `find org -name '*.class'` $(top_srcdir)/src/api/java/log4j.properties ;
+else
 $(top_builddir)/src/api/java/vomsjapi.jar: makedirs $(JAVA_CLASSES)
 	$(JAR) -cfm $(top_builddir)/src/api/java/vomsjapi.jar $(top_srcdir)/src/api/java/Manifest.add `find org -name '*.class'` $(top_srcdir)/src/api/java/log4j.properties ;
-
+endif
 makedirs:
 	mkdir -p $(top_builddir)/src/api/java/org/glite/voms/ac
 

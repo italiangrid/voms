@@ -21,11 +21,11 @@ Unspecified proxy version, settling on Globus version: 2
 Number of bits in key :1024
 Files being used:
  CA certificate file: none
- Trusted certificates directory : /home/marotta/installs/voms19/etc/grid-security/certificates
- Proxy certificate file : /tmp/x509up_u500
- User certificate file: /home/marotta/.globus2/usercert.pem
- User key file: /home/marotta/.globus2/userkey.pem
-Output to /tmp/x509up_u500"
+ Trusted certificates directory : $::INSTALLDIR/etc/grid-security/certificates
+ Proxy certificate file : /tmp/x509up_u\[0-9\]*
+ User certificate file: $::env(X509_USER_CERT)
+ User key file: $::env(X509_USER_KEY)
+Output to /tmp/x509up_u\[0-9\]*"
 
     loadvar out2 $outname
 

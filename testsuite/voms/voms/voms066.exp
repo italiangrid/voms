@@ -5,7 +5,7 @@ proc mytest {} {
     _activateCert mycert2
 
     _vomsStart voms1
-    set res [log_exec outname {voms-proxy-init -cert $::env(HOME)/.globus2/usercert.pem -key $::env(HOME)/.globus2/userkey.pem -+debug}]
+    set res [log_exec outname {voms-proxy-init -cert $::env(X509_USER_CERT) -key $::env(X509_USER_KEY) -+debug}]
     _vomsStop voms1
 
     if $res then {

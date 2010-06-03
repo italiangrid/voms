@@ -34,7 +34,6 @@ proc _activateHostCertificate {cert} {
     file copy -force "$::_certdir/$cert-key.pem" $::INSTALLDIR/certs/hostkey.pem
     exec chmod 644 $::INSTALLDIR/certs/hostcert.pem
     exec chmod 400 $::INSTALLDIR/certs/hostkey.pem
-
 }
 
 proc _getcert {cert} {
@@ -125,7 +124,7 @@ cond_subjects      globus   '\"$out\"'"
         flush $id
         close $id
         set id [open "$::_cadir/$hashname.namespaces" w+]
-        puts $id "TO ISSUER \"$dn\"  PERMIT SUBJECT \"$out\""
+        puts $id "TO ISSUER SELF PERMIT SUBJECT \"$out\""
         flush $id
         close $id
     }

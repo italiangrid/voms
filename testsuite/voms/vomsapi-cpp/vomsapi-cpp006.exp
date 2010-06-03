@@ -1,0 +1,18 @@
+load_lib vomstest.exp
+testheader "See if RetrieveFromCtx correctl fails."
+
+proc mytest {} {
+    set ::_buildout [exec mktemp $::SCRATCHDIR/voms-api-c-XXXXXX]
+    set res [_exeCC retrievefromctx.cc -useproxy]
+
+    if $res then {
+	addlog $::_buildout
+        testmessage "incorrectly succeded."
+        return $::FAILTEST
+    } else {
+	testmessage "correctly failed."
+	return $::PASSTEST
+    }
+}
+
+do_test

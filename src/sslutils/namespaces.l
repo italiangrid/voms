@@ -48,10 +48,10 @@ extern char *strndup(char*, size_t);
 
 \' BEGIN(SINGLE_QUOTED);
 
-<SINGLE_QUOTED>.*\' yylval_param->string = yytext; BEGIN(INITIAL); return SUBJECT;
+<SINGLE_QUOTED>[^']*\' yylval_param->string = yytext; BEGIN(INITIAL); return SUBJECT;
 
 \" BEGIN(DOUBLE_QUOTED);
-<DOUBLE_QUOTED>.*\" yylval_param->string = yytext; BEGIN(INITIAL); return SUBJECT;
+<DOUBLE_QUOTED>[^"]*\" yylval_param->string = yytext; BEGIN(INITIAL); return SUBJECT;
 
 
 (?i:TO)       return TO;
