@@ -597,8 +597,7 @@ Returns:
 int PRIVATE
 proxy_load_user_proxy(
     STACK_OF(X509) *                    cert_chain,
-    const char *                        file,
-    BIO *                               bp)
+    const char *                        file)
 {
 
     int                                 ret = -1;
@@ -607,20 +606,13 @@ proxy_load_user_proxy(
     int                                 count=0;
     X509 *                              x = NULL;
 
-    if (bp)
-    {
-        in = bp;
-    }
-    else
-    {
-        if (file == NULL)
-        {
-            return(1);
-        }
-        in = BIO_new(BIO_s_file());
-    }
+    if (file == NULL)
+      return(1);
 
-    if ((in == NULL) || (!bp && BIO_read_filename(in,file) <= 0))
+    in = BIO_new(BIO_s_file());
+
+
+    if ((in == NULL) || (BIO_read_filename(in,file) <= 0))
     {
         X509err(PRXYERR_F_PROXY_LOAD, PRXYERR_R_PROCESS_PROXY);
         goto err;
@@ -644,7 +636,7 @@ proxy_load_user_proxy(
             }
         }
 
-        if (bp || count)
+        if (count)
         {
             i = sk_X509_insert(cert_chain,x,sk_X509_num(cert_chain));
 
@@ -667,7 +659,7 @@ err:
         X509_free(x);
     }
     
-    if (!bp && in != NULL)
+    if (in != NULL)
     {
         BIO_free(in);
     }
@@ -3219,7 +3211,6 @@ proxy_load_user_key(
     X509 *                              ucert,
     const char *                        user_key,
     int                                 (*pw_cb)(),
-    BIO *                               bp,
     UNUSED(unsigned long *                     hSession))
 {
     unsigned long                       error;
@@ -3241,7 +3232,7 @@ proxy_load_user_key(
 #endif
 
     /* Check arguments */
-    if (!bp && !user_key)
+    if (!user_key)
     {
       PRXYerr(PRXYERR_F_INIT_CRED,PRXYERR_R_PROBLEM_USER_NOKEY_FILE);
       status = PRXYERR_R_PROBLEM_USER_NOKEY_FILE;
@@ -3251,7 +3242,7 @@ proxy_load_user_key(
     }
 
             
-    if (!bp && !strncmp(user_key,"SC:",3))
+    if (!strncmp(user_key,"SC:",3))
     {
 #ifdef USE_PKCS11
         char *cp;
@@ -3310,93 +3301,75 @@ proxy_load_user_key(
     }
     else
     {
-        if (bp)
-        {
-            if (PEM_read_bio_PrivateKey(bp,private_key,
-                                        OPENSSL_PEM_CB(xpw_cb,NULL)) == NULL)
-            {
-                PRXYerr(PRXYERR_F_INIT_CRED,PRXYERR_R_PROCESS_KEY);
-                status = PRXYERR_R_PROCESS_KEY;
-                goto err;
-            }
+      int keystatus;
+
+      if ((fp = fopen(user_key,"rb")) == NULL) {
+        PRXYerr(PRXYERR_F_INIT_CRED,PRXYERR_R_PROBLEM_USER_NOKEY_FILE);
+        status = PRXYERR_R_PROBLEM_USER_NOKEY_FILE;
+        
+        ERR_add_error_data(2, "\n        File=",user_key);
+        goto err;
+      }
+
+      /* user key must be owned by the user, and readable
+       * only be the user
+       */
+
+      if ((keystatus = checkstat(user_key))) {
+        if (keystatus == 4) {
+          status = PRXYERR_R_USER_ZERO_LENGTH_KEY_FILE;
+          PRXYerr(PRXYERR_F_INIT_CRED,
+                  PRXYERR_R_USER_ZERO_LENGTH_KEY_FILE);
         }
-        else
-        {
-            int keystatus;
-            if ((fp = fopen(user_key,"rb")) == NULL)
-            {
-              PRXYerr(PRXYERR_F_INIT_CRED,PRXYERR_R_PROBLEM_USER_NOKEY_FILE);
-              status = PRXYERR_R_PROBLEM_USER_NOKEY_FILE;
+        else {
+          status = PRXYERR_R_PROBLEM_KEY_FILE;
+          PRXYerr(PRXYERR_F_INIT_CRED,PRXYERR_R_PROBLEM_KEY_FILE);
+        }
 
-              ERR_add_error_data(2, "\n        File=",user_key);
-              goto err;
-            }
+        ERR_add_error_data(2, "\n        File=", user_key);
+        fclose(fp);
+        goto err;
+      }
 
-            /* user key must be owned by the user, and readable
-             * only be the user
-             */
-
-            if ((keystatus = checkstat(user_key)))
-            {
-                if (keystatus == 4)
-                {
-                  status = PRXYERR_R_USER_ZERO_LENGTH_KEY_FILE;
-                  PRXYerr(PRXYERR_F_INIT_CRED,
-                          PRXYERR_R_USER_ZERO_LENGTH_KEY_FILE);
-                }
-                else
-                {
-                    status = PRXYERR_R_PROBLEM_KEY_FILE;
-                    PRXYerr(PRXYERR_F_INIT_CRED,PRXYERR_R_PROBLEM_KEY_FILE);
-                }
-
-                ERR_add_error_data(2, "\n        File=", user_key);
-                fclose(fp);
-                goto err;
-            }
-
-            if (PEM_read_PrivateKey(fp,
-                                    private_key,
-                                    OPENSSL_PEM_CB(xpw_cb,NULL)) == NULL)
-            {
-                fclose(fp);
-                error = ERR_peek_error();
+      if (PEM_read_PrivateKey(fp,
+                              private_key,
+                              OPENSSL_PEM_CB(xpw_cb,NULL)) == NULL) {
+        fclose(fp);
+        error = ERR_peek_error();
 #ifdef PEM_F_PEM_DEF_CALLBACK
-                if (error == ERR_PACK(ERR_LIB_PEM,
-                                      PEM_F_PEM_DEF_CALLBACK,
-                                      PEM_R_PROBLEMS_GETTING_PASSWORD))
+        if (error == ERR_PACK(ERR_LIB_PEM,
+                              PEM_F_PEM_DEF_CALLBACK,
+                              PEM_R_PROBLEMS_GETTING_PASSWORD))
 #else
-                if (error == ERR_PACK(ERR_LIB_PEM,
-                                      PEM_F_DEF_CALLBACK,
-                                      PEM_R_PROBLEMS_GETTING_PASSWORD))
+          if (error == ERR_PACK(ERR_LIB_PEM,
+                                PEM_F_DEF_CALLBACK,
+                                PEM_R_PROBLEMS_GETTING_PASSWORD))
 #endif
-                {
-                    ERR_clear_error(); 
-                }
-#ifdef EVP_F_EVP_DECRYPTFINAL_EX
-                else if (error == ERR_PACK(ERR_LIB_EVP,
-                                           EVP_F_EVP_DECRYPTFINAL_EX,
-                                           EVP_R_BAD_DECRYPT))
-#else
-                else if (error == ERR_PACK(ERR_LIB_EVP,
-                                           EVP_F_EVP_DECRYPTFINAL,
-                                           EVP_R_BAD_DECRYPT))
-#endif
-                {
-                    ERR_clear_error();
-                    PRXYerr(PRXYERR_F_INIT_CRED,PRXYERR_R_WRONG_PASSPHRASE);
-                    status = PRXYERR_R_WRONG_PASSPHRASE;
-                }
-                else
-                {
-                    PRXYerr(PRXYERR_F_INIT_CRED,PRXYERR_R_PROCESS_KEY);
-                    ERR_add_error_data(2, "\n        File=", user_key);
-                    status = PRXYERR_R_PROCESS_KEY;
-                }
-                goto err;
+            {
+              ERR_clear_error(); 
             }
-            fclose(fp);
-        }
+#ifdef EVP_F_EVP_DECRYPTFINAL_EX
+          else if (error == ERR_PACK(ERR_LIB_EVP,
+                                     EVP_F_EVP_DECRYPTFINAL_EX,
+                                     EVP_R_BAD_DECRYPT))
+#else
+          else if (error == ERR_PACK(ERR_LIB_EVP,
+                                     EVP_F_EVP_DECRYPTFINAL,
+                                     EVP_R_BAD_DECRYPT))
+#endif
+            {
+              ERR_clear_error();
+              PRXYerr(PRXYERR_F_INIT_CRED,PRXYERR_R_WRONG_PASSPHRASE);
+              status = PRXYERR_R_WRONG_PASSPHRASE;
+            }
+          else {
+            PRXYerr(PRXYERR_F_INIT_CRED,PRXYERR_R_PROCESS_KEY);
+            ERR_add_error_data(2, "\n        File=", user_key);
+            status = PRXYERR_R_PROCESS_KEY;
+          }
+        goto err;
+      }
+      fclose(fp);  
     }
 
     /* 
@@ -3733,13 +3706,13 @@ int load_credentials(const char *certname, const char *keyname,
       if (!strncmp(keyname, "SC:", 3))
         EVP_set_pw_prompt("Enter card pin:");
 
-      if (proxy_load_user_key(key, *cert, keyname, callback, NULL, &hSession))
+      if (proxy_load_user_key(key, *cert, keyname, callback, &hSession))
         goto err;
     }
 
     if (stack && (strncmp(certname, "SC:", 3) && (!keyname || !strcmp(certname, keyname)))) {
       chain = sk_X509_new_null();
-      if (proxy_load_user_proxy(chain, certname, NULL) < 0)
+      if (proxy_load_user_proxy(chain, certname) < 0)
         goto err;
       *stack = chain;
     } 

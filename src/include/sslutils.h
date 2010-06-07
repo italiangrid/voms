@@ -391,13 +391,13 @@ proxy_load_user_cert(
     int                                 (*pw_cb)(),
     BIO *                               bp,
     unsigned long *                     hSession);
+
 int
 proxy_load_user_key(
     EVP_PKEY **                         private_key,
     X509 * ucert,
     const char *                        user_key,
     int                                 (*pw_cb)(),
-    BIO *                               bp,
     unsigned long *                     hSession);
 
 int
@@ -528,8 +528,7 @@ proxy_marshal_bp(
 int
 proxy_load_user_proxy(
     STACK_OF(X509) *                    cert_chain,
-    const char *                        file,
-    BIO *                               bp);
+    const char *                        file);
 
 int
 proxy_get_base_name(
