@@ -1,0 +1,40 @@
+load_lib vomstest.exp
+testheader "See if voms-proxy-fake hex interpretation works."
+
+proc mytest {} {
+    _activateCert mycert2
+    _cleanproxy
+
+    set res [log_exec outname {voms-proxy-fake --voms voms1 --hostcert $::INSTALLDIR/certs/hostcert.pem --hostkey $::INSTALLDIR/certs/hostkey.pem --newsubject /CN=F\\41KEDN}]
+
+    if $res then {
+        addlog $outname
+        testmessage "voms-proxy-fake failed."
+        return $::FAILTEST
+    }
+
+    if [log_exec outname {voms-proxy-info -all}] then {
+        addlog $outname
+        testmessage "voms-proxy-info failed."
+        return $::FAILTEST
+    }
+
+    set correct "subject   : /CN=FAKEDN
+issuer    : /C=IT/CN=001
+identity  : /C=IT/CN=001"
+
+    loadvar out2 $outname
+
+    if [regexp $correct $out2] then {
+        testmessage "Hex interpretation correct"
+        return $::PASSTEST
+    }
+
+    logvar correct
+    addlog $outname
+
+    testmessage "Hex interpretation correct"
+    return $::FAILTEST
+}
+
+do_test
