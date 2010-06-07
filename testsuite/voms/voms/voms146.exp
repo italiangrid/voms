@@ -1,0 +1,31 @@
+load_lib vomstest.exp
+testheader "See if voms-proxy-init fails correctly when the key is empty."
+
+proc mytest {} {
+    _activateCert mycert2
+
+    exec rm -f $::env(X509_USER_KEY)
+    exec touch $::env(X509_USER_KEY)
+
+    set res [log_exec outname {voms-proxy-init --debug}]
+
+    if $res then {
+        set correct "Wrong permissions on file:"
+        loadvar out2 $outname
+        
+        if [regexp $correct $out2] then {
+            testmessage "voms-proxy-init failed with correct message."
+            return $::PASSTEST
+        }
+
+        addlog $outname
+        testmessage "voms-proxy-init failed with an incorrect message."
+        return $::FAILTEST
+    }
+
+    testmessage "voms-proxy-init incorrectly succeeded."
+    return $::FAILTEST
+}
+
+do_test
+
