@@ -3604,34 +3604,6 @@ ASN1_UTCTIME_mktime(
 }
 
 
-/**********************************************************************
-Function: proxy_password_callback_no_prompt()
-
-Description:
-            Function to be passed into SSLeay as a password callback. Simply
-      returns an error if called so that user will not be prompted.
-        
-Parameters:
-      buffer - pointer to buffer to be filled in with password
-                        size - size of buffer
-                        w - XXX I have no idea
-
-Returns:
-      -1 always
-
-**********************************************************************/
-
-int PRIVATE
-proxy_password_callback_no_prompt(
-    UNUSED(char *                              buffer),
-    UNUSED(int                                 size),
-    UNUSED(int                                 w))
-{
-    PRXYerr(PRXYERR_F_CB_NO_PW, PRXYERR_R_NO_PROXY);
-
-    return(-1);
-}
-
 #ifdef CLASS_ADD
 
 /**********************************************************************

@@ -535,11 +535,6 @@ int
 proxy_get_base_name(
     X509_NAME *                         subject);
 
-int proxy_password_callback_no_prompt(
-    char *,
-    int,
-    int);
-
 X509_EXTENSION *
 proxy_extension_class_add_create(
     void *                              buffer, 
