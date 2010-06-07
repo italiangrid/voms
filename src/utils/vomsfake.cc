@@ -170,7 +170,7 @@ int main(int argc, char** argv)
 
 extern int yydebug;
 Fake::Fake(int argc, char ** argv) :   confile(CONFILENAME), 
-                                       separate(""), uri(""),bits(1024),
+                                       separate(""), uri(""),bits(-1),
                                        hours(12), limit_proxy(false),
                                        vomslife(-1), proxyver(0),
                                        pathlength(1), verify(false), 
@@ -907,8 +907,11 @@ bool Fake::VerifyOptions()
 
   /* controls that number of bits for the key is appropiate */
 
+  if (bits == -1)
+    bits = 1024;
+
   if ((bits!=512) && (bits!=1024) && 
-      (bits!=2048) && (bits!=4096))
+      (bits!=2048) && (bits!=4096) && (bits != 0))
     exitError("Error: number of bits in key must be one of 512, 1024, 2048, 4096.");
   else 
     Print(DEBUG) << "Number of bits in key :" << bits << std::endl; 

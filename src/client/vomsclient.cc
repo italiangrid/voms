@@ -158,7 +158,7 @@ Client::Client(int argc, char ** argv) :
                                          userconf(""),
                                          incfile(""),
                                          separate(""),
-                                         bits(1024),
+                                         bits(-1),
                                          hours(12),
                                          minutes(0),
                                          ac_hours(12),
@@ -462,7 +462,10 @@ Client::Client(int argc, char ** argv) :
   
   /* controls that number of bits for the key is appropiate */
   
-  if ((bits!=512) && (bits!=1024) && (bits!=2048) && (bits!=4096)) {
+  if (bits == -1)
+    bits = 1024;
+
+  if ((bits != 0) && (bits!=512) && (bits!=1024) && (bits!=2048) && (bits!=4096)) {
     Print(ERROR) << "Error: number of bits in key must be one of 512, 1024, 2048, 4096." << std::endl;
     exit(1);
   }
