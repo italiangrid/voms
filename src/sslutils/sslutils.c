@@ -134,7 +134,6 @@ static ERR_STRING_DATA prxyerr_str_functs[]=
     {ERR_PACK(0,PRXYERR_F_PROXY_SIGN ,0),"proxy_sign"},
     {ERR_PACK(0,PRXYERR_F_VERIFY_CB ,0),"verify_callback"},
     {ERR_PACK(0,PRXYERR_F_PROXY_TMP ,0),"proxy_marshal_tmp"},
-    {ERR_PACK(0,PRXYERR_F_INIT_CRED ,0),"proxy_init_cred"},
     {ERR_PACK(0,PRXYERR_F_LOCAL_CREATE, 0),"proxy_local_create"},
     {ERR_PACK(0,PRXYERR_F_CB_NO_PW, 0),"proxy_pw_cb"},
     {ERR_PACK(0,PRXYERR_F_GET_CA_SIGN_PATH, 0),"get_ca_signing_policy_path"},
@@ -3057,7 +3056,6 @@ proxy_load_user_cert(
     const char *                        user_cert,
     X509 **                              certificate,
     int                                 (*pw_cb)(),
-    BIO *                               bp,
     UNUSED(unsigned long *                     hSession))
 {
     int                                 status = -1;
@@ -3073,7 +3071,7 @@ proxy_load_user_cert(
 #endif
 
     /* Check arguments */
-    if (!bp && !user_cert)
+    if (!user_cert)
     {
       PRXYerr(PRXYERR_F_INIT_CRED,PRXYERR_R_PROBLEM_USER_NOCERT_FILE);
       status = PRXYERR_R_PROBLEM_USER_NOCERT_FILE;
@@ -3082,7 +3080,7 @@ proxy_load_user_cert(
       goto err;   
     }
 
-    if (!bp && !strncmp(user_cert,"SC:",3))
+    if (!strncmp(user_cert,"SC:",3))
     {
 #ifdef USE_PKCS11
         char * cp;
@@ -3099,10 +3097,13 @@ proxy_load_user_cert(
             status = PRXYERR_R_PROBLEM_USER_NOCERT_FILE;
             goto err;
         }
+
         kp++; /* skip the : */
+
         if (*hSession == 0)
         {
             rc = sc_init(hSession, cp, NULL, NULL, CKU_USER, 0);
+
             if (rc)
             {
                 PRXYerr(PRXYERR_F_INIT_CRED,PRXYERR_R_PROCESS_CERT);
@@ -3142,47 +3143,32 @@ proxy_load_user_cert(
     }
     else
     {
-        if (bp)
-        {
-            if (PEM_read_bio_X509(bp, certificate,
-                                  OPENSSL_PEM_CB(NULL,NULL)) == NULL)
-            {
-                PRXYerr(PRXYERR_F_INIT_CRED,PRXYERR_R_PROCESS_CERT);
-                status = PRXYERR_R_PROCESS_CERT;
-                goto err;
-
-            }
-        }
-        else
-        {
-
-            if((fp = fopen(user_cert,"rb")) == NULL)
-            {
-              PRXYerr(PRXYERR_F_INIT_CRED,PRXYERR_R_PROBLEM_USER_NOCERT_FILE);
-              status = PRXYERR_R_PROBLEM_USER_NOCERT_FILE;
+      if((fp = fopen(user_cert,"rb")) == NULL) {
+        PRXYerr(PRXYERR_F_INIT_CRED,PRXYERR_R_PROBLEM_USER_NOCERT_FILE);
+        status = PRXYERR_R_PROBLEM_USER_NOCERT_FILE;
                     
-              ERR_add_error_data(2, "\n        Cert File=", user_cert);
-              goto err;
-            }
+        ERR_add_error_data(2, "\n        Cert File=", user_cert);
+        goto err;
+      }
 
-            if (PEM_read_X509(fp,
-                              certificate,
-                              OPENSSL_PEM_CB(NULL,NULL)) == NULL) {
-              if (ERR_peek_error() == ERR_PACK(ERR_LIB_PEM,PEM_F_PEM_READ_BIO,PEM_R_NO_START_LINE)) {
-                ERR_clear_error();
-                PRXYerr(PRXYERR_F_INIT_CRED,PRXYERR_R_INVALID_CERT);
-                status = PRXYERR_R_INVALID_CERT;
-              } 
-              else { 
-                PRXYerr(PRXYERR_F_INIT_CRED,PRXYERR_R_PROCESS_CERT);
-                status = PRXYERR_R_PROCESS_CERT;
-              }
-              ERR_add_error_data(2, "\n        File=", user_cert);
-              fclose(fp);
-              goto err;
-            }
-            fclose(fp);
+      if (PEM_read_X509(fp,
+                        certificate,
+                        OPENSSL_PEM_CB(NULL,NULL)) == NULL) {
+        if (ERR_peek_error() == ERR_PACK(ERR_LIB_PEM,PEM_F_PEM_READ_BIO,PEM_R_NO_START_LINE)) {
+          ERR_clear_error();
+          PRXYerr(PRXYERR_F_INIT_CRED,PRXYERR_R_INVALID_CERT);
+          status = PRXYERR_R_INVALID_CERT;
+        } 
+        else { 
+          PRXYerr(PRXYERR_F_INIT_CRED,PRXYERR_R_PROCESS_CERT);
+          status = PRXYERR_R_PROCESS_CERT;
         }
+
+        ERR_add_error_data(2, "\n        File=", user_cert);
+        fclose(fp);
+        goto err;
+      }
+      fclose(fp);
     }
     status = 0;
  err:
@@ -3697,7 +3683,7 @@ int load_credentials(const char *certname, const char *keyname,
     EVP_set_pw_prompt("Enter GRID pass phrase for this identity:");
 
   if (strcmp(certname + strlen(certname) - 4, ".p12")) {
-    if(proxy_load_user_cert(certname, cert, callback, NULL, &hSession))
+    if(proxy_load_user_cert(certname, cert, callback, &hSession))
       goto err;
 
     EVP_set_pw_prompt("Enter GRID pass phrase:");

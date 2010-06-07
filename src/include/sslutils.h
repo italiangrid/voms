@@ -389,7 +389,6 @@ proxy_load_user_cert(
     const char *                        user_cert,
     X509 **                             certificate,
     int                                 (*pw_cb)(),
-    BIO *                               bp,
     unsigned long *                     hSession);
 
 int
@@ -412,12 +411,6 @@ proxy_create_local(
     char *                              buffer,
     int                                 length);
 
-
-int
-proxy_init_cred(
-    proxy_cred_desc *                   pcd,
-    int                                 (*pw_cb)(),
-    BIO *                               bp);
 
 void
 proxy_verify_init(
@@ -560,8 +553,8 @@ int PRIVATE load_certificate_from_file(FILE *file, X509 **cert,
 int
 proxy_app_verify_callback(X509_STORE_CTX *ctx, UNUSED(void *empty));
 
-EXTERN_C_END
-
 STACK_OF(X509) *load_chain(BIO *in, char*);
+
+EXTERN_C_END
 
 #endif /* _SSLUTILS_H */
