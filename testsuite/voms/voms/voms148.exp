@@ -5,7 +5,7 @@ proc mytest {} {
     _activateCert mycert2
     _cleanproxy
 
-    set res [log_exec outname {voms-proxy-fake --voms voms1 --hostcert $::INSTALLDIR/certs/hostcert.pem --hostkey $::INSTALLDIR/certs/hostkey.pem --newsubject /CN=F\\41KEDN}]
+    set res [log_exec outname {voms-proxy-fake --voms voms1 --hostcert $::INSTALLDIR/certs/hostcert.pem --hostkey $::INSTALLDIR/certs/hostkey.pem --newsubject /CN=\\46\\41\\4bEDN}]
 
     if $res then {
         addlog $outname
