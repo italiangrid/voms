@@ -6,11 +6,12 @@ proc mytest {} {
 
     exec rm -f $::env(X509_USER_KEY)
     exec touch $::env(X509_USER_KEY)
+    exec chmod 400 $::env(X509_USER_KEY)
 
-    set res [log_exec outname {voms-proxy-init --debug}]
+    set res [log_exec outname {voms-proxy-init}]
 
     if $res then {
-        set correct "Wrong permissions on file:"
+        set correct "user private key file is empty"
         loadvar out2 $outname
         
         if [regexp $correct $out2] then {
