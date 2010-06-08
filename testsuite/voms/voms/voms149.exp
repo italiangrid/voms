@@ -1,0 +1,43 @@
+load_lib vomstest.exp
+
+testheader "See if voms-proxy-fake -selfsigned (bare) works."
+
+proc mytest {} {
+    _activateCert mycert2
+    _cleanproxy
+
+    set res [log_exec outname {voms-proxy-fake -bits 0 --selfsigned -newsubject "/C=IT/O=CA"}]
+
+    if $res then {
+        addlog $outname
+        testmessage "voms-proxy-fake failed."
+        return $::FAILTEST
+    }
+
+    set proxy [_proxyname]
+    if [catch {set out2 [exec openssl x509 -text -noout -in $proxy >& $outname]}] then {
+        addlog $outname
+        testmessage "openssl failed."
+        return $::FAILTEST
+    }
+
+    set correct "\[ \t\]*Issuer: C=IT, O=CA
+.*
+\[ \t\]*Subject: C=IT, O=CA
+.*
+\[ \t\]*CA:TRUE"
+
+    loadvar out2 $outname
+    if [regexp $correct $out2] then {
+        testmessage "selfsigned works."
+        return $::PASSTEST
+    }
+
+    logvar correct
+    addlog $outname
+
+    testmessage "selfsigned does not work"
+    return $::FAILTEST
+}
+
+do_test
