@@ -45,48 +45,47 @@ CONFIG_HEADER = $(top_builddir)/src/autogen/config.h
 CONFIG_CLEAN_FILES =
 LTLIBRARIES = $(noinst_LTLIBRARIES)
 libattcert_la_LIBADD =
-am_libattcert_la_OBJECTS = libattcert_la-validate.lo \
-	libattcert_la-write.lo libattcert_la-extensions.lo \
+am__objects_1 = libattcert_la-write.lo libattcert_la-extensions.lo \
 	libattcert_la-mystack.lo libattcert_la-error.lo \
 	libattcert_la-newformat.lo libattcert_la-init.lo
+am_libattcert_la_OBJECTS = $(am__objects_1)
 libattcert_la_OBJECTS = $(am_libattcert_la_OBJECTS)
 libattcert_la_LINK = $(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) \
 	$(LIBTOOLFLAGS) --mode=link $(CCLD) $(libattcert_la_CFLAGS) \
 	$(CFLAGS) $(AM_LDFLAGS) $(LDFLAGS) -o $@
 am__DEPENDENCIES_1 =
 libattcert_gcc32_la_DEPENDENCIES = $(am__DEPENDENCIES_1)
-am_libattcert_gcc32_la_OBJECTS = libattcert_gcc32_la-validate.lo \
-	libattcert_gcc32_la-write.lo libattcert_gcc32_la-extensions.lo \
+am__objects_2 = libattcert_gcc32_la-write.lo \
+	libattcert_gcc32_la-extensions.lo \
 	libattcert_gcc32_la-mystack.lo libattcert_gcc32_la-error.lo \
 	libattcert_gcc32_la-newformat.lo libattcert_gcc32_la-init.lo
+am_libattcert_gcc32_la_OBJECTS = $(am__objects_2)
 libattcert_gcc32_la_OBJECTS = $(am_libattcert_gcc32_la_OBJECTS)
 libattcert_gcc32_la_LINK = $(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) \
 	$(LIBTOOLFLAGS) --mode=link $(CCLD) \
 	$(libattcert_gcc32_la_CFLAGS) $(CFLAGS) $(AM_LDFLAGS) \
 	$(LDFLAGS) -o $@
 libattcert_gcc32dbg_la_DEPENDENCIES = $(am__DEPENDENCIES_1)
-am_libattcert_gcc32dbg_la_OBJECTS =  \
-	libattcert_gcc32dbg_la-validate.lo \
-	libattcert_gcc32dbg_la-write.lo \
+am__objects_3 = libattcert_gcc32dbg_la-write.lo \
 	libattcert_gcc32dbg_la-extensions.lo \
 	libattcert_gcc32dbg_la-mystack.lo \
 	libattcert_gcc32dbg_la-error.lo \
 	libattcert_gcc32dbg_la-newformat.lo \
 	libattcert_gcc32dbg_la-init.lo
+am_libattcert_gcc32dbg_la_OBJECTS = $(am__objects_3)
 libattcert_gcc32dbg_la_OBJECTS = $(am_libattcert_gcc32dbg_la_OBJECTS)
 libattcert_gcc32dbg_la_LINK = $(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) \
 	$(LIBTOOLFLAGS) --mode=link $(CCLD) \
 	$(libattcert_gcc32dbg_la_CFLAGS) $(CFLAGS) $(AM_LDFLAGS) \
 	$(LDFLAGS) -o $@
 libattcert_gcc32dbgpthr_la_DEPENDENCIES = $(am__DEPENDENCIES_1)
-am_libattcert_gcc32dbgpthr_la_OBJECTS =  \
-	libattcert_gcc32dbgpthr_la-validate.lo \
-	libattcert_gcc32dbgpthr_la-write.lo \
+am__objects_4 = libattcert_gcc32dbgpthr_la-write.lo \
 	libattcert_gcc32dbgpthr_la-extensions.lo \
 	libattcert_gcc32dbgpthr_la-mystack.lo \
 	libattcert_gcc32dbgpthr_la-error.lo \
 	libattcert_gcc32dbgpthr_la-newformat.lo \
 	libattcert_gcc32dbgpthr_la-init.lo
+am_libattcert_gcc32dbgpthr_la_OBJECTS = $(am__objects_4)
 libattcert_gcc32dbgpthr_la_OBJECTS =  \
 	$(am_libattcert_gcc32dbgpthr_la_OBJECTS)
 libattcert_gcc32dbgpthr_la_LINK = $(LIBTOOL) --tag=CC \
@@ -94,14 +93,13 @@ libattcert_gcc32dbgpthr_la_LINK = $(LIBTOOL) --tag=CC \
 	$(libattcert_gcc32dbgpthr_la_CFLAGS) $(CFLAGS) $(AM_LDFLAGS) \
 	$(LDFLAGS) -o $@
 libattcert_gcc32pthr_la_DEPENDENCIES = $(am__DEPENDENCIES_1)
-am_libattcert_gcc32pthr_la_OBJECTS =  \
-	libattcert_gcc32pthr_la-validate.lo \
-	libattcert_gcc32pthr_la-write.lo \
+am__objects_5 = libattcert_gcc32pthr_la-write.lo \
 	libattcert_gcc32pthr_la-extensions.lo \
 	libattcert_gcc32pthr_la-mystack.lo \
 	libattcert_gcc32pthr_la-error.lo \
 	libattcert_gcc32pthr_la-newformat.lo \
 	libattcert_gcc32pthr_la-init.lo
+am_libattcert_gcc32pthr_la_OBJECTS = $(am__objects_5)
 libattcert_gcc32pthr_la_OBJECTS =  \
 	$(am_libattcert_gcc32pthr_la_OBJECTS)
 libattcert_gcc32pthr_la_LINK = $(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) \
@@ -109,38 +107,37 @@ libattcert_gcc32pthr_la_LINK = $(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) \
 	$(libattcert_gcc32pthr_la_CFLAGS) $(CFLAGS) $(AM_LDFLAGS) \
 	$(LDFLAGS) -o $@
 libattcert_gcc64_la_DEPENDENCIES = $(am__DEPENDENCIES_1)
-am_libattcert_gcc64_la_OBJECTS = libattcert_gcc64_la-validate.lo \
-	libattcert_gcc64_la-write.lo libattcert_gcc64_la-extensions.lo \
+am__objects_6 = libattcert_gcc64_la-write.lo \
+	libattcert_gcc64_la-extensions.lo \
 	libattcert_gcc64_la-mystack.lo libattcert_gcc64_la-error.lo \
 	libattcert_gcc64_la-newformat.lo libattcert_gcc64_la-init.lo
+am_libattcert_gcc64_la_OBJECTS = $(am__objects_6)
 libattcert_gcc64_la_OBJECTS = $(am_libattcert_gcc64_la_OBJECTS)
 libattcert_gcc64_la_LINK = $(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) \
 	$(LIBTOOLFLAGS) --mode=link $(CCLD) \
 	$(libattcert_gcc64_la_CFLAGS) $(CFLAGS) $(AM_LDFLAGS) \
 	$(LDFLAGS) -o $@
 libattcert_gcc64dbg_la_DEPENDENCIES = $(am__DEPENDENCIES_1)
-am_libattcert_gcc64dbg_la_OBJECTS =  \
-	libattcert_gcc64dbg_la-validate.lo \
-	libattcert_gcc64dbg_la-write.lo \
+am__objects_7 = libattcert_gcc64dbg_la-write.lo \
 	libattcert_gcc64dbg_la-extensions.lo \
 	libattcert_gcc64dbg_la-mystack.lo \
 	libattcert_gcc64dbg_la-error.lo \
 	libattcert_gcc64dbg_la-newformat.lo \
 	libattcert_gcc64dbg_la-init.lo
+am_libattcert_gcc64dbg_la_OBJECTS = $(am__objects_7)
 libattcert_gcc64dbg_la_OBJECTS = $(am_libattcert_gcc64dbg_la_OBJECTS)
 libattcert_gcc64dbg_la_LINK = $(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) \
 	$(LIBTOOLFLAGS) --mode=link $(CCLD) \
 	$(libattcert_gcc64dbg_la_CFLAGS) $(CFLAGS) $(AM_LDFLAGS) \
 	$(LDFLAGS) -o $@
 libattcert_gcc64dbgpthr_la_DEPENDENCIES = $(am__DEPENDENCIES_1)
-am_libattcert_gcc64dbgpthr_la_OBJECTS =  \
-	libattcert_gcc64dbgpthr_la-validate.lo \
-	libattcert_gcc64dbgpthr_la-write.lo \
+am__objects_8 = libattcert_gcc64dbgpthr_la-write.lo \
 	libattcert_gcc64dbgpthr_la-extensions.lo \
 	libattcert_gcc64dbgpthr_la-mystack.lo \
 	libattcert_gcc64dbgpthr_la-error.lo \
 	libattcert_gcc64dbgpthr_la-newformat.lo \
 	libattcert_gcc64dbgpthr_la-init.lo
+am_libattcert_gcc64dbgpthr_la_OBJECTS = $(am__objects_8)
 libattcert_gcc64dbgpthr_la_OBJECTS =  \
 	$(am_libattcert_gcc64dbgpthr_la_OBJECTS)
 libattcert_gcc64dbgpthr_la_LINK = $(LIBTOOL) --tag=CC \
@@ -148,14 +145,13 @@ libattcert_gcc64dbgpthr_la_LINK = $(LIBTOOL) --tag=CC \
 	$(libattcert_gcc64dbgpthr_la_CFLAGS) $(CFLAGS) $(AM_LDFLAGS) \
 	$(LDFLAGS) -o $@
 libattcert_gcc64pthr_la_DEPENDENCIES = $(am__DEPENDENCIES_1)
-am_libattcert_gcc64pthr_la_OBJECTS =  \
-	libattcert_gcc64pthr_la-validate.lo \
-	libattcert_gcc64pthr_la-write.lo \
+am__objects_9 = libattcert_gcc64pthr_la-write.lo \
 	libattcert_gcc64pthr_la-extensions.lo \
 	libattcert_gcc64pthr_la-mystack.lo \
 	libattcert_gcc64pthr_la-error.lo \
 	libattcert_gcc64pthr_la-newformat.lo \
 	libattcert_gcc64pthr_la-init.lo
+am_libattcert_gcc64pthr_la_OBJECTS = $(am__objects_9)
 libattcert_gcc64pthr_la_OBJECTS =  \
 	$(am_libattcert_gcc64pthr_la_OBJECTS)
 libattcert_gcc64pthr_la_LINK = $(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) \
@@ -163,52 +159,83 @@ libattcert_gcc64pthr_la_LINK = $(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) \
 	$(libattcert_gcc64pthr_la_CFLAGS) $(CFLAGS) $(AM_LDFLAGS) \
 	$(LDFLAGS) -o $@
 libattributes_nog_la_DEPENDENCIES = $(am__DEPENDENCIES_1)
-am_libattributes_nog_la_OBJECTS = libattributes_nog_la-validate.lo \
-	libattributes_nog_la-write.lo \
+am__objects_10 = libattributes_nog_la-write.lo \
 	libattributes_nog_la-extensions.lo \
 	libattributes_nog_la-mystack.lo libattributes_nog_la-error.lo \
-	libattributes_nog_la-newformat.lo libattributes_nog_la-init.lo \
-	create.lo ccinit.lo
+	libattributes_nog_la-newformat.lo libattributes_nog_la-init.lo
+am__objects_11 = libattributes_nog_la-validate.lo \
+	libattributes_nog_la-create.lo libattributes_nog_la-ccinit.lo
+am_libattributes_nog_la_OBJECTS = $(am__objects_10) $(am__objects_11)
 libattributes_nog_la_OBJECTS = $(am_libattributes_nog_la_OBJECTS)
+libattributes_nog_la_LINK = $(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) \
+	$(LIBTOOLFLAGS) --mode=link $(CXXLD) \
+	$(libattributes_nog_la_CXXFLAGS) $(CXXFLAGS) $(AM_LDFLAGS) \
+	$(LDFLAGS) -o $@
 libccattcert_la_DEPENDENCIES = libattcert.la
-am_libccattcert_la_OBJECTS = create.lo ccinit.lo
+am__objects_12 = libccattcert_la-validate.lo libccattcert_la-create.lo \
+	libccattcert_la-ccinit.lo
+am_libccattcert_la_OBJECTS = $(am__objects_12)
 libccattcert_la_OBJECTS = $(am_libccattcert_la_OBJECTS)
 libccattcert_gcc32_la_DEPENDENCIES = libattcert_gcc32.la \
 	$(am__DEPENDENCIES_1)
-am_libccattcert_gcc32_la_OBJECTS = create.lo ccinit.lo
+am__objects_13 = libccattcert_gcc32_la-validate.lo \
+	libccattcert_gcc32_la-create.lo \
+	libccattcert_gcc32_la-ccinit.lo
+am_libccattcert_gcc32_la_OBJECTS = $(am__objects_13)
 libccattcert_gcc32_la_OBJECTS = $(am_libccattcert_gcc32_la_OBJECTS)
 libccattcert_gcc32dbg_la_DEPENDENCIES = libattcert_gcc32dbg.la \
 	$(am__DEPENDENCIES_1)
-am_libccattcert_gcc32dbg_la_OBJECTS = create.lo ccinit.lo
+am__objects_14 = libccattcert_gcc32dbg_la-validate.lo \
+	libccattcert_gcc32dbg_la-create.lo \
+	libccattcert_gcc32dbg_la-ccinit.lo
+am_libccattcert_gcc32dbg_la_OBJECTS = $(am__objects_14)
 libccattcert_gcc32dbg_la_OBJECTS =  \
 	$(am_libccattcert_gcc32dbg_la_OBJECTS)
 libccattcert_gcc32dbgpthr_la_DEPENDENCIES =  \
 	libattcert_gcc32dbgpthr.la $(am__DEPENDENCIES_1)
-am_libccattcert_gcc32dbgpthr_la_OBJECTS = create.lo ccinit.lo
+am__objects_15 = libccattcert_gcc32dbgpthr_la-validate.lo \
+	libccattcert_gcc32dbgpthr_la-create.lo \
+	libccattcert_gcc32dbgpthr_la-ccinit.lo
+am_libccattcert_gcc32dbgpthr_la_OBJECTS = $(am__objects_15)
 libccattcert_gcc32dbgpthr_la_OBJECTS =  \
 	$(am_libccattcert_gcc32dbgpthr_la_OBJECTS)
 libccattcert_gcc32pthr_la_DEPENDENCIES = libattcert_gcc32pthr.la \
 	$(am__DEPENDENCIES_1)
-am_libccattcert_gcc32pthr_la_OBJECTS = create.lo ccinit.lo
+am__objects_16 = libccattcert_gcc32pthr_la-validate.lo \
+	libccattcert_gcc32pthr_la-create.lo \
+	libccattcert_gcc32pthr_la-ccinit.lo
+am_libccattcert_gcc32pthr_la_OBJECTS = $(am__objects_16)
 libccattcert_gcc32pthr_la_OBJECTS =  \
 	$(am_libccattcert_gcc32pthr_la_OBJECTS)
 libccattcert_gcc64_la_DEPENDENCIES = libattcert_gcc64.la \
 	$(am__DEPENDENCIES_1)
-am_libccattcert_gcc64_la_OBJECTS = create.lo ccinit.lo
+am__objects_17 = libccattcert_gcc64_la-validate.lo \
+	libccattcert_gcc64_la-create.lo \
+	libccattcert_gcc64_la-ccinit.lo
+am_libccattcert_gcc64_la_OBJECTS = $(am__objects_17)
 libccattcert_gcc64_la_OBJECTS = $(am_libccattcert_gcc64_la_OBJECTS)
 libccattcert_gcc64dbg_la_DEPENDENCIES = libattcert_gcc64dbg.la \
 	$(am__DEPENDENCIES_1)
-am_libccattcert_gcc64dbg_la_OBJECTS = create.lo ccinit.lo
+am__objects_18 = libccattcert_gcc64dbg_la-validate.lo \
+	libccattcert_gcc64dbg_la-create.lo \
+	libccattcert_gcc64dbg_la-ccinit.lo
+am_libccattcert_gcc64dbg_la_OBJECTS = $(am__objects_18)
 libccattcert_gcc64dbg_la_OBJECTS =  \
 	$(am_libccattcert_gcc64dbg_la_OBJECTS)
 libccattcert_gcc64dbgpthr_la_DEPENDENCIES =  \
 	libattcert_gcc64dbgpthr.la $(am__DEPENDENCIES_1)
-am_libccattcert_gcc64dbgpthr_la_OBJECTS = create.lo ccinit.lo
+am__objects_19 = libccattcert_gcc64dbgpthr_la-validate.lo \
+	libccattcert_gcc64dbgpthr_la-create.lo \
+	libccattcert_gcc64dbgpthr_la-ccinit.lo
+am_libccattcert_gcc64dbgpthr_la_OBJECTS = $(am__objects_19)
 libccattcert_gcc64dbgpthr_la_OBJECTS =  \
 	$(am_libccattcert_gcc64dbgpthr_la_OBJECTS)
 libccattcert_gcc64pthr_la_DEPENDENCIES = libattcert_gcc64pthr.la \
 	$(am__DEPENDENCIES_1)
-am_libccattcert_gcc64pthr_la_OBJECTS = create.lo ccinit.lo
+am__objects_20 = libccattcert_gcc64pthr_la-validate.lo \
+	libccattcert_gcc64pthr_la-create.lo \
+	libccattcert_gcc64pthr_la-ccinit.lo
+am_libccattcert_gcc64pthr_la_OBJECTS = $(am__objects_20)
 libccattcert_gcc64pthr_la_OBJECTS =  \
 	$(am_libccattcert_gcc64pthr_la_OBJECTS)
 DEFAULT_INCLUDES = -I.@am__isrc@ -I$(top_builddir)/src/autogen
@@ -456,27 +483,24 @@ with_scratchdir = @with_scratchdir@
 noinst_LTLIBRARIES = \
 	$(WANTED_ATTCERT_LIBS) # may add the libraries defined in EXTRA_LTLIBRARIES
 
-libattcert_la_SOURCES = \
-	validate.c \
-	write.c \
-	extensions.c \
-	mystack.c \
-	error.c \
-	newformat.c \
-	init.c
+AC_C_SOURCES = write.c extensions.c mystack.c error.c newformat.c init.c
+AC_CC_SOURCES = validate.cc create.cc ccinit.cc
+EXTRA_DIST = \
+	acerrors.h \
+	write.h \
+	init.h \
+	extensions.h \
+	attributes.h
 
-libattributes_nog_la_SOURCES = \
-	validate.c \
-	write.c \
-	extensions.c \
-	mystack.c \
-	error.c \
-	newformat.c \
-	init.c \
-	create.cc \
-	ccinit.cc
-
+libattcert_la_SOURCES = $(AC_C_SOURCES)
+libattributes_nog_la_SOURCES = $(AC_C_SOURCES) $(AC_CC_SOURCES)
 libattributes_nog_la_CFLAGS = \
+	$(NO_GLOBUS_FLAGS) \
+	-DNOGLOBUS \
+	-I $(top_srcdir)/src/include \
+	-I $(top_builddir)/src/sslutils
+
+libattributes_nog_la_CXXFLAGS = \
 	$(NO_GLOBUS_FLAGS) \
 	-DNOGLOBUS \
 	-I $(top_srcdir)/src/include \
@@ -490,13 +514,15 @@ libattcert_la_CFLAGS = \
 	-I $(top_builddir)/src/sslutils \
 	$(GLOBUS_CFLAGS)
 
+libccattcert_la_CPPFLAGS = \
+	-I $(top_srcdir)/src/include \
+	-I $(top_builddir)/src/sslutils \
+	$(GLOBUS_CFLAGS)
+
 
 #libattcert_la_LIBADD = \
 #	$(GLOBUS_GSS_API_LIBS)
-libccattcert_la_SOURCES = \
-	create.cc \
-	ccinit.cc
-
+libccattcert_la_SOURCES = $(AC_CC_SOURCES)
 libccattcert_la_LIBADD = \
 	libattcert.la
 
@@ -529,16 +555,13 @@ EXTRA_LTLIBRARIES = \
 	libattcert.la \
 	libccattcert.la
 
-libattcert_gcc32_la_SOURCES = \
-	validate.c \
-	write.c \
-	extensions.c \
-	mystack.c \
-	error.c \
-	newformat.c \
-	init.c
-
+libattcert_gcc32_la_SOURCES = $(AC_C_SOURCES)
 libattcert_gcc32_la_CFLAGS = \
+	-I $(top_srcdir)/src/include \
+	-I $(top_builddir)/src/sslutils \
+	$(GLOBUS_GCC32_CFLAGS)
+
+libccattcert_gcc32_la_CPPFLAGS = \
 	-I $(top_srcdir)/src/include \
 	-I $(top_builddir)/src/sslutils \
 	$(GLOBUS_GCC32_CFLAGS)
@@ -546,24 +569,18 @@ libattcert_gcc32_la_CFLAGS = \
 libattcert_gcc32_la_LIBADD = \
 	$(GLOBUS_GCC32_GSS_API_LIBS)
 
-libccattcert_gcc32_la_SOURCES = \
-	create.cc \
-	ccinit.cc
-
+libccattcert_gcc32_la_SOURCES = $(AC_CC_SOURCES)
 libccattcert_gcc32_la_LIBADD = \
 	libattcert_gcc32.la \
 	$(GLOBUS_GCC32_GSS_API_LIBS)
 
-libattcert_gcc32dbg_la_SOURCES = \
-	validate.c \
-	write.c \
-	extensions.c \
-	mystack.c \
-	error.c \
-	newformat.c \
-	init.c
-
+libattcert_gcc32dbg_la_SOURCES = $(AC_C_SOURCES)
 libattcert_gcc32dbg_la_CFLAGS = \
+	-I $(top_srcdir)/src/include \
+	-I $(top_builddir)/src/sslutils \
+	$(GLOBUS_GCC32DBG_CFLAGS)
+
+libccattcert_gcc32dbg_la_CPPFLAGS = \
 	-I $(top_srcdir)/src/include \
 	-I $(top_builddir)/src/sslutils \
 	$(GLOBUS_GCC32DBG_CFLAGS)
@@ -571,24 +588,18 @@ libattcert_gcc32dbg_la_CFLAGS = \
 libattcert_gcc32dbg_la_LIBADD = \
 	$(GLOBUS_GCC32DBG_GSS_API_LIBS)
 
-libccattcert_gcc32dbg_la_SOURCES = \
-	create.cc \
-	ccinit.cc
-
+libccattcert_gcc32dbg_la_SOURCES = $(AC_CC_SOURCES)
 libccattcert_gcc32dbg_la_LIBADD = \
 	libattcert_gcc32dbg.la \
 	$(GLOBUS_GCC32DBG_GSS_API_LIBS)
 
-libattcert_gcc32pthr_la_SOURCES = \
-	validate.c \
-	write.c \
-	extensions.c \
-	mystack.c \
-	error.c \
-	newformat.c \
-	init.c
-
+libattcert_gcc32pthr_la_SOURCES = $(AC_C_SOURCES)
 libattcert_gcc32pthr_la_CFLAGS = \
+	-I $(top_srcdir)/src/include \
+	-I $(top_builddir)/src/sslutils \
+	$(GLOBUS_GCC32PTHR_CFLAGS)
+
+libccattcert_gcc32pthr_la_CPPFLAGS = \
 	-I $(top_srcdir)/src/include \
 	-I $(top_builddir)/src/sslutils \
 	$(GLOBUS_GCC32PTHR_CFLAGS)
@@ -596,24 +607,18 @@ libattcert_gcc32pthr_la_CFLAGS = \
 libattcert_gcc32pthr_la_LIBADD = \
 	$(GLOBUS_GCC32PTHR_GSS_API_LIBS)
 
-libccattcert_gcc32pthr_la_SOURCES = \
-	create.cc \
-	ccinit.cc
-
+libccattcert_gcc32pthr_la_SOURCES = $(AC_CC_SOURCES)
 libccattcert_gcc32pthr_la_LIBADD = \
 	libattcert_gcc32pthr.la \
 	$(GLOBUS_GCC32PTHR_GSS_API_LIBS)
 
-libattcert_gcc32dbgpthr_la_SOURCES = \
-	validate.c \
-	write.c \
-	extensions.c \
-	mystack.c \
-	error.c \
-	newformat.c \
-	init.c
-
+libattcert_gcc32dbgpthr_la_SOURCES = $(AC_C_SOURCES)
 libattcert_gcc32dbgpthr_la_CFLAGS = \
+	-I $(top_srcdir)/src/include \
+	-I $(top_builddir)/src/sslutils \
+	$(GLOBUS_GCC32DBGPTHR_CFLAGS)
+
+libccattcert_gcc32dbgpthr_la_CPPFLAGS = \
 	-I $(top_srcdir)/src/include \
 	-I $(top_builddir)/src/sslutils \
 	$(GLOBUS_GCC32DBGPTHR_CFLAGS)
@@ -621,24 +626,18 @@ libattcert_gcc32dbgpthr_la_CFLAGS = \
 libattcert_gcc32dbgpthr_la_LIBADD = \
 	$(GLOBUS_GCC32DBGPTHR_GSS_API_LIBS)
 
-libccattcert_gcc32dbgpthr_la_SOURCES = \
-	create.cc \
-	ccinit.cc
-
+libccattcert_gcc32dbgpthr_la_SOURCES = $(AC_CC_SOURCES)
 libccattcert_gcc32dbgpthr_la_LIBADD = \
 	libattcert_gcc32dbgpthr.la \
 	$(GLOBUS_GCC32DBGPTHR_GSS_API_LIBS)
 
-libattcert_gcc64_la_SOURCES = \
-	validate.c \
-	write.c \
-	extensions.c \
-	mystack.c \
-	error.c \
-	newformat.c \
-	init.c
-
+libattcert_gcc64_la_SOURCES = $(AC_C_SOURCES)
 libattcert_gcc64_la_CFLAGS = \
+	-I $(top_srcdir)/src/include \
+	-I $(top_builddir)/src/sslutils \
+	$(GLOBUS_GCC64_CFLAGS)
+
+libccattcert_gcc64_la_CPPFLAGS = \
 	-I $(top_srcdir)/src/include \
 	-I $(top_builddir)/src/sslutils \
 	$(GLOBUS_GCC64_CFLAGS)
@@ -646,24 +645,18 @@ libattcert_gcc64_la_CFLAGS = \
 libattcert_gcc64_la_LIBADD = \
 	$(GLOBUS_GCC64_GSS_API_LIBS)
 
-libccattcert_gcc64_la_SOURCES = \
-	create.cc \
-	ccinit.cc
-
+libccattcert_gcc64_la_SOURCES = $(AC_CC_SOURCES)
 libccattcert_gcc64_la_LIBADD = \
 	libattcert_gcc64.la \
 	$(GLOBUS_GCC64_GSS_API_LIBS)
 
-libattcert_gcc64dbg_la_SOURCES = \
-	validate.c \
-	write.c \
-	extensions.c \
-	mystack.c \
-	error.c \
-	newformat.c \
-	init.c
-
+libattcert_gcc64dbg_la_SOURCES = $(AC_C_SOURCES)
 libattcert_gcc64dbg_la_CFLAGS = \
+	-I $(top_srcdir)/src/include \
+	-I $(top_builddir)/src/sslutils \
+	$(GLOBUS_GCC64DBG_CFLAGS)
+
+libccattcert_gcc64dbg_la_CPPFLAGS = \
 	-I $(top_srcdir)/src/include \
 	-I $(top_builddir)/src/sslutils \
 	$(GLOBUS_GCC64DBG_CFLAGS)
@@ -671,24 +664,18 @@ libattcert_gcc64dbg_la_CFLAGS = \
 libattcert_gcc64dbg_la_LIBADD = \
 	$(GLOBUS_GCC64DBG_GSS_API_LIBS)
 
-libccattcert_gcc64dbg_la_SOURCES = \
-	create.cc \
-	ccinit.cc
-
+libccattcert_gcc64dbg_la_SOURCES = $(AC_CC_SOURCES)
 libccattcert_gcc64dbg_la_LIBADD = \
 	libattcert_gcc64dbg.la \
 	$(GLOBUS_GCC64DBG_GSS_API_LIBS)
 
-libattcert_gcc64pthr_la_SOURCES = \
-	validate.c \
-	write.c \
-	extensions.c \
-	mystack.c \
-	error.c \
-	newformat.c \
-	init.c
-
+libattcert_gcc64pthr_la_SOURCES = $(AC_C_SOURCES)
 libattcert_gcc64pthr_la_CFLAGS = \
+	-I $(top_srcdir)/src/include \
+	-I $(top_builddir)/src/sslutils \
+	$(GLOBUS_GCC64PTHR_CFLAGS)
+
+libccattcert_gcc64pthr_la_CPPFLAGS = \
 	-I $(top_srcdir)/src/include \
 	-I $(top_builddir)/src/sslutils \
 	$(GLOBUS_GCC64PTHR_CFLAGS)
@@ -696,24 +683,18 @@ libattcert_gcc64pthr_la_CFLAGS = \
 libattcert_gcc64pthr_la_LIBADD = \
 	$(GLOBUS_GCC64PTHR_GSS_API_LIBS)
 
-libccattcert_gcc64pthr_la_SOURCES = \
-	create.cc \
-	ccinit.cc
-
+libccattcert_gcc64pthr_la_SOURCES = $(AC_CC_SOURCES)
 libccattcert_gcc64pthr_la_LIBADD = \
 	libattcert_gcc64pthr.la \
 	$(GLOBUS_GCC64PTHR_GSS_API_LIBS)
 
-libattcert_gcc64dbgpthr_la_SOURCES = \
-	validate.c \
-	write.c \
-	extensions.c \
-	mystack.c \
-	error.c \
-	newformat.c \
-	init.c
-
+libattcert_gcc64dbgpthr_la_SOURCES = $(AC_C_SOURCES)
 libattcert_gcc64dbgpthr_la_CFLAGS = \
+	-I $(top_srcdir)/src/include \
+	-I $(top_builddir)/src/sslutils \
+	$(GLOBUS_GCC64DBGPTHR_CFLAGS)
+
+libccattcert_gcc64dbgpthr_la_CPPFLAGS = \
 	-I $(top_srcdir)/src/include \
 	-I $(top_builddir)/src/sslutils \
 	$(GLOBUS_GCC64DBGPTHR_CFLAGS)
@@ -721,20 +702,10 @@ libattcert_gcc64dbgpthr_la_CFLAGS = \
 libattcert_gcc64dbgpthr_la_LIBADD = \
 	$(GLOBUS_GCC64DBGPTHR_GSS_API_LIBS)
 
-libccattcert_gcc64dbgpthr_la_SOURCES = \
-	create.cc \
-	ccinit.cc
-
+libccattcert_gcc64dbgpthr_la_SOURCES = $(AC_CC_SOURCES)
 libccattcert_gcc64dbgpthr_la_LIBADD = \
 	libattcert_gcc64dbgpthr.la \
 	$(GLOBUS_GCC64DBGPTHR_GSS_API_LIBS)
-
-EXTRA_DIST = \
-	acerrors.h \
-	write.h \
-	init.h \
-	extensions.h \
-	attributes.h
 
 all: all-am
 
@@ -797,7 +768,7 @@ libattcert_gcc64dbgpthr.la: $(libattcert_gcc64dbgpthr_la_OBJECTS) $(libattcert_g
 libattcert_gcc64pthr.la: $(libattcert_gcc64pthr_la_OBJECTS) $(libattcert_gcc64pthr_la_DEPENDENCIES) 
 	$(libattcert_gcc64pthr_la_LINK)  $(libattcert_gcc64pthr_la_OBJECTS) $(libattcert_gcc64pthr_la_LIBADD) $(LIBS)
 libattributes_nog.la: $(libattributes_nog_la_OBJECTS) $(libattributes_nog_la_DEPENDENCIES) 
-	$(CXXLINK)  $(libattributes_nog_la_OBJECTS) $(libattributes_nog_la_LIBADD) $(LIBS)
+	$(libattributes_nog_la_LINK)  $(libattributes_nog_la_OBJECTS) $(libattributes_nog_la_LIBADD) $(LIBS)
 libccattcert.la: $(libccattcert_la_OBJECTS) $(libccattcert_la_DEPENDENCIES) 
 	$(CXXLINK)  $(libccattcert_la_OBJECTS) $(libccattcert_la_LIBADD) $(LIBS)
 libccattcert_gcc32.la: $(libccattcert_gcc32_la_OBJECTS) $(libccattcert_gcc32_la_DEPENDENCIES) 
@@ -823,71 +794,62 @@ mostlyclean-compile:
 distclean-compile:
 	-rm -f *.tab.c
 
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/ccinit.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/create.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libattcert_gcc32_la-error.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libattcert_gcc32_la-extensions.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libattcert_gcc32_la-init.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libattcert_gcc32_la-mystack.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libattcert_gcc32_la-newformat.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libattcert_gcc32_la-validate.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libattcert_gcc32_la-write.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libattcert_gcc32dbg_la-error.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libattcert_gcc32dbg_la-extensions.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libattcert_gcc32dbg_la-init.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libattcert_gcc32dbg_la-mystack.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libattcert_gcc32dbg_la-newformat.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libattcert_gcc32dbg_la-validate.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libattcert_gcc32dbg_la-write.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libattcert_gcc32dbgpthr_la-error.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libattcert_gcc32dbgpthr_la-extensions.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libattcert_gcc32dbgpthr_la-init.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libattcert_gcc32dbgpthr_la-mystack.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libattcert_gcc32dbgpthr_la-newformat.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libattcert_gcc32dbgpthr_la-validate.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libattcert_gcc32dbgpthr_la-write.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libattcert_gcc32pthr_la-error.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libattcert_gcc32pthr_la-extensions.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libattcert_gcc32pthr_la-init.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libattcert_gcc32pthr_la-mystack.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libattcert_gcc32pthr_la-newformat.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libattcert_gcc32pthr_la-validate.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libattcert_gcc32pthr_la-write.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libattcert_gcc64_la-error.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libattcert_gcc64_la-extensions.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libattcert_gcc64_la-init.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libattcert_gcc64_la-mystack.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libattcert_gcc64_la-newformat.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libattcert_gcc64_la-validate.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libattcert_gcc64_la-write.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libattcert_gcc64dbg_la-error.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libattcert_gcc64dbg_la-extensions.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libattcert_gcc64dbg_la-init.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libattcert_gcc64dbg_la-mystack.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libattcert_gcc64dbg_la-newformat.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libattcert_gcc64dbg_la-validate.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libattcert_gcc64dbg_la-write.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libattcert_gcc64dbgpthr_la-error.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libattcert_gcc64dbgpthr_la-extensions.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libattcert_gcc64dbgpthr_la-init.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libattcert_gcc64dbgpthr_la-mystack.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libattcert_gcc64dbgpthr_la-newformat.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libattcert_gcc64dbgpthr_la-validate.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libattcert_gcc64dbgpthr_la-write.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libattcert_gcc64pthr_la-error.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libattcert_gcc64pthr_la-extensions.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libattcert_gcc64pthr_la-init.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libattcert_gcc64pthr_la-mystack.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libattcert_gcc64pthr_la-newformat.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libattcert_gcc64pthr_la-validate.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libattcert_gcc64pthr_la-write.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libattcert_la-error.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libattcert_la-extensions.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libattcert_la-init.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libattcert_la-mystack.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libattcert_la-newformat.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libattcert_la-validate.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libattcert_la-write.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libattributes_nog_la-ccinit.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libattributes_nog_la-create.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libattributes_nog_la-error.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libattributes_nog_la-extensions.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libattributes_nog_la-init.Plo@am__quote@
@@ -895,6 +857,33 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libattributes_nog_la-newformat.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libattributes_nog_la-validate.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libattributes_nog_la-write.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libccattcert_gcc32_la-ccinit.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libccattcert_gcc32_la-create.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libccattcert_gcc32_la-validate.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libccattcert_gcc32dbg_la-ccinit.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libccattcert_gcc32dbg_la-create.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libccattcert_gcc32dbg_la-validate.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libccattcert_gcc32dbgpthr_la-ccinit.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libccattcert_gcc32dbgpthr_la-create.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libccattcert_gcc32dbgpthr_la-validate.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libccattcert_gcc32pthr_la-ccinit.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libccattcert_gcc32pthr_la-create.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libccattcert_gcc32pthr_la-validate.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libccattcert_gcc64_la-ccinit.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libccattcert_gcc64_la-create.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libccattcert_gcc64_la-validate.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libccattcert_gcc64dbg_la-ccinit.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libccattcert_gcc64dbg_la-create.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libccattcert_gcc64dbg_la-validate.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libccattcert_gcc64dbgpthr_la-ccinit.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libccattcert_gcc64dbgpthr_la-create.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libccattcert_gcc64dbgpthr_la-validate.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libccattcert_gcc64pthr_la-ccinit.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libccattcert_gcc64pthr_la-create.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libccattcert_gcc64pthr_la-validate.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libccattcert_la-ccinit.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libccattcert_la-create.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libccattcert_la-validate.Plo@am__quote@
 
 .c.o:
 @am__fastdepCC_TRUE@	$(COMPILE) -MT $@ -MD -MP -MF $(DEPDIR)/$*.Tpo -c -o $@ $<
@@ -916,13 +905,6 @@ distclean-compile:
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	source='$<' object='$@' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(LTCOMPILE) -c -o $@ $<
-
-libattcert_la-validate.lo: validate.c
-@am__fastdepCC_TRUE@	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libattcert_la_CFLAGS) $(CFLAGS) -MT libattcert_la-validate.lo -MD -MP -MF $(DEPDIR)/libattcert_la-validate.Tpo -c -o libattcert_la-validate.lo `test -f 'validate.c' || echo '$(srcdir)/'`validate.c
-@am__fastdepCC_TRUE@	mv -f $(DEPDIR)/libattcert_la-validate.Tpo $(DEPDIR)/libattcert_la-validate.Plo
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='validate.c' object='libattcert_la-validate.lo' libtool=yes @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libattcert_la_CFLAGS) $(CFLAGS) -c -o libattcert_la-validate.lo `test -f 'validate.c' || echo '$(srcdir)/'`validate.c
 
 libattcert_la-write.lo: write.c
 @am__fastdepCC_TRUE@	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libattcert_la_CFLAGS) $(CFLAGS) -MT libattcert_la-write.lo -MD -MP -MF $(DEPDIR)/libattcert_la-write.Tpo -c -o libattcert_la-write.lo `test -f 'write.c' || echo '$(srcdir)/'`write.c
@@ -966,13 +948,6 @@ libattcert_la-init.lo: init.c
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libattcert_la_CFLAGS) $(CFLAGS) -c -o libattcert_la-init.lo `test -f 'init.c' || echo '$(srcdir)/'`init.c
 
-libattcert_gcc32_la-validate.lo: validate.c
-@am__fastdepCC_TRUE@	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libattcert_gcc32_la_CFLAGS) $(CFLAGS) -MT libattcert_gcc32_la-validate.lo -MD -MP -MF $(DEPDIR)/libattcert_gcc32_la-validate.Tpo -c -o libattcert_gcc32_la-validate.lo `test -f 'validate.c' || echo '$(srcdir)/'`validate.c
-@am__fastdepCC_TRUE@	mv -f $(DEPDIR)/libattcert_gcc32_la-validate.Tpo $(DEPDIR)/libattcert_gcc32_la-validate.Plo
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='validate.c' object='libattcert_gcc32_la-validate.lo' libtool=yes @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libattcert_gcc32_la_CFLAGS) $(CFLAGS) -c -o libattcert_gcc32_la-validate.lo `test -f 'validate.c' || echo '$(srcdir)/'`validate.c
-
 libattcert_gcc32_la-write.lo: write.c
 @am__fastdepCC_TRUE@	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libattcert_gcc32_la_CFLAGS) $(CFLAGS) -MT libattcert_gcc32_la-write.lo -MD -MP -MF $(DEPDIR)/libattcert_gcc32_la-write.Tpo -c -o libattcert_gcc32_la-write.lo `test -f 'write.c' || echo '$(srcdir)/'`write.c
 @am__fastdepCC_TRUE@	mv -f $(DEPDIR)/libattcert_gcc32_la-write.Tpo $(DEPDIR)/libattcert_gcc32_la-write.Plo
@@ -1014,13 +989,6 @@ libattcert_gcc32_la-init.lo: init.c
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	source='init.c' object='libattcert_gcc32_la-init.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libattcert_gcc32_la_CFLAGS) $(CFLAGS) -c -o libattcert_gcc32_la-init.lo `test -f 'init.c' || echo '$(srcdir)/'`init.c
-
-libattcert_gcc32dbg_la-validate.lo: validate.c
-@am__fastdepCC_TRUE@	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libattcert_gcc32dbg_la_CFLAGS) $(CFLAGS) -MT libattcert_gcc32dbg_la-validate.lo -MD -MP -MF $(DEPDIR)/libattcert_gcc32dbg_la-validate.Tpo -c -o libattcert_gcc32dbg_la-validate.lo `test -f 'validate.c' || echo '$(srcdir)/'`validate.c
-@am__fastdepCC_TRUE@	mv -f $(DEPDIR)/libattcert_gcc32dbg_la-validate.Tpo $(DEPDIR)/libattcert_gcc32dbg_la-validate.Plo
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='validate.c' object='libattcert_gcc32dbg_la-validate.lo' libtool=yes @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libattcert_gcc32dbg_la_CFLAGS) $(CFLAGS) -c -o libattcert_gcc32dbg_la-validate.lo `test -f 'validate.c' || echo '$(srcdir)/'`validate.c
 
 libattcert_gcc32dbg_la-write.lo: write.c
 @am__fastdepCC_TRUE@	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libattcert_gcc32dbg_la_CFLAGS) $(CFLAGS) -MT libattcert_gcc32dbg_la-write.lo -MD -MP -MF $(DEPDIR)/libattcert_gcc32dbg_la-write.Tpo -c -o libattcert_gcc32dbg_la-write.lo `test -f 'write.c' || echo '$(srcdir)/'`write.c
@@ -1064,13 +1032,6 @@ libattcert_gcc32dbg_la-init.lo: init.c
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libattcert_gcc32dbg_la_CFLAGS) $(CFLAGS) -c -o libattcert_gcc32dbg_la-init.lo `test -f 'init.c' || echo '$(srcdir)/'`init.c
 
-libattcert_gcc32dbgpthr_la-validate.lo: validate.c
-@am__fastdepCC_TRUE@	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libattcert_gcc32dbgpthr_la_CFLAGS) $(CFLAGS) -MT libattcert_gcc32dbgpthr_la-validate.lo -MD -MP -MF $(DEPDIR)/libattcert_gcc32dbgpthr_la-validate.Tpo -c -o libattcert_gcc32dbgpthr_la-validate.lo `test -f 'validate.c' || echo '$(srcdir)/'`validate.c
-@am__fastdepCC_TRUE@	mv -f $(DEPDIR)/libattcert_gcc32dbgpthr_la-validate.Tpo $(DEPDIR)/libattcert_gcc32dbgpthr_la-validate.Plo
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='validate.c' object='libattcert_gcc32dbgpthr_la-validate.lo' libtool=yes @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libattcert_gcc32dbgpthr_la_CFLAGS) $(CFLAGS) -c -o libattcert_gcc32dbgpthr_la-validate.lo `test -f 'validate.c' || echo '$(srcdir)/'`validate.c
-
 libattcert_gcc32dbgpthr_la-write.lo: write.c
 @am__fastdepCC_TRUE@	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libattcert_gcc32dbgpthr_la_CFLAGS) $(CFLAGS) -MT libattcert_gcc32dbgpthr_la-write.lo -MD -MP -MF $(DEPDIR)/libattcert_gcc32dbgpthr_la-write.Tpo -c -o libattcert_gcc32dbgpthr_la-write.lo `test -f 'write.c' || echo '$(srcdir)/'`write.c
 @am__fastdepCC_TRUE@	mv -f $(DEPDIR)/libattcert_gcc32dbgpthr_la-write.Tpo $(DEPDIR)/libattcert_gcc32dbgpthr_la-write.Plo
@@ -1112,13 +1073,6 @@ libattcert_gcc32dbgpthr_la-init.lo: init.c
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	source='init.c' object='libattcert_gcc32dbgpthr_la-init.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libattcert_gcc32dbgpthr_la_CFLAGS) $(CFLAGS) -c -o libattcert_gcc32dbgpthr_la-init.lo `test -f 'init.c' || echo '$(srcdir)/'`init.c
-
-libattcert_gcc32pthr_la-validate.lo: validate.c
-@am__fastdepCC_TRUE@	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libattcert_gcc32pthr_la_CFLAGS) $(CFLAGS) -MT libattcert_gcc32pthr_la-validate.lo -MD -MP -MF $(DEPDIR)/libattcert_gcc32pthr_la-validate.Tpo -c -o libattcert_gcc32pthr_la-validate.lo `test -f 'validate.c' || echo '$(srcdir)/'`validate.c
-@am__fastdepCC_TRUE@	mv -f $(DEPDIR)/libattcert_gcc32pthr_la-validate.Tpo $(DEPDIR)/libattcert_gcc32pthr_la-validate.Plo
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='validate.c' object='libattcert_gcc32pthr_la-validate.lo' libtool=yes @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libattcert_gcc32pthr_la_CFLAGS) $(CFLAGS) -c -o libattcert_gcc32pthr_la-validate.lo `test -f 'validate.c' || echo '$(srcdir)/'`validate.c
 
 libattcert_gcc32pthr_la-write.lo: write.c
 @am__fastdepCC_TRUE@	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libattcert_gcc32pthr_la_CFLAGS) $(CFLAGS) -MT libattcert_gcc32pthr_la-write.lo -MD -MP -MF $(DEPDIR)/libattcert_gcc32pthr_la-write.Tpo -c -o libattcert_gcc32pthr_la-write.lo `test -f 'write.c' || echo '$(srcdir)/'`write.c
@@ -1162,13 +1116,6 @@ libattcert_gcc32pthr_la-init.lo: init.c
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libattcert_gcc32pthr_la_CFLAGS) $(CFLAGS) -c -o libattcert_gcc32pthr_la-init.lo `test -f 'init.c' || echo '$(srcdir)/'`init.c
 
-libattcert_gcc64_la-validate.lo: validate.c
-@am__fastdepCC_TRUE@	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libattcert_gcc64_la_CFLAGS) $(CFLAGS) -MT libattcert_gcc64_la-validate.lo -MD -MP -MF $(DEPDIR)/libattcert_gcc64_la-validate.Tpo -c -o libattcert_gcc64_la-validate.lo `test -f 'validate.c' || echo '$(srcdir)/'`validate.c
-@am__fastdepCC_TRUE@	mv -f $(DEPDIR)/libattcert_gcc64_la-validate.Tpo $(DEPDIR)/libattcert_gcc64_la-validate.Plo
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='validate.c' object='libattcert_gcc64_la-validate.lo' libtool=yes @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libattcert_gcc64_la_CFLAGS) $(CFLAGS) -c -o libattcert_gcc64_la-validate.lo `test -f 'validate.c' || echo '$(srcdir)/'`validate.c
-
 libattcert_gcc64_la-write.lo: write.c
 @am__fastdepCC_TRUE@	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libattcert_gcc64_la_CFLAGS) $(CFLAGS) -MT libattcert_gcc64_la-write.lo -MD -MP -MF $(DEPDIR)/libattcert_gcc64_la-write.Tpo -c -o libattcert_gcc64_la-write.lo `test -f 'write.c' || echo '$(srcdir)/'`write.c
 @am__fastdepCC_TRUE@	mv -f $(DEPDIR)/libattcert_gcc64_la-write.Tpo $(DEPDIR)/libattcert_gcc64_la-write.Plo
@@ -1210,13 +1157,6 @@ libattcert_gcc64_la-init.lo: init.c
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	source='init.c' object='libattcert_gcc64_la-init.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libattcert_gcc64_la_CFLAGS) $(CFLAGS) -c -o libattcert_gcc64_la-init.lo `test -f 'init.c' || echo '$(srcdir)/'`init.c
-
-libattcert_gcc64dbg_la-validate.lo: validate.c
-@am__fastdepCC_TRUE@	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libattcert_gcc64dbg_la_CFLAGS) $(CFLAGS) -MT libattcert_gcc64dbg_la-validate.lo -MD -MP -MF $(DEPDIR)/libattcert_gcc64dbg_la-validate.Tpo -c -o libattcert_gcc64dbg_la-validate.lo `test -f 'validate.c' || echo '$(srcdir)/'`validate.c
-@am__fastdepCC_TRUE@	mv -f $(DEPDIR)/libattcert_gcc64dbg_la-validate.Tpo $(DEPDIR)/libattcert_gcc64dbg_la-validate.Plo
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='validate.c' object='libattcert_gcc64dbg_la-validate.lo' libtool=yes @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libattcert_gcc64dbg_la_CFLAGS) $(CFLAGS) -c -o libattcert_gcc64dbg_la-validate.lo `test -f 'validate.c' || echo '$(srcdir)/'`validate.c
 
 libattcert_gcc64dbg_la-write.lo: write.c
 @am__fastdepCC_TRUE@	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libattcert_gcc64dbg_la_CFLAGS) $(CFLAGS) -MT libattcert_gcc64dbg_la-write.lo -MD -MP -MF $(DEPDIR)/libattcert_gcc64dbg_la-write.Tpo -c -o libattcert_gcc64dbg_la-write.lo `test -f 'write.c' || echo '$(srcdir)/'`write.c
@@ -1260,13 +1200,6 @@ libattcert_gcc64dbg_la-init.lo: init.c
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libattcert_gcc64dbg_la_CFLAGS) $(CFLAGS) -c -o libattcert_gcc64dbg_la-init.lo `test -f 'init.c' || echo '$(srcdir)/'`init.c
 
-libattcert_gcc64dbgpthr_la-validate.lo: validate.c
-@am__fastdepCC_TRUE@	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libattcert_gcc64dbgpthr_la_CFLAGS) $(CFLAGS) -MT libattcert_gcc64dbgpthr_la-validate.lo -MD -MP -MF $(DEPDIR)/libattcert_gcc64dbgpthr_la-validate.Tpo -c -o libattcert_gcc64dbgpthr_la-validate.lo `test -f 'validate.c' || echo '$(srcdir)/'`validate.c
-@am__fastdepCC_TRUE@	mv -f $(DEPDIR)/libattcert_gcc64dbgpthr_la-validate.Tpo $(DEPDIR)/libattcert_gcc64dbgpthr_la-validate.Plo
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='validate.c' object='libattcert_gcc64dbgpthr_la-validate.lo' libtool=yes @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libattcert_gcc64dbgpthr_la_CFLAGS) $(CFLAGS) -c -o libattcert_gcc64dbgpthr_la-validate.lo `test -f 'validate.c' || echo '$(srcdir)/'`validate.c
-
 libattcert_gcc64dbgpthr_la-write.lo: write.c
 @am__fastdepCC_TRUE@	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libattcert_gcc64dbgpthr_la_CFLAGS) $(CFLAGS) -MT libattcert_gcc64dbgpthr_la-write.lo -MD -MP -MF $(DEPDIR)/libattcert_gcc64dbgpthr_la-write.Tpo -c -o libattcert_gcc64dbgpthr_la-write.lo `test -f 'write.c' || echo '$(srcdir)/'`write.c
 @am__fastdepCC_TRUE@	mv -f $(DEPDIR)/libattcert_gcc64dbgpthr_la-write.Tpo $(DEPDIR)/libattcert_gcc64dbgpthr_la-write.Plo
@@ -1309,13 +1242,6 @@ libattcert_gcc64dbgpthr_la-init.lo: init.c
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libattcert_gcc64dbgpthr_la_CFLAGS) $(CFLAGS) -c -o libattcert_gcc64dbgpthr_la-init.lo `test -f 'init.c' || echo '$(srcdir)/'`init.c
 
-libattcert_gcc64pthr_la-validate.lo: validate.c
-@am__fastdepCC_TRUE@	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libattcert_gcc64pthr_la_CFLAGS) $(CFLAGS) -MT libattcert_gcc64pthr_la-validate.lo -MD -MP -MF $(DEPDIR)/libattcert_gcc64pthr_la-validate.Tpo -c -o libattcert_gcc64pthr_la-validate.lo `test -f 'validate.c' || echo '$(srcdir)/'`validate.c
-@am__fastdepCC_TRUE@	mv -f $(DEPDIR)/libattcert_gcc64pthr_la-validate.Tpo $(DEPDIR)/libattcert_gcc64pthr_la-validate.Plo
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='validate.c' object='libattcert_gcc64pthr_la-validate.lo' libtool=yes @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libattcert_gcc64pthr_la_CFLAGS) $(CFLAGS) -c -o libattcert_gcc64pthr_la-validate.lo `test -f 'validate.c' || echo '$(srcdir)/'`validate.c
-
 libattcert_gcc64pthr_la-write.lo: write.c
 @am__fastdepCC_TRUE@	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libattcert_gcc64pthr_la_CFLAGS) $(CFLAGS) -MT libattcert_gcc64pthr_la-write.lo -MD -MP -MF $(DEPDIR)/libattcert_gcc64pthr_la-write.Tpo -c -o libattcert_gcc64pthr_la-write.lo `test -f 'write.c' || echo '$(srcdir)/'`write.c
 @am__fastdepCC_TRUE@	mv -f $(DEPDIR)/libattcert_gcc64pthr_la-write.Tpo $(DEPDIR)/libattcert_gcc64pthr_la-write.Plo
@@ -1357,13 +1283,6 @@ libattcert_gcc64pthr_la-init.lo: init.c
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	source='init.c' object='libattcert_gcc64pthr_la-init.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libattcert_gcc64pthr_la_CFLAGS) $(CFLAGS) -c -o libattcert_gcc64pthr_la-init.lo `test -f 'init.c' || echo '$(srcdir)/'`init.c
-
-libattributes_nog_la-validate.lo: validate.c
-@am__fastdepCC_TRUE@	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libattributes_nog_la_CFLAGS) $(CFLAGS) -MT libattributes_nog_la-validate.lo -MD -MP -MF $(DEPDIR)/libattributes_nog_la-validate.Tpo -c -o libattributes_nog_la-validate.lo `test -f 'validate.c' || echo '$(srcdir)/'`validate.c
-@am__fastdepCC_TRUE@	mv -f $(DEPDIR)/libattributes_nog_la-validate.Tpo $(DEPDIR)/libattributes_nog_la-validate.Plo
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='validate.c' object='libattributes_nog_la-validate.lo' libtool=yes @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libattributes_nog_la_CFLAGS) $(CFLAGS) -c -o libattributes_nog_la-validate.lo `test -f 'validate.c' || echo '$(srcdir)/'`validate.c
 
 libattributes_nog_la-write.lo: write.c
 @am__fastdepCC_TRUE@	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libattributes_nog_la_CFLAGS) $(CFLAGS) -MT libattributes_nog_la-write.lo -MD -MP -MF $(DEPDIR)/libattributes_nog_la-write.Tpo -c -o libattributes_nog_la-write.lo `test -f 'write.c' || echo '$(srcdir)/'`write.c
@@ -1427,6 +1346,216 @@ libattributes_nog_la-init.lo: init.c
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='$<' object='$@' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(LTCXXCOMPILE) -c -o $@ $<
+
+libattributes_nog_la-validate.lo: validate.cc
+@am__fastdepCXX_TRUE@	$(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libattributes_nog_la_CXXFLAGS) $(CXXFLAGS) -MT libattributes_nog_la-validate.lo -MD -MP -MF $(DEPDIR)/libattributes_nog_la-validate.Tpo -c -o libattributes_nog_la-validate.lo `test -f 'validate.cc' || echo '$(srcdir)/'`validate.cc
+@am__fastdepCXX_TRUE@	mv -f $(DEPDIR)/libattributes_nog_la-validate.Tpo $(DEPDIR)/libattributes_nog_la-validate.Plo
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='validate.cc' object='libattributes_nog_la-validate.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libattributes_nog_la_CXXFLAGS) $(CXXFLAGS) -c -o libattributes_nog_la-validate.lo `test -f 'validate.cc' || echo '$(srcdir)/'`validate.cc
+
+libattributes_nog_la-create.lo: create.cc
+@am__fastdepCXX_TRUE@	$(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libattributes_nog_la_CXXFLAGS) $(CXXFLAGS) -MT libattributes_nog_la-create.lo -MD -MP -MF $(DEPDIR)/libattributes_nog_la-create.Tpo -c -o libattributes_nog_la-create.lo `test -f 'create.cc' || echo '$(srcdir)/'`create.cc
+@am__fastdepCXX_TRUE@	mv -f $(DEPDIR)/libattributes_nog_la-create.Tpo $(DEPDIR)/libattributes_nog_la-create.Plo
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='create.cc' object='libattributes_nog_la-create.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libattributes_nog_la_CXXFLAGS) $(CXXFLAGS) -c -o libattributes_nog_la-create.lo `test -f 'create.cc' || echo '$(srcdir)/'`create.cc
+
+libattributes_nog_la-ccinit.lo: ccinit.cc
+@am__fastdepCXX_TRUE@	$(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libattributes_nog_la_CXXFLAGS) $(CXXFLAGS) -MT libattributes_nog_la-ccinit.lo -MD -MP -MF $(DEPDIR)/libattributes_nog_la-ccinit.Tpo -c -o libattributes_nog_la-ccinit.lo `test -f 'ccinit.cc' || echo '$(srcdir)/'`ccinit.cc
+@am__fastdepCXX_TRUE@	mv -f $(DEPDIR)/libattributes_nog_la-ccinit.Tpo $(DEPDIR)/libattributes_nog_la-ccinit.Plo
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='ccinit.cc' object='libattributes_nog_la-ccinit.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libattributes_nog_la_CXXFLAGS) $(CXXFLAGS) -c -o libattributes_nog_la-ccinit.lo `test -f 'ccinit.cc' || echo '$(srcdir)/'`ccinit.cc
+
+libccattcert_la-validate.lo: validate.cc
+@am__fastdepCXX_TRUE@	$(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libccattcert_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT libccattcert_la-validate.lo -MD -MP -MF $(DEPDIR)/libccattcert_la-validate.Tpo -c -o libccattcert_la-validate.lo `test -f 'validate.cc' || echo '$(srcdir)/'`validate.cc
+@am__fastdepCXX_TRUE@	mv -f $(DEPDIR)/libccattcert_la-validate.Tpo $(DEPDIR)/libccattcert_la-validate.Plo
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='validate.cc' object='libccattcert_la-validate.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libccattcert_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o libccattcert_la-validate.lo `test -f 'validate.cc' || echo '$(srcdir)/'`validate.cc
+
+libccattcert_la-create.lo: create.cc
+@am__fastdepCXX_TRUE@	$(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libccattcert_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT libccattcert_la-create.lo -MD -MP -MF $(DEPDIR)/libccattcert_la-create.Tpo -c -o libccattcert_la-create.lo `test -f 'create.cc' || echo '$(srcdir)/'`create.cc
+@am__fastdepCXX_TRUE@	mv -f $(DEPDIR)/libccattcert_la-create.Tpo $(DEPDIR)/libccattcert_la-create.Plo
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='create.cc' object='libccattcert_la-create.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libccattcert_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o libccattcert_la-create.lo `test -f 'create.cc' || echo '$(srcdir)/'`create.cc
+
+libccattcert_la-ccinit.lo: ccinit.cc
+@am__fastdepCXX_TRUE@	$(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libccattcert_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT libccattcert_la-ccinit.lo -MD -MP -MF $(DEPDIR)/libccattcert_la-ccinit.Tpo -c -o libccattcert_la-ccinit.lo `test -f 'ccinit.cc' || echo '$(srcdir)/'`ccinit.cc
+@am__fastdepCXX_TRUE@	mv -f $(DEPDIR)/libccattcert_la-ccinit.Tpo $(DEPDIR)/libccattcert_la-ccinit.Plo
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='ccinit.cc' object='libccattcert_la-ccinit.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libccattcert_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o libccattcert_la-ccinit.lo `test -f 'ccinit.cc' || echo '$(srcdir)/'`ccinit.cc
+
+libccattcert_gcc32_la-validate.lo: validate.cc
+@am__fastdepCXX_TRUE@	$(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libccattcert_gcc32_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT libccattcert_gcc32_la-validate.lo -MD -MP -MF $(DEPDIR)/libccattcert_gcc32_la-validate.Tpo -c -o libccattcert_gcc32_la-validate.lo `test -f 'validate.cc' || echo '$(srcdir)/'`validate.cc
+@am__fastdepCXX_TRUE@	mv -f $(DEPDIR)/libccattcert_gcc32_la-validate.Tpo $(DEPDIR)/libccattcert_gcc32_la-validate.Plo
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='validate.cc' object='libccattcert_gcc32_la-validate.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libccattcert_gcc32_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o libccattcert_gcc32_la-validate.lo `test -f 'validate.cc' || echo '$(srcdir)/'`validate.cc
+
+libccattcert_gcc32_la-create.lo: create.cc
+@am__fastdepCXX_TRUE@	$(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libccattcert_gcc32_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT libccattcert_gcc32_la-create.lo -MD -MP -MF $(DEPDIR)/libccattcert_gcc32_la-create.Tpo -c -o libccattcert_gcc32_la-create.lo `test -f 'create.cc' || echo '$(srcdir)/'`create.cc
+@am__fastdepCXX_TRUE@	mv -f $(DEPDIR)/libccattcert_gcc32_la-create.Tpo $(DEPDIR)/libccattcert_gcc32_la-create.Plo
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='create.cc' object='libccattcert_gcc32_la-create.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libccattcert_gcc32_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o libccattcert_gcc32_la-create.lo `test -f 'create.cc' || echo '$(srcdir)/'`create.cc
+
+libccattcert_gcc32_la-ccinit.lo: ccinit.cc
+@am__fastdepCXX_TRUE@	$(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libccattcert_gcc32_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT libccattcert_gcc32_la-ccinit.lo -MD -MP -MF $(DEPDIR)/libccattcert_gcc32_la-ccinit.Tpo -c -o libccattcert_gcc32_la-ccinit.lo `test -f 'ccinit.cc' || echo '$(srcdir)/'`ccinit.cc
+@am__fastdepCXX_TRUE@	mv -f $(DEPDIR)/libccattcert_gcc32_la-ccinit.Tpo $(DEPDIR)/libccattcert_gcc32_la-ccinit.Plo
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='ccinit.cc' object='libccattcert_gcc32_la-ccinit.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libccattcert_gcc32_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o libccattcert_gcc32_la-ccinit.lo `test -f 'ccinit.cc' || echo '$(srcdir)/'`ccinit.cc
+
+libccattcert_gcc32dbg_la-validate.lo: validate.cc
+@am__fastdepCXX_TRUE@	$(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libccattcert_gcc32dbg_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT libccattcert_gcc32dbg_la-validate.lo -MD -MP -MF $(DEPDIR)/libccattcert_gcc32dbg_la-validate.Tpo -c -o libccattcert_gcc32dbg_la-validate.lo `test -f 'validate.cc' || echo '$(srcdir)/'`validate.cc
+@am__fastdepCXX_TRUE@	mv -f $(DEPDIR)/libccattcert_gcc32dbg_la-validate.Tpo $(DEPDIR)/libccattcert_gcc32dbg_la-validate.Plo
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='validate.cc' object='libccattcert_gcc32dbg_la-validate.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libccattcert_gcc32dbg_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o libccattcert_gcc32dbg_la-validate.lo `test -f 'validate.cc' || echo '$(srcdir)/'`validate.cc
+
+libccattcert_gcc32dbg_la-create.lo: create.cc
+@am__fastdepCXX_TRUE@	$(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libccattcert_gcc32dbg_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT libccattcert_gcc32dbg_la-create.lo -MD -MP -MF $(DEPDIR)/libccattcert_gcc32dbg_la-create.Tpo -c -o libccattcert_gcc32dbg_la-create.lo `test -f 'create.cc' || echo '$(srcdir)/'`create.cc
+@am__fastdepCXX_TRUE@	mv -f $(DEPDIR)/libccattcert_gcc32dbg_la-create.Tpo $(DEPDIR)/libccattcert_gcc32dbg_la-create.Plo
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='create.cc' object='libccattcert_gcc32dbg_la-create.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libccattcert_gcc32dbg_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o libccattcert_gcc32dbg_la-create.lo `test -f 'create.cc' || echo '$(srcdir)/'`create.cc
+
+libccattcert_gcc32dbg_la-ccinit.lo: ccinit.cc
+@am__fastdepCXX_TRUE@	$(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libccattcert_gcc32dbg_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT libccattcert_gcc32dbg_la-ccinit.lo -MD -MP -MF $(DEPDIR)/libccattcert_gcc32dbg_la-ccinit.Tpo -c -o libccattcert_gcc32dbg_la-ccinit.lo `test -f 'ccinit.cc' || echo '$(srcdir)/'`ccinit.cc
+@am__fastdepCXX_TRUE@	mv -f $(DEPDIR)/libccattcert_gcc32dbg_la-ccinit.Tpo $(DEPDIR)/libccattcert_gcc32dbg_la-ccinit.Plo
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='ccinit.cc' object='libccattcert_gcc32dbg_la-ccinit.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libccattcert_gcc32dbg_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o libccattcert_gcc32dbg_la-ccinit.lo `test -f 'ccinit.cc' || echo '$(srcdir)/'`ccinit.cc
+
+libccattcert_gcc32dbgpthr_la-validate.lo: validate.cc
+@am__fastdepCXX_TRUE@	$(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libccattcert_gcc32dbgpthr_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT libccattcert_gcc32dbgpthr_la-validate.lo -MD -MP -MF $(DEPDIR)/libccattcert_gcc32dbgpthr_la-validate.Tpo -c -o libccattcert_gcc32dbgpthr_la-validate.lo `test -f 'validate.cc' || echo '$(srcdir)/'`validate.cc
+@am__fastdepCXX_TRUE@	mv -f $(DEPDIR)/libccattcert_gcc32dbgpthr_la-validate.Tpo $(DEPDIR)/libccattcert_gcc32dbgpthr_la-validate.Plo
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='validate.cc' object='libccattcert_gcc32dbgpthr_la-validate.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libccattcert_gcc32dbgpthr_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o libccattcert_gcc32dbgpthr_la-validate.lo `test -f 'validate.cc' || echo '$(srcdir)/'`validate.cc
+
+libccattcert_gcc32dbgpthr_la-create.lo: create.cc
+@am__fastdepCXX_TRUE@	$(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libccattcert_gcc32dbgpthr_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT libccattcert_gcc32dbgpthr_la-create.lo -MD -MP -MF $(DEPDIR)/libccattcert_gcc32dbgpthr_la-create.Tpo -c -o libccattcert_gcc32dbgpthr_la-create.lo `test -f 'create.cc' || echo '$(srcdir)/'`create.cc
+@am__fastdepCXX_TRUE@	mv -f $(DEPDIR)/libccattcert_gcc32dbgpthr_la-create.Tpo $(DEPDIR)/libccattcert_gcc32dbgpthr_la-create.Plo
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='create.cc' object='libccattcert_gcc32dbgpthr_la-create.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libccattcert_gcc32dbgpthr_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o libccattcert_gcc32dbgpthr_la-create.lo `test -f 'create.cc' || echo '$(srcdir)/'`create.cc
+
+libccattcert_gcc32dbgpthr_la-ccinit.lo: ccinit.cc
+@am__fastdepCXX_TRUE@	$(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libccattcert_gcc32dbgpthr_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT libccattcert_gcc32dbgpthr_la-ccinit.lo -MD -MP -MF $(DEPDIR)/libccattcert_gcc32dbgpthr_la-ccinit.Tpo -c -o libccattcert_gcc32dbgpthr_la-ccinit.lo `test -f 'ccinit.cc' || echo '$(srcdir)/'`ccinit.cc
+@am__fastdepCXX_TRUE@	mv -f $(DEPDIR)/libccattcert_gcc32dbgpthr_la-ccinit.Tpo $(DEPDIR)/libccattcert_gcc32dbgpthr_la-ccinit.Plo
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='ccinit.cc' object='libccattcert_gcc32dbgpthr_la-ccinit.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libccattcert_gcc32dbgpthr_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o libccattcert_gcc32dbgpthr_la-ccinit.lo `test -f 'ccinit.cc' || echo '$(srcdir)/'`ccinit.cc
+
+libccattcert_gcc32pthr_la-validate.lo: validate.cc
+@am__fastdepCXX_TRUE@	$(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libccattcert_gcc32pthr_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT libccattcert_gcc32pthr_la-validate.lo -MD -MP -MF $(DEPDIR)/libccattcert_gcc32pthr_la-validate.Tpo -c -o libccattcert_gcc32pthr_la-validate.lo `test -f 'validate.cc' || echo '$(srcdir)/'`validate.cc
+@am__fastdepCXX_TRUE@	mv -f $(DEPDIR)/libccattcert_gcc32pthr_la-validate.Tpo $(DEPDIR)/libccattcert_gcc32pthr_la-validate.Plo
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='validate.cc' object='libccattcert_gcc32pthr_la-validate.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libccattcert_gcc32pthr_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o libccattcert_gcc32pthr_la-validate.lo `test -f 'validate.cc' || echo '$(srcdir)/'`validate.cc
+
+libccattcert_gcc32pthr_la-create.lo: create.cc
+@am__fastdepCXX_TRUE@	$(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libccattcert_gcc32pthr_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT libccattcert_gcc32pthr_la-create.lo -MD -MP -MF $(DEPDIR)/libccattcert_gcc32pthr_la-create.Tpo -c -o libccattcert_gcc32pthr_la-create.lo `test -f 'create.cc' || echo '$(srcdir)/'`create.cc
+@am__fastdepCXX_TRUE@	mv -f $(DEPDIR)/libccattcert_gcc32pthr_la-create.Tpo $(DEPDIR)/libccattcert_gcc32pthr_la-create.Plo
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='create.cc' object='libccattcert_gcc32pthr_la-create.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libccattcert_gcc32pthr_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o libccattcert_gcc32pthr_la-create.lo `test -f 'create.cc' || echo '$(srcdir)/'`create.cc
+
+libccattcert_gcc32pthr_la-ccinit.lo: ccinit.cc
+@am__fastdepCXX_TRUE@	$(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libccattcert_gcc32pthr_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT libccattcert_gcc32pthr_la-ccinit.lo -MD -MP -MF $(DEPDIR)/libccattcert_gcc32pthr_la-ccinit.Tpo -c -o libccattcert_gcc32pthr_la-ccinit.lo `test -f 'ccinit.cc' || echo '$(srcdir)/'`ccinit.cc
+@am__fastdepCXX_TRUE@	mv -f $(DEPDIR)/libccattcert_gcc32pthr_la-ccinit.Tpo $(DEPDIR)/libccattcert_gcc32pthr_la-ccinit.Plo
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='ccinit.cc' object='libccattcert_gcc32pthr_la-ccinit.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libccattcert_gcc32pthr_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o libccattcert_gcc32pthr_la-ccinit.lo `test -f 'ccinit.cc' || echo '$(srcdir)/'`ccinit.cc
+
+libccattcert_gcc64_la-validate.lo: validate.cc
+@am__fastdepCXX_TRUE@	$(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libccattcert_gcc64_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT libccattcert_gcc64_la-validate.lo -MD -MP -MF $(DEPDIR)/libccattcert_gcc64_la-validate.Tpo -c -o libccattcert_gcc64_la-validate.lo `test -f 'validate.cc' || echo '$(srcdir)/'`validate.cc
+@am__fastdepCXX_TRUE@	mv -f $(DEPDIR)/libccattcert_gcc64_la-validate.Tpo $(DEPDIR)/libccattcert_gcc64_la-validate.Plo
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='validate.cc' object='libccattcert_gcc64_la-validate.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libccattcert_gcc64_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o libccattcert_gcc64_la-validate.lo `test -f 'validate.cc' || echo '$(srcdir)/'`validate.cc
+
+libccattcert_gcc64_la-create.lo: create.cc
+@am__fastdepCXX_TRUE@	$(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libccattcert_gcc64_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT libccattcert_gcc64_la-create.lo -MD -MP -MF $(DEPDIR)/libccattcert_gcc64_la-create.Tpo -c -o libccattcert_gcc64_la-create.lo `test -f 'create.cc' || echo '$(srcdir)/'`create.cc
+@am__fastdepCXX_TRUE@	mv -f $(DEPDIR)/libccattcert_gcc64_la-create.Tpo $(DEPDIR)/libccattcert_gcc64_la-create.Plo
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='create.cc' object='libccattcert_gcc64_la-create.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libccattcert_gcc64_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o libccattcert_gcc64_la-create.lo `test -f 'create.cc' || echo '$(srcdir)/'`create.cc
+
+libccattcert_gcc64_la-ccinit.lo: ccinit.cc
+@am__fastdepCXX_TRUE@	$(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libccattcert_gcc64_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT libccattcert_gcc64_la-ccinit.lo -MD -MP -MF $(DEPDIR)/libccattcert_gcc64_la-ccinit.Tpo -c -o libccattcert_gcc64_la-ccinit.lo `test -f 'ccinit.cc' || echo '$(srcdir)/'`ccinit.cc
+@am__fastdepCXX_TRUE@	mv -f $(DEPDIR)/libccattcert_gcc64_la-ccinit.Tpo $(DEPDIR)/libccattcert_gcc64_la-ccinit.Plo
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='ccinit.cc' object='libccattcert_gcc64_la-ccinit.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libccattcert_gcc64_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o libccattcert_gcc64_la-ccinit.lo `test -f 'ccinit.cc' || echo '$(srcdir)/'`ccinit.cc
+
+libccattcert_gcc64dbg_la-validate.lo: validate.cc
+@am__fastdepCXX_TRUE@	$(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libccattcert_gcc64dbg_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT libccattcert_gcc64dbg_la-validate.lo -MD -MP -MF $(DEPDIR)/libccattcert_gcc64dbg_la-validate.Tpo -c -o libccattcert_gcc64dbg_la-validate.lo `test -f 'validate.cc' || echo '$(srcdir)/'`validate.cc
+@am__fastdepCXX_TRUE@	mv -f $(DEPDIR)/libccattcert_gcc64dbg_la-validate.Tpo $(DEPDIR)/libccattcert_gcc64dbg_la-validate.Plo
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='validate.cc' object='libccattcert_gcc64dbg_la-validate.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libccattcert_gcc64dbg_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o libccattcert_gcc64dbg_la-validate.lo `test -f 'validate.cc' || echo '$(srcdir)/'`validate.cc
+
+libccattcert_gcc64dbg_la-create.lo: create.cc
+@am__fastdepCXX_TRUE@	$(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libccattcert_gcc64dbg_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT libccattcert_gcc64dbg_la-create.lo -MD -MP -MF $(DEPDIR)/libccattcert_gcc64dbg_la-create.Tpo -c -o libccattcert_gcc64dbg_la-create.lo `test -f 'create.cc' || echo '$(srcdir)/'`create.cc
+@am__fastdepCXX_TRUE@	mv -f $(DEPDIR)/libccattcert_gcc64dbg_la-create.Tpo $(DEPDIR)/libccattcert_gcc64dbg_la-create.Plo
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='create.cc' object='libccattcert_gcc64dbg_la-create.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libccattcert_gcc64dbg_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o libccattcert_gcc64dbg_la-create.lo `test -f 'create.cc' || echo '$(srcdir)/'`create.cc
+
+libccattcert_gcc64dbg_la-ccinit.lo: ccinit.cc
+@am__fastdepCXX_TRUE@	$(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libccattcert_gcc64dbg_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT libccattcert_gcc64dbg_la-ccinit.lo -MD -MP -MF $(DEPDIR)/libccattcert_gcc64dbg_la-ccinit.Tpo -c -o libccattcert_gcc64dbg_la-ccinit.lo `test -f 'ccinit.cc' || echo '$(srcdir)/'`ccinit.cc
+@am__fastdepCXX_TRUE@	mv -f $(DEPDIR)/libccattcert_gcc64dbg_la-ccinit.Tpo $(DEPDIR)/libccattcert_gcc64dbg_la-ccinit.Plo
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='ccinit.cc' object='libccattcert_gcc64dbg_la-ccinit.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libccattcert_gcc64dbg_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o libccattcert_gcc64dbg_la-ccinit.lo `test -f 'ccinit.cc' || echo '$(srcdir)/'`ccinit.cc
+
+libccattcert_gcc64dbgpthr_la-validate.lo: validate.cc
+@am__fastdepCXX_TRUE@	$(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libccattcert_gcc64dbgpthr_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT libccattcert_gcc64dbgpthr_la-validate.lo -MD -MP -MF $(DEPDIR)/libccattcert_gcc64dbgpthr_la-validate.Tpo -c -o libccattcert_gcc64dbgpthr_la-validate.lo `test -f 'validate.cc' || echo '$(srcdir)/'`validate.cc
+@am__fastdepCXX_TRUE@	mv -f $(DEPDIR)/libccattcert_gcc64dbgpthr_la-validate.Tpo $(DEPDIR)/libccattcert_gcc64dbgpthr_la-validate.Plo
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='validate.cc' object='libccattcert_gcc64dbgpthr_la-validate.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libccattcert_gcc64dbgpthr_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o libccattcert_gcc64dbgpthr_la-validate.lo `test -f 'validate.cc' || echo '$(srcdir)/'`validate.cc
+
+libccattcert_gcc64dbgpthr_la-create.lo: create.cc
+@am__fastdepCXX_TRUE@	$(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libccattcert_gcc64dbgpthr_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT libccattcert_gcc64dbgpthr_la-create.lo -MD -MP -MF $(DEPDIR)/libccattcert_gcc64dbgpthr_la-create.Tpo -c -o libccattcert_gcc64dbgpthr_la-create.lo `test -f 'create.cc' || echo '$(srcdir)/'`create.cc
+@am__fastdepCXX_TRUE@	mv -f $(DEPDIR)/libccattcert_gcc64dbgpthr_la-create.Tpo $(DEPDIR)/libccattcert_gcc64dbgpthr_la-create.Plo
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='create.cc' object='libccattcert_gcc64dbgpthr_la-create.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libccattcert_gcc64dbgpthr_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o libccattcert_gcc64dbgpthr_la-create.lo `test -f 'create.cc' || echo '$(srcdir)/'`create.cc
+
+libccattcert_gcc64dbgpthr_la-ccinit.lo: ccinit.cc
+@am__fastdepCXX_TRUE@	$(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libccattcert_gcc64dbgpthr_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT libccattcert_gcc64dbgpthr_la-ccinit.lo -MD -MP -MF $(DEPDIR)/libccattcert_gcc64dbgpthr_la-ccinit.Tpo -c -o libccattcert_gcc64dbgpthr_la-ccinit.lo `test -f 'ccinit.cc' || echo '$(srcdir)/'`ccinit.cc
+@am__fastdepCXX_TRUE@	mv -f $(DEPDIR)/libccattcert_gcc64dbgpthr_la-ccinit.Tpo $(DEPDIR)/libccattcert_gcc64dbgpthr_la-ccinit.Plo
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='ccinit.cc' object='libccattcert_gcc64dbgpthr_la-ccinit.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libccattcert_gcc64dbgpthr_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o libccattcert_gcc64dbgpthr_la-ccinit.lo `test -f 'ccinit.cc' || echo '$(srcdir)/'`ccinit.cc
+
+libccattcert_gcc64pthr_la-validate.lo: validate.cc
+@am__fastdepCXX_TRUE@	$(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libccattcert_gcc64pthr_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT libccattcert_gcc64pthr_la-validate.lo -MD -MP -MF $(DEPDIR)/libccattcert_gcc64pthr_la-validate.Tpo -c -o libccattcert_gcc64pthr_la-validate.lo `test -f 'validate.cc' || echo '$(srcdir)/'`validate.cc
+@am__fastdepCXX_TRUE@	mv -f $(DEPDIR)/libccattcert_gcc64pthr_la-validate.Tpo $(DEPDIR)/libccattcert_gcc64pthr_la-validate.Plo
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='validate.cc' object='libccattcert_gcc64pthr_la-validate.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libccattcert_gcc64pthr_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o libccattcert_gcc64pthr_la-validate.lo `test -f 'validate.cc' || echo '$(srcdir)/'`validate.cc
+
+libccattcert_gcc64pthr_la-create.lo: create.cc
+@am__fastdepCXX_TRUE@	$(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libccattcert_gcc64pthr_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT libccattcert_gcc64pthr_la-create.lo -MD -MP -MF $(DEPDIR)/libccattcert_gcc64pthr_la-create.Tpo -c -o libccattcert_gcc64pthr_la-create.lo `test -f 'create.cc' || echo '$(srcdir)/'`create.cc
+@am__fastdepCXX_TRUE@	mv -f $(DEPDIR)/libccattcert_gcc64pthr_la-create.Tpo $(DEPDIR)/libccattcert_gcc64pthr_la-create.Plo
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='create.cc' object='libccattcert_gcc64pthr_la-create.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libccattcert_gcc64pthr_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o libccattcert_gcc64pthr_la-create.lo `test -f 'create.cc' || echo '$(srcdir)/'`create.cc
+
+libccattcert_gcc64pthr_la-ccinit.lo: ccinit.cc
+@am__fastdepCXX_TRUE@	$(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libccattcert_gcc64pthr_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT libccattcert_gcc64pthr_la-ccinit.lo -MD -MP -MF $(DEPDIR)/libccattcert_gcc64pthr_la-ccinit.Tpo -c -o libccattcert_gcc64pthr_la-ccinit.lo `test -f 'ccinit.cc' || echo '$(srcdir)/'`ccinit.cc
+@am__fastdepCXX_TRUE@	mv -f $(DEPDIR)/libccattcert_gcc64pthr_la-ccinit.Tpo $(DEPDIR)/libccattcert_gcc64pthr_la-ccinit.Plo
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='ccinit.cc' object='libccattcert_gcc64pthr_la-ccinit.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libccattcert_gcc64pthr_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o libccattcert_gcc64pthr_la-ccinit.lo `test -f 'ccinit.cc' || echo '$(srcdir)/'`ccinit.cc
 
 mostlyclean-libtool:
 	-rm -f *.lo

@@ -26,7 +26,13 @@
 #include "config.h"
 #include "replace.h"
 
+#ifdef _GNU_SOURCE
+#undef _GNU_SOURCE
+#endif
+
 #define _GNU_SOURCE
+
+extern "C" {
 
 #include <stddef.h>
 #include <openssl/sha.h>
@@ -45,7 +51,6 @@
 
 #include "attributes.h"
 #include "acstack.h"
-#include "../api/ccapi/voms_apic.h"
 #include "validate.h"
 #include "listfunc.h"
 #include "doio.h"
@@ -55,38 +60,16 @@
 #include <unistd.h>
 
 #include "replace.h"
-
-static char *getfqdn(void);
-static int checkAttributes(STACK_OF(AC_ATTR) *, struct col *);
-static int checkExtensions(STACK_OF(X509_EXTENSION) *,X509 *,struct col *,int);
-static int interpret_attributes(AC_FULL_ATTRIBUTES *, struct col *);
-
-static void free_att(struct att *a)
-{
-  if (a) {
-    free(a->name);
-    free(a->qual);
-    free(a->val);
-    free(a);
-  }
 }
 
-static void free_att_list(struct att_list *at)
-{
-  if (at) {
-    free(at->grantor);
-    listfree((char **)(at->attrs), (freefn)free_att);
-    free(at);
-  }
-}
+#include "../api/ccapi/voms_api.h"
+#include "../api/ccapi/realdata.h"
+#include <string>
 
-static void free_full_att(struct full_att *fa)
-{
-  if (fa) {
-    listfree((char **)(fa->list), (freefn)free_att_list);
-    free(fa);
-  }
-}
+static std::string getfqdn(void);
+static int checkAttributes(STACK_OF(AC_ATTR) *, voms&);
+static int checkExtensions(STACK_OF(X509_EXTENSION) *,X509 *, int, realdata *);
+static int interpret_attributes(AC_FULL_ATTRIBUTES *, realdata*);
 
 char *get_error(int e)
 {
@@ -176,8 +159,13 @@ char *get_error(int e)
 #define NCHECK(a)  do { if ((a)) ERROR(AC_ERR_SET); }     while (0)
 #define WARNING(a) do { if ((a)) ERROR(AC_ERR_SET); } while (0)
 
-  
-int validate(X509 *cert, X509 *issuer, AC *ac, struct col *voms, int valids, time_t vertime)
+#define CTOCPPSTR(var, str) do {    \
+    char *s = (str);                \
+    var = std::string( s ? s : ""); \
+    free(s);                        \
+  } while (0)
+
+int validate(X509 *cert, X509 *issuer, AC *ac, voms &v, int valids, time_t vertime)
 {
   STACK_OF(GENERAL_NAME) *names;
   GENERAL_NAME  *name = NULL;
@@ -219,31 +207,36 @@ int validate(X509 *cert, X509 *issuer, AC *ac, struct col *voms, int valids, tim
       ERROR(AC_ERR_SIGNATURE);
   }
 
-  if (voms) {
-    voms->version    = 1;
-    voms->siglen     = ac->signature->length;
-    voms->signature  = ac->signature->data;
-    bn               = ASN1_INTEGER_to_BN(ac->acinfo->serial, NULL);
-    voms->serial     = BN_bn2hex(bn);
-    BN_free(bn);
-    if (cert) {
-      voms->user       = X509_NAME_oneline(X509_get_subject_name(cert), NULL, 0);
-      voms->userca     = X509_NAME_oneline(X509_get_issuer_name(cert), NULL, 0);
-    }
-    else {
-      if (valids & VER_ID)
-        ERROR(AC_ERR_HOLDER);
-      voms->user  = voms->userca = NULL;
-    }
-    if (issuer) {
-      voms->server     = X509_NAME_oneline(X509_get_subject_name(issuer), NULL, 0);
-      voms->serverca   = X509_NAME_oneline(X509_get_issuer_name(issuer), NULL, 0);
-    }
-    else {
-      voms->server     = X509_NAME_oneline(sk_GENERAL_NAME_value(ac->acinfo->form->names, 0)->d.dirn,NULL, 0);
-      voms->serverca   = strdup("Unable to determine CA");
-    }
+  v.version    = 1;
+  v.siglen     = ac->signature->length;
+  v.signature  = std::string((char*)ac->signature->data, ac->signature->length);
+  bn               = ASN1_INTEGER_to_BN(ac->acinfo->serial, NULL);
+  v.serial     = std::string(BN_bn2hex(bn));
+  BN_free(bn);
+
+  if (cert) {
+    CTOCPPSTR(v.user,   X509_NAME_oneline(X509_get_subject_name(cert), NULL, 0));
+    CTOCPPSTR(v.userca, X509_NAME_oneline(X509_get_issuer_name(cert), NULL, 0));
   }
+  else {
+    if (valids & VER_ID)
+      ERROR(AC_ERR_HOLDER);
+    v.user  = v.userca = "";
+  }
+  if (issuer) {
+    CTOCPPSTR(v.server,   X509_NAME_oneline(X509_get_subject_name(issuer), NULL, 0));
+    CTOCPPSTR(v.serverca, X509_NAME_oneline(X509_get_issuer_name(issuer), NULL, 0));
+  }
+  else {
+    CTOCPPSTR(v.server, X509_NAME_oneline(sk_GENERAL_NAME_value(ac->acinfo->form->names, 0)->d.dirn,NULL, 0));
+    v.serverca   = "Unable to determine CA";
+  }
+
+  realdata *rd = (struct realdata *)(v.realdata);
+
+  rd->ac = ac;
+
+  v.holder = holder;
 
   if (valids) {
     if (valids & VER_ID) {
@@ -309,10 +302,8 @@ int validate(X509 *cert, X509 *issuer, AC *ac, struct col *voms, int valids, tim
   b = ac->acinfo->validity->notBefore;
   a = ac->acinfo->validity->notAfter;
 
-  if (voms) {
-    voms->date1 = strndup((const char*)b->data, b->length);
-    voms->date2 = strndup((const char*)a->data, a->length);
-  }
+  v.date1 = std::string((char*)b->data, b->length);
+  v.date2 = std::string((char*)a->data, a->length);
 
   if (valids & VER_DATE) {
     time_t ctime, dtime;
@@ -342,16 +333,13 @@ int validate(X509 *cert, X509 *issuer, AC *ac, struct col *voms, int valids, tim
       ERROR(AC_ERR_ATTRIBS);
   }
 
-  if (voms)
-    voms->reserved = (char *)ac;
-
-  if ((res = checkExtensions(ac->acinfo->exts, issuer, voms, valids)))
+  if ((res = checkExtensions(ac->acinfo->exts, issuer, valids, rd)))
     return res;
 
-  return checkAttributes(ac->acinfo->attrib, voms);
+  return checkAttributes(ac->acinfo->attrib, v);
 }
 
-static int checkAttributes(STACK_OF(AC_ATTR) *atts, struct col *voms)
+static int checkAttributes(STACK_OF(AC_ATTR) *atts, voms &v)
 {
   int nid3;
   int pos3;
@@ -363,26 +351,8 @@ static int checkAttributes(STACK_OF(AC_ATTR) *atts, struct col *voms)
   AC_IETFATTRVAL *capname;
   GENERAL_NAME *data;
 
-  char **list, **tmp;
-
-  char *str, *str2;
-  struct data *d;
-  char *g, *r, *c;
-  char *rolestart, *capstart;
-  struct data **dlist, **dtmp;
-
-  str = str2 = NULL;
-  list = tmp = NULL;
-  d = NULL;
-  dlist = dtmp = NULL;
-  data = NULL;
-
   if (!atts)
     return 0;
-
-  if (voms)
-    voms->voname = NULL;
-
 
   /* find AC_ATTR with IETFATTR type */
   nid3 = OBJ_txt2nid("idatcap");
@@ -406,17 +376,15 @@ static int checkAttributes(STACK_OF(AC_ATTR) *atts, struct col *voms)
   /* put policyAuthority in voms struct */
   data = sk_GENERAL_NAME_value(capattr->names, 0);
   if (data->type == GEN_URI) {
-    char *point;
-    if (voms) {
-      voms->voname = strndup((char*)data->d.ia5->data, data->d.ia5->length);
-      point = strstr(voms->voname, "://");
+    v.voname = std::string((char*)data->d.ia5->data, data->d.ia5->length);
+    std::string::size_type point = v.voname.find("://");
 
-      if (point) {
-        *point='\0';
-        voms->uri = point + 3;
-      }
-      else return AC_ERR_ATTRIB_URI;
+    if (point != std::string::npos) {
+      v.uri    = v.voname.substr(point + 3);
+      v.voname = v.voname.substr(0, point);
     }
+    else 
+      return AC_ERR_ATTRIB_URI;
   }
   else
     return AC_ERR_ATTRIB_URI;
@@ -428,80 +396,50 @@ static int checkAttributes(STACK_OF(AC_ATTR) *atts, struct col *voms)
     if (!(capname->type == V_ASN1_OCTET_STRING))
       return AC_ERR_ATTRIB_FQAN;
 
-    if (voms) {
-      str  = strndup((char*)capname->data, capname->length);
-      str2 = strdup(str);
-      d = (struct data *)malloc(sizeof(struct data));
+    std::string str  = std::string((char*)capname->data, capname->length);
 
-      if (!str || !str2)
-        goto err;
+    v.fqan.push_back(str);
 
-      if (!(tmp=listadd(list, str)))
-        goto err;
+    struct data d;
 
-      list = tmp;
+    std::string::size_type rolestart = str.find("/Role=");
+    std::string::size_type capstart  = str.find("/Capability=");
 
-      g = r = c = NULL;
-
-      rolestart = strstr(str2, "/Role=");
-      capstart = strstr(str2, "/Capability=");
-    
-      g = str2;
-      str2 = NULL;
-      if (rolestart) {
-        *rolestart = '\0';
-        r = rolestart + 6;
+    if (capstart != std::string::npos) {
+      if (rolestart != std::string::npos) {
+        d.group = str.substr(0, rolestart);
+        d.role  = str.substr(rolestart + 6, capstart - rolestart -6);
+        d.cap   = str.substr(capstart + 12);
       }
-
-      if (capstart) {
-        *capstart = '\0';
-        c = capstart + 12;
+      else {
+        d.group = str.substr(0, capstart);
+        d.role  = "";
+        d.cap   = str.substr(capstart + 12);
       }
-
-      d->group = g;
-      d->role  = r;
-      d->cap   = c;
-
-      if (!(dtmp = (struct data **)listadd((char **)dlist, (char *)d)))
-        goto err;
-
-      dlist = dtmp;
+    } 
+    else {
+      if (rolestart != std::string::npos) {
+        d.group = str.substr(0, rolestart);
+        d.role  = str.substr(rolestart+6);
+        d.cap   = "";
+      }
+      else {
+        d.group = str;
+        d.role  = "";
+        d.cap   = "";
+      }
     }
+
+    v.std.push_back(d);
   }
 
-  if (voms) {
-    voms->std     = dlist;
-    voms->compact = list;
-    voms->type    = TYPE_STD;
-  }
+
+  v.type    = TYPE_STD;
 
   return 0;
-
- err:
-  {
-    char        **tmp  = list;
-    struct data **dtmp = dlist;
-
-    while (*list)
-      free(*list++);
-
-    while (*dlist) {
-      free ((*dlist)->group);
-      free(*dlist++);
-    }
-
-    free(tmp);
-    free(dtmp);
-    free(str);
-    free(str2);
-    if (voms)
-      free(voms->voname);
-  }
-  return AC_ERR_MEMORY;
-
 }
   
-static int checkExtensions(STACK_OF(X509_EXTENSION) *exts, X509 *iss, struct col *voms, int valids)
+static int checkExtensions(STACK_OF(X509_EXTENSION) *exts, X509 *iss, int valids, realdata *rd)
 {
   int nid1 = OBJ_txt2nid("idcenoRevAvail");
   int nid2 = OBJ_txt2nid("authorityKeyIdentifier");
@@ -530,19 +468,22 @@ static int checkExtensions(STACK_OF(X509_EXTENSION) *exts, X509 *iss, struct col
     ex = sk_X509_EXTENSION_value(exts, pos3);
     if (pos3 == pos4) {
       if (valids & VER_TARGETS) {
-        char *fqdn = getfqdn();
+        std::string fqdn = getfqdn();
         int ok = 0;
         int i;
         ASN1_IA5STRING *fqdns = ASN1_IA5STRING_new();
         if (fqdns) {
           ret = AC_ERR_TARGET_NO_MATCH;
-          ASN1_STRING_set(fqdns, fqdn, strlen(fqdn));
+          ASN1_STRING_set(fqdns, fqdn.c_str(), fqdn.size());
           targets = (AC_TARGETS *)X509V3_EXT_d2i(ex);
+
           if (targets) {
             for (i = 0; i < sk_AC_TARGET_num(targets->targets); i++) {
               name = sk_AC_TARGET_value(targets->targets, i);
+
               if (name->name && name->name->type == GEN_URI) {
                 ok = !ASN1_STRING_cmp(name->name->d.ia5, fqdns);
+
                 if (ok) {
                   ret = 0;
                   break;
@@ -566,8 +507,6 @@ static int checkExtensions(STACK_OF(X509_EXTENSION) *exts, X509 *iss, struct col
     pos3 = X509v3_get_ext_by_critical(exts, 1, pos3);
   }
 
-  voms->atts = NULL;
-
   if (pos5 >= 0) {
     X509_EXTENSION *ex = NULL;
     AC_FULL_ATTRIBUTES *full_attr = NULL;
@@ -575,7 +514,7 @@ static int checkExtensions(STACK_OF(X509_EXTENSION) *exts, X509 *iss, struct col
     full_attr = (AC_FULL_ATTRIBUTES *)X509V3_EXT_d2i(ex);
 
     if (full_attr) {
-      if (!interpret_attributes(full_attr, voms)) {
+      if (!interpret_attributes(full_attr, rd)) {
         ret = AC_ERR_ATTRIB;
       }
     }
@@ -641,118 +580,51 @@ static int checkExtensions(STACK_OF(X509_EXTENSION) *exts, X509 *iss, struct col
   return ret;
 }
 
-static char *getfqdn(void)
+static std::string getfqdn(void)
 {
-  static char *name = NULL;
   char hostname[256];
   char domainname[256];
-
-  if (name)
-    free(name);
-  name = NULL;
 
   if ((!gethostname(hostname, 255)) && (!getdomainname(domainname, 255))) {
     if (!strcmp(domainname, "(none)")) {
       domainname[0]='\0';
 
-      name = snprintf_wrap("%s%s%s", hostname, (domainname[0] == '.' ? "." : ""), domainname);
+      return std::string(hostname) + (domainname[0] == '.' ? "." : "") + domainname;
     }
   }
-  return name;
+  return "";
 }
 
 
-static int interpret_attributes(AC_FULL_ATTRIBUTES *full_attr, struct col *voms)
+static int interpret_attributes(AC_FULL_ATTRIBUTES *full_attr, realdata *rd)
 {
-  struct full_att *fa      = malloc(sizeof(struct full_att));
-  struct att_list *al      = NULL;
-  struct att      *a       = NULL;
-  char *name, *value, *qualifier, *grant;
   GENERAL_NAME *gn = NULL;
   STACK_OF(AC_ATT_HOLDER) *providers = NULL;
-  int i;
-
-  name = value = qualifier = grant = NULL;
-  if (!fa)
-    return 0;
-
-  fa->list = NULL;
 
   providers = full_attr->providers;
 
-  for (i = 0; i < sk_AC_ATT_HOLDER_num(providers); i++) {
+  for (int i = 0; i < sk_AC_ATT_HOLDER_num(providers); i++) {
     AC_ATT_HOLDER *holder = sk_AC_ATT_HOLDER_value(providers, i);
     STACK_OF(AC_ATTRIBUTE) *atts = holder->attributes;
-    char **tmp = NULL;
-    int j;
 
-    al = malloc(sizeof(struct att_list));
-    if (!al)
-      goto err;
+    struct attributelist al;
 
-    al->grantor = NULL;
-    al->attrs   = NULL;
-
-    for (j = 0; j < sk_AC_ATTRIBUTE_num(atts); j++) {
+    for (int j = 0; j < sk_AC_ATTRIBUTE_num(atts); j++) {
       AC_ATTRIBUTE *at = sk_AC_ATTRIBUTE_value(atts, j);
-      char ** tmp = NULL;
 
-      name      = strndup((const char*)at->name->data,      at->name->length);
-      value     = strndup((const char*)at->value->data,     at->value->length);
-      qualifier = strndup((const char*)at->qualifier->data, at->qualifier->length);
-      if (!name || !value || !qualifier)
-        goto err;
+      struct attribute a;
+      a.name      = std::string((char*)at->name->data,      at->name->length);
+      a.value     = std::string((char*)at->value->data,     at->value->length);
+      a.qualifier = std::string((char*)at->qualifier->data, at->qualifier->length);
 
-      a = malloc(sizeof(struct att));
-      a->name = name;
-      a->val  = value;
-      a->qual = qualifier;
-      name = value = qualifier = NULL;
-
-      tmp = listadd((char **)(al->attrs), (char *)a);
-      if (tmp) {
-        al->attrs = (struct att **)tmp;
-        a = NULL;
-      }
-      else {
-        listfree((char **)(al->attrs), (freefn)free_att);
-        goto err;
-      }
+      al.attributes.push_back(a);
     }
 
     gn = sk_GENERAL_NAME_value(holder->grantor, 0);
-    grant = strndup((char*)gn->d.ia5->data, gn->d.ia5->length);
-    if (!grant)
-      goto err;
-    
-    al->grantor = grant;
-    grant = NULL;
+    al.grantor = std::string((char*)gn->d.ia5->data, gn->d.ia5->length);
 
-    tmp = listadd((char **)(fa->list), (char *)al);
-    if (tmp) {
-      fa->list = (struct att_list **)tmp;
-      al = NULL;
-    }
-    else {
-      listfree((char **)(fa->list), (freefn)free_att_list);
-      goto err;
-    }
+    rd->attributes->push_back(al);
   }
-  voms->atts = fa;
-  fa = NULL;
 
- err:
-  free(grant);
-  free(name);
-  free(value);
-  free(qualifier);
-  free_att(a);
-  free_att_list(al);
-  free_full_att(fa);
-  if (fa) {
-    return 0;
-  }
-  else
-    return 1;
-
+  return rd->attributes->size() == 0;
 }

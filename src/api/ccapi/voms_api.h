@@ -123,7 +123,7 @@ public:
 private:
   struct vomsr *translate();
   friend int TranslateVOMS(struct vomsdatar *vd, std::vector<voms>&v, int *error);
-
+  friend int validate(X509 *cert, X509 *issuer, AC *ac, voms &v, int valids, time_t vertime);
 public:
   AC *GetAC();
 
