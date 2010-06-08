@@ -134,6 +134,7 @@ static ERR_STRING_DATA prxyerr_str_functs[]=
     {ERR_PACK(0,PRXYERR_F_PROXY_SIGN ,0),"proxy_sign"},
     {ERR_PACK(0,PRXYERR_F_VERIFY_CB ,0),"verify_callback"},
     {ERR_PACK(0,PRXYERR_F_PROXY_TMP ,0),"proxy_marshal_tmp"},
+    {ERR_PACK(0,PRXYERR_F_INIT_CRED ,0),"proxy_init_cred"},
     {ERR_PACK(0,PRXYERR_F_LOCAL_CREATE, 0),"proxy_local_create"},
     {ERR_PACK(0,PRXYERR_F_CB_NO_PW, 0),"proxy_pw_cb"},
     {ERR_PACK(0,PRXYERR_F_GET_CA_SIGN_PATH, 0),"get_ca_signing_policy_path"},
@@ -3801,20 +3802,21 @@ end:
   return(ret);
 }
 
+static char htoi(char r) 
+{
+  if (isdigit(r))
+    return r - '0';
+  else
+    return 10 + r -'a';
+}
+
 static char hextoint(char r, char s)
 {
   int v = 0;
   if (isxdigit(r) && isxdigit(s)) {
-    if (isdigit(r))
-      v = r - '0';
-    else
-      v = 10 + r -'a';
+    v = htoi(r);
     v <<= 4;
-
-    if (isdigit(s))
-      v += s -'0';
-    else
-      v += 10 + s - 'a';
+    v += htoi(s);
   }
   return v;
 }

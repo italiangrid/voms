@@ -5,7 +5,7 @@ proc mytest {} {
     _activateCert mycert2
     _cleanproxy
 
-    set res [log_exec outname {voms-proxy-fake --voms voms1 --hostcert $::INSTALLDIR/certs/hostcert.pem --hostkey $::INSTALLDIR/certs/hostkey.pem --newsubject /CN=\\46\\41\\4bEDN}]
+    set res [log_exec outname {voms-proxy-fake --voms voms1 --hostcert $::INSTALLDIR/certs/hostcert.pem --hostkey $::INSTALLDIR/certs/hostkey.pem --newsubject /CN=\\46\\41\\4bED\N\\\\\N}]
 
     if $res then {
         addlog $outname
@@ -19,13 +19,11 @@ proc mytest {} {
         return $::FAILTEST
     }
 
-    set correct "subject   : /CN=FAKEDN
-issuer    : /C=IT/CN=001
-identity  : /C=IT/CN=001"
+    set correct "subject   : /CN=FAKEDN\\\N"
 
     loadvar out2 $outname
 
-    if [regexp $correct $out2] then {
+    if [expr [string first $correct $out2] != -1] then {
         testmessage "Hex interpretation correct"
         return $::PASSTEST
     }
@@ -33,7 +31,7 @@ identity  : /C=IT/CN=001"
     logvar correct
     addlog $outname
 
-    testmessage "Hex interpretation correct"
+    testmessage "Hex interpretation incorrect"
     return $::FAILTEST
 }
 
