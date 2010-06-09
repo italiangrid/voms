@@ -51,7 +51,6 @@ extern "C" {
 
 #include "attributes.h"
 #include "acstack.h"
-#include "validate.h"
 #include "listfunc.h"
 #include "doio.h"
 
@@ -64,6 +63,7 @@ extern "C" {
 
 #include "../api/ccapi/voms_api.h"
 #include "../api/ccapi/realdata.h"
+
 #include <string>
 
 static std::string getfqdn(void);
@@ -71,7 +71,7 @@ static int checkAttributes(STACK_OF(AC_ATTR) *, voms&);
 static int checkExtensions(STACK_OF(X509_EXTENSION) *,X509 *, int, realdata *);
 static int interpret_attributes(AC_FULL_ATTRIBUTES *, realdata*);
 
-char *get_error(int e)
+std::string get_error(int e)
 {
   switch (e) {
   case AC_ERR_UNSET:
@@ -165,7 +165,7 @@ char *get_error(int e)
     free(s);                        \
   } while (0)
 
-int validate(X509 *cert, X509 *issuer, AC *ac, voms &v, int valids, time_t vertime)
+int validate(X509 *cert, X509 *issuer, AC *ac, voms &v, verify_type valids, time_t vertime, struct realdata *rd)
 {
   STACK_OF(GENERAL_NAME) *names;
   GENERAL_NAME  *name = NULL;
@@ -196,7 +196,7 @@ int validate(X509 *cert, X509 *issuer, AC *ac, voms &v, int valids, time_t verti
     CHECK(ac->signature);
   }
 
-  if (valids & VER_SIGN) {
+  if (valids & VERIFY_SIGN) {
     int ok;
     CHECK(issuer);
     key=X509_extract_key(issuer);
@@ -219,7 +219,7 @@ int validate(X509 *cert, X509 *issuer, AC *ac, voms &v, int valids, time_t verti
     CTOCPPSTR(v.userca, X509_NAME_oneline(X509_get_issuer_name(cert), NULL, 0));
   }
   else {
-    if (valids & VER_ID)
+    if (valids & VERIFY_ID)
       ERROR(AC_ERR_HOLDER);
     v.user  = v.userca = "";
   }
@@ -232,14 +232,10 @@ int validate(X509 *cert, X509 *issuer, AC *ac, voms &v, int valids, time_t verti
     v.serverca   = "Unable to determine CA";
   }
 
-  realdata *rd = (struct realdata *)(v.realdata);
-
   rd->ac = ac;
 
-  v.holder = holder;
-
   if (valids) {
-    if (valids & VER_ID) {
+    if (valids & VERIFY_ID) {
 
       if (ac->acinfo->holder->baseid) {
         CHECK(ac->acinfo->holder->baseid->serial);
@@ -291,7 +287,7 @@ int validate(X509 *cert, X509 *issuer, AC *ac, voms &v, int valids, time_t verti
       ERROR(AC_ERR_ISSUER_NAME);
     if (name->type != GEN_DIRNAME) 
       ERROR(AC_ERR_ISSUER_NAME);
-    if (valids & VER_ID)
+    if (valids & VERIFY_ID)
       if (X509_NAME_cmp(name->d.dirn, issuer->cert_info->subject))
         ERROR(AC_ERR_ISSUER_NAME);
 
@@ -305,7 +301,7 @@ int validate(X509 *cert, X509 *issuer, AC *ac, voms &v, int valids, time_t verti
   v.date1 = std::string((char*)b->data, b->length);
   v.date2 = std::string((char*)a->data, a->length);
 
-  if (valids & VER_DATE) {
+  if (valids & VERIFY_DATE) {
     time_t ctime, dtime;
     if (vertime == 0) {
       time (&ctime);
@@ -467,7 +463,7 @@ static int checkExtensions(STACK_OF(X509_EXTENSION) *exts, X509 *iss, int valids
 
     ex = sk_X509_EXTENSION_value(exts, pos3);
     if (pos3 == pos4) {
-      if (valids & VER_TARGETS) {
+      if (valids & VERIFY_TARGET) {
         std::string fqdn = getfqdn();
         int ok = 0;
         int i;
@@ -524,7 +520,7 @@ static int checkExtensions(STACK_OF(X509_EXTENSION) *exts, X509 *iss, int valids
   if (ret)
     return ret;
 
-  if (valids & VER_KEYID) {
+  if (valids & VERIFY_KEY) {
     if (pos2 >= 0) {
       X509_EXTENSION *ex;
       AUTHORITY_KEYID *key;
@@ -564,7 +560,7 @@ static int checkExtensions(STACK_OF(X509_EXTENSION) *exts, X509 *iss, int valids
           }
         }
         else {
-          if (!(valids & VER_ID))
+          if (!(valids & VERIFY_ID))
             ret = AC_ERR_EXT_KEY;
         }
         AUTHORITY_KEYID_free(key);

@@ -82,7 +82,7 @@ void *logh = NULL;
 extern int AC_Init(void);
 
 #include "ccwrite.h"
-
+#include "validate.h"
 
 
 std::string vomsresult::makeRESTAnswer(int& code)
@@ -140,10 +140,6 @@ std::string vomsresult::makeRESTAnswer(int& code)
   output += "</voms>";
 
   return output;
-}
-
-extern "C" {
-  extern char *get_error(int);
 }
 
 SOAP_NMAC struct Namespace namespaces[] =
@@ -1124,7 +1120,7 @@ bool VOMSServer::makeAC(vomsresult& vr, EVP_PKEY *key, X509 *issuer,
           free(ttmp);
         }
         else
-          vr.setError(ERR_NOT_MEMBER, std::string(get_error(res)));
+          vr.setError(ERR_NOT_MEMBER, get_error(res));
 
         AC_free(a);
         BN_free(serial);
