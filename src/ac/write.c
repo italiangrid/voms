@@ -247,7 +247,7 @@ int writeac(X509 *issuerc, STACK_OF(X509) *issuerstack, X509 *holder, EVP_PKEY *
   sk_AC_ATTR_push(a->acinfo->attrib, capabilities);
   capabilities = NULL;
 
-  if (ac_full_attrs) {
+  if (ac_full_attrs && i) {
     ret = make_and_push_ext(a, "attributes", (char *)(ac_full_attrs->providers), 0);
     AC_FULL_ATTRIBUTES_free(ac_full_attrs);
     ac_full_attrs = NULL;
@@ -256,6 +256,8 @@ int writeac(X509 *issuerc, STACK_OF(X509) *issuerstack, X509 *holder, EVP_PKEY *
     if (ret)
       ERROR(AC_ERR_NO_EXTENSION);
   }
+  else
+    AC_FULL_ATTRIBUTES_free(ac_full_attrs);
 
   stk = sk_X509_new_null();
 

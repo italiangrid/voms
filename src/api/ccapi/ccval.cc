@@ -70,7 +70,7 @@ bool vomsdata::verifyac(X509 *cert, X509 *issuer, AC *ac, time_t verificationtim
     return false;
   }
 
-  if (!result)
+  if (result)
     seterror(VERR_VERIFY, get_error(result));
 
   return result == 0;

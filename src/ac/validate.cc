@@ -232,8 +232,6 @@ int validate(X509 *cert, X509 *issuer, AC *ac, voms &v, verify_type valids, time
     v.serverca   = "Unable to determine CA";
   }
 
-  rd->ac = ac;
-
   if (valids) {
     if (valids & VERIFY_ID) {
 
@@ -332,7 +330,12 @@ int validate(X509 *cert, X509 *issuer, AC *ac, voms &v, verify_type valids, time
   if ((res = checkExtensions(ac->acinfo->exts, issuer, valids, rd)))
     return res;
 
-  return checkAttributes(ac->acinfo->attrib, v);
+  res = checkAttributes(ac->acinfo->attrib, v);
+
+  if (res == 0)
+    rd->ac = ac;
+
+  return res;
 }
 
 static int checkAttributes(STACK_OF(AC_ATTR) *atts, voms &v)
@@ -511,7 +514,7 @@ static int checkExtensions(STACK_OF(X509_EXTENSION) *exts, X509 *iss, int valids
 
     if (full_attr) {
       if (!interpret_attributes(full_attr, rd)) {
-        ret = AC_ERR_ATTRIB;
+        ret = AC_ERR_ATTRIBS;
       }
     }
     AC_FULL_ATTRIBUTES_free(full_attr);
@@ -622,5 +625,5 @@ static int interpret_attributes(AC_FULL_ATTRIBUTES *full_attr, realdata *rd)
     rd->attributes->push_back(al);
   }
 
-  return rd->attributes->size() == 0;
+  return rd->attributes->size() != 0;
 }
