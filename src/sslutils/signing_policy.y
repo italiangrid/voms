@@ -32,7 +32,6 @@
 
 #include "parsertypes.h"
 
-char **splistadd(char **vect, char *data);
 char **parse_subjects(char *string);
 void signingerror(void *policies, void *scanner, char const *msg);
 %}
@@ -69,8 +68,8 @@ void signingerror(void *policies, void *scanner, char const *msg);
 %type <policy>    access_identities
 %%
 
-eacl: eacl_entry      { *policies = (struct policy **)splistadd((char**)(*policies), (char*)($1)); }
-| eacl eacl_entry { *policies = (struct policy **)splistadd((char**)(*policies), (char*)($2)); }
+eacl: eacl_entry      { *policies = (struct policy **)listadd((char**)(*policies), (char*)($1)); }
+| eacl eacl_entry { *policies = (struct policy **)listadd((char**)(*policies), (char*)($2)); }
 
 eacl_entry: access_identities POS_RIGHTS GLOBUS CA_SIGN restrictions {
   if ($1) {
@@ -89,10 +88,10 @@ access_identities: access_identity {
 }
 
 restrictions: realcondition {
-  $$ = splistadd(NULL, (char*)($1));
+  $$ = listadd(NULL, (char*)($1));
 }
 | realcondition restrictions {
-  $$ = splistadd($2, (char*)($1));
+  $$ = listadd($2, (char*)($1));
 }
 
 
@@ -146,35 +145,6 @@ realcondition: COND_SUBJECTS GLOBUS SUBJECTS {
 
 %%
 
-char **splistadd(char **vect, char *data)
-{
-  int i = 0;
-  char **newvect;
-
-  if (!data)
-    return vect;
-
-  if (vect)
-    while (vect[i++]) ;
-  else
-    i=1;
-
-  if ((newvect = (char **)malloc((i+1)*sizeof(char*)))) {
-    if (vect) {
-      memcpy(newvect, vect, (sizeof(char*)*(i-1)));
-      newvect[i-1] = data;
-      newvect[i] = NULL;
-      free(vect);
-    }
-    else {
-      newvect[0] = data;
-      newvect[1] = NULL;
-    }
-    return newvect;
-  }
-  return NULL;
-}
-
 char **parse_subjects(char *string)
 {
   char **list = NULL;
@@ -192,7 +162,7 @@ char **parse_subjects(char *string)
         return list;
       *end = '\0';
 
-      list = (char**)splistadd(list, string+1);
+      list = (char**)listadd(list, string+1);
       string = ++end;
       while (isspace(*string))
         string++;
@@ -200,7 +170,7 @@ char **parse_subjects(char *string)
     else if (divider == '\0')
       break;
     else  {
-      list = (char**)splistadd(list, string);
+      list = (char**)listadd(list, string);
       string += strlen(string);
     }
   } while (string && string[0] != '\0');

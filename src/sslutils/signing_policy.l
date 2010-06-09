@@ -47,10 +47,10 @@ extern char *strndup(char*, size_t);
 #.* /* ignore comments */
 \' BEGIN(SINGLE_QUOTED);
 
-<SINGLE_QUOTED>.*\' yylval_param->string = yytext; BEGIN(INITIAL); return SUBJECTS;
+<SINGLE_QUOTED>[^']*\' yytext[strlen(yytext)-1]='\0'; yylval_param->string = yytext; BEGIN(INITIAL); return SUBJECTS;
 
 \" BEGIN(DOUBLE_QUOTED);
-<DOUBLE_QUOTED>.*\" yylval_param->string = yytext; BEGIN(INITIAL); return SUBJECTS;
+<DOUBLE_QUOTED>[^"]*\" yytext[strlen(yytext)-1]='\0'; yylval_param->string = yytext; BEGIN(INITIAL); return SUBJECTS;
 
 
 cond_subjects                   return COND_SUBJECTS;

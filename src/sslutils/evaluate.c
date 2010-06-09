@@ -26,6 +26,7 @@
 #include <openssl/x509.h>
 #include "parsertypes.h"
 #include "doio.h"
+#include "listfunc.h"
 
 #include <regex.h>
 #include <stdio.h>
@@ -289,31 +290,24 @@ int restriction_evaluate(STACK_OF(X509) *chain, struct policy **namespaces,
   return result;
 }
 
+static void free_condition(struct condition *cond)
+{
+  free(cond->original);
+  free(cond->subjects);
+  free(cond);
+}
+
+static void free_policy(struct policy *pol)
+{
+  free(pol->caname);
+
+  listfree(pol->conds, (freefn)free_condition);
+  free(pol);
+}
+
 void free_policies(struct policy **policies)
 {
-  if (policies) {
-    int i = 0;
-    while (policies[i]) {
-      struct policy *pol = policies[i];
-      free(pol->caname);
-      if (pol->conds) {
-        int j = 0;
-
-        while (pol->conds[j]) {
-          struct condition *cond = pol->conds[j];
-
-          free(cond->original);
-          free(cond->subjects);
-          free(cond);
-          j++;
-        }
-      }
-      free(pol->conds);
-      free(pol);
-      i++;
-    }
-  }
-  free(policies);
+  listfree(policies, free_policy);
 }
 
 static FILE *open_from_dir(char *path, char *filename)
