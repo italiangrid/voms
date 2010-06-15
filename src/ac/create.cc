@@ -39,25 +39,30 @@ extern "C" {
 #include "write.h"
 #include <stdlib.h>
 #include "acerrors.h"
+#include "listfunc.h"
 }
 
 #include <cstring>
 
-static void deallocate(char **v1, int s1, char **v2, int s2) 
+// convert vector of strings to char**
+static char **vectoarray(std::vector<std::string>& vector)
 {
-  if (v1) {
-    int i =0;
-    while (i < s1)
-      free(v1[i++]);
-    free(v1);
+  char **array = (char**)calloc(vector.size() + 1, sizeof(char*));
+
+  if (array) {
+    int j = 0;
+
+    for (std::vector<std::string>::iterator i = vector.begin(); i != vector.end(); i++) {
+      array[j] = strdup((*i).c_str());
+      if (!array[j]) {
+        listfree(array, free);
+        return NULL;
+      }
+      j++;
+    }
   }
 
-  if (v2) {
-    int i =0;
-    while (i < s2)
-      free(v2[i++]);
-    free(v2);
-  }
+  return array;
 }
 
 int createac(X509 *issuerc, STACK_OF(X509) *issuerstack, X509 *holder, EVP_PKEY *pkey, BIGNUM *serial,
@@ -65,30 +70,11 @@ int createac(X509 *issuerc, STACK_OF(X509) *issuerstack, X509 *holder, EVP_PKEY 
              AC **ac, std::string vo, std::string uri, int valid, bool old,
              STACK_OF(X509_EXTENSION) *extensions)
 {
-  int size = fqan.size();
   char **array = NULL;
   char **array2 = NULL;
+  int res = 0;
 
-  // convert vector of strings to char**
-  if ((array = (char **)calloc(size + 1, sizeof(char *))) && 
-      (array2 = (char **)calloc(attributes.size() + 1, sizeof(char *)))) {
-    int j = 0;
-    for (std::vector<std::string>::iterator i = fqan.begin(); i != fqan.end(); i++) {
-      array[j] = strdup((*i).c_str());
-      if (!array[j]) {
-        goto err;
-      }
-      j++;
-    }
-
-    j = 0;
-    for (std::vector<std::string>::iterator i = attributes.begin(); i != attributes.end(); i++) {
-      array2[j] = strdup((*i).c_str());
-      if (!array2[j]) {
-        goto err;
-      }
-      j++;
-    }
+  if ((array = vectoarray(fqan)) && (array2 = vectoarray(attributes))) {
 
     std::string complete;
     for (std::vector<std::string>::iterator i = targets.begin(); i != targets.end(); i++)
@@ -97,17 +83,15 @@ int createac(X509 *issuerc, STACK_OF(X509) *issuerstack, X509 *holder, EVP_PKEY 
       else
         complete += "," + (*i);
     
-    int res = writeac(issuerc, issuerstack, holder, pkey, serial, array,
-                      (complete.empty() ? NULL : const_cast<char *>(complete.c_str())), array2, 
-                      ac, const_cast<char *>(vo.c_str()), const_cast<char *>(uri.c_str()), valid, (old ? 1 : 0), 
-                      0, extensions);
+    res = writeac(issuerc, issuerstack, holder, pkey, serial, array,
+                  (complete.empty() ? NULL : const_cast<char *>(complete.c_str())), array2, 
+                  ac, const_cast<char *>(vo.c_str()), const_cast<char *>(uri.c_str()), valid, (old ? 1 : 0), 
+                  0, extensions);
 
-    deallocate(array, size+1, array2, attributes.size() + 1);
-    
-    return res;
   }
 
- err:
-  deallocate(array, size+1, array2, attributes.size() + 1);
-  return false;
+  listfree(array, free);
+  listfree(array2, free);
+
+  return res;
 }
