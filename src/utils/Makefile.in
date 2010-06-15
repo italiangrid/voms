@@ -64,9 +64,7 @@ am__voms_proxy_fake_SOURCES_DIST = vomsfake.h vomsfake.cc vomsparser.c \
 @BUILD_CLIENTS_TRUE@am_voms_proxy_fake_OBJECTS = vomsfake.$(OBJEXT) \
 @BUILD_CLIENTS_TRUE@	vomsparser.$(OBJEXT) lex.yy.$(OBJEXT)
 voms_proxy_fake_OBJECTS = $(am_voms_proxy_fake_OBJECTS)
-@BUILD_CLIENTS_TRUE@voms_proxy_fake_DEPENDENCIES = $(top_builddir)/src/common/libutilities_nog.la \
-@BUILD_CLIENTS_TRUE@	$(top_builddir)/src/ac/libattributes_nog.la \
-@BUILD_CLIENTS_TRUE@	$(top_builddir)/src/common/libutilc_nog.la \
+@BUILD_CLIENTS_TRUE@voms_proxy_fake_DEPENDENCIES = $(top_builddir)/src/api/ccapi/libvomsapi_nog.la \
 @BUILD_CLIENTS_TRUE@	$(top_builddir)/src/replib/librep.la \
 @BUILD_CLIENTS_TRUE@	$(top_builddir)/src/sslutils/libssl_utils_nog.la
 am__voms_proxy_info_SOURCES_DIST = voms_proxy_info.cc
@@ -318,9 +316,7 @@ with_scratchdir = @with_scratchdir@
 @BUILD_CLIENTS_TRUE@	lex.yy.c 
 
 @BUILD_CLIENTS_TRUE@voms_proxy_fake_LDADD = \
-@BUILD_CLIENTS_TRUE@	$(top_builddir)/src/common/libutilities_nog.la \
-@BUILD_CLIENTS_TRUE@	$(top_builddir)/src/ac/libattributes_nog.la \
-@BUILD_CLIENTS_TRUE@	$(top_builddir)/src/common/libutilc_nog.la \
+@BUILD_CLIENTS_TRUE@	$(top_builddir)/src/api/ccapi/libvomsapi_nog.la  \
 @BUILD_CLIENTS_TRUE@	$(top_builddir)/src/replib/librep.la \
 @BUILD_CLIENTS_TRUE@	$(top_builddir)/src/sslutils/libssl_utils_nog.la
 

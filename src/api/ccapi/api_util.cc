@@ -65,6 +65,7 @@ extern "C" {
 #include "realdata.h"
 
 #include "internal.h"
+#include "normalize.h"
 
 extern proxy_verify_desc *setup_initializers(char *cadir);
 extern void destroy_initializers(void *data);
@@ -74,39 +75,20 @@ static bool readdn(std::ifstream &file, char *buffer, int buflen);
 extern std::map<vomsdata*, vomsspace::internal*> privatedata;
 extern pthread_mutex_t privatelock;
 
-/*
- * this change the substring FROM into TO in NAME
- */
-static void change(std::string &name, const std::string& from, const std::string& to) 
-{
-  std::string::size_type pos = name.find(from);
-
-  //  name.replace(pos, from.size(), to, 0, to.size());
-  while (pos != std::string::npos) {
-    name = name.substr(0, pos) + to + name.substr(pos+from.length());
-    pos = name.find(from, pos+to.length());
-  }
-}
-
-static void normalize(std::string &name)
-{
-  change(name, "/USERID=", "/UID=");
-  change(name, "/emailAddress=", "/Email=");
-  change(name, "/E=", "/Email=");
-}
-
 static bool dncompare(const std::string &first, const std::string &second)
 {
   if (first == second)
     return true;
 
-  std::string s1 = first;
-  std::string s2 = second;
+  char *s1 = normalize(first.c_str());
+  char *s2 = normalize(second.c_str());
 
-  normalize(s1);
-  normalize(s2);
+  int res = strcmp(s1, s2);
 
-  return s1 == s2;
+  free(s1);
+  free(s2);
+
+  return res == 0;
 }
 
 bool

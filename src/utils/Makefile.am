@@ -41,9 +41,7 @@ lex.yy.c: vomsparser.l vomsparser.h
 	flex vomsparser.l
 
 voms_proxy_fake_LDADD = \
-	$(top_builddir)/src/common/libutilities_nog.la \
-	$(top_builddir)/src/ac/libattributes_nog.la \
-	$(top_builddir)/src/common/libutilc_nog.la \
+	$(top_builddir)/src/api/ccapi/libvomsapi_nog.la  \
 	$(top_builddir)/src/replib/librep.la \
 	$(top_builddir)/src/sslutils/libssl_utils_nog.la
 

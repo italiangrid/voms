@@ -27,6 +27,7 @@
 #include "parsertypes.h"
 #include "doio.h"
 #include "listfunc.h"
+#include "normalize.h"
 
 #include <regex.h>
 #include <stdio.h>
@@ -93,9 +94,11 @@ static int evaluate_match_namespace(char *pattern, char *subject, int type)
   regex_t compiled;
   regmatch_t match[1];
   int success = SUCCESS_UNDECIDED;
+  char *patterntmp = normalize(pattern);
+  char *subjecttmp = normalize(subject);
 
-  if (!regcomp(&compiled, pattern, REG_NOSUB)) {
-    if (!regexec(&compiled, subject, 0, match, 0)) {
+  if (!regcomp(&compiled, patterntmp, REG_NOSUB)) {
+    if (!regexec(&compiled, subjecttmp, 0, match, 0)) {
       /* matched */
       if (type)
         success = SUCCESS_PERMIT;
@@ -103,6 +106,10 @@ static int evaluate_match_namespace(char *pattern, char *subject, int type)
         success = SUCCESS_DENY;
     }
   }
+
+  free(patterntmp);
+  free(subjecttmp);
+
   return success;
 }
 
@@ -110,17 +117,22 @@ static int evaluate_match_signing(char *pattern, char *subject, int type)
 {
   int success = SUCCESS_UNDECIDED;
   int len = 0;
+  int compare;
+  char *patterntmp = normalize(pattern);
+  char *subjecttmp = normalize(subject);
 
   if (!pattern || !subject)
     return success;
 
   len = strlen(pattern);
-  int compare;
 
   if (pattern[len-1] == '*')
-    compare = strncmp(pattern, subject, len-1);
+    compare = strncmp(patterntmp, subjecttmp, len-1);
   else
-    compare = strcmp(pattern, subject);
+    compare = strcmp(patterntmp, subjecttmp);
+
+  free(patterntmp);
+  free(subjecttmp);
 
   if (!compare) {
     if (type) 

@@ -66,7 +66,6 @@ void declareOIDs(void)
     return;
 
   done=1;
-  OBJ_create(email, "Email", "Email");
   OBJC(idatcap,"idatcap");
   /*  //// test */
   OBJC(attributes,"attributes");
