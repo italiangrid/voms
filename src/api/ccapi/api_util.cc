@@ -69,19 +69,19 @@ extern "C" {
 
 extern proxy_verify_desc *setup_initializers(char *cadir);
 extern void destroy_initializers(void *data);
-static bool dncompare(const std::string &mut, const std::string &fixed);
+static bool dncompare(const char *mut, const char *fixed);
 static bool readdn(std::ifstream &file, char *buffer, int buflen);
 
 extern std::map<vomsdata*, vomsspace::internal*> privatedata;
 extern pthread_mutex_t privatelock;
 
-static bool dncompare(const std::string &first, const std::string &second)
+static bool dncompare(const char *first, const char *second)
 {
-  if (first == second)
+  if (!strcmp(first, second))
     return true;
 
-  char *s1 = normalize(first.c_str());
-  char *s2 = normalize(second.c_str());
+  char *s1 = normalize(first);
+  char *s2 = normalize(second);
 
   int res = strcmp(s1, s2);
 
@@ -450,9 +450,9 @@ X509 *vomsdata::check_from_certs(AC *ac, const std::string& voname)
 {
   bool found  = false;
 
-  DIR * dp = NULL;
-  BIO * in = NULL;
-  X509 * x = NULL;
+  DIR  * dp = NULL;
+  BIO  * in = NULL;
+  X509 * x  = NULL;
 
   for(int i = 0; (i < 2 && !found); ++i) {
     
