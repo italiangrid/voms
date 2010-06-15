@@ -194,7 +194,6 @@ Fake::Fake(int argc, char ** argv) :   confile(CONFILENAME),
   std::string crtfile;
   std::string kfile;
   std::string ofile;
-  std::vector<std::string> order;
   bool pwstdin = false;
 
   yydebug = 0;
