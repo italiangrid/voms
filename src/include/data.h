@@ -26,6 +26,7 @@
 #define VOMS_DATA_H
 
 #include <string>
+#include <vector>
 
 extern bool        acceptable(const char *str);
 extern bool        acceptable(std::string s);
@@ -33,4 +34,5 @@ extern char *      timestamp(void);
 extern std::string stringify(int i, std::string &s);
 extern std::string OpenSSLError(bool debug);
 extern std::string readfile(std::string filename);
+extern char **vectoarray(std::vector<std::string>& vector);
 #endif

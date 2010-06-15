@@ -49,13 +49,12 @@ bool vomsdata::verifyac(X509 *cert, X509 *issuer, AC *ac, voms &v)
 
 bool vomsdata::verifyac(X509 *cert, X509 *issuer, AC *ac, time_t verificationtime, voms &v)
 {
-  struct realdata *rd = NULL;
-
   int result;
+  struct realdata *rd = (struct realdata *)v.realdata;
 
-  rd = (struct realdata *)v.realdata;
   delete rd->attributes;
   AC_free(rd->ac);
+
   rd->ac = NULL;
   rd->attributes = NULL;
 

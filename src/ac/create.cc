@@ -29,6 +29,8 @@
 #include <vector>
 #include <string>
 
+#include "data.h"
+
 extern "C" {
 #include <openssl/evp.h>
 #include <openssl/x509.h>
@@ -44,26 +46,6 @@ extern "C" {
 
 #include <cstring>
 
-// convert vector of strings to char**
-static char **vectoarray(std::vector<std::string>& vector)
-{
-  char **array = (char**)calloc(vector.size() + 1, sizeof(char*));
-
-  if (array) {
-    int j = 0;
-
-    for (std::vector<std::string>::iterator i = vector.begin(); i != vector.end(); i++) {
-      array[j] = strdup((*i).c_str());
-      if (!array[j]) {
-        listfree(array, free);
-        return NULL;
-      }
-      j++;
-    }
-  }
-
-  return array;
-}
 
 int createac(X509 *issuerc, STACK_OF(X509) *issuerstack, X509 *holder, EVP_PKEY *pkey, BIGNUM *serial,
              std::vector<std::string> &fqan, std::vector<std::string> &targets, std::vector<std::string>& attributes,
