@@ -842,6 +842,12 @@ bool Client::CreateProxy(std::string data, AC ** aclist, int version)
       Print(INFO) << " Done" << std::endl << std::flush;
 
     VOMS_FreeProxy(proxy);
+    free(args->proxyfilename);
+    free(args->policyfile);
+    free(args->policylang);
+    free(args->voID);
+    free(args->filename);
+
     VOMS_FreeProxyArguments(args);
   }
 
