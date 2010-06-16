@@ -829,7 +829,6 @@ bool VOMSServer::makeAC(vomsresult& vr, EVP_PKEY *key, X509 *issuer,
 
   parse_targets(r.targets, targs);
 
-  std::vector<gattrib> attributes;
   std::string tmp="";
   std::string command=comm[0];
   bool result = true;
@@ -1069,8 +1068,8 @@ bool VOMSServer::makeAC(vomsresult& vr, EVP_PKEY *key, X509 *issuer,
       LOGM(VARP, logh, LEV_INFO, T_PRE, "Request Result: %s",  (*i).c_str());
 
     if (LogLevelMin(logh, LEV_DEBUG)) {
-      if(result && !attributes.empty()) {
-        for(std::vector<gattrib>::iterator i = attributes.begin(); i != attributes.end(); ++i)
+      if(result && !attribs.empty()) {
+        for(std::vector<gattrib>::iterator i = attribs.begin(); i != attribs.end(); ++i)
           LOGM(VARP, logh, LEV_DEBUG, T_PRE,  "User got attributes: %s", i->str().c_str());
       }
       else
