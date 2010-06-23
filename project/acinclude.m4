@@ -1062,7 +1062,23 @@ AC_DEFUN([AC_TESTSUITE],
 	      [with_cobertura_prefix="$withval"],
 	      [with_cobertura_prefix="no"])
 
+  AC_ARG_WITH(valgrind,
+        [ --with-valgrind=PFX     Also test memory leaks with valgrind],
+        [with_valgrind="$withval"],
+        [with_valgrind="no"])
+
+  echo "with_valgrind=$with_valgrind"
+  if test "x$with_valgrind" == "x" ; then
+     with_valgrind=`which valgrind` 2>/dev/null;
+  fi
+  echo "with_valgrind=$with_valgrind"
+  if test "x$with_valgrind" == "xno" ; then
+     with_valgrind="";
+  fi
+  echo "with_valgrind=$with_valgrind"
+
   AM_CONDITIONAL(USE_COBERTURA, test ! x$with_cobertura_prefix = xno)
+  AC_SUBST(with_valgrind)
   AC_SUBST(with_reportdir)
   AC_SUBST(with_scratchdir)
   AC_SUBST(with_dbuser)

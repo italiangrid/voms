@@ -277,6 +277,7 @@ with_dbuser = @with_dbuser@
 with_mysqlconf = @with_mysqlconf@
 with_reportdir = @with_reportdir@
 with_scratchdir = @with_scratchdir@
+with_valgrind = @with_valgrind@
 @BUILD_SERVER_TRUE@voms_SOURCES = \
 @BUILD_SERVER_TRUE@	main.cc \
 @BUILD_SERVER_TRUE@	vomsd.cc \
