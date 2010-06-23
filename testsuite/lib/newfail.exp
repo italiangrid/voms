@@ -253,7 +253,22 @@ proc real_do_test { name } {
 
     if {[info exists ::VALGRIND]} then {
         #clean valgrind files
-        file delete -force $::SCRATCHDIR/valg-*
+        puts "DELETING: [glob -nocomplain -directory $::SCRATCHDIR valg-*]"
+        set list [glob -nocomplain -directory $::SCRATCHDIR valg-*]
+
+        set listed ""
+        if { [expr ![catch {set listed [glob -directory $::SCRATCHDIR valg-*]}]]} then {
+            puts "listed=$listed"
+            foreach f $listed {
+                file delete -force $f
+            }
+        }
+
+#        puts "LIST=$list"
+#        exec rm -f $::SCRATCHDIR/valg-*
+        puts "FILES: [exec ls $::SCRATCHDIR]"
+        set list [glob -nocomplain -directory $::SCRATCHDIR valg-*]
+        puts "LIST=$list"
     }
 
     if {[info exists ::NOJAVALIB] != 0} then {
@@ -393,5 +408,7 @@ proc do_test { {name "" } } {
         fail "test could not be executed correctly."
     }
 
+    puts "DELETING..."
     file delete -force $::SCRATCHDIR/valg-*
+
 }
