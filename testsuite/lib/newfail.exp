@@ -106,7 +106,7 @@ proc _do_valgrind_cl {} {
     if {[info exists ::VALGRIND]} then {
         #check wether leakage occurred
         puts "Setting var"
-        set VALGRINDPART "$::DOVALGRIND --trace-children=yes --num-callers=15 --suppressions=suppressions --leak-check=full --log-file=[_do_valgrind_log_file] "
+        set VALGRINDPART "$::DOVALGRIND --trace-children=yes --leak-resolution=high --num-callers=25 --suppressions=suppressions --leak-check=full --log-file=[_do_valgrind_log_file] "
         puts "set var to $VALGRINDPART"
     }
 
@@ -116,8 +116,6 @@ proc _do_valgrind_cl {} {
 }
 
 proc log_exec {outname command} {
-#    upvar 1 $outname myname
-#
     puts "log_exec called"
     if ([info exists ::VALGRIND]) then {
         puts "try valgrind (set path)"
@@ -199,7 +197,7 @@ proc cleanup {} {
     }
 
     catch {exec rm -rf $::INSTALLDIR/ca}
-#    catch {exec rm -rf $::SCRATCHDIR}
+    catch {exec rm -rf $::SCRATCHDIR}
 }
 
 proc testheader {description {testname ""}} {
@@ -250,6 +248,13 @@ proc real_do_test { name } {
     set fname [file dirname [file dirname $scriptname]]
 
     set realname [string range $scriptname [string length $$fname] end]
+
+    #kill everything, just to be sure
+    catch {exec killall edg-voms 2>/dev/null}
+    catch {exec killall middleman 2>/dev/null}
+    catch {exec killall valgrind 2>/dev/null}
+    catch {exec kill -a valgrind 2>/dev/null}
+    catch {exec kill -9 `ps aux |grep valgrind | grep -v grep | tr -s ' ' | cut -d' ' -f2`}
 
     if {[info exists ::VALGRIND]} then {
         #clean valgrind files
@@ -366,6 +371,16 @@ proc do_test { {name "" } } {
                             set failed 1
                             addlog $f
                         }
+
+#                        set match2 "possibly lost: 0"
+#                        if [expr ![regexp $match $filecontent dummy]] then {
+#                            set failed 1
+#                        }
+
+#                        if $failed then {
+#                            addlog $f
+#                        }
+
                     }
                 }
             }

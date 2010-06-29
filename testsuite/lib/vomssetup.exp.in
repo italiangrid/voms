@@ -149,6 +149,7 @@ proc _vomsStop {name } {
         catch {exec killall middleman 2>/dev/null}
         catch {exec killall valgrind 2>/dev/null}
         catch {exec kill -a valgrind 2>/dev/null}
+        catch {exec kill -9 `ps aux |grep valgrind | grep -v grep | tr -s ' ' | cut -d' ' -f2`}
     } else {
         exec $::INSTALLDIR/etc/init.d/voms stop [exec cat $::_vomsdefinitions/$name/options/voms-vo] >/dev/null
     }
