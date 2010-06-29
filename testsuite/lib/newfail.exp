@@ -100,46 +100,32 @@ proc _do_valgrind_log_file {} {
 }
 
 proc _do_valgrind_cl {} {
-    puts "called do_valgrind_cl"
     set VALGRINDPART ""
-    puts "reset var"
     if {[info exists ::VALGRIND]} then {
         #check wether leakage occurred
-        puts "Setting var"
         set VALGRINDPART "$::DOVALGRIND --trace-children=yes --leak-resolution=high --num-callers=25 --suppressions=suppressions --leak-check=full --log-file=[_do_valgrind_log_file] "
-        puts "set var to $VALGRINDPART"
     }
 
-    puts "return var"
-    puts "VALGRINDPART=$VALGRINDPART"
     return $VALGRINDPART
 }
 
 proc log_exec {outname command} {
-    puts "log_exec called"
     if ([info exists ::VALGRIND]) then {
-        puts "try valgrind (set path)"
         set VALGRINDPART [_do_valgrind_cl]
-        puts "try valgrind (path set)"
         return [log_exec_real $outname $command "$VALGRINDPART"]
-        puts "try valgrind (tried)"
     } else {
-        puts "no valgrind"
         return [log_exec_real $outname $command]
     }
 }
 
 proc log_exec_real {outname command {valgrindpart ""} } {
-    puts "log_exec_real 1"
     upvar 2 $outname myname
-    puts "log_exec_real 2"
 # The following (complicated) code ensures that the output file name
 # starts with the name of the command being executed 
     set command [string trim $command]
     set idx  [string first " " $command]
     set idx2 [string last "/" [string range $command 0 [expr {$idx-1}]]]
 
-    puts "COMMAND=$command"
     if [expr {$idx != -1}] then {
         set cname [string range $command [expr {$idx2+1}] [expr {$idx-1}]]
     } else {
@@ -147,15 +133,11 @@ proc log_exec_real {outname command {valgrindpart ""} } {
     }
     set cname "$cname-XXXXXX"
 
-    puts "cname=$cname"
 # end output file name creation
     set myname [exec mktemp $::SCRATCHDIR/$cname]
-    puts "myname=$myname"
 # for voms-* commands run them from the install path
 # for other commands, look for them in the system path
     set voms [string first "voms" $cname]
-
-    puts "voms=$voms"
 
     if [expr {$voms == 0}] then {
         set command "$::INSTALLDIR/bin/$command"
@@ -164,14 +146,7 @@ proc log_exec_real {outname command {valgrindpart ""} } {
     set command "$valgrindpart $command"
     set command [string trim $command]
 
-    puts "command=$command"
-#   puts "[uplevel 2 exec $command >& $myname]"
-    puts "doing uplevel"
     set bis [catch {set out [uplevel 2 exec $command >& $myname]} out3]
-    puts "bis=$bis"
-
-    puts "myname=$myname"
-    puts "out3=$out3"
     return $bis
 }
 
@@ -258,22 +233,16 @@ proc real_do_test { name } {
 
     if {[info exists ::VALGRIND]} then {
         #clean valgrind files
-        puts "DELETING: [glob -nocomplain -directory $::SCRATCHDIR valg-*]"
         set list [glob -nocomplain -directory $::SCRATCHDIR valg-*]
 
         set listed ""
         if { [expr ![catch {set listed [glob -directory $::SCRATCHDIR valg-*]}]]} then {
-            puts "listed=$listed"
             foreach f $listed {
                 file delete -force $f
             }
         }
 
-#        puts "LIST=$list"
-#        exec rm -f $::SCRATCHDIR/valg-*
-        puts "FILES: [exec ls $::SCRATCHDIR]"
         set list [glob -nocomplain -directory $::SCRATCHDIR valg-*]
-        puts "LIST=$list"
     }
 
     if {[info exists ::NOJAVALIB] != 0} then {
@@ -306,20 +275,13 @@ proc real_do_test { name } {
         set $_testmessage "Failure during prolog execution."
     }
 
-    puts "res2=$res"
-
     if { $res2 == 0 } then {
-        puts "name=$name"
-
-
         if [expr ! [string equal $name "" ]] then {
             set res [catch {set out [$name]} out]
         } else {
             set res [catch {set out [mytest]} out]
         }
 
-        puts "res=$res"
-        puts "out=$out"
         if { $res == 0 } then {
             set res $out
         }
@@ -329,8 +291,6 @@ proc real_do_test { name } {
         # Ensures that an eventual failure from the epilog
         # is considered a failure for the whole test
         if { $res2 != 0 } then {
-            puts "res2 (epilog)=$res"
-
             set res $res2
             set $_testmessage "Failure during epilog execution."        
         }
@@ -345,21 +305,16 @@ proc real_do_test { name } {
 proc do_test { {name "" } } {
     global _testmessage
 
-    puts "origtest"
     set res [real_do_test $name]
-    puts "afterorig"
 
-    puts "res=$res"
     if { $res == $::PASSTEST} then {
         if {[info exists ::DOVALGRIND]} then {
-            puts "do valgrind version of test"
             set ::VALGRIND "1"
             set res2 [real_do_test $name]
 
             set listed ""
             set failed 0
             if { [expr ![catch {set listed [glob -directory $::SCRATCHDIR valg-*]}]]} then {
-                puts "listed=$listed"
                 foreach f $listed {
 
                     if [file size $f] then {
@@ -384,7 +339,7 @@ proc do_test { {name "" } } {
                     }
                 }
             }
-            puts "list=$listed"
+
             unset ::VALGRIND
             if $failed then {
                 set res $::FAILTEST
@@ -423,7 +378,6 @@ proc do_test { {name "" } } {
         fail "test could not be executed correctly."
     }
 
-    puts "DELETING..."
     file delete -force $::SCRATCHDIR/valg-*
 
 }

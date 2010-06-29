@@ -133,7 +133,6 @@ proc _inittests {} {
 proc _vomsServersInit {} {
     puts -nonewline "."
 
-    puts "voms server init"
     catch { file delete -force $::_vomsdefinitions }
     set ::_vomsdefinitions $::INSTALLDIR/vomsservers
     file mkdir $::_vomsdefinitions

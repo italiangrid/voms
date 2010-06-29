@@ -126,7 +126,6 @@ proc _vomsStart {name } {
         set VALGRINDPART [_do_valgrind_cl]
         set voms_start "$::SCRATCHDIR/voms-start"
         log_exec voms_start {$::INSTALLDIR/sbin/edg-voms --conf $::INSTALLDIR/etc/voms/$name/voms.conf >/dev/null}
-        puts "started"
     } else {
         exec $::INSTALLDIR/etc/init.d/voms start [exec cat $::_vomsdefinitions/$name/options/voms-vo] >/dev/null
     }
@@ -190,7 +189,6 @@ proc _vomsSetup {name} {
     exec chmod 700 $::SCRATCHDIR/vomsinit.sh
     set val [catch {exec $::SCRATCHDIR/vomsinit.sh 2>$outname}]
 #    file delete $::SCRATCHDIR/vomsinit.sh
-    exec cat $outname
 
     if {$val} {
         puts [exec cat $outname]
