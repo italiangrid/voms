@@ -1,8 +1,7 @@
 load_lib vomstest.exp
+testheader "See if voms-proxy-init -proxyver 3 --pl fails when --policy is absent."
 
 proc mytest {} {
-    testheader "See if voms-proxy-init -proxyver 3 --pl fails when --policy is absent."
-
     _activateCert mycert2
     _cleanproxy
 

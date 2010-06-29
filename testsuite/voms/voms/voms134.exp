@@ -1,4 +1,5 @@
 load_lib vomstest.exp
+testheader "See if voms correctly exits when it cannot read the password the the DB."
 
 proc my_prolog {} {
     _backupVOMS voms1
@@ -9,8 +10,6 @@ proc my_epilog {} {
 }
 
 proc mytest {} {
-    testheader "See if voms correctly exits when it cannot read the password the the DB."
-
     _activateCert mycert2
     _cleanproxy
 
