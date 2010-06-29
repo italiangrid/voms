@@ -191,9 +191,9 @@ proc cleanup {} {
         exec rm total.info
         exec genhtml --no-branch-coverage --show-details --legend --highlight -o $::REPORTDIR/coverage voms.info >/dev/null
         exec rm voms.info
-	if [expr ![string equal $::COBERTURA "no"]] then {
-	    exec $::COBERTURA/cobertura-report.sh --destination $::REPORTDIR/javacoverage --datafile ../src/api/java/cobertura.ser ../src/api/java
-	}
+        if [expr ![string equal $::COBERTURA "no"]] then {
+            exec $::COBERTURA/cobertura-report.sh --destination $::REPORTDIR/javacoverage --datafile ../src/api/java/cobertura.ser ../src/api/java
+        }
     }
 
     catch {exec rm -rf $::INSTALLDIR/ca}
