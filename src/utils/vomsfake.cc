@@ -66,8 +66,8 @@ extern "C" {
 #include "vomsproxy.h"
 
 VOLIST *volist = NULL;
-  extern int yyparse();
-  extern FILE *yyin;
+extern int yyparse();
+extern FILE *yyin;
 }
 
 #include <voms_api_nog.h>
@@ -170,6 +170,9 @@ int main(int argc, char** argv)
 
 extern int yydebug;
 Fake::Fake(int argc, char ** argv) :   confile(CONFILENAME), 
+                                       cacertfile(NULL), certdir(NULL),
+                                       certfile(NULL), keyfile(NULL),
+                                       outfile(NULL),
                                        separate(""), uri(""),bits(-1),
                                        hours(12), limit_proxy(false),
                                        vomslife(-1), proxyver(0),
@@ -380,9 +383,9 @@ Fake::Fake(int argc, char ** argv) :   confile(CONFILENAME),
     voelem->hostcert = (char*)hostcert.c_str();
     voelem->hostkey = (char*)hostkey.c_str();
     voelem->uri = (char*)uri.c_str();
-    voelem->voname = (char*)voms.c_str();
+    voelem->voname = strdup(voms.c_str());
     voelem->vomslife = vomslife;
-    voelem->pastac = (char*)pastac.c_str();
+    voelem->pastac = strdup(pastac.c_str());
 
     voelem->fqans = (char **)malloc(sizeof(char*)*(fqans.size()+1));
     for (unsigned int i  = 0; i < fqans.size(); i++)
@@ -426,12 +429,27 @@ Fake::Fake(int argc, char ** argv) :   confile(CONFILENAME),
 
   /* prepare proxy_cred_desc */
 
-  if(!pcdInit())
+  if(!pcdInit()) {
+    CleanAll();
     exit(3);
+  }
+}
+
+void Fake::CleanAll() 
+{
+  free(cacertfile);
+  free(certdir);
+  free(outfile);
+  free(certfile);
+  free(keyfile);
+  X509_free(ucert);
+  EVP_PKEY_free(upkey);
+  sk_X509_pop_free(cert_chain, X509_free);
 }
 
 Fake::~Fake() 
 {
+  CleanAll();
 }
 
 bool Fake::Run() 
@@ -569,6 +587,18 @@ bool Fake::CreateProxy(std::string data, AC ** aclist, int version)
 
     PrintProxyCreationError(warn, additional);
 
+    free(args->voID);
+    free(args->proxyfilename);
+    free(args->filename);
+    free(args->newsubject);
+    free(args->newissuer);
+    free(args->newserial);
+    free(args->policyfile);
+    free(args->policylang);
+    free(args->keyusage);
+    free(args->netscape);
+    free(args->exkusage);
+    sk_X509_EXTENSION_pop_free(args->extensions, X509_EXTENSION_free);
     VOMS_FreeProxyArguments(args);
 
     if (proxy) {
@@ -626,6 +656,7 @@ void Fake::Test()
     ASN1_UTCTIME * asn1_time = ASN1_UTCTIME_new();
     X509_gmtime_adj(asn1_time, 0);
     time_t time_now = ASN1_UTCTIME_mktime(asn1_time);
+    ASN1_UTCTIME_free(asn1_time);
     time_t time_after = ASN1_UTCTIME_mktime(X509_get_notAfter(ucert));
     time_t time_diff = time_after - time_now ;
 
@@ -696,13 +727,23 @@ bool Fake::MakeACs(VOLIST *volist)
           /* Now do extensions */
           STACK_OF(X509_EXTENSION) *exts = NULL;
 
-          for (int i =0; i < vo->extsize; i++)
+          for (int i = 0; i < vo->extsize; i++)
             exts = create_and_add_extension(std::string(vo->extensions[i]), exts);
 
           if (ac)
             res = writeac(hcert, NULL, holder, hkey, (BIGNUM *)(BN_value_one()), fqanlist,
                           vo->targets, attributes, &ac, vo->voname, vo->uri, vo->vomslife * 3600, !newformat, 
                           seconds, exts);
+
+          if (vo->fqans)
+            listfree(vo->fqans, (freefn)free);
+          if (attributes)
+            listfree(attributes, (freefn)free);
+
+          sk_X509_EXTENSION_pop_free(exts, X509_EXTENSION_free);
+          free(vo->voname);
+          free(vo->pastac);
+
         }
       } 
       else {
@@ -746,6 +787,10 @@ bool Fake::MakeACs(VOLIST *volist)
     owncert = BIO_new(BIO_s_file());
   }
 
+  BIO_free(hcrt);
+  BIO_free(hckey);
+  BIO_free(owncert);
+
   if (!actmplist) {
     AC_free(ac);
     listfree((char **)aclist, (freefn)AC_free);
@@ -765,7 +810,7 @@ bool Fake::pcdInit() {
   SSLeay_add_ssl_algorithms();
   PKCS12_PBE_add();
   
-  BIO * bio_err;
+  BIO * bio_err = NULL;
   if ((bio_err = BIO_new(BIO_s_file())) != NULL)
     BIO_set_fp(bio_err, stderr, BIO_NOCLOSE);
 
@@ -792,7 +837,10 @@ bool Fake::pcdInit() {
   
  err:
 
+  BIO_free(bio_err);
   Error();
+  if (!status)
+    CleanAll();
   return status;
   
 }
@@ -1033,29 +1081,39 @@ static long mystrtol(char *number, int limit)
 
 STACK_OF(X509_EXTENSION) *Fake::create_and_add_extension(const std::string &string, STACK_OF(X509_EXTENSION) *exts)
 {
+  bool alloced = false;
+
+  if (!exts) { 
+    exts= sk_X509_EXTENSION_new_null();
+    if (!exts) {
+      Print(ERROR) << "Memory problems." << std::endl;
+      goto err;
+    }
+    alloced = true;
+  }
+
   X509_EXTENSION *ext = create_extension(string);
 
   if (ext) {
-    if (!exts) { 
-      exts= sk_X509_EXTENSION_new_null();
-      if (!exts) {
-        Print(ERROR) << "Memory problems." << std::endl;
-        exit(1);
-      }
-    }
     if (!sk_X509_EXTENSION_push(exts, ext)) {
-      if (!exts) {
-        Print(ERROR) << "Memory problems." << std::endl;
-        exit(1);
-      }
+      Print(ERROR) << "Memory problems." << std::endl;
+      goto err;
     }
   }
   else {
-    Print(ERROR) << std::endl << "Cannot create extension: " << string <<std::endl;
-    exit(1);
+    Print(ERROR) << std::endl << "Cannot create extension: " << string << std::endl;
+    goto err;
   }
 
   return exts;
+
+ err:
+  if (alloced)
+    sk_X509_EXTENSION_pop_free(exts, X509_EXTENSION_free);
+
+  X509_EXTENSION_free(ext);
+
+  exit(1);
 }
 
 static std::string::size_type get_minimum(std::string::size_type s1,

@@ -234,6 +234,7 @@ with_dbuser = @with_dbuser@
 with_mysqlconf = @with_mysqlconf@
 with_reportdir = @with_reportdir@
 with_scratchdir = @with_scratchdir@
+with_valgrind = @with_valgrind@
 USERDOC_DIR = $(top_builddir)/doc/userdoc
 SGML_INCLUDES = authors.sgml bugzilla.sgml license.sgml links.sgml
 SGML = $(srcdir)/voms-proxy-init.xml \

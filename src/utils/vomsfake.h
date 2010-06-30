@@ -131,7 +131,9 @@ class Fake {
   
   // verify the certificate is signed by a trusted CA
   bool Verify();
-  
+
+  void CleanAll();
+
   // get openssl error */
   void Error();
 

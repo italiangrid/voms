@@ -94,29 +94,60 @@ proc loadvar {var file} {
     set temp [exec cat $file]
 }
 
+proc _do_valgrind_log_file {} {
+    set outname [exec mktemp $::SCRATCHDIR/valg-XXXXXX]
+    return $outname
+}
+
+proc _do_valgrind_cl {} {
+    set VALGRINDPART ""
+    if {[info exists ::VALGRIND]} then {
+        #check wether leakage occurred
+        set VALGRINDPART "$::DOVALGRIND --trace-children=yes --leak-resolution=high --num-callers=25 --suppressions=suppressions --leak-check=full --log-file=[_do_valgrind_log_file] "
+    }
+
+    return $VALGRINDPART
+}
+
 proc log_exec {outname command} {
-    upvar 1 $outname myname
+    if ([info exists ::VALGRIND]) then {
+        set VALGRINDPART [_do_valgrind_cl]
+        return [log_exec_real $outname $command "$VALGRINDPART"]
+    } else {
+        return [log_exec_real $outname $command]
+    }
+}
+
+proc log_exec_real {outname command {valgrindpart ""} } {
+    upvar 2 $outname myname
 # The following (complicated) code ensures that the output file name
 # starts with the name of the command being executed 
-    set idx [string first " " $command]
+    set command [string trim $command]
+    set idx  [string first " " $command]
+    set idx2 [string last "/" [string range $command 0 [expr {$idx-1}]]]
+
     if [expr {$idx != -1}] then {
-        set cname [string range $command 0 [expr {$idx-1}]]
+        set cname [string range $command [expr {$idx2+1}] [expr {$idx-1}]]
     } else {
         set cname $command
     }
     set cname "$cname-XXXXXX"
+
 # end output file name creation
     set myname [exec mktemp $::SCRATCHDIR/$cname]
-
 # for voms-* commands run them from the install path
 # for other commands, look for them in the system path
     set voms [string first "voms" $cname]
 
     if [expr {$voms == 0}] then {
-        return [catch {set out [uplevel exec $::INSTALLDIR/bin/$command >& $myname]}]
-    } else {
-        return [catch {set out [uplevel exec $command >& $myname]}]
+        set command "$::INSTALLDIR/bin/$command"
     }
+
+    set command "$valgrindpart $command"
+    set command [string trim $command]
+
+    set bis [catch {set out [uplevel 2 exec $command >& $myname]} out3]
+    return $bis
 }
 
 proc cleanup {} {
@@ -135,9 +166,9 @@ proc cleanup {} {
         exec rm total.info
         exec genhtml --no-branch-coverage --show-details --legend --highlight -o $::REPORTDIR/coverage voms.info >/dev/null
         exec rm voms.info
-	if [expr ![string equal $::COBERTURA "no"]] then {
-	    exec $::COBERTURA/cobertura-report.sh --destination $::REPORTDIR/javacoverage --datafile ../src/api/java/cobertura.ser ../src/api/java
-	}
+        if [expr ![string equal $::COBERTURA "no"]] then {
+            exec $::COBERTURA/cobertura-report.sh --destination $::REPORTDIR/javacoverage --datafile ../src/api/java/cobertura.ser ../src/api/java
+        }
     }
 
     catch {exec rm -rf $::INSTALLDIR/ca}
@@ -182,7 +213,7 @@ proc test_set_epilog { name } {
     set ::_test_epilog $name
 }
 
-proc do_test { {name ""} } {
+proc real_do_test { name } {
     global _testmessage
 
     set res $::UNDECIDEDTEST
@@ -193,11 +224,32 @@ proc do_test { {name ""} } {
 
     set realname [string range $scriptname [string length $$fname] end]
 
+    #kill everything, just to be sure
+    catch {exec killall edg-voms 2>/dev/null}
+    catch {exec killall middleman 2>/dev/null}
+    catch {exec killall valgrind 2>/dev/null}
+    catch {exec kill -a valgrind 2>/dev/null}
+    catch {exec kill -9 `ps aux |grep valgrind | grep -v grep | tr -s ' ' | cut -d' ' -f2`}
+
+    if {[info exists ::VALGRIND]} then {
+        #clean valgrind files
+        set list [glob -nocomplain -directory $::SCRATCHDIR valg-*]
+
+        set listed ""
+        if { [expr ![catch {set listed [glob -directory $::SCRATCHDIR valg-*]}]]} then {
+            foreach f $listed {
+                file delete -force $f
+            }
+        }
+
+        set list [glob -nocomplain -directory $::SCRATCHDIR valg-*]
+    }
+
     if {[info exists ::NOJAVALIB] != 0} then {
         if [regexp "vomsapi-java*" $realname] {
             set $_testmessage "Test disabled."
             unsupported $_testmessage
-            return
+            return $res
         }
     }
 
@@ -205,7 +257,7 @@ proc do_test { {name ""} } {
         if [regexp "vomsapi-cpp*" $realname] {
             set $_testmessage "Test disabled."
             unsupported $_testmessage
-            return
+            return $res
         }
     }
 
@@ -213,7 +265,7 @@ proc do_test { {name ""} } {
         if [regexp "vomsapi-c[0-9]*" $realname] {
             set $_testmessage "Test disabled."
             unsupported $_testmessage
-            return
+            return $res
         }
     }
 
@@ -230,6 +282,9 @@ proc do_test { {name ""} } {
             set res [catch {set out [mytest]} out]
         }
 
+        if { $res == 0 } then {
+            set res $out
+        }
         if [expr ! [ string equal $::_test_epilog ""]] then {
             set res2 [catch {set out2 [$::_test_epilog]} out2]
         }
@@ -244,38 +299,85 @@ proc do_test { {name ""} } {
     }
     _restoreVOMS voms1
 
+    return $res
+}
+
+proc do_test { {name "" } } {
+    global _testmessage
+
+    set res [real_do_test $name]
+
+    if { $res == $::PASSTEST} then {
+        if {[info exists ::DOVALGRIND]} then {
+            set ::VALGRIND "1"
+            set res2 [real_do_test $name]
+
+            set listed ""
+            set failed 0
+            if { [expr ![catch {set listed [glob -directory $::SCRATCHDIR valg-*]}]]} then {
+                foreach f $listed {
+
+                    if [file size $f] then {
+                        loadvar filecontent $f
+
+                        set match "definitely lost: 0"
+
+                        if [expr ![regexp $match $filecontent dummy]] then {
+                            set failed 1
+                            addlog $f
+                        }
+
+#                        set match2 "possibly lost: 0"
+#                        if [expr ![regexp $match $filecontent dummy]] then {
+#                            set failed 1
+#                        }
+
+#                        if $failed then {
+#                            addlog $f
+#                        }
+
+                    }
+                }
+            }
+
+            unset ::VALGRIND
+            if $failed then {
+                set res $::FAILTEST
+                testmessage "failed valgrind check."
+            }
+        }
+    }
+
     set ::_test_prolog ""
     set ::_test_epilog ""
 
-    if {$res == 0} then {
-        if {$out == $::PASSTEST } then {
-            if [expr [string equal $_testmessage ""]] then {
-                pass "test succeeded"
-            } else {
-                pass $_testmessage
-            }
-        } elseif {$out == $::FAILTEST } then {
-            if [expr [string equal $_testmessage ""]] then {
-                fail "test failed"
-            } else {
-                fail $_testmessage
-            }
-        } elseif {$out == $::UNDECIDEDTEST } then {
-            if [expr [string equal $_testmessage ""]] then {
-                unsupported "test undecided"
-            } else {
-                unsupported $_testmessage
-            }
+    if {$res == $::PASSTEST } then {
+        if [expr [string equal $_testmessage ""]] then {
+            pass "test succeeded"
+        } else {
+            pass $_testmessage
+        }
+    } elseif {$res == $::FAILTEST } then {
+        if [expr [string equal $_testmessage ""]] then {
+            fail "test failed"
+        } else {
+            fail $_testmessage
+        }
+    } elseif {$res == $::UNDECIDEDTEST } then {
+        if [expr [string equal $_testmessage ""]] then {
+            unsupported "test undecided"
+        } else {
+            unsupported $_testmessage
         }
     } else {
-        if {[info exists out] != 0} then {
-            set outname [exec mktemp $::SCRATCHDIR/voms-proxy-init-XXXXXX]
-            set id [open $outname "w+"]
-            puts $id $out
-            close $id
-            addlog $outname
-        }
+        set outname [exec mktemp $::SCRATCHDIR/voms-proxy-init-XXXXXX]
+        set id [open $outname "w+"]
+        puts $id $res
+        close $id
+        addlog $outname
         fail "test could not be executed correctly."
     }
-}
 
+    file delete -force $::SCRATCHDIR/valg-*
+
+}

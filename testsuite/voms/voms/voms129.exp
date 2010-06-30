@@ -1,8 +1,7 @@
 load_lib vomstest.exp
+testheader "See if voms-proxy-init --bits 5000 fails correctly."
 
 proc mytest {} {
-    testheader "See if voms-proxy-init --bits 5000 fails correctly."
-
     _activateCert mycert2
     _cleanproxy
 

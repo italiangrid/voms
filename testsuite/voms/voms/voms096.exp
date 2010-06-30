@@ -1,7 +1,7 @@
 load_lib vomstest.exp
+testheader "See if -pwstdin works with voms-proxy-init."
 
 proc mytest {} {
-    testheader "See if -pwstdin works with voms-proxy-init."
     _activateCert passcert
 
     _vomsStart voms1

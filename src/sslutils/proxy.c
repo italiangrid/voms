@@ -217,11 +217,13 @@ struct VOMSProxy *VOMS_MakeProxy(struct VOMSProxyArguments *args, int *warning, 
     if (filedata) {
       if ((ex3 = CreateProxyExtension("incfile", filedata, filesize, 0)) == NULL) {
         PRXYerr(PRXYERR_F_PROXY_SIGN, PRXYERR_R_CLASS_ADD_EXT);
+        free(filedata);
         goto err;
       }
-
+      
+      free(filedata);
       if (!SET_EXT(ex3))
-	goto err;
+        goto err;
     }
     else {
       setAdditional(additional, args->filename);
@@ -336,15 +338,17 @@ struct VOMSProxy *VOMS_MakeProxy(struct VOMSProxyArguments *args, int *warning, 
       }
           
       if (!SET_EXT(ex13))
-	goto err;
+        goto err;
 
       tmpcert = X509_new();
       if (tmpcert) {
-        X509_set_pubkey(tmpcert, X509_REQ_get_pubkey(req));
+        EVP_PKEY *key = X509_REQ_get_pubkey(req);
+        X509_set_pubkey(tmpcert, key);
         X509_add_ext(tmpcert, ex13, -1);
         X509V3_set_ctx(&ctx, tmpcert, tmpcert, req, NULL, 0);
         ex11 = X509V3_EXT_conf_nid(NULL, &ctx, NID_authority_key_identifier, "keyid");
         X509_free(tmpcert);
+        EVP_PKEY_free(key);
       }
       else
         ex11 = NULL;
@@ -456,6 +460,8 @@ struct VOMSProxy *VOMS_MakeProxy(struct VOMSProxyArguments *args, int *warning, 
       myPROXYCERTINFO_set_version(proxycertinfo, args->proxyversion);
       myPROXYCERTINFO_set_proxypolicy(proxycertinfo, proxypolicy);
 
+      myPROXYPOLICY_free(proxypolicy);
+
       if (args->pathlength>=0)
         myPROXYCERTINFO_set_path_length(proxycertinfo, args->pathlength);
 
@@ -483,7 +489,7 @@ struct VOMSProxy *VOMS_MakeProxy(struct VOMSProxyArguments *args, int *warning, 
     }
 
     if (args->proxyversion == 3) {
-      ex7 = X509V3_EXT_conf_nid(NULL, NULL, OBJ_obj2nid(OBJ_txt2obj(PROXYCERTINFO_V3,1)), (char*)proxycertinfo);
+      ex7 = X509V3_EXT_conf_nid(NULL, NULL, my_txt2nid(PROXYCERTINFO_V3), (char*)proxycertinfo);
       value = NULL;
     } else {
       if (nativeopenssl) {
@@ -492,12 +498,12 @@ struct VOMSProxy *VOMS_MakeProxy(struct VOMSProxyArguments *args, int *warning, 
         ctx.db = (void*)&ctx;
         X509V3_CONF_METHOD method = { NULL, NULL, NULL, NULL };
         ctx.db_meth = &method;
-        ex7 = X509V3_EXT_conf_nid(NULL, &ctx, OBJ_obj2nid(OBJ_txt2obj(PROXYCERTINFO_V4,1)), (char*)value);
+        ex7 = X509V3_EXT_conf_nid(NULL, &ctx, my_txt2nid(PROXYCERTINFO_V4), (char*)value);
         free(value);
         value = NULL;
       }
       else
-        ex7 = X509V3_EXT_conf_nid(NULL, NULL, OBJ_obj2nid(OBJ_txt2obj(PROXYCERTINFO_V4,1)), (char*)value);
+        ex7 = X509V3_EXT_conf_nid(NULL, NULL, my_txt2nid(PROXYCERTINFO_V4), (char*)value);
       value = NULL;
     }
 
@@ -576,7 +582,6 @@ struct VOMSProxy *VOMS_MakeProxy(struct VOMSProxyArguments *args, int *warning, 
   if (!args->proxyrequest)
     X509_REQ_free(req);
 
-
   X509_EXTENSION_free(ex13);
   X509_EXTENSION_free(ex12);
   X509_EXTENSION_free(ex11);
@@ -625,17 +630,18 @@ X509_EXTENSION *CreateProxyExtension(char * name, char *data, int datalen, int c
   
   if (!(ex = X509_EXTENSION_create_by_OBJ(NULL, ex_obj, crit, ex_oct))) {
     PRXYerr(PRXYERR_F_PROXY_SIGN,PRXYERR_R_CLASS_ADD_EXT);
-    goto err;
   }
 	
-  return ex;
-  
  err:
   
+  /* avoid spurious free of the contents. */
+  ex_oct->length = 0;
+  ex_oct->data = NULL;
   ASN1_OCTET_STRING_free(ex_oct);
+
   ASN1_OBJECT_free(ex_obj);
   
-  return NULL;
+  return ex;
   
 }
 

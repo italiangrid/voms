@@ -1,8 +1,7 @@
 load_lib vomstest.exp
+testheader "See if voms-proxy-init fails correctly when the certificate is expired."
 
 proc mytest {} {
-    testheader "See if voms-proxy-init fails correctly when the certificate is expired."
-
     _activateCert mycertexpired
     _cleanproxy
 
@@ -13,17 +12,17 @@ proc mytest {} {
     addlog $outname
 
     if $res then {
-	set correct ".*Either proxy or user certificate are expired."
+        set correct ".*Either proxy or user certificate are expired."
 
-	loadvar out2 $outname
+        loadvar out2 $outname
 
-	if [regexp $correct $out2] then {
-	    testmessage "voms-proxy-init failed correctly."
-	    return $::PASSTEST
-	} else {
-	    testmessage "error message incorrect."
-	    return $::FAILTEST
-	}
+        if [regexp $correct $out2] then {
+            testmessage "voms-proxy-init failed correctly."
+            return $::PASSTEST
+        } else {
+            testmessage "error message incorrect."
+            return $::FAILTEST
+        }
     } 
 
     testmessage "voms-proxy-init incorrectly succeeded."

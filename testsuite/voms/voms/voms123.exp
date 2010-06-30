@@ -1,7 +1,7 @@
 load_lib vomstest.exp
+testheader "See if voms-proxy-init --separate works correctly with extra data."
 
 proc mytest {} {
-    testheader "See if voms-proxy-init --separate works correctly with extra data."
     _activateCert mycert2
     _cleanproxy
 

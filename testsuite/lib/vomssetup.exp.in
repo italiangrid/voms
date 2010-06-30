@@ -120,7 +120,15 @@ proc _vomsStart {name } {
     catch {set saved $::env(GLITE_LOCATION)}
     set ::env(GLITE_LOCATION) $::INSTALLDIR
     exec /bin/sh -c "rm -f $::INSTALLDIR/var/log/voms.$name*"
-    exec $::INSTALLDIR/etc/init.d/voms start [exec cat $::_vomsdefinitions/$name/options/voms-vo] >/dev/null
+
+    if {[info exists ::VALGRIND]} then {
+        set VALGRINDPART [_do_valgrind_cl]
+        set voms_start "$::SCRATCHDIR/voms-start"
+        log_exec voms_start {$::INSTALLDIR/sbin/edg-voms --conf $::INSTALLDIR/etc/voms/$name/voms.conf >/dev/null}
+    } else {
+        exec $::INSTALLDIR/etc/init.d/voms start [exec cat $::_vomsdefinitions/$name/options/voms-vo] >/dev/null
+    }
+
     if [expr ! [string equal $saved ""]] then {
         set ::env(GLITE_LOCATION) $saved
     } else {
@@ -132,7 +140,18 @@ proc _vomsStop {name } {
     set saved ""
     catch {set saved $::env(GLITE_LOCATION)}
     set ::env(GLITE_LOCATION) $::INSTALLDIR
-    exec $::INSTALLDIR/etc/init.d/voms stop [exec cat $::_vomsdefinitions/$name/options/voms-vo] >/dev/null
+
+    if {[info exists ::VALGRIND]} then {
+        # kill must be done by hand
+        catch {exec killall edg-voms 2>/dev/null}
+        catch {exec killall middleman 2>/dev/null}
+        catch {exec killall valgrind 2>/dev/null}
+        catch {exec kill -a valgrind 2>/dev/null}
+        catch {exec kill -9 `ps aux |grep valgrind | grep -v grep | tr -s ' ' | cut -d' ' -f2`}
+    } else {
+        exec $::INSTALLDIR/etc/init.d/voms stop [exec cat $::_vomsdefinitions/$name/options/voms-vo] >/dev/null
+    }
+
     if [expr ![string equal $saved ""]] then {
         set ::env(GLITE_LOCATION) $saved
     } else {
@@ -169,7 +188,6 @@ proc _vomsSetup {name} {
     exec chmod 700 $::SCRATCHDIR/vomsinit.sh
     set val [catch {exec $::SCRATCHDIR/vomsinit.sh 2>$outname}]
 #    file delete $::SCRATCHDIR/vomsinit.sh
-    exec cat $outname
 
     if {$val} {
         puts [exec cat $outname]

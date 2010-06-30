@@ -212,6 +212,15 @@ static ERR_STRING_DATA prxyerr_str_reasons[]=
     {0,NULL}
 };
 
+int my_txt2nid(char *name)
+{
+  ASN1_OBJECT *obj = OBJ_txt2obj(name,1);
+  int nid = OBJ_obj2nid(obj);
+  ASN1_OBJECT_free(obj);
+
+  return nid;
+}
+
 /*********************************************************************
 Function: X509_NAME_cmp_no_set
 
@@ -718,6 +727,7 @@ proxy_genreq(
         }
         
         rbits = 8 * EVP_PKEY_size(upkey);
+        EVP_PKEY_free(upkey);
     }
     else
     {
@@ -1120,6 +1130,7 @@ proxy_sign_ext(
 #else
       ASN1_digest(i2d_PUBKEY, EVP_sha1(), (char *) new_public_key, md, &len);
 #endif
+      EVP_PKEY_free(new_public_key);
       new_public_key = NULL;
 
       (*new_cert)->cert_info->serialNumber = ASN1_INTEGER_new();
@@ -1530,10 +1541,6 @@ void
 proxy_verify_release(
     proxy_verify_desc *                 pvd)
 {
-    if (pvd->cert_chain)
-    {
-        sk_X509_pop_free(pvd->cert_chain,X509_free);
-    }
     pvd->cert_chain = NULL;
     pvd->pvxd = NULL;
 }
@@ -1660,6 +1667,7 @@ int proxy_check_proxy_name(
             /* TO DO:  discover exact type of proxy. */
 
           }
+          myPROXYCERTINFO_free(certinfo);
         }
 #if OPENSSL_VERSION_NUMBER >= 0x00908010
 #ifdef EXFLAG_PROXY
@@ -2181,13 +2189,6 @@ proxy_verify_callback(
      * This is used to create a new proxy by delegation. 
      */
 
-    if (pvd->cert_chain == NULL)
-    {
-        pvd->cert_chain = sk_X509_new_null();
-    }
-    
-    sk_X509_push(pvd->cert_chain, X509_dup(ctx->current_cert));
-
     pvd->cert_depth++;
 
     if (ca_policy_file_path != NULL)
@@ -2214,8 +2215,8 @@ proxy_verify_callback(
                   nid != NID_netscape_cert_type &&
                   nid != NID_subject_key_identifier &&
                   nid != NID_authority_key_identifier &&
-                  nid != OBJ_obj2nid(OBJ_txt2obj(PROXYCERTINFO_V3,1)) &&
-                  nid != OBJ_obj2nid(OBJ_txt2obj(PROXYCERTINFO_V4,1)))
+                  nid != my_txt2nid(PROXYCERTINFO_V3) &&
+                  nid != my_txt2nid(PROXYCERTINFO_V4))
                 {
                   PRXYerr(PRXYERR_F_VERIFY_CB, PRXYERR_R_UNKNOWN_CRIT_EXT);
                   ctx->error = X509_V_ERR_CERT_REJECTED;
@@ -2422,7 +2423,10 @@ proxy_verify_cert_chain(
     retval = 1;
 
 err:
-    if (cscinitialized) X509_STORE_CTX_cleanup(&csc);
+    if (cscinitialized) 
+      X509_STORE_CTX_cleanup(&csc);
+    if (cert_store)
+      X509_STORE_free(cert_store);
     return retval;
 }
 #endif /* NO_PROXY_VERIFY_CALLBACK */
@@ -2952,9 +2956,11 @@ err:
         *p_user_proxy = strdup(user_proxy);
       }
       if (p_user_cert && user_cert && !(*p_user_cert)) {
+        free(*p_user_cert);
         *p_user_cert = strdup(user_cert);
       }
       if (p_user_key && user_key && !(*p_user_key)) {
+        free(*p_user_key);
         *p_user_key = strdup(user_key);
       }
     }
@@ -3366,7 +3372,8 @@ proxy_load_user_key(
      */
     if (ucert)
     {
-        ucertpkey =  X509_PUBKEY_get(X509_get_X509_PUBKEY(ucert));
+        X509_PUBKEY *key = X509_get_X509_PUBKEY(ucert);
+        ucertpkey =  X509_PUBKEY_get(key);
         if (ucertpkey!= NULL  && ucertpkey->type == 
             (*private_key)->type)
         {
@@ -3417,6 +3424,7 @@ proxy_load_user_key(
         }
         
         EVP_PKEY_free(ucertpkey);
+
         if (mismatch)
         {
             PRXYerr(PRXYERR_F_INIT_CRED,PRXYERR_R_KEY_CERT_MISMATCH);
@@ -3640,21 +3648,21 @@ int PRIVATE determine_filenames(char **cacert, char **certdir, char **outfile,
   if (noregen) {
     int modify = 0;
 
-    if(*outfile)
-      oldoutfile = *outfile;
-
-    *outfile = NULL;
-
     if (*certfile == NULL && *keyfile == NULL) 
       modify = 1;
 
-    if (proxy_get_filenames(0, cacert, certdir, outfile, certfile, keyfile))
+    if (proxy_get_filenames(0, NULL, NULL, &oldoutfile, certfile, keyfile))
       goto err;
 
-    if (modify)
-      *certfile = *keyfile = *outfile;
+    if (modify) {
+      free(*certfile);
+      free(*keyfile);
+      *certfile = strdup(oldoutfile);
+      *keyfile = oldoutfile;
+    }
+    else
+      free(oldoutfile);
 
-    *outfile = oldoutfile;
     if (proxy_get_filenames(0, cacert, certdir, outfile, certfile, keyfile))
       goto err;
   }

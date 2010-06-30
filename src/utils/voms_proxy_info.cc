@@ -53,6 +53,7 @@ extern "C" {
 #include "openssl/ssl.h"
 #include "openssl/rsa.h"
 #include "openssl/conf.h"
+#include "openssl/stack.h"
 
 #ifdef USE_PKCS11
 #include "scutils.h"
@@ -352,14 +353,10 @@ static bool
 test_proxy()
 {
   char *ccaf;
-  char *cd;
   char *of;
   char *inof;
-  char *cf;
-  char *kf;
   bool res = false;
   BIO *bio_err;
-  proxy_cred_desc *pcd;
   BIO  *in = NULL;
   X509 *x  = NULL;
   STACK_OF(X509) *chain = NULL;
@@ -376,22 +373,14 @@ test_proxy()
   if ((bio_err=BIO_new(BIO_s_file())) != NULL)
     BIO_set_fp(bio_err,stderr,BIO_NOCLOSE);
 
-  if ((pcd = proxy_cred_desc_new()) == NULL)
-    goto err;
-
-  pcd->type = CRED_TYPE_PERMANENT;
-
   /*
    * These 5 const_cast are allowed because proxy_get_filenames will
    * overwrite the pointers, not the data itself.
    */
   ccaf = NULL;
-  cd   = NULL;
   inof = of   = (file.empty() ? NULL : const_cast<char *>(file.c_str()));
-  cf   = NULL;
-  kf   = NULL;
     
-  if (!determine_filenames(&ccaf, &cd, &of, &cf, &kf, 0)) {
+  if (!determine_filenames(&ccaf, NULL, &of, NULL, NULL, 0)) {
     std::string output = OpenSSLError(debug);
 
     std::cerr << output;
@@ -448,6 +437,11 @@ test_proxy()
   BIO_free(in);
   BIO_free(bio_err);
 
+  X509_free(x);
+  sk_X509_pop_free(chain, X509_free);
+  if (of != inof)
+    free(of);
+
   return res;
 }
 
@@ -475,7 +469,7 @@ convtime(std::string data)
 {
   ASN1_TIME *t= ASN1_TIME_new();
 
-  t->data   = (unsigned char *)(data.data());
+  t->data   = (unsigned char*)strdup(data.data());
   t->length = data.size();
   switch(t->length) {
   case 10:
@@ -521,14 +515,19 @@ static bool print(X509 *cert, STACK_OF(X509) *chain, vomsdata &vd)
 
         const char *type = proxy_type(cert);
 
-        std::cout << "subject   : " << X509_NAME_oneline(X509_get_subject_name(cert), NULL, 0) << "\n";
-        std::cout << "issuer    : " << X509_NAME_oneline(X509_get_issuer_name(cert), NULL, 0) << "\n";
-        
+        char *name = X509_NAME_oneline(X509_get_subject_name(cert), NULL, 0);
+        std::cout << "subject   : " << name << "\n";
+        OPENSSL_free(name);
+
+        name = X509_NAME_oneline(X509_get_issuer_name(cert), NULL, 0);
+        std::cout << "issuer    : " << name << "\n";
+        OPENSSL_free(name);
+
         if (strcmp(type, "unknown") != 0)
           std::cout << "type      : " << type << "\n";
 
-	if (all || keyusage)
-	  std::cout << "key usage : " << getKeyUsage(cert) << "\n";
+        if (all || keyusage)
+          std::cout << "key usage : " << getKeyUsage(cert) << "\n";
         std::cout << "strength  : " << totbits << " bits" << "\n";
         std::cout << "timeleft  : " << leftcert/3600 << ":" << std::setw(2) << std::setfill('0') 
                   << (leftcert%3600)/60 << ":" << std::setw(2) << std::setfill('0') << (leftcert%3600)%60 << "\n\n";
@@ -538,9 +537,15 @@ static bool print(X509 *cert, STACK_OF(X509) *chain, vomsdata &vd)
   }
  
   if (defaultinfo || all || text) {
-    std::cout << "subject   : " << X509_NAME_oneline(X509_get_subject_name(cert), NULL, 0) << "\n";
-    std::cout << "issuer    : " << X509_NAME_oneline(X509_get_issuer_name(cert), NULL, 0) << "\n";
-    std::cout << "identity  : " << X509_NAME_oneline(X509_get_issuer_name(cert), NULL, 0) << "\n";
+    char * name = X509_NAME_oneline(X509_get_subject_name(cert), NULL, 0);
+    std::cout << "subject   : " << name << "\n";
+    OPENSSL_free(name);
+
+    name = X509_NAME_oneline(X509_get_issuer_name(cert), NULL, 0);
+    std::cout << "issuer    : " << name  << "\n";
+    std::cout << "identity  : " << name << "\n";
+    OPENSSL_free(name);
+
     std::cout << "type      : " << proxy_type(cert) << "\n";
     std::cout << "strength  : " << totbits << " bits" << "\n";
     std::cout << "path      : " << file << "\n";
@@ -557,6 +562,7 @@ static bool print(X509 *cert, STACK_OF(X509) *chain, vomsdata &vd)
       ASN1_TIME * after  = convtime(v->date2);
       leftac = stillvalid(after) - now;	
       leftac = (leftac<0) ? 0 : leftac;
+      ASN1_TIME_free(after);
 
       std::cout << "=== VO " << v->voname << " extension information ===\n";
       std::cout << "VO        : " << v->voname << "\n";
@@ -583,12 +589,22 @@ static bool print(X509 *cert, STACK_OF(X509) *chain, vomsdata &vd)
     }
   }
 
-  if (subject)
-    std::cout << X509_NAME_oneline(X509_get_subject_name(cert), NULL, 0) << "\n";
-  if (issuer)
-    std::cout << X509_NAME_oneline(X509_get_issuer_name(cert), NULL, 0) << "\n";
-  if (identity)
-    std::cout << X509_NAME_oneline(X509_get_issuer_name(cert), NULL, 0) << "\n";
+  if (subject) {
+    char *name = X509_NAME_oneline(X509_get_subject_name(cert), NULL, 0);
+    std::cout << name << "\n";
+    OPENSSL_free(name);
+  }
+  if (issuer) {
+    char *name = X509_NAME_oneline(X509_get_issuer_name(cert), NULL, 0);
+    std::cout << name << "\n";
+    OPENSSL_free(name);
+  }
+  if (identity) {
+    char *name = X509_NAME_oneline(X509_get_issuer_name(cert), NULL, 0);
+    std::cout << name << "\n";
+    OPENSSL_free(name);
+  }
+
   if (type)
     std::cout << proxy_type(cert) << "\n";
   if (strength)
@@ -605,12 +621,14 @@ static bool print(X509 *cert, STACK_OF(X509) *chain, vomsdata &vd)
   if(text) {
     X509 *tmp = X509_dup(cert);
     X509_print_fp(stdout, tmp);
+    X509_free(tmp);
 
     if (dochain) {
       for (int start = sk_X509_num(chain)-1; start >= 1; start--) {
         X509 *tmp = sk_X509_value(chain, start);
         X509 *cert = X509_dup(tmp);
         X509_print_fp(stdout, cert);
+        X509_free(cert);
       }
     }
   }
@@ -635,6 +653,7 @@ static bool print(X509 *cert, STACK_OF(X509) *chain, vomsdata &vd)
     ASN1_TIME * after  = convtime(v->date2);
     leftac = stillvalid(after) - now;
     leftac = (leftac<0) ? 0 : leftac;
+    ASN1_TIME_free(after);
 
     if (actimeleft)
         std::cout << leftac << "\n";
@@ -721,9 +740,7 @@ static std::string getKeyUsage(X509 *cert)
 
     ASN1_BIT_STRING_free(usage);
 
-    // Do not free it.  CONF_VALUE_free() is not defined.  The program
-    //  ends, so the loss of memory is irrelevant.
-    //  sk_CONF_VALUE_pop_free(confs, CONF_VALUE_free);
+    sk_CONF_VALUE_pop_free(confs, X509V3_conf_free);
   }
 
   return keyusage;

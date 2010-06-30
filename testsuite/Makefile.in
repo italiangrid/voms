@@ -233,6 +233,7 @@ with_dbuser = @with_dbuser@
 with_mysqlconf = @with_mysqlconf@
 with_reportdir = @with_reportdir@
 with_scratchdir = @with_scratchdir@
+with_valgrind = @with_valgrind@
 AUTOMAKE_OPTIONS = dejagnu
 DEJATOOL = voms
 all: all-am

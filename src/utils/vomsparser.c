@@ -448,7 +448,7 @@ static const yytype_int8 yyrhs[] =
 static const yytype_uint8 yyrline[] =
 {
        0,    51,    51,    58,    65,    82,    97,   103,   109,   114,
-     123,   135,   136
+     125,   140,   141
 };
 #endif
 
@@ -1462,13 +1462,15 @@ yyreduce:
   strcat((yyval.param)->value, (yyvsp[(3) - (5)].input));
   strcat((yyval.param)->value,"=");
   strcat((yyval.param)->value, (yyvsp[(5) - (5)].input));
+  free((yyvsp[(3) - (5)].input));
+  free((yyvsp[(5) - (5)].input));
  }
     break;
 
   case 10:
 
 /* Line 1455 of yacc.c  */
-#line 123 "vomsfake.y"
+#line 125 "vomsfake.y"
     {
   (yyval.param) = (PARAM *)calloc(1,sizeof(PARAM));
   (yyval.param)->name = (yyvsp[(1) - (8)].string);
@@ -1478,27 +1480,30 @@ yyreduce:
   strcat((yyval.param)->value, (yyvsp[(3) - (8)].input));
   strcat((yyval.param)->value,"=");
   strcat((yyval.param)->value, (yyvsp[(5) - (8)].input));
+  free((yyvsp[(3) - (8)].input));
+  free((yyvsp[(5) - (8)].input));
+  free((yyvsp[(7) - (8)].input));
  }
     break;
 
   case 11:
 
 /* Line 1455 of yacc.c  */
-#line 135 "vomsfake.y"
+#line 140 "vomsfake.y"
     { (yyval.input) = (yyvsp[(1) - (1)].string); }
     break;
 
   case 12:
 
 /* Line 1455 of yacc.c  */
-#line 136 "vomsfake.y"
+#line 141 "vomsfake.y"
     { (yyval.input) = (yyvsp[(1) - (1)].string); }
     break;
 
 
 
 /* Line 1455 of yacc.c  */
-#line 1502 "vomsparser.c"
+#line 1507 "vomsparser.c"
       default: break;
     }
   YY_SYMBOL_PRINT ("-> $$ =", yyr1[yyn], &yyval, &yyloc);
@@ -1710,7 +1715,7 @@ yyreturn:
 
 
 /* Line 1675 of yacc.c  */
-#line 139 "vomsfake.y"
+#line 144 "vomsfake.y"
 
 
 static void convertparam(VO *vo, PARAM* param)
@@ -1731,20 +1736,18 @@ static void convertparam(VO *vo, PARAM* param)
     vo->pastac = strdup(param->value);
   }
   else if (strcmp(param->name, "-target") == 0) {
-    {
-      int do_add = 1;
+    int do_add = 1;
 
-      if (vo->targets == NULL) {
-        do_add = 0;
-        vo->targets = malloc(1);
-        vo->targets[0] = '\0';
-      }
-      vo->targets = realloc(vo->targets, strlen(vo->targets) +
-                            strlen(param->value) + 4);
-      if (do_add)
-        vo->targets = strcat(vo->targets, ",");
-      vo->targets = strcat(vo->targets, param->value);
+    if (vo->targets == NULL) {
+      do_add = 0;
+      vo->targets = malloc(1);
+      vo->targets[0] = '\0';
     }
+    vo->targets = realloc(vo->targets, strlen(vo->targets) +
+                          strlen(param->value) + 4);
+    if (do_add)
+      vo->targets = strcat(vo->targets, ",");
+    vo->targets = strcat(vo->targets, param->value);
   }
   else if (strcmp(param->name, "-uri") == 0) {
     vo->uri = strdup(param->value);
@@ -1756,5 +1759,7 @@ static void convertparam(VO *vo, PARAM* param)
   else if (strcmp(param->name, "-acextension") == 0) {
     vo->extensions[vo->extsize++] = strdup(param->value);
   }
+  free(param->value);
+  free(param->name);
 }
 

@@ -1,4 +1,5 @@
 load_lib vomstest.exp
+testheader "See if voms correctly exits when the password file has the wrong privileges."
 
 proc my_prolog {} {
     file attributes $::INSTALLDIR/etc/voms/voms1/voms.pass -permissions 00500
@@ -9,8 +10,6 @@ proc my_epilog {} {
 }
 
 proc mytest {} {
-    testheader "See if voms correctly exits when the password file has the wrong privileges."
-
     _activateCert mycert2
     _cleanproxy
 

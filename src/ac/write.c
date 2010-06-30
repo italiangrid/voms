@@ -51,6 +51,7 @@ static int make_and_push_ext(AC *ac, char *name, char *data, int critical)
     return 0;
   }
 
+  X509_EXTENSION_free(ext);
   return AC_ERR_NO_EXTENSION;
 }
 
@@ -281,9 +282,13 @@ int writeac(X509 *issuerc, STACK_OF(X509) *issuerstack, X509 *holder, EVP_PKEY *
     ERROR(AC_ERR_NO_EXTENSION);
 
   /* Create several extensions */
-  if (make_and_push_ext(a, "idcenoRevAvail", "loc", 0) ||
-      make_and_push_ext(a, "authKeyId", (char *)issuerc, 0) ||
-      (t && make_and_push_ext(a, "idceTargets", t, 1)))
+  if (make_and_push_ext(a, "idcenoRevAvail", "loc", 0))
+    ERROR(AC_ERR_NO_EXTENSION);
+
+  if (make_and_push_ext(a, "authKeyId", (char *)issuerc, 0))
+    ERROR(AC_ERR_NO_EXTENSION);
+
+  if (t && make_and_push_ext(a, "idceTargets", t, 1))
     ERROR(AC_ERR_NO_EXTENSION);
 
   if (extensions) {
