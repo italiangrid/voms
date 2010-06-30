@@ -107,6 +107,7 @@ static int evaluate_match_namespace(char *pattern, char *subject, int type)
     }
   }
 
+  regfree(&compiled);
   free(patterntmp);
   free(subjecttmp);
 

@@ -211,7 +211,9 @@ int validate(X509 *cert, X509 *issuer, AC *ac, voms &v, verify_type valids, time
   v.siglen     = ac->signature->length;
   v.signature  = std::string((char*)ac->signature->data, ac->signature->length);
   bn               = ASN1_INTEGER_to_BN(ac->acinfo->serial, NULL);
-  v.serial     = std::string(BN_bn2hex(bn));
+  char *bnstring = BN_bn2hex(bn);
+  v.serial     = std::string(bnstring);
+  OPENSSL_free(bnstring);
   BN_free(bn);
 
   if (cert) {
@@ -491,9 +493,11 @@ static int checkExtensions(STACK_OF(X509_EXTENSION) *exts, X509 *iss, int valids
             }
             if (!ok) {
               ASN1_STRING_free(fqdns);
+              AC_TARGETS_free(targets);              
               return AC_ERR_TARGET_NO_MATCH;
             }
           }
+          AC_TARGETS_free(targets);
           ASN1_STRING_free(fqdns);
         }
         if (!ok)

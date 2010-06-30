@@ -496,8 +496,10 @@ Client::Client(int argc, char ** argv) :
 
   /* prepare proxy_cred_desc */
 
-  if (!pcdInit())
+  if (!pcdInit()) {
+    CleanAll();
     exit(3);
+  }
 
   v = new vomsdata("", certdir);
 
@@ -541,8 +543,10 @@ Client::Client(int argc, char ** argv) :
     else
       userconf="";
 
-    if (!LoadVomses())
+    if (!LoadVomses()) {
+      delete v;
       exit(1);
+    }
 
     for (unsigned int i = 0; i < vomses.size(); i++) {
 
@@ -554,6 +558,7 @@ Client::Client(int argc, char ** argv) :
       servers = v->FindByAlias(contact.vo().empty() ? contact.nick() : contact.vo());
       if (servers.empty()) {
         Print(ERROR) << "VOMS Server for " << vomses[i] << " not known!" << std::endl;
+        delete v;
         exit(1);
       }
 
@@ -566,25 +571,31 @@ Client::Client(int argc, char ** argv) :
     setenv("X509_CERT_DIR", certdir.c_str(), 1);
 }
 
-Client::~Client() {
-
+void Client::CleanAll() 
+{
   sk_X509_pop_free(cert_chain, X509_free);
   X509_free(ucert);
   EVP_PKEY_free(private_key);
+
   free(cacertfile);
   free(certdir);
   free(certfile);
   free(keyfile);
   free(outfile);
+  listfree((char **)aclist, (freefn)AC_free);
 
   if (v)
     delete v;
 
   OBJ_cleanup();
-
 }
 
-bool Client::Run() 
+Client::~Client() 
+{
+  CleanAll();
+}
+
+int Client::Run() 
 {
   /* set output file and environment */
   
@@ -690,7 +701,7 @@ bool Client::Run()
             Print(ERROR) << "Error while handling AC." << std::endl;
             if (!noregen)
               unlink(proxyfile.c_str()); 
-            exit(3);
+            return 3;
           }
           
           /* if contact succeded jumps to other vos */
@@ -713,7 +724,7 @@ bool Client::Run()
         Print(ERROR) << std::endl << "None of the contacted servers for " << beg->vo << " were capable\nof returning a valid AC for the user." << std::endl;
         if (!noregen) 
           unlink(proxyfile.c_str());
-        exit(1);
+        return 1;
       }
     }
   }
@@ -733,14 +744,14 @@ bool Client::Run()
   if (!separate.empty() && (!data.empty() || aclist)) {
     if (!WriteSeparate()) {
       Print(ERROR) << "Wasn't able to write to " << separate << std::endl;
-      exit(1);
+      return 1;
     }
-    exit(0);
+    return 0;
   }
 
   if (listing) {
     Print(FORCED) << "Available attributes:\n" << data <<std::endl;
-    exit(0);
+    return 0;
   }
 
   if (!data.empty())
@@ -752,7 +763,7 @@ bool Client::Run()
       (void)AddToList(ac);
     else {
       Print(ERROR) << "Error while reading AC from file: " << acfile << std::endl << std::flush;
-      exit(1);
+      return 1;
     }
   }
   
@@ -761,11 +772,13 @@ bool Client::Run()
   Print(INFO)  << "Creating proxy " << std::flush; 
   Print(DEBUG) << "to " << proxyfile << " " << std::flush;
 
-  if (CreateProxy(data, aclist ? aclist : NULL, proxyver)) {
+  if (CreateProxy(data, aclist, proxyver)) {
     goto err;
   }
-  else 
-    free(aclist);
+  //  else  {
+    //    free(aclist);
+    //    aclist = NULL;
+  //  }
   
   Print(INFO) << "\n" << std::flush;
 
@@ -780,16 +793,16 @@ bool Client::Run()
   /* assure user certificate is not expired or going to, else advise but still create proxy */
   
   if (Test())
-    return false;
+    return 1;
   
-  return Verify(true);
+  return Verify();
 
  err:
   
   Error();
   if (!v->ErrorMessage().empty())
     Print(ERROR) << "ERROR: " << v->ErrorMessage() << std::endl;
-  return false;
+  return 1;
 }
 
 bool Client::CreateProxy(std::string data, AC ** aclist, int version) 
@@ -832,6 +845,12 @@ bool Client::CreateProxy(std::string data, AC ** aclist, int version)
     PrintProxyCreationError(warn, additional);
 
     if (proxy) {
+      /* In case of success, OpenSSL routines have already automagically 
+         cleaned the contents of the aclist */
+      if (args->aclist == this->aclist) {
+        free(args->aclist);
+        this->aclist = NULL;
+      }
       ret = VOMS_WriteProxy(proxyfile.c_str(), proxy);
       if (ret == -1) 
         Print(ERROR) << "\nERROR: Cannot write proxy to: " << proxyfile << std::endl << std::flush;
@@ -890,20 +909,21 @@ bool Client::WriteSeparate()
   std::string acfilename = separate + (data.empty() ? "" : ".ac");
 
   if (aclist) {
-    
+    AC **aclisttmp = aclist;
     BIO * out = BIO_new(BIO_s_file());
 
     BIO_write_filename(out, (char *)(acfilename).c_str());
     
-    while(*aclist) {
+    while(*aclisttmp) {
 #ifdef TYPEDEF_I2D_OF
-      if (!PEM_ASN1_write_bio((i2d_of_void *)i2d_AC, "ATTRIBUTE CERTIFICATE", out, (char *)*(aclist++), NULL, NULL, 0, NULL, NULL))
+      if (!PEM_ASN1_write_bio((i2d_of_void *)i2d_AC, "ATTRIBUTE CERTIFICATE", out, (char *)*(aclisttmp++), NULL, NULL, 0, NULL, NULL))
 #else
-      if (!PEM_ASN1_write_bio(((int (*)())i2d_AC), "ATTRIBUTE CERTIFICATE", out, (char *)*(aclist++), NULL, NULL, 0, NULL, NULL))
+      if (!PEM_ASN1_write_bio(((int (*)())i2d_AC), "ATTRIBUTE CERTIFICATE", out, (char *)*(aclisttmp++), NULL, NULL, 0, NULL, NULL))
 #endif
         {
           Print(INFO) << "Unable to write to BIO" << std::endl;
-          return false;;
+          BIO_free(out);
+          return false;
         }
     }
 
@@ -935,15 +955,13 @@ bool Client::WriteSeparate()
   return true;
 }
 
-bool Client::Verify(bool doproxy) 
+int Client::Verify() 
 {
 
-  X509 *cert = ucert;
-  STACK_OF(X509) *chain = cert_chain;
+  X509 *cert = NULL;
+  STACK_OF(X509) *chain = NULL;
 
-  if (doproxy) {
-    load_credentials(outfile, outfile, &cert, &chain, NULL, pw_cb);
-  }
+  load_credentials(outfile, outfile, &cert, &chain, NULL, pw_cb);
 
   /* First step:  Verify certificate chain. */
   proxy_verify_ctx_init(&pvxd);
@@ -951,30 +969,38 @@ bool Client::Verify(bool doproxy)
   pvxd.certdir = this->certdir;
 
   if (proxy_verify_cert_chain(cert, chain, &pvd)) {
-    if (doproxy) {
-      /* Second step: Verify AC. */
-      if (!v->Retrieve(cert, chain, RECURSE_CHAIN)) {
-        if (v->error != VERR_NOEXT) {
-          Print(ERROR) << "Error: verify failed." << std::endl
-                       << v->ErrorMessage() << std::endl;
-          return false;
-        }
+    /* Second step: Verify AC. */
+    if (!v->Retrieve(cert, chain, RECURSE_CHAIN)) {
+      if (v->error != VERR_NOEXT) {
+        Print(ERROR) << "Error: verify failed." << std::endl
+                     << v->ErrorMessage() << std::endl;
+        goto err;
       }
     }
+
     if (verify) 
       Print(FORCED) << "verify OK" << std::endl; 
-    return true;
+
+    sk_X509_pop_free(chain, X509_free);
+    X509_free(cert);
+
+    return 0;
   }
   else {
     Print(ERROR) << "Error: Certificate verify failed." << std::endl;
     Error();
-    return false;
+    goto err;
   }
 
   // Should never reach here
 
   Error();
-  return false;
+
+
+ err:
+  sk_X509_pop_free(chain, X509_free);
+  X509_free(cert);
+  return 1;
 }
 
 bool Client::Test() 
@@ -1031,6 +1057,7 @@ bool Client::AddToList(AC *ac)
   }
   else {
     listfree((char **)aclist, (freefn)AC_free);
+    aclist = NULL;
     Error();
     return false;
   }
@@ -1059,8 +1086,8 @@ bool Client::checkstats(char *file, int mode)
 }
 
 
-bool Client::pcdInit() {
-
+bool Client::pcdInit() 
+{
   int status = false;
 
   ERR_load_prxyerr_strings(0);
@@ -1239,8 +1266,9 @@ void Client::PrintConnectResult(int status, const std::string& contact)
                   << " (or in memorizing)" << std::endl;
 
       /* Remove temporary proxy */
-     if (!noregen)
+      if (!noregen)
         unlink(proxyfile.c_str()); 
+      CleanAll();
       exit(1);
     }
   }

@@ -119,6 +119,8 @@ voparam: ID '=' value {
   strcat($$->value, $3);
   strcat($$->value,"=");
   strcat($$->value, $5);
+  free($3);
+  free($5);
  }
 | ID '=' value '=' value '(' value ')' {
   $$ = (PARAM *)calloc(1,sizeof(PARAM));
@@ -129,6 +131,9 @@ voparam: ID '=' value {
   strcat($$->value, $3);
   strcat($$->value,"=");
   strcat($$->value, $5);
+  free($3);
+  free($5);
+  free($7);
  }
 ;
 
@@ -156,20 +161,18 @@ static void convertparam(VO *vo, PARAM* param)
     vo->pastac = strdup(param->value);
   }
   else if (strcmp(param->name, "-target") == 0) {
-    {
-      int do_add = 1;
+    int do_add = 1;
 
-      if (vo->targets == NULL) {
-        do_add = 0;
-        vo->targets = malloc(1);
-        vo->targets[0] = '\0';
-      }
-      vo->targets = realloc(vo->targets, strlen(vo->targets) +
-                            strlen(param->value) + 4);
-      if (do_add)
-        vo->targets = strcat(vo->targets, ",");
-      vo->targets = strcat(vo->targets, param->value);
+    if (vo->targets == NULL) {
+      do_add = 0;
+      vo->targets = malloc(1);
+      vo->targets[0] = '\0';
     }
+    vo->targets = realloc(vo->targets, strlen(vo->targets) +
+                          strlen(param->value) + 4);
+    if (do_add)
+      vo->targets = strcat(vo->targets, ",");
+    vo->targets = strcat(vo->targets, param->value);
   }
   else if (strcmp(param->name, "-uri") == 0) {
     vo->uri = strdup(param->value);
@@ -181,4 +184,6 @@ static void convertparam(VO *vo, PARAM* param)
   else if (strcmp(param->name, "-acextension") == 0) {
     vo->extensions[vo->extsize++] = strdup(param->value);
   }
+  free(param->value);
+  free(param->name);
 }

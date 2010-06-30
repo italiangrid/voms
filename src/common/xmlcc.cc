@@ -152,8 +152,11 @@ std::string Decode(const std::string data)
   else
     tmp = MyDecode(data.data(), data.size(), &j);
 
-  if (tmp)
-    return std::string(tmp, j);
+  if (tmp) {
+    std::string s = std::string(tmp, j);
+    free(tmp);
+    return s;
+  }
 
   return "";
 }

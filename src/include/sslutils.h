@@ -555,6 +555,8 @@ proxy_app_verify_callback(X509_STORE_CTX *ctx, UNUSED(void *empty));
 
 STACK_OF(X509) *load_chain(BIO *in, char*);
 
+int my_txt2nid(char *name);
+
 EXTERN_C_END
 
 #endif /* _SSLUTILS_H */

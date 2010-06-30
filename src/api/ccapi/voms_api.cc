@@ -180,6 +180,7 @@ vomsdata::~vomsdata()
   (void)privatedata.erase(this);
   pthread_mutex_unlock(&privatelock);
   delete data;
+
 }
 
 std::string vomsdata::ServerErrors(void)
@@ -946,8 +947,10 @@ std::vector<std::string> voms::GetTargets()
                                         name->name->d.ia5->length));
       }
     }
+    AC_TARGETS_free(target);
   }
 
+  AC_free(ac);
   return targets;
 }
 
@@ -961,17 +964,21 @@ bool vomsdata::LoadCredentials(X509 *cert, EVP_PKEY *pkey, STACK_OF(X509) *chain
   if (!data)
     return false;
 
-  if (cert)
+  if (cert) {
+    X509_free(data->cert);
     data->cert = X509_dup(cert);
+  }
 
-  if (pkey)
+  if (pkey) {
+    EVP_PKEY_free(data->key);
     data->key = EVP_PKEY_dup(pkey);
-
+  }
 
   /* sk_dup does *not* duplicate the stack content.  Only the
      stack itself. */
   /* So, do the duplication by hand. */
   if (chain) {
+    sk_X509_pop_free(data->chain, X509_free);
     data->chain = sk_X509_new_null();
 
     if (data->chain) {

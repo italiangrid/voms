@@ -410,11 +410,13 @@ void *targets_s2i(UNUSED(struct v3_ext_method *method), UNUSED(struct v3_ext_ctx
 {
   char *pos;
   char *list = strdup(data);
+  char *back = list;
   AC_TARGETS *a = AC_TARGETS_new();
 
   int attlist;
   do {
     pos = strchr(list, ',');
+
     if (pos)
       *pos = '\0';
     {
@@ -439,9 +441,11 @@ void *targets_s2i(UNUSED(struct v3_ext_method *method), UNUSED(struct v3_ext_ctx
       list = ++pos;
   } while (pos);
 
+  free(back);
   return a;
 
  err:
+  free(back);
   AC_TARGETS_free(a);
   return NULL;    
 

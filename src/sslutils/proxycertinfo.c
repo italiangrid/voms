@@ -95,15 +95,12 @@ ASN1_OBJECT * myPROXYPOLICY_get_policy_language(myPROXYPOLICY * policy)
 int myPROXYPOLICY_set_policy(myPROXYPOLICY * proxypolicy, unsigned char * policy, int length) 
 {
   if(policy != NULL) {
-    unsigned char * copy = malloc(length);
-    memcpy(copy, policy, length);
-
     /* if member policy of proxypolicy non set */
     if(!proxypolicy->policy)
       proxypolicy->policy = ASN1_OCTET_STRING_new();
       
     /* set member policy of proxypolicy */
-    ASN1_OCTET_STRING_set(proxypolicy->policy, copy, length);
+    ASN1_OCTET_STRING_set(proxypolicy->policy, policy, length);
   }
   else 
     ASN1_OCTET_STRING_free(proxypolicy->policy);
