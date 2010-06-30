@@ -105,8 +105,7 @@ proc _vomsReload { name } {
     set saved ""
     catch {set saved $::env(GLITE_LOCATION)}
     set ::env(GLITE_LOCATION) $::INSTALLDIR
-    set VALGRINDPART [_do_valgrind_cl]
-    exec $VALGRINDPART $::INSTALLDIR/etc/init.d/voms reload [exec cat $::_vomsdefinitions/$name/options/voms-vo] >/dev/null
+    exec $::INSTALLDIR/etc/init.d/voms reload [exec cat $::_vomsdefinitions/$name/options/voms-vo] >/dev/null
     if [expr ! [string equal $saved ""]] then {
         set ::env(GLITE_LOCATION) $saved
     } else {
