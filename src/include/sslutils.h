@@ -389,15 +389,14 @@ proxy_load_user_cert(
     const char *                        user_cert,
     X509 **                             certificate,
     int                                 (*pw_cb)(),
-    BIO *                               bp,
     unsigned long *                     hSession);
+
 int
 proxy_load_user_key(
     EVP_PKEY **                         private_key,
     X509 * ucert,
     const char *                        user_key,
     int                                 (*pw_cb)(),
-    BIO *                               bp,
     unsigned long *                     hSession);
 
 int
@@ -412,12 +411,6 @@ proxy_create_local(
     char *                              buffer,
     int                                 length);
 
-
-int
-proxy_init_cred(
-    proxy_cred_desc *                   pcd,
-    int                                 (*pw_cb)(),
-    BIO *                               bp);
 
 void
 proxy_verify_init(
@@ -491,7 +484,6 @@ proxy_sign_ext(
     X509_NAME *                         subject_name,
     X509_NAME *                         issuer_name,    
     int                                 seconds,
-    int                                 serial_num,
     STACK_OF(X509_EXTENSION) *          extensions,
     int                                 proxyver,
     int                                 pastproxy,
@@ -529,17 +521,11 @@ proxy_marshal_bp(
 int
 proxy_load_user_proxy(
     STACK_OF(X509) *                    cert_chain,
-    const char *                        file,
-    BIO *                               bp);
+    const char *                        file);
 
 int
 proxy_get_base_name(
     X509_NAME *                         subject);
-
-int proxy_password_callback_no_prompt(
-    char *,
-    int,
-    int);
 
 X509_EXTENSION *
 proxy_extension_class_add_create(
@@ -567,8 +553,10 @@ int PRIVATE load_certificate_from_file(FILE *file, X509 **cert,
 int
 proxy_app_verify_callback(X509_STORE_CTX *ctx, UNUSED(void *empty));
 
-EXTERN_C_END
-
 STACK_OF(X509) *load_chain(BIO *in, char*);
+
+int my_txt2nid(char *name);
+
+EXTERN_C_END
 
 #endif /* _SSLUTILS_H */

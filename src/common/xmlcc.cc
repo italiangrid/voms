@@ -152,8 +152,11 @@ std::string Decode(const std::string data)
   else
     tmp = MyDecode(data.data(), data.size(), &j);
 
-  if (tmp)
-    return std::string(tmp, j);
+  if (tmp) {
+    std::string s = std::string(tmp, j);
+    free(tmp);
+    return s;
+  }
 
   return "";
 }
@@ -269,12 +272,14 @@ std::string XML_Req_Encode(const std::string &command, const std::string &order,
   do {
     pos = command.find_first_of(',', begin);
     res += "<command>";
+
     if (pos != std::string::npos) {
       res += command.substr(begin, pos);
       begin = pos + 1;
     }
     else
       res += command.substr(begin);
+
     res += "</command>";
   } while (pos != std::string::npos);
 
@@ -293,11 +298,6 @@ std::string XML_Req_Encode(const std::string &command, const std::string &order,
   free(str);
 
   return res;
-}
-
-std::string XML_Ans_Encode(const std::string &ac, const std::vector<errorp> e, bool base64)
-{
-  return XML_Ans_Encode(ac, "", e, base64);
 }
 
 std::string Encode(std::string data, int base64)
@@ -509,7 +509,7 @@ static void endans(void *userdata, const char *name)
       a->num = ERR_NOT_MEMBER;
     else if (!strcmp(msg, "SuspendedUser"))
       a->num = ERR_SUSPENDED;
-    else if (!strcmp(msg, "BadReqquest"))
+    else if (!strcmp(msg, "BadRequest"))
       a->num = ERR_WITH_DB;
     else
       a->num = ERR_UNEXPECTED_ERROR;

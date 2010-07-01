@@ -2,27 +2,28 @@
 noinst_LTLIBRARIES = \
 	$(WANTED_ATTCERT_LIBS) # may add the libraries defined in EXTRA_LTLIBRARIES
 
-libattcert_la_SOURCES = \
-	validate.c \
-	write.c \
-	extensions.c \
-	mystack.c \
-	error.c \
-	newformat.c \
-	init.c
+AC_C_SOURCES = write.c extensions.c mystack.c error.c newformat.c init.c
 
-libattributes_nog_la_SOURCES = \
-	validate.c \
-	write.c \
-	extensions.c \
-	mystack.c \
-	error.c \
-	newformat.c \
-	init.c \
-	create.cc \
-	ccinit.cc
+AC_CC_SOURCES = validate.cc create.cc ccinit.cc
+
+EXTRA_DIST = \
+	acerrors.h \
+	write.h \
+	init.h \
+	extensions.h \
+	attributes.h
+
+libattcert_la_SOURCES = $(AC_C_SOURCES)
+
+libattributes_nog_la_SOURCES = $(AC_C_SOURCES) $(AC_CC_SOURCES)
 
 libattributes_nog_la_CFLAGS = \
+	$(NO_GLOBUS_FLAGS) \
+	-DNOGLOBUS \
+	-I $(top_srcdir)/src/include \
+	-I $(top_builddir)/src/sslutils
+
+libattributes_nog_la_CXXFLAGS = \
 	$(NO_GLOBUS_FLAGS) \
 	-DNOGLOBUS \
 	-I $(top_srcdir)/src/include \
@@ -36,12 +37,16 @@ libattcert_la_CFLAGS= \
 	-I $(top_builddir)/src/sslutils \
 	$(GLOBUS_CFLAGS)
 
+libccattcert_la_CPPFLAGS= \
+	-I $(top_srcdir)/src/include \
+	-I $(top_builddir)/src/sslutils \
+	$(GLOBUS_CFLAGS)
+
 #libattcert_la_LIBADD = \
 #	$(GLOBUS_GSS_API_LIBS)
 
-libccattcert_la_SOURCES = \
-	create.cc \
-	ccinit.cc
+libccattcert_la_SOURCES = $(AC_CC_SOURCES)
+
 
 libccattcert_la_LIBADD  = \
 	libattcert.la
@@ -75,16 +80,14 @@ EXTRA_LTLIBRARIES = \
 	libattcert.la \
 	libccattcert.la
 
-libattcert_gcc32_la_SOURCES = \
-	validate.c \
-	write.c \
-	extensions.c \
-	mystack.c \
-	error.c \
-	newformat.c \
-	init.c
+libattcert_gcc32_la_SOURCES = $(AC_C_SOURCES)
 
 libattcert_gcc32_la_CFLAGS= \
+	-I $(top_srcdir)/src/include \
+	-I $(top_builddir)/src/sslutils \
+	$(GLOBUS_GCC32_CFLAGS)
+
+libccattcert_gcc32_la_CPPFLAGS= \
 	-I $(top_srcdir)/src/include \
 	-I $(top_builddir)/src/sslutils \
 	$(GLOBUS_GCC32_CFLAGS)
@@ -92,24 +95,20 @@ libattcert_gcc32_la_CFLAGS= \
 libattcert_gcc32_la_LIBADD = \
 	$(GLOBUS_GCC32_GSS_API_LIBS)
 
-libccattcert_gcc32_la_SOURCES = \
-	create.cc \
-	ccinit.cc
+libccattcert_gcc32_la_SOURCES = $(AC_CC_SOURCES)
 
 libccattcert_gcc32_la_LIBADD  = \
 	libattcert_gcc32.la \
 	$(GLOBUS_GCC32_GSS_API_LIBS)
 
-libattcert_gcc32dbg_la_SOURCES = \
-	validate.c \
-	write.c \
-	extensions.c \
-	mystack.c \
-	error.c \
-	newformat.c \
-	init.c
+libattcert_gcc32dbg_la_SOURCES = $(AC_C_SOURCES)
 
 libattcert_gcc32dbg_la_CFLAGS= \
+	-I $(top_srcdir)/src/include \
+	-I $(top_builddir)/src/sslutils \
+	$(GLOBUS_GCC32DBG_CFLAGS)
+
+libccattcert_gcc32dbg_la_CPPFLAGS= \
 	-I $(top_srcdir)/src/include \
 	-I $(top_builddir)/src/sslutils \
 	$(GLOBUS_GCC32DBG_CFLAGS)
@@ -117,24 +116,20 @@ libattcert_gcc32dbg_la_CFLAGS= \
 libattcert_gcc32dbg_la_LIBADD = \
 	$(GLOBUS_GCC32DBG_GSS_API_LIBS)
 
-libccattcert_gcc32dbg_la_SOURCES = \
-	create.cc \
-	ccinit.cc
+libccattcert_gcc32dbg_la_SOURCES = $(AC_CC_SOURCES)
 
 libccattcert_gcc32dbg_la_LIBADD  = \
 	libattcert_gcc32dbg.la \
 	$(GLOBUS_GCC32DBG_GSS_API_LIBS)
 
-libattcert_gcc32pthr_la_SOURCES = \
-	validate.c \
-	write.c \
-	extensions.c \
-	mystack.c \
-	error.c \
-	newformat.c \
-	init.c
+libattcert_gcc32pthr_la_SOURCES = $(AC_C_SOURCES)
 
 libattcert_gcc32pthr_la_CFLAGS= \
+	-I $(top_srcdir)/src/include \
+	-I $(top_builddir)/src/sslutils \
+	$(GLOBUS_GCC32PTHR_CFLAGS)
+
+libccattcert_gcc32pthr_la_CPPFLAGS= \
 	-I $(top_srcdir)/src/include \
 	-I $(top_builddir)/src/sslutils \
 	$(GLOBUS_GCC32PTHR_CFLAGS)
@@ -142,24 +137,20 @@ libattcert_gcc32pthr_la_CFLAGS= \
 libattcert_gcc32pthr_la_LIBADD = \
 	$(GLOBUS_GCC32PTHR_GSS_API_LIBS)
 
-libccattcert_gcc32pthr_la_SOURCES = \
-	create.cc \
-	ccinit.cc
+libccattcert_gcc32pthr_la_SOURCES = $(AC_CC_SOURCES)
 
 libccattcert_gcc32pthr_la_LIBADD  = \
 	libattcert_gcc32pthr.la \
 	$(GLOBUS_GCC32PTHR_GSS_API_LIBS)
 
-libattcert_gcc32dbgpthr_la_SOURCES = \
-	validate.c \
-	write.c \
-	extensions.c \
-	mystack.c \
-	error.c \
-	newformat.c \
-	init.c
+libattcert_gcc32dbgpthr_la_SOURCES = $(AC_C_SOURCES)
 
 libattcert_gcc32dbgpthr_la_CFLAGS= \
+	-I $(top_srcdir)/src/include \
+	-I $(top_builddir)/src/sslutils \
+	$(GLOBUS_GCC32DBGPTHR_CFLAGS)
+
+libccattcert_gcc32dbgpthr_la_CPPFLAGS= \
 	-I $(top_srcdir)/src/include \
 	-I $(top_builddir)/src/sslutils \
 	$(GLOBUS_GCC32DBGPTHR_CFLAGS)
@@ -167,24 +158,20 @@ libattcert_gcc32dbgpthr_la_CFLAGS= \
 libattcert_gcc32dbgpthr_la_LIBADD = \
 	$(GLOBUS_GCC32DBGPTHR_GSS_API_LIBS)
 
-libccattcert_gcc32dbgpthr_la_SOURCES = \
-	create.cc \
-	ccinit.cc
+libccattcert_gcc32dbgpthr_la_SOURCES = $(AC_CC_SOURCES)
 
 libccattcert_gcc32dbgpthr_la_LIBADD  = \
 	libattcert_gcc32dbgpthr.la \
 	$(GLOBUS_GCC32DBGPTHR_GSS_API_LIBS)
 
-libattcert_gcc64_la_SOURCES = \
-	validate.c \
-	write.c \
-	extensions.c \
-	mystack.c \
-	error.c \
-	newformat.c \
-	init.c
+libattcert_gcc64_la_SOURCES = $(AC_C_SOURCES)
 
 libattcert_gcc64_la_CFLAGS= \
+	-I $(top_srcdir)/src/include \
+	-I $(top_builddir)/src/sslutils \
+	$(GLOBUS_GCC64_CFLAGS)
+
+libccattcert_gcc64_la_CPPFLAGS= \
 	-I $(top_srcdir)/src/include \
 	-I $(top_builddir)/src/sslutils \
 	$(GLOBUS_GCC64_CFLAGS)
@@ -192,24 +179,20 @@ libattcert_gcc64_la_CFLAGS= \
 libattcert_gcc64_la_LIBADD = \
 	$(GLOBUS_GCC64_GSS_API_LIBS)
 
-libccattcert_gcc64_la_SOURCES = \
-	create.cc \
-	ccinit.cc
+libccattcert_gcc64_la_SOURCES = $(AC_CC_SOURCES)
 
 libccattcert_gcc64_la_LIBADD  = \
 	libattcert_gcc64.la \
 	$(GLOBUS_GCC64_GSS_API_LIBS)
 
-libattcert_gcc64dbg_la_SOURCES = \
-	validate.c \
-	write.c \
-	extensions.c \
-	mystack.c \
-	error.c \
-	newformat.c \
-	init.c
+libattcert_gcc64dbg_la_SOURCES = $(AC_C_SOURCES)
 
 libattcert_gcc64dbg_la_CFLAGS= \
+	-I $(top_srcdir)/src/include \
+	-I $(top_builddir)/src/sslutils \
+	$(GLOBUS_GCC64DBG_CFLAGS)
+
+libccattcert_gcc64dbg_la_CPPFLAGS= \
 	-I $(top_srcdir)/src/include \
 	-I $(top_builddir)/src/sslutils \
 	$(GLOBUS_GCC64DBG_CFLAGS)
@@ -217,24 +200,20 @@ libattcert_gcc64dbg_la_CFLAGS= \
 libattcert_gcc64dbg_la_LIBADD = \
 	$(GLOBUS_GCC64DBG_GSS_API_LIBS)
 
-libccattcert_gcc64dbg_la_SOURCES = \
-	create.cc \
-	ccinit.cc
+libccattcert_gcc64dbg_la_SOURCES = $(AC_CC_SOURCES)
 
 libccattcert_gcc64dbg_la_LIBADD  = \
 	libattcert_gcc64dbg.la \
 	$(GLOBUS_GCC64DBG_GSS_API_LIBS)
 
-libattcert_gcc64pthr_la_SOURCES = \
-	validate.c \
-	write.c \
-	extensions.c \
-	mystack.c \
-	error.c \
-	newformat.c \
-	init.c
+libattcert_gcc64pthr_la_SOURCES = $(AC_C_SOURCES)
 
 libattcert_gcc64pthr_la_CFLAGS= \
+	-I $(top_srcdir)/src/include \
+	-I $(top_builddir)/src/sslutils \
+	$(GLOBUS_GCC64PTHR_CFLAGS)
+
+libccattcert_gcc64pthr_la_CPPFLAGS= \
 	-I $(top_srcdir)/src/include \
 	-I $(top_builddir)/src/sslutils \
 	$(GLOBUS_GCC64PTHR_CFLAGS)
@@ -242,24 +221,20 @@ libattcert_gcc64pthr_la_CFLAGS= \
 libattcert_gcc64pthr_la_LIBADD = \
 	$(GLOBUS_GCC64PTHR_GSS_API_LIBS)
 
-libccattcert_gcc64pthr_la_SOURCES = \
-	create.cc \
-	ccinit.cc
+libccattcert_gcc64pthr_la_SOURCES = $(AC_CC_SOURCES)
 
 libccattcert_gcc64pthr_la_LIBADD  = \
 	libattcert_gcc64pthr.la \
 	$(GLOBUS_GCC64PTHR_GSS_API_LIBS)
 
-libattcert_gcc64dbgpthr_la_SOURCES = \
-	validate.c \
-	write.c \
-	extensions.c \
-	mystack.c \
-	error.c \
-	newformat.c \
-	init.c
+libattcert_gcc64dbgpthr_la_SOURCES = $(AC_C_SOURCES)
 
 libattcert_gcc64dbgpthr_la_CFLAGS= \
+	-I $(top_srcdir)/src/include \
+	-I $(top_builddir)/src/sslutils \
+	$(GLOBUS_GCC64DBGPTHR_CFLAGS)
+
+libccattcert_gcc64dbgpthr_la_CPPFLAGS= \
 	-I $(top_srcdir)/src/include \
 	-I $(top_builddir)/src/sslutils \
 	$(GLOBUS_GCC64DBGPTHR_CFLAGS)
@@ -267,17 +242,9 @@ libattcert_gcc64dbgpthr_la_CFLAGS= \
 libattcert_gcc64dbgpthr_la_LIBADD = \
 	$(GLOBUS_GCC64DBGPTHR_GSS_API_LIBS)
 
-libccattcert_gcc64dbgpthr_la_SOURCES = \
-	create.cc \
-	ccinit.cc
+libccattcert_gcc64dbgpthr_la_SOURCES = $(AC_CC_SOURCES)
 
 libccattcert_gcc64dbgpthr_la_LIBADD  = \
 	libattcert_gcc64dbgpthr.la \
 	$(GLOBUS_GCC64DBGPTHR_GSS_API_LIBS)
 
-EXTRA_DIST = \
-	acerrors.h \
-	write.h \
-	init.h \
-	extensions.h \
-	attributes.h

@@ -1,0 +1,29 @@
+load_lib vomstest.exp
+
+testheader "See if voms-proxy-fake -selfsigned fails correctly when subject AND issuer are not specified."
+
+proc mytest {} {
+    _activateCert mycert2
+    _cleanproxy
+
+    set res [log_exec outname {voms-proxy-fake --selfsigned}]
+    addlog $outname
+
+    if $res then {
+        set correct "Error: At least one of --newsubject and --newissuer must be specified for --selfsigned."
+        loadvar out2 $outname
+
+        if [regexp $correct $out2] then {
+            testmessage "voms-proxy-fake failed with the expected message."
+            return $::PASSTEST
+        }
+
+        testmessage "voms-proxy-fake failed with an incorrect message."
+        return $::FAILTEST
+    }
+
+    testmessage "voms-proxy-fake unexpectedly succeeded"
+    return $::FAILTEST
+}
+
+do_test

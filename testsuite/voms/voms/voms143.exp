@@ -1,0 +1,39 @@
+load_lib vomstest.exp
+
+testheader "See if voms-proxy-fake -bits 0 works."
+
+proc mytest {} {
+    _activateCert mycert2
+    _cleanproxy
+
+    set res [log_exec outname {voms-proxy-fake --voms voms1 --hostcert $::INSTALLDIR/certs/hostcert.pem --hostkey $::INSTALLDIR/certs/hostkey.pem --bits 0}]
+
+    if $res then {
+        addlog $outname
+        testmessage "voms-proxy-fake failed."
+        return $::FAILTEST
+    }
+
+    set proxy [_proxyname]
+    if [catch {set out2 [exec openssl x509 -text -noout -in $proxy >& $outname]}] then {
+        addlog $outname
+        testmessage "openssl failed."
+        return $::FAILTEST
+    }
+
+    set correct "\[ \t\]RSA Public Key: \\(1024 bit\\)"
+
+    loadvar out2 $outname
+    if [regexp $correct $out2] then {
+        testmessage "--bits 0 works."
+        return $::PASSTEST
+    }
+
+    logvar correct
+    addlog $outname
+
+    testmessage "--bits 0 does not work"
+    return $::FAILTEST
+}
+
+do_test

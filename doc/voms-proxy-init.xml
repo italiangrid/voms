@@ -78,7 +78,8 @@ This option is deprecated, since it does not set the validity of the generated p
 This option obsoletes both -hours and -vomslife, and should be used in preference to both</para>
 
 <para><option>-bits</option> <replaceable>B</replaceable>
-Number of bits in key {512|1024|2048|4096}</para>
+Number of bits in key {0|512|1024|2048|4096}.  0 is a special value
+which means: same number of bits as in the issuing certificate.</para>
 
 <para><option>-cert</option> <replaceable>certfile</replaceable>
 Non-standard location of user certificate</para>

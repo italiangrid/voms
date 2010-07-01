@@ -253,11 +253,13 @@ target_alias = @target_alias@
 top_build_prefix = @top_build_prefix@
 top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
+with_cobertura_prefix = @with_cobertura_prefix@
 with_dbpwd = @with_dbpwd@
 with_dbuser = @with_dbuser@
 with_mysqlconf = @with_mysqlconf@
 with_reportdir = @with_reportdir@
 with_scratchdir = @with_scratchdir@
+with_valgrind = @with_valgrind@
 SUBDIRS = src doc project testsuite
 EXTRA_DIST = build.xml autogen.sh LICENSE project/build.number project/build.properties \
   project/configure.properties.xml project/properties.xml project/version.properties

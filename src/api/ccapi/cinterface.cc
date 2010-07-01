@@ -27,14 +27,17 @@
 
 #include "voms_api.h"
 
-/*Interface routines from C++ API to C API */
+/* Interface routines from C++ API to C API */
+
 extern "C" {
 #include "cinterface.h"
 #include <stdlib.h>
 #include <time.h>
+#include <listfunc.h>
 }
 
 #include "realdata.h"
+#include "data.h"
 
 #include <cstring>
 #include <cstdlib>
@@ -210,7 +213,7 @@ static struct contactdatar **Arrayize(std::vector<contactdata> &cd, int *error)
   }
   else {
     *error = VERR_MEM;
-    free (cdr);
+    free(cdr);
     free(cda);
     return NULL;
   }
@@ -297,19 +300,16 @@ struct vomsr *voms::translate()
       if ((!dst->holder && holder) || !dst->ac)
         throw 3;
 
-      dst->fqan = (char **)calloc(1, sizeof(char *)*(fqan.size()+1));
+      dst->fqan = vectoarray(fqan);
+      if (!dst->fqan)
+        throw 3;
+
       dst->std  = (struct datar **)calloc(1, sizeof(struct datar *)*(std.size()+1));
-      if (!dst->fqan || !dst->std)
+      if (!dst->std)
         throw 3;
 
       int j = 0;
 
-      for (std::vector<std::string>::iterator i = fqan.begin();
-           i != fqan.end(); i++)
-        if (!(dst->fqan[j++] = mystrdup((*i).c_str())))
-          throw 3;
-    
-      j = 0;
       for (std::vector<data>::iterator i = std.begin();
              i != std.end(); i++) {
         struct datar *d = (struct datar *)calloc(1, sizeof(struct datar));
@@ -333,26 +333,22 @@ struct vomsr *voms::translate()
   return NULL;
 }
 
+
+static void freeDatar(struct datar *dr)
+{
+  if (dr){
+    free(dr->group);
+    free(dr->role);
+    free(dr->cap);
+    free(dr);
+  }
+}
+
 void VOMS_Delete(struct vomsr *v) 
 {
   if (v) {
-    if (v->fqan) {
-      int i = 0;
-      while(v->fqan[i])
-        free(v->fqan[i++]);
-      free(v->fqan);
-    }
-    if (v->std) {
-      int i = 0;
-      while(v->std[i]) {
-        free(v->std[i]->group);
-        free(v->std[i]->role);
-        free(v->std[i]->cap);
-        free(v->std[i++]);
-      }
-      free (v->std);
-    }
-
+    listfree(v->fqan, free);
+    listfree((char**)v->std, (freefn)freeDatar);
     free(v->signature);
     free(v->user);
     free(v->userca);
@@ -390,12 +386,7 @@ void VOMS_Destroy(struct vomsdatar *vd)
     free(vd->vdir);
     free(vd->workvo);
     free(vd->extra_data);
-    if (vd->data) {
-      int i = 0;
-      while (vd->data[i])
-        VOMS_Delete(vd->data[i++]);
-    }
-    free(vd->data);
+    listfree((char**)vd->data, (freefn)VOMS_Delete);
     delete vd->real;
     free(vd);
   }
@@ -905,45 +896,13 @@ char **VOMS_GetTargetsList(struct vomsr *v, struct vomsdatar *vd, int *error)
 
   std::vector<std::string> targets = GetV(v).GetTargets();
 
-  int size = targets.size();
-
-  char **array = (char **)malloc(sizeof(char*)*(size+1));
-
-  if (array) {
-    int i = 0;
-    for (i = 0; i < size; i++) {
-      array[i] = mystrdup(targets[i].c_str());
-      if (!array[i])
-        goto err;
-    }
-    array[i] = NULL;
-    
-    return array;
-
-  }
-
-err:
-  if (array) {
-    int j = 0;
-
-    while (array[j])
-      free(array[j++]);
-  }
-  free(array);
-
-  return NULL;
+  return vectoarray(targets);
 }
 
 
 void VOMS_FreeTargetsList(char **targets)
 {
-  if (targets) {
-    int j = 0;
-    while (targets[j])
-      free(targets[j++]);
-  }
-
-  free(targets);
+  listfree(targets, free);
 }
 
 }

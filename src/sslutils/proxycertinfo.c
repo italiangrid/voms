@@ -36,8 +36,8 @@
 
 /* myPROXYPOLICY function */
 
-myPROXYPOLICY * myPROXYPOLICY_new() {
-
+myPROXYPOLICY * myPROXYPOLICY_new() 
+{
   ASN1_CTX                            c;
   myPROXYPOLICY *                       ret;
 
@@ -48,21 +48,20 @@ myPROXYPOLICY * myPROXYPOLICY_new() {
   ret->policy = NULL;
   return (ret);
   M_ASN1_New_Error(ASN1_F_PROXYPOLICY_NEW);
-
 }
 
-void myPROXYPOLICY_free(myPROXYPOLICY * policy) {
-
+void myPROXYPOLICY_free(myPROXYPOLICY * policy) 
+{
   if(policy == NULL) return;
 
   ASN1_OBJECT_free(policy->policy_language);
   M_ASN1_OCTET_STRING_free(policy->policy);
   OPENSSL_free(policy);
-
 }
 
 /* duplicate */
-myPROXYPOLICY * myPROXYPOLICY_dup(myPROXYPOLICY * policy) {
+myPROXYPOLICY * myPROXYPOLICY_dup(myPROXYPOLICY * policy) 
+{
 #ifdef TYPEDEF_I2D_OF
   return ((myPROXYPOLICY *) ASN1_dup((i2d_of_void *)i2d_myPROXYPOLICY,
 				   (d2i_of_void *)d2i_myPROXYPOLICY,
@@ -75,15 +74,15 @@ myPROXYPOLICY * myPROXYPOLICY_dup(myPROXYPOLICY * policy) {
 }
 
 /* set policy language */
-int myPROXYPOLICY_set_policy_language(myPROXYPOLICY * policy, ASN1_OBJECT * policy_language) {
-
+int myPROXYPOLICY_set_policy_language(myPROXYPOLICY * policy, ASN1_OBJECT * policy_language) 
+{
   if(policy_language != NULL) {
     ASN1_OBJECT_free(policy->policy_language);
     policy->policy_language = OBJ_dup(policy_language);
     return 1;
   }
-  return 0;
 
+  return 0;
 }
 
 /* get policy language */
@@ -93,36 +92,30 @@ ASN1_OBJECT * myPROXYPOLICY_get_policy_language(myPROXYPOLICY * policy)
 }
 
 /* set policy */
-int myPROXYPOLICY_set_policy(myPROXYPOLICY * proxypolicy, unsigned char * policy, int length) {
-
+int myPROXYPOLICY_set_policy(myPROXYPOLICY * proxypolicy, unsigned char * policy, int length) 
+{
   if(policy != NULL) {
-
-    /* perchè questa copia? */
-    unsigned char * copy = malloc(length);
-    memcpy(copy, policy, length);
-
     /* if member policy of proxypolicy non set */
     if(!proxypolicy->policy)
       proxypolicy->policy = ASN1_OCTET_STRING_new();
       
     /* set member policy of proxypolicy */
-    ASN1_OCTET_STRING_set(proxypolicy->policy, copy, length);
-
+    ASN1_OCTET_STRING_set(proxypolicy->policy, policy, length);
   }
-  
   else 
     ASN1_OCTET_STRING_free(proxypolicy->policy);
 
   return 1;
-
 }
 
 /* get policy */
-unsigned char * myPROXYPOLICY_get_policy(myPROXYPOLICY * proxypolicy, int * length) {
-
+unsigned char * myPROXYPOLICY_get_policy(myPROXYPOLICY * proxypolicy, int * length) 
+{
   /* assure field policy is set */
+
   if(proxypolicy->policy) {
     *length = proxypolicy->policy->length;
+
     /* assure ASN1_OCTET_STRING is full */
     if (*length>0 && proxypolicy->policy->data) {
       unsigned char * copy = malloc(*length);
@@ -130,15 +123,12 @@ unsigned char * myPROXYPOLICY_get_policy(myPROXYPOLICY * proxypolicy, int * leng
       return copy;
     }
   }
-  /* else return NULL */
   return NULL;
-
 }
 
 /* internal to der conversion */
 int i2d_myPROXYPOLICY(myPROXYPOLICY * policy, unsigned char ** pp) 
 {
-
   M_ASN1_I2D_vars(policy);
 
   M_ASN1_I2D_len(policy->policy_language, i2d_ASN1_OBJECT);
@@ -149,9 +139,11 @@ int i2d_myPROXYPOLICY(myPROXYPOLICY * policy, unsigned char ** pp)
     
   M_ASN1_I2D_seq_total();
   M_ASN1_I2D_put(policy->policy_language, i2d_ASN1_OBJECT);
+
   if(policy->policy) { 
     M_ASN1_I2D_put(policy->policy, i2d_ASN1_OCTET_STRING);
   }
+
   M_ASN1_I2D_finish();
 }
 
@@ -185,12 +177,10 @@ myPROXYPOLICY * d2i_myPROXYPOLICY(myPROXYPOLICY ** a, unsigned char ** pp, long 
 
 /* myPROXYCERTINFO function */
 
-myPROXYCERTINFO * myPROXYCERTINFO_new() {
-
-  myPROXYCERTINFO *                     ret;
+myPROXYCERTINFO * myPROXYCERTINFO_new() 
+{
+  myPROXYCERTINFO *                   ret = NULL;
   ASN1_CTX                            c;
-
-  ret = NULL;
 
   M_ASN1_New_Malloc(ret, myPROXYCERTINFO);
   memset(ret, 0, sizeof(myPROXYCERTINFO));
@@ -198,33 +188,30 @@ myPROXYCERTINFO * myPROXYCERTINFO_new() {
   ret->proxypolicy           = myPROXYPOLICY_new();
   return (ret);
   M_ASN1_New_Error(ASN1_F_PROXYCERTINFO_NEW);
-
 }
 
-void myPROXYCERTINFO_free(myPROXYCERTINFO * proxycertinfo) {
- 
+void myPROXYCERTINFO_free(myPROXYCERTINFO * proxycertinfo) 
+{ 
   /* assure proxycertinfo not empty */ 
   if(proxycertinfo == NULL) return;
   
   ASN1_INTEGER_free(proxycertinfo->path_length);
   myPROXYPOLICY_free(proxycertinfo->proxypolicy);
   OPENSSL_free(proxycertinfo);
-
 }
 
 /* set path_length */
-int myPROXYCERTINFO_set_path_length(myPROXYCERTINFO * proxycertinfo, long path_length) {
-  
+int myPROXYCERTINFO_set_path_length(myPROXYCERTINFO * proxycertinfo, long path_length) 
+{  
   /* assure proxycertinfo is not empty */
   if(proxycertinfo != NULL) {
 
     if(path_length != -1) {
-      /* if member path_length is empty allocate memory the set */
+      /* if member path_length is empty allocate memory then set */
       if(proxycertinfo->path_length == NULL)
 	proxycertinfo->path_length = ASN1_INTEGER_new();
       return ASN1_INTEGER_set(proxycertinfo->path_length, path_length);
     }
-
     else {
       ASN1_INTEGER_free(proxycertinfo->path_length);
       proxycertinfo->path_length = NULL;
@@ -234,7 +221,6 @@ int myPROXYCERTINFO_set_path_length(myPROXYCERTINFO * proxycertinfo, long path_l
   }
 
   return 0;
-
 }
 
 int myPROXYCERTINFO_set_version(myPROXYCERTINFO * proxycertinfo, int version)
@@ -243,6 +229,7 @@ int myPROXYCERTINFO_set_version(myPROXYCERTINFO * proxycertinfo, int version)
     proxycertinfo->version = version;
     return 1;
   }
+
   return 0;
 }
 
@@ -255,17 +242,17 @@ int myPROXYCERTINFO_get_version(myPROXYCERTINFO * proxycertinfo)
 
 
 /* get path length */
-long myPROXYCERTINFO_get_path_length(myPROXYCERTINFO * proxycertinfo) {
-
+long myPROXYCERTINFO_get_path_length(myPROXYCERTINFO * proxycertinfo) 
+{
   if(proxycertinfo && proxycertinfo->path_length)
     return ASN1_INTEGER_get(proxycertinfo->path_length);
-  else return -1;
-
+  else 
+    return -1;
 }
 
 /* set policy */
-int myPROXYCERTINFO_set_proxypolicy(myPROXYCERTINFO * proxycertinfo, myPROXYPOLICY * proxypolicy) {
-
+int myPROXYCERTINFO_set_proxypolicy(myPROXYCERTINFO * proxycertinfo, myPROXYPOLICY * proxypolicy) 
+{
   myPROXYPOLICY_free(proxycertinfo->proxypolicy);
 
   if(proxypolicy != NULL)
@@ -274,22 +261,20 @@ int myPROXYCERTINFO_set_proxypolicy(myPROXYCERTINFO * proxycertinfo, myPROXYPOLI
     proxycertinfo->proxypolicy = NULL;
 
   return 1;
-
 }
 
 /* get policy */
-myPROXYPOLICY * myPROXYCERTINFO_get_proxypolicy(myPROXYCERTINFO * proxycertinfo) {
-
+myPROXYPOLICY * myPROXYCERTINFO_get_proxypolicy(myPROXYCERTINFO * proxycertinfo) 
+{
   if(proxycertinfo)
     return proxycertinfo->proxypolicy;
 
   return NULL;
-
 }
 
 /* internal to der conversion */
-static int i2d_myPROXYCERTINFO_v3(myPROXYCERTINFO * proxycertinfo, unsigned char ** pp) {
-
+static int i2d_myPROXYCERTINFO_v3(myPROXYCERTINFO * proxycertinfo, unsigned char ** pp) 
+{
     int                                 v1;
 
     M_ASN1_I2D_vars(proxycertinfo);
@@ -303,7 +288,6 @@ static int i2d_myPROXYCERTINFO_v3(myPROXYCERTINFO * proxycertinfo, unsigned char
     M_ASN1_I2D_put(proxycertinfo->proxypolicy, i2d_myPROXYPOLICY);
     M_ASN1_I2D_put_EXP_opt(proxycertinfo->path_length, i2d_ASN1_INTEGER, 1, v1);
     M_ASN1_I2D_finish();
-
 }
 
 static int i2d_myPROXYCERTINFO_v4(myPROXYCERTINFO * proxycertinfo, unsigned char ** pp) 
@@ -397,24 +381,15 @@ static void *myproxycertinfo_s2i(UNUSED(struct v3_ext_method *method), UNUSED(st
   return (myPROXYCERTINFO*)data;
 }
 
-static char *stradd(char *orig, char *new)
-{
-  char *str = realloc(orig, (orig ? strlen(orig) : 0) + strlen(new) +1);
-
-  if (str) {
-    if (!orig)
-      str[0] = '\0';
-
-    return strcat(str, new);
-  }
-  else
-    return orig;
-}
-
 static char *myproxycertinfo_i2s(UNUSED(struct v3_ext_method *method), void *ext)
 {
   myPROXYCERTINFO *pci = NULL;
   char *encoding = NULL;
+  char *output = NULL;
+  myPROXYPOLICY *pp;
+  int dooid = 0;
+  char oid[256];
+
   pci = (myPROXYCERTINFO *)ext;
  
   if (!pci)
@@ -424,39 +399,31 @@ static char *myproxycertinfo_i2s(UNUSED(struct v3_ext_method *method), void *ext
     int j = ASN1_INTEGER_get(pci->path_length);
 
     char *buffer = snprintf_wrap("%X", j);
-    encoding = snprintf_wrap("Path Length Constraint: %s%s\n\n", strlen(buffer)%2 ? "0" : "", buffer);
+    output = snprintf_wrap("Path Length Constraint: %s%s\n\n", strlen(buffer)%2 ? "0" : "", buffer);
     free(buffer);
   }
   else
-    encoding = snprintf_wrap("Path Length Constraint: unlimited\n");
+    output = strdup("Path Length Constraint: unlimited\n");
 
-  myPROXYPOLICY *pp = pci->proxypolicy;
+  pp = pci->proxypolicy;
 
-  if (pci) {
-    encoding = snprintf_wrap("%sPolicy Language: ", encoding);
-    char oid[256];
-
-    if (i2t_ASN1_OBJECT(oid, 256, pp->policy_language)) {
-      encoding = snprintf_wrap("%s%s", encoding, oid);
-
-      if (pp->policy) {
-        unsigned char *data = ASN1_STRING_data(pp->policy);
-
-        if (data){
-          encoding = snprintf_wrap("%s\nPolicy Text: %s\n", encoding, (char *)data);
-        }
-      }
-    }
+  if (pp && i2t_ASN1_OBJECT(oid, 256, pp->policy_language)) {
+    dooid  = 1;
   }
 
-  encoding = snprintf_wrap("%s\n",encoding);
+  encoding = snprintf_wrap("%sPolicy Language: %s%s%s%s\n", 
+			   output, 
+			   ( dooid ? oid : ""), 
+			   ( (pp && pp->policy) ? "\nPolicy Text: " : ""), 
+			   ( (pp && pp->policy) ? ASN1_STRING_data(pp->policy) : ""),
+			   ( (pp && pp->policy) ? "\n" : ""));
 
+  free(output);
   return encoding;
 }
 
 void InitProxyCertInfoExtension(int full)
 {
-
 #define PROXYCERTINFO_V3      "1.3.6.1.4.1.3536.1.222"
 #define PROXYCERTINFO_V4      "1.3.6.1.5.5.7.1.14"
 #define OBJC(c,n) OBJ_create(c,n,n)

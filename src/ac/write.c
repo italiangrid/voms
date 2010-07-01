@@ -51,6 +51,7 @@ static int make_and_push_ext(AC *ac, char *name, char *data, int critical)
     return 0;
   }
 
+  X509_EXTENSION_free(ext);
   return AC_ERR_NO_EXTENSION;
 }
 
@@ -247,7 +248,7 @@ int writeac(X509 *issuerc, STACK_OF(X509) *issuerstack, X509 *holder, EVP_PKEY *
   sk_AC_ATTR_push(a->acinfo->attrib, capabilities);
   capabilities = NULL;
 
-  if (ac_full_attrs) {
+  if (ac_full_attrs && i) {
     ret = make_and_push_ext(a, "attributes", (char *)(ac_full_attrs->providers), 0);
     AC_FULL_ATTRIBUTES_free(ac_full_attrs);
     ac_full_attrs = NULL;
@@ -256,6 +257,8 @@ int writeac(X509 *issuerc, STACK_OF(X509) *issuerstack, X509 *holder, EVP_PKEY *
     if (ret)
       ERROR(AC_ERR_NO_EXTENSION);
   }
+  else
+    AC_FULL_ATTRIBUTES_free(ac_full_attrs);
 
   stk = sk_X509_new_null();
 
@@ -279,9 +282,13 @@ int writeac(X509 *issuerc, STACK_OF(X509) *issuerstack, X509 *holder, EVP_PKEY *
     ERROR(AC_ERR_NO_EXTENSION);
 
   /* Create several extensions */
-  if (make_and_push_ext(a, "idcenoRevAvail", "loc", 0) ||
-      make_and_push_ext(a, "authKeyId", (char *)issuerc, 0) ||
-      (t && make_and_push_ext(a, "idceTargets", t, 1)))
+  if (make_and_push_ext(a, "idcenoRevAvail", "loc", 0))
+    ERROR(AC_ERR_NO_EXTENSION);
+
+  if (make_and_push_ext(a, "authKeyId", (char *)issuerc, 0))
+    ERROR(AC_ERR_NO_EXTENSION);
+
+  if (t && make_and_push_ext(a, "idceTargets", t, 1))
     ERROR(AC_ERR_NO_EXTENSION);
 
   if (extensions) {

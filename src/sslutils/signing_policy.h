@@ -59,7 +59,7 @@ typedef union YYSTYPE
 {
 
 /* Line 1676 of yacc.c  */
-#line 47 "signing_policy.y"
+#line 46 "signing_policy.y"
 
   char *string;
   struct condition *cond;

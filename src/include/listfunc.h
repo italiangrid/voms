@@ -28,6 +28,6 @@
 
 typedef void (*freefn)(void *);
 
-extern char **listadd(char **vect, char *data, int size);
+extern char **listadd(char **vect, char *data);
 extern void   listfree(char **vect, freefn f);
 #endif

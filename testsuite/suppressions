@@ -1,0 +1,504 @@
+##----------------------------------------------------------------------##
+
+# Errors to suppress by default with XFree86 3.3.6)
+
+# Format of this file is:
+# {
+#     name_of_suppression
+#     skin_name:supp_kind
+#     (optional extra info for some suppression types)
+#     caller0 name, or /name/of/so/file.so
+#     caller1 name, or ditto
+#     (optionally: caller2 name)
+#     (optionally: caller3 name)
+#  }
+#
+# For Memcheck, the supp_kinds are:
+#
+#     Param Value1 Value2 Value4 Value8
+#     Free Addr1 Addr2 Addr4 Addr8
+#     Cond (previously known as Value0)
+#
+# and the optional extra info is:
+#     if Param: name of system call param
+#     if Free: name of free-ing fn)
+
+##----------------------------------------------------------------------##
+
+{
+   OpenSSL-Cond-0
+   Memcheck:Cond
+   fun:bn_sqr_comba8
+}
+{
+   OpenSSL-Cond-1
+   Memcheck:Cond
+   fun:BN_is_bit_set
+}
+{
+   OpenSSL-Cond-2
+   Memcheck:Cond
+   fun:BN_usub
+}
+{
+   OpenSSL-Cond-3
+   Memcheck:Cond
+   fun:BN_sqr
+}
+{
+   OpenSSL-Cond-4
+   Memcheck:Cond
+   fun:BN_ucmp
+}
+{
+   OpenSSL-Cond-5
+   Memcheck:Cond
+   fun:BN_cmp
+}
+{
+   OpenSSL-Cond-6
+   Memcheck:Cond
+   fun:BN_from_montgomery
+}
+{
+   OpenSSL-Cond-7
+   Memcheck:Cond
+   fun:bn_mul_comba8
+}
+{
+   OpenSSL-Cond-8
+   Memcheck:Cond
+   fun:BN_mul
+}
+{
+   OpenSSL-Cond-9
+   Memcheck:Cond
+   fun:BN_div
+}
+{
+   OpenSSL-Cond-10
+   Memcheck:Cond
+   fun:BN_add_word
+}
+{
+   OpenSSL-Cond-11
+   Memcheck:Cond
+   fun:BN_sub_word
+}
+{
+   OpenSSL-Cond-12
+   Memcheck:Cond
+   fun:BN_lshift
+}
+{
+   OpenSSL-Cond-13
+   Memcheck:Cond
+   fun:BN_mod_inverse
+}
+{
+   OpenSSL-Cond-14
+   Memcheck:Cond
+   fun:BN_num_bits_word
+}
+{
+   OpenSSL-Cond-15
+   Memcheck:Cond
+   fun:__udivdi3
+}
+{
+   OpenSSL-Cond-16
+   Memcheck:Cond
+   fun:BN_rshift1
+}
+{
+   OpenSSL-Cond-17
+   Memcheck:Cond
+   fun:euclid
+}
+{
+   OpenSSL-Cond-18
+   Memcheck:Cond
+   fun:BN_bin2bn
+}
+{
+   OpenSSL-Cond-19
+   Memcheck:Cond
+   fun:BN_lshift
+}
+{
+   OpenSSL-Cond-20
+   Memcheck:Cond
+   fun:BN_rshift
+}
+{
+   OpenSSL-Cond-21
+   Memcheck:Cond
+   fun:__umoddi3
+}
+{
+   OpenSSL-Cond-22
+   Memcheck:Cond
+   fun:probable_prime
+}
+{
+   OpenSSL-Cond-23
+   Memcheck:Cond
+   fun:BN_is_bit_set
+}
+{
+   OpenSSL-Cond-24
+   Memcheck:Cond
+   fun:d2i_ASN1_OBJECT
+}
+{
+   OpenSSL-Cond-25
+   Memcheck:Cond
+   fun:c2i_ASN1_OBJECT
+}
+{
+   OpenSSL-Cond-26
+   Memcheck:Cond
+   fun:ASN1_get_object
+}
+{
+   OpenSSL-Cond-27
+   Memcheck:Cond
+   fun:asn1_GetSequence
+}
+{
+   OpenSSL-Cond-28
+   Memcheck:Cond
+   fun:d2i_X509_ALGOR
+}
+{
+   OpenSSL-Cond-29
+   Memcheck:Cond
+   fun:asn1_get_length
+}
+{
+   OpenSSL-Cond-30
+   Memcheck:Cond
+   fun:RSA_padding_check_PKCS1_type_1
+}
+{
+   OpenSSL-Cond-31
+   Memcheck:Cond
+   fun:bn_sub_words
+}
+{
+   OpenSSL-Cond-32
+   Memcheck:Cond
+   fun:memcmp
+}
+{
+   OpenSSL-Cond-33
+   Memcheck:Cond
+   fun:RSA_verify
+}
+{
+   OpenSSL-Cond-34
+   Memcheck:Cond
+   fun:OBJ_bsearch
+}
+{
+   OpenSSL-Cond-35
+   Memcheck:Cond
+   fun:obj_cmp
+}
+{
+   OpenSSL-Cond-36
+   Memcheck:Cond
+   fun:getrn
+}
+{
+   OpenSSL-Cond-37
+   Memcheck:Cond
+   fun:add_hash
+}
+{
+   OpenSSL-Cond-38
+   Memcheck:Cond
+   fun:asn1_Finish
+}
+{
+   OpenSSL-Cond-39
+   Memcheck:Cond
+   fun:memcpy
+}
+{
+   OpenSSL-Cond-40
+   Memcheck:Cond
+   fun:d2i_ASN1_bytes
+}
+{
+   OpenSSL-Cond-41
+   Memcheck:Cond
+   fun:memcpy
+   fun:d2i_ASN1_bytes
+}
+{
+   OpenSSL-Cond-42
+   Memcheck:Cond
+   fun:d2i_ASN1_TYPE
+}
+{
+   OpenSSL-Cond-43
+   Memcheck:Cond
+   fun:malloc
+}
+{
+   OpenSSL-Cond-44
+   Memcheck:Cond
+   fun:BN_mod_exp_mont
+}
+{
+   OpenSSL-Cond-45
+   Memcheck:Cond
+   fun:bn_sub_words
+}
+{
+   OpenSSL-Cond-46
+   Memcheck:Cond
+   fun:bn_mul_recursive
+}
+{
+   OpenSSL-Cond-47
+   Memcheck:Cond
+   fun:bn_cmp_words
+}
+{
+   OpenSSL-Cond-48
+   Memcheck:Cond
+   fun:witness
+}
+{
+   OpenSSL-Cond-49
+   Memcheck:Cond
+   fun:BN_uadd
+}
+{
+   OpenSSL-Cond-50
+   Memcheck:Cond
+   fun:bn_sqr_recursive
+}
+{
+   OpenSSL-Cond-51
+   Memcheck:Cond
+   fun:i2c_ASN1_INTEGER
+}
+{
+   OpenSSL-Cond-52
+   Memcheck:Cond
+   fun:RSA_generate_key
+}
+{
+   OpenSSL-Cond-53
+   Memcheck:Cond
+   fun:ssl3_read_bytes
+}
+{
+   OpenSSL-Cond-54
+   Memcheck:Cond
+   fun:ssl3_get_finished
+}
+{
+   OpenSSL-Cond-55
+   Memcheck:Cond
+   fun:SHA1_Update
+}
+{
+   OpenSSL-Cond-56
+   Memcheck:Cond
+   fun:MD5_Update
+}
+{
+   OpenSSL-Cond-57
+   Memcheck:Cond
+   fun:ssl3_get_message
+}
+{
+   OpenSSL-Cond-58
+   Memcheck:Cond
+   fun:BUF_MEM_grow
+}
+{
+   OpenSSL-Cond-59
+   Memcheck:Cond
+   fun:RSA_padding_add_PKCS1_type_2
+}
+{
+   OpenSSL-Cond-60
+   Memcheck:Cond
+   fun:MD5_Final
+}
+{
+   OpenSSL-Cond-61
+   Memcheck:Cond
+   fun:SHA1_Final
+}
+{
+   OpenSSL-Cond-62
+   Memcheck:Cond
+   fun:BN_sub
+}
+{
+   OpenSSL-Cond-63
+   Memcheck:Cond
+   fun:BN_add
+}
+{
+   OpenSSL-Addr-1
+   Memcheck:Value4
+   fun:memcpy
+}
+{
+   OpenSSL-Addr-2
+   Memcheck:Value4
+   fun:EVP_EncodeBlock
+}
+{
+   OpenSSL-Addr-3
+   Memcheck:Value4
+   fun:BN_num_bits_word
+}
+{
+   OpenSSL-Addr-4
+   Memcheck:Value4
+   fun:BN_memcmp
+}
+{
+   OpenSSL-Addr-5
+   Memcheck:Value4
+   fun:getrn
+}
+{
+   OpenSSL-Addr-6
+   Memcheck:Value4
+   fun:asn1_get_length
+}
+{
+   OpenSSL-Addr-7
+   Memcheck:Value4
+   fun:d2i_ASN1_bytes
+}
+{
+   OpenSSL-Addr-8
+   Memcheck:Value4
+   fun:ASN1_get_object
+}
+{
+   OpenSSL-Addr-9
+   Memcheck:Value4
+   fun:memcmp
+}
+{
+   OpenSSL-Addr-10
+   Memcheck:Value4
+   fun:d2i_ASN1_TYPE
+}
+{
+   OpenSSL-Addr-11
+   Memcheck:Value4
+   fun:des_encrypt2
+}
+{
+   OpenSSL-Addr-12
+   Memcheck:Value4
+   fun:des_set_key_unchecked
+}
+{
+   OpenSSL-Addr-13
+   Memcheck:Value4
+   fun:MD5_Update
+}
+{
+   OpenSSL-Addr-14
+   Memcheck:Value4
+   fun:SHA1_Update
+}
+{
+   OpenSSL-Addr-15
+   Memcheck:Value4
+   fun:SHA1_Final
+}
+{
+   OpenSSL-Addr-16
+   Memcheck:Value4
+   fun:MD5_Final
+}
+{
+   globus1
+   Memcheck:Value4
+   fun:globus_gss_assist_wrap_send 
+}
+{
+   globus2
+   Memcheck:Value4
+   fun:globus_gss_assist_init_sec_context
+}
+{
+   OpenSSL-Addr-17
+   Memcheck:Value4
+   fun:BN_from_montgomery
+}
+{
+   OpenSSL-Addr-18
+   Memcheck:Value4
+   fun:BN_mod_exp_mont_consttime
+}
+{
+   OpenSSL-Addr-19
+   Memcheck:Value4
+   fun:bn_mul_recursive
+}
+{
+   OpenSSL-Addr-20
+   Memcheck:Value4
+   fun:BN_is_prime_fasttest
+}
+{
+   OpenSSL-Addr-21
+   Memcheck:Value4
+   fun:BN_gcd
+}
+{
+   OpenSSL-Addr-22
+   Memcheck:Value4
+   fun:BN_mod_exp_mont_consttime
+}
+{
+   OpenSSL-Addr-23
+   Memcheck:Cond
+   fun:BN_mod_exp_mont_consttime
+}
+{
+   OpenSSL-Addr-24
+   Memcheck:Cond
+   fun:ASN1_item_ex_d2i
+}
+{
+   OpenSSL-Addr-25
+   Memcheck:Cond
+   fun:BN_is_prime_fasttest
+}
+{
+   OpenSSL-Addr-26
+   Memcheck:Cond
+   fun:BN_gcd
+}
+{
+   OpenSSL-Addr-27
+   Memcheck:Cond
+   fun:/lib/libcrypto.so.0.9.7a
+   fun:BN_mod_word
+}
+{
+   OpenSSL-Addr-28
+   Memcheck:Cond
+   fun:/lib/libcrypto.so.0.9.7a
+   fun:OBJ_bsearch
+}
+
+
+
+##----------------------------------------------------------------------##

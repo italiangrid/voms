@@ -108,8 +108,8 @@
 #include <stdlib.h>
 
 #include "parsertypes.h"
+#include "listfunc.h"
 
-char **nmlistadd(char **vect, char *data, int size);
 char **parse_subjects(char *string);
 void namespaceserror(void *policies, void *scanner, char const *msg);
 
@@ -1380,14 +1380,14 @@ yyreduce:
 
 /* Line 1455 of yacc.c  */
 #line 66 "namespaces.y"
-    { *policies = (struct policy**)nmlistadd((char**)*policies, (char*)((yyvsp[(1) - (1)].policy)), sizeof((yyvsp[(1) - (1)].policy))); }
+    { *policies = (struct policy**)listadd((char**)*policies, (char*)((yyvsp[(1) - (1)].policy))); }
     break;
 
   case 3:
 
 /* Line 1455 of yacc.c  */
 #line 67 "namespaces.y"
-    { *policies = (struct policy**)nmlistadd((char**)*policies, (char*)((yyvsp[(2) - (2)].policy)), sizeof((yyvsp[(2) - (2)].policy))); }
+    { *policies = (struct policy**)listadd((char**)*policies, (char*)((yyvsp[(2) - (2)].policy))); }
     break;
 
   case 4:
@@ -1399,7 +1399,7 @@ yyreduce:
   if ((yyval.policy)) {
     (yyval.policy)->self = 0;
     (yyval.policy)->caname = strdup((yyvsp[(3) - (4)].string));
-    (yyval.policy)->conds = (struct condition**)nmlistadd(NULL, (char*)((yyvsp[(4) - (4)].cond)), sizeof(struct condition *));
+    (yyval.policy)->conds = (struct condition**)listadd(NULL, (char*)((yyvsp[(4) - (4)].cond)));
     (yyval.policy)->type = TYPE_NAMESPACE;
   }
 
@@ -1415,7 +1415,7 @@ yyreduce:
   if ((yyval.policy)) {
     (yyval.policy)->self = 1;
     (yyval.policy)->caname = NULL;
-    (yyval.policy)->conds = (struct condition**)nmlistadd(NULL, (char*)((yyvsp[(4) - (4)].cond)), sizeof(struct condition *));
+    (yyval.policy)->conds = (struct condition**)listadd(NULL, (char*)((yyvsp[(4) - (4)].cond)));
     (yyval.policy)->type = TYPE_NAMESPACE;
   }
  }
@@ -1430,7 +1430,7 @@ yyreduce:
   if ((yyval.cond)) {
     (yyval.cond)->positive = (yyvsp[(1) - (3)].integer);
     (yyval.cond)->original = strdup((yyvsp[(3) - (3)].string));
-    (yyval.cond)->subjects = nmlistadd(NULL, (yyval.cond)->original, sizeof(char*));
+    (yyval.cond)->subjects = listadd(NULL, (yyval.cond)->original);
     if (!(yyval.cond)->subjects) {
       free((yyval.cond)->original);
       free((yyval.cond));
@@ -1672,44 +1672,15 @@ yyreturn:
 #line 110 "namespaces.y"
 
 
-char **nmlistadd(char **vect, char *data, int size)
-{
-  int i = 0;
-  char **newvect;
-
-  if (!data || (size <= 0))
-    return NULL;
-
-  if (vect)
-    while (vect[i++]) ;
-  else
-    i=1;
-
-  if ((newvect = (char **)malloc((i+1)*size))) {
-    if (vect) {
-      memcpy(newvect, vect, (size*(i-1)));
-      newvect[i-1] = data;
-      newvect[i] = NULL;
-      free(vect);
-    }
-    else {
-      newvect[0] = data;
-      newvect[1] = NULL;
-    }
-    return newvect;
-  }
-  return NULL;
-}
-
 #if 0
 int main()
 {
   namespacesdebug = 1;
-  void **arg = NULL;
+  struct policy **arg = NULL;
   void *scanner=NULL;
   namespaceslex_init(&scanner);
   namespacesset_debug(1, scanner);
-  return namespacesparse(arg, scanner);
+  return namespacesparse(&arg, scanner);
 }
 #endif
 

@@ -1,8 +1,7 @@
 load_lib vomstest.exp
+testheader "See if voms-proxy-init --separate fails correctly when it cannot write."
 
 proc mytest {} {
-    testheader "See if voms-proxy-init --separate fails correctly when it cannot write."
-
     _activateCert mycert2
     _cleanproxy
 

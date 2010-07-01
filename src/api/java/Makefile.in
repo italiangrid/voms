@@ -223,11 +223,13 @@ target_alias = @target_alias@
 top_build_prefix = @top_build_prefix@
 top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
+with_cobertura_prefix = @with_cobertura_prefix@
 with_dbpwd = @with_dbpwd@
 with_dbuser = @with_dbuser@
 with_mysqlconf = @with_mysqlconf@
 with_reportdir = @with_reportdir@
 with_scratchdir = @with_scratchdir@
+with_valgrind = @with_valgrind@
 JAVAC = $(JHOME)/bin/javac
 JAR = $(JHOME)/bin/jar
 JAVA_CLASSES = org/glite/voms/BasicVOMSTrustStore.class \
@@ -461,11 +463,13 @@ uninstall-am:
 all-local: $(top_builddir)/src/api/java/vomsjapi.jar
 
 %.class : %.java
-	$(JAVAC) -sourcepath $(top_srcdir)/src/api/java -classpath $(JAVA_CLASSPATH):$(JAVA_CLASSPATH2):$(CLASSPATH) -d $(top_builddir)/src/api/java $<
+	$(JAVAC) -sourcepath $(top_srcdir)/src/api/java -classpath $(JAVA_CLASSPATH):$(JAVA_CLASSPATH2):$(CLASSPATH) -d $(top_builddir)/src/api/java $< 
 
-$(top_builddir)/src/api/java/vomsjapi.jar: makedirs $(JAVA_CLASSES)
-	$(JAR) -cfm $(top_builddir)/src/api/java/vomsjapi.jar $(top_srcdir)/src/api/java/Manifest.add `find org -name '*.class'` $(top_srcdir)/src/api/java/log4j.properties ;
-
+@USE_COBERTURA_TRUE@$(top_builddir)/src/api/java/vomsjapi.jar: makedirs $(JAVA_CLASSES)
+@USE_COBERTURA_TRUE@	$(with_cobertura_prefix)/cobertura-instrument.sh --basedir $(top_srcdir)/src/api/java --destination $(top_builddir)/src/api/java/ `find $(top_srcdir)/src/api/java -name '*.class' -printf "%P "`
+@USE_COBERTURA_TRUE@	$(JAR) -cfm $(top_builddir)/src/api/java/vomsjapi.jar $(top_srcdir)/src/api/java/Manifest.add `find org -name '*.class'` $(top_srcdir)/src/api/java/log4j.properties ;
+@USE_COBERTURA_FALSE@$(top_builddir)/src/api/java/vomsjapi.jar: makedirs $(JAVA_CLASSES)
+@USE_COBERTURA_FALSE@	$(JAR) -cfm $(top_builddir)/src/api/java/vomsjapi.jar $(top_srcdir)/src/api/java/Manifest.add `find org -name '*.class'` $(top_srcdir)/src/api/java/log4j.properties ;
 makedirs:
 	mkdir -p $(top_builddir)/src/api/java/org/glite/voms/ac
 

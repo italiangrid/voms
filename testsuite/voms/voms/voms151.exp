@@ -1,0 +1,52 @@
+
+load_lib vomstest.exp
+testheader "See if voms-proxy-fake --separate works."
+
+proc mytest {} {
+    _activateCert mycert2
+    _cleanproxy
+    set outinfo [exec mktemp $::SCRATCHDIR/vo-info-XXXXXX]
+    set id [open $outinfo "w+"]
+    puts $id "\[voms1\]"
+    puts $id "-hostcert = $::INSTALLDIR/certs/hostcert.pem"
+    puts $id "-hostkey = $::INSTALLDIR/certs/hostkey.pem"
+    puts $id "-fqan = /voms1"
+    puts $id "-uri = testmachine.cnaf.infn.it"
+    puts $id "\[voms2\]"
+    puts $id "-hostcert = $::INSTALLDIR/certs/hostcert.pem"
+    puts $id "-hostkey = $::INSTALLDIR/certs/hostkey.pem"
+    puts $id "-fqan = /voms3"
+    puts $id "-uri = testmachine.cnaf.infn.it:5000"
+    puts $id "-ga = nome = \"prova di prova\""
+    puts $id "-ga = nome = prova"
+    puts $id "-ga = \"non lo so\" = boh (/vom3)"
+    puts $id "-target = r.f.c.it"
+    puts $id "-target = r.f.s.it"
+    puts $id "-vomslife = 10"
+    close $id
+
+    set res [log_exec outname {voms-proxy-fake --voinfo $outinfo --separate $::SCRATCHDIR/fake}]
+
+    if $res then {
+        addlog $outname
+        testmessage "voms-proxy-fake failed."
+        return $::FAILTEST
+    }
+
+    set correct "-----BEGIN ATTRIBUTE CERTIFICATE-----"
+
+    loadvar out2 $::SCRATCHDIR/fake
+
+    if [regexp -- $correct $out2 dummy] then {
+        testmessage "voms-proxy-init --separate worked successfully."
+        return $::PASSTEST
+    }
+
+    logvar correct
+    addlog $::SCRATCHDIR/fake
+    testmessage "Unexpected output in voms-proxy-fake --separate"
+    return $::FAILTEST
+
+}
+
+do_test

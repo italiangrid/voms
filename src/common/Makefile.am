@@ -31,6 +31,7 @@ libutilc_la_SOURCES = \
 	list.c \
 	failure.c \
 	doio.c \
+	normalize.c \
 	credentials.c
 
 AM_CPPFLAGS = \
@@ -53,4 +54,5 @@ libutilc_nog_la_SOURCES = \
 	list.c \
 	failure.c \
 	doio.c \
+	normalize.c \
 	credentials.c

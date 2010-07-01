@@ -1,4 +1,5 @@
 load_lib vomstest.exp
+testheader "See if voms correctly exits when the password is not terminated by a newline."
 
 proc my_prolog {} {
     file copy -force $::INSTALLDIR/etc/voms/voms1/voms.pass $::SCRATCHDIR/temp.pass
@@ -29,8 +30,6 @@ proc my_epilog {} {
 }
 
 proc mytest {} {
-    testheader "See if voms correctly exits when the password is not terminated by a newline."
-
     _activateCert mycert2
     _cleanproxy
 

@@ -81,11 +81,11 @@ int
 main(int argc, char **argv)
 {
     if (strrchr(argv[0],'/'))
-	program = strrchr(argv[0],'/') + 1;
+      program = strrchr(argv[0],'/') + 1;
     else
-	program = argv[0];
+      program = argv[0];
 
-    static std::string LONG_USAGE =		\
+    static std::string LONG_USAGE = \
       "\n" \
       "    Options\n" \
       "    -help, -usage       Displays usage\n" \
@@ -133,8 +133,7 @@ main(int argc, char **argv)
 static bool
 delete_proxy(void)
 {
-  char *ccaf, *cd, *of, *cf, *kf;
-  proxy_cred_desc *pcd;
+  char *of;
 
 #ifdef WIN32
   CRYPTO_malloc_init();
@@ -143,25 +142,22 @@ delete_proxy(void)
   ERR_load_prxyerr_strings(0);
   SSLeay_add_ssl_algorithms();
 
-  if ((pcd = proxy_cred_desc_new()) == NULL)
-    return 0;
-
-  pcd->type = CRED_TYPE_PERMANENT;
-
   /*
    * These 5 const_cast are allowed because proxy_get_filenames will
    * overwrite the pointers, not the data itself.
    */
-  ccaf = NULL;
-  cd   = NULL;
-  of   = (file.empty() ? NULL : const_cast<char *>(file.c_str()));
-  cf   = NULL;
-  kf   = NULL;
+  of = (file.empty() ? NULL : strdup(const_cast<char *>(file.c_str())));
     
-  if (!determine_filenames(&ccaf, &cd, &of, &cf, &kf, 0))
+  if (!determine_filenames(NULL, NULL, &of, NULL, NULL, 0)) {
+    free(of);
     return 0;
+  }
 
-  return destroy_proxy(of, dryrun);
+  int ret = destroy_proxy(of, dryrun);
+
+  free(of);
+
+  return ret;
 }
 
 static int real_write(int fd, char *buffer, int size)
@@ -188,7 +184,7 @@ int destroy_proxy(char *file, bool dry)
   if (fd != -1) {
     if (dry) {
       if (!quiet)
-	std::cerr << "Would remove " << file << std::endl;
+        std::cerr << "Would remove " << file << std::endl;
     }
     else {
       memset(delblock, 0, 100);
@@ -199,12 +195,11 @@ int destroy_proxy(char *file, bool dry)
         int num = size / 100;
         int rem = size % 100;
 
-        while (num--) {
-	  (void)real_write(fd, delblock, 100);
-	}
+        while (num--)
+          (void)real_write(fd, delblock, 100);
 
         if (rem)
-	  (void)real_write(fd, delblock, rem);
+          (void)real_write(fd, delblock, rem);
       }
       close(fd);
       remove(file);

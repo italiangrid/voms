@@ -45,12 +45,13 @@ CONFIG_HEADER = $(top_builddir)/src/autogen/config.h
 CONFIG_CLEAN_FILES =
 LTLIBRARIES = $(noinst_LTLIBRARIES)
 libutilc_la_LIBADD =
-am_libutilc_la_OBJECTS = list.lo failure.lo doio.lo credentials.lo
+am_libutilc_la_OBJECTS = list.lo failure.lo doio.lo normalize.lo \
+	credentials.lo
 libutilc_la_OBJECTS = $(am_libutilc_la_OBJECTS)
 libutilc_nog_la_LIBADD =
 am_libutilc_nog_la_OBJECTS = libutilc_nog_la-list.lo \
 	libutilc_nog_la-failure.lo libutilc_nog_la-doio.lo \
-	libutilc_nog_la-credentials.lo
+	libutilc_nog_la-normalize.lo libutilc_nog_la-credentials.lo
 libutilc_nog_la_OBJECTS = $(am_libutilc_nog_la_OBJECTS)
 libutilities_la_LIBADD =
 am_libutilities_la_OBJECTS = data.lo options.lo pass.lo fqan.lo \
@@ -266,11 +267,13 @@ target_alias = @target_alias@
 top_build_prefix = @top_build_prefix@
 top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
+with_cobertura_prefix = @with_cobertura_prefix@
 with_dbpwd = @with_dbpwd@
 with_dbuser = @with_dbuser@
 with_mysqlconf = @with_mysqlconf@
 with_reportdir = @with_reportdir@
 with_scratchdir = @with_scratchdir@
+with_valgrind = @with_valgrind@
 noinst_LTLIBRARIES = \
 	$(WANTED_UTIL_LIBS)
 
@@ -303,6 +306,7 @@ libutilc_la_SOURCES = \
 	list.c \
 	failure.c \
 	doio.c \
+	normalize.c \
 	credentials.c
 
 AM_CPPFLAGS = \
@@ -325,6 +329,7 @@ libutilc_nog_la_SOURCES = \
 	list.c \
 	failure.c \
 	doio.c \
+	normalize.c \
 	credentials.c
 
 all: all-am
@@ -393,7 +398,9 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libutilc_nog_la-doio.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libutilc_nog_la-failure.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libutilc_nog_la-list.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libutilc_nog_la-normalize.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/list.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/normalize.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/options.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/pass.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/xmlcc.Plo@am__quote@
@@ -439,6 +446,13 @@ libutilc_nog_la-doio.lo: doio.c
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	source='doio.c' object='libutilc_nog_la-doio.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libutilc_nog_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o libutilc_nog_la-doio.lo `test -f 'doio.c' || echo '$(srcdir)/'`doio.c
+
+libutilc_nog_la-normalize.lo: normalize.c
+@am__fastdepCC_TRUE@	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libutilc_nog_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT libutilc_nog_la-normalize.lo -MD -MP -MF $(DEPDIR)/libutilc_nog_la-normalize.Tpo -c -o libutilc_nog_la-normalize.lo `test -f 'normalize.c' || echo '$(srcdir)/'`normalize.c
+@am__fastdepCC_TRUE@	mv -f $(DEPDIR)/libutilc_nog_la-normalize.Tpo $(DEPDIR)/libutilc_nog_la-normalize.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='normalize.c' object='libutilc_nog_la-normalize.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libutilc_nog_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o libutilc_nog_la-normalize.lo `test -f 'normalize.c' || echo '$(srcdir)/'`normalize.c
 
 libutilc_nog_la-credentials.lo: credentials.c
 @am__fastdepCC_TRUE@	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libutilc_nog_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT libutilc_nog_la-credentials.lo -MD -MP -MF $(DEPDIR)/libutilc_nog_la-credentials.Tpo -c -o libutilc_nog_la-credentials.lo `test -f 'credentials.c' || echo '$(srcdir)/'`credentials.c

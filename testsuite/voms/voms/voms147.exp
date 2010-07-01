@@ -1,0 +1,32 @@
+load_lib vomstest.exp
+testheader "See if voms-proxy-init fails correctly when the key is corrupted."
+
+proc mytest {} {
+    _activateCert mycert2
+
+    exec chmod 600 $::env(X509_USER_KEY)
+    exec cat $::env(X509_USER_KEY) | tr "\[a-z\]" "\[A-Z\]" > $::SCRATCHDIR/o.pem
+    exec cp $::SCRATCHDIR/o.pem $::env(X509_USER_KEY)
+    exec chmod 400 $::env(X509_USER_KEY)
+
+    set res [log_exec outname {voms-proxy-init}]
+
+    if $res then {
+        set correct "wrong tag"
+        loadvar out2 $outname
+        
+        if [regexp $correct $out2] then {
+            testmessage "voms-proxy-init failed with correct message."
+            return $::PASSTEST
+        }
+
+        addlog $outname
+        testmessage "voms-proxy-init failed with an incorrect message."
+        return $::FAILTEST
+    }
+
+    testmessage "voms-proxy-init incorrectly succeeded."
+    return $::FAILTEST
+}
+
+do_test

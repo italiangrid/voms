@@ -52,6 +52,8 @@ extern "C" {
 #include <openssl/objects.h>
 #include <openssl/asn1.h>
 #include <openssl/evp.h>
+#include <openssl/pkcs12.h>
+
 #include "credentials.h"
 #include "sslutils.h"
 #include "gssapi_compat.h"
@@ -83,16 +85,6 @@ extern int InitProxyCertInfoExtension(int);
 extern bool retrieve(X509 *cert, STACK_OF(X509) *chain, recurse_type how, 
 		     std::string &buffer, std::string &vo, std::string &file, 
 		     std::string &subject, std::string &ca, verror_type &error);
-
-static X509 *
-decouple_cred(gss_cred_id_t credential, STACK_OF(X509) **stk)
-{
-  if (!stk || (credential == 0L))
-    return NULL;
-
-  *stk = ((gss2_cred_id_desc *)credential)->cred_handle->cert_chain;
-  return ((gss2_cred_id_desc *)credential)->cred_handle->cert;
-}
 
 static std::string parse_commands(const std::string& commands);
 
@@ -130,7 +122,7 @@ vomsdata::vomsdata(std::string voms_dir, std::string cert_dir) :  ca_cert_dir(ce
 #endif
 
    if (!initialized) {
-     initialized = 1;
+     initialized = true;
 #ifdef NOGLOBUS
      SSL_library_init();
      SSLeay_add_all_algorithms();
@@ -140,6 +132,7 @@ vomsdata::vomsdata(std::string voms_dir, std::string cert_dir) :  ca_cert_dir(ce
      (void)AC_Init();
      InitProxyCertInfoExtension(1);
 #endif
+     PKCS12_PBE_add();
    }
 
   if (voms_cert_dir.empty()) {
@@ -187,6 +180,7 @@ vomsdata::~vomsdata()
   (void)privatedata.erase(this);
   pthread_mutex_unlock(&privatelock);
   delete data;
+
 }
 
 std::string vomsdata::ServerErrors(void)
@@ -452,7 +446,8 @@ bool vomsdata::RetrieveFromCred(gss_cred_id_t cred, recurse_type how)
   X509 *cert;
   STACK_OF(X509) *chain;
 
-  cert = decouple_cred(cred, &chain);
+  chain = ((gss2_cred_id_desc *)cred)->cred_handle->cert_chain;
+  cert = ((gss2_cred_id_desc *)cred)->cred_handle->cert;
 
   return Retrieve(cert, chain, how);
 }
@@ -914,9 +909,9 @@ vomsdata::vomsdata(const vomsdata &orig) : ca_cert_dir(orig.ca_cert_dir),
                                            verificationtime(orig.verificationtime)
 {}
 
-int getMajorVersionNumber(void) {return 1;}
-int getMinorVersionNumber(void) {return 9;}
-int getPatchVersionNumber(void) {return 14;}
+int getMajorVersionNumber(void) {return 2;}
+int getMinorVersionNumber(void) {return 0;}
+int getPatchVersionNumber(void) {return 0;}
 
 void vomsdata::SetRetryCount(int retryCount)
 {
@@ -952,8 +947,10 @@ std::vector<std::string> voms::GetTargets()
                                         name->name->d.ia5->length));
       }
     }
+    AC_TARGETS_free(target);
   }
 
+  AC_free(ac);
   return targets;
 }
 
@@ -967,17 +964,21 @@ bool vomsdata::LoadCredentials(X509 *cert, EVP_PKEY *pkey, STACK_OF(X509) *chain
   if (!data)
     return false;
 
-  if (cert)
+  if (cert) {
+    X509_free(data->cert);
     data->cert = X509_dup(cert);
+  }
 
-  if (pkey)
+  if (pkey) {
+    EVP_PKEY_free(data->key);
     data->key = EVP_PKEY_dup(pkey);
-
+  }
 
   /* sk_dup does *not* duplicate the stack content.  Only the
      stack itself. */
   /* So, do the duplication by hand. */
   if (chain) {
+    sk_X509_pop_free(data->chain, X509_free);
     data->chain = sk_X509_new_null();
 
     if (data->chain) {

@@ -65,47 +65,30 @@ extern "C" {
 #include "realdata.h"
 
 #include "internal.h"
+#include "normalize.h"
 
 extern proxy_verify_desc *setup_initializers(char *cadir);
 extern void destroy_initializers(void *data);
-static bool dncompare(const std::string &mut, const std::string &fixed);
+static bool dncompare(const char *mut, const char *fixed);
 static bool readdn(std::ifstream &file, char *buffer, int buflen);
 
 extern std::map<vomsdata*, vomsspace::internal*> privatedata;
 extern pthread_mutex_t privatelock;
 
-/*
- * this change the substring FROM into TO in NAME
- */
-static void change(std::string &name, const std::string& from, const std::string& to) 
+static bool dncompare(const char *first, const char *second)
 {
-  std::string::size_type pos = name.find(from);
-
-  while (pos != std::string::npos) {
-    name = name.substr(0, pos) + to + name.substr(pos+from.length());
-    pos = name.find(from, pos+1);
-  }
-}
-
-static void normalize(std::string &name)
-{
-  change(name, "/USERID=", "/UID=");
-  change(name, "/emailAddress=", "/Email=");
-  change(name, "/E=", "/Email=");
-}
-
-static bool dncompare(const std::string &first, const std::string &second)
-{
-  if (first == second)
+  if (!strcmp(first, second))
     return true;
 
-  std::string s1 = first;
-  std::string s2 = second;
+  char *s1 = normalize(first);
+  char *s2 = normalize(second);
 
-  normalize(s1);
-  normalize(s2);
+  int res = strcmp(s1, s2);
 
-  return s1 == s2;
+  free(s1);
+  free(s2);
+
+  return res == 0;
 }
 
 bool
@@ -388,14 +371,6 @@ bool vomsdata::check_sig_ac(X509 *cert, void *data)
 }
 
 X509 *
-vomsdata::check(UNUSED(check_sig f), UNUSED(void *data))
-{
-  // This should not be used anymore.  Only left here for binary compatibility.
-  return NULL;
-}
-
-
-X509 *
 vomsdata::check(void *data)
 {
   error = VERR_DIR;
@@ -407,9 +382,6 @@ vomsdata::check(void *data)
 
   int nid = OBJ_txt2nid("idatcap");
   int pos = X509at_get_attr_by_NID(atts, nid, -1);
-
-  int nidc = OBJ_txt2nid("certseq");
-  int posc = X509v3_get_ext_by_NID(ac->acinfo->exts, nidc, -1);
 
   if (!(pos >=0)) {
     seterror(VERR_DIR, "Unable to extract vo name from AC.");
@@ -455,15 +427,17 @@ vomsdata::check(void *data)
     return NULL;
   }
 
-
   /* check if the DN/CA file is installed for a given VO. */
+
+  int nidc = OBJ_txt2nid("certseq");
+  int posc = X509v3_get_ext_by_NID(ac->acinfo->exts, nidc, -1);
+
   if (posc >= 0) {
     std::string filecerts = voms_cert_dir + "/" + voname + "/" + hostname + ".lsc";
     std::ifstream file(filecerts.c_str());
 
     if (file)
       return check_from_file(ac, file, voname, filecerts);
-
   }
 
   /* check if able to find the signing certificate 
@@ -476,9 +450,9 @@ X509 *vomsdata::check_from_certs(AC *ac, const std::string& voname)
 {
   bool found  = false;
 
-  DIR * dp = NULL;
-  BIO * in = NULL;
-  X509 * x = NULL;
+  DIR  * dp = NULL;
+  BIO  * in = NULL;
+  X509 * x  = NULL;
 
   for(int i = 0; (i < 2 && !found); ++i) {
     
@@ -714,7 +688,7 @@ vomsdata::check_cert(X509 *cert)
   if (stack) {
     sk_X509_push(stack, cert);
 
-    bool result =  check_cert(stack);
+    bool result = check_cert(stack);
 
     sk_X509_free(stack);
 
@@ -737,6 +711,7 @@ vomsdata::check_cert(STACK_OF(X509) *stack)
   error = VERR_MEM;
   if (ctx && csc) {
     proxy_verify_desc *pvd = setup_initializers(strdup((char*)ca_cert_dir.c_str()));
+
     X509_STORE_set_verify_cb_func(ctx,proxy_verify_callback);
 #ifdef SIGPIPE
     signal(SIGPIPE,SIG_IGN);
@@ -744,10 +719,13 @@ vomsdata::check_cert(STACK_OF(X509) *stack)
     CRYPTO_malloc_init();
     if ((lookup = X509_STORE_add_lookup(ctx, X509_LOOKUP_file()))) {
       X509_LOOKUP_load_file(lookup, NULL, X509_FILETYPE_DEFAULT);
+
       if ((lookup=X509_STORE_add_lookup(ctx,X509_LOOKUP_hash_dir()))) {
         X509_LOOKUP_add_dir(lookup, ca_cert_dir.c_str(), X509_FILETYPE_PEM);
+
         for (int i = 1; i < sk_X509_num(stack); i++)
           X509_STORE_add_cert(ctx,sk_X509_value(stack, i));
+
         ERR_clear_error();
         error = VERR_VERIFY;
         X509_STORE_CTX_init(csc, ctx, sk_X509_value(stack, 0), NULL);
@@ -763,14 +741,6 @@ vomsdata::check_cert(STACK_OF(X509) *stack)
     X509_STORE_CTX_free(csc);
 
   return (index != 0);
-}
-
-bool
-vomsdata::my_conn(const std::string &hostname, int port, const std::string &contact,
-	const std::string &command, std::string &u, std::string &uc,
-                  std::string &buf)
-{
-  return my_conn(hostname, port, contact, command, u, uc, buf, -1);
 }
 
 bool
@@ -862,19 +832,35 @@ vomsdata::contact(const std::string &hostname, int port, const std::string &cont
                  buffer, timeout);
 }   
 
-bool
-vomsdata::contact(const std::string &hostname, int port, const std::string &contact,
-	const std::string &command, std::string &buffer, std::string &username,
-                  std::string &ca)
-{
-  return my_conn(hostname, port, contact, command, username, ca,
-                 buffer, -1);
-}   
-
 /*
  * Kept for binary compatibility.
- * No one calls this.
+ * No one calls these.
  */
+X509 *
+vomsdata::check(UNUSED(check_sig f), UNUSED(void *data))
+{
+  return NULL;
+}
+
+bool
+vomsdata::my_conn(UNUSED(const std::string &hostname), UNUSED(int port), 
+		  UNUSED(const std::string &contact),
+		  UNUSED(const std::string &command), UNUSED(std::string &u), 
+		  UNUSED(std::string &uc), UNUSED(std::string &buf))
+{
+  return false;
+}
+
+bool
+vomsdata::contact(UNUSED(const std::string &hostname), UNUSED(int port), 
+		  UNUSED(const std::string &contact),
+		  UNUSED(const std::string &command), 
+		  UNUSED(std::string &buffer), UNUSED(std::string &username),
+                  UNUSED(std::string &ca))
+{
+  return false;
+}   
+
 STACK_OF(X509) *vomsdata::load_chain(UNUSED(BIO *in))
 {
   return NULL;

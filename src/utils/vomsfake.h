@@ -119,7 +119,7 @@ class Fake {
   
   bool CreateProxy(std::string filedata, AC ** aclist, int version);
 
-  bool Retrieve(VOLIST *list);
+  bool MakeACs(VOLIST *list);
   
   // write AC and data retrieved form server to file
   bool WriteSeparate();
@@ -131,7 +131,9 @@ class Fake {
   
   // verify the certificate is signed by a trusted CA
   bool Verify();
-  
+
+  void CleanAll();
+
   // get openssl error */
   void Error();
 

@@ -42,7 +42,5 @@ int main(int argc, char** argv) {
     exit(1);
 
   Client v(argc, argv);
-  bool result = v.Run();
-
-  return (result ? 0 : 1);
+  return v.Run();
 }

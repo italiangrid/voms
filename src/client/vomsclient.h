@@ -131,7 +131,7 @@ class Client {
   
   Client(int argc, char** argv);
   ~Client();
-  bool Run();
+  int Run();
 
  private:
   
@@ -148,10 +148,11 @@ class Client {
   bool pcdInit();
   
   // verify the certificate is signed by a trusted CA
-  bool Verify(bool doproxy);
+  int Verify();
   
   // get openssl error */
   void Error();
+  void CleanAll();
 
   bool LoadVomses();
   std::ostream& Print(message_type type);

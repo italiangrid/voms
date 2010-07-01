@@ -38,9 +38,13 @@ extern "C" {
 
 #include <openssl/err.h>
 #include <openssl/ssl.h>
+
+#include "listfunc.h"
 }
 
 #include <string>
+#include <vector>
+
 /*
  * Function:
  *   filter(c)
@@ -255,4 +259,25 @@ std::string readfile(std::string filename)
   }
 
   return result;
+}
+
+// convert vector of strings to char**
+char **vectoarray(std::vector<std::string>& vector)
+{
+  char **array = (char**)calloc(vector.size() + 1, sizeof(char*));
+
+  if (array) {
+    int j = 0;
+
+    for (std::vector<std::string>::iterator i = vector.begin(); i != vector.end(); i++) {
+      array[j] = strdup((*i).c_str());
+      if (!array[j]) {
+        listfree(array, free);
+        return NULL;
+      }
+      j++;
+    }
+  }
+
+  return array;
 }

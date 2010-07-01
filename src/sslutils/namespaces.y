@@ -29,8 +29,8 @@
 #include <stdlib.h>
 
 #include "parsertypes.h"
+#include "listfunc.h"
 
-char **nmlistadd(char **vect, char *data, int size);
 char **parse_subjects(char *string);
 void namespaceserror(void *policies, void *scanner, char const *msg);
 %}
@@ -63,8 +63,8 @@ void namespaceserror(void *policies, void *scanner, char const *msg);
 
 %%
 
-eacl: rule  { *policies = (struct policy**)nmlistadd((char**)*policies, (char*)($1), sizeof($1)); }
-| eacl rule { *policies = (struct policy**)nmlistadd((char**)*policies, (char*)($2), sizeof($2)); }
+eacl: rule  { *policies = (struct policy**)listadd((char**)*policies, (char*)($1)); }
+| eacl rule { *policies = (struct policy**)listadd((char**)*policies, (char*)($2)); }
 ;
 
 rule: TO ISSUER SUBJECT condition {
@@ -72,7 +72,7 @@ rule: TO ISSUER SUBJECT condition {
   if ($$) {
     $$->self = 0;
     $$->caname = strdup($3);
-    $$->conds = (struct condition**)nmlistadd(NULL, (char*)($4), sizeof(struct condition *));
+    $$->conds = (struct condition**)listadd(NULL, (char*)($4));
     $$->type = TYPE_NAMESPACE;
   }
 
@@ -82,7 +82,7 @@ rule: TO ISSUER SUBJECT condition {
   if ($$) {
     $$->self = 1;
     $$->caname = NULL;
-    $$->conds = (struct condition**)nmlistadd(NULL, (char*)($4), sizeof(struct condition *));
+    $$->conds = (struct condition**)listadd(NULL, (char*)($4));
     $$->type = TYPE_NAMESPACE;
   }
  }
@@ -93,7 +93,7 @@ condition: permit_or_deny SUBJECT_WORD SUBJECT {
   if ($$) {
     $$->positive = $1;
     $$->original = strdup($3);
-    $$->subjects = nmlistadd(NULL, $$->original, sizeof(char*));
+    $$->subjects = listadd(NULL, $$->original);
     if (!$$->subjects) {
       free($$->original);
       free($$);
@@ -109,44 +109,15 @@ permit_or_deny: PERMIT { $$ = 1; }
 
 %%
 
-char **nmlistadd(char **vect, char *data, int size)
-{
-  int i = 0;
-  char **newvect;
-
-  if (!data || (size <= 0))
-    return NULL;
-
-  if (vect)
-    while (vect[i++]) ;
-  else
-    i=1;
-
-  if ((newvect = (char **)malloc((i+1)*size))) {
-    if (vect) {
-      memcpy(newvect, vect, (size*(i-1)));
-      newvect[i-1] = data;
-      newvect[i] = NULL;
-      free(vect);
-    }
-    else {
-      newvect[0] = data;
-      newvect[1] = NULL;
-    }
-    return newvect;
-  }
-  return NULL;
-}
-
 #if 0
 int main()
 {
   namespacesdebug = 1;
-  void **arg = NULL;
+  struct policy **arg = NULL;
   void *scanner=NULL;
   namespaceslex_init(&scanner);
   namespacesset_debug(1, scanner);
-  return namespacesparse(arg, scanner);
+  return namespacesparse(&arg, scanner);
 }
 #endif
 

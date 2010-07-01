@@ -117,11 +117,16 @@ std::string GSISocketClient::GetError()
 bool 
 GSISocketClient::post_connection_check(SSL *ssl)
 {
-  X509 *peer_cert = SSL_get_peer_certificate(ssl);
-  if (!peer_cert)
-    return false;
+  bool ret = true;
 
-  return true;
+  X509 *peer_cert = SSL_get_peer_certificate(ssl);
+
+  if (!peer_cert)
+    ret = false;
+
+  X509_free(peer_cert);
+
+  return ret;
 }
 
 
@@ -308,6 +313,7 @@ GSISocketClient::Open()
 
  err:
   destroy_SSL_proxy_handler(ssl);
+  SSL_clear(ssl);
   SSL_free(ssl);
   SSL_CTX_free(ctx);
   BIO_free(conn);

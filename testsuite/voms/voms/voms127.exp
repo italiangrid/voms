@@ -1,8 +1,7 @@
 load_lib vomstest.exp
+testheader "See if voms-proxy-init -pwstdin fails correctly when no password is provided."
 
 proc mytest {} {
-    testheader "See if voms-proxy-init -pwstdin fails correctly when no password is provided."
-
     _activateCert passcert
     _cleanproxy
 

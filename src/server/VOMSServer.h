@@ -27,12 +27,62 @@
 
 #include <iostream>
 #include <fstream>
+#include <vector>
+#include <string>
 
 #include "Server.h"
+#include "errors.h"
+#include "vomsxml.h"
 
 #include <openssl/evp.h>
 
 #include "data.h"
+
+class vomsresult {
+private:
+  std::string ac;
+  std::string data;
+  std::vector<errorp> errs;
+  bool base64;
+
+public:
+  vomsresult() : ac("A"), data(""), base64(true) {};
+
+  void setError(int num, std::string message) 
+  {
+    errorp t;
+    t.num = num;
+    t.message = message;
+    errs.push_back(t);
+  }
+
+  void setError(errorp p) 
+  {
+    errs.push_back(p);
+  }
+
+  void setBase64(bool b64)
+  {
+    base64 = b64;
+  }
+
+  void setAC(std::string ac)
+  {
+    this->ac = ac;
+  }
+
+  void setData(std::string data)
+  {
+    this->data = data;
+  }
+
+  std::string makeXMLAnswer(void)
+  {
+    return XML_Ans_Encode(ac, data, errs, base64);
+  }
+
+  std::string makeRESTAnswer(int& code);
+};
 
 class VOMSInitException {
 
@@ -50,6 +100,8 @@ public:
   ~VOMSServer();
   void UpdateOpts(void);
   void Run();
+  bool makeAC(vomsresult& vr, EVP_PKEY *key, X509 *issuer, 
+	      X509 *holder, const std::string &message);
 
 private:
   VOMSServer &operator=(VOMSServer const &) {exit(1);}

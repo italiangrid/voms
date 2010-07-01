@@ -57,16 +57,13 @@ am__DEPENDENCIES_1 =
 @BUILD_CLIENTS_TRUE@voms_proxy_destroy_DEPENDENCIES = $(top_builddir)/src/api/ccapi/libvomsapi_nog.la \
 @BUILD_CLIENTS_TRUE@	$(top_builddir)/src/sslutils/libssl_utils_nog.la \
 @BUILD_CLIENTS_TRUE@	$(top_builddir)/src/replib/librep.la \
-@BUILD_CLIENTS_TRUE@	$(top_builddir)/src/log/liblog.la \
 @BUILD_CLIENTS_TRUE@	$(am__DEPENDENCIES_1)
 am__voms_proxy_fake_SOURCES_DIST = vomsfake.h vomsfake.cc vomsparser.c \
 	lex.yy.c
 @BUILD_CLIENTS_TRUE@am_voms_proxy_fake_OBJECTS = vomsfake.$(OBJEXT) \
 @BUILD_CLIENTS_TRUE@	vomsparser.$(OBJEXT) lex.yy.$(OBJEXT)
 voms_proxy_fake_OBJECTS = $(am_voms_proxy_fake_OBJECTS)
-@BUILD_CLIENTS_TRUE@voms_proxy_fake_DEPENDENCIES = $(top_builddir)/src/common/libutilities_nog.la \
-@BUILD_CLIENTS_TRUE@	$(top_builddir)/src/ac/libattributes_nog.la \
-@BUILD_CLIENTS_TRUE@	$(top_builddir)/src/common/libutilc_nog.la \
+@BUILD_CLIENTS_TRUE@voms_proxy_fake_DEPENDENCIES = $(top_builddir)/src/api/ccapi/libvomsapi_nog.la \
 @BUILD_CLIENTS_TRUE@	$(top_builddir)/src/replib/librep.la \
 @BUILD_CLIENTS_TRUE@	$(top_builddir)/src/sslutils/libssl_utils_nog.la
 am__voms_proxy_info_SOURCES_DIST = voms_proxy_info.cc
@@ -75,7 +72,6 @@ am__voms_proxy_info_SOURCES_DIST = voms_proxy_info.cc
 voms_proxy_info_OBJECTS = $(am_voms_proxy_info_OBJECTS)
 @BUILD_CLIENTS_TRUE@voms_proxy_info_DEPENDENCIES = $(top_builddir)/src/api/ccapi/libvomsapi_nog.la \
 @BUILD_CLIENTS_TRUE@	$(top_builddir)/src/replib/librep.la \
-@BUILD_CLIENTS_TRUE@	$(top_builddir)/src/log/liblog.la \
 @BUILD_CLIENTS_TRUE@	$(top_builddir)/src/sslutils/libssl_utils_nog.la \
 @BUILD_CLIENTS_TRUE@	$(am__DEPENDENCIES_1)
 DEFAULT_INCLUDES = -I.@am__isrc@ -I$(top_builddir)/src/autogen
@@ -285,18 +281,19 @@ target_alias = @target_alias@
 top_build_prefix = @top_build_prefix@
 top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
+with_cobertura_prefix = @with_cobertura_prefix@
 with_dbpwd = @with_dbpwd@
 with_dbuser = @with_dbuser@
 with_mysqlconf = @with_mysqlconf@
 with_reportdir = @with_reportdir@
 with_scratchdir = @with_scratchdir@
+with_valgrind = @with_valgrind@
 @BUILD_CLIENTS_TRUE@voms_proxy_info_SOURCES = \
 @BUILD_CLIENTS_TRUE@	voms_proxy_info.cc
 
 @BUILD_CLIENTS_TRUE@voms_proxy_info_LDADD = \
 @BUILD_CLIENTS_TRUE@	$(top_builddir)/src/api/ccapi/libvomsapi_nog.la  \
 @BUILD_CLIENTS_TRUE@	$(top_builddir)/src/replib/librep.la \
-@BUILD_CLIENTS_TRUE@	$(top_builddir)/src/log/liblog.la \
 @BUILD_CLIENTS_TRUE@	$(top_builddir)/src/sslutils/libssl_utils_nog.la \
 @BUILD_CLIENTS_TRUE@	$(EXPAT_LIBS)
 
@@ -307,7 +304,6 @@ with_scratchdir = @with_scratchdir@
 @BUILD_CLIENTS_TRUE@	$(top_builddir)/src/api/ccapi/libvomsapi_nog.la  \
 @BUILD_CLIENTS_TRUE@	$(top_builddir)/src/sslutils/libssl_utils_nog.la \
 @BUILD_CLIENTS_TRUE@	$(top_builddir)/src/replib/librep.la \
-@BUILD_CLIENTS_TRUE@	$(top_builddir)/src/log/liblog.la \
 @BUILD_CLIENTS_TRUE@	$(EXPAT_LIBS)
 
 @BUILD_CLIENTS_TRUE@voms_proxy_fake_SOURCES = \
@@ -317,9 +313,7 @@ with_scratchdir = @with_scratchdir@
 @BUILD_CLIENTS_TRUE@	lex.yy.c 
 
 @BUILD_CLIENTS_TRUE@voms_proxy_fake_LDADD = \
-@BUILD_CLIENTS_TRUE@	$(top_builddir)/src/common/libutilities_nog.la \
-@BUILD_CLIENTS_TRUE@	$(top_builddir)/src/ac/libattributes_nog.la \
-@BUILD_CLIENTS_TRUE@	$(top_builddir)/src/common/libutilc_nog.la \
+@BUILD_CLIENTS_TRUE@	$(top_builddir)/src/api/ccapi/libvomsapi_nog.la  \
 @BUILD_CLIENTS_TRUE@	$(top_builddir)/src/replib/librep.la \
 @BUILD_CLIENTS_TRUE@	$(top_builddir)/src/sslutils/libssl_utils_nog.la
 

@@ -1,8 +1,7 @@
 load_lib vomstest.exp
+testheader "See if voms-proxy-init --vomslife fails correctly when it should."
 
 proc mytest {} {
-    testheader "See if voms-proxy-init --vomslife fails correctly when it should."
-
     _activateCert mycert2
     _cleanproxy
 
