@@ -251,7 +251,6 @@ static int restriction_evaluate_namespace(STACK_OF(X509) *chain, struct policy *
   }
 
   for (i = start; i != end; i += step) {
-    int j = i;
     X509 *cert = sk_X509_value(chain, i);
 
     for (j = i; j >= 0; j--) {
@@ -342,7 +341,7 @@ void read_pathrestriction(STACK_OF(X509) *chain, char *path,
 {
   int size = sk_X509_num(chain);
   char hashed[9];
-  char *hash = hashed;
+  char *hash;
   char signing[25]   = "/XXXXXXXX.signing_policy";
   char namespace[21] = "/XXXXXXXX.namespaces";
   int i = 0, j = 0;
@@ -395,6 +394,5 @@ void read_pathrestriction(STACK_OF(X509) *chain, char *path,
         j++;
       }
     }
-
   }
 }

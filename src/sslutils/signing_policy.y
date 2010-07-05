@@ -105,7 +105,7 @@ access_identity: ACCESS_ID_CA X509 SUBJECTS {
     $$->type = TYPE_SIGNING;
   }
 
-  if (!$$->caname) {
+  if (!$$ && $$->caname) {
     free($$);
     $$ = NULL;
   }
