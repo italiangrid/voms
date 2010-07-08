@@ -31,7 +31,7 @@
 #include <ctype.h>
 
 #include "parsertypes.h"
-#include "list.h"
+#include "listfunc.h"
 
 char **parse_subjects(char *string);
 void signingerror(void *policies, void *scanner, char const *msg);

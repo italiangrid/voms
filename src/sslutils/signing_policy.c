@@ -110,13 +110,14 @@
 #include <ctype.h>
 
 #include "parsertypes.h"
+#include "listfunc.h"
 
 char **parse_subjects(char *string);
 void signingerror(void *policies, void *scanner, char const *msg);
 
 
 /* Line 189 of yacc.c  */
-#line 120 "signing_policy.c"
+#line 121 "signing_policy.c"
 
 /* Enabling traces.  */
 #ifndef YYDEBUG
@@ -163,7 +164,7 @@ typedef union YYSTYPE
 {
 
 /* Line 214 of yacc.c  */
-#line 46 "signing_policy.y"
+#line 47 "signing_policy.y"
 
   char *string;
   struct condition *cond;
@@ -173,7 +174,7 @@ typedef union YYSTYPE
 
 
 /* Line 214 of yacc.c  */
-#line 177 "signing_policy.c"
+#line 178 "signing_policy.c"
 } YYSTYPE;
 # define YYSTYPE_IS_TRIVIAL 1
 # define yystype YYSTYPE /* obsolescent; will be withdrawn */
@@ -185,7 +186,7 @@ typedef union YYSTYPE
 
 
 /* Line 264 of yacc.c  */
-#line 189 "signing_policy.c"
+#line 190 "signing_policy.c"
 
 #ifdef short
 # undef short
@@ -472,8 +473,8 @@ static const yytype_int8 yyrhs[] =
 /* YYRLINE[YYN] -- source line where rule number YYN was defined.  */
 static const yytype_uint8 yyrline[] =
 {
-       0,    71,    71,    72,    74,    80,    86,    90,    93,    98,
-     113,   117,   130
+       0,    72,    72,    73,    75,    81,    87,    91,    94,    99,
+     114,   118,   131
 };
 #endif
 
@@ -1397,21 +1398,21 @@ yyreduce:
         case 2:
 
 /* Line 1455 of yacc.c  */
-#line 71 "signing_policy.y"
+#line 72 "signing_policy.y"
     { *policies = (struct policy **)listadd((char**)(*policies), (char*)((yyvsp[(1) - (1)].policy))); }
     break;
 
   case 3:
 
 /* Line 1455 of yacc.c  */
-#line 72 "signing_policy.y"
+#line 73 "signing_policy.y"
     { *policies = (struct policy **)listadd((char**)(*policies), (char*)((yyvsp[(2) - (2)].policy))); }
     break;
 
   case 4:
 
 /* Line 1455 of yacc.c  */
-#line 74 "signing_policy.y"
+#line 75 "signing_policy.y"
     {
   if ((yyvsp[(1) - (5)].policy)) {
     (yyval.policy)->conds = (struct condition**)((yyvsp[(5) - (5)].array));
@@ -1423,7 +1424,7 @@ yyreduce:
   case 5:
 
 /* Line 1455 of yacc.c  */
-#line 80 "signing_policy.y"
+#line 81 "signing_policy.y"
     {
   /* Ignore this.  Globus does. */
   free((yyvsp[(1) - (5)].policy));
@@ -1434,7 +1435,7 @@ yyreduce:
   case 6:
 
 /* Line 1455 of yacc.c  */
-#line 86 "signing_policy.y"
+#line 87 "signing_policy.y"
     {
   (yyval.policy) = (yyvsp[(1) - (1)].policy);
 }
@@ -1443,7 +1444,7 @@ yyreduce:
   case 7:
 
 /* Line 1455 of yacc.c  */
-#line 90 "signing_policy.y"
+#line 91 "signing_policy.y"
     {
   (yyval.array) = listadd(NULL, (char*)((yyvsp[(1) - (1)].cond)));
 }
@@ -1452,7 +1453,7 @@ yyreduce:
   case 8:
 
 /* Line 1455 of yacc.c  */
-#line 93 "signing_policy.y"
+#line 94 "signing_policy.y"
     {
   (yyval.array) = listadd((yyvsp[(2) - (2)].array), (char*)((yyvsp[(1) - (2)].cond)));
 }
@@ -1461,7 +1462,7 @@ yyreduce:
   case 9:
 
 /* Line 1455 of yacc.c  */
-#line 98 "signing_policy.y"
+#line 99 "signing_policy.y"
     {
   (yyval.policy) = (struct policy *)calloc(1, sizeof(struct policy));
 
@@ -1482,7 +1483,7 @@ yyreduce:
   case 10:
 
 /* Line 1455 of yacc.c  */
-#line 113 "signing_policy.y"
+#line 114 "signing_policy.y"
     {
   (yyval.policy) = (struct policy *)calloc(1, sizeof(struct policy));
 }
@@ -1491,7 +1492,7 @@ yyreduce:
   case 11:
 
 /* Line 1455 of yacc.c  */
-#line 117 "signing_policy.y"
+#line 118 "signing_policy.y"
     { 
     (yyval.cond) = (struct condition*)malloc(sizeof(struct condition));
     if ((yyval.cond)) {
@@ -1510,7 +1511,7 @@ yyreduce:
   case 12:
 
 /* Line 1455 of yacc.c  */
-#line 130 "signing_policy.y"
+#line 131 "signing_policy.y"
     {
     (yyval.cond) = (struct condition*)malloc(sizeof(struct condition));
 
@@ -1530,7 +1531,7 @@ yyreduce:
 
 
 /* Line 1455 of yacc.c  */
-#line 1534 "signing_policy.c"
+#line 1535 "signing_policy.c"
       default: break;
     }
   YY_SYMBOL_PRINT ("-> $$ =", yyr1[yyn], &yyval, &yyloc);
@@ -1742,7 +1743,7 @@ yyreturn:
 
 
 /* Line 1675 of yacc.c  */
-#line 146 "signing_policy.y"
+#line 147 "signing_policy.y"
 
 
 char **parse_subjects(char *string)
