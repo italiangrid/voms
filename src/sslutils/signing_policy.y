@@ -31,6 +31,7 @@
 #include <ctype.h>
 
 #include "parsertypes.h"
+#include "list.h"
 
 char **parse_subjects(char *string);
 void signingerror(void *policies, void *scanner, char const *msg);
@@ -105,7 +106,7 @@ access_identity: ACCESS_ID_CA X509 SUBJECTS {
     $$->type = TYPE_SIGNING;
   }
 
-  if (!$$ && $$->caname) {
+  if ($$ && !$$->caname) {
     free($$);
     $$ = NULL;
   }

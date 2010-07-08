@@ -251,6 +251,7 @@ static int restriction_evaluate_namespace(STACK_OF(X509) *chain, struct policy *
   }
 
   for (i = start; i != end; i += step) {
+    int j;
     X509 *cert = sk_X509_value(chain, i);
 
     for (j = i; j >= 0; j--) {
@@ -313,13 +314,13 @@ static void free_policy(struct policy *pol)
 {
   free(pol->caname);
 
-  listfree(pol->conds, (freefn)free_condition);
+  listfree((char**)(pol->conds), (freefn)free_condition);
   free(pol);
 }
 
 void free_policies(struct policy **policies)
 {
-  listfree(policies, free_policy);
+  listfree((char**)policies, (freefn)free_policy);
 }
 
 static FILE *open_from_dir(char *path, char *filename)

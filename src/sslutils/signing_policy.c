@@ -1472,7 +1472,7 @@ yyreduce:
     (yyval.policy)->type = TYPE_SIGNING;
   }
 
-  if (!(yyval.policy)->caname) {
+  if ((yyval.policy) && !(yyval.policy)->caname) {
     free((yyval.policy));
     (yyval.policy) = NULL;
   }

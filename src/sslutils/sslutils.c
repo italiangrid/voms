@@ -611,7 +611,6 @@ proxy_load_user_proxy(
 
     int                                 ret = -1;
     BIO *                               in = NULL;
-    int                                 i;
     int                                 count=0;
     X509 *                              x = NULL;
 
@@ -2529,7 +2528,6 @@ proxy_get_filenames(
 {
 
     int                                 status = -1;
-    int                                 len;
     char *                              cert_file = NULL;
     char *                              cert_dir = NULL;
     char *                              user_proxy = NULL;
@@ -3060,12 +3058,11 @@ int PRIVATE
 proxy_load_user_cert(
     const char *                        user_cert,
     X509 **                              certificate,
-    int                                 (*pw_cb)(),
+    UNUSED(int                                 (*pw_cb)()),
     UNUSED(unsigned long *                     hSession))
 {
     int                                 status = -1;
     FILE *                              fp;
-    int                                 (*xpw_cb)();
 
     /* Check arguments */
     if (!user_cert)

@@ -1082,6 +1082,7 @@ static long mystrtol(char *number, int limit)
 STACK_OF(X509_EXTENSION) *Fake::create_and_add_extension(const std::string &string, STACK_OF(X509_EXTENSION) *exts)
 {
   bool alloced = false;
+  X509_EXTENSION *ext = NULL;
 
   if (!exts) { 
     exts= sk_X509_EXTENSION_new_null();
@@ -1092,7 +1093,7 @@ STACK_OF(X509_EXTENSION) *Fake::create_and_add_extension(const std::string &stri
     alloced = true;
   }
 
-  X509_EXTENSION *ext = create_extension(string);
+  ext = create_extension(string);
 
   if (ext) {
     if (!sk_X509_EXTENSION_push(exts, ext)) {
