@@ -4,6 +4,7 @@ sbin_PROGRAMS = voms
 voms_SOURCES = \
 	main.cc \
 	vomsd.cc \
+	vomsd-rest.cc \
 	VOMSServer.h \
 	attribute.h \
 	uuid.c \
