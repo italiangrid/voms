@@ -126,6 +126,44 @@ AC_PREFIX_DEFAULT("/opt/glite")
 
 AM_CONFIG_HEADER([src/autogen/config.h])
 
+if test "x$build_cpp_api" = "xyes"; then
+if test "x$build_c_api" = "xyes"; then
+# both C and CPP
+INSTALL_API_LIBS="$WANTED_API_LIBS"
+else
+# CPP only
+libs="$WANTED_API_LIBS"; 
+lista="" ; 
+for p in $libs; do 
+  res=`echo $p | grep libvomsapi` ; 
+  if test "x$res" == "x"; then 
+	lista="$lista" ; 
+  else 
+	lista="$p $lista" ; 
+  fi 
+done ; 
+INSTALL_API_LIBS="$lista"
+fi
+elif test "x$build_c_api" = "xyes"; then
+# C only
+libs="$WANTED_API_LIBS"; 
+lista="" ; 
+for p in $libs; do 
+  res=`echo $p | grep libvomsc` ; 
+  if test "x$res" == "x"; then 
+	lista="$lista" ; 
+  else 
+	lista="$p $lista" ; 
+  fi 
+done ; 
+INSTALL_API_LIBS="$lista"
+else
+# nothing
+INSTALL_API_LIBS=""
+fi
+
+AC_SUBST(INSTALL_API_LIBS)
+
 AC_CONFIG_FILES([Makefile
                  src/Makefile
                  src/ac/Makefile

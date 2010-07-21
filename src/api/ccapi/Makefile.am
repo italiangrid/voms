@@ -382,12 +382,12 @@ libvomsc_gcc64dbgpthr_la_LIBADD = \
 libvomsc_gcc64dbgpthr_la_LDFLAGS = \
 	-rpath $(libdir)
 
+if BUILD_INTERFACES
 include_HEADERS = \
 	voms_api.h \
 	voms_apic.h \
 	voms_api_nog.h \
 	voms_apic_nog.h
-
 EXTRA_DIST = \
 	api_util.h \
 	ccval.h \
@@ -396,6 +396,7 @@ EXTRA_DIST = \
 	cinterface.h \
 	realdata.h \
 	internal.h
+endif
 
 CLEANFILES = \
 	libvomsapi_gcc32.la \
@@ -593,6 +594,60 @@ apidoc-local: $(HTML) $(MAN3)
 else
 apidoc-local:
 endif
+
+
+
+if BUILD_C_API
+if BUILD_CPP_API
+
+# both C and CPP -- do nothing
+librewrite:
+
+else
+
+# C only
+librewrite:
+	@libs='$(lib_LTLIBRARIES)'; \
+	lista="" \
+	for p in $$@libs do ; \
+	  echo "CONSIDERING: $p"
+	  echo $p | grep libvomsc \
+	  res=$$ \
+	  if test $res; then \
+		echo "escluso" \
+	  else \
+		echo "permesso" \
+		lista="$lista $p" \
+	  fi \
+	done \
+	lib_LTLIBRARIES="$lista"
+
+endif
+else
+if BUILD_CPP_API
+# CPP only
+libs='$(lib_LTLIBRARIES)'; \
+echo "$$libs" ; \
+lista="" ; \
+for p in $$libs; do \
+  echo "CONSIDERING: $$p" ; \
+  echo $$p | grep libvomsapi ; \
+  res=$$ ; \
+  if test $res; then \
+	echo "escluso" ; \
+  else \
+	echo "permesso" ; \
+	lista="$$p $$lista" ; \
+  fi \
+done ; \
+echo "lista=$$lista"
+else
+lista=""
+endif
+endif
+
+install-exec-am: export lib_LTLIBRARIES = $(INSTALL_API_LIBS)
+install-exec-am: install-libLTLIBRARIES
 
 apidoc-recursive:
 #	$(MAKE) apidoc -C capi

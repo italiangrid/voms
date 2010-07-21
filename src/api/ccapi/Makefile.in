@@ -34,7 +34,7 @@ POST_UNINSTALL = :
 build_triplet = @build@
 host_triplet = @host@
 subdir = src/api/ccapi
-DIST_COMMON = $(include_HEADERS) $(srcdir)/Makefile.am \
+DIST_COMMON = $(am__include_HEADERS_DIST) $(srcdir)/Makefile.am \
 	$(srcdir)/Makefile.in
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 am__aclocal_m4_deps = $(top_srcdir)/project/acinclude.m4 \
@@ -362,6 +362,8 @@ DIST_SOURCES = $(libvomsapi_la_SOURCES) $(libvomsapi_gcc32_la_SOURCES) \
 	$(libvomsc_gcc64dbg_la_SOURCES) \
 	$(libvomsc_gcc64dbgpthr_la_SOURCES) \
 	$(libvomsc_gcc64pthr_la_SOURCES)
+am__include_HEADERS_DIST = voms_api.h voms_apic.h voms_api_nog.h \
+	voms_apic_nog.h
 includeHEADERS_INSTALL = $(INSTALL_HEADER)
 HEADERS = $(include_HEADERS)
 ETAGS = etags
@@ -431,6 +433,7 @@ GLOBUS_GSS_API_LIBS = @GLOBUS_GSS_API_LIBS@
 GLOBUS_GSS_LIBS = @GLOBUS_GSS_LIBS@
 GREP = @GREP@
 INSTALL = @INSTALL@
+INSTALL_API_LIBS = @INSTALL_API_LIBS@
 INSTALL_DATA = @INSTALL_DATA@
 INSTALL_PROGRAM = @INSTALL_PROGRAM@
 INSTALL_SCRIPT = @INSTALL_SCRIPT@
@@ -926,20 +929,20 @@ libvomsc_gcc64dbgpthr_la_LIBADD = \
 libvomsc_gcc64dbgpthr_la_LDFLAGS = \
 	-rpath $(libdir)
 
-include_HEADERS = \
-	voms_api.h \
-	voms_apic.h \
-	voms_api_nog.h \
-	voms_apic_nog.h
+@BUILD_INTERFACES_TRUE@include_HEADERS = \
+@BUILD_INTERFACES_TRUE@	voms_api.h \
+@BUILD_INTERFACES_TRUE@	voms_apic.h \
+@BUILD_INTERFACES_TRUE@	voms_api_nog.h \
+@BUILD_INTERFACES_TRUE@	voms_apic_nog.h
 
-EXTRA_DIST = \
-	api_util.h \
-	ccval.h \
-	voms_api.h \
-	voms_apic.h \
-	cinterface.h \
-	realdata.h \
-	internal.h
+@BUILD_INTERFACES_TRUE@EXTRA_DIST = \
+@BUILD_INTERFACES_TRUE@	api_util.h \
+@BUILD_INTERFACES_TRUE@	ccval.h \
+@BUILD_INTERFACES_TRUE@	voms_api.h \
+@BUILD_INTERFACES_TRUE@	voms_apic.h \
+@BUILD_INTERFACES_TRUE@	cinterface.h \
+@BUILD_INTERFACES_TRUE@	realdata.h \
+@BUILD_INTERFACES_TRUE@	internal.h
 
 CLEANFILES = \
 	libvomsapi_gcc32.la \
@@ -987,6 +990,25 @@ LATEX = $(CCDOCPLC_DIR)/latex/Makefile \
         $(CDOCPLC_DIR)/latex/doxygen.sty
 
 DOXY = $(CCDOCPLC_DIR)/Doxyfile $(CDOCPLC_DIR)/Doxyfile $(include_HEADERS)
+
+# CPP only
+@BUILD_CPP_API_TRUE@@BUILD_C_API_FALSE@libs = '$(lib_LTLIBRARIES)'; \
+@BUILD_CPP_API_TRUE@@BUILD_C_API_FALSE@echo "$$libs" ; \
+@BUILD_CPP_API_TRUE@@BUILD_C_API_FALSE@lista="" ; \
+@BUILD_CPP_API_TRUE@@BUILD_C_API_FALSE@for p in $$libs; do \
+@BUILD_CPP_API_TRUE@@BUILD_C_API_FALSE@  echo "CONSIDERING: $$p" ; \
+@BUILD_CPP_API_TRUE@@BUILD_C_API_FALSE@  echo $$p | grep libvomsapi ; \
+@BUILD_CPP_API_TRUE@@BUILD_C_API_FALSE@  res=$$ ; \
+@BUILD_CPP_API_TRUE@@BUILD_C_API_FALSE@  if test $res; then \
+@BUILD_CPP_API_TRUE@@BUILD_C_API_FALSE@	echo "escluso" ; \
+@BUILD_CPP_API_TRUE@@BUILD_C_API_FALSE@  else \
+@BUILD_CPP_API_TRUE@@BUILD_C_API_FALSE@	echo "permesso" ; \
+@BUILD_CPP_API_TRUE@@BUILD_C_API_FALSE@	lista="$$p $$lista" ; \
+@BUILD_CPP_API_TRUE@@BUILD_C_API_FALSE@  fi \
+@BUILD_CPP_API_TRUE@@BUILD_C_API_FALSE@done ; \
+@BUILD_CPP_API_TRUE@@BUILD_C_API_FALSE@echo "lista=$$lista"
+
+@BUILD_CPP_API_FALSE@@BUILD_C_API_FALSE@lista = ""
 all: all-am
 
 .SUFFIXES:
@@ -2029,8 +2051,6 @@ install-data-am: install-data-local install-includeHEADERS
 
 install-dvi: install-dvi-am
 
-install-exec-am: install-libLTLIBRARIES
-
 install-html: install-html-am
 
 install-info: install-info-am
@@ -2225,6 +2245,29 @@ all-local: apidoc-local
 
 @BUILD_DOCS_TRUE@apidoc-local: $(HTML) $(MAN3) 
 @BUILD_DOCS_FALSE@apidoc-local:
+
+# both C and CPP -- do nothing
+@BUILD_CPP_API_TRUE@@BUILD_C_API_TRUE@librewrite:
+
+# C only
+@BUILD_CPP_API_FALSE@@BUILD_C_API_TRUE@librewrite:
+@BUILD_CPP_API_FALSE@@BUILD_C_API_TRUE@	@libs='$(lib_LTLIBRARIES)'; \
+@BUILD_CPP_API_FALSE@@BUILD_C_API_TRUE@	lista="" \
+@BUILD_CPP_API_FALSE@@BUILD_C_API_TRUE@	for p in $$@libs do ; \
+@BUILD_CPP_API_FALSE@@BUILD_C_API_TRUE@	  echo "CONSIDERING: $p"
+@BUILD_CPP_API_FALSE@@BUILD_C_API_TRUE@	  echo $p | grep libvomsc \
+@BUILD_CPP_API_FALSE@@BUILD_C_API_TRUE@	  res=$$ \
+@BUILD_CPP_API_FALSE@@BUILD_C_API_TRUE@	  if test $res; then \
+@BUILD_CPP_API_FALSE@@BUILD_C_API_TRUE@		echo "escluso" \
+@BUILD_CPP_API_FALSE@@BUILD_C_API_TRUE@	  else \
+@BUILD_CPP_API_FALSE@@BUILD_C_API_TRUE@		echo "permesso" \
+@BUILD_CPP_API_FALSE@@BUILD_C_API_TRUE@		lista="$lista $p" \
+@BUILD_CPP_API_FALSE@@BUILD_C_API_TRUE@	  fi \
+@BUILD_CPP_API_FALSE@@BUILD_C_API_TRUE@	done \
+@BUILD_CPP_API_FALSE@@BUILD_C_API_TRUE@	lib_LTLIBRARIES="$lista"
+
+install-exec-am: export lib_LTLIBRARIES = $(INSTALL_API_LIBS)
+install-exec-am: install-libLTLIBRARIES
 
 apidoc-recursive:
 #	$(MAKE) apidoc -C capi

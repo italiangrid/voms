@@ -790,6 +790,7 @@ ac_includes_default="\
 
 ac_default_prefix="/opt/glite"
 ac_subst_vars='LTLIBOBJS
+INSTALL_API_LIBS
 with_cobertura_prefix
 enable_coverage
 enable_mysqltests
@@ -810,6 +811,14 @@ BUILD_SERVER_FALSE
 BUILD_SERVER_TRUE
 BUILD_CLIENTS_FALSE
 BUILD_CLIENTS_TRUE
+BUILD_INTERFACES_FALSE
+BUILD_INTERFACES_TRUE
+BUILD_CPP_API_FALSE
+BUILD_CPP_API_TRUE
+BUILD_C_API_FALSE
+BUILD_C_API_TRUE
+BUILD_JAVA_ONLY_FALSE
+BUILD_JAVA_ONLY_TRUE
 BUILD_ALL_FALSE
 BUILD_ALL_TRUE
 LIBOBJS
@@ -818,8 +827,6 @@ BUILD_DOCS_FALSE
 BUILD_DOCS_TRUE
 JAVA_CLASSPATH2
 JAVA_CLASSPATH
-BUILD_JAVA_ONLY_FALSE
-BUILD_JAVA_ONLY_TRUE
 JHOME
 JAVA_INCLUDES
 BUILD_JAVA_FALSE
@@ -1020,12 +1027,15 @@ with_bc
 with_log4j
 with_commons_cli
 with_commons_lang
-with_java_only
 enable_docs
 with_dmalloc
 with_api_only
 with_clients
 with_server
+with_java_only
+with_c_api
+with_cpp_api
+with_interfaces
 with_report_dir
 with_scratch_dir
 with_dbuser
@@ -1718,12 +1728,15 @@ Optional Packages:
   --with-log4j=FILE        Specifies the location of the log4j jar, default=$CLASSPATH
   --with-commons-cli=jars  Specifies the location of the commons-cli jar, default = $CLASSPATH
   --with-commons-lang=jars  Specifies the location of the commons-lang jar, default = $CLASSPATH
- --with-java-only     Builds only the java APIs
   --with-dmalloc          use dmalloc, as in
 			  http://www.dmalloc.com/dmalloc.tar.gz
   --with-api-only   Enable compilation of the APIs only (no)
   --with-clients   Enable compilation of the clients (yes)
   --with-server   Enable compilation of the server (yes)
+ --with-java-only     Builds only the java APIs
+  --with-c-api   Enable compilation of the C APIs (yes)
+  --with-cpp-api   Enable compilation of the C++ APIs (yes)
+  --with-interfaces   Enable compilation of the includes (yes)
   --with-report-dir    Set reportdir for testsuite
   --with-scratch-dir   Set scratchdir for testsuite
   --with-dbuser        Set DB user for testsuite
@@ -5418,13 +5431,13 @@ if test "${lt_cv_nm_interface+set}" = set; then
 else
   lt_cv_nm_interface="BSD nm"
   echo "int some_variable = 0;" > conftest.$ac_ext
-  (eval echo "\"\$as_me:5421: $ac_compile\"" >&5)
+  (eval echo "\"\$as_me:5434: $ac_compile\"" >&5)
   (eval "$ac_compile" 2>conftest.err)
   cat conftest.err >&5
-  (eval echo "\"\$as_me:5424: $NM \\\"conftest.$ac_objext\\\"\"" >&5)
+  (eval echo "\"\$as_me:5437: $NM \\\"conftest.$ac_objext\\\"\"" >&5)
   (eval "$NM \"conftest.$ac_objext\"" 2>conftest.err > conftest.out)
   cat conftest.err >&5
-  (eval echo "\"\$as_me:5427: output\"" >&5)
+  (eval echo "\"\$as_me:5440: output\"" >&5)
   cat conftest.out >&5
   if $GREP 'External.*some_variable' conftest.out > /dev/null; then
     lt_cv_nm_interface="MS dumpbin"
@@ -5883,7 +5896,7 @@ linux* | k*bsd*-gnu)
   lt_cv_deplibs_check_method=pass_all
   ;;
 
-netbsd*)
+netbsd* | netbsdelf*-gnu)
   if echo __ELF__ | $CC -E - | $GREP __ELF__ > /dev/null; then
     lt_cv_deplibs_check_method='match_pattern /lib[^/]+(\.so\.[0-9]+\.[0-9]+|_pic\.a)$'
   else
@@ -6619,7 +6632,7 @@ ia64-*-hpux*)
   ;;
 *-*-irix6*)
   # Find out which ABI we are using.
-  echo '#line 6622 "configure"' > conftest.$ac_ext
+  echo '#line 6635 "configure"' > conftest.$ac_ext
   if { (eval echo "$as_me:$LINENO: \"$ac_compile\"") >&5
   (eval $ac_compile) 2>&5
   ac_status=$?
@@ -8955,11 +8968,11 @@ else
    -e 's:.*FLAGS}\{0,1\} :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:8958: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:8971: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>conftest.err)
    ac_status=$?
    cat conftest.err >&5
-   echo "$as_me:8962: \$? = $ac_status" >&5
+   echo "$as_me:8975: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s "$ac_outfile"; then
      # The compiler can only warn and ignore the option if not recognized
      # So say no if there are warnings other than the usual output.
@@ -9294,11 +9307,11 @@ else
    -e 's:.*FLAGS}\{0,1\} :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:9297: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:9310: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>conftest.err)
    ac_status=$?
    cat conftest.err >&5
-   echo "$as_me:9301: \$? = $ac_status" >&5
+   echo "$as_me:9314: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s "$ac_outfile"; then
      # The compiler can only warn and ignore the option if not recognized
      # So say no if there are warnings other than the usual output.
@@ -9399,11 +9412,11 @@ else
    -e 's:.*FLAGS}\{0,1\} :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:9402: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:9415: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>out/conftest.err)
    ac_status=$?
    cat out/conftest.err >&5
-   echo "$as_me:9406: \$? = $ac_status" >&5
+   echo "$as_me:9419: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s out/conftest2.$ac_objext
    then
      # The compiler can only warn and ignore the option if not recognized
@@ -9454,11 +9467,11 @@ else
    -e 's:.*FLAGS}\{0,1\} :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:9457: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:9470: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>out/conftest.err)
    ac_status=$?
    cat out/conftest.err >&5
-   echo "$as_me:9461: \$? = $ac_status" >&5
+   echo "$as_me:9474: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s out/conftest2.$ac_objext
    then
      # The compiler can only warn and ignore the option if not recognized
@@ -9755,7 +9768,7 @@ _LT_EOF
       fi
       ;;
 
-    netbsd*)
+    netbsd* | netbsdelf*-gnu)
       if echo __ELF__ | $CC -E - | $GREP __ELF__ >/dev/null; then
 	archive_cmds='$LD -Bshareable $libobjs $deplibs $linker_flags -o $lib'
 	wlarc=
@@ -9930,6 +9943,7 @@ _LT_EOF
 	if test "$aix_use_runtimelinking" = yes; then
 	  shared_flag="$shared_flag "'${wl}-G'
 	fi
+	link_all_deplibs=no
       else
 	# not using gcc
 	if test "$host_cpu" = ia64; then
@@ -10344,7 +10358,7 @@ rm -f core conftest.err conftest.$ac_objext conftest_ipa8_conftest.oo \
       link_all_deplibs=yes
       ;;
 
-    netbsd*)
+    netbsd* | netbsdelf*-gnu)
       if echo __ELF__ | $CC -E - | $GREP __ELF__ >/dev/null; then
 	archive_cmds='$LD -Bshareable -o $lib $libobjs $deplibs $linker_flags'  # a.out
       else
@@ -11321,6 +11335,18 @@ rm -f core conftest.err conftest.$ac_objext conftest_ipa8_conftest.oo \
   dynamic_linker='GNU/Linux ld.so'
   ;;
 
+netbsdelf*-gnu)
+  version_type=linux
+  need_lib_prefix=no
+  need_version=no
+  library_names_spec='${libname}${release}${shared_ext}$versuffix ${libname}${release}${shared_ext}$major ${libname}${shared_ext}'
+  soname_spec='${libname}${release}${shared_ext}$major'
+  shlibpath_var=LD_LIBRARY_PATH
+  shlibpath_overrides_runpath=no
+  hardcode_into_libs=yes
+  dynamic_linker='NetBSD ld.elf_so'
+  ;;
+
 netbsd*)
   version_type=sunos
   need_lib_prefix=no
@@ -12254,7 +12280,7 @@ else
   lt_dlunknown=0; lt_dlno_uscore=1; lt_dlneed_uscore=2
   lt_status=$lt_dlunknown
   cat > conftest.$ac_ext <<_LT_EOF
-#line 12257 "configure"
+#line 12283 "configure"
 #include "confdefs.h"
 
 #if HAVE_DLFCN_H
@@ -12350,7 +12376,7 @@ else
   lt_dlunknown=0; lt_dlno_uscore=1; lt_dlneed_uscore=2
   lt_status=$lt_dlunknown
   cat > conftest.$ac_ext <<_LT_EOF
-#line 12353 "configure"
+#line 12379 "configure"
 #include "confdefs.h"
 
 #if HAVE_DLFCN_H
@@ -14246,7 +14272,7 @@ $as_echo_n "checking for $compiler option to produce PIC... " >&6; }
 	    ;;
 	esac
 	;;
-      netbsd*)
+      netbsd* | netbsdelf*-gnu)
 	;;
       *qnx* | *nto*)
         # QNX uses GNU C++, but need to define -shared option too, otherwise
@@ -14370,11 +14396,11 @@ else
    -e 's:.*FLAGS}\{0,1\} :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:14373: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:14399: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>conftest.err)
    ac_status=$?
    cat conftest.err >&5
-   echo "$as_me:14377: \$? = $ac_status" >&5
+   echo "$as_me:14403: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s "$ac_outfile"; then
      # The compiler can only warn and ignore the option if not recognized
      # So say no if there are warnings other than the usual output.
@@ -14469,11 +14495,11 @@ else
    -e 's:.*FLAGS}\{0,1\} :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:14472: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:14498: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>out/conftest.err)
    ac_status=$?
    cat out/conftest.err >&5
-   echo "$as_me:14476: \$? = $ac_status" >&5
+   echo "$as_me:14502: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s out/conftest2.$ac_objext
    then
      # The compiler can only warn and ignore the option if not recognized
@@ -14521,11 +14547,11 @@ else
    -e 's:.*FLAGS}\{0,1\} :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:14524: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:14550: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>out/conftest.err)
    ac_status=$?
    cat out/conftest.err >&5
-   echo "$as_me:14528: \$? = $ac_status" >&5
+   echo "$as_me:14554: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s out/conftest2.$ac_objext
    then
      # The compiler can only warn and ignore the option if not recognized
@@ -14596,6 +14622,9 @@ $as_echo_n "checking whether the $compiler linker ($LD) supports shared librarie
   ;;
   cygwin* | mingw* | cegcc*)
     export_symbols_cmds_CXX='$NM $libobjs $convenience | $global_symbol_pipe | $SED -e '\''/^[BCDGRS][ ]/s/.*[ ]\([^ ]*\)/\1 DATA/;/^.*[ ]__nm__/s/^.*[ ]__nm__\([^ ]*\)[ ][^ ]*/\1 DATA/;/^I[ ]/d;/^[AITW][ ]/s/.* //'\'' | sort | uniq > $export_symbols'
+  ;;
+  linux* | k*bsd*-gnu)
+    link_all_deplibs_CXX=no
   ;;
   *)
     export_symbols_cmds_CXX='$NM $libobjs $convenience | $global_symbol_pipe | $SED '\''s/.* //'\'' | sort | uniq > $export_symbols'
@@ -15181,6 +15210,18 @@ rm -f core conftest.err conftest.$ac_objext conftest_ipa8_conftest.oo \
   # people can always --disable-shared, the test was removed, and we
   # assume the GNU/Linux dynamic linker is in use.
   dynamic_linker='GNU/Linux ld.so'
+  ;;
+
+netbsdelf*-gnu)
+  version_type=linux
+  need_lib_prefix=no
+  need_version=no
+  library_names_spec='${libname}${release}${shared_ext}$versuffix ${libname}${release}${shared_ext}$major ${libname}${shared_ext}'
+  soname_spec='${libname}${release}${shared_ext}$major'
+  shlibpath_var=LD_LIBRARY_PATH
+  shlibpath_overrides_runpath=no
+  hardcode_into_libs=yes
+  dynamic_linker='NetBSD ld.elf_so'
   ;;
 
 netbsd*)
@@ -16445,23 +16486,6 @@ $as_echo "hope it is in $CLASSPATH" >&6; }
     { $as_echo "$as_me:$LINENO: result: specified: $wcomlang" >&5
 $as_echo "specified: $wcomlang" >&6; }
   fi
-
-
-# Check whether --with-java-only was given.
-if test "${with_java_only+set}" = set; then
-  withval=$with_java_only;  wjavaall="$withval"
-else
-   wjavaall="no"
-fi
-
-
-   if test x$wjavaall = xyes; then
-  BUILD_JAVA_ONLY_TRUE=
-  BUILD_JAVA_ONLY_FALSE='#'
-else
-  BUILD_JAVA_ONLY_TRUE='#'
-  BUILD_JAVA_ONLY_FALSE=
-fi
 
 
   JAVA_CLASSPATH=".:$wbc:$wlog4j:$wcomcli:$wcomlang"
@@ -21261,6 +21285,99 @@ else
 fi
 
 
+
+# Check whether --with-java-only was given.
+if test "${with_java_only+set}" = set; then
+  withval=$with_java_only;  wjavaall="$withval"
+else
+   wjavaall="no"
+fi
+
+
+
+# Check whether --with-c-api was given.
+if test "${with_c_api+set}" = set; then
+  withval=$with_c_api;
+      case "$withval" in
+        yes) build_c_api="yes" ;;
+        no)  build_c_api="no" ;;
+        *) { { $as_echo "$as_me:$LINENO: error: bad value $(withval) for --with-c-api" >&5
+$as_echo "$as_me: error: bad value $(withval) for --with-c-api" >&2;}
+   { (exit 1); exit 1; }; } ;;
+      esac
+
+else
+   build_c_api="yes"
+fi
+
+
+
+# Check whether --with-cpp-api was given.
+if test "${with_cpp_api+set}" = set; then
+  withval=$with_cpp_api;
+      case "$withval" in
+        yes) build_cpp_api="yes" ;;
+        no)  build_cpp_api="no" ;;
+        *) { { $as_echo "$as_me:$LINENO: error: bad value $(withval) for --with-cpp-api" >&5
+$as_echo "$as_me: error: bad value $(withval) for --with-cpp-api" >&2;}
+   { (exit 1); exit 1; }; } ;;
+      esac
+
+else
+   build_cpp_api="yes"
+fi
+
+
+
+# Check whether --with-interfaces was given.
+if test "${with_interfaces+set}" = set; then
+  withval=$with_interfaces;
+      case "$withval" in
+        yes) build_interfaces="yes" ;;
+        no)  build_interfaces="no" ;;
+        *) { { $as_echo "$as_me:$LINENO: error: bad value $(withval) for --with-interfaces" >&5
+$as_echo "$as_me: error: bad value $(withval) for --with-interfaces" >&2;}
+   { (exit 1); exit 1; }; } ;;
+      esac
+
+else
+   build_interfaces="yes"
+fi
+
+
+
+   if test x$wjavaall = xyes; then
+  BUILD_JAVA_ONLY_TRUE=
+  BUILD_JAVA_ONLY_FALSE='#'
+else
+  BUILD_JAVA_ONLY_TRUE='#'
+  BUILD_JAVA_ONLY_FALSE=
+fi
+
+   if test x$build_c_api = xyes; then
+  BUILD_C_API_TRUE=
+  BUILD_C_API_FALSE='#'
+else
+  BUILD_C_API_TRUE='#'
+  BUILD_C_API_FALSE=
+fi
+
+   if test x$build_cpp_api = xyes; then
+  BUILD_CPP_API_TRUE=
+  BUILD_CPP_API_FALSE='#'
+else
+  BUILD_CPP_API_TRUE='#'
+  BUILD_CPP_API_FALSE=
+fi
+
+   if test x$build_interfaces = xyes; then
+  BUILD_INTERFACES_TRUE=
+  BUILD_INTERFACES_FALSE='#'
+else
+  BUILD_INTERFACES_TRUE='#'
+  BUILD_INTERFACES_FALSE=
+fi
+
    if test x$build_clients = xyes; then
   BUILD_CLIENTS_TRUE=
   BUILD_CLIENTS_FALSE='#'
@@ -21537,6 +21654,44 @@ fi
 ac_config_headers="$ac_config_headers src/autogen/config.h"
 
 
+if test "x$build_cpp_api" = "xyes"; then
+if test "x$build_c_api" = "xyes"; then
+# both C and CPP
+INSTALL_API_LIBS="$WANTED_API_LIBS"
+else
+# CPP only
+libs="$WANTED_API_LIBS";
+lista="" ;
+for p in $libs; do
+  res=`echo $p | grep libvomsapi` ;
+  if test "x$res" == "x"; then
+	lista="$lista" ;
+  else
+	lista="$p $lista" ;
+  fi
+done ;
+INSTALL_API_LIBS="$lista"
+fi
+elif test "x$build_c_api" = "xyes"; then
+# C only
+libs="$WANTED_API_LIBS";
+lista="" ;
+for p in $libs; do
+  res=`echo $p | grep libvomsc` ;
+  if test "x$res" == "x"; then
+	lista="$lista" ;
+  else
+	lista="$p $lista" ;
+  fi
+done ;
+INSTALL_API_LIBS="$lista"
+else
+# nothing
+INSTALL_API_LIBS=""
+fi
+
+
+
 ac_config_files="$ac_config_files Makefile src/Makefile src/ac/Makefile src/api/Makefile src/api/ccapi/Makefile src/api/java/Makefile src/client/Makefile src/common/Makefile src/include/Makefile src/install/Makefile src/log/Makefile src/replib/Makefile src/replica/Makefile src/server/Makefile src/socklib/Makefile src/sslutils/Makefile src/utils/Makefile doc/Makefile project/Makefile testsuite/Makefile testsuite/SuiteConfig"
 
 ac_config_files="$ac_config_files src/install/voms_install_db src/install/voms.start src/replica/voms_install_replica src/install/upgrade1to2 src/install/mysql2oracle testsuite/lib/vomssetup.exp"
@@ -21687,13 +21842,6 @@ $as_echo "$as_me: error: conditional \"BUILD_JAVA\" was never defined.
 Usually this means the macro was only invoked conditionally." >&2;}
    { (exit 1); exit 1; }; }
 fi
-if test -z "${BUILD_JAVA_ONLY_TRUE}" && test -z "${BUILD_JAVA_ONLY_FALSE}"; then
-  { { $as_echo "$as_me:$LINENO: error: conditional \"BUILD_JAVA_ONLY\" was never defined.
-Usually this means the macro was only invoked conditionally." >&5
-$as_echo "$as_me: error: conditional \"BUILD_JAVA_ONLY\" was never defined.
-Usually this means the macro was only invoked conditionally." >&2;}
-   { (exit 1); exit 1; }; }
-fi
 if test -z "${BUILD_DOCS_TRUE}" && test -z "${BUILD_DOCS_FALSE}"; then
   { { $as_echo "$as_me:$LINENO: error: conditional \"BUILD_DOCS\" was never defined.
 Usually this means the macro was only invoked conditionally." >&5
@@ -21705,6 +21853,34 @@ if test -z "${BUILD_ALL_TRUE}" && test -z "${BUILD_ALL_FALSE}"; then
   { { $as_echo "$as_me:$LINENO: error: conditional \"BUILD_ALL\" was never defined.
 Usually this means the macro was only invoked conditionally." >&5
 $as_echo "$as_me: error: conditional \"BUILD_ALL\" was never defined.
+Usually this means the macro was only invoked conditionally." >&2;}
+   { (exit 1); exit 1; }; }
+fi
+if test -z "${BUILD_JAVA_ONLY_TRUE}" && test -z "${BUILD_JAVA_ONLY_FALSE}"; then
+  { { $as_echo "$as_me:$LINENO: error: conditional \"BUILD_JAVA_ONLY\" was never defined.
+Usually this means the macro was only invoked conditionally." >&5
+$as_echo "$as_me: error: conditional \"BUILD_JAVA_ONLY\" was never defined.
+Usually this means the macro was only invoked conditionally." >&2;}
+   { (exit 1); exit 1; }; }
+fi
+if test -z "${BUILD_C_API_TRUE}" && test -z "${BUILD_C_API_FALSE}"; then
+  { { $as_echo "$as_me:$LINENO: error: conditional \"BUILD_C_API\" was never defined.
+Usually this means the macro was only invoked conditionally." >&5
+$as_echo "$as_me: error: conditional \"BUILD_C_API\" was never defined.
+Usually this means the macro was only invoked conditionally." >&2;}
+   { (exit 1); exit 1; }; }
+fi
+if test -z "${BUILD_CPP_API_TRUE}" && test -z "${BUILD_CPP_API_FALSE}"; then
+  { { $as_echo "$as_me:$LINENO: error: conditional \"BUILD_CPP_API\" was never defined.
+Usually this means the macro was only invoked conditionally." >&5
+$as_echo "$as_me: error: conditional \"BUILD_CPP_API\" was never defined.
+Usually this means the macro was only invoked conditionally." >&2;}
+   { (exit 1); exit 1; }; }
+fi
+if test -z "${BUILD_INTERFACES_TRUE}" && test -z "${BUILD_INTERFACES_FALSE}"; then
+  { { $as_echo "$as_me:$LINENO: error: conditional \"BUILD_INTERFACES\" was never defined.
+Usually this means the macro was only invoked conditionally." >&5
+$as_echo "$as_me: error: conditional \"BUILD_INTERFACES\" was never defined.
 Usually this means the macro was only invoked conditionally." >&2;}
    { (exit 1); exit 1; }; }
 fi
@@ -23279,27 +23455,28 @@ $as_echo "$as_me: executing $ac_file commands" >&6;}
 
 
   case $ac_file$ac_mode in
-    "depfiles":C) test x"$AMDEP_TRUE" != x"" || # Autoconf 2.62 quotes --file arguments for eval, but not when files
-# are listed without --file.  Let's play safe and only enable the eval
-# if we detect the quoting.
-case $CONFIG_FILES in
-*\'*) eval set x "$CONFIG_FILES" ;;
-*)   set x $CONFIG_FILES ;;
-esac
-shift
-for mf
-do
-  # Strip MF so we end up with the name of the file.
-  mf=`echo "$mf" | sed -e 's/:.*$//'`
-  # Check whether this is an Automake generated Makefile or not.
-  # We used to match only the files named `Makefile.in', but
-  # some people rename them; so instead we look at the file content.
-  # Grep'ing the first line is not enough: some people post-process
-  # each Makefile.in and add a new line on top of each file to say so.
-  # Grep'ing the whole file is not good either: AIX grep has a line
-  # limit of 2048, but all sed's we know have understand at least 4000.
-  if sed -n 's,^#.*generated by automake.*,X,p' "$mf" | grep X >/dev/null 2>&1; then
-    dirpart=`$as_dirname -- "$mf" ||
+    "depfiles":C) test x"$AMDEP_TRUE" != x"" || {
+  # Autoconf 2.62 quotes --file arguments for eval, but not when files
+  # are listed without --file.  Let's play safe and only enable the eval
+  # if we detect the quoting.
+  case $CONFIG_FILES in
+  *\'*) eval set x "$CONFIG_FILES" ;;
+  *)   set x $CONFIG_FILES ;;
+  esac
+  shift
+  for mf
+  do
+    # Strip MF so we end up with the name of the file.
+    mf=`echo "$mf" | sed -e 's/:.*$//'`
+    # Check whether this is an Automake generated Makefile or not.
+    # We used to match only the files named `Makefile.in', but
+    # some people rename them; so instead we look at the file content.
+    # Grep'ing the first line is not enough: some people post-process
+    # each Makefile.in and add a new line on top of each file to say so.
+    # Grep'ing the whole file is not good either: AIX grep has a line
+    # limit of 2048, but all sed's we know have understand at least 4000.
+    if sed -n 's,^#.*generated by automake.*,X,p' "$mf" | grep X >/dev/null 2>&1; then
+      dirpart=`$as_dirname -- "$mf" ||
 $as_expr X"$mf" : 'X\(.*[^/]\)//*[^/][^/]*/*$' \| \
 	 X"$mf" : 'X\(//\)[^/]' \| \
 	 X"$mf" : 'X\(//\)$' \| \
@@ -23322,28 +23499,28 @@ $as_echo X"$mf" |
 	    q
 	  }
 	  s/.*/./; q'`
-  else
-    continue
-  fi
-  # Extract the definition of DEPDIR, am__include, and am__quote
-  # from the Makefile without running `make'.
-  DEPDIR=`sed -n 's/^DEPDIR = //p' < "$mf"`
-  test -z "$DEPDIR" && continue
-  am__include=`sed -n 's/^am__include = //p' < "$mf"`
-  test -z "am__include" && continue
-  am__quote=`sed -n 's/^am__quote = //p' < "$mf"`
-  # When using ansi2knr, U may be empty or an underscore; expand it
-  U=`sed -n 's/^U = //p' < "$mf"`
-  # Find all dependency output files, they are included files with
-  # $(DEPDIR) in their names.  We invoke sed twice because it is the
-  # simplest approach to changing $(DEPDIR) to its actual value in the
-  # expansion.
-  for file in `sed -n "
-    s/^$am__include $am__quote\(.*(DEPDIR).*\)$am__quote"'$/\1/p' <"$mf" | \
-       sed -e 's/\$(DEPDIR)/'"$DEPDIR"'/g' -e 's/\$U/'"$U"'/g'`; do
-    # Make sure the directory exists.
-    test -f "$dirpart/$file" && continue
-    fdir=`$as_dirname -- "$file" ||
+    else
+      continue
+    fi
+    # Extract the definition of DEPDIR, am__include, and am__quote
+    # from the Makefile without running `make'.
+    DEPDIR=`sed -n 's/^DEPDIR = //p' < "$mf"`
+    test -z "$DEPDIR" && continue
+    am__include=`sed -n 's/^am__include = //p' < "$mf"`
+    test -z "am__include" && continue
+    am__quote=`sed -n 's/^am__quote = //p' < "$mf"`
+    # When using ansi2knr, U may be empty or an underscore; expand it
+    U=`sed -n 's/^U = //p' < "$mf"`
+    # Find all dependency output files, they are included files with
+    # $(DEPDIR) in their names.  We invoke sed twice because it is the
+    # simplest approach to changing $(DEPDIR) to its actual value in the
+    # expansion.
+    for file in `sed -n "
+      s/^$am__include $am__quote\(.*(DEPDIR).*\)$am__quote"'$/\1/p' <"$mf" | \
+	 sed -e 's/\$(DEPDIR)/'"$DEPDIR"'/g' -e 's/\$U/'"$U"'/g'`; do
+      # Make sure the directory exists.
+      test -f "$dirpart/$file" && continue
+      fdir=`$as_dirname -- "$file" ||
 $as_expr X"$file" : 'X\(.*[^/]\)//*[^/][^/]*/*$' \| \
 	 X"$file" : 'X\(//\)[^/]' \| \
 	 X"$file" : 'X\(//\)$' \| \
@@ -23366,7 +23543,7 @@ $as_echo X"$file" |
 	    q
 	  }
 	  s/.*/./; q'`
-    { as_dir=$dirpart/$fdir
+      { as_dir=$dirpart/$fdir
   case $as_dir in #(
   -*) as_dir=./$as_dir;;
   esac
@@ -23407,10 +23584,11 @@ $as_echo X"$as_dir" |
   } || test -d "$as_dir" || { { $as_echo "$as_me:$LINENO: error: cannot create directory $as_dir" >&5
 $as_echo "$as_me: error: cannot create directory $as_dir" >&2;}
    { (exit 1); exit 1; }; }; }
-    # echo "creating $dirpart/$file"
-    echo '# dummy' > "$dirpart/$file"
+      # echo "creating $dirpart/$file"
+      echo '# dummy' > "$dirpart/$file"
+    done
   done
-done
+}
  ;;
     "libtool":C)
 

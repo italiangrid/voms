@@ -33,6 +33,49 @@ AC_DEFUN([AC_BUILD_PARTS],
     ],
     [ build_server="yes" ])
 
+  AC_ARG_WITH(java-only,
+    [ --with-java-only     Builds only the java APIs ],
+    [ wjavaall="$withval" ],
+    [ wjavaall="no"])
+
+  AC_ARG_WITH(c-api,
+    [  --with-c-api   Enable compilation of the C APIs (yes)],
+    [
+      case "$withval" in
+        yes) build_c_api="yes" ;;
+        no)  build_c_api="no" ;;
+        *) AC_MSG_ERROR([bad value $(withval) for --with-c-api]) ;;
+      esac
+    ],
+    [ build_c_api="yes" ])
+
+  AC_ARG_WITH(cpp-api,
+    [  --with-cpp-api   Enable compilation of the C++ APIs (yes)],
+    [
+      case "$withval" in
+        yes) build_cpp_api="yes" ;;
+        no)  build_cpp_api="no" ;;
+        *) AC_MSG_ERROR([bad value $(withval) for --with-cpp-api]) ;;
+      esac
+    ],
+    [ build_cpp_api="yes" ])
+
+  AC_ARG_WITH(interfaces,
+    [  --with-interfaces   Enable compilation of the includes (yes)],
+    [
+      case "$withval" in
+        yes) build_interfaces="yes" ;;
+        no)  build_interfaces="no" ;;
+        *) AC_MSG_ERROR([bad value $(withval) for --with-interfaces]) ;;
+      esac
+    ],
+    [ build_interfaces="yes" ])
+
+  
+  AM_CONDITIONAL(BUILD_JAVA_ONLY, test x$wjavaall = xyes)
+  AM_CONDITIONAL(BUILD_C_API, test x$build_c_api = xyes)
+  AM_CONDITIONAL(BUILD_CPP_API, test x$build_cpp_api = xyes)
+  AM_CONDITIONAL(BUILD_INTERFACES, test x$build_interfaces = xyes)
   AM_CONDITIONAL(BUILD_CLIENTS, test x$build_clients = xyes)
   AM_CONDITIONAL(BUILD_SERVER, test x$build_server = xyes)
 ])
@@ -526,12 +569,6 @@ AC_DEFUN([AC_JAVA],
     AC_MSG_RESULT([specified: $wcomlang])
   fi
 
-  AC_ARG_WITH(java-only,
-    [ --with-java-only     Builds only the java APIs ],
-    [ wjavaall="$withval" ],
-    [ wjavaall="no"])
-
-  AM_CONDITIONAL(BUILD_JAVA_ONLY, test x$wjavaall = xyes)
           
   JAVA_CLASSPATH=".:$wbc:$wlog4j:$wcomcli:$wcomlang"
   JAVA_CLASSPATH2=""

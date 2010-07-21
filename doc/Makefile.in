@@ -114,6 +114,7 @@ GLOBUS_GSS_API_LIBS = @GLOBUS_GSS_API_LIBS@
 GLOBUS_GSS_LIBS = @GLOBUS_GSS_LIBS@
 GREP = @GREP@
 INSTALL = @INSTALL@
+INSTALL_API_LIBS = @INSTALL_API_LIBS@
 INSTALL_DATA = @INSTALL_DATA@
 INSTALL_PROGRAM = @INSTALL_PROGRAM@
 INSTALL_SCRIPT = @INSTALL_SCRIPT@
@@ -299,17 +300,29 @@ UTILS = $(UTILS_HTML) \
          $(UTILS_PS)
 
 DOCS = capi.pdf c++api.pdf software.pdf AC-RFC.pdf
-@BUILD_JAVA_ONLY_FALSE@man_MANS = \
-@BUILD_JAVA_ONLY_FALSE@	voms.8 \
-@BUILD_JAVA_ONLY_FALSE@	voms-proxy-init.1 \
-@BUILD_JAVA_ONLY_FALSE@	testvoms.1 \
-@BUILD_JAVA_ONLY_FALSE@	voms-proxy-info.1 \
-@BUILD_JAVA_ONLY_FALSE@	voms-proxy-destroy.1 \
-@BUILD_JAVA_ONLY_FALSE@	voms-install-replica.8 \
-@BUILD_JAVA_ONLY_FALSE@	voms-proxy-fake.1 \
-@BUILD_JAVA_ONLY_FALSE@	voms-proxy-list.1
+@BUILD_CLIENTS_FALSE@@BUILD_SERVER_FALSE@man_MANS = 
+@BUILD_CLIENTS_FALSE@@BUILD_SERVER_TRUE@man_MANS = \
+@BUILD_CLIENTS_FALSE@@BUILD_SERVER_TRUE@	voms.8 \
+@BUILD_CLIENTS_FALSE@@BUILD_SERVER_TRUE@	voms-install-replica.8
 
-@BUILD_JAVA_ONLY_TRUE@man_MANS = 
+@BUILD_CLIENTS_TRUE@@BUILD_SERVER_FALSE@man_MANS = \
+@BUILD_CLIENTS_TRUE@@BUILD_SERVER_FALSE@	voms-proxy-init.1 \
+@BUILD_CLIENTS_TRUE@@BUILD_SERVER_FALSE@	testvoms.1 \
+@BUILD_CLIENTS_TRUE@@BUILD_SERVER_FALSE@	voms-proxy-info.1 \
+@BUILD_CLIENTS_TRUE@@BUILD_SERVER_FALSE@	voms-proxy-destroy.1 \
+@BUILD_CLIENTS_TRUE@@BUILD_SERVER_FALSE@	voms-proxy-fake.1 \
+@BUILD_CLIENTS_TRUE@@BUILD_SERVER_FALSE@	voms-proxy-list.1
+
+@BUILD_CLIENTS_TRUE@@BUILD_SERVER_TRUE@man_MANS = \
+@BUILD_CLIENTS_TRUE@@BUILD_SERVER_TRUE@	voms.8 \
+@BUILD_CLIENTS_TRUE@@BUILD_SERVER_TRUE@	voms-install-replica.8 \
+@BUILD_CLIENTS_TRUE@@BUILD_SERVER_TRUE@	voms-proxy-init.1 \
+@BUILD_CLIENTS_TRUE@@BUILD_SERVER_TRUE@	testvoms.1 \
+@BUILD_CLIENTS_TRUE@@BUILD_SERVER_TRUE@	voms-proxy-info.1 \
+@BUILD_CLIENTS_TRUE@@BUILD_SERVER_TRUE@	voms-proxy-destroy.1 \
+@BUILD_CLIENTS_TRUE@@BUILD_SERVER_TRUE@	voms-proxy-fake.1 \
+@BUILD_CLIENTS_TRUE@@BUILD_SERVER_TRUE@	voms-proxy-list.1
+
 EXTRA_DIST = $(SGML_INCLUDES) $(SGML_DIST) $(LATEX_DIST)
 MAINTAINERCLEANFILES = Makefile.in \
                        manpage.links \
@@ -702,28 +715,21 @@ userdoc: userdoc-local userdoc-recursive
 
 @BUILD_JAVA_ONLY_TRUE@install-data-hook:
 @BUILD_JAVA_ONLY_FALSE@install-data-hook: install-man1 install-man8
-@BUILD_JAVA_ONLY_FALSE@	(cd $(DESTDIR)$(mandir)/man1; \
+@BUILD_JAVA_ONLY_FALSE@	-(cd $(DESTDIR)$(mandir)/man1; \
 @BUILD_JAVA_ONLY_FALSE@	for file in *.1; do \
 @BUILD_JAVA_ONLY_FALSE@	  GZIP=$(GZIP_ENV) gzip -f $${file}; \
+@BUILD_JAVA_ONLY_FALSE@	  ln -s $(DESTDIR)$(mandir)/man1/$${file}.gz $(DESTDIR)$(mandir)/man1/edg-$${file}.gz ;\
+@BUILD_JAVA_ONLY_FALSE@          ln -s $(DESTDIR)$(mandir)/man1/$${file}.gz $(DESTDIR)$(mandir)/man1/glite-$${file}.gz ; \
 @BUILD_JAVA_ONLY_FALSE@	done)
-@BUILD_JAVA_ONLY_FALSE@	(cd $(DESTDIR)$(mandir)/man8; \
+@BUILD_JAVA_ONLY_FALSE@	-(cd $(DESTDIR)$(mandir)/man8; \
 @BUILD_JAVA_ONLY_FALSE@	for file in *.8; do \
 @BUILD_JAVA_ONLY_FALSE@	  GZIP=$(GZIP_ENV) gzip -f $${file}; \
+@BUILD_JAVA_ONLY_FALSE@	  ln -s $(DESTDIR)$(mandir)/man8/$${file}.gz $(DESTDIR)$(mandir)/man8/edg-$${file}.gz ; \
+@BUILD_JAVA_ONLY_FALSE@          ln -s $(DESTDIR)$(mandir)/man8/$${file}.gz $(DESTDIR)$(mandir)/man8/glite-$${file}.gz ; \
 @BUILD_JAVA_ONLY_FALSE@	done)
-@BUILD_JAVA_ONLY_FALSE@	-ln -s voms-proxy-init.1.gz    $(DESTDIR)$(mandir)/man1/edg-voms-proxy-init.1.gz
-@BUILD_JAVA_ONLY_FALSE@	-ln -s voms-proxy-list.1.gz    $(DESTDIR)$(mandir)/man1/edg-voms-proxy-list.1.gz
-@BUILD_JAVA_ONLY_FALSE@	-ln -s voms-proxy-info.1.gz    $(DESTDIR)$(mandir)/man1/edg-voms-proxy-info.1.gz
-@BUILD_JAVA_ONLY_FALSE@	-ln -s voms-proxy-destroy.1.gz $(DESTDIR)$(mandir)/man1/edg-voms-proxy-destroy.1.gz
-@BUILD_JAVA_ONLY_FALSE@	-ln -s voms-proxy-fake.1.gz    $(DESTDIR)$(mandir)/man1/edg-voms-proxy-fake.1.gz
-@BUILD_JAVA_ONLY_FALSE@	-ln -s voms.8.gz               $(DESTDIR)$(mandir)/man8/edg-voms.8.gz
-@BUILD_JAVA_ONLY_FALSE@	-ln -s voms-install-replica.8.gz $(DESTDIR)$(mandir)/man8/edg-voms-install-replica.8.gz
-@BUILD_JAVA_ONLY_FALSE@@ENABLE_GLITE_TRUE@	-ln -s voms-proxy-init.1.gz    $(DESTDIR)$(mandir)/man1/glite-voms-proxy-init.1.gz
-@BUILD_JAVA_ONLY_FALSE@@ENABLE_GLITE_TRUE@	-ln -s voms-proxy-list.1.gz    $(DESTDIR)$(mandir)/man1/glite-voms-proxy-list.1.gz
-@BUILD_JAVA_ONLY_FALSE@@ENABLE_GLITE_TRUE@	-ln -s voms-proxy-info.1.gz    $(DESTDIR)$(mandir)/man1/glite-voms-proxy-info.1.gz
-@BUILD_JAVA_ONLY_FALSE@@ENABLE_GLITE_TRUE@	-ln -s voms-proxy-destroy.1.gz $(DESTDIR)$(mandir)/man1/glite-voms-proxy-destroy.1.gz
-@BUILD_JAVA_ONLY_FALSE@@ENABLE_GLITE_TRUE@	-ln -s voms-proxy-fake.1.gz    $(DESTDIR)$(mandir)/man1/glite-voms-proxy-fake.1.gz
-@BUILD_JAVA_ONLY_FALSE@@ENABLE_GLITE_TRUE@	-ln -s voms.8.gz               $(DESTDIR)$(mandir)/man8/glite-voms.8.gz
-@BUILD_JAVA_ONLY_FALSE@@ENABLE_GLITE_TRUE@	-ln -s voms-install-replica.8.gz $(DESTDIR)$(mandir)/man8/glite-voms-install-replica.8.gz
+@BUILD_JAVA_ONLY_FALSE@@ENABLE_GLITE_TRUE@	@echo
+@BUILD_JAVA_ONLY_FALSE@@ENABLE_GLITE_FALSE@	-rm -f $(DESTDIR)$(mandir/)man1/glite*
+@BUILD_JAVA_ONLY_FALSE@@ENABLE_GLITE_FALSE@	-rm -f $(DESTDIR)$(mandir/)man8/glite*
 
 @BUILD_DOCS_TRUE@@HAVE_DOCBOOK_MAN_TRUE@%.1: %.xml $(COMMON_XMLFILES)
 @BUILD_DOCS_TRUE@@HAVE_DOCBOOK_MAN_TRUE@	$(XSLTPROC) $(XSLTPROCFLAGS) $(MAN_STYLESHEET) $<

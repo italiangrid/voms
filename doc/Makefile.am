@@ -73,18 +73,44 @@ DOCS   = capi.pdf c++api.pdf software.pdf AC-RFC.pdf
 
 mandir = $(datadir)/man
 
-if BUILD_JAVA_ONLY
-man_MANS =
-else
+if BUILD_SERVER 
+if BUILD_CLIENTS
 man_MANS = \
 	voms.8 \
+	voms-install-replica.8 \
 	voms-proxy-init.1 \
 	testvoms.1 \
 	voms-proxy-info.1 \
 	voms-proxy-destroy.1 \
-	voms-install-replica.8 \
 	voms-proxy-fake.1 \
 	voms-proxy-list.1
+endif
+endif
+
+if BUILD_SERVER
+if !BUILD_CLIENTS
+man_MANS = \
+	voms.8 \
+	voms-install-replica.8
+endif
+endif
+
+if !BUILD_SERVER
+if BUILD_CLIENTS
+man_MANS = \
+	voms-proxy-init.1 \
+	testvoms.1 \
+	voms-proxy-info.1 \
+	voms-proxy-destroy.1 \
+	voms-proxy-fake.1 \
+	voms-proxy-list.1
+endif
+endif
+
+if !BUILD_SERVER
+if !BUILD_CLIENTS
+man_MANS =
+endif
 endif
 
 EXTRA_DIST = $(SGML_INCLUDES) $(SGML_DIST) $(LATEX_DIST)
@@ -222,29 +248,23 @@ if BUILD_JAVA_ONLY
 install-data-hook:
 else
 install-data-hook: install-man1 install-man8
-	(cd $(DESTDIR)$(mandir)/man1; \
+	-(cd $(DESTDIR)$(mandir)/man1; \
 	for file in *.1; do \
 	  GZIP=$(GZIP_ENV) gzip -f $${file}; \
+	  ln -s $(DESTDIR)$(mandir)/man1/$${file}.gz $(DESTDIR)$(mandir)/man1/edg-$${file}.gz ;\
+          ln -s $(DESTDIR)$(mandir)/man1/$${file}.gz $(DESTDIR)$(mandir)/man1/glite-$${file}.gz ; \
 	done)
-	(cd $(DESTDIR)$(mandir)/man8; \
+	-(cd $(DESTDIR)$(mandir)/man8; \
 	for file in *.8; do \
 	  GZIP=$(GZIP_ENV) gzip -f $${file}; \
+	  ln -s $(DESTDIR)$(mandir)/man8/$${file}.gz $(DESTDIR)$(mandir)/man8/edg-$${file}.gz ; \
+          ln -s $(DESTDIR)$(mandir)/man8/$${file}.gz $(DESTDIR)$(mandir)/man8/glite-$${file}.gz ; \
 	done)
-	-ln -s voms-proxy-init.1.gz    $(DESTDIR)$(mandir)/man1/edg-voms-proxy-init.1.gz
-	-ln -s voms-proxy-list.1.gz    $(DESTDIR)$(mandir)/man1/edg-voms-proxy-list.1.gz
-	-ln -s voms-proxy-info.1.gz    $(DESTDIR)$(mandir)/man1/edg-voms-proxy-info.1.gz
-	-ln -s voms-proxy-destroy.1.gz $(DESTDIR)$(mandir)/man1/edg-voms-proxy-destroy.1.gz
-	-ln -s voms-proxy-fake.1.gz    $(DESTDIR)$(mandir)/man1/edg-voms-proxy-fake.1.gz
-	-ln -s voms.8.gz               $(DESTDIR)$(mandir)/man8/edg-voms.8.gz
-	-ln -s voms-install-replica.8.gz $(DESTDIR)$(mandir)/man8/edg-voms-install-replica.8.gz
 if ENABLE_GLITE
-	-ln -s voms-proxy-init.1.gz    $(DESTDIR)$(mandir)/man1/glite-voms-proxy-init.1.gz
-	-ln -s voms-proxy-list.1.gz    $(DESTDIR)$(mandir)/man1/glite-voms-proxy-list.1.gz
-	-ln -s voms-proxy-info.1.gz    $(DESTDIR)$(mandir)/man1/glite-voms-proxy-info.1.gz
-	-ln -s voms-proxy-destroy.1.gz $(DESTDIR)$(mandir)/man1/glite-voms-proxy-destroy.1.gz
-	-ln -s voms-proxy-fake.1.gz    $(DESTDIR)$(mandir)/man1/glite-voms-proxy-fake.1.gz
-	-ln -s voms.8.gz               $(DESTDIR)$(mandir)/man8/glite-voms.8.gz
-	-ln -s voms-install-replica.8.gz $(DESTDIR)$(mandir)/man8/glite-voms-install-replica.8.gz
+	@echo
+else    
+	-rm -f $(DESTDIR)$(mandir/)man1/glite*
+	-rm -f $(DESTDIR)$(mandir/)man8/glite*
 endif
 endif
 

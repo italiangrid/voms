@@ -1,7 +1,9 @@
 includedir = @includedir@/glite/security/voms
 
+if BUILD_INTERFACES
 include_HEADERS = \
 	vomsssl.h
+endif
 
 noinst_LTLIBRARIES = \
 	$(WANTED_SOCK_LIBS) # may add the libraries defined in EXTRA_LTLIBRARIES

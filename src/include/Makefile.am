@@ -1,9 +1,11 @@
 
 includedir = @includedir@/glite/security/voms
 
+if BUILD_INTERFACES
 include_HEADERS = \
 	newformat.h \
 	acstack.h
+endif
 
 EXTRA_DIST = Client.h data.h gssapi_compat.h \
 options.h pass.h Server.h fqan.h doio.h \
