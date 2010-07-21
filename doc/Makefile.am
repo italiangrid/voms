@@ -6,14 +6,12 @@ SGML_INCLUDES = authors.sgml bugzilla.sgml license.sgml links.sgml
 SGML = $(srcdir)/voms-proxy-init.xml \
        $(srcdir)/voms-proxy-list.xml \
        $(srcdir)/voms.xml \
-       $(srcdir)/testvoms.xml \
        $(srcdir)/voms-proxy-info.xml \
        $(srcdir)/voms-proxy-destroy.xml \
        $(srcdir)/voms-install-replica.xml \
        $(srcdir)/voms-proxy-fake.xml
 
-SGML_DIST = voms-proxy-init.xml voms.sgml testvoms.xml \
-						voms-proxy-info.xml \
+SGML_DIST = voms-proxy-init.xml voms.sgml voms-proxy-info.xml \
             voms-proxy-destroy.xml voms-install-replica.xml \
             voms-proxy-fake.xml voms-proxy-list.xml
 
@@ -51,12 +49,6 @@ CLIENT_PS   = $(USERDOC_DIR)/client/ps/voms-proxy-init.ps \
 	      $(USERDOC_DIR)/client/ps/voms-proxy-destroy.ps \
 	      $(USERDOC_DIR)/client/ps/voms-proxy-fake.ps
 
-UTILS_HTML  = $(USERDOC_DIR)/utils/html/testvoms.html
-
-UTILS_PDF   = $(USERDOC_DIR)/utils/pdf/testvoms.pdf
-
-UTILS_PS    = $(USERDOC_DIR)/utils/ps/testvoms.ps
-
 SERVER = $(SERVER_HTML) \
          $(SERVER_PDF) \
          $(SERVER_PS)
@@ -64,10 +56,6 @@ SERVER = $(SERVER_HTML) \
 CLIENT = $(CLIENT_HTML) \
          $(CLIENT_PDF) \
          $(CLIENT_PS)
-
-UTILS  = $(UTILS_HTML) \
-         $(UTILS_PDF) \
-         $(UTILS_PS)
 
 DOCS   = capi.pdf c++api.pdf software.pdf AC-RFC.pdf
 
@@ -79,7 +67,6 @@ man_MANS = \
 	voms.8 \
 	voms-install-replica.8 \
 	voms-proxy-init.1 \
-	testvoms.1 \
 	voms-proxy-info.1 \
 	voms-proxy-destroy.1 \
 	voms-proxy-fake.1 \
@@ -99,7 +86,6 @@ if !BUILD_SERVER
 if BUILD_CLIENTS
 man_MANS = \
 	voms-proxy-init.1 \
-	testvoms.1 \
 	voms-proxy-info.1 \
 	voms-proxy-destroy.1 \
 	voms-proxy-fake.1 \
@@ -119,7 +105,7 @@ MAINTAINERCLEANFILES = Makefile.in \
                        manpage.links \
                        manpage.refs
 
-CLEANFILES = $(DOCS) $(SERVER) $(CLIENT) $(UTILS) *toc *aux *log
+CLEANFILES = $(DOCS) $(SERVER) $(CLIENT) *toc *aux *log
 
 $(USERDOC_DIR)/server/html/%.html: %.sgml $(SGML_INCLUDES)
 	echo $(USERDOC_DIR)/
@@ -190,7 +176,7 @@ userdoc-local:
 endif
 endif
 
-userdoc-all: $(SERVER) $(CLIENT) $(UTILS) $(DOCS) $(APIPDOCS)
+userdoc-all: $(SERVER) $(CLIENT) $(DOCS) $(APIPDOCS)
 
 if BUILD_DOCS
 $(MAN3) $(HTML) $(LATEX): $(DOXY)

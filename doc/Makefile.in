@@ -241,14 +241,12 @@ SGML_INCLUDES = authors.sgml bugzilla.sgml license.sgml links.sgml
 SGML = $(srcdir)/voms-proxy-init.xml \
        $(srcdir)/voms-proxy-list.xml \
        $(srcdir)/voms.xml \
-       $(srcdir)/testvoms.xml \
        $(srcdir)/voms-proxy-info.xml \
        $(srcdir)/voms-proxy-destroy.xml \
        $(srcdir)/voms-install-replica.xml \
        $(srcdir)/voms-proxy-fake.xml
 
-SGML_DIST = voms-proxy-init.xml voms.sgml testvoms.xml \
-						voms-proxy-info.xml \
+SGML_DIST = voms-proxy-init.xml voms.sgml voms-proxy-info.xml \
             voms-proxy-destroy.xml voms-install-replica.xml \
             voms-proxy-fake.xml voms-proxy-list.xml
 
@@ -284,9 +282,6 @@ CLIENT_PS = $(USERDOC_DIR)/client/ps/voms-proxy-init.ps \
 	      $(USERDOC_DIR)/client/ps/voms-proxy-destroy.ps \
 	      $(USERDOC_DIR)/client/ps/voms-proxy-fake.ps
 
-UTILS_HTML = $(USERDOC_DIR)/utils/html/testvoms.html
-UTILS_PDF = $(USERDOC_DIR)/utils/pdf/testvoms.pdf
-UTILS_PS = $(USERDOC_DIR)/utils/ps/testvoms.ps
 SERVER = $(SERVER_HTML) \
          $(SERVER_PDF) \
          $(SERVER_PS)
@@ -294,10 +289,6 @@ SERVER = $(SERVER_HTML) \
 CLIENT = $(CLIENT_HTML) \
          $(CLIENT_PDF) \
          $(CLIENT_PS)
-
-UTILS = $(UTILS_HTML) \
-         $(UTILS_PDF) \
-         $(UTILS_PS)
 
 DOCS = capi.pdf c++api.pdf software.pdf AC-RFC.pdf
 @BUILD_CLIENTS_FALSE@@BUILD_SERVER_FALSE@man_MANS = 
@@ -307,7 +298,6 @@ DOCS = capi.pdf c++api.pdf software.pdf AC-RFC.pdf
 
 @BUILD_CLIENTS_TRUE@@BUILD_SERVER_FALSE@man_MANS = \
 @BUILD_CLIENTS_TRUE@@BUILD_SERVER_FALSE@	voms-proxy-init.1 \
-@BUILD_CLIENTS_TRUE@@BUILD_SERVER_FALSE@	testvoms.1 \
 @BUILD_CLIENTS_TRUE@@BUILD_SERVER_FALSE@	voms-proxy-info.1 \
 @BUILD_CLIENTS_TRUE@@BUILD_SERVER_FALSE@	voms-proxy-destroy.1 \
 @BUILD_CLIENTS_TRUE@@BUILD_SERVER_FALSE@	voms-proxy-fake.1 \
@@ -317,7 +307,6 @@ DOCS = capi.pdf c++api.pdf software.pdf AC-RFC.pdf
 @BUILD_CLIENTS_TRUE@@BUILD_SERVER_TRUE@	voms.8 \
 @BUILD_CLIENTS_TRUE@@BUILD_SERVER_TRUE@	voms-install-replica.8 \
 @BUILD_CLIENTS_TRUE@@BUILD_SERVER_TRUE@	voms-proxy-init.1 \
-@BUILD_CLIENTS_TRUE@@BUILD_SERVER_TRUE@	testvoms.1 \
 @BUILD_CLIENTS_TRUE@@BUILD_SERVER_TRUE@	voms-proxy-info.1 \
 @BUILD_CLIENTS_TRUE@@BUILD_SERVER_TRUE@	voms-proxy-destroy.1 \
 @BUILD_CLIENTS_TRUE@@BUILD_SERVER_TRUE@	voms-proxy-fake.1 \
@@ -328,7 +317,7 @@ MAINTAINERCLEANFILES = Makefile.in \
                        manpage.links \
                        manpage.refs
 
-CLEANFILES = $(DOCS) $(SERVER) $(CLIENT) $(UTILS) *toc *aux *log
+CLEANFILES = $(DOCS) $(SERVER) $(CLIENT) *toc *aux *log
 APIPDOCS = apidoc/api/VOMS_C_API/latex/refman.pdf \
 	apidoc/api/VOMS_C_API/latex/refman.ps \
 	apidoc/api/VOMS_CC_API/latex/refman.pdf \
@@ -663,7 +652,7 @@ all-local: userdoc-local
 @BUILD_DOCS_TRUE@@BUILD_JAVA_ONLY_FALSE@userdoc-local: $(man_MANS)
 @BUILD_DOCS_FALSE@@BUILD_JAVA_ONLY_FALSE@userdoc-local:
 
-userdoc-all: $(SERVER) $(CLIENT) $(UTILS) $(DOCS) $(APIPDOCS)
+userdoc-all: $(SERVER) $(CLIENT) $(DOCS) $(APIPDOCS)
 
 @BUILD_DOCS_TRUE@$(MAN3) $(HTML) $(LATEX): $(DOXY)
 @BUILD_DOCS_TRUE@	doxygen $(CCDOCPLC_DIR)/Doxyfile
