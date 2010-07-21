@@ -11,6 +11,18 @@ AC_DEFUN([AC_LINUX],
 
 AC_DEFUN([AC_BUILD_PARTS],
 [
+
+  AC_ARG_WITH(all,
+    [  --with-all   Enable compilation of the clients (yes)],
+    [
+      case "$withval" in
+        yes) build_all="yes" ;;
+        no)  build_all="no" ;;
+        *) AC_MSG_ERROR([bad value $withval for --with-all]) ;;
+      esac
+    ],
+    [ build_all="yes" ])
+
   AC_ARG_WITH(clients,
     [  --with-clients   Enable compilation of the clients (yes)],
     [
@@ -20,7 +32,7 @@ AC_DEFUN([AC_BUILD_PARTS],
         *) AC_MSG_ERROR([bad value $withval for --with-client]) ;;
       esac
     ],
-    [ build_clients="yes" ])
+    [ build_clients="$build_all" ])
 
   AC_ARG_WITH(server,
     [  --with-server   Enable compilation of the server (yes)],
@@ -31,7 +43,7 @@ AC_DEFUN([AC_BUILD_PARTS],
         *) AC_MSG_ERROR([bad value $withval for --with-server]) ;;
       esac
     ],
-    [ build_server="yes" ])
+    [ build_server="$build_all" ])
 
   AC_ARG_WITH(java-only,
     [ --with-java-only     Builds only the java APIs ],
@@ -47,7 +59,7 @@ AC_DEFUN([AC_BUILD_PARTS],
         *) AC_MSG_ERROR([bad value $withval for --with-c-api]) ;;
       esac
     ],
-    [ build_c_api="yes" ])
+    [ build_c_api="$build_all" ])
 
   AC_ARG_WITH(cpp-api,
     [  --with-cpp-api   Enable compilation of the C++ APIs (yes)],
@@ -58,7 +70,7 @@ AC_DEFUN([AC_BUILD_PARTS],
         *) AC_MSG_ERROR([bad value $withval for --with-cpp-api]) ;;
       esac
     ],
-    [ build_cpp_api="yes" ])
+    [ build_cpp_api="$build_all" ])
 
   AC_ARG_WITH(interfaces,
     [  --with-interfaces   Enable compilation of the includes (yes)],
@@ -69,7 +81,7 @@ AC_DEFUN([AC_BUILD_PARTS],
         *) AC_MSG_ERROR([bad value $withval for --with-interfaces]) ;;
       esac
     ],
-    [ build_interfaces="yes" ])
+    [ build_interfaces="$build_all" ])
 
   AC_ARG_WITH(config,
     [  --with-config   Enable compilation of the includes (yes)],
@@ -80,7 +92,7 @@ AC_DEFUN([AC_BUILD_PARTS],
         *) AC_MSG_ERROR([bad value $withval for --with-config]) ;;
       esac
     ],
-    [ build_config="yes" ])
+    [ build_config="build_all" ])
 
   AC_ARG_WITH(no-globus-only,
     [  --with-no-globus-only   Enable compilation of the includes (yes)],
