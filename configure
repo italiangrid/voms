@@ -807,6 +807,10 @@ HAVE_DOCBOOK_MAN_FALSE
 HAVE_DOCBOOK_MAN_TRUE
 XSLTPROCFLAGS
 XSLTPROC
+BUILD_NOGLOBUS_ONLY_FALSE
+BUILD_NOGLOBUS_ONLY_TRUE
+BUILD_CONFIG_FALSE
+BUILD_CONFIG_TRUE
 BUILD_SERVER_FALSE
 BUILD_SERVER_TRUE
 BUILD_CLIENTS_FALSE
@@ -1036,6 +1040,8 @@ with_java_only
 with_c_api
 with_cpp_api
 with_interfaces
+with_config
+with_no_globus_only
 with_report_dir
 with_scratch_dir
 with_dbuser
@@ -1737,6 +1743,8 @@ Optional Packages:
   --with-c-api   Enable compilation of the C APIs (yes)
   --with-cpp-api   Enable compilation of the C++ APIs (yes)
   --with-interfaces   Enable compilation of the includes (yes)
+  --with-config   Enable compilation of the includes (yes)
+  --with-no-globus-only   Enable compilation of the includes (yes)
   --with-report-dir    Set reportdir for testsuite
   --with-scratch-dir   Set scratchdir for testsuite
   --with-dbuser        Set DB user for testsuite
@@ -5431,13 +5439,13 @@ if test "${lt_cv_nm_interface+set}" = set; then
 else
   lt_cv_nm_interface="BSD nm"
   echo "int some_variable = 0;" > conftest.$ac_ext
-  (eval echo "\"\$as_me:5434: $ac_compile\"" >&5)
+  (eval echo "\"\$as_me:5442: $ac_compile\"" >&5)
   (eval "$ac_compile" 2>conftest.err)
   cat conftest.err >&5
-  (eval echo "\"\$as_me:5437: $NM \\\"conftest.$ac_objext\\\"\"" >&5)
+  (eval echo "\"\$as_me:5445: $NM \\\"conftest.$ac_objext\\\"\"" >&5)
   (eval "$NM \"conftest.$ac_objext\"" 2>conftest.err > conftest.out)
   cat conftest.err >&5
-  (eval echo "\"\$as_me:5440: output\"" >&5)
+  (eval echo "\"\$as_me:5448: output\"" >&5)
   cat conftest.out >&5
   if $GREP 'External.*some_variable' conftest.out > /dev/null; then
     lt_cv_nm_interface="MS dumpbin"
@@ -6632,7 +6640,7 @@ ia64-*-hpux*)
   ;;
 *-*-irix6*)
   # Find out which ABI we are using.
-  echo '#line 6635 "configure"' > conftest.$ac_ext
+  echo '#line 6643 "configure"' > conftest.$ac_ext
   if { (eval echo "$as_me:$LINENO: \"$ac_compile\"") >&5
   (eval $ac_compile) 2>&5
   ac_status=$?
@@ -8968,11 +8976,11 @@ else
    -e 's:.*FLAGS}\{0,1\} :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:8971: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:8979: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>conftest.err)
    ac_status=$?
    cat conftest.err >&5
-   echo "$as_me:8975: \$? = $ac_status" >&5
+   echo "$as_me:8983: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s "$ac_outfile"; then
      # The compiler can only warn and ignore the option if not recognized
      # So say no if there are warnings other than the usual output.
@@ -9307,11 +9315,11 @@ else
    -e 's:.*FLAGS}\{0,1\} :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:9310: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:9318: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>conftest.err)
    ac_status=$?
    cat conftest.err >&5
-   echo "$as_me:9314: \$? = $ac_status" >&5
+   echo "$as_me:9322: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s "$ac_outfile"; then
      # The compiler can only warn and ignore the option if not recognized
      # So say no if there are warnings other than the usual output.
@@ -9412,11 +9420,11 @@ else
    -e 's:.*FLAGS}\{0,1\} :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:9415: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:9423: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>out/conftest.err)
    ac_status=$?
    cat out/conftest.err >&5
-   echo "$as_me:9419: \$? = $ac_status" >&5
+   echo "$as_me:9427: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s out/conftest2.$ac_objext
    then
      # The compiler can only warn and ignore the option if not recognized
@@ -9467,11 +9475,11 @@ else
    -e 's:.*FLAGS}\{0,1\} :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:9470: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:9478: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>out/conftest.err)
    ac_status=$?
    cat out/conftest.err >&5
-   echo "$as_me:9474: \$? = $ac_status" >&5
+   echo "$as_me:9482: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s out/conftest2.$ac_objext
    then
      # The compiler can only warn and ignore the option if not recognized
@@ -12280,7 +12288,7 @@ else
   lt_dlunknown=0; lt_dlno_uscore=1; lt_dlneed_uscore=2
   lt_status=$lt_dlunknown
   cat > conftest.$ac_ext <<_LT_EOF
-#line 12283 "configure"
+#line 12291 "configure"
 #include "confdefs.h"
 
 #if HAVE_DLFCN_H
@@ -12376,7 +12384,7 @@ else
   lt_dlunknown=0; lt_dlno_uscore=1; lt_dlneed_uscore=2
   lt_status=$lt_dlunknown
   cat > conftest.$ac_ext <<_LT_EOF
-#line 12379 "configure"
+#line 12387 "configure"
 #include "confdefs.h"
 
 #if HAVE_DLFCN_H
@@ -14396,11 +14404,11 @@ else
    -e 's:.*FLAGS}\{0,1\} :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:14399: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:14407: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>conftest.err)
    ac_status=$?
    cat conftest.err >&5
-   echo "$as_me:14403: \$? = $ac_status" >&5
+   echo "$as_me:14411: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s "$ac_outfile"; then
      # The compiler can only warn and ignore the option if not recognized
      # So say no if there are warnings other than the usual output.
@@ -14495,11 +14503,11 @@ else
    -e 's:.*FLAGS}\{0,1\} :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:14498: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:14506: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>out/conftest.err)
    ac_status=$?
    cat out/conftest.err >&5
-   echo "$as_me:14502: \$? = $ac_status" >&5
+   echo "$as_me:14510: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s out/conftest2.$ac_objext
    then
      # The compiler can only warn and ignore the option if not recognized
@@ -14547,11 +14555,11 @@ else
    -e 's:.*FLAGS}\{0,1\} :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:14550: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:14558: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>out/conftest.err)
    ac_status=$?
    cat out/conftest.err >&5
-   echo "$as_me:14554: \$? = $ac_status" >&5
+   echo "$as_me:14562: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s out/conftest2.$ac_objext
    then
      # The compiler can only warn and ignore the option if not recognized
@@ -21258,8 +21266,8 @@ if test "${with_clients+set}" = set; then
       case "$withval" in
         yes) build_clients="yes" ;;
         no)  build_clients="no" ;;
-        *) { { $as_echo "$as_me:$LINENO: error: bad value $(withval) for --with-client" >&5
-$as_echo "$as_me: error: bad value $(withval) for --with-client" >&2;}
+        *) { { $as_echo "$as_me:$LINENO: error: bad value $withval for --with-client" >&5
+$as_echo "$as_me: error: bad value $withval for --with-client" >&2;}
    { (exit 1); exit 1; }; } ;;
       esac
 
@@ -21275,8 +21283,8 @@ if test "${with_server+set}" = set; then
       case "$withval" in
         yes) build_server="yes" ;;
         no)  build_server="no" ;;
-        *) { { $as_echo "$as_me:$LINENO: error: bad value $(withval) for --with-server" >&5
-$as_echo "$as_me: error: bad value $(withval) for --with-server" >&2;}
+        *) { { $as_echo "$as_me:$LINENO: error: bad value $withval for --with-server" >&5
+$as_echo "$as_me: error: bad value $withval for --with-server" >&2;}
    { (exit 1); exit 1; }; } ;;
       esac
 
@@ -21301,8 +21309,8 @@ if test "${with_c_api+set}" = set; then
       case "$withval" in
         yes) build_c_api="yes" ;;
         no)  build_c_api="no" ;;
-        *) { { $as_echo "$as_me:$LINENO: error: bad value $(withval) for --with-c-api" >&5
-$as_echo "$as_me: error: bad value $(withval) for --with-c-api" >&2;}
+        *) { { $as_echo "$as_me:$LINENO: error: bad value $withval for --with-c-api" >&5
+$as_echo "$as_me: error: bad value $withval for --with-c-api" >&2;}
    { (exit 1); exit 1; }; } ;;
       esac
 
@@ -21318,8 +21326,8 @@ if test "${with_cpp_api+set}" = set; then
       case "$withval" in
         yes) build_cpp_api="yes" ;;
         no)  build_cpp_api="no" ;;
-        *) { { $as_echo "$as_me:$LINENO: error: bad value $(withval) for --with-cpp-api" >&5
-$as_echo "$as_me: error: bad value $(withval) for --with-cpp-api" >&2;}
+        *) { { $as_echo "$as_me:$LINENO: error: bad value $withval for --with-cpp-api" >&5
+$as_echo "$as_me: error: bad value $withval for --with-cpp-api" >&2;}
    { (exit 1); exit 1; }; } ;;
       esac
 
@@ -21335,13 +21343,47 @@ if test "${with_interfaces+set}" = set; then
       case "$withval" in
         yes) build_interfaces="yes" ;;
         no)  build_interfaces="no" ;;
-        *) { { $as_echo "$as_me:$LINENO: error: bad value $(withval) for --with-interfaces" >&5
-$as_echo "$as_me: error: bad value $(withval) for --with-interfaces" >&2;}
+        *) { { $as_echo "$as_me:$LINENO: error: bad value $withval for --with-interfaces" >&5
+$as_echo "$as_me: error: bad value $withval for --with-interfaces" >&2;}
    { (exit 1); exit 1; }; } ;;
       esac
 
 else
    build_interfaces="yes"
+fi
+
+
+
+# Check whether --with-config was given.
+if test "${with_config+set}" = set; then
+  withval=$with_config;
+      case "$withval" in
+        yes) build_config="yes" ;;
+        no)  build_config="no" ;;
+        *) { { $as_echo "$as_me:$LINENO: error: bad value $withval for --with-config" >&5
+$as_echo "$as_me: error: bad value $withval for --with-config" >&2;}
+   { (exit 1); exit 1; }; } ;;
+      esac
+
+else
+   build_config="yes"
+fi
+
+
+
+# Check whether --with-no-globus-only was given.
+if test "${with_no_globus_only+set}" = set; then
+  withval=$with_no_globus_only;
+      case "$withval" in
+        yes) build_nglobus_only="yes" ;;
+        no)  build_nglobus_only="no" ;;
+        *) { { $as_echo "$as_me:$LINENO: error: bad value $withval for --with-no-globus-only" >&5
+$as_echo "$as_me: error: bad value $withval for --with-no-globus-only" >&2;}
+   { (exit 1); exit 1; }; } ;;
+      esac
+
+else
+   build_nglobus_only="no"
 fi
 
 
@@ -21392,6 +21434,22 @@ fi
 else
   BUILD_SERVER_TRUE='#'
   BUILD_SERVER_FALSE=
+fi
+
+   if test x$build_config = xyes; then
+  BUILD_CONFIG_TRUE=
+  BUILD_CONFIG_FALSE='#'
+else
+  BUILD_CONFIG_TRUE='#'
+  BUILD_CONFIG_FALSE=
+fi
+
+   if test x$build_nglobus_only = xyes; then
+  BUILD_NOGLOBUS_ONLY_TRUE=
+  BUILD_NOGLOBUS_ONLY_FALSE='#'
+else
+  BUILD_NOGLOBUS_ONLY_TRUE='#'
+  BUILD_NOGLOBUS_ONLY_FALSE=
 fi
 
 
@@ -21690,6 +21748,20 @@ else
 INSTALL_API_LIBS=""
 fi
 
+if test "x$build_nglobus_only"="xyes"; then
+libs="$INSTALL_API_LIBS";
+lista="" ;
+for p in $libs; do
+  res=`echo $p | grep _nog` ;
+  if test "x$res" == "x"; then
+	lista="$lista" ;
+  else
+	lista="$p $lista" ;
+  fi
+done ;
+INSTALL_API_LIBS="$lista"
+fi
+
 
 
 ac_config_files="$ac_config_files Makefile src/Makefile src/ac/Makefile src/api/Makefile src/api/ccapi/Makefile src/api/java/Makefile src/client/Makefile src/common/Makefile src/include/Makefile src/install/Makefile src/log/Makefile src/replib/Makefile src/replica/Makefile src/server/Makefile src/socklib/Makefile src/sslutils/Makefile src/utils/Makefile doc/Makefile project/Makefile testsuite/Makefile testsuite/SuiteConfig"
@@ -21895,6 +21967,20 @@ if test -z "${BUILD_SERVER_TRUE}" && test -z "${BUILD_SERVER_FALSE}"; then
   { { $as_echo "$as_me:$LINENO: error: conditional \"BUILD_SERVER\" was never defined.
 Usually this means the macro was only invoked conditionally." >&5
 $as_echo "$as_me: error: conditional \"BUILD_SERVER\" was never defined.
+Usually this means the macro was only invoked conditionally." >&2;}
+   { (exit 1); exit 1; }; }
+fi
+if test -z "${BUILD_CONFIG_TRUE}" && test -z "${BUILD_CONFIG_FALSE}"; then
+  { { $as_echo "$as_me:$LINENO: error: conditional \"BUILD_CONFIG\" was never defined.
+Usually this means the macro was only invoked conditionally." >&5
+$as_echo "$as_me: error: conditional \"BUILD_CONFIG\" was never defined.
+Usually this means the macro was only invoked conditionally." >&2;}
+   { (exit 1); exit 1; }; }
+fi
+if test -z "${BUILD_NOGLOBUS_ONLY_TRUE}" && test -z "${BUILD_NOGLOBUS_ONLY_FALSE}"; then
+  { { $as_echo "$as_me:$LINENO: error: conditional \"BUILD_NOGLOBUS_ONLY\" was never defined.
+Usually this means the macro was only invoked conditionally." >&5
+$as_echo "$as_me: error: conditional \"BUILD_NOGLOBUS_ONLY\" was never defined.
 Usually this means the macro was only invoked conditionally." >&2;}
    { (exit 1); exit 1; }; }
 fi

@@ -162,6 +162,20 @@ else
 INSTALL_API_LIBS=""
 fi
 
+if test "x$build_nglobus_only"="xyes"; then
+libs="$INSTALL_API_LIBS"; 
+lista="" ; 
+for p in $libs; do 
+  res=`echo $p | grep _nog` ; 
+  if test "x$res" == "x"; then 
+	lista="$lista" ; 
+  else 
+	lista="$p $lista" ; 
+  fi 
+done ; 
+INSTALL_API_LIBS="$lista"
+fi
+
 AC_SUBST(INSTALL_API_LIBS)
 
 AC_CONFIG_FILES([Makefile
