@@ -58,9 +58,8 @@ am__DEPENDENCIES_1 =
 @BUILD_SERVER_TRUE@voms_DEPENDENCIES =  \
 @BUILD_SERVER_TRUE@	$(top_builddir)/src/socklib/libsock_nog.la \
 @BUILD_SERVER_TRUE@	$(top_builddir)/src/common/libutilities_nog.la \
-@BUILD_SERVER_TRUE@	$(top_builddir)/src/ac/libccattcert.la \
+@BUILD_SERVER_TRUE@	$(top_builddir)/src/ac/libattributes_nog.la \
 @BUILD_SERVER_TRUE@	$(top_builddir)/src/common/libutilc_nog.la \
-@BUILD_SERVER_TRUE@	$(top_builddir)/src/ac/libattcert.la \
 @BUILD_SERVER_TRUE@	$(top_builddir)/src/replib/librep.la \
 @BUILD_SERVER_TRUE@	$(top_builddir)/src/log/liblog.la \
 @BUILD_SERVER_TRUE@	$(top_builddir)/src/api/ccapi/libvomsapi_nog.la \
@@ -297,9 +296,8 @@ with_valgrind = @with_valgrind@
 @BUILD_SERVER_TRUE@voms_LDADD = \
 @BUILD_SERVER_TRUE@	$(top_builddir)/src/socklib/libsock_nog.la \
 @BUILD_SERVER_TRUE@	$(top_builddir)/src/common/libutilities_nog.la \
-@BUILD_SERVER_TRUE@	$(top_builddir)/src/ac/libccattcert.la \
+@BUILD_SERVER_TRUE@	$(top_builddir)/src/ac/libattributes_nog.la \
 @BUILD_SERVER_TRUE@	$(top_builddir)/src/common/libutilc_nog.la \
-@BUILD_SERVER_TRUE@	$(top_builddir)/src/ac/libattcert.la \
 @BUILD_SERVER_TRUE@	$(top_builddir)/src/replib/librep.la \
 @BUILD_SERVER_TRUE@	$(top_builddir)/src/log/liblog.la \
 @BUILD_SERVER_TRUE@	$(top_builddir)/src/api/ccapi/libvomsapi_nog.la \
