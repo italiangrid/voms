@@ -162,7 +162,7 @@ else
 INSTALL_API_LIBS=""
 fi
 
-if test "x$build_nglobus_only"="xyes"; then
+if test "x$build_nglobus_only" = "xyes"; then
 libs="$INSTALL_API_LIBS"; 
 lista="" ; 
 for p in $libs; do 

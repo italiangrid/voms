@@ -990,25 +990,6 @@ LATEX = $(CCDOCPLC_DIR)/latex/Makefile \
         $(CDOCPLC_DIR)/latex/doxygen.sty
 
 DOXY = $(CCDOCPLC_DIR)/Doxyfile $(CDOCPLC_DIR)/Doxyfile $(include_HEADERS)
-
-# CPP only
-@BUILD_CPP_API_TRUE@@BUILD_C_API_FALSE@libs = '$(lib_LTLIBRARIES)'; \
-@BUILD_CPP_API_TRUE@@BUILD_C_API_FALSE@echo "$$libs" ; \
-@BUILD_CPP_API_TRUE@@BUILD_C_API_FALSE@lista="" ; \
-@BUILD_CPP_API_TRUE@@BUILD_C_API_FALSE@for p in $$libs; do \
-@BUILD_CPP_API_TRUE@@BUILD_C_API_FALSE@  echo "CONSIDERING: $$p" ; \
-@BUILD_CPP_API_TRUE@@BUILD_C_API_FALSE@  echo $$p | grep libvomsapi ; \
-@BUILD_CPP_API_TRUE@@BUILD_C_API_FALSE@  res=$$ ; \
-@BUILD_CPP_API_TRUE@@BUILD_C_API_FALSE@  if test $res; then \
-@BUILD_CPP_API_TRUE@@BUILD_C_API_FALSE@	echo "escluso" ; \
-@BUILD_CPP_API_TRUE@@BUILD_C_API_FALSE@  else \
-@BUILD_CPP_API_TRUE@@BUILD_C_API_FALSE@	echo "permesso" ; \
-@BUILD_CPP_API_TRUE@@BUILD_C_API_FALSE@	lista="$$p $$lista" ; \
-@BUILD_CPP_API_TRUE@@BUILD_C_API_FALSE@  fi \
-@BUILD_CPP_API_TRUE@@BUILD_C_API_FALSE@done ; \
-@BUILD_CPP_API_TRUE@@BUILD_C_API_FALSE@echo "lista=$$lista"
-
-@BUILD_CPP_API_FALSE@@BUILD_C_API_FALSE@lista = ""
 all: all-am
 
 .SUFFIXES:
@@ -2246,28 +2227,8 @@ all-local: apidoc-local
 @BUILD_DOCS_TRUE@apidoc-local: $(HTML) $(MAN3) 
 @BUILD_DOCS_FALSE@apidoc-local:
 
-# both C and CPP -- do nothing
-@BUILD_CPP_API_TRUE@@BUILD_C_API_TRUE@librewrite:
-
-# C only
-@BUILD_CPP_API_FALSE@@BUILD_C_API_TRUE@librewrite:
-@BUILD_CPP_API_FALSE@@BUILD_C_API_TRUE@	@libs='$(lib_LTLIBRARIES)'; \
-@BUILD_CPP_API_FALSE@@BUILD_C_API_TRUE@	lista="" \
-@BUILD_CPP_API_FALSE@@BUILD_C_API_TRUE@	for p in $$@libs do ; \
-@BUILD_CPP_API_FALSE@@BUILD_C_API_TRUE@	  echo "CONSIDERING: $p"
-@BUILD_CPP_API_FALSE@@BUILD_C_API_TRUE@	  echo $p | grep libvomsc \
-@BUILD_CPP_API_FALSE@@BUILD_C_API_TRUE@	  res=$$ \
-@BUILD_CPP_API_FALSE@@BUILD_C_API_TRUE@	  if test $res; then \
-@BUILD_CPP_API_FALSE@@BUILD_C_API_TRUE@		echo "escluso" \
-@BUILD_CPP_API_FALSE@@BUILD_C_API_TRUE@	  else \
-@BUILD_CPP_API_FALSE@@BUILD_C_API_TRUE@		echo "permesso" \
-@BUILD_CPP_API_FALSE@@BUILD_C_API_TRUE@		lista="$lista $p" \
-@BUILD_CPP_API_FALSE@@BUILD_C_API_TRUE@	  fi \
-@BUILD_CPP_API_FALSE@@BUILD_C_API_TRUE@	done \
-@BUILD_CPP_API_FALSE@@BUILD_C_API_TRUE@	lib_LTLIBRARIES="$lista"
-
-install-exec-am: export lib_LTLIBRARIES = $(INSTALL_API_LIBS)
-install-exec-am: install-libLTLIBRARIES
+install-exec-am: lib_LTLIBRARIES = $(INSTALL_API_LIBS)
+install-exec-am: install-libLTLIBRARIES lib_LTLIBRARIES = $(INSTALL_API_LIBS)
 
 apidoc-recursive:
 #	$(MAKE) apidoc -C capi

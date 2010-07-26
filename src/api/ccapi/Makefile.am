@@ -595,59 +595,8 @@ else
 apidoc-local:
 endif
 
-
-
-if BUILD_C_API
-if BUILD_CPP_API
-
-# both C and CPP -- do nothing
-librewrite:
-
-else
-
-# C only
-librewrite:
-	@libs='$(lib_LTLIBRARIES)'; \
-	lista="" \
-	for p in $$@libs do ; \
-	  echo "CONSIDERING: $p"
-	  echo $p | grep libvomsc \
-	  res=$$ \
-	  if test $res; then \
-		echo "escluso" \
-	  else \
-		echo "permesso" \
-		lista="$lista $p" \
-	  fi \
-	done \
-	lib_LTLIBRARIES="$lista"
-
-endif
-else
-if BUILD_CPP_API
-# CPP only
-libs='$(lib_LTLIBRARIES)'; \
-echo "$$libs" ; \
-lista="" ; \
-for p in $$libs; do \
-  echo "CONSIDERING: $$p" ; \
-  echo $$p | grep libvomsapi ; \
-  res=$$ ; \
-  if test $res; then \
-	echo "escluso" ; \
-  else \
-	echo "permesso" ; \
-	lista="$$p $$lista" ; \
-  fi \
-done ; \
-echo "lista=$$lista"
-else
-lista=""
-endif
-endif
-
-install-exec-am: export lib_LTLIBRARIES = $(INSTALL_API_LIBS)
-install-exec-am: install-libLTLIBRARIES
+install-exec-am: lib_LTLIBRARIES = $(INSTALL_API_LIBS)
+install-exec-am: install-libLTLIBRARIES lib_LTLIBRARIES = $(INSTALL_API_LIBS)
 
 apidoc-recursive:
 #	$(MAKE) apidoc -C capi
