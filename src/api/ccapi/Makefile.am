@@ -596,7 +596,7 @@ apidoc-local:
 endif
 
 install-exec-am: lib_LTLIBRARIES = $(INSTALL_API_LIBS)
-install-exec-am: install-libLTLIBRARIES lib_LTLIBRARIES = $(INSTALL_API_LIBS)
+install-exec-am: install-libLTLIBRARIES
 
 apidoc-recursive:
 #	$(MAKE) apidoc -C capi
