@@ -638,6 +638,20 @@ AC_DEFUN([AC_ENABLE_DOCS],
     AM_CONDITIONAL(BUILD_DOCS, test x$build_docs = xyes)
 ])
 
+AC_DEFUN([AC_EMI_LIBS],
+[
+    AC_ARG_ENABLE(emi-libs,
+      [ --enable-emi-libs Enable Library generation with EMI rules ],
+      [
+        case "$enableval" in
+        yes) build_emi="yes" ;;
+        no) build_emi="no" ;;
+        *) AC_MSG_ERROR(bad value $(enableval) for --enable-emi-libs) ;;
+        esac
+      ],
+      [ build_emi="no"])    
+])
+
 # AC_ENABLE_GLITE switch for glite
 # -------------------------------------------------------
 AC_DEFUN([AC_ENABLE_GLITE],
