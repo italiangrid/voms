@@ -86,7 +86,7 @@ extern int writeac(const X509 *issuerc, const STACK_OF(X509) *certstack, const X
 }
 
 static int time_to_sec(std::string timestring);
-static long mystrtol(char *number, int limit);
+static long mystrtol(char *number, long int limit);
 static std::string hextostring(const std::string &data);
 static int hex2value(char c);
 
@@ -1056,7 +1056,7 @@ static int time_to_sec(std::string timestring)
   return seconds + minutes * 60 + hours * 3600;
 }
 
-static long mystrtol(char *number, int limit)
+static long mystrtol(char *number, long int limit)
 {
   char *end = NULL;
 
