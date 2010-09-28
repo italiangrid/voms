@@ -54,18 +54,13 @@ void *logh = NULL;
 #include "myproxycertinfo.h"
 }
 
-#include "soapH.h"
-
 #include "Server.h"
-
-#include "VOMSServer.h"
 
 #include "options.h"
 #include "data.h"
 #include "pass.h"
 #include "errors.h"
 #include "vomsxml.h"
-#include "fqan.h"
 
 #include <map>
 #include <set>
@@ -79,11 +74,15 @@ void *logh = NULL;
 
 #include "voms_api_nog.h"
 
+#include "soapH.h"
+
 extern int AC_Init(void);
+extern int http_get(soap *soap);
 
 #include "ccwrite.h"
 #include "validate.h"
 
+#include "VOMSServer.h"
 
 std::string vomsresult::makeRESTAnswer(int& code)
 {
@@ -160,7 +159,7 @@ static ordermap ordering;
 
 static std::string sqllib = "";
 
-static char *maingroup = NULL;
+char *maingroup = NULL;
 
 typedef sqliface::interface* (*cdb)();
 typedef int (*gv)();
@@ -171,18 +170,10 @@ gv  getlibversion;
 bool dummyb = false;
 
 static bool checkinside(gattrib g, std::vector<std::string> list);
-static void AdjustURI(std::string &uri, int port);
-static bool get_parameter(char **path, char **name, char **value);
 static signed long int get_userid(sqliface::interface *db, X509 *cert, const std::string& voname, vomsresult &vr);
 static std::string addtoorder(std::string previous, char *group, char *role);
 static bool determine_group_and_role(std::string command, char *comm, char **group, char **role);
-static int (*pw_cb)() = NULL;
-static char *canonicalize_string(char *original);
-static bool makeACSSL(vomsresult &vr, SSL *ssl, const std::string& command, const std::string &orderstring, const std::string& targets, int requested, VOMSServer *v);
-static int makeACREST(struct soap *soap, const std::string& command, const std::string& orderstring, const std::string& targets, int requested, int unknown);
-static int http_get(soap *soap);
 static BIGNUM *get_serial();
-static int pwstdin_callback(char * buf, int num, UNUSED(int w));
 static void sigchld_handler(UNUSED(int sig));
 static void sighup_handler(UNUSED(int sig));
 static void sigterm_handler(UNUSED(int sig));
@@ -191,24 +182,7 @@ static void orderattribs(std::vector<std::string> &v);
 static std::string parse_order(const std::string &message, ordermap &ordering);
 static void parse_targets(const std::string &message, std::vector<std::string> &target);
 static bool not_in(std::string fqan, std::vector<std::string> fqans);
-static int hexint(char c);
-
-static int pwstdin_callback(char * buf, int num, UNUSED(int w)) 
-{
-  int i;
-  
-  if (!(fgets(buf, num, stdin))) {
-    std::cerr << "Failed to read pass-phrase from stdin" << std::endl;
-    return -1;
-  }
-  i = strlen(buf);
-  if (buf[i-1] == '\n') {
-      buf[i-1] = '\0';
-      i--;
-  }
-  return i;	
-  
-}
+static void AdjustURI(std::string &uri, int port);
 
 static void
 sigchld_handler(UNUSED(int sig))
@@ -1412,256 +1386,6 @@ static bool checkinside(gattrib g, std::vector<std::string> list)
   return !g.qualifier.empty() && not_in(g.qualifier, list);
 }
 
-static bool
-makeACSSL(vomsresult &vr, SSL *ssl, const std::string& command, const std::string &orderstring, const std::string& targets, int requested, VOMSServer *v)
-{
-  X509 *holder = SSL_get_peer_certificate(ssl);
-  X509 *issuer = NULL;
-  EVP_PKEY *key = NULL;
-  pw_cb =(int (*)())(pwstdin_callback);
-  char *hostcert = (char*)"/etc/grid-security/hostcert.pem";
-  char *hostkey  = (char*)"/etc/grid-security/hostkey.pem";
-
-  if (!v->x509_user_cert.empty())
-    hostcert = (char*)v->x509_user_cert.c_str();
-
-  if (!v->x509_user_key.empty())
-    hostkey = (char *)v->x509_user_key.c_str();
-
-  if (!load_credentials(hostcert, hostkey, 
-                        &issuer, NULL,  &key, pw_cb)) {
-    X509_free(issuer);
-    EVP_PKEY_free(key);
-    return false;
-  }
-
-  std::string message = XML_Req_Encode(command, orderstring, targets, requested);
-
-  bool ret = selfpointer->makeAC(vr, key, issuer, holder, message);
-  X509_free(issuer);
-  EVP_PKEY_free(key);
-
-  return ret;
-}
-
-static int http_get(soap *soap)
-{
-  char *path = strdup(soap->path);
-  int unknown = 0;
-
-  LOGM(VARP, logh, LEV_DEBUG, T_PRE, "REST Request: %s", soap->path);
-
-  if (!path)
-    return SOAP_GET_METHOD;
-
-  char *s = strchr(path, '?');
-
-  if (s)
-    *s='\0';
-
-  char *prepath=canonicalize_string(path);
-
-  if (strcmp(prepath, "/generate-ac") != 0) {
-    free(path);
-    soap_response(soap,404);
-    soap_end_send(soap);
-    return 404;
-  }
-
-  soap_response(soap, SOAP_HTML);
-
-  /* determine parameters */
-  std::vector<std::string> fqans;
-  int lifetime = -1;
-  std::string orderstring;
-  std::string targetstring;
-
-  if (s) {
-    ++s;
-
-    if (!strlen(s)) {
-      free(path);
-      soap_response(soap, 404);
-      soap_end_send(soap);
-      return 500;
-    }
-
-    char *basis = s;
-
-    do {
-      char *cname;
-      char *cvalue;
-
-      if (!get_parameter(&basis, &cname, &cvalue)) {
-        free(path);
-        soap_response(soap, 404);
-        soap_end_send(soap);
-        return 500;
-      }
-
-      if (strcmp(cname, "lifetime") == 0)
-        lifetime = atoi(cvalue);
-
-      else if (strcmp(cname, "fqans") == 0) {
-        char *position = strchr(cvalue, ',');
-
-        while (position) {
-          *position = '\0';
-          fqans.push_back(std::string(cvalue));
-          cvalue = ++position;
-          position = strchr(cvalue, ',');
-        }
-        fqans.push_back(std::string(cvalue));
-      }
-
-      else if (strcmp(cname, "order") == 0) {
-        if (orderstring.empty())
-          orderstring = std::string(cvalue);
-        else
-          orderstring += ", " + std::string(cvalue);
-      }
-      else if (strcmp(cname, "targets") == 0) {
-        targetstring = std::string(cvalue);
-      }
-      else {
-        /* purposefully ignore other parameters */
-        /* but put it in an otherwise positive response */
-        unknown = 1;
-      }
-    } while (basis);
-  }
-
-  if (fqans.size()==0)
-    fqans.push_back(maingroup);
-
-  std::string command = parse_fqan(fqans);
-
-  int res = makeACREST(soap, command, orderstring, targetstring, lifetime, unknown);
-
-  free(path);
-
-  return res;
-}
-
-static bool get_parameter(char **path, char **name, char **value)
-{
-  if (!path || !name || !value)
-    return false;
-
-  char* next = strchr(*path, '&');
-
-  if (next)
-    *next='\0';
-
-  char *equal = strchr(*path, '=');
-
-  if (!equal)
-    return false;
-
-  *equal='\0';
-
-  *name = *path;
-  *value = equal+1;
-
-  if (next)
-    *path = ++next;
-  else 
-    *path = next;
-
-  return true;
-}
-
-static int hexint(char c)
-{
-  if (c >= '0' && c <= '9')
-    return c - '0';
-
-  if (c >= 'a' && c <= 'f')
-    return c - 'a' + 10;
-
-  if (c >= 'A' && c <= 'F')
-    return c - 'A' + 10;
-
-  return 0;
-}
-
-static char *canonicalize_string(char *original)
-{
-  char *currentin  = original;
-  char *currentout = original;
-
-  while (*currentin != '\0') {
-    if (*currentin != '%')
-      *currentout++ = *currentin++;
-    else {
-      char first = *(currentin+1);
-
-      if (first != '\0') {
-        char second = *(currentin+2);
-
-        if (second != '\0') {
-          if (isxdigit(first) && isxdigit(second)) {
-            *currentout++=hexint(first)*16 + hexint(second);
-            currentin += 3;
-          }
-          else
-            *currentout++ = *currentin++;
-        }
-        else
-          *currentout++ = *currentin++;
-      }
-      else
-        *currentout++ = *currentin++;
-    }
-  }
-  *currentout='\0';
-
-  return original;
-}
-
-static int
-makeACREST(struct soap *soap, const std::string& command, const std::string& orderstring, const std::string& targets, int requested, int unknown)
-{
-  vomsresult vr;
-
-  if (unknown)
-    vr.setError(WARN_UNKNOWN_COMMAND, "Unknown parameters in the request were ignored!");
-
-  (void)makeACSSL(vr, soap->ssl, command, orderstring, targets, requested, selfpointer);
-
-  int value;
-  std::string output = vr.makeRESTAnswer(value);
-
-  soap->http_content = "text/xml";
-  soap_response(soap, value);
-  soap_send(soap, output.c_str());
-  soap_end_send(soap);
-
-  return SOAP_OK;
-}
-
-static void AdjustURI(std::string &uri, int port)
-{
-  if (uri.empty()) {
-    int   hostnamesize = 50;
-    char *hostname = new char[1];
-    int ok = 0;
-
-    do {
-      delete[] hostname;
-      hostname = new char[hostnamesize];
-      ok = gethostname(hostname, hostnamesize);
-      hostnamesize += 50;
-    } while (ok);
-    
-    std::string temp;
-
-    uri = std::string(hostname) + ":" + stringify(port, temp);
-
-    delete[] hostname;
-  }
-}
-
 static signed long int get_userid(sqliface::interface *db, X509 *cert, const std::string& voname, vomsresult &vr)
 {
   signed long int uid = -1;
@@ -1709,4 +1433,26 @@ static std::string addtoorder(std::string previous, char *group, char *role)
     (role  ? std::string("/Role=") + role : "");
 
   return previous;
+}
+
+static void AdjustURI(std::string &uri, int port)
+{
+  if (uri.empty()) {
+    int   hostnamesize = 50;
+    char *hostname = new char[1];
+    int ok = 0;
+
+    do {
+      delete[] hostname;
+      hostname = new char[hostnamesize];
+      ok = gethostname(hostname, hostnamesize);
+      hostnamesize += 50;
+    } while (ok);
+    
+    std::string temp;
+
+    uri = std::string(hostname) + ":" + stringify(port, temp);
+
+    delete[] hostname;
+  }
 }

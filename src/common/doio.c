@@ -27,10 +27,13 @@
 
 #include <stdio.h>
 #include <stdarg.h>
+#include <stdlib.h>
 
 char *vsnprintf_wrap(const char *format, va_list v)
 {
-  va_list w = v;
+  va_list w;
+
+  va_copy(w,v);;
   char *str = NULL;
   int plen = 0;
 

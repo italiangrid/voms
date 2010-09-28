@@ -127,6 +127,7 @@ GLOBUS_GSS_API_LIBS = @GLOBUS_GSS_API_LIBS@
 GLOBUS_GSS_LIBS = @GLOBUS_GSS_LIBS@
 GREP = @GREP@
 INSTALL = @INSTALL@
+INSTALL_API_LIBS = @INSTALL_API_LIBS@
 INSTALL_DATA = @INSTALL_DATA@
 INSTALL_PROGRAM = @INSTALL_PROGRAM@
 INSTALL_SCRIPT = @INSTALL_SCRIPT@
@@ -249,17 +250,17 @@ with_reportdir = @with_reportdir@
 with_scratchdir = @with_scratchdir@
 with_valgrind = @with_valgrind@
 defaultsysconfdir = @sysconfdir@
-defaultsysconf_DATA = \
-	vomses.template
+@BUILD_CONFIG_TRUE@defaultsysconf_DATA = \
+@BUILD_CONFIG_TRUE@	vomses.template
 
-sysconf_DATA = \
-	voms.data
+@BUILD_CONFIG_TRUE@sysconf_DATA = \
+@BUILD_CONFIG_TRUE@	voms.data
 
-libexec_SCRIPTS = \
-	voms_install_db \
-	upgrade1to2 \
-	voms-ping \
-	mysql2oracle
+@BUILD_CONFIG_TRUE@libexec_SCRIPTS = \
+@BUILD_CONFIG_TRUE@	voms_install_db \
+@BUILD_CONFIG_TRUE@	upgrade1to2 \
+@BUILD_CONFIG_TRUE@	voms-ping \
+@BUILD_CONFIG_TRUE@	mysql2oracle
 
 initdir = @sysconfdir@/init.d
 EXTRA_DIST = \
@@ -437,6 +438,7 @@ maintainer-clean-generic:
 	@echo "This command is intended for maintainers to use"
 	@echo "it deletes files that may require special tools to rebuild."
 	-test -z "$(MAINTAINERCLEANFILES)" || rm -f $(MAINTAINERCLEANFILES)
+@BUILD_SERVER_FALSE@install-exec-hook:
 clean: clean-am
 
 clean-am: clean-generic clean-libtool mostlyclean-am
@@ -511,9 +513,9 @@ uninstall-am: uninstall-defaultsysconfDATA uninstall-libexecSCRIPTS \
 	uninstall-libexecSCRIPTS uninstall-sysconfDATA
 
 
-install-exec-hook: voms.start
-	$(mkinstalldirs) $(DESTDIR)$(initdir)
-	$(INSTALL) $(top_builddir)/src/install/voms.start $(DESTDIR)$(initdir)/voms
+@BUILD_SERVER_TRUE@install-exec-hook: voms.start
+@BUILD_SERVER_TRUE@	$(mkinstalldirs) $(DESTDIR)$(initdir)
+@BUILD_SERVER_TRUE@	$(INSTALL) $(top_builddir)/src/install/voms.start $(DESTDIR)$(initdir)/voms
 # Tell versions [3.59,3.63) of GNU make to not export all variables.
 # Otherwise a system limit (for SysV at least) may be exceeded.
 .NOEXPORT:

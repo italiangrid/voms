@@ -382,12 +382,12 @@ libvomsc_gcc64dbgpthr_la_LIBADD = \
 libvomsc_gcc64dbgpthr_la_LDFLAGS = \
 	-rpath $(libdir)
 
+if BUILD_INTERFACES
 include_HEADERS = \
 	voms_api.h \
 	voms_apic.h \
 	voms_api_nog.h \
 	voms_apic_nog.h
-
 EXTRA_DIST = \
 	api_util.h \
 	ccval.h \
@@ -396,6 +396,7 @@ EXTRA_DIST = \
 	cinterface.h \
 	realdata.h \
 	internal.h
+endif
 
 CLEANFILES = \
 	libvomsapi_gcc32.la \
@@ -593,6 +594,9 @@ apidoc-local: $(HTML) $(MAN3)
 else
 apidoc-local:
 endif
+
+install-exec-am: lib_LTLIBRARIES = $(INSTALL_API_LIBS)
+install-exec-am: install-libLTLIBRARIES
 
 apidoc-recursive:
 #	$(MAKE) apidoc -C capi

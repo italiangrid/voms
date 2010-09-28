@@ -634,10 +634,12 @@ X509_EXTENSION *CreateProxyExtension(char * name, char *data, int datalen, int c
 	
  err:
   
-  /* avoid spurious free of the contents. */
-  ex_oct->length = 0;
-  ex_oct->data = NULL;
-  ASN1_OCTET_STRING_free(ex_oct);
+  if (ex_oct) {
+    /* avoid spurious free of the contents. */
+    ex_oct->length = 0;
+    ex_oct->data = NULL;
+    ASN1_OCTET_STRING_free(ex_oct);
+  }
 
   ASN1_OBJECT_free(ex_obj);
   

@@ -611,7 +611,6 @@ proxy_load_user_proxy(
 
     int                                 ret = -1;
     BIO *                               in = NULL;
-    int                                 i;
     int                                 count=0;
     X509 *                              x = NULL;
 
@@ -645,11 +644,10 @@ proxy_load_user_proxy(
             }
         }
 
-        if (count)
-        {
-            i = sk_X509_insert(cert_chain,x,sk_X509_num(cert_chain));
+        if (count) {
+          (void)sk_X509_insert(cert_chain,x,sk_X509_num(cert_chain));
 
-            x = NULL;
+          x = NULL;
         }
         
         count++;
@@ -2530,7 +2528,6 @@ proxy_get_filenames(
 {
 
     int                                 status = -1;
-    int                                 len;
     char *                              cert_file = NULL;
     char *                              cert_dir = NULL;
     char *                              user_proxy = NULL;
@@ -2676,7 +2673,6 @@ proxy_get_filenames(
 
             if (globus_location)
             {
-                installed_cert_dir = (char *) malloc(len);
                 installed_cert_dir = snprintf_wrap("%s%s%s",
                         globus_location,
                         FILE_SEPERATOR,
@@ -3062,20 +3058,11 @@ int PRIVATE
 proxy_load_user_cert(
     const char *                        user_cert,
     X509 **                              certificate,
-    int                                 (*pw_cb)(),
+    UNUSED(int                                 (*pw_cb)()),
     UNUSED(unsigned long *                     hSession))
 {
     int                                 status = -1;
     FILE *                              fp;
-    int                                 (*xpw_cb)();
-
-    xpw_cb = pw_cb;
-#ifdef WIN32
-    if (!xpw_cb)
-    {
-        xpw_cb = read_passphrase_win32;
-    }
-#endif
 
     /* Check arguments */
     if (!user_cert)
@@ -3490,7 +3477,7 @@ ASN1_UTCTIME_mktime(
   i = ctm->length;
   str = (char *)ctm->data;
   if ((i < 11) || (i > 17)) {
-    newtime = 0;
+    return 0;
   }
   memcpy(p,str,size);
   p += size;
@@ -3502,15 +3489,15 @@ ASN1_UTCTIME_mktime(
   else {
     *(p++)= *(str++); *(p++)= *(str++);
   }
-  *(p++)='Z';
-  *(p++)='\0';
+  *(p++) = 'Z';
+  *p = '\0';
 
   if (*str == 'Z') {
     offset=0;
   }
   else {
     if ((*str != '+') && (str[5] != '-')) {
-      newtime = 0;
+      return 0;
     }
     offset=((str[1]-'0')*10+(str[2]-'0'))*60;
     offset+=(str[3]-'0')*10+(str[4]-'0');
@@ -3549,7 +3536,7 @@ ASN1_UTCTIME_mktime(
   tm.tm_min   = (buff1[index++]-'0')*10;
   tm.tm_min  += (buff1[index++]-'0');
   tm.tm_sec   = (buff1[index++]-'0')*10;
-  tm.tm_sec  += (buff1[index++]-'0');
+  tm.tm_sec  += (buff1[index]-'0');
 
   /*
    * mktime assumes local time, so subtract off
@@ -3873,8 +3860,8 @@ static X509_NAME *make_DN(const char *dnstring)
 {
   char *buffername = (char*)malloc(strlen(dnstring)+1);
   unsigned char *buffervalue = (unsigned char*)malloc(strlen(dnstring)+1);
-  char *currentname = buffername;
-  unsigned char *currentvalue = buffervalue;
+  char *currentname;
+  unsigned char *currentvalue;
   X509_NAME *name = NULL;
   int valuelen = 0;
   char next = 0;

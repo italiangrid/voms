@@ -47,19 +47,19 @@ CONFIG_CLEAN_FILES =
 am__installdirs = "$(DESTDIR)$(sbindir)"
 sbinPROGRAMS_INSTALL = $(INSTALL_PROGRAM)
 PROGRAMS = $(sbin_PROGRAMS)
-am__voms_SOURCES_DIST = main.cc vomsd.cc VOMSServer.h attribute.h \
-	uuid.c uuid.h attribute.cc soapC.c stdsoap2.c
+am__voms_SOURCES_DIST = main.cc vomsd.cc vomsd-rest.cc VOMSServer.h \
+	attribute.h uuid.c uuid.h attribute.cc soapC.c stdsoap2.c
 @BUILD_SERVER_TRUE@am_voms_OBJECTS = main.$(OBJEXT) vomsd.$(OBJEXT) \
-@BUILD_SERVER_TRUE@	uuid.$(OBJEXT) attribute.$(OBJEXT) \
-@BUILD_SERVER_TRUE@	soapC.$(OBJEXT) stdsoap2.$(OBJEXT)
+@BUILD_SERVER_TRUE@	vomsd-rest.$(OBJEXT) uuid.$(OBJEXT) \
+@BUILD_SERVER_TRUE@	attribute.$(OBJEXT) soapC.$(OBJEXT) \
+@BUILD_SERVER_TRUE@	stdsoap2.$(OBJEXT)
 voms_OBJECTS = $(am_voms_OBJECTS)
 am__DEPENDENCIES_1 =
 @BUILD_SERVER_TRUE@voms_DEPENDENCIES =  \
 @BUILD_SERVER_TRUE@	$(top_builddir)/src/socklib/libsock_nog.la \
 @BUILD_SERVER_TRUE@	$(top_builddir)/src/common/libutilities_nog.la \
-@BUILD_SERVER_TRUE@	$(top_builddir)/src/ac/libccattcert.la \
+@BUILD_SERVER_TRUE@	$(top_builddir)/src/ac/libattributes_nog.la \
 @BUILD_SERVER_TRUE@	$(top_builddir)/src/common/libutilc_nog.la \
-@BUILD_SERVER_TRUE@	$(top_builddir)/src/ac/libattcert.la \
 @BUILD_SERVER_TRUE@	$(top_builddir)/src/replib/librep.la \
 @BUILD_SERVER_TRUE@	$(top_builddir)/src/log/liblog.la \
 @BUILD_SERVER_TRUE@	$(top_builddir)/src/api/ccapi/libvomsapi_nog.la \
@@ -157,6 +157,7 @@ GLOBUS_GSS_API_LIBS = @GLOBUS_GSS_API_LIBS@
 GLOBUS_GSS_LIBS = @GLOBUS_GSS_LIBS@
 GREP = @GREP@
 INSTALL = @INSTALL@
+INSTALL_API_LIBS = @INSTALL_API_LIBS@
 INSTALL_DATA = @INSTALL_DATA@
 INSTALL_PROGRAM = @INSTALL_PROGRAM@
 INSTALL_SCRIPT = @INSTALL_SCRIPT@
@@ -281,6 +282,7 @@ with_valgrind = @with_valgrind@
 @BUILD_SERVER_TRUE@voms_SOURCES = \
 @BUILD_SERVER_TRUE@	main.cc \
 @BUILD_SERVER_TRUE@	vomsd.cc \
+@BUILD_SERVER_TRUE@	vomsd-rest.cc \
 @BUILD_SERVER_TRUE@	VOMSServer.h \
 @BUILD_SERVER_TRUE@	attribute.h \
 @BUILD_SERVER_TRUE@	uuid.c \
@@ -294,9 +296,8 @@ with_valgrind = @with_valgrind@
 @BUILD_SERVER_TRUE@voms_LDADD = \
 @BUILD_SERVER_TRUE@	$(top_builddir)/src/socklib/libsock_nog.la \
 @BUILD_SERVER_TRUE@	$(top_builddir)/src/common/libutilities_nog.la \
-@BUILD_SERVER_TRUE@	$(top_builddir)/src/ac/libccattcert.la \
+@BUILD_SERVER_TRUE@	$(top_builddir)/src/ac/libattributes_nog.la \
 @BUILD_SERVER_TRUE@	$(top_builddir)/src/common/libutilc_nog.la \
-@BUILD_SERVER_TRUE@	$(top_builddir)/src/ac/libattcert.la \
 @BUILD_SERVER_TRUE@	$(top_builddir)/src/replib/librep.la \
 @BUILD_SERVER_TRUE@	$(top_builddir)/src/log/liblog.la \
 @BUILD_SERVER_TRUE@	$(top_builddir)/src/api/ccapi/libvomsapi_nog.la \
@@ -385,6 +386,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/soapC.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/stdsoap2.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/uuid.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/vomsd-rest.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/vomsd.Po@am__quote@
 
 .c.o:

@@ -114,6 +114,7 @@ GLOBUS_GSS_API_LIBS = @GLOBUS_GSS_API_LIBS@
 GLOBUS_GSS_LIBS = @GLOBUS_GSS_LIBS@
 GREP = @GREP@
 INSTALL = @INSTALL@
+INSTALL_API_LIBS = @INSTALL_API_LIBS@
 INSTALL_DATA = @INSTALL_DATA@
 INSTALL_PROGRAM = @INSTALL_PROGRAM@
 INSTALL_SCRIPT = @INSTALL_SCRIPT@
@@ -235,7 +236,7 @@ with_mysqlconf = @with_mysqlconf@
 with_reportdir = @with_reportdir@
 with_scratchdir = @with_scratchdir@
 with_valgrind = @with_valgrind@
-libexec_SCRIPTS = voms_replica_master_setup.sh voms_replica_slave_setup.sh
+@BUILD_SERVER_TRUE@libexec_SCRIPTS = voms_replica_master_setup.sh voms_replica_slave_setup.sh
 EXTRA_DIST = voms_replica_master_setup.sh voms_replica_slave_setup.sh
 MAINTAINERCLEANFILES = Makefile.in
 all: all-am

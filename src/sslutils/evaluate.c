@@ -251,7 +251,7 @@ static int restriction_evaluate_namespace(STACK_OF(X509) *chain, struct policy *
   }
 
   for (i = start; i != end; i += step) {
-    int j = i;
+    int j;
     X509 *cert = sk_X509_value(chain, i);
 
     for (j = i; j >= 0; j--) {
@@ -314,13 +314,13 @@ static void free_policy(struct policy *pol)
 {
   free(pol->caname);
 
-  listfree(pol->conds, (freefn)free_condition);
+  listfree((char**)(pol->conds), (freefn)free_condition);
   free(pol);
 }
 
 void free_policies(struct policy **policies)
 {
-  listfree(policies, free_policy);
+  listfree((char**)policies, (freefn)free_policy);
 }
 
 static FILE *open_from_dir(char *path, char *filename)
@@ -342,7 +342,7 @@ void read_pathrestriction(STACK_OF(X509) *chain, char *path,
 {
   int size = sk_X509_num(chain);
   char hashed[9];
-  char *hash = hashed;
+  char *hash;
   char signing[25]   = "/XXXXXXXX.signing_policy";
   char namespace[21] = "/XXXXXXXX.namespaces";
   int i = 0, j = 0;
@@ -395,6 +395,5 @@ void read_pathrestriction(STACK_OF(X509) *chain, char *path,
         j++;
       }
     }
-
   }
 }

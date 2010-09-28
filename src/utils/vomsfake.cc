@@ -86,7 +86,7 @@ extern int writeac(const X509 *issuerc, const STACK_OF(X509) *certstack, const X
 }
 
 static int time_to_sec(std::string timestring);
-static long mystrtol(char *number, int limit);
+static long mystrtol(char *number, long int limit);
 static std::string hextostring(const std::string &data);
 static int hex2value(char c);
 
@@ -1056,7 +1056,7 @@ static int time_to_sec(std::string timestring)
   return seconds + minutes * 60 + hours * 3600;
 }
 
-static long mystrtol(char *number, int limit)
+static long mystrtol(char *number, long int limit)
 {
   char *end = NULL;
 
@@ -1082,6 +1082,7 @@ static long mystrtol(char *number, int limit)
 STACK_OF(X509_EXTENSION) *Fake::create_and_add_extension(const std::string &string, STACK_OF(X509_EXTENSION) *exts)
 {
   bool alloced = false;
+  X509_EXTENSION *ext = NULL;
 
   if (!exts) { 
     exts= sk_X509_EXTENSION_new_null();
@@ -1092,7 +1093,7 @@ STACK_OF(X509_EXTENSION) *Fake::create_and_add_extension(const std::string &stri
     alloced = true;
   }
 
-  X509_EXTENSION *ext = create_extension(string);
+  ext = create_extension(string);
 
   if (ext) {
     if (!sk_X509_EXTENSION_push(exts, ext)) {

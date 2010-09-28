@@ -4,6 +4,7 @@ sbin_PROGRAMS = voms
 voms_SOURCES = \
 	main.cc \
 	vomsd.cc \
+	vomsd-rest.cc \
 	VOMSServer.h \
 	attribute.h \
 	uuid.c \
@@ -17,9 +18,8 @@ voms_SOURCES = \
 voms_LDADD = \
 	$(top_builddir)/src/socklib/libsock_nog.la \
 	$(top_builddir)/src/common/libutilities_nog.la \
-	$(top_builddir)/src/ac/libccattcert.la \
+	$(top_builddir)/src/ac/libattributes_nog.la \
 	$(top_builddir)/src/common/libutilc_nog.la \
-	$(top_builddir)/src/ac/libattcert.la \
 	$(top_builddir)/src/replib/librep.la \
 	$(top_builddir)/src/log/liblog.la \
 	$(top_builddir)/src/api/ccapi/libvomsapi_nog.la \

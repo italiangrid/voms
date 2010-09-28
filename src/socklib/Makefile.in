@@ -34,7 +34,7 @@ POST_UNINSTALL = :
 build_triplet = @build@
 host_triplet = @host@
 subdir = src/socklib
-DIST_COMMON = $(include_HEADERS) $(srcdir)/Makefile.am \
+DIST_COMMON = $(am__include_HEADERS_DIST) $(srcdir)/Makefile.am \
 	$(srcdir)/Makefile.in
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 am__aclocal_m4_deps = $(top_srcdir)/project/acinclude.m4 \
@@ -176,6 +176,7 @@ DIST_SOURCES = $(libsock_la_SOURCES) $(libsock_gcc32_la_SOURCES) \
 	$(libsock_gcc64dbg_la_SOURCES) \
 	$(libsock_gcc64dbgpthr_la_SOURCES) \
 	$(libsock_gcc64pthr_la_SOURCES) $(libsock_nog_la_SOURCES)
+am__include_HEADERS_DIST = vomsssl.h
 am__vpath_adj_setup = srcdirstrip=`echo "$(srcdir)" | sed 's|.|.|g'`;
 am__vpath_adj = case $$p in \
     $(srcdir)/*) f=`echo "$$p" | sed "s|^$$srcdirstrip/||"`;; \
@@ -252,6 +253,7 @@ GLOBUS_GSS_API_LIBS = @GLOBUS_GSS_API_LIBS@
 GLOBUS_GSS_LIBS = @GLOBUS_GSS_LIBS@
 GREP = @GREP@
 INSTALL = @INSTALL@
+INSTALL_API_LIBS = @INSTALL_API_LIBS@
 INSTALL_DATA = @INSTALL_DATA@
 INSTALL_PROGRAM = @INSTALL_PROGRAM@
 INSTALL_SCRIPT = @INSTALL_SCRIPT@
@@ -373,8 +375,8 @@ with_mysqlconf = @with_mysqlconf@
 with_reportdir = @with_reportdir@
 with_scratchdir = @with_scratchdir@
 with_valgrind = @with_valgrind@
-include_HEADERS = \
-	vomsssl.h
+@BUILD_INTERFACES_TRUE@include_HEADERS = \
+@BUILD_INTERFACES_TRUE@	vomsssl.h
 
 noinst_LTLIBRARIES = \
 	$(WANTED_SOCK_LIBS) # may add the libraries defined in EXTRA_LTLIBRARIES

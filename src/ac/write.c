@@ -94,11 +94,10 @@ int writeac(X509 *issuerc, STACK_OF(X509) *issuerstack, X509 *holder, EVP_PKEY *
   AC_ATTR *capabilities;
   AC_IETFATTR *capnames;
   AC_FULL_ATTRIBUTES *ac_full_attrs;
-  ASN1_OBJECT *cobj, *aobj;
+  ASN1_OBJECT *cobj;
   X509_ALGOR *alg1, *alg2;
   ASN1_GENERALIZEDTIME *time1, *time2;
   AC_ATT_HOLDER *ac_att_holder = NULL;
-  char *qual, *name, *value, *tmp, *tmp2;
   STACK_OF(X509) *stk = NULL;
   
   ASN1_NULL *null;
@@ -109,16 +108,15 @@ int writeac(X509 *issuerc, STACK_OF(X509) *issuerstack, X509 *holder, EVP_PKEY *
   time_t curtime;
 
   a = NULL;
-  name1 = name2 = subjdup = issdup = NULL;
+  subjdup = issdup = NULL;
   dirn = dirn2 = NULL;
-  version = serial = holdserial = NULL;
+  serial = holdserial = NULL;
   time1 = time2 = NULL;
   uid = NULL;
   capabilities = NULL;
   capnames = NULL;
-  cobj = aobj = NULL;
+  cobj = NULL;
   ac_full_attrs = NULL;
-  qual = name = value = tmp = tmp2 = NULL;
 
   if (!issuerc || !holder || !s || !fqan || !ac || !pkey)
     return AC_ERR_PARAMETERS;
@@ -152,7 +150,6 @@ int writeac(X509 *issuerc, STACK_OF(X509) *issuerstack, X509 *holder, EVP_PKEY *
   version             = BN_to_ASN1_INTEGER((BIGNUM *)(BN_value_one()), NULL);
   capabilities        = AC_ATTR_new();
   cobj                = OBJ_txt2obj("idatcap",0);
-  aobj                = OBJ_txt2obj("attributes",0);
   capnames            = AC_IETFATTR_new();
   null                = ASN1_NULL_new();
   ac_full_attrs       = AC_FULL_ATTRIBUTES_new();

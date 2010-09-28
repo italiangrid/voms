@@ -11,16 +11,28 @@ AC_DEFUN([AC_LINUX],
 
 AC_DEFUN([AC_BUILD_PARTS],
 [
+
+  AC_ARG_WITH(all,
+    [  --with-all   Enable compilation of the clients (yes)],
+    [
+      case "$withval" in
+        yes) build_all="yes" ;;
+        no)  build_all="no" ;;
+        *) AC_MSG_ERROR([bad value $withval for --with-all]) ;;
+      esac
+    ],
+    [ build_all="yes" ])
+
   AC_ARG_WITH(clients,
     [  --with-clients   Enable compilation of the clients (yes)],
     [
       case "$withval" in
         yes) build_clients="yes" ;;
         no)  build_clients="no" ;;
-        *) AC_MSG_ERROR([bad value $(withval) for --with-client]) ;;
+        *) AC_MSG_ERROR([bad value $withval for --with-client]) ;;
       esac
     ],
-    [ build_clients="yes" ])
+    [ build_clients="$build_all" ])
 
   AC_ARG_WITH(server,
     [  --with-server   Enable compilation of the server (yes)],
@@ -28,13 +40,80 @@ AC_DEFUN([AC_BUILD_PARTS],
       case "$withval" in
         yes) build_server="yes" ;;
         no)  build_server="no" ;;
-        *) AC_MSG_ERROR([bad value $(withval) for --with-server]) ;;
+        *) AC_MSG_ERROR([bad value $withval for --with-server]) ;;
       esac
     ],
-    [ build_server="yes" ])
+    [ build_server="$build_all" ])
 
-  AM_CONDITIONAL(BUILD_CLIENTS, test x$build_clients = xyes)
-  AM_CONDITIONAL(BUILD_SERVER, test x$build_server = xyes)
+  AC_ARG_WITH(java-only,
+    [ --with-java-only     Builds only the java APIs ],
+    [ wjavaall="$withval" ],
+    [ wjavaall="no"])
+
+  AC_ARG_WITH(c-api,
+    [  --with-c-api   Enable compilation of the C APIs (yes)],
+    [
+      case "$withval" in
+        yes) build_c_api="yes" ;;
+        no)  build_c_api="no" ;;
+        *) AC_MSG_ERROR([bad value $withval for --with-c-api]) ;;
+      esac
+    ],
+    [ build_c_api="$build_all" ])
+
+  AC_ARG_WITH(cpp-api,
+    [  --with-cpp-api   Enable compilation of the C++ APIs (yes)],
+    [
+      case "$withval" in
+        yes) build_cpp_api="yes" ;;
+        no)  build_cpp_api="no" ;;
+        *) AC_MSG_ERROR([bad value $withval for --with-cpp-api]) ;;
+      esac
+    ],
+    [ build_cpp_api="$build_all" ])
+
+  AC_ARG_WITH(interfaces,
+    [  --with-interfaces   Enable compilation of the includes (yes)],
+    [
+      case "$withval" in
+        yes) build_interfaces="yes" ;;
+        no)  build_interfaces="no" ;;
+        *) AC_MSG_ERROR([bad value $withval for --with-interfaces]) ;;
+      esac
+    ],
+    [ build_interfaces="$build_all" ])
+
+  AC_ARG_WITH(config,
+    [  --with-config   Enable compilation of the includes (yes)],
+    [
+      case "$withval" in
+        yes) build_config="yes" ;;
+        no)  build_config="no" ;;
+        *) AC_MSG_ERROR([bad value $withval for --with-config]) ;;
+      esac
+    ],
+    [ build_config="build_all" ])
+
+  AC_ARG_WITH(no-globus-only,
+    [  --with-no-globus-only   Enable compilation of the includes (yes)],
+    [
+      case "$withval" in
+        yes) build_nglobus_only="yes" ;;
+        no)  build_nglobus_only="no" ;;
+        *) AC_MSG_ERROR([bad value $withval for --with-no-globus-only]) ;;
+      esac
+    ],
+    [ build_nglobus_only="no" ])
+
+
+  AM_CONDITIONAL(BUILD_JAVA_ONLY,  test x$wjavaall = xyes)
+  AM_CONDITIONAL(BUILD_C_API,      test x$build_c_api = xyes)
+  AM_CONDITIONAL(BUILD_CPP_API,    test x$build_cpp_api = xyes)
+  AM_CONDITIONAL(BUILD_INTERFACES, test x$build_interfaces = xyes)
+  AM_CONDITIONAL(BUILD_CLIENTS,    test x$build_clients = xyes)
+  AM_CONDITIONAL(BUILD_SERVER,     test x$build_server = xyes)
+  AM_CONDITIONAL(BUILD_CONFIG,     test x$build_config = xyes)
+  AM_CONDITIONAL(BUILD_NOGLOBUS_ONLY,   test x$build_nglobus_only = xyes)
 ])
 
 AC_DEFUN([AC_VOMS_LIBRARY],
@@ -526,12 +605,6 @@ AC_DEFUN([AC_JAVA],
     AC_MSG_RESULT([specified: $wcomlang])
   fi
 
-  AC_ARG_WITH(java-only,
-    [ --with-java-only     Builds only the java APIs ],
-    [ wjavaall="$withval" ],
-    [ wjavaall="no"])
-
-  AM_CONDITIONAL(BUILD_JAVA_ONLY, test x$wjavaall = xyes)
           
   JAVA_CLASSPATH=".:$wbc:$wlog4j:$wcomcli:$wcomlang"
   JAVA_CLASSPATH2=""
@@ -563,6 +636,20 @@ AC_DEFUN([AC_ENABLE_DOCS],
 	    [build_docs="no"])
 
     AM_CONDITIONAL(BUILD_DOCS, test x$build_docs = xyes)
+])
+
+AC_DEFUN([AC_EMI_LIBS],
+[
+    AC_ARG_ENABLE(emi-libs,
+      [ --enable-emi-libs Enable Library generation with EMI rules ],
+      [
+        case "$enableval" in
+        yes) build_emi="yes" ;;
+        no) build_emi="no" ;;
+        *) AC_MSG_ERROR(bad value $(enableval) for --enable-emi-libs) ;;
+        esac
+      ],
+      [ build_emi="no"])    
 ])
 
 # AC_ENABLE_GLITE switch for glite

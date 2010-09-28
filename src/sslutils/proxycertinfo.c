@@ -415,7 +415,7 @@ static char *myproxycertinfo_i2s(UNUSED(struct v3_ext_method *method), void *ext
 			   output, 
 			   ( dooid ? oid : ""), 
 			   ( (pp && pp->policy) ? "\nPolicy Text: " : ""), 
-			   ( (pp && pp->policy) ? ASN1_STRING_data(pp->policy) : ""),
+         ( (pp && pp->policy) ? (char*)ASN1_STRING_data(pp->policy) : ""),
 			   ( (pp && pp->policy) ? "\n" : ""));
 
   free(output);

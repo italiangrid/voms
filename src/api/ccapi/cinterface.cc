@@ -42,6 +42,8 @@ extern "C" {
 #include <cstring>
 #include <cstdlib>
 
+void VOMS_Destroy(struct vomsdatar *vd);
+
 int TranslateVOMS(struct vomsdatar *vd, std::vector<voms> &v, UNUSED(int *error))
 {
   if (vd->data) {
@@ -49,9 +51,8 @@ int TranslateVOMS(struct vomsdatar *vd, std::vector<voms> &v, UNUSED(int *error)
     free(vd->data[0]);
     free(vd->data);
   }
-  int vsize = v.size();
-  
-  struct vomsr **arr2 = (struct vomsr **)malloc((vsize+1) * sizeof(struct vomsr *));
+
+  struct vomsr **arr2 = (struct vomsr **)malloc((v.size()+1) * sizeof(struct vomsr *));
   int i = 0;
 
   if (arr2) {
@@ -96,22 +97,26 @@ struct vomsdatar *VOMS_Init(char *voms, char *cert)
 {
   struct vomsdatar *vd = NULL;
   try {
-    vomsdata *v = new vomsdata((voms ? std::string(voms) : ""),
-                               (cert ? std::string(cert) : ""));
-
     if ((vd = (struct vomsdatar *)malloc(sizeof(struct vomsdatar)))) {
       vd->cdir = mystrdup(voms ? voms : "");
       vd->vdir = mystrdup(cert ? cert : "");
       vd->data = NULL;
       vd->extra_data = vd->workvo = NULL;
       vd->volen = vd->extralen = 0;
-      vd->real = v;
+      vd->real = new vomsdata((voms ? std::string(voms) : ""),
+                              (cert ? std::string(cert) : ""));;
       vd->timeout = -1;
     }
   }
-  catch(...) {}
+  catch(...) {
+    goto err;
+  }
   
   return vd;
+
+ err:
+  VOMS_Destroy(vd);
+  return NULL;
 }
 
 #define GetPointer(v) (((struct realdata *)(((struct vomsdatar *)((v)->my2))->real->data[v->mydata].realdata)))
@@ -855,8 +860,6 @@ vomsdatar *VOMS_Duplicate(vomsdatar *orig)
   struct vomsdatar *vd = NULL;
 
   try {
-    vomsdata *v = new vomsdata(*(orig->real));
-
     if ((vd = (struct vomsdatar *)malloc(sizeof(struct vomsdatar)))) {
       int error = 0;
 
@@ -868,17 +871,21 @@ vomsdatar *VOMS_Duplicate(vomsdatar *orig)
       vd->volen = orig->volen;
       vd->extralen = orig->extralen;
       vd->timeout = orig->timeout;
-      vd->real = v;
+      vd->real = new vomsdata(*(orig->real));
 
-      if (!TranslateVOMS(vd, v->data, &error)) {
-        VOMS_Destroy(vd);
-        vd = NULL;
-      }
+      if (!TranslateVOMS(vd, vd->real->data, &error))
+        goto err;
     }
   }
-  catch(...) {}
+  catch(...) {
+    goto err;
+  }
 
   return vd;
+
+ err:
+  VOMS_Destroy(vd);
+  return NULL;
 }
 
 AC *VOMS_GetAC(vomsr *v)

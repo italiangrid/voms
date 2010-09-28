@@ -111,6 +111,7 @@ GLOBUS_GSS_API_LIBS = @GLOBUS_GSS_API_LIBS@
 GLOBUS_GSS_LIBS = @GLOBUS_GSS_LIBS@
 GREP = @GREP@
 INSTALL = @INSTALL@
+INSTALL_API_LIBS = @INSTALL_API_LIBS@
 INSTALL_DATA = @INSTALL_DATA@
 INSTALL_PROGRAM = @INSTALL_PROGRAM@
 INSTALL_SCRIPT = @INSTALL_SCRIPT@
@@ -331,6 +332,7 @@ distclean-generic:
 maintainer-clean-generic:
 	@echo "This command is intended for maintainers to use"
 	@echo "it deletes files that may require special tools to rebuild."
+@BUILD_INTERFACES_FALSE@install-exec-hook:
 clean: clean-am
 
 clean-am: clean-generic clean-libtool mostlyclean-am
@@ -401,9 +403,9 @@ uninstall-am:
 	mostlyclean-generic mostlyclean-libtool pdf pdf-am ps ps-am \
 	uninstall uninstall-am
 
-install-exec-hook:
-	$(mkinstalldirs) $(DESTDIR)/$(datadir)/m4
-	$(INSTALL_DATA) $(top_srcdir)/project/voms.m4 $(DESTDIR)/$(datadir)/m4
+@BUILD_INTERFACES_TRUE@install-exec-hook:
+@BUILD_INTERFACES_TRUE@	$(mkinstalldirs) $(DESTDIR)/$(datadir)/m4
+@BUILD_INTERFACES_TRUE@	$(INSTALL_DATA) $(top_srcdir)/project/voms.m4 $(DESTDIR)/$(datadir)/m4
 # Tell versions [3.59,3.63) of GNU make to not export all variables.
 # Otherwise a system limit (for SysV at least) may be exceeded.
 .NOEXPORT:

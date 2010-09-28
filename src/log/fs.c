@@ -221,7 +221,7 @@ static int logfile_rotate(const char * name)
   char *fname = NULL;
   int fd;
 
-  pos = dirname = fname = newname = oldname = NULL;
+  newname = NULL;
 
   /* get the name of the directory and of the file */
 
@@ -235,7 +235,7 @@ static int logfile_rotate(const char * name)
   
     if (pos == NULL) {
       dirname = snprintf_wrap(".");
-      basename = pos;
+      basename = name;
     }
     else if (pos == name) {
       dirname = snprintf_wrap("/");
@@ -262,21 +262,21 @@ static int logfile_rotate(const char * name)
             strncmp(basename, de->d_name, baselen) == 0)
           max = atoi(pos+1);
       }
+      closedir(dir);
     }
-    closedir(dir);
     free(dirname);
 
     /* rename each file increasing the suffix */
     if (max) {
       for(i = max; i > 0 ; --i) {
-	newname = snprintf_wrap("%s.%d", name, i+1);
-	oldname = snprintf_wrap("%s.%d", name, i);
+        newname = snprintf_wrap("%s.%d", name, i+1);
+        oldname = snprintf_wrap("%s.%d", name, i);
     
-	if (newname && oldname)
-	  (void)rename(oldname, newname);
+        if (newname && oldname)
+          (void)rename(oldname, newname);
 
-	free(oldname);
-	free(newname);
+        free(oldname);
+        free(newname);
       }
     }
 
@@ -285,7 +285,7 @@ static int logfile_rotate(const char * name)
     /* rename the main file to .1  */
     if (newname) {
       if (rename(name, newname) != -1)
-	result = 1;
+        result = 1;
     }
 
     free(newname);
