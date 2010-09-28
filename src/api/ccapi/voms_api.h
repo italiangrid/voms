@@ -90,6 +90,8 @@ struct contactdata {   /*!< You must never allocate directly this structure.
   int          version; /*!< The version of globus under which the server is running */ 
 };
 
+class vomspriv;
+
 struct voms {
   friend class vomsdata;
   int version;             /*!< 0 means data didn't originate from an AC */
@@ -130,6 +132,9 @@ public:
 public:
   std::vector<attributelist>& GetAttributes();   /*!< Generic attributes */
   std::vector<std::string> GetTargets();
+
+private:
+  vomspriv *vp;
 };
 
 enum recurse_type { 
@@ -180,6 +185,8 @@ enum verror_type {
 };
 
 typedef bool (*check_sig)(X509 *, void *, verror_type &); /*!<*/
+
+class vomsdatapriv;
 
 struct vomsdata {
   private:
@@ -490,6 +497,9 @@ public:
 
 private:
   bool InterpretOutput(const std::string&, std::string&);
+
+private:
+  vomsdatapriv *vdp;
 };
 
 
