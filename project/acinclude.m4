@@ -105,7 +105,6 @@ AC_DEFUN([AC_BUILD_PARTS],
     ],
     [ build_nglobus_only="no" ])
 
-
   AM_CONDITIONAL(BUILD_JAVA_ONLY,  test x$wjavaall = xyes)
   AM_CONDITIONAL(BUILD_C_API,      test x$build_c_api = xyes)
   AM_CONDITIONAL(BUILD_CPP_API,    test x$build_cpp_api = xyes)
