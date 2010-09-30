@@ -84,7 +84,7 @@ AC_DEFUN([AC_BUILD_PARTS],
     [ build_interfaces="$build_all" ])
 
   AC_ARG_WITH(config,
-    [  --with-config   Enable compilation of the includes (yes)],
+    [  --with-config   Enable compilation of the configuration files (yes)],
     [
       case "$withval" in
         yes) build_config="yes" ;;
@@ -95,7 +95,7 @@ AC_DEFUN([AC_BUILD_PARTS],
     [ build_config="build_all" ])
 
   AC_ARG_WITH(no-globus-only,
-    [  --with-no-globus-only   Enable compilation of the includes (yes)],
+    [  --with-no-globus-only   Compiles only the globus-independent libraries (yes)],
     [
       case "$withval" in
         yes) build_nglobus_only="yes" ;;
