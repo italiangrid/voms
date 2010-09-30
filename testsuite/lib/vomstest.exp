@@ -223,7 +223,7 @@ proc _setupPKI {} {
 proc _setupNormalVomsMysql {} {
     _defineVOMSServer voms1
     _defineVOMSOption voms1 db-type   mysql
-    _defineVOMSOption voms1 db        voms_test2
+    _defineVOMSOption voms1 db        voms_test1000
     if [expr ! [string equal $::DBPASSWORD ""]] then {
         _defineVOMSOption voms1 db-pwd    $::DBPASSWORD
     }
