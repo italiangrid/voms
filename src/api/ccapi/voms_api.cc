@@ -115,7 +115,8 @@ vomsdata::vomsdata(std::string voms_dir, std::string cert_dir) :  ca_cert_dir(ce
                                                                   extra_data(""),
                                                                   ver_type(VERIFY_FULL),
                                                                   retry_count(1),
-                                                                  verificationtime(0)
+                                                                  verificationtime(0),
+                                                                  vdp(NULL)
 {
 #ifndef NOGLOBUS
    (void)globus_thread_once(&l_globus_once_control, l_init_globus_once_func);
@@ -836,9 +837,10 @@ voms::voms(const voms &orig)
   
   ((struct realdata *)realdata)->attributes = 
     new std::vector<attributelist>(*(((struct realdata *)orig.realdata)->attributes));
+  vp = NULL;
 }
 
-voms::voms(): version(0), siglen(0), holder(NULL)
+voms::voms(): version(0), siglen(0), holder(NULL), vp(NULL)
 {
   realdata = (void *)calloc(1, sizeof(struct realdata));
 }
@@ -864,6 +866,7 @@ voms &voms::operator=(const voms &orig)
   custom    = orig.custom;
   fqan      = orig.fqan;
   serial    = orig.serial;
+  vp        = NULL;
   AC_free(((struct realdata *)realdata)->ac);
 
   ((struct realdata *)realdata)->ac = AC_dup(((struct realdata *)orig.realdata)->ac);
@@ -906,7 +909,8 @@ vomsdata::vomsdata(const vomsdata &orig) : ca_cert_dir(orig.ca_cert_dir),
                                            serverrors(orig.serverrors),
                                            errmessage(orig.errmessage),
                                            retry_count(orig.retry_count),
-                                           verificationtime(orig.verificationtime)
+                                           verificationtime(orig.verificationtime),
+                                           vdp(NULL)
 {}
 
 int getMajorVersionNumber(void) {return 2;}

@@ -208,7 +208,7 @@ public class VOMSESFileParser {
             if ( line.matches( "\\s*$" ) )
                 continue;
 
-            String[] tokens = splitLine( line );
+            String[] tokens = splitLine( line.trim() );
 
             if ( tokens.length < 5 || tokens.length > 6 )
                 throw new VOMSException( "Syntax error on vomses file!" );
