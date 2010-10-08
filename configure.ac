@@ -3,7 +3,7 @@ AC_PREREQ(2.57)
 AC_CONFIG_AUX_DIR([./project])
 AM_INIT_AUTOMAKE
 AC_CONFIG_SRCDIR([src/utils/voms_proxy_destroy.cc])
-
+AC_CONFIG_MACRO_DIR([m4])
 AM_MAINTAINER_MODE
 
 # Notices.

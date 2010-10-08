@@ -1,3 +1,4 @@
+ACLOCAL_AMFLAGS=-I m4
 SUBDIRS = src doc project testsuite
 
 EXTRA_DIST = build.xml autogen.sh LICENSE project/build.number project/build.properties \

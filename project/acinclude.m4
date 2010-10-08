@@ -608,8 +608,6 @@ AC_DEFUN([AC_JAVA],
   JAVA_CLASSPATH=".:$wbc:$wlog4j:$wcomcli:$wcomlang"
   JAVA_CLASSPATH2=""
 
-#  JAVA_CLASSPATH2='.:/data/marotta/cog-1.1/lib/cog-jglobus.jar:${top_srcdir}/jars/commons-cli-1.0.jar:${top_srcdir}/jars/commons-lang-2.2.jar:/data/marotta/cog-1.1/lib/cryptix32.jar:/data/marotta/cog-1.1/lib/cryptix-asn1.jar:/data/marotta/cog-1.1/lib/cryptix.jar:/data/marotta/cog-1.1/lib/jgss.jar:/data/marotta/cog-1.1/lib/puretls.jar'
-
   AC_MSG_CHECKING([CLASSPATH is $JAVA_CLASSPATH2])
   AC_SUBST(JAVA_CLASSPATH)    
   AC_SUBST(JAVA_CLASSPATH2)    
