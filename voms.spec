@@ -37,10 +37,6 @@ will bind to.
 %prep
 %setup -q
 
-# Fix bad permissions (which otherwise end up in the debuginfo package)
-find . '(' -name '*.h' -o -name '*.c' -o -name '*.cpp' -o \
-	   -name '*.cc' -o -name '*.java' ')' -exec chmod a-x {} ';'
-
 # Fix location dir
 sed -e 's/\(LOCATION_DIR.*\)"\$prefix"/\1""/g' -i project/acinclude.m4
 
@@ -76,29 +72,21 @@ make install DESTDIR=$RPM_BUILD_ROOT
 
 rm -f $RPM_BUILD_ROOT%{_libdir}/*.a
 rm -f $RPM_BUILD_ROOT%{_libdir}/*.la
-rm -f $RPM_BUILD_ROOT%{_libdir}/*_gcc*.so.*
+rm -f $RPM_BUILD_ROOT%{_libdir}/*_gcc*
 
 mkdir -p $RPM_BUILD_ROOT%{_sysconfdir}/grid-security/vomsdir
+rm -rf $RPM_BUILD_ROOT%{_includedir}
 
-mv $RPM_BUILD_ROOT%{_datadir}/vomses.template \
-   $RPM_BUILD_ROOT
-
-#mv $RPM_BUILD_ROOT%{_docdir} \
-#   $RPM_BUILD_ROOT
+mv $RPM_BUILD_ROOT%{_datadir}/vomses.template $RPM_BUILD_ROOT
 
 rm -rf $RPM_BUILD_ROOT%{_datadir}/*
 
 mkdir -p $RPM_BUILD_ROOT%{_datadir}/%{name}
 
-mv $RPM_BUILD_ROOT/vomses.template \
-   $RPM_BUILD_ROOT%{_datadir}/%{name}
+mv $RPM_BUILD_ROOT/vomses.template $RPM_BUILD_ROOT%{_datadir}/%{name}
 
 mkdir -p $RPM_BUILD_ROOT%{_docdir}/%{name}-%{version}
 install -m 644 -p LICENSE AUTHORS $RPM_BUILD_ROOT%{_docdir}/%{name}-%{version}
-
-#mv $RPM_BUILD_ROOT \
-#   $RPM_BUILD_ROOT%{_docdir}
-
 
 touch $RPM_BUILD_ROOT%{_sysconfdir}/vomses
 
