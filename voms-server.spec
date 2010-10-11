@@ -86,6 +86,8 @@ rm -f $RPM_BUILD_ROOT%{_bindir}/edg-voms*
 rm -f $RPM_BUILD_ROOT%{_sbindir}/edg-voms*
 rm -f $RPM_BUILD_ROOT%{_mandir}/man1/edg-voms*
 rm -f $RPM_BUILD_ROOT%{_mandir}/man8/edg-voms*
+rm -f $RPM_BUILD_ROOT%{_mandir}/man1/glite-voms*
+rm -f $RPM_BUILD_ROOT%{_mandir}/man8/glite-voms*
 
 rm -f $RPM_BUILD_ROOT%{_libdir}/*.a
 rm -f $RPM_BUILD_ROOT%{_libdir}/*.la
