@@ -4,7 +4,7 @@ AC_DEFUN([AC_VOMS_LIBRARY],
     candidatepath=$2
 
     if test "x$candidatepath" = "x" ; then
-      libpath=$GLOBUS_LOCATION/lib
+      libpath=${GLOBUS_LOCATION:-/usr}/lib
     else
       libpath=$candidatepath/lib
     fi

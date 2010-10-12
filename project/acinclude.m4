@@ -673,7 +673,7 @@ AC_DEFUN([AC_ENABLE_GLITE],
     	AC_SUBST(LOCATION_DIR, "${prefix}")
     	AC_SUBST(VAR_LOCATION_ENV, "VOMS_LOCATION_VAR")
     	AC_DEFINE(LOCATION_ENV, "VOMS_LOCATION", [Environment variable name])
-    	AC_DEFINE_UNQUOTED(LOCATION_DIR, "$prefix", [Location of system directory])
+    	AC_DEFINE_UNQUOTED(LOCATION_DIR, "", [Location of system directory])
     	AC_DEFINE(USER_DIR, ".voms", [Location of user directory])
     else
     	AC_MSG_RESULT([Preparing for gLite environment])

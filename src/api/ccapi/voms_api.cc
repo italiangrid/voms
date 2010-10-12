@@ -750,7 +750,7 @@ bool vomsdata::loadfile0(std::string filename, UNUSED(uid_t uid), UNUSED(gid_t g
 bool vomsdata::LoadSystemContacts(std::string dir)
 {
   if (dir.empty())
-    dir = "/opt/glite/etc/vomses";
+    dir = "/etc/vomses";
 
   return loadfile(dir, 0, 0);
 }
