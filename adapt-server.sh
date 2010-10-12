@@ -46,6 +46,10 @@ mkdir -p $dir/var/log/voms
 
 #touch $dir/etc/vomses
 rm -f $dir/etc/vomses
+rm -rf $dir/include
+rm -rf $dir/lib
+rm -rf $dir/lib64
+rm -rf $dir/usr/include
 
 sed -e 's!${datapath}/etc/voms/voms!${basepath}/share/voms/voms!' \
     -e 's/useradd/\#&/' -e 's/groupadd/\#&/' \
