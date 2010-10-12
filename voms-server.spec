@@ -1,5 +1,3 @@
-%global with_gcj %{!?_without_gcj:1}%{?_without_gcj:0}
-
 Name:		voms-server
 Version:	2.0.0
 Release:	1%{?dist}
@@ -84,10 +82,6 @@ make install DESTDIR=$RPM_BUILD_ROOT
 
 rm -f $RPM_BUILD_ROOT%{_bindir}/edg-voms*
 rm -f $RPM_BUILD_ROOT%{_sbindir}/edg-voms*
-rm -f $RPM_BUILD_ROOT%{_mandir}/man1/edg-voms*
-rm -f $RPM_BUILD_ROOT%{_mandir}/man8/edg-voms*
-rm -f $RPM_BUILD_ROOT%{_mandir}/man1/glite-voms*
-rm -f $RPM_BUILD_ROOT%{_mandir}/man8/glite-voms*
 
 rm -f $RPM_BUILD_ROOT%{_libdir}/*.a
 rm -f $RPM_BUILD_ROOT%{_libdir}/*.la

@@ -36,10 +36,6 @@ make install DESTDIR=$dir
 
 rm -f $dir/usr/bin/edg-voms*
 rm -f $dir/usr/sbin/edg-voms*
-rm -f $dir/usr/share/man/man1/edg-voms*
-rm -f $dir/usr/share/man/man8/edg-voms*
-rm -f $dir/usr/share/man/man1/glite-voms*
-rm -f $dir/usr/share/man/man8/glite-voms*
 
 rm -f $dir/usr/lib/*.a
 rm -f $dir/usr/lib/*.la

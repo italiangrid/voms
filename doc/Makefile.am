@@ -83,28 +83,6 @@ if BUILD_JAVA_ONLY
 install-data-hook:
 else
 install-data-hook: install-man1 install-man8
-	-(cd $(DESTDIR)$(mandir)/man1; \
-	for file in *.1; do \
-	  if test "x$${file}" != 'x*.1' ; then \
-	    GZIP=$(GZIP_ENV) gzip -f $${file}; \
-	    ln -s $(DESTDIR)$(mandir)/man1/$${file}.gz $(DESTDIR)$(mandir)/man1/edg-$${file}.gz ;\
-            ln -s $(DESTDIR)$(mandir)/man1/$${file}.gz $(DESTDIR)$(mandir)/man1/glite-$${file}.gz ; \
-	  fi \
-	done)
-	-(cd $(DESTDIR)$(mandir)/man8; \
-	for file in *.8; do \
-	  if test "x$${file}" != 'x*.8' ; then \
-	    GZIP=$(GZIP_ENV) gzip -f $${file}; \
-	    ln -s $(DESTDIR)$(mandir)/man8/$${file}.gz $(DESTDIR)$(mandir)/man8/edg-$${file}.gz ; \
-            ln -s $(DESTDIR)$(mandir)/man8/$${file}.gz $(DESTDIR)$(mandir)/man8/glite-$${file}.gz ; \
-	  fi \
-	done)
-if ENABLE_GLITE
-	@echo
-else    
-	-rm -f $(DESTDIR)$(mandir/)man1/glite*
-	-rm -f $(DESTDIR)$(mandir/)man8/glite*
-endif
 endif
 
 MAN_STYLESHEET = http://docbook.sourceforge.net/release/xsl/current/manpages/docbook.xsl
