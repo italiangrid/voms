@@ -33,9 +33,4 @@ AM_CPPFLAGS = \
   -DWITH_SOAPDEFS_H \
 	$(NO_GLOBUS_FLAGS)
 
-install-exec-hook:
-	-ln -s voms $(DESTDIR)$(sbindir)/edg-voms
-if ENABLE_GLITE
-	-ln -s voms $(DESTDIR)$(sbindir)/glite-voms
-endif
 endif

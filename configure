@@ -15744,7 +15744,7 @@ _ACEOF
 
 
 cat >>confdefs.h <<_ACEOF
-#define LOCATION_DIR "$prefix"
+#define LOCATION_DIR ""
 _ACEOF
 
 
