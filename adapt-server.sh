@@ -31,9 +31,6 @@ touch -r src/utils/vomsfake.y src/utils/lex.yy.c
 fi
 
 if test "x$action" = "xport"; then
-rm -rf $dir
-make install DESTDIR=$dir
-
 rm -f $dir/usr/bin/edg-voms*
 rm -f $dir/usr/sbin/edg-voms*
 
