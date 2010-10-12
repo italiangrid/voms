@@ -559,7 +559,6 @@ distclean-generic:
 maintainer-clean-generic:
 	@echo "This command is intended for maintainers to use"
 	@echo "it deletes files that may require special tools to rebuild."
-@BUILD_CLIENTS_FALSE@install-exec-hook:
 clean: clean-am
 
 clean-am: clean-binPROGRAMS clean-generic clean-libtool mostlyclean-am
@@ -585,8 +584,6 @@ install-data-am:
 install-dvi: install-dvi-am
 
 install-exec-am: install-binPROGRAMS
-	@$(NORMAL_INSTALL)
-	$(MAKE) $(AM_MAKEFLAGS) install-exec-hook
 
 install-html: install-html-am
 
@@ -620,21 +617,21 @@ ps-am:
 
 uninstall-am: uninstall-binPROGRAMS
 
-.MAKE: install-am install-exec-am install-strip
+.MAKE: install-am install-strip
 
 .PHONY: CTAGS GTAGS all all-am check check-am clean clean-binPROGRAMS \
 	clean-generic clean-libtool ctags distclean distclean-compile \
 	distclean-generic distclean-libtool distclean-tags distdir dvi \
 	dvi-am html html-am info info-am install install-am \
 	install-binPROGRAMS install-data install-data-am install-dvi \
-	install-dvi-am install-exec install-exec-am install-exec-hook \
-	install-html install-html-am install-info install-info-am \
-	install-man install-pdf install-pdf-am install-ps \
-	install-ps-am install-strip installcheck installcheck-am \
-	installdirs maintainer-clean maintainer-clean-generic \
-	mostlyclean mostlyclean-compile mostlyclean-generic \
-	mostlyclean-libtool pdf pdf-am ps ps-am tags uninstall \
-	uninstall-am uninstall-binPROGRAMS
+	install-dvi-am install-exec install-exec-am install-html \
+	install-html-am install-info install-info-am install-man \
+	install-pdf install-pdf-am install-ps install-ps-am \
+	install-strip installcheck installcheck-am installdirs \
+	maintainer-clean maintainer-clean-generic mostlyclean \
+	mostlyclean-compile mostlyclean-generic mostlyclean-libtool \
+	pdf pdf-am ps ps-am tags uninstall uninstall-am \
+	uninstall-binPROGRAMS
 
 
 @BUILD_CLIENTS_TRUE@vomsfake.$(OBJEXT): vomsparser.h
@@ -646,14 +643,6 @@ uninstall-am: uninstall-binPROGRAMS
 
 @BUILD_CLIENTS_TRUE@lex.yy.c: vomsparser.l vomsparser.h
 @BUILD_CLIENTS_TRUE@	flex vomsparser.l
-
-@BUILD_CLIENTS_TRUE@install-exec-hook:
-@BUILD_CLIENTS_TRUE@	-ln -s voms-proxy-info $(DESTDIR)$(bindir)/edg-voms-proxy-info
-@BUILD_CLIENTS_TRUE@	-ln -s voms-proxy-destroy $(DESTDIR)$(bindir)/edg-voms-proxy-destroy
-@BUILD_CLIENTS_TRUE@	-ln -s voms-proxy-fake $(DESTDIR)$(bindir)/edg-voms-proxy-fake
-@BUILD_CLIENTS_TRUE@@ENABLE_GLITE_TRUE@	-ln -s voms-proxy-info $(DESTDIR)$(bindir)/glite-voms-proxy-info
-@BUILD_CLIENTS_TRUE@@ENABLE_GLITE_TRUE@	-ln -s voms-proxy-destroy $(DESTDIR)$(bindir)/glite-voms-proxy-destroy
-@BUILD_CLIENTS_TRUE@@ENABLE_GLITE_TRUE@	-ln -s voms-proxy-fake $(DESTDIR)$(bindir)/glite-voms-proxy-fake
 # Tell versions [3.59,3.63) of GNU make to not export all variables.
 # Otherwise a system limit (for SysV at least) may be exceeded.
 .NOEXPORT:

@@ -569,11 +569,7 @@ uninstall-am: uninstall-binPROGRAMS
 
 
 @BUILD_CLIENTS_TRUE@install-exec-hook:
-@BUILD_CLIENTS_TRUE@	-ln -s voms-proxy-init $(DESTDIR)$(bindir)/edg-voms-proxy-init
 @BUILD_CLIENTS_TRUE@	-ln -s voms-proxy-init $(DESTDIR)$(bindir)/voms-proxy-list
-@BUILD_CLIENTS_TRUE@	-ln -s voms-proxy-init $(DESTDIR)$(bindir)/edg-voms-proxy-list
-@BUILD_CLIENTS_TRUE@@ENABLE_GLITE_TRUE@	-ln -s voms-proxy-init $(DESTDIR)$(bindir)/glite-voms-proxy-init
-@BUILD_CLIENTS_TRUE@@ENABLE_GLITE_TRUE@	-ln -s voms-proxy-init $(DESTDIR)$(bindir)/glite-voms-proxy-list
 # Tell versions [3.59,3.63) of GNU make to not export all variables.
 # Otherwise a system limit (for SysV at least) may be exceeded.
 .NOEXPORT:

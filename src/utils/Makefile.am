@@ -49,13 +49,4 @@ AM_CPPFLAGS = \
 	-I$(top_srcdir)/src/sslutils \
 	$(NO_GLOBUS_FLAGS)
 
-install-exec-hook:
-	-ln -s voms-proxy-info $(DESTDIR)$(bindir)/edg-voms-proxy-info
-	-ln -s voms-proxy-destroy $(DESTDIR)$(bindir)/edg-voms-proxy-destroy
-	-ln -s voms-proxy-fake $(DESTDIR)$(bindir)/edg-voms-proxy-fake
-if ENABLE_GLITE
-	-ln -s voms-proxy-info $(DESTDIR)$(bindir)/glite-voms-proxy-info
-	-ln -s voms-proxy-destroy $(DESTDIR)$(bindir)/glite-voms-proxy-destroy
-	-ln -s voms-proxy-fake $(DESTDIR)$(bindir)/glite-voms-proxy-fake
-endif
 endif
