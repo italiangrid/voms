@@ -1,13 +1,9 @@
 #!/bin/sh
-
 dir=$1
 action=$2
 version=$3
 
 if test "x$action" = "xpre"; then
-# Fix default vomses file location
-sed -e 's!/opt/glite/etc/vomses!/etc/vomses!' -i src/api/ccapi/voms_api.cc
-
 # Use pdflatex
 sed -e 's!^\(USE_PDFLATEX *= *\)NO!\1YES!' -i src/api/ccapi/Makefile.am
 
@@ -20,7 +16,7 @@ touch -r src/utils/vomsfake.y src/utils/lex.yy.c
 ./autogen.sh
 fi
 
-if test "x$action" = "xport"; then
+if test "x$action" = "xpost"; then
 rm -f $dir/usr/bin/edg-voms*
 rm -f $dir/usr/sbin/edg-voms*
 
