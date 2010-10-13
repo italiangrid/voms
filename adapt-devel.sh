@@ -22,8 +22,13 @@ rm -f $dir/usr/sbin/edg-voms*
 
 rm -f $dir/usr/lib/*.a
 rm -f $dir/usr/lib/*.la
+rm -f $dir/usr/lib/*_gcc*.so.*
+rm -f $dir/usr/lib/*.so.*
 
-rm $dir/usr/share/vomses.template
+mv $dir/usr/include/glite/security/voms $dir/usr/include/voms
+rm -rf $dir/usr/include/glite
+
+mv $dir/usr/share/mv $dir/usr/share/aclocal
 
 mkdir -p $dir/etc/grid-security/vomsdir
 mkdir -p $dir/etc/grid-security/voms
@@ -33,29 +38,11 @@ mkdir -p $dir/var/log/voms
 #touch $dir/etc/vomses
 rm -f $dir/etc/vomses
 rm -rf $dir/include
+rm -rf $dir/usr/include
 rm -rf $dir/lib
 rm -rf $dir/lib64
 rm -rf $dir/usr/include
 
-sed -e 's!${datapath}/etc/voms/voms!${basepath}/share/voms/voms!' \
-    -e 's/useradd/\#&/' -e 's/groupadd/\#&/' \
-    -e 's/vomsd(8)/voms(8)/' \
-    -i $dir/usr/share/voms/voms_install_db
-
-# Turn off default enabling of the service
-mkdir -p $dir/etc/rc.d/init.d
-sed -e 's/\(chkconfig: \)\w*/\1-/' \
-    -e '/Default-Start/d' \
-    -e 's/\(Default-Stop:\s*\).*/\10 1 2 3 4 5 6/' \
-   $dir/usr/share/init.d/voms > \
-   $dir/etc/rc.d/init.d/voms
-chmod 755 $dir/etc/rc.d/init.d/voms
-rm -rf $dir/usr/share/init.d
-
-mkdir -p $dir/etc/sysconfig
-echo VOMS_USER=voms > $dir/etc/sysconfig/voms
-
-mkdir -p $dir/usr/share/voms-server-$version
-install -m 644 -p LICENSE AUTHORS $dir/usr/share/voms-server-$version
-
+mkdir -p $dir/usr/share/voms-devel-$version
+install -m 644 -p LICENSE AUTHORS $dir/usr/share/voms-devel-$version
 fi

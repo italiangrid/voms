@@ -29,19 +29,6 @@ Virtual Organization Membership Service (VOMS) Java API Documentation.
 %prep
 %setup -q
 
-# Fix bad permissions (which otherwise end up in the debuginfo package)
-find . '(' -name '*.h' -o -name '*.c' -o -name '*.cpp' -o \
-	   -name '*.cc' -o -name '*.java' ')' -exec chmod a-x {} ';'
-
-# Fix location dir
-sed -e 's/\(LOCATION_DIR.*\)"\$prefix"/\1""/g' -i project/acinclude.m4
-
-# Fix default Globus location
-sed -e 's!\(GLOBUS_LOCATION\)!{\1:-/usr}!' -i project/voms.m4
-
-# Fix default vomses file location
-sed -e 's!/opt/glite/etc/vomses!/etc/vomses!' -i src/api/ccapi/voms_api.cc
-
 # Use pdflatex
 sed -e 's!^\(USE_PDFLATEX *= *\)NO!\1YES!' -i src/api/ccapi/Makefile.am
 
