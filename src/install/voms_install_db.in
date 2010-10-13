@@ -56,6 +56,8 @@ logformat=""
 sqlloc=""
 help=""
 oldformat="no"
+vomscert="/etc/grid-security/voms/hostcert.pem"
+vomskey="/etc/grid-security/voms/hostkey.pem"
 
 if test "x@with_mysqlconf@" != "x" ; then
     MYSQLCONF=" --defaults-file=@with_mysqlconf@ "
@@ -64,7 +66,7 @@ else
 fi
 
 
-TEMP=`getopt -o h --long mysql-home:,loglevel:,logtype:,logformat:,logdateformat:,oracle-home:,db:,port:,code:,voms-vo:,socktimeout:,db-type:,sqlloc:,db-admin:,db-pwd:,voms-name:,voms-pwd:,newformat,compat -n 'voms_install_db' -- "$@"`
+TEMP=`getopt -o h --long vomscert:,vomskey:,mysql-home:,loglevel:,logtype:,logformat:,logdateformat:,oracle-home:,db:,port:,code:,voms-vo:,socktimeout:,db-type:,sqlloc:,db-admin:,db-pwd:,voms-name:,voms-pwd:,newformat,compat -n 'voms_install_db' -- "$@"`
 
 if [ $? != 0 ] ; then $ECHO "Terminating..." >&2 ; exit 1 ; fi
 
@@ -92,6 +94,8 @@ while true ; do
   --logdateformat)          logdateformat=$2           ; shift 2 ;;
   --newformat)              oldformat="yes"            ; shift 1 ;;
   --oldformat)              oldformat="no"             ; shift 1 ;;
+  --vomscert)               vomscert=$2                ; shift 2 ;;
+  --vomskey)                vomskey=$2                 ; shift 2 ;;
   -h)                       help="yes"                 ; shift 1 ;;
 	--)                       shift                      ; break   ;;
 	*)                        $ECHO "$1: Internal Error!" >&2 ; exit 1  ;;
@@ -137,9 +141,9 @@ if test "x$help" = "xyes"; then
     $ECHO "                            default is 60 seconds."
     $ECHO "    --loglevel lev          Sets the amount of leveling.  Higher values imply more"
     $ECHO "                            logging. The default is 2. (LOG_ERROR)"
-    $ECHO "    --logtype type          Specifies what to log. See the vomsd(8) man page for details."
-    $ECHO "    --logformat format      See the vomsd(8) man page for details."
-    $ECHO "    --logdateformat format  See the vomsd(8) man page for details."
+    $ECHO "    --logtype type          Specifies what to log. See the voms(8) man page for details."
+    $ECHO "    --logformat format      See the voms(8) man page for details."
+    $ECHO "    --logdateformat format  See the voms(8) man page for details."
     $ECHO "    --newformat             Creates AC according to the old format."
     $ECHO "    --oldformat             Creates AC according to the old format."
     $ECHO "    --help                  This output."
@@ -211,7 +215,7 @@ if test "x$db_type" = "xmysql" ; then
 fi
 
 # Create Tables
-$CLIENT < "${datapath}/etc/voms/voms-"$db_type$compat_mode".data"
+$CLIENT < "${basepath}/share/voms/voms-"$db_type$compat_mode".data"
 
 # Create users
 if test "x$db_type" = "xmysql" ; then
@@ -262,10 +266,10 @@ EOF
 done
 
 # Creating voms group
-groupadd voms 2>/dev/null
+#groupadd voms 2>/dev/null
 
 # Creating voms user
-useradd -g voms voms 2>/dev/null
+#useradd -g voms voms 2>/dev/null
 
 # Setting ownership and permission for voms_password_query file
 mkdir -p $datapath/etc/voms/$voms_vo
@@ -296,3 +300,5 @@ fi
 if test "x$newformat" = "xyes"; then
     $ECHO -en "--newformat\n" >> $datapath/etc/voms/$voms_vo/voms.conf
 fi
+$ECHO -en "--x509_user_cert=$vomscert\n" >> \$datapath/etc/voms/\$voms_vo/voms.conf
+$ECHO -en "--x509_user_key=$vomskey\n" >> \$datapath/etc/voms/\$voms_vo/voms.conf
