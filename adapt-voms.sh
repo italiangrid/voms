@@ -24,7 +24,7 @@ rm -f $dir/usr/lib/*.a
 rm -f $dir/usr/lib/*.la
 rm -f $dir/usr/lib/*_gcc*
 
-mv $dir/usr/share/vomses.template $dir/
+mv $dir/etc/vomses.template $dir/
 rm -rf $dir/usr/share
 mkdir -p $dir/usr/share/voms
 mv $dir/vomses.template $dir/usr/share/voms
