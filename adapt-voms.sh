@@ -47,5 +47,5 @@ echo VOMS_USER=voms > $dir/etc/sysconfig/voms
 touch $dir/etc/sysconfig/vomses
 
 mkdir -p $dir/usr/share/voms-$version
-install -m 644 -p LICENSE AUTHORS $dir/usr/share/voms-server-$version
+install -m 644 -p LICENSE AUTHORS $dir/usr/share/voms-$version
 fi
