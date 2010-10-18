@@ -23,6 +23,9 @@ rm -f $dir/usr/sbin/edg-voms*
 rm -f $dir/usr/lib/*.a
 rm -f $dir/usr/lib/*.la
 rm -f $dir/usr/lib/*_gcc*
+rm -f $dir/usr/lib64/*.a
+rm -f $dir/usr/lib64/*.la
+rm -f $dir/usr/lib64/*_gcc*
 
 mv $dir/etc/vomses.template $dir/
 rm -rf $dir/usr/share
