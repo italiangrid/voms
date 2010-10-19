@@ -33,7 +33,7 @@ mv $dir/usr/share/mv $dir/usr/share/aclocal
 
 #touch $dir/etc/vomses
 rm -rf $dir/etc/
-rm -rf $dir/include
+#rm -rf $dir/include
 rm -rf $dir/usr/bin
 rm -rf $dir/usr/sbin
 rm -rf $dir/var
