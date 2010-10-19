@@ -26,8 +26,9 @@ rm -f $dir/usr/lib64/*.la
 rm -f $dir/usr/lib64/*_gcc*.so.*
 rm -f $dir/usr/lib64/*.so.*
 
-mv $dir/usr/include/glite/security/voms $dir/usr/include/voms
-rm -rf $dir/usr/include/glite
+#mv $dir/usr/include/glite/security/voms $dir/usr/include/voms
+mv $dir/include/glite/security/voms $dir/usr/include/voms
+rm -rf $dir/include/glite
 
 mv $dir/usr/share/mv $dir/usr/share/aclocal
 
