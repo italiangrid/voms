@@ -26,19 +26,18 @@ rm -f $dir/usr/lib64/*.la
 rm -f $dir/usr/lib64/*_gcc*.so.*
 rm -f $dir/usr/lib64/*.so.*
 
-#mv $dir/usr/include/glite/security/voms $dir/usr/include/voms
+mkdir -p $dir/usr/include
 mv $dir/include/glite/security/voms $dir/usr/include/voms
-rm -rf $dir/include/glite
+rm -rf $dir/include
 
 mv $dir/usr/share/mv $dir/usr/share/aclocal
 
-#touch $dir/etc/vomses
 rm -rf $dir/etc/
-#rm -rf $dir/include
 rm -rf $dir/usr/bin
 rm -rf $dir/usr/sbin
 rm -rf $dir/var
 rm -rf $dir/libexec
+rm -rf $dir/usr/libexec
 rm -rf $dir/share
 
 mkdir -p $dir/usr/share/voms-devel-$version
