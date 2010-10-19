@@ -18,6 +18,13 @@ fi
 
 if test "x$action" = "xpost"; then
 
+rm -rf $dir/usr/lib
+rm -rf $dir/usr/lib64
+rm -rf $dir/usr/libexec
+rm -rf $dir/usr/sbin
+rm -rf $dir/usr/share/man/man8
+rm -rf $dir/include
+
 mkdir -p $dir/usr/share/voms-clients-$version
 install -m 644 -p LICENSE AUTHORS $dir/usr/share/voms-clients-$version
 
