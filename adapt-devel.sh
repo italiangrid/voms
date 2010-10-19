@@ -17,29 +17,25 @@ touch -r src/utils/vomsfake.y src/utils/lex.yy.c
 fi
 
 if test "x$action" = "xpost"; then
-rm -f $dir/usr/bin/edg-voms*
-rm -f $dir/usr/sbin/edg-voms*
-
 rm -f $dir/usr/lib/*.a
 rm -f $dir/usr/lib/*.la
 rm -f $dir/usr/lib/*_gcc*.so.*
 rm -f $dir/usr/lib/*.so.*
+rm -f $dir/usr/lib64/*.a
+rm -f $dir/usr/lib64/*.la
+rm -f $dir/usr/lib64/*_gcc*.so.*
+rm -f $dir/usr/lib64/*.so.*
 
 mv $dir/usr/include/glite/security/voms $dir/usr/include/voms
 rm -rf $dir/usr/include/glite
 
 mv $dir/usr/share/mv $dir/usr/share/aclocal
 
-mkdir -p $dir/etc/grid-security/vomsdir
-mkdir -p $dir/etc/grid-security/voms
-mkdir -p $dir/etc/voms
-mkdir -p $dir/var/log/voms
-
 #touch $dir/etc/vomses
 rm -rf $dir/etc/
 rm -rf $dir/include
-rm -rf $dir/lib
-rm -rf $dir/lib64
+rm -rf $dir/usr/bin
+rm -rf $dir/usr/sbin
 rm -rf $dir/var
 rm -rf $dir/libexec
 rm -rf $dir/share
