@@ -36,12 +36,13 @@ mkdir -p $dir/etc/voms
 mkdir -p $dir/var/log/voms
 
 #touch $dir/etc/vomses
-rm -f $dir/etc/vomses
+rm -rf $dir/etc/
 rm -rf $dir/include
-rm -rf $dir/usr/include
 rm -rf $dir/lib
 rm -rf $dir/lib64
-rm -rf $dir/usr/include
+rm -rf $dir/var
+rm -rf $dir/libexec
+rm -rf $dir/share
 
 mkdir -p $dir/usr/share/voms-devel-$version
 install -m 644 -p LICENSE AUTHORS $dir/usr/share/voms-devel-$version
