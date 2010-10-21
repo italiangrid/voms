@@ -309,23 +309,24 @@ proc do_test { {name "" } } {
 
     if { $res == $::PASSTEST} then {
         if {[info exists ::DOVALGRIND]} then {
-            set ::VALGRIND "1"
-            set res2 [real_do_test $name]
+            if {[expr ! [string equal $::DOVALGRIND ""]]} then {
+                set ::VALGRIND "1"
+                set res2 [real_do_test $name]
 
-            set listed ""
-            set failed 0
-            if { [expr ![catch {set listed [glob -directory $::SCRATCHDIR valg-*]}]]} then {
-                foreach f $listed {
+                set listed ""
+                set failed 0
+                if { [expr ![catch {set listed [glob -directory $::SCRATCHDIR valg-*]}]]} then {
+                    foreach f $listed {
 
-                    if [file size $f] then {
-                        loadvar filecontent $f
+                        if [file size $f] then {
+                            loadvar filecontent $f
 
-                        set match "definitely lost: 0"
+                            set match "definitely lost: 0"
 
-                        if [expr ![regexp $match $filecontent dummy]] then {
-                            set failed 1
-                            addlog $f
-                        }
+                            if [expr ![regexp $match $filecontent dummy]] then {
+                                set failed 1
+                                addlog $f
+                            }
 
 #                        set match2 "possibly lost: 0"
 #                        if [expr ![regexp $match $filecontent dummy]] then {
@@ -336,14 +337,15 @@ proc do_test { {name "" } } {
 #                            addlog $f
 #                        }
 
+                        }
                     }
                 }
-            }
 
-            unset ::VALGRIND
-            if $failed then {
-                set res $::FAILTEST
-                testmessage "failed valgrind check."
+                unset ::VALGRIND
+                if $failed then {
+                    set res $::FAILTEST
+                    testmessage "failed valgrind check."
+                }
             }
         }
     }
