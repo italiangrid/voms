@@ -19,7 +19,7 @@ fi
 if test "x$action" = "xpost"; then
 mv $dir/usr/share/java/vomsjapi.jar $dir/usr/share/java/vomsjapi-$version.jar
 ln -s $dir/usr/share/java/vomsjapi-$version.jar $dir/usr/share/java/vomsjapi.jar
-
+rm -rf $dir/usr/share/man
 
 mkdir -p $dir/usr/share/vomsjapi-$version
 install -m 644 -p LICENSE AUTHORS $dir/usr/share/vomsjapi-$version
