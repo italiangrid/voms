@@ -519,12 +519,8 @@ AC_DEFUN([AC_JAVA],
       [  --with-java-home=DIR    Specifies where to find the java installation, default=$JAVA_HOME],
       [ javahome="$withval"],
       [ javahome="$JAVA_HOME"])
-# Find include dirs
-    javainc="`find $javahome/include -type d -exec echo -n '-I{} ' ';'`"
-    JAVA_INCLUDES="$javainc"
     JHOME="$javahome"
     AC_MSG_RESULT($javahome)
-    AC_SUBST(JAVA_INCLUDES)
     AC_SUBST(JHOME)
   fi
 
