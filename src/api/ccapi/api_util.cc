@@ -378,10 +378,10 @@ vomsdata::check(void *data)
   /* extract vo name from AC */
   
   AC * ac = (AC *)data;
-  STACK_OF(AC_ATTR) * atts = ac->acinfo->attrib;
+  const STACK_OF(AC_ATTR) * atts = ac->acinfo->attrib;
 
   int nid = OBJ_txt2nid("idatcap");
-  int pos = X509at_get_attr_by_NID(atts, nid, -1);
+  int pos = X509at_get_attr_by_NID((const STACK_OF(X509_ATTRIBUTE)*)atts, nid, -1);
 
   if (!(pos >=0)) {
     seterror(VERR_DIR, "Unable to extract vo name from AC.");

@@ -89,7 +89,7 @@
 #endif
 
 #define DECL_STACK(type) \
-   DECLARE_STACK_OF(type) \
+   PREDECLARE_STACK_OF(type) \
    extern STACK_OF(type) *sk_##type##_new (int (*)(const type * const *, const type * const *)); \
    extern STACK_OF(type) *sk_##type##_new_null (); \
    extern void   sk_##type##_free (STACK_OF(type) *); \

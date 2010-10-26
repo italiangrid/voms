@@ -62,6 +62,7 @@ extern "C" {
 #include "listfunc.h"
 #include "credentials.h"
 #include "parsertypes.h"
+#define YYTOKENTYPE
 #include "vomsparser.h"
 #include "vomsproxy.h"
 
