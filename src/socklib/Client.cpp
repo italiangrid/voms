@@ -47,6 +47,7 @@ extern "C" {
 #include <openssl/x509v3.h>
 #include <openssl/err.h>
 #include <openssl/bio.h>
+#include <openssl/opensslv.h>
 #include <unistd.h>
 #include <fcntl.h>
 

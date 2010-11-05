@@ -45,9 +45,11 @@ extern "C" {
 #include <openssl/evp.h>
 #include <openssl/buffer.h>
 #include <openssl/bn.h>
+#include <openssl/opensslv.h>
 
 #include "newformat.h"
 #include "acerrors.h"
+#include "acstack.h"
 
 #include "attributes.h"
 #include "acstack.h"
@@ -65,6 +67,11 @@ extern "C" {
 #include "../api/ccapi/realdata.h"
 
 #include <string>
+
+#if OPENSSL_VERSION_NUMBER < 0x1000000fL
+DECL_STACK(GENERAL_NAMES)
+IMPL_STACK(GENERAL_NAMES)
+#endif
 
 static std::string getfqdn(void);
 static int checkAttributes(STACK_OF(AC_ATTR) *, voms&);
@@ -265,14 +272,18 @@ int validate(X509 *cert, X509 *issuer, AC *ac, voms &v, verify_type valids, time
         }
       }    
       else if (ac->acinfo->holder->name) {
-        names = ac->acinfo->holder->name;
-        if ((sk_GENERAL_NAME_num(names) == 1) || 
-            ((name = sk_GENERAL_NAME_value(names,0))) ||
-            (name->type != GEN_DIRNAME)) {
-          if (X509_NAME_cmp(name->d.dirn, cert->cert_info->issuer)) {
-            /* CHECK ALT_NAMES */
-            /* in VOMS ACs, checking into alt names is assumed to always fail. */
-            ERROR(AC_ERR_UID_MISMATCH);
+        STACK_OF(GENERAL_NAMES) *gnames = ac->acinfo->holder->name;
+        GENERAL_NAMES *gname;
+        if ((sk_GENERAL_NAMES_num(gnames) == 1) || 
+            ((gname = sk_GENERAL_NAMES_value(gnames,0)))) {
+          if ((sk_GENERAL_NAME_num(gname) == 1) ||
+              ((name = sk_GENERAL_NAME_value(gname,0)) ||
+               (name->type != GEN_DIRNAME))) {
+            if (X509_NAME_cmp(name->d.dirn, cert->cert_info->issuer)) {
+              /* CHECK ALT_NAMES */
+              /* in VOMS ACs, checking into alt names is assumed to always fail. */
+              ERROR(AC_ERR_UID_MISMATCH);
+            }
           }
         }
       }
@@ -356,7 +367,7 @@ static int checkAttributes(STACK_OF(AC_ATTR) *atts, voms &v)
 
   /* find AC_ATTR with IETFATTR type */
   nid3 = OBJ_txt2nid("idatcap");
-  pos3 = X509at_get_attr_by_NID(atts, nid3, -1);
+  pos3 = X509at_get_attr_by_NID((STACK_OF(X509_ATTRIBUTE)*)atts, nid3, -1);
   if (!(pos3 >=0))
     return AC_ERR_ATTRIBS;
   caps = sk_AC_ATTR_value(atts, pos3);

@@ -724,7 +724,7 @@ static std::string getKeyUsage(X509 *cert)
 
   std::string keyusage;
 
-  X509V3_EXT_METHOD *method = X509V3_EXT_get_nid(NID_key_usage);
+  const X509V3_EXT_METHOD *method = X509V3_EXT_get_nid(NID_key_usage);
 
   if (method) {
     confs = NULL;
