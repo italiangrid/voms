@@ -15,6 +15,7 @@
 @SET_MAKE@
 
 
+
 VPATH = @srcdir@
 pkgdatadir = $(datadir)/@PACKAGE@
 pkglibdir = $(libdir)/@PACKAGE@
@@ -35,7 +36,7 @@ build_triplet = @build@
 host_triplet = @host@
 subdir = src/api/ccapi
 DIST_COMMON = $(am__include_HEADERS_DIST) $(srcdir)/Makefile.am \
-	$(srcdir)/Makefile.in
+	$(srcdir)/Makefile.in $(srcdir)/voms-1.0.pc.in
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 am__aclocal_m4_deps = $(top_srcdir)/project/acinclude.m4 \
 	$(top_srcdir)/project/expat.m4 $(top_srcdir)/project/glite.m4 \
@@ -44,14 +45,15 @@ am__configure_deps = $(am__aclocal_m4_deps) $(CONFIGURE_DEPENDENCIES) \
 	$(ACLOCAL_M4)
 mkinstalldirs = $(SHELL) $(top_srcdir)/./project/mkinstalldirs
 CONFIG_HEADER = $(top_builddir)/src/autogen/config.h
-CONFIG_CLEAN_FILES =
+CONFIG_CLEAN_FILES = voms-1.0.pc
 am__vpath_adj_setup = srcdirstrip=`echo "$(srcdir)" | sed 's|.|.|g'`;
 am__vpath_adj = case $$p in \
     $(srcdir)/*) f=`echo "$$p" | sed "s|^$$srcdirstrip/||"`;; \
     *) f=$$p;; \
   esac;
 am__strip_dir = `echo $$p | sed -e 's|^.*/||'`;
-am__installdirs = "$(DESTDIR)$(libdir)" "$(DESTDIR)$(includedir)"
+am__installdirs = "$(DESTDIR)$(libdir)" "$(DESTDIR)$(pkgconfigdir)" \
+	"$(DESTDIR)$(includedir)"
 libLTLIBRARIES_INSTALL = $(INSTALL)
 LTLIBRARIES = $(lib_LTLIBRARIES)
 am__DEPENDENCIES_1 =
@@ -362,6 +364,8 @@ DIST_SOURCES = $(libvomsapi_la_SOURCES) $(libvomsapi_gcc32_la_SOURCES) \
 	$(libvomsc_gcc64dbg_la_SOURCES) \
 	$(libvomsc_gcc64dbgpthr_la_SOURCES) \
 	$(libvomsc_gcc64pthr_la_SOURCES)
+pkgconfigDATA_INSTALL = $(INSTALL_DATA)
+DATA = $(pkgconfig_DATA)
 am__include_HEADERS_DIST = voms_api.h voms_apic.h voms_api_nog.h \
 	voms_apic_nog.h
 includeHEADERS_INSTALL = $(INSTALL_HEADER)
@@ -556,6 +560,8 @@ with_mysqlconf = @with_mysqlconf@
 with_reportdir = @with_reportdir@
 with_scratchdir = @with_scratchdir@
 with_valgrind = @with_valgrind@
+pkgconfigdir = $(libdir)/pkgconfig
+pkgconfig_DATA = voms-1.0.pc
 lib_LTLIBRARIES = \
 	$(WANTED_API_LIBS) # may add the libraries defined in EXTRA_LTLIBRARIES
 
@@ -1041,6 +1047,8 @@ $(top_srcdir)/configure: @MAINTAINER_MODE_TRUE@ $(am__configure_deps)
 	cd $(top_builddir) && $(MAKE) $(AM_MAKEFLAGS) am--refresh
 $(ACLOCAL_M4): @MAINTAINER_MODE_TRUE@ $(am__aclocal_m4_deps)
 	cd $(top_builddir) && $(MAKE) $(AM_MAKEFLAGS) am--refresh
+voms-1.0.pc: $(top_builddir)/config.status $(srcdir)/voms-1.0.pc.in
+	cd $(top_builddir) && $(SHELL) ./config.status $(subdir)/$@
 install-libLTLIBRARIES: $(lib_LTLIBRARIES)
 	@$(NORMAL_INSTALL)
 	test -z "$(libdir)" || $(MKDIR_P) "$(DESTDIR)$(libdir)"
@@ -1900,6 +1908,23 @@ mostlyclean-libtool:
 
 clean-libtool:
 	-rm -rf .libs _libs
+install-pkgconfigDATA: $(pkgconfig_DATA)
+	@$(NORMAL_INSTALL)
+	test -z "$(pkgconfigdir)" || $(MKDIR_P) "$(DESTDIR)$(pkgconfigdir)"
+	@list='$(pkgconfig_DATA)'; for p in $$list; do \
+	  if test -f "$$p"; then d=; else d="$(srcdir)/"; fi; \
+	  f=$(am__strip_dir) \
+	  echo " $(pkgconfigDATA_INSTALL) '$$d$$p' '$(DESTDIR)$(pkgconfigdir)/$$f'"; \
+	  $(pkgconfigDATA_INSTALL) "$$d$$p" "$(DESTDIR)$(pkgconfigdir)/$$f"; \
+	done
+
+uninstall-pkgconfigDATA:
+	@$(NORMAL_UNINSTALL)
+	@list='$(pkgconfig_DATA)'; for p in $$list; do \
+	  f=$(am__strip_dir) \
+	  echo " rm -f '$(DESTDIR)$(pkgconfigdir)/$$f'"; \
+	  rm -f "$(DESTDIR)$(pkgconfigdir)/$$f"; \
+	done
 install-includeHEADERS: $(include_HEADERS)
 	@$(NORMAL_INSTALL)
 	test -z "$(includedir)" || $(MKDIR_P) "$(DESTDIR)$(includedir)"
@@ -1993,9 +2018,9 @@ distdir: $(DISTFILES)
 	done
 check-am: all-am
 check: check-am
-all-am: Makefile $(LTLIBRARIES) $(HEADERS) all-local
+all-am: Makefile $(LTLIBRARIES) $(DATA) $(HEADERS) all-local
 installdirs:
-	for dir in "$(DESTDIR)$(libdir)" "$(DESTDIR)$(includedir)"; do \
+	for dir in "$(DESTDIR)$(libdir)" "$(DESTDIR)$(pkgconfigdir)" "$(DESTDIR)$(includedir)"; do \
 	  test -z "$$dir" || $(MKDIR_P) "$$dir"; \
 	done
 install: install-am
@@ -2044,7 +2069,8 @@ info: info-am
 
 info-am:
 
-install-data-am: install-data-local install-includeHEADERS
+install-data-am: install-data-local install-includeHEADERS \
+	install-pkgconfigDATA
 	@$(NORMAL_INSTALL)
 	$(MAKE) $(AM_MAKEFLAGS) install-data-hook
 
@@ -2081,7 +2107,8 @@ ps: ps-am
 
 ps-am:
 
-uninstall-am: uninstall-includeHEADERS uninstall-libLTLIBRARIES
+uninstall-am: uninstall-includeHEADERS uninstall-libLTLIBRARIES \
+	uninstall-pkgconfigDATA
 
 .MAKE: install-am install-data-am install-strip
 
@@ -2094,13 +2121,14 @@ uninstall-am: uninstall-includeHEADERS uninstall-libLTLIBRARIES
 	install-dvi install-dvi-am install-exec install-exec-am \
 	install-html install-html-am install-includeHEADERS \
 	install-info install-info-am install-libLTLIBRARIES \
-	install-man install-pdf install-pdf-am install-ps \
-	install-ps-am install-strip installcheck installcheck-am \
-	installdirs maintainer-clean maintainer-clean-generic \
-	maintainer-clean-local mostlyclean mostlyclean-compile \
-	mostlyclean-generic mostlyclean-libtool pdf pdf-am ps ps-am \
-	tags uninstall uninstall-am uninstall-includeHEADERS \
-	uninstall-libLTLIBRARIES
+	install-man install-pdf install-pdf-am install-pkgconfigDATA \
+	install-ps install-ps-am install-strip installcheck \
+	installcheck-am installdirs maintainer-clean \
+	maintainer-clean-generic maintainer-clean-local mostlyclean \
+	mostlyclean-compile mostlyclean-generic mostlyclean-libtool \
+	pdf pdf-am ps ps-am tags uninstall uninstall-am \
+	uninstall-includeHEADERS uninstall-libLTLIBRARIES \
+	uninstall-pkgconfigDATA
 
 	$(top_builddir)/src/common/libutilities.la \
 	$(top_builddir)/src/replib/librep.la \

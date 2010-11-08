@@ -1,5 +1,7 @@
 
 includedir = @includedir@/glite/security/voms
+pkgconfigdir = $(libdir)/pkgconfig
+pkgconfig_DATA = voms-1.0.pc
 
 lib_LTLIBRARIES = \
 	$(WANTED_API_LIBS) # may add the libraries defined in EXTRA_LTLIBRARIES
