@@ -1,5 +1,7 @@
 
 includedir = @includedir@/glite/security/voms
+pkgconfigdir = $(libdir)/pkgconfig
+pkgconfig_DATA = voms-1.0.pc
 
 lib_LTLIBRARIES = \
 	$(WANTED_API_LIBS) # may add the libraries defined in EXTRA_LTLIBRARIES
@@ -14,31 +16,6 @@ CCSOURCES = \
 API_INCLUDES = \
 	-I$(top_srcdir)/src/include
 
-libvomsapi_nog_la_SOURCES = \
-	$(CCSOURCES)
-
-libvomsapi_nog_la_CXXFLAGS = \
-	$(NO_GLOBUS_FLAGS) \
-	-DNOGLOBUS \
-	$(API_INCLUDES)
-
-libvomsapi_nog_la_LDFLAGS = \
-	-rpath $(libdir)
-
-NOGLIBADD = \
-	$(EXPAT_LIBS) \
-	$(OPENSSL_LIBS) \
-	$(top_builddir)/src/replib/librep.la \
-	$(top_builddir)/src/common/libutilities_nog.la \
-	$(top_builddir)/src/common/libutilc_nog.la \
-	$(top_builddir)/src/sslutils/libssl_utils_nog.la \
-	$(top_builddir)/src/log/liblog.la\
-	$(top_builddir)/src/socklib/libsock_nog.la
-
-libvomsapi_nog_la_LIBADD = \
-	$(NOGLIBADD) \
-	$(top_builddir)/src/ac/libattributes_nog.la
-
 libvomsapi_la_SOURCES = \
 	$(CCSOURCES)
 
@@ -48,48 +25,32 @@ libvomsapi_la_CXXFLAGS = \
 	$(API_INCLUDES)
 
 libvomsapi_la_LDFLAGS = \
-	-rpath $(libdir)
+	-rpath $(libdir) \
+  -version-info 1:0:0
 
-CCLIBADD = \
+NOGLIBADD = \
 	$(EXPAT_LIBS) \
-  $(GLOBUS_LIBS) \
+	$(OPENSSL_LIBS) \
 	$(top_builddir)/src/replib/librep.la \
 	$(top_builddir)/src/common/libutilities.la \
-	$(top_builddir)/src/log/liblog.la 
-#	$(top_builddir)/src/sslutils/$(USE_SSL_UTILS_LIB)
+	$(top_builddir)/src/common/libutilc_nog.la \
+	$(top_builddir)/src/sslutils/libssl_utils_nog.la \
+	$(top_builddir)/src/log/liblog.la\
+	$(top_builddir)/src/socklib/libsock_nog.la
 
 libvomsapi_la_LIBADD = \
 	$(NOGLIBADD) \
 	$(top_builddir)/src/ac/libattributes_nog.la
 
-CSOURCES = \
-	api_util.cc \
-	voms_api.cc \
-	ccval.cc \
-	internal.cc \
-	cinterface.cc
 
-libvomsc_la_SOURCES = \
-	$(CSOURCES)
+#CCLIBADD = \
+#	$(EXPAT_LIBS) \
+# $(GLOBUS_LIBS) \
+#	$(top_builddir)/src/replib/librep.la \
+#	$(top_builddir)/src/common/libutilities.la \
+#	$(top_builddir)/src/log/liblog.la 
+#	$(top_builddir)/src/sslutils/$(USE_SSL_UTILS_LIB)
 
-libvomsc_la_CXXFLAGS = \
-	-I$(top_srcdir)/src/include \
-	$(API_INCLUDES) \
-	$(GLOBUS_CFLAGS)
-
-libvomsc_la_LDFLAGS = \
-	-rpath $(libdir)
-
-
-CLIBADD = 
-	$(top_builddir)/src/common/libutilities.la \
-	$(top_builddir)/src/replib/librep.la \
-	$(top_builddir)/src/log/liblog.la
-
-libvomsc_la_LIBADD = \
-	$(CCLIBADD) \
-	$(top_builddir)/src/socklib/libsock.la \
-	$(top_builddir)/src/ac/libccattcert.la
 
 # test programs
 
@@ -136,7 +97,8 @@ libvomsapi_gcc32_la_LIBADD = \
 	$(top_builddir)/src/ac/libccattcert_gcc32.la
 
 libvomsapi_gcc32_la_LDFLAGS = \
-	-rpath $(libdir)
+	-rpath $(libdir) \
+  -version-info 1:0:0
 
 libvomsapi_gcc32dbg_la_SOURCES = \
 	$(CCSOURCES)
@@ -152,7 +114,8 @@ libvomsapi_gcc32dbg_la_LIBADD = \
 	$(top_builddir)/src/ac/libccattcert_gcc32dbg.la
 
 libvomsapi_gcc32dbg_la_LDFLAGS = \
-	-rpath $(libdir)
+	-rpath $(libdir) \
+  -version-info 1:0:0
 
 libvomsapi_gcc32pthr_la_SOURCES = \
 	$(CCSOURCES)
@@ -168,7 +131,8 @@ libvomsapi_gcc32pthr_la_LIBADD = \
 	$(top_builddir)/src/ac/libccattcert_gcc32pthr.la
 
 libvomsapi_gcc32pthr_la_LDFLAGS = \
-	-rpath $(libdir)
+	-rpath $(libdir) \
+  -version-info 1:0:0
 
 libvomsapi_gcc32dbgpthr_la_SOURCES = \
 	$(CCSOURCES)
@@ -184,7 +148,8 @@ libvomsapi_gcc32dbgpthr_la_LIBADD = \
 	$(top_builddir)/src/ac/libccattcert_gcc32dbgpthr.la
 
 libvomsapi_gcc32dbgpthr_la_LDFLAGS = \
-	-rpath $(libdir)
+	-rpath $(libdir) \
+  -version-info 1:0:0
 
 libvomsc_gcc32_la_SOURCES = \
 	$(CSOURCES)
@@ -200,7 +165,8 @@ libvomsc_gcc32_la_LIBADD = \
 	$(top_builddir)/src/ac/libccattcert_gcc32.la
 
 libvomsc_gcc32_la_LDFLAGS = \
-	-rpath $(libdir)
+	-rpath $(libdir) \
+  -version-info 1:0:0
 
 libvomsc_gcc32dbg_la_SOURCES = \
 	$(CSOURCES)
@@ -216,7 +182,8 @@ libvomsc_gcc32dbg_la_LIBADD = \
 	$(top_builddir)/src/ac/libccattcert_gcc32dbg.la
 
 libvomsc_gcc32dbg_la_LDFLAGS = \
-	-rpath $(libdir)
+	-rpath $(libdir) \
+  -version-info 1:0:0
 
 libvomsc_gcc32pthr_la_SOURCES = \
 	$(CSOURCES)
@@ -232,7 +199,8 @@ libvomsc_gcc32pthr_la_LIBADD = \
 	$(top_builddir)/src/ac/libccattcert_gcc32pthr.la
 
 libvomsc_gcc32pthr_la_LDFLAGS = \
-	-rpath $(libdir)
+	-rpath $(libdir) \
+  -version-info 1:0:0
 
 libvomsc_gcc32dbgpthr_la_SOURCES = \
 	$(CSOURCES)
@@ -248,7 +216,8 @@ libvomsc_gcc32dbgpthr_la_LIBADD = \
 	$(top_builddir)/src/ac/libccattcert_gcc32dbgpthr.la
 
 libvomsc_gcc32dbgpthr_la_LDFLAGS = \
-	-rpath $(libdir)
+	-rpath $(libdir) \
+  -version-info 1:0:0
 
 
 
@@ -267,7 +236,8 @@ libvomsapi_gcc64_la_LIBADD = \
 	$(top_builddir)/src/ac/libccattcert_gcc64.la
 
 libvomsapi_gcc64_la_LDFLAGS = \
-	-rpath $(libdir)
+	-rpath $(libdir) \
+  -version-info 1:0:0
 
 libvomsapi_gcc64dbg_la_SOURCES = \
 	$(CCSOURCES)
@@ -283,7 +253,8 @@ libvomsapi_gcc64dbg_la_LIBADD = \
 	$(top_builddir)/src/ac/libccattcert_gcc64dbg.la
 
 libvomsapi_gcc64dbg_la_LDFLAGS = \
-	-rpath $(libdir)
+	-rpath $(libdir) \
+  -version-info 1:0:0
 
 libvomsapi_gcc64pthr_la_SOURCES = \
 	$(CCSOURCES)
@@ -299,7 +270,8 @@ libvomsapi_gcc64pthr_la_LIBADD = \
 	$(top_builddir)/src/ac/libccattcert_gcc64pthr.la
 
 libvomsapi_gcc64pthr_la_LDFLAGS = \
-	-rpath $(libdir)
+	-rpath $(libdir) \
+  -version-info 1:0:0
 
 libvomsapi_gcc64dbgpthr_la_SOURCES = \
 	$(CCSOURCES)
@@ -315,7 +287,8 @@ libvomsapi_gcc64dbgpthr_la_LIBADD = \
 	$(top_builddir)/src/ac/libccattcert_gcc64dbgpthr.la
 
 libvomsapi_gcc64dbgpthr_la_LDFLAGS = \
-	-rpath $(libdir)
+	-rpath $(libdir) \
+  -version-info 1:0:0
 
 libvomsc_gcc64_la_SOURCES = \
 	$(CSOURCES)
@@ -331,7 +304,8 @@ libvomsc_gcc64_la_LIBADD = \
 	$(top_builddir)/src/ac/libccattcert_gcc64.la
 
 libvomsc_gcc64_la_LDFLAGS = \
-	-rpath $(libdir)
+	-rpath $(libdir) \
+  -version-info 1:0:0
 
 libvomsc_gcc64dbg_la_SOURCES = \
 	$(CSOURCES)
@@ -347,7 +321,8 @@ libvomsc_gcc64dbg_la_LIBADD = \
 	$(top_builddir)/src/ac/libccattcert_gcc64dbg.la
 
 libvomsc_gcc64dbg_la_LDFLAGS = \
-	-rpath $(libdir)
+	-rpath $(libdir) \
+  -version-info 1:0:0
 
 libvomsc_gcc64pthr_la_SOURCES = \
 	$(CSOURCES)
@@ -364,7 +339,8 @@ libvomsc_gcc64pthr_la_LIBADD = \
 
 
 libvomsc_gcc64pthr_la_LDFLAGS = \
-	-rpath $(libdir)
+	-rpath $(libdir) \
+  -version-info 1:0:0
 
 libvomsc_gcc64dbgpthr_la_SOURCES = \
 	$(CSOURCES)
@@ -380,7 +356,8 @@ libvomsc_gcc64dbgpthr_la_LIBADD = \
 	$(top_builddir)/src/ac/libccattcert_gcc64dbgpthr.la
 
 libvomsc_gcc64dbgpthr_la_LDFLAGS = \
-	-rpath $(libdir)
+	-rpath $(libdir) \
+  -version-info 1:0:0
 
 if BUILD_INTERFACES
 include_HEADERS = \

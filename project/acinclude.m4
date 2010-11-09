@@ -183,7 +183,7 @@ AC_DEFUN([AC_OPENSSL],
     AC_SUBST(OPENSSL_LIBS)
     AC_MSG_CHECKING([for system OpenSSL version])
     if test "x$with_openssl_libs" = "xyes" ; then
-      WANTED_API_LIBS="$WANTED_API_LIBS libvomsapi_nog.la"
+      WANTED_API_LIBS="$WANTED_API_LIBS libvomsapi.la"
       WANTED_ATTCERT_LIBS="$WANTED_ATTCERT_LIBS libattributes_nog.la"
       WANTED_SSL_UTILS_LIBS="$WANTED_SSL_UTILS_LIBS libssl_utils_nog.la"
       WANTED_UTIL_LIBS="$WANTED_UTIL_LIBS libutilities_nog.la libutilc_nog.la"
@@ -262,10 +262,7 @@ AC_DEFUN([AC_GLOBUS],
         USE_SOCK_LIB_SERVER="libsock_nog.la"
       fi
       if test "x$USE_CCAPI_LIB" = "x"; then
-        USE_CCAPI_LIB="libvomsapi_nog.la"
-      fi
-      if test "x$USE_CAPI_LIB" = "x"; then
-        USE_CAPI_LIB="libvomsc.la"
+        USE_CCAPI_LIB="libvomsapi.la"
       fi
       if test "x$USE_ATTCERT_LIB" = "x"; then
         USE_ATTCERT_LIB="libattcert.la"
@@ -277,7 +274,7 @@ AC_DEFUN([AC_GLOBUS],
       WANTED_SSL_UTILS_LIBS="$WANTED_SSL_UTILS_LIBS libssl_utils.la"
       WANTED_SOCK_LIBS="$WANTED_SOCK_LIBS libsock.la libsock_nog.la"
       WANTED_ATTCERT_LIBS="$WANTED_ATTCERT_LIBS libattcert.la libccattcert.la"
-      WANTED_API_LIBS="$WANTED_API_LIBS libvomsapi.la libvomsc.la"
+      WANTED_API_LIBS="$WANTED_API_LIBS libvomsapi.la"
       WANTED_UTIL_LIBS="$WANTED_UTIL_LIBS libutilities.la libutilc.la"
     fi    
     new_flavors=""
@@ -318,9 +315,6 @@ AC_DEFUN([AC_GLOBUS],
       if test "x$USE_CCAPI_LIB" = "x"; then
         USE_CCAPI_LIB="libvomsapi_$flavor.la"
       fi
-      if test "x$USE_CAPI_LIB" = "x"; then
-        USE_CAPI_LIB="libvomsc_$flavor.la"
-      fi
       if test "x$USE_ATTCERT_LIB" = "x"; then
         USE_ATTCERT_LIB="libattcert_$flavor.la"
       fi
@@ -330,7 +324,6 @@ AC_DEFUN([AC_GLOBUS],
       WANTED_SSL_UTILS_LIBS="$WANTED_SSL_UTILS_LIBS libssl_utils_"$flavor".la"
       WANTED_SOCK_LIBS="$WANTED_SOCK_LIBS libsock_$flavor.la libsock_nog.la"
       WANTED_CCAPI_LIBS="$WANTED_CCAPI_LIBS libvomsapi_"$flavor".la"
-      WANTED_CAPI_LIBS="$WANTED_CAPI_LIBS libvomsc_"$flavor".la"
       WANTED_ATTCERT_LIBS="$WANTED_ATTCERT_LIBS libattcert_"$flavor".la libccattcert_"$flavor".la"
       WANTED_UTIL_LIBS="$WANTED_UTIL_LIBS libutilities.la libutilc.la"
     done

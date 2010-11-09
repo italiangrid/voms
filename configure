@@ -15681,7 +15681,7 @@ ac_compiler_gnu=$ac_cv_c_compiler_gnu
     { $as_echo "$as_me:$LINENO: checking for system OpenSSL version" >&5
 $as_echo_n "checking for system OpenSSL version... " >&6; }
     if test "x$with_openssl_libs" = "xyes" ; then
-      WANTED_API_LIBS="$WANTED_API_LIBS libvomsapi_nog.la"
+      WANTED_API_LIBS="$WANTED_API_LIBS libvomsapi.la"
       WANTED_ATTCERT_LIBS="$WANTED_ATTCERT_LIBS libattributes_nog.la"
       WANTED_SSL_UTILS_LIBS="$WANTED_SSL_UTILS_LIBS libssl_utils_nog.la"
       WANTED_UTIL_LIBS="$WANTED_UTIL_LIBS libutilities_nog.la libutilc_nog.la"
@@ -16057,10 +16057,7 @@ $as_echo "found $GLOBUS_FLAVORS ($with_globus_flavor selected)" >&6; }
         USE_SOCK_LIB_SERVER="libsock_nog.la"
       fi
       if test "x$USE_CCAPI_LIB" = "x"; then
-        USE_CCAPI_LIB="libvomsapi_nog.la"
-      fi
-      if test "x$USE_CAPI_LIB" = "x"; then
-        USE_CAPI_LIB="libvomsc.la"
+        USE_CCAPI_LIB="libvomsapi.la"
       fi
       if test "x$USE_ATTCERT_LIB" = "x"; then
         USE_ATTCERT_LIB="libattcert.la"
@@ -16072,7 +16069,7 @@ $as_echo "found $GLOBUS_FLAVORS ($with_globus_flavor selected)" >&6; }
       WANTED_SSL_UTILS_LIBS="$WANTED_SSL_UTILS_LIBS libssl_utils.la"
       WANTED_SOCK_LIBS="$WANTED_SOCK_LIBS libsock.la libsock_nog.la"
       WANTED_ATTCERT_LIBS="$WANTED_ATTCERT_LIBS libattcert.la libccattcert.la"
-      WANTED_API_LIBS="$WANTED_API_LIBS libvomsapi.la libvomsc.la"
+      WANTED_API_LIBS="$WANTED_API_LIBS libvomsapi.la"
       WANTED_UTIL_LIBS="$WANTED_UTIL_LIBS libutilities.la libutilc.la"
     fi
     new_flavors=""
@@ -16114,9 +16111,6 @@ $as_echo "Final globus flavors: ${GLOBUS_FLAVORS}" >&6; }
       if test "x$USE_CCAPI_LIB" = "x"; then
         USE_CCAPI_LIB="libvomsapi_$flavor.la"
       fi
-      if test "x$USE_CAPI_LIB" = "x"; then
-        USE_CAPI_LIB="libvomsc_$flavor.la"
-      fi
       if test "x$USE_ATTCERT_LIB" = "x"; then
         USE_ATTCERT_LIB="libattcert_$flavor.la"
       fi
@@ -16126,7 +16120,6 @@ $as_echo "Final globus flavors: ${GLOBUS_FLAVORS}" >&6; }
       WANTED_SSL_UTILS_LIBS="$WANTED_SSL_UTILS_LIBS libssl_utils_"$flavor".la"
       WANTED_SOCK_LIBS="$WANTED_SOCK_LIBS libsock_$flavor.la libsock_nog.la"
       WANTED_CCAPI_LIBS="$WANTED_CCAPI_LIBS libvomsapi_"$flavor".la"
-      WANTED_CAPI_LIBS="$WANTED_CAPI_LIBS libvomsc_"$flavor".la"
       WANTED_ATTCERT_LIBS="$WANTED_ATTCERT_LIBS libattcert_"$flavor".la libccattcert_"$flavor".la"
       WANTED_UTIL_LIBS="$WANTED_UTIL_LIBS libutilities.la libutilc.la"
     done
@@ -21780,7 +21773,7 @@ INSTALL_API_LIBS="$lista"
 
 ac_config_files="$ac_config_files Makefile src/Makefile src/ac/Makefile src/api/Makefile src/api/ccapi/Makefile src/api/java/Makefile src/client/Makefile src/common/Makefile src/include/Makefile src/install/Makefile src/log/Makefile src/replib/Makefile src/replica/Makefile src/server/Makefile src/socklib/Makefile src/sslutils/Makefile src/utils/Makefile doc/Makefile project/Makefile testsuite/Makefile testsuite/SuiteConfig"
 
-ac_config_files="$ac_config_files src/install/voms_install_db src/install/voms.start src/replica/voms_install_replica src/install/upgrade1to2 src/install/mysql2oracle testsuite/lib/vomssetup.exp"
+ac_config_files="$ac_config_files src/install/voms_install_db src/install/voms.start src/replica/voms_install_replica src/install/upgrade1to2 src/install/mysql2oracle testsuite/lib/vomssetup.exp src/api/ccapi/voms-1.0.pc"
 
 cat >confcache <<\_ACEOF
 # This file is a shell script that caches the results of configure
@@ -22901,6 +22894,7 @@ do
     "src/install/upgrade1to2") CONFIG_FILES="$CONFIG_FILES src/install/upgrade1to2" ;;
     "src/install/mysql2oracle") CONFIG_FILES="$CONFIG_FILES src/install/mysql2oracle" ;;
     "testsuite/lib/vomssetup.exp") CONFIG_FILES="$CONFIG_FILES testsuite/lib/vomssetup.exp" ;;
+    "src/api/ccapi/voms-1.0.pc") CONFIG_FILES="$CONFIG_FILES src/api/ccapi/voms-1.0.pc" ;;
 
   *) { { $as_echo "$as_me:$LINENO: error: invalid argument: $ac_config_target" >&5
 $as_echo "$as_me: error: invalid argument: $ac_config_target" >&2;}
