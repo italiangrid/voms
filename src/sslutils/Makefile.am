@@ -42,8 +42,8 @@ libssl_utils_la_LIBADD = \
 
 libssl_utils_nog_la_CFLAGS = \
 	$(NO_GLOBUS_FLAGS) \
-	-I $(top_srcdir)/src/include \
-	$(GLOBUS_CFLAGS)
+	-DNOGLOBUS \
+	-I $(top_srcdir)/src/include
 
 ###
 

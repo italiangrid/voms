@@ -310,10 +310,11 @@ libutilc_la_SOURCES = \
 	credentials.c
 
 AM_CPPFLAGS = \
+	$(NO_GLOBUS_FLAGS) \
+	-DNOGLOBUS \
 	-I $(top_srcdir)/src/include \
 	-I $(top_srcdir)/src/sslutils \
-	$(EXPAT_CFLAGS) \
-	$(GLOBUS_CFLAGS)
+	$(EXPAT_CFLAGS)
 
 AM_LDFLAGS = \
 	$(EXPAT_LIBS)
