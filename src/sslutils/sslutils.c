@@ -3733,10 +3733,14 @@ int load_credentials(const char *certname, const char *keyname,
 err:
   if (chain)
     sk_X509_free(chain);
-  if (cert)
+  if (cert) {
     X509_free(*cert);
-  if (key)
+    *cert = NULL;
+  }
+  if (key) {
     EVP_PKEY_free(*key);
+    *key = NULL;
+  }
   return 0;
 }
 
