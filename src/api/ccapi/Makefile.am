@@ -16,32 +16,6 @@ CCSOURCES = \
 API_INCLUDES = \
 	-I$(top_srcdir)/src/include
 
-libvomsapi_nog_la_SOURCES = \
-	$(CCSOURCES)
-
-libvomsapi_nog_la_CXXFLAGS = \
-	$(NO_GLOBUS_FLAGS) \
-	-DNOGLOBUS \
-	$(API_INCLUDES)
-
-libvomsapi_nog_la_LDFLAGS = \
-	-rpath $(libdir) \
-  -version-info 1:0:0
-
-NOGLIBADD = \
-	$(EXPAT_LIBS) \
-	$(OPENSSL_LIBS) \
-	$(top_builddir)/src/replib/librep.la \
-	$(top_builddir)/src/common/libutilities_nog.la \
-	$(top_builddir)/src/common/libutilc_nog.la \
-	$(top_builddir)/src/sslutils/libssl_utils_nog.la \
-	$(top_builddir)/src/log/liblog.la\
-	$(top_builddir)/src/socklib/libsock_nog.la
-
-libvomsapi_nog_la_LIBADD = \
-	$(NOGLIBADD) \
-	$(top_builddir)/src/ac/libattributes_nog.la
-
 libvomsapi_la_SOURCES = \
 	$(CCSOURCES)
 
@@ -54,47 +28,29 @@ libvomsapi_la_LDFLAGS = \
 	-rpath $(libdir) \
   -version-info 1:0:0
 
-CCLIBADD = \
+NOGLIBADD = \
 	$(EXPAT_LIBS) \
-  $(GLOBUS_LIBS) \
+	$(OPENSSL_LIBS) \
 	$(top_builddir)/src/replib/librep.la \
 	$(top_builddir)/src/common/libutilities.la \
-	$(top_builddir)/src/log/liblog.la 
-#	$(top_builddir)/src/sslutils/$(USE_SSL_UTILS_LIB)
+	$(top_builddir)/src/common/libutilc_nog.la \
+	$(top_builddir)/src/sslutils/libssl_utils_nog.la \
+	$(top_builddir)/src/log/liblog.la\
+	$(top_builddir)/src/socklib/libsock_nog.la
 
 libvomsapi_la_LIBADD = \
 	$(NOGLIBADD) \
 	$(top_builddir)/src/ac/libattributes_nog.la
 
-CSOURCES = \
-	api_util.cc \
-	voms_api.cc \
-	ccval.cc \
-	internal.cc \
-	cinterface.cc
 
-libvomsc_la_SOURCES = \
-	$(CSOURCES)
+#CCLIBADD = \
+#	$(EXPAT_LIBS) \
+# $(GLOBUS_LIBS) \
+#	$(top_builddir)/src/replib/librep.la \
+#	$(top_builddir)/src/common/libutilities.la \
+#	$(top_builddir)/src/log/liblog.la 
+#	$(top_builddir)/src/sslutils/$(USE_SSL_UTILS_LIB)
 
-libvomsc_la_CXXFLAGS = \
-	-I$(top_srcdir)/src/include \
-	$(API_INCLUDES) \
-	$(GLOBUS_CFLAGS)
-
-libvomsc_la_LDFLAGS = \
-	-rpath $(libdir) \
-  -version-info 1:0:0
-
-
-CLIBADD = 
-	$(top_builddir)/src/common/libutilities.la \
-	$(top_builddir)/src/replib/librep.la \
-	$(top_builddir)/src/log/liblog.la
-
-libvomsc_la_LIBADD = \
-	$(CCLIBADD) \
-	$(top_builddir)/src/socklib/libsock.la \
-	$(top_builddir)/src/ac/libccattcert.la
 
 # test programs
 

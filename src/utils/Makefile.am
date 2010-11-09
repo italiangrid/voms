@@ -8,7 +8,7 @@ voms_proxy_info_SOURCES = \
 	voms_proxy_info.cc
 
 voms_proxy_info_LDADD = \
-	$(top_builddir)/src/api/ccapi/libvomsapi_nog.la  \
+	$(top_builddir)/src/api/ccapi/libvomsapi.la  \
 	$(top_builddir)/src/replib/librep.la \
 	$(top_builddir)/src/sslutils/libssl_utils_nog.la \
 	$(EXPAT_LIBS)
@@ -17,7 +17,7 @@ voms_proxy_destroy_SOURCES = \
 	voms_proxy_destroy.cc
 
 voms_proxy_destroy_LDADD = \
-	$(top_builddir)/src/api/ccapi/libvomsapi_nog.la  \
+	$(top_builddir)/src/api/ccapi/libvomsapi.la  \
 	$(top_builddir)/src/sslutils/libssl_utils_nog.la \
 	$(top_builddir)/src/replib/librep.la \
 	$(EXPAT_LIBS)
@@ -39,7 +39,7 @@ lex.yy.c: vomsparser.l vomsparser.h
 	flex vomsparser.l
 
 voms_proxy_fake_LDADD = \
-	$(top_builddir)/src/api/ccapi/libvomsapi_nog.la  \
+	$(top_builddir)/src/api/ccapi/libvomsapi.la  \
 	$(top_builddir)/src/replib/librep.la \
 	$(top_builddir)/src/sslutils/libssl_utils_nog.la
 
