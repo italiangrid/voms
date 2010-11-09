@@ -21,7 +21,7 @@ proc mytest {} {
         return $::FAILTEST
     }
 
-    set correct "\[ \t\]RSA Public Key: \\(1024 bit\\)"
+    set correct "Key: \\(1024 bit\\)"
 
     loadvar out2 $outname
     if [regexp $correct $out2] then {
