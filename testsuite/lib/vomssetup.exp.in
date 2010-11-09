@@ -342,7 +342,7 @@ proc _buildC { name } {
     set realname "[file dirname [info script]]/$name"
     set realout  "$::SCRATCHDIR/a.out"
     if [file exists $realname] then {
-        return [catch {set out [ exec gcc -g -O0 @GLOBUS_CFLAGS@ -o $realout -I$::INSTALLDIR/include/glite/security/voms $realname -L $::INSTALLDIR/lib64 -L $::INSTALLDIR/lib -lvomsc >& $::_buildout ]}]
+        return [catch {set out [ exec gcc -g -O0 @GLOBUS_CFLAGS@ -o $realout -I$::INSTALLDIR/include/glite/security/voms $realname -L $::INSTALLDIR/lib64 -L $::INSTALLDIR/lib -lvomsapi >& $::_buildout ]}]
     } else {
         fail "File does not exists!"
     }
