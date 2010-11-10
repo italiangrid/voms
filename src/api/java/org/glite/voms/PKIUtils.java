@@ -80,6 +80,7 @@ import org.bouncycastle.jce.X509Principal;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.bouncycastle.openssl.PEMReader;
 import org.bouncycastle.openssl.PasswordFinder;
+import org.bouncycastle.jce.provider.JCERSAPrivateKey;
 
 
 public class PKIUtils {
@@ -689,20 +690,34 @@ public class PKIUtils {
              pem = new PEMReader(new FileReader(file), finder);
              logger.debug("pem = " + pem);
              Object read = null;
+
              do {
                  read = pem.readObject();
-		 logger.debug("File is: " + file.getAbsolutePath());
+                 logger.debug("File is: " + file.getAbsolutePath());
                  logger.debug("Object read is: " + read);
-             } while (!(read instanceof KeyPair) && read != null);
-	     if (read != null) {
-	       KeyPair pair = (KeyPair)read;
-	       logger.debug("key = " + pair );
-	       return pair.getPrivate();
-	     }
-	     else {
-	       // no private key was found!
-	       return null;
-	     }
+                 logger.debug("Object class is: " + read.getClass().getCanonicalName());
+             } while (!((read instanceof KeyPair) || (read instanceof JCERSAPrivateKey)) && read != null);
+
+             if (read != null) {
+                 if (read instanceof KeyPair) {
+                     KeyPair pair = (KeyPair)read;
+                     logger.debug("key = " + pair );
+                     return pair.getPrivate();
+                 }
+                 else if (read instanceof JCERSAPrivateKey) {
+                     logger.debug("key = " + read);
+                     return (PrivateKey)read;
+                 }
+                 else if (read instanceof PrivateKey) {
+                     return (PrivateKey)read;
+                 }
+                 else
+                     return null;
+             }
+             else {
+                 // no private key was found!
+                 return null;
+             }
          }
          catch (IOException e) {
              throw new IllegalArgumentException("Not a PEM format file " + file.getName(), e);
