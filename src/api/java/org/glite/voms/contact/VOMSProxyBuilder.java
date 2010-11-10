@@ -66,7 +66,6 @@ import java.math.BigInteger;
 
 import org.apache.log4j.Logger;
 
-import org.bouncycastle.asn1.DEREncodableVector;
 import org.bouncycastle.asn1.ASN1EncodableVector;
 import org.bouncycastle.asn1.DERSequence;
 import org.bouncycastle.asn1.ASN1Sequence;
@@ -79,7 +78,7 @@ import org.bouncycastle.asn1.DERPrintableString;
 import org.bouncycastle.asn1.x509.X509Name;
 import org.bouncycastle.asn1.x509.KeyUsage;
 
-import org.bouncycastle.jce.X509V3CertificateGenerator;
+import org.bouncycastle.x509.X509V3CertificateGenerator;
 
 import org.glite.voms.ac.AttributeCertificate;
 
@@ -208,7 +207,7 @@ public class VOMSProxyBuilder {
 
         Iterator i = ACs.iterator();
 
-        DEREncodableVector acVector = new DEREncodableVector();
+        ASN1EncodableVector acVector = new ASN1EncodableVector();
 
         while (i.hasNext())
             acVector.add( (AttributeCertificate)i.next() );

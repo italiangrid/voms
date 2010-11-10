@@ -58,7 +58,7 @@ import org.bouncycastle.asn1.DERObjectIdentifier;
 import org.bouncycastle.asn1.ASN1Sequence;
 import org.bouncycastle.asn1.ASN1Object;
 import org.bouncycastle.asn1.DERObject;
-import org.bouncycastle.asn1.DERInputStream;
+import org.bouncycastle.asn1.ASN1InputStream;
 import org.bouncycastle.asn1.DEROctetString;
 import org.bouncycastle.asn1.x509.X509Extension;
 import org.bouncycastle.asn1.x509.X509Extensions;
@@ -70,7 +70,7 @@ import org.glite.voms.ac.AttributeCertificateInfo;
 import org.glite.voms.ac.VOMSTrustStore;
 import org.glite.voms.contact.MyProxyCertInfo;
 
-class MyDERInputStream extends DERInputStream {
+class MyDERInputStream extends ASN1InputStream {
     public MyDERInputStream(InputStream is) {
         super(is);
     }
@@ -470,7 +470,7 @@ public class PKIVerifier {
         DERObject obj = null;
 
         try {
-            obj = new DERInputStream(new ByteArrayInputStream(ext.getValue().getOctets())).readObject();
+            obj = new ASN1InputStream(new ByteArrayInputStream(ext.getValue().getOctets())).readObject();
             MyDERInputStream str = new MyDERInputStream(((DEROctetString)obj).getOctetStream());
             int len = 0;
             int res = 0;

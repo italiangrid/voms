@@ -40,7 +40,7 @@ import java.util.Vector;
 
 import javax.security.auth.x500.X500Principal;
 
-import org.bouncycastle.asn1.DEREncodableVector;
+import org.bouncycastle.asn1.ASN1EncodableVector;
 import org.bouncycastle.asn1.DERInteger;
 import org.bouncycastle.asn1.x509.AlgorithmIdentifier;
 
@@ -137,7 +137,7 @@ public class ACGenerator {
             throw new IllegalArgumentException("All mandatory components are not present");
         }
 
-        DEREncodableVector v = new DEREncodableVector();
+        ASN1EncodableVector v = new ASN1EncodableVector();
         v.add(new DERInteger(1));
         v.add(new Holder(holderIssuer, holderSerial));
         v.add(new AttCertIssuer(new V2Form(Util.x500nameToGeneralNames(issuer))));

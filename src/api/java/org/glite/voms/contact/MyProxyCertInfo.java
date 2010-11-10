@@ -27,7 +27,7 @@ package org.glite.voms.contact;
 
 import org.bouncycastle.asn1.DERInteger;
 import org.bouncycastle.asn1.DEREncodable;
-import org.bouncycastle.asn1.DEREncodableVector;
+import org.bouncycastle.asn1.ASN1EncodableVector;
 import org.bouncycastle.asn1.DERObject;
 import org.bouncycastle.asn1.DERObjectIdentifier;
 import org.bouncycastle.asn1.DERSequence;
@@ -35,7 +35,7 @@ import org.bouncycastle.asn1.ASN1Sequence;
 import org.bouncycastle.asn1.ASN1Object;
 import java.io.IOException;
 import java.io.ByteArrayInputStream;
-import org.bouncycastle.asn1.DERInputStream;
+import org.bouncycastle.asn1.ASN1InputStream;
 
 public class MyProxyCertInfo implements DEREncodable {
 
@@ -93,7 +93,7 @@ public class MyProxyCertInfo implements DEREncodable {
         DERObject derObj = null;
         try {
             ByteArrayInputStream inStream = new ByteArrayInputStream(payload);
-            DERInputStream derInputStream = new DERInputStream(inStream);
+            ASN1InputStream derInputStream = new ASN1InputStream(inStream);
             derObj = derInputStream.readObject();
         } catch (IOException e) {
             throw new IllegalArgumentException("Unable to convert byte array: " + 
@@ -107,7 +107,7 @@ public class MyProxyCertInfo implements DEREncodable {
     }
 
     public DERObject getDERObject() {
-        DEREncodableVector vec = new DEREncodableVector();
+        ASN1EncodableVector vec = new ASN1EncodableVector();
 
         switch(version) {
         case VOMSProxyBuilder.GT3_PROXY:

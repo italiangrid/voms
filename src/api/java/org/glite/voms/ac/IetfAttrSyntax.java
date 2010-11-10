@@ -38,7 +38,7 @@ import java.util.Vector;
 import org.bouncycastle.asn1.ASN1Sequence;
 import org.bouncycastle.asn1.ASN1TaggedObject;
 import org.bouncycastle.asn1.DEREncodable;
-import org.bouncycastle.asn1.DEREncodableVector;
+import org.bouncycastle.asn1.ASN1EncodableVector;
 import org.bouncycastle.asn1.DERObject;
 import org.bouncycastle.asn1.DERObjectIdentifier;
 import org.bouncycastle.asn1.DEROctetString;
@@ -130,13 +130,13 @@ public class IetfAttrSyntax implements DEREncodable {
     }
 
     public DERObject getDERObject() {
-        DEREncodableVector v = new DEREncodableVector();
+        ASN1EncodableVector v = new ASN1EncodableVector();
 
         if (policyAuthority != null) {
             v.add(new DERTaggedObject(0, policyAuthority));
         }
 
-        DEREncodableVector v2 = new DEREncodableVector();
+        ASN1EncodableVector v2 = new ASN1EncodableVector();
 
         for (Iterator i = values.iterator(); i.hasNext();) {
             v2.add((DEREncodable) i.next());

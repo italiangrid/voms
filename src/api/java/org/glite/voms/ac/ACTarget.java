@@ -27,7 +27,7 @@ package org.glite.voms.ac;
 import org.bouncycastle.asn1.ASN1Sequence;
 import org.bouncycastle.asn1.ASN1TaggedObject;
 import org.bouncycastle.asn1.DEREncodable;
-import org.bouncycastle.asn1.DEREncodableVector;
+import org.bouncycastle.asn1.ASN1EncodableVector;
 import org.bouncycastle.asn1.DERIA5String;
 import org.bouncycastle.asn1.DERObject;
 import org.bouncycastle.asn1.DERSequence;
@@ -192,7 +192,7 @@ public class ACTarget implements DEREncodable {
             GeneralName nm = new GeneralName(new DERIA5String(iss), 6);
             ASN1Sequence seq = ASN1Sequence.getInstance(name.getDERObject());
 
-            DEREncodableVector v = new DEREncodableVector();
+            ASN1EncodableVector v = new ASN1EncodableVector();
             v.add(nm);
             v.add(seq);
             cert = new IssuerSerial(new DERSequence(v));
@@ -256,7 +256,7 @@ public class ACTarget implements DEREncodable {
      * @return the DERObject
      */
     public DERObject getDERObject() {
-        DEREncodableVector v = new DEREncodableVector();
+        ASN1EncodableVector v = new ASN1EncodableVector();
 
         if (name != null)
             v.add(new DERTaggedObject(0, name));
