@@ -1,12 +1,14 @@
 
 noinst_LTLIBRARIES = \
-	$(WANTED_UTIL_LIBS)
-
-EXTRA_LTLIBRARIES = \
 	libutilities.la \
-	libutilities_nog.la \
 	libutilc_nog.la \
 	libutilc.la
+
+
+#EXTRA_LTLIBRARIES = \
+#	libutilities.la \
+#	libutilc_nog.la \
+#	libutilc.la
 
 libutilities_la_SOURCES = \
 	data.cc \
@@ -15,14 +17,7 @@ libutilities_la_SOURCES = \
 	fqan.cc \
 	xmlcc.cc
 
-libutilities_nog_la_SOURCES = \
-	data.cc \
-	options.cc \
-	pass.cc \
-	fqan.cc \
-	xmlcc.cc
-
-libutilities_nog_la_CFLAGS = \
+libutilities_la_CFLAGS = \
 	-DNOGLOBUS \
 	$(NO_GLOBUS_FLAGS) \
 	-I $(top_srcdir)/src/include

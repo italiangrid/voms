@@ -30,6 +30,7 @@
 extern "C" {
 #endif
 
+#define NOGLOBUS
 #ifdef NOGLOBUS
 #ifndef GSSAPI_H_
 typedef void * gss_cred_id_t;

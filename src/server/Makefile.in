@@ -57,7 +57,7 @@ voms_OBJECTS = $(am_voms_OBJECTS)
 am__DEPENDENCIES_1 =
 @BUILD_SERVER_TRUE@voms_DEPENDENCIES =  \
 @BUILD_SERVER_TRUE@	$(top_builddir)/src/socklib/libsock_nog.la \
-@BUILD_SERVER_TRUE@	$(top_builddir)/src/common/libutilities_nog.la \
+@BUILD_SERVER_TRUE@	$(top_builddir)/src/common/libutilities.la \
 @BUILD_SERVER_TRUE@	$(top_builddir)/src/ac/libattributes_nog.la \
 @BUILD_SERVER_TRUE@	$(top_builddir)/src/common/libutilc_nog.la \
 @BUILD_SERVER_TRUE@	$(top_builddir)/src/replib/librep.la \
@@ -294,7 +294,7 @@ with_valgrind = @with_valgrind@
 #	$(top_builddir)/src/sslutils/libssl_utils_nog.la 
 @BUILD_SERVER_TRUE@voms_LDADD = \
 @BUILD_SERVER_TRUE@	$(top_builddir)/src/socklib/libsock_nog.la \
-@BUILD_SERVER_TRUE@	$(top_builddir)/src/common/libutilities_nog.la \
+@BUILD_SERVER_TRUE@	$(top_builddir)/src/common/libutilities.la \
 @BUILD_SERVER_TRUE@	$(top_builddir)/src/ac/libattributes_nog.la \
 @BUILD_SERVER_TRUE@	$(top_builddir)/src/common/libutilc_nog.la \
 @BUILD_SERVER_TRUE@	$(top_builddir)/src/replib/librep.la \

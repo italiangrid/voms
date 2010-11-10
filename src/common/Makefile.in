@@ -57,10 +57,6 @@ libutilities_la_LIBADD =
 am_libutilities_la_OBJECTS = data.lo options.lo pass.lo fqan.lo \
 	xmlcc.lo
 libutilities_la_OBJECTS = $(am_libutilities_la_OBJECTS)
-libutilities_nog_la_LIBADD =
-am_libutilities_nog_la_OBJECTS = data.lo options.lo pass.lo fqan.lo \
-	xmlcc.lo
-libutilities_nog_la_OBJECTS = $(am_libutilities_nog_la_OBJECTS)
 DEFAULT_INCLUDES = -I.@am__isrc@ -I$(top_builddir)/src/autogen
 depcomp = $(SHELL) $(top_srcdir)/./project/depcomp
 am__depfiles_maybe = depfiles
@@ -83,9 +79,9 @@ CXXLINK = $(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) \
 	--mode=link $(CXXLD) $(AM_CXXFLAGS) $(CXXFLAGS) $(AM_LDFLAGS) \
 	$(LDFLAGS) -o $@
 SOURCES = $(libutilc_la_SOURCES) $(libutilc_nog_la_SOURCES) \
-	$(libutilities_la_SOURCES) $(libutilities_nog_la_SOURCES)
+	$(libutilities_la_SOURCES)
 DIST_SOURCES = $(libutilc_la_SOURCES) $(libutilc_nog_la_SOURCES) \
-	$(libutilities_la_SOURCES) $(libutilities_nog_la_SOURCES)
+	$(libutilities_la_SOURCES)
 ETAGS = etags
 CTAGS = ctags
 DISTFILES = $(DIST_COMMON) $(DIST_SOURCES) $(TEXINFOS) $(EXTRA_DIST)
@@ -275,14 +271,15 @@ with_reportdir = @with_reportdir@
 with_scratchdir = @with_scratchdir@
 with_valgrind = @with_valgrind@
 noinst_LTLIBRARIES = \
-	$(WANTED_UTIL_LIBS)
-
-EXTRA_LTLIBRARIES = \
 	libutilities.la \
-	libutilities_nog.la \
 	libutilc_nog.la \
 	libutilc.la
 
+
+#EXTRA_LTLIBRARIES = \
+#	libutilities.la \
+#	libutilc_nog.la \
+#	libutilc.la
 libutilities_la_SOURCES = \
 	data.cc \
 	options.cc \
@@ -290,14 +287,7 @@ libutilities_la_SOURCES = \
 	fqan.cc \
 	xmlcc.cc
 
-libutilities_nog_la_SOURCES = \
-	data.cc \
-	options.cc \
-	pass.cc \
-	fqan.cc \
-	xmlcc.cc
-
-libutilities_nog_la_CFLAGS = \
+libutilities_la_CFLAGS = \
 	-DNOGLOBUS \
 	$(NO_GLOBUS_FLAGS) \
 	-I $(top_srcdir)/src/include
@@ -381,8 +371,6 @@ libutilc_nog.la: $(libutilc_nog_la_OBJECTS) $(libutilc_nog_la_DEPENDENCIES)
 	$(LINK)  $(libutilc_nog_la_OBJECTS) $(libutilc_nog_la_LIBADD) $(LIBS)
 libutilities.la: $(libutilities_la_OBJECTS) $(libutilities_la_DEPENDENCIES) 
 	$(CXXLINK)  $(libutilities_la_OBJECTS) $(libutilities_la_LIBADD) $(LIBS)
-libutilities_nog.la: $(libutilities_nog_la_OBJECTS) $(libutilities_nog_la_DEPENDENCIES) 
-	$(CXXLINK)  $(libutilities_nog_la_OBJECTS) $(libutilities_nog_la_LIBADD) $(LIBS)
 
 mostlyclean-compile:
 	-rm -f *.$(OBJEXT)
