@@ -795,8 +795,9 @@ public class PKIVerifier {
         if (namespaceCandidate == null) {
             // specification says to travel up the chain in this case
             int size = certStack.size();
-            int current = size;
+            int current = size-1;
 
+            logger.debug("size = " + size + ", current = " + current + "\n");
             if (size > 0) {
                 do {
                     namespaceCandidate = (Namespace)namespaces.get(PKIUtils.getHash(
