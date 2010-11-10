@@ -1411,7 +1411,7 @@ static yyconst flex_int16_t yy_rule_linenum[15] =
 
 #include "parsertypes.h"
 #include "namespaces.h"
-extern char *strndup(char*, size_t);
+extern char *strndup(const char*, size_t);
 
 
 #line 1418 "lex.namespaces.c"
