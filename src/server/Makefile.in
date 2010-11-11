@@ -300,7 +300,7 @@ with_valgrind = @with_valgrind@
 @BUILD_SERVER_TRUE@	$(top_builddir)/src/replib/librep.la \
 @BUILD_SERVER_TRUE@	$(top_builddir)/src/log/liblog.la \
 @BUILD_SERVER_TRUE@	$(top_builddir)/src/api/ccapi/libvomsapi.la \
-@BUILD_SERVER_TRUE@	$(EXPAT_LIBS)
+@BUILD_SERVER_TRUE@	$(EXPAT_LIBS) -ldl
 
 @BUILD_SERVER_TRUE@voms_LDFLAGS = 
 @BUILD_SERVER_TRUE@AM_CPPFLAGS = \

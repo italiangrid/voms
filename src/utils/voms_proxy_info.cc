@@ -54,6 +54,7 @@ extern "C" {
 #include "openssl/rsa.h"
 #include "openssl/conf.h"
 #include "openssl/stack.h"
+#include "openssl/opensslv.h"
 
 #ifdef USE_PKCS11
 #include "scutils.h"
@@ -298,10 +299,10 @@ int numbits(X509 *cert)
   return bits;
 }
 
-static char *findlast(const char *haystack, const char *needle)
+static const char *findlast(const char *haystack, const char *needle)
 {
-  char *point = strstr(haystack, needle);
-  char *tmp = point;
+  const char *point = strstr(haystack, needle);
+  const char *tmp = point;
 
   while (tmp) {
     tmp = strstr(tmp+1, needle);
@@ -315,8 +316,8 @@ static char *findlast(const char *haystack, const char *needle)
 static const char *proxy_type(X509 *cert)
 {
   char *buffer = X509_NAME_oneline(X509_get_subject_name(cert), NULL, 0);
-  char *point1 = findlast(buffer,"CN=proxy");
-  char *point2 = findlast(buffer,"CN=limited proxy");
+  const char *point1 = findlast(buffer,"CN=proxy");
+  const char *point2 = findlast(buffer,"CN=limited proxy");
 
   OPENSSL_free(buffer);
 
@@ -724,7 +725,11 @@ static std::string getKeyUsage(X509 *cert)
 
   std::string keyusage;
 
+#if OPENSSL_VERSION_NUMBER >= 0x10000000L
   const X509V3_EXT_METHOD *method = X509V3_EXT_get_nid(NID_key_usage);
+#else
+  X509V3_EXT_METHOD *method = X509V3_EXT_get_nid(NID_key_usage);
+#endif
 
   if (method) {
     confs = NULL;
