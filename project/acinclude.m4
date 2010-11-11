@@ -92,7 +92,7 @@ AC_DEFUN([AC_BUILD_PARTS],
         *) AC_MSG_ERROR([bad value $withval for --with-config]) ;;
       esac
     ],
-    [ build_config="build_all" ])
+    [ build_config="$build_all" ])
 
   AC_ARG_WITH(no-globus-only,
     [  --with-no-globus-only   Compiles only the globus-independent libraries (yes)],
