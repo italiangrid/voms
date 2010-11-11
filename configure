@@ -21346,7 +21346,7 @@ $as_echo "$as_me: error: bad value $withval for --with-config" >&2;}
       esac
 
 else
-   build_config="build_all"
+   build_config="$build_all"
 fi
 
 
