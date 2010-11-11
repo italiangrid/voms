@@ -311,8 +311,7 @@ DIST_SOURCES = $(libvomsapi_la_SOURCES) $(libvomsapi_gcc32_la_SOURCES) \
 	$(libvomsc_gcc64pthr_la_SOURCES)
 pkgconfigDATA_INSTALL = $(INSTALL_DATA)
 DATA = $(pkgconfig_DATA)
-am__include_HEADERS_DIST = voms_api.h voms_apic.h voms_api_nog.h \
-	voms_apic_nog.h
+am__include_HEADERS_DIST = voms_api.h voms_apic.h
 includeHEADERS_INSTALL = $(INSTALL_HEADER)
 HEADERS = $(include_HEADERS)
 ETAGS = etags
@@ -859,9 +858,7 @@ libvomsc_gcc64dbgpthr_la_LDFLAGS = \
 
 @BUILD_INTERFACES_TRUE@include_HEADERS = \
 @BUILD_INTERFACES_TRUE@	voms_api.h \
-@BUILD_INTERFACES_TRUE@	voms_apic.h \
-@BUILD_INTERFACES_TRUE@	voms_api_nog.h \
-@BUILD_INTERFACES_TRUE@	voms_apic_nog.h
+@BUILD_INTERFACES_TRUE@	voms_apic.h
 
 @BUILD_INTERFACES_TRUE@EXTRA_DIST = \
 @BUILD_INTERFACES_TRUE@	api_util.h \
