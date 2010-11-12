@@ -57,19 +57,17 @@ am__installdirs = "$(DESTDIR)$(libdir)" "$(DESTDIR)$(pkgconfigdir)" \
 libLTLIBRARIES_INSTALL = $(INSTALL)
 LTLIBRARIES = $(lib_LTLIBRARIES)
 am__DEPENDENCIES_1 =
-am__DEPENDENCIES_2 = $(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1) \
-	$(top_builddir)/src/replib/librep.la \
+libvomsapi_la_DEPENDENCIES = $(am__DEPENDENCIES_1) \
+	$(am__DEPENDENCIES_1) $(top_builddir)/src/replib/librep.la \
 	$(top_builddir)/src/common/libutilities_nog.la \
 	$(top_builddir)/src/common/libutilc_nog.la \
 	$(top_builddir)/src/sslutils/libssl_utils_nog.la \
 	$(top_builddir)/src/log/liblog.la \
-	$(top_builddir)/src/socklib/libsock_nog.la
-libvomsapi_la_DEPENDENCIES = $(am__DEPENDENCIES_2) \
+	$(top_builddir)/src/socklib/libsock_nog.la \
 	$(top_builddir)/src/ac/libattributes_nog.la
-am__objects_1 = libvomsapi_la-api_util.lo libvomsapi_la-voms_api.lo \
-	libvomsapi_la-ccval.lo libvomsapi_la-internal.lo \
-	libvomsapi_la-cinterface.lo
-am_libvomsapi_la_OBJECTS = $(am__objects_1)
+am_libvomsapi_la_OBJECTS = libvomsapi_la-api_util.lo \
+	libvomsapi_la-voms_api.lo libvomsapi_la-ccval.lo \
+	libvomsapi_la-internal.lo libvomsapi_la-cinterface.lo
 libvomsapi_la_OBJECTS = $(am_libvomsapi_la_OBJECTS)
 libvomsapi_la_LINK = $(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) \
 	$(LIBTOOLFLAGS) --mode=link $(CXXLD) $(libvomsapi_la_CXXFLAGS) \
@@ -248,29 +246,23 @@ with_valgrind = @with_valgrind@
 pkgconfigdir = $(libdir)/pkgconfig
 pkgconfig_DATA = voms-1.0.pc
 lib_LTLIBRARIES = libvomsapi.la
-CCSOURCES = \
+libvomsapi_la_SOURCES = \
 	api_util.cc \
 	voms_api.cc \
 	ccval.cc \
 	internal.cc \
 	cinterface.cc
 
-API_INCLUDES = \
-	-I$(top_srcdir)/src/include
-
-libvomsapi_la_SOURCES = \
-	$(CCSOURCES)
-
 libvomsapi_la_CXXFLAGS = \
 	$(NO_GLOBUS_FLAGS) \
 	-DNOGLOBUS \
-	$(API_INCLUDES)
+	-I$(top_srcdir)/src/include
 
 libvomsapi_la_LDFLAGS = \
 	-rpath $(libdir) \
   -version-info 1:0:0
 
-NOGLIBADD = \
+libvomsapi_la_LIBADD = \
 	$(EXPAT_LIBS) \
 	$(OPENSSL_LIBS) \
 	$(top_builddir)/src/replib/librep.la \
@@ -278,10 +270,7 @@ NOGLIBADD = \
 	$(top_builddir)/src/common/libutilc_nog.la \
 	$(top_builddir)/src/sslutils/libssl_utils_nog.la \
 	$(top_builddir)/src/log/liblog.la\
-	$(top_builddir)/src/socklib/libsock_nog.la
-
-libvomsapi_la_LIBADD = \
-	$(NOGLIBADD) \
+	$(top_builddir)/src/socklib/libsock_nog.la \
 	$(top_builddir)/src/ac/libattributes_nog.la
 
 

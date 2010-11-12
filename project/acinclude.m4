@@ -124,13 +124,6 @@ AC_DEFUN([AC_OPENSSL],
     AC_SUBST(OPENSSL_LIBS)
     AC_SUBST(NO_GLOBUS_FLAGS)
     AC_MSG_CHECKING([for system OpenSSL version])
-    if test "x$with_openssl_libs" = "xyes" ; then
-      WANTED_API_LIBS="$WANTED_API_LIBS libvomsapi.la"
-      WANTED_ATTCERT_LIBS="libattributes_nog.la"
-      WANTED_SSL_UTILS_LIBS="libssl_utils_nog.la"
-      WANTED_UTIL_LIBS="libutilities_nog.la libutilc_nog.la"
-      WANTED_SOCK_LIBS="libsock_nog.la"
-    fi
     cat >conftest.h <<HERE
 #include <openssl/opensslv.h>
 OPENSSL_VERSION_TEXT
@@ -141,8 +134,6 @@ HERE
   fi
   LD_LIBRARY_PATH="$SAVE_LD_LIBRARY_PATH"
 ])
-
-        USE_CCAPI_LIB="libvomsapi.la"
 
 # AC_COMPILER add switch to enable debug and warning
 # options for gcc

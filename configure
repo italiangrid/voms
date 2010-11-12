@@ -15612,13 +15612,6 @@ ac_compiler_gnu=$ac_cv_c_compiler_gnu
 
     { $as_echo "$as_me:$LINENO: checking for system OpenSSL version" >&5
 $as_echo_n "checking for system OpenSSL version... " >&6; }
-    if test "x$with_openssl_libs" = "xyes" ; then
-      WANTED_API_LIBS="$WANTED_API_LIBS libvomsapi.la"
-      WANTED_ATTCERT_LIBS="libattributes_nog.la"
-      WANTED_SSL_UTILS_LIBS="libssl_utils_nog.la"
-      WANTED_UTIL_LIBS="libutilities_nog.la libutilc_nog.la"
-      WANTED_SOCK_LIBS="libsock_nog.la"
-    fi
     cat >conftest.h <<HERE
 #include <openssl/opensslv.h>
 OPENSSL_VERSION_TEXT

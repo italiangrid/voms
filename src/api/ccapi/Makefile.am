@@ -5,29 +5,24 @@ pkgconfig_DATA = voms-1.0.pc
 
 lib_LTLIBRARIES = libvomsapi.la
 
-CCSOURCES = \
+libvomsapi_la_SOURCES = \
 	api_util.cc \
 	voms_api.cc \
 	ccval.cc \
 	internal.cc \
 	cinterface.cc
 
-API_INCLUDES = \
-	-I$(top_srcdir)/src/include
-
-libvomsapi_la_SOURCES = \
-	$(CCSOURCES)
 
 libvomsapi_la_CXXFLAGS = \
 	$(NO_GLOBUS_FLAGS) \
 	-DNOGLOBUS \
-	$(API_INCLUDES)
+	-I$(top_srcdir)/src/include
 
 libvomsapi_la_LDFLAGS = \
 	-rpath $(libdir) \
   -version-info 1:0:0
 
-NOGLIBADD = \
+libvomsapi_la_LIBADD = \
 	$(EXPAT_LIBS) \
 	$(OPENSSL_LIBS) \
 	$(top_builddir)/src/replib/librep.la \
@@ -35,10 +30,7 @@ NOGLIBADD = \
 	$(top_builddir)/src/common/libutilc_nog.la \
 	$(top_builddir)/src/sslutils/libssl_utils_nog.la \
 	$(top_builddir)/src/log/liblog.la\
-	$(top_builddir)/src/socklib/libsock_nog.la
-
-libvomsapi_la_LIBADD = \
-	$(NOGLIBADD) \
+	$(top_builddir)/src/socklib/libsock_nog.la \
 	$(top_builddir)/src/ac/libattributes_nog.la
 
 

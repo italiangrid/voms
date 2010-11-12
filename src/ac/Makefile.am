@@ -1,8 +1,6 @@
 
 noinst_LTLIBRARIES = \
-  libattributes_nog.la \
-  libattcert.la \
-  libccattcert.la
+  libattributes_nog.la
 
 AC_C_SOURCES = write.c extensions.c mystack.c error.c newformat.c init.c
 
@@ -14,8 +12,6 @@ EXTRA_DIST = \
 	init.h \
 	extensions.h \
 	attributes.h
-
-libattcert_la_SOURCES = $(AC_C_SOURCES)
 
 libattributes_nog_la_SOURCES = $(AC_C_SOURCES) $(AC_CC_SOURCES)
 
@@ -33,19 +29,6 @@ libattributes_nog_la_CXXFLAGS = \
 
 libattributes_nog_la_LIBADD = \
 	$(OPENSSL_LIBS)
-
-libattcert_la_CFLAGS= \
-	-I $(top_srcdir)/src/include \
-	-I $(top_builddir)/src/sslutils
-
-libccattcert_la_CPPFLAGS= \
-	-I $(top_srcdir)/src/include \
-	-I $(top_builddir)/src/sslutils
-
-libccattcert_la_SOURCES = $(AC_CC_SOURCES)
-
-libccattcert_la_LIBADD  = \
-	libattcert.la
 
 AM_CPPFLAGS= \
 	-I $(top_srcdir)/src/include \
