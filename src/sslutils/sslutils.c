@@ -1632,13 +1632,8 @@ int proxy_check_proxy_name(
     ASN1_OBJECT *objv3;
     ASN1_OBJECT *objv4;
 
-    objv3 = OBJ_txt2obj(PROXYCERTINFO_V3,1);
-    objv4 = OBJ_txt2obj(PROXYCERTINFO_V4,1);
-    nidv3 = OBJ_obj2nid(objv3);
-    nidv4 = OBJ_obj2nid(objv4);
-
-    ASN1_OBJECT_free(objv3);
-    ASN1_OBJECT_free(objv4);
+    nidv3 = my_txt2nid(PROXYCERTINFO_V3);
+    nidv4 = my_txt2nid(PROXYCERTINFO_V4);
 
     if (nidv3 == 0 || nidv4 == 0)
       ERR_clear_error();
