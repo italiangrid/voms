@@ -10,6 +10,7 @@ voms_proxy_init_SOURCES = \
 voms_proxy_init_LDADD = \
   $(top_builddir)/src/api/ccapi/libvomsapi.la \
   $(top_builddir)/src/sslutils/libssl_utils_nog.la \
+  $(top_builddir)/src/common/libutilc_nog.la \
 	$(EXPAT_LIBS)
 
 AM_CPPFLAGS = -I$(top_srcdir)/src/api/ccapi \

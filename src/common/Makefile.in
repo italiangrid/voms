@@ -44,19 +44,11 @@ mkinstalldirs = $(SHELL) $(top_srcdir)/./project/mkinstalldirs
 CONFIG_HEADER = $(top_builddir)/src/autogen/config.h
 CONFIG_CLEAN_FILES =
 LTLIBRARIES = $(noinst_LTLIBRARIES)
-libutilc_la_LIBADD =
-am_libutilc_la_OBJECTS = list.lo failure.lo doio.lo normalize.lo \
-	credentials.lo
-libutilc_la_OBJECTS = $(am_libutilc_la_OBJECTS)
 libutilc_nog_la_LIBADD =
 am_libutilc_nog_la_OBJECTS = libutilc_nog_la-list.lo \
 	libutilc_nog_la-failure.lo libutilc_nog_la-doio.lo \
 	libutilc_nog_la-normalize.lo libutilc_nog_la-credentials.lo
 libutilc_nog_la_OBJECTS = $(am_libutilc_nog_la_OBJECTS)
-libutilities_la_LIBADD =
-am_libutilities_la_OBJECTS = data.lo options.lo pass.lo fqan.lo \
-	xmlcc.lo
-libutilities_la_OBJECTS = $(am_libutilities_la_OBJECTS)
 libutilities_nog_la_LIBADD =
 am_libutilities_nog_la_OBJECTS = data.lo options.lo pass.lo fqan.lo \
 	xmlcc.lo
@@ -82,10 +74,9 @@ CXXLD = $(CXX)
 CXXLINK = $(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) \
 	--mode=link $(CXXLD) $(AM_CXXFLAGS) $(CXXFLAGS) $(AM_LDFLAGS) \
 	$(LDFLAGS) -o $@
-SOURCES = $(libutilc_la_SOURCES) $(libutilc_nog_la_SOURCES) \
-	$(libutilities_la_SOURCES) $(libutilities_nog_la_SOURCES)
-DIST_SOURCES = $(libutilc_la_SOURCES) $(libutilc_nog_la_SOURCES) \
-	$(libutilities_la_SOURCES) $(libutilities_nog_la_SOURCES)
+SOURCES = $(libutilc_nog_la_SOURCES) $(libutilities_nog_la_SOURCES)
+DIST_SOURCES = $(libutilc_nog_la_SOURCES) \
+	$(libutilities_nog_la_SOURCES)
 ETAGS = etags
 CTAGS = ctags
 DISTFILES = $(DIST_COMMON) $(DIST_SOURCES) $(TEXINFOS) $(EXTRA_DIST)
@@ -124,33 +115,6 @@ EXPAT_STATIC_LIBS = @EXPAT_STATIC_LIBS@
 FGREP = @FGREP@
 GLITE_CFLAGS = @GLITE_CFLAGS@
 GLITE_LOCATION = @GLITE_LOCATION@
-GLOBUS_CFLAGS = @GLOBUS_CFLAGS@
-GLOBUS_GCC32DBGPTHR_CFLAGS = @GLOBUS_GCC32DBGPTHR_CFLAGS@
-GLOBUS_GCC32DBGPTHR_GSS_API_LIBS = @GLOBUS_GCC32DBGPTHR_GSS_API_LIBS@
-GLOBUS_GCC32DBGPTHR_GSS_LIBS = @GLOBUS_GCC32DBGPTHR_GSS_LIBS@
-GLOBUS_GCC32DBG_CFLAGS = @GLOBUS_GCC32DBG_CFLAGS@
-GLOBUS_GCC32DBG_GSS_API_LIBS = @GLOBUS_GCC32DBG_GSS_API_LIBS@
-GLOBUS_GCC32DBG_GSS_LIBS = @GLOBUS_GCC32DBG_GSS_LIBS@
-GLOBUS_GCC32PTHR_CFLAGS = @GLOBUS_GCC32PTHR_CFLAGS@
-GLOBUS_GCC32PTHR_GSS_API_LIBS = @GLOBUS_GCC32PTHR_GSS_API_LIBS@
-GLOBUS_GCC32PTHR_GSS_LIBS = @GLOBUS_GCC32PTHR_GSS_LIBS@
-GLOBUS_GCC32_CFLAGS = @GLOBUS_GCC32_CFLAGS@
-GLOBUS_GCC32_GSS_API_LIBS = @GLOBUS_GCC32_GSS_API_LIBS@
-GLOBUS_GCC32_GSS_LIBS = @GLOBUS_GCC32_GSS_LIBS@
-GLOBUS_GCC64DBGPTHR_CFLAGS = @GLOBUS_GCC64DBGPTHR_CFLAGS@
-GLOBUS_GCC64DBGPTHR_GSS_API_LIBS = @GLOBUS_GCC64DBGPTHR_GSS_API_LIBS@
-GLOBUS_GCC64DBGPTHR_GSS_LIBS = @GLOBUS_GCC64DBGPTHR_GSS_LIBS@
-GLOBUS_GCC64DBG_CFLAGS = @GLOBUS_GCC64DBG_CFLAGS@
-GLOBUS_GCC64DBG_GSS_API_LIBS = @GLOBUS_GCC64DBG_GSS_API_LIBS@
-GLOBUS_GCC64DBG_GSS_LIBS = @GLOBUS_GCC64DBG_GSS_LIBS@
-GLOBUS_GCC64PTHR_CFLAGS = @GLOBUS_GCC64PTHR_CFLAGS@
-GLOBUS_GCC64PTHR_GSS_API_LIBS = @GLOBUS_GCC64PTHR_GSS_API_LIBS@
-GLOBUS_GCC64PTHR_GSS_LIBS = @GLOBUS_GCC64PTHR_GSS_LIBS@
-GLOBUS_GCC64_CFLAGS = @GLOBUS_GCC64_CFLAGS@
-GLOBUS_GCC64_GSS_API_LIBS = @GLOBUS_GCC64_GSS_API_LIBS@
-GLOBUS_GCC64_GSS_LIBS = @GLOBUS_GCC64_GSS_LIBS@
-GLOBUS_GSS_API_LIBS = @GLOBUS_GSS_API_LIBS@
-GLOBUS_GSS_LIBS = @GLOBUS_GSS_LIBS@
 GREP = @GREP@
 INSTALL = @INSTALL@
 INSTALL_API_LIBS = @INSTALL_API_LIBS@
@@ -194,20 +158,8 @@ SED = @SED@
 SET_MAKE = @SET_MAKE@
 SHELL = @SHELL@
 STRIP = @STRIP@
-USE_ATTCERT_LIB = @USE_ATTCERT_LIB@
-USE_CAPI_LIB = @USE_CAPI_LIB@
-USE_CCAPI_LIB = @USE_CCAPI_LIB@
-USE_CCATTCERT_LIB = @USE_CCATTCERT_LIB@
-USE_SOCK_LIB = @USE_SOCK_LIB@
-USE_SOCK_LIB_SERVER = @USE_SOCK_LIB_SERVER@
-USE_SSL_UTILS_LIB = @USE_SSL_UTILS_LIB@
 VAR_LOCATION_ENV = @VAR_LOCATION_ENV@
 VERSION = @VERSION@
-WANTED_API_LIBS = @WANTED_API_LIBS@
-WANTED_ATTCERT_LIBS = @WANTED_ATTCERT_LIBS@
-WANTED_SOCK_LIBS = @WANTED_SOCK_LIBS@
-WANTED_SSL_UTILS_LIBS = @WANTED_SSL_UTILS_LIBS@
-WANTED_UTIL_LIBS = @WANTED_UTIL_LIBS@
 WORKDIR = @WORKDIR@
 XSLTPROC = @XSLTPROC@
 XSLTPROCFLAGS = @XSLTPROCFLAGS@
@@ -275,20 +227,8 @@ with_reportdir = @with_reportdir@
 with_scratchdir = @with_scratchdir@
 with_valgrind = @with_valgrind@
 noinst_LTLIBRARIES = \
-	$(WANTED_UTIL_LIBS)
-
-EXTRA_LTLIBRARIES = \
-	libutilities.la \
 	libutilities_nog.la \
-	libutilc_nog.la \
-	libutilc.la
-
-libutilities_la_SOURCES = \
-	data.cc \
-	options.cc \
-	pass.cc \
-	fqan.cc \
-	xmlcc.cc
+	libutilc_nog.la
 
 libutilities_nog_la_SOURCES = \
 	data.cc \
@@ -302,18 +242,10 @@ libutilities_nog_la_CFLAGS = \
 	$(NO_GLOBUS_FLAGS) \
 	-I $(top_srcdir)/src/include
 
-libutilc_la_SOURCES = \
-	list.c \
-	failure.c \
-	doio.c \
-	normalize.c \
-	credentials.c
-
 AM_CPPFLAGS = \
 	-I $(top_srcdir)/src/include \
 	-I $(top_srcdir)/src/sslutils \
-	$(EXPAT_CFLAGS) \
-	$(GLOBUS_CFLAGS)
+	$(EXPAT_CFLAGS)
 
 AM_LDFLAGS = \
 	$(EXPAT_LIBS)
@@ -374,12 +306,8 @@ clean-noinstLTLIBRARIES:
 	  echo "rm -f \"$${dir}/so_locations\""; \
 	  rm -f "$${dir}/so_locations"; \
 	done
-libutilc.la: $(libutilc_la_OBJECTS) $(libutilc_la_DEPENDENCIES) 
-	$(LINK)  $(libutilc_la_OBJECTS) $(libutilc_la_LIBADD) $(LIBS)
 libutilc_nog.la: $(libutilc_nog_la_OBJECTS) $(libutilc_nog_la_DEPENDENCIES) 
 	$(LINK)  $(libutilc_nog_la_OBJECTS) $(libutilc_nog_la_LIBADD) $(LIBS)
-libutilities.la: $(libutilities_la_OBJECTS) $(libutilities_la_DEPENDENCIES) 
-	$(CXXLINK)  $(libutilities_la_OBJECTS) $(libutilities_la_LIBADD) $(LIBS)
 libutilities_nog.la: $(libutilities_nog_la_OBJECTS) $(libutilities_nog_la_DEPENDENCIES) 
 	$(CXXLINK)  $(libutilities_nog_la_OBJECTS) $(libutilities_nog_la_LIBADD) $(LIBS)
 
@@ -389,18 +317,13 @@ mostlyclean-compile:
 distclean-compile:
 	-rm -f *.tab.c
 
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/credentials.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/data.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/doio.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/failure.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/fqan.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libutilc_nog_la-credentials.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libutilc_nog_la-doio.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libutilc_nog_la-failure.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libutilc_nog_la-list.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libutilc_nog_la-normalize.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/list.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/normalize.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/options.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/pass.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/xmlcc.Plo@am__quote@

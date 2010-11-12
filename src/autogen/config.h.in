@@ -71,12 +71,6 @@
 /* Define to 1 if you have the `getpwnam' function. */
 #undef HAVE_GETPWNAM
 
-/* Define to 1 if you have globus_module_activate */
-#undef HAVE_GLOBUS_MODULE_ACTIVATE
-
-/* Define to 1 if you have GLOBUS_OFF_T */
-#undef HAVE_GLOBUS_OFF_T
-
 /* Define to 1 if you have the <inttypes.h> header file. */
 #undef HAVE_INTTYPES_H
 

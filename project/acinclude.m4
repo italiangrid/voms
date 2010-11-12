@@ -51,7 +51,7 @@ AC_DEFUN([AC_BUILD_PARTS],
     [ wjavaall="no"])
 
   AC_ARG_WITH(c-api,
-    [  --with-c-api   Enable compilation of the C APIs (yes)],
+    [  --with-c-api   No effect],
     [
       case "$withval" in
         yes) build_c_api="yes" ;;
@@ -94,100 +94,42 @@ AC_DEFUN([AC_BUILD_PARTS],
     ],
     [ build_config="$build_all" ])
 
-  AC_ARG_WITH(no-globus-only,
-    [  --with-no-globus-only   Compiles only the globus-independent libraries (yes)],
-    [
-      case "$withval" in
-        yes) build_nglobus_only="yes" ;;
-        no)  build_nglobus_only="no" ;;
-        *) AC_MSG_ERROR([bad value $withval for --with-no-globus-only]) ;;
-      esac
-    ],
-    [ build_nglobus_only="no" ])
-
   AM_CONDITIONAL(BUILD_JAVA_ONLY,  test x$wjavaall = xyes)
-  AM_CONDITIONAL(BUILD_C_API,      test x$build_c_api = xyes)
   AM_CONDITIONAL(BUILD_CPP_API,    test x$build_cpp_api = xyes)
   AM_CONDITIONAL(BUILD_INTERFACES, test x$build_interfaces = xyes)
   AM_CONDITIONAL(BUILD_CLIENTS,    test x$build_clients = xyes)
   AM_CONDITIONAL(BUILD_SERVER,     test x$build_server = xyes)
   AM_CONDITIONAL(BUILD_CONFIG,     test x$build_config = xyes)
-  AM_CONDITIONAL(BUILD_NOGLOBUS_ONLY,   test x$build_nglobus_only = xyes)
 ])
-
-AC_DEFUN([AC_VOMS_LIBRARY],
-[
-    globus_flavor=$1
-    candidatepath=$2
-
-    if test "x$candidatepath" = "x" ; then
-      libpath=$GLOBUS_LOCATION/lib
-    else
-      libpath=$candidatepath/lib
-    fi
-
-    if test "x$globus_flavor" = "x" ; then
-      globus_flavor="none"
-    fi
-
-    AC_MSG_CHECKING([for library to use with globus library: $globus_flavor])
-
-    if test "x$globus_flavor" = "xnone" ; then
-      AC_MSG_RESULT([libvomsapi])
-      VOMS_LIBRARY="-lvomsapi"
-    elif test -e $libpath/libglobus_gssapi_gsi_$globus_flavor.so ; then 
-      if ( (ldd $libpath/libglobus_gssapi_gsi_$globus_flavor.so|grep crypto|cut -d'=' -f2|grep $globus_flavor) >/dev/null 2>&1 ); then
-        AC_MSG_RESULT([libvomsapi_$globus_flavor])
-        VOMS_LIBRARY="-lvomsapi_$globus_flavor"
-      else
-        AC_MSG_RESULT([libvomsapi])
-        VOMS_LIBRARY="-lvomsapi"
-      fi
-    else
-      AC_MSG_ERROR([flavor $globus_flavor is unknown])
-    fi
-
-    AC_SUBST(VOMS_LIBRARY)
-])
-
 
 # AC_OPENSSL checks system openssl availability
 # ---------------------------------------------
 AC_DEFUN([AC_OPENSSL],
 [
   AC_ARG_WITH(openssl_prefix,
-              [ --with-openssl-prefix=PFX    prefix where OpenSSL (non-globus) is installed. (/usr)],
+              [ --with-openssl-prefix=PFX    prefix where OpenSSL is installed. (/usr)],
               [with_openssl_prefix="$withval"],
               [with_openssl_prefix=/usr])
-
-  AC_ARG_WITH(openssl_libs,
-              [ --with-openssl-libs do you want OpenSSL only libs? (yes)],
-              [ with_openssl_libs="$withval"],
-              [ with_openssl_libs="yes"])
-
-  if test "x$with_openssl_libs" != "xno"  -a "x$with_openssl_libs" != "xyes" ; then
-     AC_MSG_ERROR([Value of --with-openssl-libs must be either "yes" or "no"])
-  fi  
 
   SAVE_LD_LIBRARY_PATH=$LD_LIBRARY_PATH
   LD_LIBRARY_PATH="$with_openssl_prefix/lib"
 
   AC_LANG_PUSH(C)
   AC_CHECK_LIB(crypto, CRYPTO_num_locks, [found=yes], [found=no])
-  AC_LANG_POP(C) 
+  AC_LANG_POP(C)  
+  NO_GLOBUS_FLAGS="-I$with_openssl_prefix/include"
 
   if test "x$found" = "xyes"; then
-    NO_GLOBUS_FLAGS="-I$with_openssl_prefix/include"
     OPENSSL_LIBS="-L$with_openssl_prefix/lib -lcrypto -lssl"
-    AC_SUBST(NO_GLOBUS_FLAGS)
     AC_SUBST(OPENSSL_LIBS)
+    AC_SUBST(NO_GLOBUS_FLAGS)
     AC_MSG_CHECKING([for system OpenSSL version])
     if test "x$with_openssl_libs" = "xyes" ; then
       WANTED_API_LIBS="$WANTED_API_LIBS libvomsapi.la"
-      WANTED_ATTCERT_LIBS="$WANTED_ATTCERT_LIBS libattributes_nog.la"
-      WANTED_SSL_UTILS_LIBS="$WANTED_SSL_UTILS_LIBS libssl_utils_nog.la"
-      WANTED_UTIL_LIBS="$WANTED_UTIL_LIBS libutilities_nog.la libutilc_nog.la"
-      WANTED_SOCK_LIBS="$WANTED_SOCK_LIBS libsock_nog.la"
+      WANTED_ATTCERT_LIBS="libattributes_nog.la"
+      WANTED_SSL_UTILS_LIBS="libssl_utils_nog.la"
+      WANTED_UTIL_LIBS="libutilities_nog.la libutilc_nog.la"
+      WANTED_SOCK_LIBS="libsock_nog.la"
     fi
     cat >conftest.h <<HERE
 #include <openssl/opensslv.h>
@@ -200,254 +142,7 @@ HERE
   LD_LIBRARY_PATH="$SAVE_LD_LIBRARY_PATH"
 ])
 
-# AC_GLOBUS checks globus prefix, looks for globus 
-# flavors, selects globus flavor and define wanted lib
-# according to flavor installed with their own compiler
-# flags 
-# -------------------------------------------------------
-AC_DEFUN([AC_GLOBUS],
-[
-    AC_ARG_WITH(globus_prefix,
-	[  --with-globus-prefix=PFX     prefix where GLOBUS is installed. (/opt/globus)],
-	[with_globus_prefix="$withval"],
-        [with_globus_prefix=${GLOBUS_LOCATION:-/opt/globus}])
-
-    AC_MSG_CHECKING([for GLOBUS installation at $with_globus_prefix])
-    # to be added
-    AC_MSG_RESULT([yes])
-
-    AC_ARG_WITH(bit64,
-                [  --with-bit64    use 64bit libraries only.],
-                [with_64bit="yes"],
-                [with_64bit="no"])
-                
-    LD_LIBRARY_PATH="$LD_LIBRARY_PATH:$with_globus_prefix/lib"
-    AC_MSG_CHECKING([for GLOBUS flavors])
-
-    for i in `ls $with_globus_prefix/include`; do
-      if test "x$i" != "xldap_backend"; then
-        GLOBUS_FLAVORS="$GLOBUS_FLAVORS $i"
-      fi
-    done
-
-    if test "x$with_64bit" == "xno" ; then
-      if test -e $with_globus_prefix/include/gcc32dbg ; then
-        default_flavor=gcc32dbg
-      elif test -e $with_globus_prefix/include/gcc64dbg ; then
-        default_flavor=gcc64dbg
-      else
-        default_flavor=""
-      fi
-    else
-      if test -e $with_globus_prefix/include/gcc64dbg ; then
-        default_flavor=gcc64dbg
-      else
-        default_flavor=""
-      fi
-    fi      
-
-    AC_ARG_WITH(globus_flavor,
-              	[  --with-globus-flavor=flavor  default=${GLOBUS_FLAVOR:-none}],
-              	[with_globus_flavor="$withval"],
-                [with_globus_flavor=${GLOBUS_FLAVOR}])
-
-    AC_MSG_RESULT([found $GLOBUS_FLAVORS ($with_globus_flavor selected)])
-
-    if test "x$with_globus_flavor" = "x" ; then
-      if test "x$USE_SSL_UTILS_LIB" = "x"; then
-        USE_SSL_UTILS_LIB="libssl_utils_nog.la"
-      fi
-      if test "x$USE_SOCK_LIB" = "x"; then
-        USE_SOCK_LIB="libsock.la"
-        USE_SOCK_LIB_SERVER="libsock_nog.la"
-      fi
-      if test "x$USE_CCAPI_LIB" = "x"; then
         USE_CCAPI_LIB="libvomsapi.la"
-      fi
-      if test "x$USE_ATTCERT_LIB" = "x"; then
-        USE_ATTCERT_LIB="libattcert.la"
-      fi
-      if test "x$USE_CCATTCERT_LIB" = "x"; then
-        USE_CCATTCERT_LIB="libccattcert.la"
-      fi
-
-      WANTED_SSL_UTILS_LIBS="$WANTED_SSL_UTILS_LIBS libssl_utils.la"
-      WANTED_SOCK_LIBS="$WANTED_SOCK_LIBS libsock.la libsock_nog.la"
-      WANTED_ATTCERT_LIBS="$WANTED_ATTCERT_LIBS libattcert.la libccattcert.la"
-      WANTED_API_LIBS="$WANTED_API_LIBS libvomsapi.la"
-      WANTED_UTIL_LIBS="$WANTED_UTIL_LIBS libutilities.la libutilc.la"
-    fi    
-    new_flavors=""
-
-    for flavor in $GLOBUS_FLAVORS ; do
-      if test "x$with_globus_flavor" != "x" ; then
-        if test "x$flavor" == "x$with_globus_flavor" ; then
-          new_flavors="$flavor $new_flavors"
-        fi
-      else
-          new_flavors="$GLOBUS_FLAVORS"
-      fi
-    done
-
-    GLOBUS_FLAVORS=""
-
-    for flavor in $new_flavors ; do
-      if test "x$with_64bit" == "xyes" ; then
-        echo $flavor | grep 64 >/dev/null
-        if test $? -eq 0 ; then
-          GLOBUS_FLAVORS="$GLOBUS_FLAVORS $flavor"
-        fi
-      else
-        GLOBUS_FLAVORS="$flavor $GLOBUS_FLAVORS"
-      fi
-    done
-
-    AC_MSG_RESULT([Final globus flavors: ${GLOBUS_FLAVORS}])
-
-    for flavor in $GLOBUS_FLAVORS ; do
-      if test "x$USE_SSL_UTILS_LIB" = "x"; then
-        USE_SSL_UTILS_LIB="libssl_utils_$flavor.la"
-      fi
-      if test "x$USE_SOCK_LIB" = "x"; then
-        USE_SOCK_LIB="libsock_$flavor.la"
-        USE_SOCK_LIB_SERVER="libsock_nog.la"
-      fi
-      if test "x$USE_CCAPI_LIB" = "x"; then
-        USE_CCAPI_LIB="libvomsapi_$flavor.la"
-      fi
-      if test "x$USE_ATTCERT_LIB" = "x"; then
-        USE_ATTCERT_LIB="libattcert_$flavor.la"
-      fi
-      if test "x$USE_CCATTCERT_LIB" = "x"; then
-        USE_CCATTCERT_LIB="libccattcert_$flavor.la"
-      fi
-      WANTED_SSL_UTILS_LIBS="$WANTED_SSL_UTILS_LIBS libssl_utils_"$flavor".la"
-      WANTED_SOCK_LIBS="$WANTED_SOCK_LIBS libsock_$flavor.la libsock_nog.la"
-      WANTED_CCAPI_LIBS="$WANTED_CCAPI_LIBS libvomsapi_"$flavor".la"
-      WANTED_ATTCERT_LIBS="$WANTED_ATTCERT_LIBS libattcert_"$flavor".la libccattcert_"$flavor".la"
-      WANTED_UTIL_LIBS="$WANTED_UTIL_LIBS libutilities.la libutilc.la"
-    done
-
-    WANTED_API_LIBS="$WANTED_API_LIBS $WANTED_CCAPI_LIBS $WANTED_CAPI_LIBS"
-
-    ac_globus_ldlib="-L$with_globus_prefix/lib"
-
-    if test "x$with_globus_flavor" = "x" ; then
-      with_globus_flavor=${default_flavor}
-    fi
-
-    for flavor in $GLOBUS_FLAVORS ; do
-      if ( ( ldd $with_globus_prefix/lib/libglobus_gssapi_gsi_$flavor.so |grep crypto_$flavor >/dev/null 2>&1) ); then
-        FLVR="_$flavor"
-      else
-        FLVR=""
-      fi
-      AC_MSG_RESULT([found flavor=$FLVR])
-      if test "x$flavor" = "x$with_globus_flavor" ; then
-      	GLOBUS_CFLAGS="-I$with_globus_prefix/include/$flavor"
-        GLOBUS_GSS_LIBS="$ac_globus_ldlib -lglobus_gssapi_gsi_$flavor -lglobus_gss_assist_$flavor"
-        GLOBUS_GSS_API_LIBS="$ac_globus_ldlib -lcrypto$FLVR -lssl$FLVR"
-      fi
-      if test "x$flavor" = "xgcc32" ; then
-	      GLOBUS_GCC32_CFLAGS="-I$with_globus_prefix/include/$flavor"
-        GLOBUS_GCC32_GSS_LIBS="$ac_globus_ldlib -lglobus_gssapi_gsi_$flavor -lglobus_gss_assist_$flavor"
-        GLOBUS_GCC32_GSS_API_LIBS="$ac_globus_ldlib -lcrypto$FLVR -lssl$FLVR"
-      fi
-      if test "x$flavor" = "xgcc32dbg" ; then
-        GLOBUS_GCC32DBG_CFLAGS="-I$with_globus_prefix/include/$flavor"
-        GLOBUS_GCC32DBG_GSS_LIBS="$ac_globus_ldlib -lglobus_gssapi_gsi_$flavor -lglobus_gss_assist_$flavor"
-        GLOBUS_GCC32DBG_GSS_API_LIBS="$ac_globus_ldlib -lcrypto$FLVR -lssl$FLVR"
-      fi
-      if test "x$flavor" = "xgcc32dbgpthr" ; then
-        GLOBUS_GCC32DBGPTHR_CFLAGS="-I$with_globus_prefix/include/$flavor"
-        GLOBUS_GCC32DBGPTHR_GSS_LIBS="$ac_globus_ldlib -lglobus_gssapi_gsi_$flavor -lglobus_gss_assist_$flavor"
-        GLOBUS_GCC32DPBPTHR_GSS_API_LIBS="$ac_globus_ldlib -lcrypto$FLVR -lssl$FLVR"
-      fi
-      if test "x$flavor" = "xgcc32pthr" ; then
-        GLOBUS_GCC32PTHR_CFLAGS="-I$with_globus_prefix/include/$flavor"
-        GLOBUS_GCC32PTHR_GSS_LIBS="$ac_globus_ldlib -lglobus_gssapi_gsi_$flavor -lglobus_gss_assist_$flavor"
-        GLOBUS_GCC32PTHR_GSS_API_LIBS="$ac_globus_ldlib -lcrypto$FLVR -lssl$FLVR"
-      fi
-
-      if test "x$flavor" = "xgcc64" ; then
-	      GLOBUS_GCC64_CFLAGS="-I$with_globus_prefix/include/$flavor"
-        GLOBUS_GCC64_GSS_LIBS="$ac_globus_ldlib -lglobus_gssapi_gsi_$flavor -lglobus_gss_assist_$flavor"
-        GLOBUS_GCC64_GSS_API_LIBS="$ac_globus_ldlib -lcrypto$FLVR -lssl$FLVR"
-      fi
-      if test "x$flavor" = "xgcc64dbg" ; then
-        GLOBUS_GCC64DBG_CFLAGS="-I$with_globus_prefix/include/$flavor"
-        GLOBUS_GCC64DBG_GSS_LIBS="$ac_globus_ldlib -lglobus_gssapi_gsi_$flavor -lglobus_gss_assist_$flavor"
-        GLOBUS_GCC64DBG_GSS_API_LIBS="$ac_globus_ldlib -lcrypto$FLVR -lssl$FLVR"
-      fi
-      if test "x$flavor" = "xgcc64dbgpthr" ; then
-        GLOBUS_GCC64DBGPTHR_CFLAGS="-I$with_globus_prefix/include/$flavor"
-        GLOBUS_GCC64DBGPTHR_GSS_LIBS="$ac_globus_ldlib -lglobus_gssapi_gsi_$flavor -lglobus_gss_assist_$flavor"
-        GLOBUS_GCC64DBGPTHR_GSS_API_LIBS="$ac_globus_ldlib -lcrypto$FLVR -lssl$FLVR"
-      fi
-      if test "x$flavor" = "xgcc64pthr" ; then
-        GLOBUS_GCC64PTHR_CFLAGS="-I$with_globus_prefix/include/$flavor"
-        GLOBUS_GCC64PTHR_GSS_LIBS="$ac_globus_ldlib -lglobus_gssapi_gsi_$flavor -lglobus_gss_assist_$flavor"
-        GLOBUS_GCC64PTHR_GSS_API_LIBS="$ac_globus_ldlib -lcrypto$FLVR -lssl$FLVR"
-      fi
-    done
-
-
-    AC_LANG_PUSH(C)
-    LDFLAGS_SAVE="$LDFLAGS"
-    LDFLAGS="$LDFLAGS $GLOBUS_GSS_LIBS"
-    AC_MSG_CHECKING([for globus_module_activate])
-    AC_TRY_LINK([], [(void)globus_module_activate();],
-                [ AC_DEFINE(HAVE_GLOBUS_MODULE_ACTIVATE, 1, [Define to 1 if you have globus_module_activate])
-                  AC_MSG_RESULT(yes)],
-                [AC_MSG_RESULT(no)])
-    LDFLAGS="$LDFLAGS_SAVE"
-    AC_LANG_POP(C)
-    AC_SUBST(WANTED_SSL_UTILS_LIBS)
-    AC_SUBST(WANTED_SOCK_LIBS)
-    AC_SUBST(WANTED_API_LIBS)
-    AC_SUBST(WANTED_ATTCERT_LIBS)
-    AC_SUBST(WANTED_UTIL_LIBS)
-
-    AC_SUBST(GLOBUS_CFLAGS)
-    AC_SUBST(GLOBUS_GCC32_CFLAGS)
-    AC_SUBST(GLOBUS_GCC32DBG_CFLAGS)
-    AC_SUBST(GLOBUS_GCC32DBGPTHR_CFLAGS)
-    AC_SUBST(GLOBUS_GCC32PTHR_CFLAGS)
-
-    AC_SUBST(GLOBUS_GCC64_CFLAGS)
-    AC_SUBST(GLOBUS_GCC64DBG_CFLAGS)
-    AC_SUBST(GLOBUS_GCC64DBGPTHR_CFLAGS)
-    AC_SUBST(GLOBUS_GCC64PTHR_CFLAGS)
-
-    AC_SUBST(GLOBUS_GSS_LIBS)
-    AC_SUBST(GLOBUS_GSS_API_LIBS)
-    AC_SUBST(GLOBUS_GCC32_GSS_LIBS)
-    AC_SUBST(GLOBUS_GCC32DBG_GSS_LIBS)
-    AC_SUBST(GLOBUS_GCC32DBGPTHR_GSS_LIBS)
-    AC_SUBST(GLOBUS_GCC32PTHR_GSS_LIBS)
-    AC_SUBST(GLOBUS_GCC32_GSS_API_LIBS)
-    AC_SUBST(GLOBUS_GCC32DBG_GSS_API_LIBS)
-    AC_SUBST(GLOBUS_GCC32DBGPTHR_GSS_API_LIBS)
-    AC_SUBST(GLOBUS_GCC32PTHR_GSS_API_LIBS)
-
-    AC_SUBST(GLOBUS_GCC64_GSS_API_LIBS)
-    AC_SUBST(GLOBUS_GCC64DBG_GSS_API_LIBS)
-    AC_SUBST(GLOBUS_GCC64DBGPTHR_GSS_API_LIBS)
-    AC_SUBST(GLOBUS_GCC64PTHR_GSS_API_LIBS)
-    AC_SUBST(GLOBUS_GCC64_GSS_LIBS)
-    AC_SUBST(GLOBUS_GCC64DBG_GSS_LIBS)
-    AC_SUBST(GLOBUS_GCC64DBGPTHR_GSS_LIBS)
-    AC_SUBST(GLOBUS_GCC64PTHR_GSS_LIBS)
-
-    AC_SUBST(USE_SSL_UTILS_LIB)
-    AC_SUBST(USE_SOCK_LIB)
-    AC_SUBST(USE_SOCK_LIB_SERVER)
-    AC_SUBST(USE_CCAPI_LIB)
-    AC_SUBST(USE_CAPI_LIB)
-    AC_SUBST(USE_ATTCERT_LIB)
-    AC_SUBST(USE_CCATTCERT_LIB)
-
-])
 
 # AC_COMPILER add switch to enable debug and warning
 # options for gcc
@@ -795,33 +490,6 @@ AC_DEFUN([AC_VOMS_LONG_LONG],
     AC_MSG_RESULT([$ac_have_long_long_t])
 ])
 
-# AC_VOMS_GLOBUS_OFF_T check whether GLOBUS_OFF type is present
-# -------------------------------------------------------------------
-AC_DEFUN([AC_VOMS_GLOBUS_OFF_T],
-[
-    AC_MSG_CHECKING([for GLOBUS_OFF_T])
-
-    CFLAGS_SAVE="$CFLAGS"
-    CFLAGS="$CFLAGS $GLOBUS_CFLAGS"
-
-    AC_TRY_COMPILE(
-      [
-        #include <globus_common.h>
-      ], 
-      [GLOBUS_OFF_T goff],
-      [ac_have_globus_off_t="yes"], 
-      [ac_have_globus_off_t="no"]
-    )
-
-    if test "x$ac_have_globus_off_t" = "xyes" ; then
-      AC_DEFINE(HAVE_GLOBUS_OFF_T, 1, [Define to 1 if you have GLOBUS_OFF_T]) 
-    fi
-
-    AC_MSG_RESULT([$ac_have_globus_off_t])
-
-    CFLAGS="$CFLAGS_SAVE"
-])
-
 # AC_VOMS_FIND_FUNC
 # -------------------------------------------------------------------
 AC_DEFUN([AC_VOMS_FIND_FUNC],
@@ -882,50 +550,6 @@ AC_DEFUN([AC_VOMS_STRUCT_IOVEC],
 
     AC_MSG_RESULT([$ac_have_struct_iovec])
 ])
-
-# AC_VOMS_GLOBUS_CONFIG_H check whether globus_config.h is present 
-# -------------------------------------------------------------------
-AC_DEFUN([AC_VOMS_GLOBUS_CONFIG_H],
-[
-    AC_MSG_CHECKING([for globus_config.h])
-
-    CFLAGS_SAVE="$CFLAGS"
-    CFLAGS="$CFLAGS $GLOBUS_CFLAGS"
-
-    AC_TRY_COMPILE(
-      [
-        #include <globus_config.h>
-      ], 
-      [],
-      [ac_have_globus_config_h="yes"], 
-      [ac_have_globus_config_h="no"]
-    )
-
-    if test "x$ac_have_globus_config_h" = "xno" ; then
-      proc=`$ac_aux_dir/config.guess | cut -d- -f1`
-      arch=`$ac_aux_dir/config.guess | cut -d- -f3`
-      case "$proc" in
-        i*86) proc=X86 ;;
-        ia64) proc=IA64 ;;
-        *) proc="" ;;
-      esac
-      arch=`echo $arch | tr a-z A-Z`
-      echo "#define BUILD_LITE 1" > src/include/globus_config.h
-      echo "#define BUILD_DEBUG 1" >> src/include/globus_config.h
-      echo "#define TARGET_ARCH_$arch 1" >> src/include/globus_config.h
-      if ! test "x$proc" = "x"; then
-        echo "#define TARGET_ARCH_$proc 1" >> src/include/globus_config.h
-      fi
-    fi
-
-    AC_MSG_RESULT([$ac_have_globus_config_h])
-
-    CFLAGS="$CFLAGS_SAVE"
-])
-
-
-
-
 
 AC_DEFUN([NEW_ISSUES],
 [
@@ -1063,9 +687,6 @@ rm -rf conftest*
 AC_LANG_POP(C)
 
 ])
-
-# AC_VOMS_GLOBUS_CONFIG_H check whether globus_config.h is present 
-# -------------------------------------------------------------------
 
 AC_DEFUN([AC_TESTSUITE],
 [

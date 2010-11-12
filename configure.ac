@@ -47,10 +47,6 @@ if ! test -e /usr/lib64 ; then
 fi
 
 AC_EXPAT([], have_expat=yes, have_expat=no)        # taken from org.glite
-AC_GLOBUS([], have_globus=yes, have_globus=no)
-
-#AC_CHECK_FUNCS(globus_module_activate)
-# check in acinclude.m4
 
 AC_JAVA
 AC_ENABLE_DOCS
@@ -106,9 +102,7 @@ NEW_ISSUES
 AC_DEFINE(_SVID_SOURCE, 1, [Get SVID extensions])
 AC_VOMS_TIME_T_TIMEZONE
 AM_WITH_DMALLOC
-AC_VOMS_GLOBUS_CONFIG_H
 AC_VOMS_STRUCT_IOVEC
-AC_VOMS_GLOBUS_OFF_T
 AC_VOMS_SOCKLEN_T
 AC_VOMS_FIND_FUNC
 AC_VOMS_LONG_LONG
@@ -128,64 +122,11 @@ AC_PREFIX_DEFAULT("/opt/glite")
 AM_CONFIG_HEADER([src/autogen/config.h])
 
 if test "x$build_cpp_api" = "xyes"; then
-if test "x$build_c_api" = "xyes"; then
 # both C and CPP
-INSTALL_API_LIBS="$WANTED_API_LIBS"
+INSTALL_API_LIBS="libvomsapi.la"
 else
-# CPP only
-libs="$WANTED_API_LIBS"; 
-lista="" ; 
-for p in $libs; do 
-  res=`echo $p | grep libvomsapi` ; 
-  if test "x$res" == "x"; then 
-	lista="$lista" ; 
-  else 
-	lista="$p $lista" ; 
-  fi 
-done ; 
-INSTALL_API_LIBS="$lista"
-fi
-elif test "x$build_c_api" = "xyes"; then
-# C only
-libs="$WANTED_API_LIBS"; 
-lista="" ; 
-for p in $libs; do 
-  res=`echo $p | grep libvomsc` ; 
-  if test "x$res" == "x"; then 
-	lista="$lista" ; 
-  else 
-	lista="$p $lista" ; 
-  fi 
-done ; 
-INSTALL_API_LIBS="$lista"
-else
-# nothing
 INSTALL_API_LIBS=""
 fi
-
-
-libs="$INSTALL_API_LIBS";
-lista="" ;
-for p in $libs; do
-  res=`echo $p | grep _nog` ;
-  if test "x$res" == "x"; then
-    if test "x$build_nglobus_only" = "xyes"; then
-   	  lista="$lista" ;
-    else
-      lista="$p $lista" ;
-    fi
-  else
-    if test "x$build_nglobus_only" = "xyes"; then
-      lista="$p $lista" ;
-    elif test "x$build_emi" = "xyes"; then
-   	  lista="$lista" ;
-    else
-      lista="$p $lista" ;
-    fi
-  fi
-done ;
-
-INSTALL_API_LIBS="$lista"
 
 
 AC_SUBST(INSTALL_API_LIBS)
