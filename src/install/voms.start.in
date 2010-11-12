@@ -95,7 +95,11 @@ fi
 
 # add lib directory to LD_LIBRARY_PATH
 if [ "$@LOCATION_ENV@" != "/usr" ] ; then
+if test "x$LD_LIBRARY_PATH" == "x" ; then
+    export LD_LIBRARY_PATH="$@LOCATION_ENV@/lib"
+else
     export LD_LIBRARY_PATH="$@LOCATION_ENV@/lib:$LD_LIBRARY_PATH"
+fi
 fi
 
 voms=${binpath}/voms
