@@ -157,6 +157,5 @@ AC_CONFIG_FILES([src/install/voms_install_db
                  src/replica/voms_install_replica
                  src/install/upgrade1to2
                  src/install/mysql2oracle
-                 testsuite/lib/vomssetup.exp
                  src/api/ccapi/voms-1.0.pc])
 AC_OUTPUT
