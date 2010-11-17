@@ -807,8 +807,6 @@ HAVE_DOCBOOK_MAN_FALSE
 HAVE_DOCBOOK_MAN_TRUE
 XSLTPROCFLAGS
 XSLTPROC
-BUILD_NOGLOBUS_ONLY_FALSE
-BUILD_NOGLOBUS_ONLY_TRUE
 BUILD_CONFIG_FALSE
 BUILD_CONFIG_TRUE
 BUILD_SERVER_FALSE
@@ -819,8 +817,6 @@ BUILD_INTERFACES_FALSE
 BUILD_INTERFACES_TRUE
 BUILD_CPP_API_FALSE
 BUILD_CPP_API_TRUE
-BUILD_C_API_FALSE
-BUILD_C_API_TRUE
 BUILD_JAVA_ONLY_FALSE
 BUILD_JAVA_ONLY_TRUE
 BUILD_ALL_FALSE
@@ -829,50 +825,10 @@ LIBOBJS
 ALLOCA
 BUILD_DOCS_FALSE
 BUILD_DOCS_TRUE
-JAVA_CLASSPATH2
 JAVA_CLASSPATH
 JHOME
 BUILD_JAVA_FALSE
 BUILD_JAVA_TRUE
-USE_CCATTCERT_LIB
-USE_ATTCERT_LIB
-USE_CAPI_LIB
-USE_CCAPI_LIB
-USE_SOCK_LIB_SERVER
-USE_SOCK_LIB
-USE_SSL_UTILS_LIB
-GLOBUS_GCC64PTHR_GSS_LIBS
-GLOBUS_GCC64DBGPTHR_GSS_LIBS
-GLOBUS_GCC64DBG_GSS_LIBS
-GLOBUS_GCC64_GSS_LIBS
-GLOBUS_GCC64PTHR_GSS_API_LIBS
-GLOBUS_GCC64DBGPTHR_GSS_API_LIBS
-GLOBUS_GCC64DBG_GSS_API_LIBS
-GLOBUS_GCC64_GSS_API_LIBS
-GLOBUS_GCC32PTHR_GSS_API_LIBS
-GLOBUS_GCC32DBGPTHR_GSS_API_LIBS
-GLOBUS_GCC32DBG_GSS_API_LIBS
-GLOBUS_GCC32_GSS_API_LIBS
-GLOBUS_GCC32PTHR_GSS_LIBS
-GLOBUS_GCC32DBGPTHR_GSS_LIBS
-GLOBUS_GCC32DBG_GSS_LIBS
-GLOBUS_GCC32_GSS_LIBS
-GLOBUS_GSS_API_LIBS
-GLOBUS_GSS_LIBS
-GLOBUS_GCC64PTHR_CFLAGS
-GLOBUS_GCC64DBGPTHR_CFLAGS
-GLOBUS_GCC64DBG_CFLAGS
-GLOBUS_GCC64_CFLAGS
-GLOBUS_GCC32PTHR_CFLAGS
-GLOBUS_GCC32DBGPTHR_CFLAGS
-GLOBUS_GCC32DBG_CFLAGS
-GLOBUS_GCC32_CFLAGS
-GLOBUS_CFLAGS
-WANTED_UTIL_LIBS
-WANTED_ATTCERT_LIBS
-WANTED_API_LIBS
-WANTED_SOCK_LIBS
-WANTED_SSL_UTILS_LIBS
 EXPAT_STATIC_LIBS
 EXPAT_LIBS
 EXPAT_CFLAGS
@@ -885,8 +841,8 @@ LOCATION_ENV
 DISTTAR
 ENABLE_GLITE_FALSE
 ENABLE_GLITE_TRUE
-OPENSSL_LIBS
 NO_GLOBUS_FLAGS
+OPENSSL_LIBS
 CXXCPP
 OTOOL64
 OTOOL
@@ -1016,14 +972,10 @@ enable_libtool_lock
 with_debug
 with_warnings
 with_openssl_prefix
-with_openssl_libs
 enable_glite
 with_glite_location
 with_dist_location
 with_expat_prefix
-with_globus_prefix
-with_bit64
-with_globus_flavor
 enable_java
 with_java_home
 with_bc
@@ -1041,7 +993,6 @@ with_c_api
 with_cpp_api
 with_interfaces
 with_config
-with_no_globus_only
 enable_emi_libs
 with_report_dir
 with_scratch_dir
@@ -1723,14 +1674,10 @@ Optional Packages:
   --with-gnu-ld           assume the C compiler uses GNU ld [default=no]
   --with-debug Compiles without optimizations and with debug activated
   --with-warnings Compiles with maximum warnings
- --with-openssl-prefix=PFX    prefix where OpenSSL (non-globus) is installed. (/usr)
- --with-openssl-libs do you want OpenSSL only libs? (yes)
+ --with-openssl-prefix=PFX    prefix where OpenSSL is installed. (/usr)
   --with-glite-location=PFX     prefix where GLITE is installed. (/opt/glite)
   --with-dist-location=PFX     prefix where DIST location is. (pwd)
   --with-expat-prefix=PFX      prefix where 'expat' is installed.
-  --with-globus-prefix=PFX     prefix where GLOBUS is installed. (/opt/globus)
-  --with-bit64    use 64bit libraries only.
-  --with-globus-flavor=flavor  default=${GLOBUS_FLAVOR:-none}
   --with-java-home=DIR    Specifies where to find the java installation, default=$JAVA_HOME
   --with-bc=FILE          Specifies the location of the bouncycastle jar, default=$CLASSPATH
   --with-log4j=FILE        Specifies the location of the log4j jar, default=$CLASSPATH
@@ -1743,11 +1690,10 @@ Optional Packages:
   --with-clients   Enable compilation of the clients (yes)
   --with-server   Enable compilation of the server (yes)
  --with-java-only     Builds only the java APIs
-  --with-c-api   Enable compilation of the C APIs (yes)
+  --with-c-api   No effect
   --with-cpp-api   Enable compilation of the C++ APIs (yes)
   --with-interfaces   Enable compilation of the includes (yes)
   --with-config   Enable compilation of the configuration files (yes)
-  --with-no-globus-only   Compiles only the globus-independent libraries (yes)
   --with-report-dir    Set reportdir for testsuite
   --with-scratch-dir   Set scratchdir for testsuite
   --with-dbuser        Set DB user for testsuite
@@ -5442,13 +5388,13 @@ if test "${lt_cv_nm_interface+set}" = set; then
 else
   lt_cv_nm_interface="BSD nm"
   echo "int some_variable = 0;" > conftest.$ac_ext
-  (eval echo "\"\$as_me:5445: $ac_compile\"" >&5)
+  (eval echo "\"\$as_me:5391: $ac_compile\"" >&5)
   (eval "$ac_compile" 2>conftest.err)
   cat conftest.err >&5
-  (eval echo "\"\$as_me:5448: $NM \\\"conftest.$ac_objext\\\"\"" >&5)
+  (eval echo "\"\$as_me:5394: $NM \\\"conftest.$ac_objext\\\"\"" >&5)
   (eval "$NM \"conftest.$ac_objext\"" 2>conftest.err > conftest.out)
   cat conftest.err >&5
-  (eval echo "\"\$as_me:5451: output\"" >&5)
+  (eval echo "\"\$as_me:5397: output\"" >&5)
   cat conftest.out >&5
   if $GREP 'External.*some_variable' conftest.out > /dev/null; then
     lt_cv_nm_interface="MS dumpbin"
@@ -6643,7 +6589,7 @@ ia64-*-hpux*)
   ;;
 *-*-irix6*)
   # Find out which ABI we are using.
-  echo '#line 6646 "configure"' > conftest.$ac_ext
+  echo '#line 6592 "configure"' > conftest.$ac_ext
   if { (eval echo "$as_me:$LINENO: \"$ac_compile\"") >&5
   (eval $ac_compile) 2>&5
   ac_status=$?
@@ -8979,11 +8925,11 @@ else
    -e 's:.*FLAGS}\{0,1\} :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:8982: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:8928: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>conftest.err)
    ac_status=$?
    cat conftest.err >&5
-   echo "$as_me:8986: \$? = $ac_status" >&5
+   echo "$as_me:8932: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s "$ac_outfile"; then
      # The compiler can only warn and ignore the option if not recognized
      # So say no if there are warnings other than the usual output.
@@ -9318,11 +9264,11 @@ else
    -e 's:.*FLAGS}\{0,1\} :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:9321: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:9267: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>conftest.err)
    ac_status=$?
    cat conftest.err >&5
-   echo "$as_me:9325: \$? = $ac_status" >&5
+   echo "$as_me:9271: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s "$ac_outfile"; then
      # The compiler can only warn and ignore the option if not recognized
      # So say no if there are warnings other than the usual output.
@@ -9423,11 +9369,11 @@ else
    -e 's:.*FLAGS}\{0,1\} :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:9426: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:9372: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>out/conftest.err)
    ac_status=$?
    cat out/conftest.err >&5
-   echo "$as_me:9430: \$? = $ac_status" >&5
+   echo "$as_me:9376: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s out/conftest2.$ac_objext
    then
      # The compiler can only warn and ignore the option if not recognized
@@ -9478,11 +9424,11 @@ else
    -e 's:.*FLAGS}\{0,1\} :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:9481: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:9427: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>out/conftest.err)
    ac_status=$?
    cat out/conftest.err >&5
-   echo "$as_me:9485: \$? = $ac_status" >&5
+   echo "$as_me:9431: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s out/conftest2.$ac_objext
    then
      # The compiler can only warn and ignore the option if not recognized
@@ -12278,7 +12224,7 @@ else
   lt_dlunknown=0; lt_dlno_uscore=1; lt_dlneed_uscore=2
   lt_status=$lt_dlunknown
   cat > conftest.$ac_ext <<_LT_EOF
-#line 12281 "configure"
+#line 12227 "configure"
 #include "confdefs.h"
 
 #if HAVE_DLFCN_H
@@ -12374,7 +12320,7 @@ else
   lt_dlunknown=0; lt_dlno_uscore=1; lt_dlneed_uscore=2
   lt_status=$lt_dlunknown
   cat > conftest.$ac_ext <<_LT_EOF
-#line 12377 "configure"
+#line 12323 "configure"
 #include "confdefs.h"
 
 #if HAVE_DLFCN_H
@@ -14394,11 +14340,11 @@ else
    -e 's:.*FLAGS}\{0,1\} :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:14397: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:14343: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>conftest.err)
    ac_status=$?
    cat conftest.err >&5
-   echo "$as_me:14401: \$? = $ac_status" >&5
+   echo "$as_me:14347: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s "$ac_outfile"; then
      # The compiler can only warn and ignore the option if not recognized
      # So say no if there are warnings other than the usual output.
@@ -14493,11 +14439,11 @@ else
    -e 's:.*FLAGS}\{0,1\} :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:14496: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:14442: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>out/conftest.err)
    ac_status=$?
    cat out/conftest.err >&5
-   echo "$as_me:14500: \$? = $ac_status" >&5
+   echo "$as_me:14446: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s out/conftest2.$ac_objext
    then
      # The compiler can only warn and ignore the option if not recognized
@@ -14545,11 +14491,11 @@ else
    -e 's:.*FLAGS}\{0,1\} :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:14548: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:14494: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>out/conftest.err)
    ac_status=$?
    cat out/conftest.err >&5
-   echo "$as_me:14552: \$? = $ac_status" >&5
+   echo "$as_me:14498: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s out/conftest2.$ac_objext
    then
      # The compiler can only warn and ignore the option if not recognized
@@ -15571,21 +15517,6 @@ else
 fi
 
 
-
-# Check whether --with-openssl_libs was given.
-if test "${with_openssl_libs+set}" = set; then
-  withval=$with_openssl_libs;  with_openssl_libs="$withval"
-else
-   with_openssl_libs="yes"
-fi
-
-
-  if test "x$with_openssl_libs" != "xno"  -a "x$with_openssl_libs" != "xyes" ; then
-     { { $as_echo "$as_me:$LINENO: error: Value of --with-openssl-libs must be either \"yes\" or \"no\"" >&5
-$as_echo "$as_me: error: Value of --with-openssl-libs must be either \"yes\" or \"no\"" >&2;}
-   { (exit 1); exit 1; }; }
-  fi
-
   SAVE_LD_LIBRARY_PATH=$LD_LIBRARY_PATH
   LD_LIBRARY_PATH="$with_openssl_prefix/lib"
 
@@ -15672,21 +15603,14 @@ ac_compile='$CC -c $CFLAGS $CPPFLAGS conftest.$ac_ext >&5'
 ac_link='$CC -o conftest$ac_exeext $CFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
 ac_compiler_gnu=$ac_cv_c_compiler_gnu
 
+  NO_GLOBUS_FLAGS="-I$with_openssl_prefix/include"
 
   if test "x$found" = "xyes"; then
-    NO_GLOBUS_FLAGS="-I$with_openssl_prefix/include"
     OPENSSL_LIBS="-L$with_openssl_prefix/lib -lcrypto -lssl"
 
 
     { $as_echo "$as_me:$LINENO: checking for system OpenSSL version" >&5
 $as_echo_n "checking for system OpenSSL version... " >&6; }
-    if test "x$with_openssl_libs" = "xyes" ; then
-      WANTED_API_LIBS="$WANTED_API_LIBS libvomsapi.la"
-      WANTED_ATTCERT_LIBS="$WANTED_ATTCERT_LIBS libattributes_nog.la"
-      WANTED_SSL_UTILS_LIBS="$WANTED_SSL_UTILS_LIBS libssl_utils_nog.la"
-      WANTED_UTIL_LIBS="$WANTED_UTIL_LIBS libutilities_nog.la libutilc_nog.la"
-      WANTED_SOCK_LIBS="$WANTED_SOCK_LIBS libsock_nog.la"
-    fi
     cat >conftest.h <<HERE
 #include <openssl/opensslv.h>
 OPENSSL_VERSION_TEXT
@@ -15987,330 +15911,6 @@ $as_echo "$ac_cv_expat_valid (in lib)" >&6; }
         # taken from org.glite
 
 
-# Check whether --with-globus_prefix was given.
-if test "${with_globus_prefix+set}" = set; then
-  withval=$with_globus_prefix; with_globus_prefix="$withval"
-else
-  with_globus_prefix=${GLOBUS_LOCATION:-/opt/globus}
-fi
-
-
-    { $as_echo "$as_me:$LINENO: checking for GLOBUS installation at $with_globus_prefix" >&5
-$as_echo_n "checking for GLOBUS installation at $with_globus_prefix... " >&6; }
-    # to be added
-    { $as_echo "$as_me:$LINENO: result: yes" >&5
-$as_echo "yes" >&6; }
-
-
-# Check whether --with-bit64 was given.
-if test "${with_bit64+set}" = set; then
-  withval=$with_bit64; with_64bit="yes"
-else
-  with_64bit="no"
-fi
-
-
-    LD_LIBRARY_PATH="$LD_LIBRARY_PATH:$with_globus_prefix/lib"
-    { $as_echo "$as_me:$LINENO: checking for GLOBUS flavors" >&5
-$as_echo_n "checking for GLOBUS flavors... " >&6; }
-
-    for i in `ls $with_globus_prefix/include`; do
-      if test "x$i" != "xldap_backend"; then
-        GLOBUS_FLAVORS="$GLOBUS_FLAVORS $i"
-      fi
-    done
-
-    if test "x$with_64bit" == "xno" ; then
-      if test -e $with_globus_prefix/include/gcc32dbg ; then
-        default_flavor=gcc32dbg
-      elif test -e $with_globus_prefix/include/gcc64dbg ; then
-        default_flavor=gcc64dbg
-      else
-        default_flavor=""
-      fi
-    else
-      if test -e $with_globus_prefix/include/gcc64dbg ; then
-        default_flavor=gcc64dbg
-      else
-        default_flavor=""
-      fi
-    fi
-
-
-# Check whether --with-globus_flavor was given.
-if test "${with_globus_flavor+set}" = set; then
-  withval=$with_globus_flavor; with_globus_flavor="$withval"
-else
-  with_globus_flavor=${GLOBUS_FLAVOR}
-fi
-
-
-    { $as_echo "$as_me:$LINENO: result: found $GLOBUS_FLAVORS ($with_globus_flavor selected)" >&5
-$as_echo "found $GLOBUS_FLAVORS ($with_globus_flavor selected)" >&6; }
-
-    if test "x$with_globus_flavor" = "x" ; then
-      if test "x$USE_SSL_UTILS_LIB" = "x"; then
-        USE_SSL_UTILS_LIB="libssl_utils_nog.la"
-      fi
-      if test "x$USE_SOCK_LIB" = "x"; then
-        USE_SOCK_LIB="libsock.la"
-        USE_SOCK_LIB_SERVER="libsock_nog.la"
-      fi
-      if test "x$USE_CCAPI_LIB" = "x"; then
-        USE_CCAPI_LIB="libvomsapi.la"
-      fi
-      if test "x$USE_ATTCERT_LIB" = "x"; then
-        USE_ATTCERT_LIB="libattcert.la"
-      fi
-      if test "x$USE_CCATTCERT_LIB" = "x"; then
-        USE_CCATTCERT_LIB="libccattcert.la"
-      fi
-
-      WANTED_SSL_UTILS_LIBS="$WANTED_SSL_UTILS_LIBS libssl_utils.la"
-      WANTED_SOCK_LIBS="$WANTED_SOCK_LIBS libsock.la libsock_nog.la"
-      WANTED_ATTCERT_LIBS="$WANTED_ATTCERT_LIBS libattcert.la libccattcert.la"
-      WANTED_API_LIBS="$WANTED_API_LIBS libvomsapi.la"
-      WANTED_UTIL_LIBS="$WANTED_UTIL_LIBS libutilities.la libutilc.la"
-    fi
-    new_flavors=""
-
-    for flavor in $GLOBUS_FLAVORS ; do
-      if test "x$with_globus_flavor" != "x" ; then
-        if test "x$flavor" == "x$with_globus_flavor" ; then
-          new_flavors="$flavor $new_flavors"
-        fi
-      else
-          new_flavors="$GLOBUS_FLAVORS"
-      fi
-    done
-
-    GLOBUS_FLAVORS=""
-
-    for flavor in $new_flavors ; do
-      if test "x$with_64bit" == "xyes" ; then
-        echo $flavor | grep 64 >/dev/null
-        if test $? -eq 0 ; then
-          GLOBUS_FLAVORS="$GLOBUS_FLAVORS $flavor"
-        fi
-      else
-        GLOBUS_FLAVORS="$flavor $GLOBUS_FLAVORS"
-      fi
-    done
-
-    { $as_echo "$as_me:$LINENO: result: Final globus flavors: ${GLOBUS_FLAVORS}" >&5
-$as_echo "Final globus flavors: ${GLOBUS_FLAVORS}" >&6; }
-
-    for flavor in $GLOBUS_FLAVORS ; do
-      if test "x$USE_SSL_UTILS_LIB" = "x"; then
-        USE_SSL_UTILS_LIB="libssl_utils_$flavor.la"
-      fi
-      if test "x$USE_SOCK_LIB" = "x"; then
-        USE_SOCK_LIB="libsock_$flavor.la"
-        USE_SOCK_LIB_SERVER="libsock_nog.la"
-      fi
-      if test "x$USE_CCAPI_LIB" = "x"; then
-        USE_CCAPI_LIB="libvomsapi_$flavor.la"
-      fi
-      if test "x$USE_ATTCERT_LIB" = "x"; then
-        USE_ATTCERT_LIB="libattcert_$flavor.la"
-      fi
-      if test "x$USE_CCATTCERT_LIB" = "x"; then
-        USE_CCATTCERT_LIB="libccattcert_$flavor.la"
-      fi
-      WANTED_SSL_UTILS_LIBS="$WANTED_SSL_UTILS_LIBS libssl_utils_"$flavor".la"
-      WANTED_SOCK_LIBS="$WANTED_SOCK_LIBS libsock_$flavor.la libsock_nog.la"
-      WANTED_CCAPI_LIBS="$WANTED_CCAPI_LIBS libvomsapi_"$flavor".la"
-      WANTED_ATTCERT_LIBS="$WANTED_ATTCERT_LIBS libattcert_"$flavor".la libccattcert_"$flavor".la"
-      WANTED_UTIL_LIBS="$WANTED_UTIL_LIBS libutilities.la libutilc.la"
-    done
-
-    WANTED_API_LIBS="$WANTED_API_LIBS $WANTED_CCAPI_LIBS $WANTED_CAPI_LIBS"
-
-    ac_globus_ldlib="-L$with_globus_prefix/lib"
-
-    if test "x$with_globus_flavor" = "x" ; then
-      with_globus_flavor=${default_flavor}
-    fi
-
-    for flavor in $GLOBUS_FLAVORS ; do
-      if ( ( ldd $with_globus_prefix/lib/libglobus_gssapi_gsi_$flavor.so |grep crypto_$flavor >/dev/null 2>&1) ); then
-        FLVR="_$flavor"
-      else
-        FLVR=""
-      fi
-      { $as_echo "$as_me:$LINENO: result: found flavor=$FLVR" >&5
-$as_echo "found flavor=$FLVR" >&6; }
-      if test "x$flavor" = "x$with_globus_flavor" ; then
-      	GLOBUS_CFLAGS="-I$with_globus_prefix/include/$flavor"
-        GLOBUS_GSS_LIBS="$ac_globus_ldlib -lglobus_gssapi_gsi_$flavor -lglobus_gss_assist_$flavor"
-        GLOBUS_GSS_API_LIBS="$ac_globus_ldlib -lcrypto$FLVR -lssl$FLVR"
-      fi
-      if test "x$flavor" = "xgcc32" ; then
-	      GLOBUS_GCC32_CFLAGS="-I$with_globus_prefix/include/$flavor"
-        GLOBUS_GCC32_GSS_LIBS="$ac_globus_ldlib -lglobus_gssapi_gsi_$flavor -lglobus_gss_assist_$flavor"
-        GLOBUS_GCC32_GSS_API_LIBS="$ac_globus_ldlib -lcrypto$FLVR -lssl$FLVR"
-      fi
-      if test "x$flavor" = "xgcc32dbg" ; then
-        GLOBUS_GCC32DBG_CFLAGS="-I$with_globus_prefix/include/$flavor"
-        GLOBUS_GCC32DBG_GSS_LIBS="$ac_globus_ldlib -lglobus_gssapi_gsi_$flavor -lglobus_gss_assist_$flavor"
-        GLOBUS_GCC32DBG_GSS_API_LIBS="$ac_globus_ldlib -lcrypto$FLVR -lssl$FLVR"
-      fi
-      if test "x$flavor" = "xgcc32dbgpthr" ; then
-        GLOBUS_GCC32DBGPTHR_CFLAGS="-I$with_globus_prefix/include/$flavor"
-        GLOBUS_GCC32DBGPTHR_GSS_LIBS="$ac_globus_ldlib -lglobus_gssapi_gsi_$flavor -lglobus_gss_assist_$flavor"
-        GLOBUS_GCC32DPBPTHR_GSS_API_LIBS="$ac_globus_ldlib -lcrypto$FLVR -lssl$FLVR"
-      fi
-      if test "x$flavor" = "xgcc32pthr" ; then
-        GLOBUS_GCC32PTHR_CFLAGS="-I$with_globus_prefix/include/$flavor"
-        GLOBUS_GCC32PTHR_GSS_LIBS="$ac_globus_ldlib -lglobus_gssapi_gsi_$flavor -lglobus_gss_assist_$flavor"
-        GLOBUS_GCC32PTHR_GSS_API_LIBS="$ac_globus_ldlib -lcrypto$FLVR -lssl$FLVR"
-      fi
-
-      if test "x$flavor" = "xgcc64" ; then
-	      GLOBUS_GCC64_CFLAGS="-I$with_globus_prefix/include/$flavor"
-        GLOBUS_GCC64_GSS_LIBS="$ac_globus_ldlib -lglobus_gssapi_gsi_$flavor -lglobus_gss_assist_$flavor"
-        GLOBUS_GCC64_GSS_API_LIBS="$ac_globus_ldlib -lcrypto$FLVR -lssl$FLVR"
-      fi
-      if test "x$flavor" = "xgcc64dbg" ; then
-        GLOBUS_GCC64DBG_CFLAGS="-I$with_globus_prefix/include/$flavor"
-        GLOBUS_GCC64DBG_GSS_LIBS="$ac_globus_ldlib -lglobus_gssapi_gsi_$flavor -lglobus_gss_assist_$flavor"
-        GLOBUS_GCC64DBG_GSS_API_LIBS="$ac_globus_ldlib -lcrypto$FLVR -lssl$FLVR"
-      fi
-      if test "x$flavor" = "xgcc64dbgpthr" ; then
-        GLOBUS_GCC64DBGPTHR_CFLAGS="-I$with_globus_prefix/include/$flavor"
-        GLOBUS_GCC64DBGPTHR_GSS_LIBS="$ac_globus_ldlib -lglobus_gssapi_gsi_$flavor -lglobus_gss_assist_$flavor"
-        GLOBUS_GCC64DBGPTHR_GSS_API_LIBS="$ac_globus_ldlib -lcrypto$FLVR -lssl$FLVR"
-      fi
-      if test "x$flavor" = "xgcc64pthr" ; then
-        GLOBUS_GCC64PTHR_CFLAGS="-I$with_globus_prefix/include/$flavor"
-        GLOBUS_GCC64PTHR_GSS_LIBS="$ac_globus_ldlib -lglobus_gssapi_gsi_$flavor -lglobus_gss_assist_$flavor"
-        GLOBUS_GCC64PTHR_GSS_API_LIBS="$ac_globus_ldlib -lcrypto$FLVR -lssl$FLVR"
-      fi
-    done
-
-
-    ac_ext=c
-ac_cpp='$CPP $CPPFLAGS'
-ac_compile='$CC -c $CFLAGS $CPPFLAGS conftest.$ac_ext >&5'
-ac_link='$CC -o conftest$ac_exeext $CFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
-ac_compiler_gnu=$ac_cv_c_compiler_gnu
-
-    LDFLAGS_SAVE="$LDFLAGS"
-    LDFLAGS="$LDFLAGS $GLOBUS_GSS_LIBS"
-    { $as_echo "$as_me:$LINENO: checking for globus_module_activate" >&5
-$as_echo_n "checking for globus_module_activate... " >&6; }
-    cat >conftest.$ac_ext <<_ACEOF
-/* confdefs.h.  */
-_ACEOF
-cat confdefs.h >>conftest.$ac_ext
-cat >>conftest.$ac_ext <<_ACEOF
-/* end confdefs.h.  */
-
-int
-main ()
-{
-(void)globus_module_activate();
-  ;
-  return 0;
-}
-_ACEOF
-rm -f conftest.$ac_objext conftest$ac_exeext
-if { (ac_try="$ac_link"
-case "(($ac_try" in
-  *\"* | *\`* | *\\*) ac_try_echo=\$ac_try;;
-  *) ac_try_echo=$ac_try;;
-esac
-eval ac_try_echo="\"\$as_me:$LINENO: $ac_try_echo\""
-$as_echo "$ac_try_echo") >&5
-  (eval "$ac_link") 2>conftest.er1
-  ac_status=$?
-  grep -v '^ *+' conftest.er1 >conftest.err
-  rm -f conftest.er1
-  cat conftest.err >&5
-  $as_echo "$as_me:$LINENO: \$? = $ac_status" >&5
-  (exit $ac_status); } && {
-	 test -z "$ac_c_werror_flag" ||
-	 test ! -s conftest.err
-       } && test -s conftest$ac_exeext && {
-	 test "$cross_compiling" = yes ||
-	 $as_test_x conftest$ac_exeext
-       }; then
-
-cat >>confdefs.h <<\_ACEOF
-#define HAVE_GLOBUS_MODULE_ACTIVATE 1
-_ACEOF
-
-                  { $as_echo "$as_me:$LINENO: result: yes" >&5
-$as_echo "yes" >&6; }
-else
-  $as_echo "$as_me: failed program was:" >&5
-sed 's/^/| /' conftest.$ac_ext >&5
-
-	{ $as_echo "$as_me:$LINENO: result: no" >&5
-$as_echo "no" >&6; }
-fi
-
-rm -rf conftest.dSYM
-rm -f core conftest.err conftest.$ac_objext conftest_ipa8_conftest.oo \
-      conftest$ac_exeext conftest.$ac_ext
-    LDFLAGS="$LDFLAGS_SAVE"
-    ac_ext=c
-ac_cpp='$CPP $CPPFLAGS'
-ac_compile='$CC -c $CFLAGS $CPPFLAGS conftest.$ac_ext >&5'
-ac_link='$CC -o conftest$ac_exeext $CFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
-ac_compiler_gnu=$ac_cv_c_compiler_gnu
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-#AC_CHECK_FUNCS(globus_module_activate)
-# check in acinclude.m4
-
-
   # Check whether --enable-java was given.
 if test "${enable_java+set}" = set; then
   enableval=$enable_java;
@@ -16461,11 +16061,9 @@ $as_echo "specified: $wcomlang" >&6; }
 
 
   JAVA_CLASSPATH=".:$wbc:$wlog4j:$wcomcli:$wcomlang"
-  JAVA_CLASSPATH2=""
 
-  { $as_echo "$as_me:$LINENO: checking CLASSPATH is $JAVA_CLASSPATH2" >&5
-$as_echo_n "checking CLASSPATH is $JAVA_CLASSPATH2... " >&6; }
-
+  { $as_echo "$as_me:$LINENO: checking CLASSPATH is $JAVA_CLASSPATH" >&5
+$as_echo_n "checking CLASSPATH is $JAVA_CLASSPATH... " >&6; }
 
 
 
@@ -20646,81 +20244,6 @@ fi
 
 
 
-    { $as_echo "$as_me:$LINENO: checking for globus_config.h" >&5
-$as_echo_n "checking for globus_config.h... " >&6; }
-
-    CFLAGS_SAVE="$CFLAGS"
-    CFLAGS="$CFLAGS $GLOBUS_CFLAGS"
-
-    cat >conftest.$ac_ext <<_ACEOF
-/* confdefs.h.  */
-_ACEOF
-cat confdefs.h >>conftest.$ac_ext
-cat >>conftest.$ac_ext <<_ACEOF
-/* end confdefs.h.  */
-
-        #include <globus_config.h>
-
-int
-main ()
-{
-
-  ;
-  return 0;
-}
-_ACEOF
-rm -f conftest.$ac_objext
-if { (ac_try="$ac_compile"
-case "(($ac_try" in
-  *\"* | *\`* | *\\*) ac_try_echo=\$ac_try;;
-  *) ac_try_echo=$ac_try;;
-esac
-eval ac_try_echo="\"\$as_me:$LINENO: $ac_try_echo\""
-$as_echo "$ac_try_echo") >&5
-  (eval "$ac_compile") 2>conftest.er1
-  ac_status=$?
-  grep -v '^ *+' conftest.er1 >conftest.err
-  rm -f conftest.er1
-  cat conftest.err >&5
-  $as_echo "$as_me:$LINENO: \$? = $ac_status" >&5
-  (exit $ac_status); } && {
-	 test -z "$ac_c_werror_flag" ||
-	 test ! -s conftest.err
-       } && test -s conftest.$ac_objext; then
-  ac_have_globus_config_h="yes"
-else
-  $as_echo "$as_me: failed program was:" >&5
-sed 's/^/| /' conftest.$ac_ext >&5
-
-	ac_have_globus_config_h="no"
-
-fi
-
-rm -f core conftest.err conftest.$ac_objext conftest.$ac_ext
-
-    if test "x$ac_have_globus_config_h" = "xno" ; then
-      proc=`$ac_aux_dir/config.guess | cut -d- -f1`
-      arch=`$ac_aux_dir/config.guess | cut -d- -f3`
-      case "$proc" in
-        i*86) proc=X86 ;;
-        ia64) proc=IA64 ;;
-        *) proc="" ;;
-      esac
-      arch=`echo $arch | tr a-z A-Z`
-      echo "#define BUILD_LITE 1" > src/include/globus_config.h
-      echo "#define BUILD_DEBUG 1" >> src/include/globus_config.h
-      echo "#define TARGET_ARCH_$arch 1" >> src/include/globus_config.h
-      if ! test "x$proc" = "x"; then
-        echo "#define TARGET_ARCH_$proc 1" >> src/include/globus_config.h
-      fi
-    fi
-
-    { $as_echo "$as_me:$LINENO: result: $ac_have_globus_config_h" >&5
-$as_echo "$ac_have_globus_config_h" >&6; }
-
-    CFLAGS="$CFLAGS_SAVE"
-
-
     { $as_echo "$as_me:$LINENO: checking for struct iovec" >&5
 $as_echo_n "checking for struct iovec... " >&6; }
 
@@ -20782,72 +20305,6 @@ _ACEOF
 
     { $as_echo "$as_me:$LINENO: result: $ac_have_struct_iovec" >&5
 $as_echo "$ac_have_struct_iovec" >&6; }
-
-
-    { $as_echo "$as_me:$LINENO: checking for GLOBUS_OFF_T" >&5
-$as_echo_n "checking for GLOBUS_OFF_T... " >&6; }
-
-    CFLAGS_SAVE="$CFLAGS"
-    CFLAGS="$CFLAGS $GLOBUS_CFLAGS"
-
-    cat >conftest.$ac_ext <<_ACEOF
-/* confdefs.h.  */
-_ACEOF
-cat confdefs.h >>conftest.$ac_ext
-cat >>conftest.$ac_ext <<_ACEOF
-/* end confdefs.h.  */
-
-        #include <globus_common.h>
-
-int
-main ()
-{
-GLOBUS_OFF_T goff
-  ;
-  return 0;
-}
-_ACEOF
-rm -f conftest.$ac_objext
-if { (ac_try="$ac_compile"
-case "(($ac_try" in
-  *\"* | *\`* | *\\*) ac_try_echo=\$ac_try;;
-  *) ac_try_echo=$ac_try;;
-esac
-eval ac_try_echo="\"\$as_me:$LINENO: $ac_try_echo\""
-$as_echo "$ac_try_echo") >&5
-  (eval "$ac_compile") 2>conftest.er1
-  ac_status=$?
-  grep -v '^ *+' conftest.er1 >conftest.err
-  rm -f conftest.er1
-  cat conftest.err >&5
-  $as_echo "$as_me:$LINENO: \$? = $ac_status" >&5
-  (exit $ac_status); } && {
-	 test -z "$ac_c_werror_flag" ||
-	 test ! -s conftest.err
-       } && test -s conftest.$ac_objext; then
-  ac_have_globus_off_t="yes"
-else
-  $as_echo "$as_me: failed program was:" >&5
-sed 's/^/| /' conftest.$ac_ext >&5
-
-	ac_have_globus_off_t="no"
-
-fi
-
-rm -f core conftest.err conftest.$ac_objext conftest.$ac_ext
-
-    if test "x$ac_have_globus_off_t" = "xyes" ; then
-
-cat >>confdefs.h <<\_ACEOF
-#define HAVE_GLOBUS_OFF_T 1
-_ACEOF
-
-    fi
-
-    { $as_echo "$as_me:$LINENO: result: $ac_have_globus_off_t" >&5
-$as_echo "$ac_have_globus_off_t" >&6; }
-
-    CFLAGS="$CFLAGS_SAVE"
 
 
     { $as_echo "$as_me:$LINENO: checking for (sane) socklen_t" >&5
@@ -21350,37 +20807,12 @@ else
 fi
 
 
-
-# Check whether --with-no-globus-only was given.
-if test "${with_no_globus_only+set}" = set; then
-  withval=$with_no_globus_only;
-      case "$withval" in
-        yes) build_nglobus_only="yes" ;;
-        no)  build_nglobus_only="no" ;;
-        *) { { $as_echo "$as_me:$LINENO: error: bad value $withval for --with-no-globus-only" >&5
-$as_echo "$as_me: error: bad value $withval for --with-no-globus-only" >&2;}
-   { (exit 1); exit 1; }; } ;;
-      esac
-
-else
-   build_nglobus_only="no"
-fi
-
-
    if test x$wjavaall = xyes; then
   BUILD_JAVA_ONLY_TRUE=
   BUILD_JAVA_ONLY_FALSE='#'
 else
   BUILD_JAVA_ONLY_TRUE='#'
   BUILD_JAVA_ONLY_FALSE=
-fi
-
-   if test x$build_c_api = xyes; then
-  BUILD_C_API_TRUE=
-  BUILD_C_API_FALSE='#'
-else
-  BUILD_C_API_TRUE='#'
-  BUILD_C_API_FALSE=
 fi
 
    if test x$build_cpp_api = xyes; then
@@ -21421,14 +20853,6 @@ fi
 else
   BUILD_CONFIG_TRUE='#'
   BUILD_CONFIG_FALSE=
-fi
-
-   if test x$build_nglobus_only = xyes; then
-  BUILD_NOGLOBUS_ONLY_TRUE=
-  BUILD_NOGLOBUS_ONLY_FALSE='#'
-else
-  BUILD_NOGLOBUS_ONLY_TRUE='#'
-  BUILD_NOGLOBUS_ONLY_FALSE=
 fi
 
 
@@ -21709,71 +21133,18 @@ ac_config_headers="$ac_config_headers src/autogen/config.h"
 
 
 if test "x$build_cpp_api" = "xyes"; then
-if test "x$build_c_api" = "xyes"; then
 # both C and CPP
-INSTALL_API_LIBS="$WANTED_API_LIBS"
+INSTALL_API_LIBS="libvomsapi.la"
 else
-# CPP only
-libs="$WANTED_API_LIBS";
-lista="" ;
-for p in $libs; do
-  res=`echo $p | grep libvomsapi` ;
-  if test "x$res" == "x"; then
-	lista="$lista" ;
-  else
-	lista="$p $lista" ;
-  fi
-done ;
-INSTALL_API_LIBS="$lista"
-fi
-elif test "x$build_c_api" = "xyes"; then
-# C only
-libs="$WANTED_API_LIBS";
-lista="" ;
-for p in $libs; do
-  res=`echo $p | grep libvomsc` ;
-  if test "x$res" == "x"; then
-	lista="$lista" ;
-  else
-	lista="$p $lista" ;
-  fi
-done ;
-INSTALL_API_LIBS="$lista"
-else
-# nothing
 INSTALL_API_LIBS=""
 fi
-
-
-libs="$INSTALL_API_LIBS";
-lista="" ;
-for p in $libs; do
-  res=`echo $p | grep _nog` ;
-  if test "x$res" == "x"; then
-    if test "x$build_nglobus_only" = "xyes"; then
-   	  lista="$lista" ;
-    else
-      lista="$p $lista" ;
-    fi
-  else
-    if test "x$build_nglobus_only" = "xyes"; then
-      lista="$p $lista" ;
-    elif test "x$build_emi" = "xyes"; then
-   	  lista="$lista" ;
-    else
-      lista="$p $lista" ;
-    fi
-  fi
-done ;
-
-INSTALL_API_LIBS="$lista"
 
 
 
 
 ac_config_files="$ac_config_files Makefile src/Makefile src/ac/Makefile src/api/Makefile src/api/ccapi/Makefile src/api/java/Makefile src/client/Makefile src/common/Makefile src/include/Makefile src/install/Makefile src/log/Makefile src/replib/Makefile src/replica/Makefile src/server/Makefile src/socklib/Makefile src/sslutils/Makefile src/utils/Makefile doc/Makefile project/Makefile testsuite/Makefile testsuite/SuiteConfig"
 
-ac_config_files="$ac_config_files src/install/voms_install_db src/install/voms.start src/replica/voms_install_replica src/install/upgrade1to2 src/install/mysql2oracle testsuite/lib/vomssetup.exp src/api/ccapi/voms-1.0.pc"
+ac_config_files="$ac_config_files src/install/voms_install_db src/install/voms.start src/replica/voms_install_replica src/install/upgrade1to2 src/install/mysql2oracle src/api/ccapi/voms-1.0.pc"
 
 cat >confcache <<\_ACEOF
 # This file is a shell script that caches the results of configure
@@ -21942,13 +21313,6 @@ $as_echo "$as_me: error: conditional \"BUILD_JAVA_ONLY\" was never defined.
 Usually this means the macro was only invoked conditionally." >&2;}
    { (exit 1); exit 1; }; }
 fi
-if test -z "${BUILD_C_API_TRUE}" && test -z "${BUILD_C_API_FALSE}"; then
-  { { $as_echo "$as_me:$LINENO: error: conditional \"BUILD_C_API\" was never defined.
-Usually this means the macro was only invoked conditionally." >&5
-$as_echo "$as_me: error: conditional \"BUILD_C_API\" was never defined.
-Usually this means the macro was only invoked conditionally." >&2;}
-   { (exit 1); exit 1; }; }
-fi
 if test -z "${BUILD_CPP_API_TRUE}" && test -z "${BUILD_CPP_API_FALSE}"; then
   { { $as_echo "$as_me:$LINENO: error: conditional \"BUILD_CPP_API\" was never defined.
 Usually this means the macro was only invoked conditionally." >&5
@@ -21981,13 +21345,6 @@ if test -z "${BUILD_CONFIG_TRUE}" && test -z "${BUILD_CONFIG_FALSE}"; then
   { { $as_echo "$as_me:$LINENO: error: conditional \"BUILD_CONFIG\" was never defined.
 Usually this means the macro was only invoked conditionally." >&5
 $as_echo "$as_me: error: conditional \"BUILD_CONFIG\" was never defined.
-Usually this means the macro was only invoked conditionally." >&2;}
-   { (exit 1); exit 1; }; }
-fi
-if test -z "${BUILD_NOGLOBUS_ONLY_TRUE}" && test -z "${BUILD_NOGLOBUS_ONLY_FALSE}"; then
-  { { $as_echo "$as_me:$LINENO: error: conditional \"BUILD_NOGLOBUS_ONLY\" was never defined.
-Usually this means the macro was only invoked conditionally." >&5
-$as_echo "$as_me: error: conditional \"BUILD_NOGLOBUS_ONLY\" was never defined.
 Usually this means the macro was only invoked conditionally." >&2;}
    { (exit 1); exit 1; }; }
 fi
@@ -22893,7 +22250,6 @@ do
     "src/replica/voms_install_replica") CONFIG_FILES="$CONFIG_FILES src/replica/voms_install_replica" ;;
     "src/install/upgrade1to2") CONFIG_FILES="$CONFIG_FILES src/install/upgrade1to2" ;;
     "src/install/mysql2oracle") CONFIG_FILES="$CONFIG_FILES src/install/mysql2oracle" ;;
-    "testsuite/lib/vomssetup.exp") CONFIG_FILES="$CONFIG_FILES testsuite/lib/vomssetup.exp" ;;
     "src/api/ccapi/voms-1.0.pc") CONFIG_FILES="$CONFIG_FILES src/api/ccapi/voms-1.0.pc" ;;
 
   *) { { $as_echo "$as_me:$LINENO: error: invalid argument: $ac_config_target" >&5

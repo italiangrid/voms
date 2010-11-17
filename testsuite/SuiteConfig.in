@@ -9,3 +9,4 @@ DBPASSWORD @with_dbpwd@
 MYSQLCONF  @with_mysqlconf@
 COBERTURA  @with_cobertura_prefix@
 DOVALGRIND @with_valgrind@
+JAVAPATH   @JAVA_CLASSPATH@

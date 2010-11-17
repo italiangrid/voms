@@ -17,7 +17,7 @@ voms_SOURCES = \
 
 voms_LDADD = \
 	$(top_builddir)/src/socklib/libsock_nog.la \
-	$(top_builddir)/src/common/libutilities.la \
+	$(top_builddir)/src/common/libutilities_nog.la \
 	$(top_builddir)/src/ac/libattributes_nog.la \
 	$(top_builddir)/src/common/libutilc_nog.la \
 	$(top_builddir)/src/replib/librep.la \

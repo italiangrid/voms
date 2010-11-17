@@ -31,13 +31,9 @@ extern "C" {
 #endif
 
 #define NOGLOBUS
-#ifdef NOGLOBUS
 #ifndef GSSAPI_H_
 typedef void * gss_cred_id_t;
 typedef void * gss_ctx_id_t;
-#endif
-#else
-#include "gssapi.h"
 #endif
 
 #include <openssl/x509.h>

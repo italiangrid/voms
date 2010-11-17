@@ -3,53 +3,36 @@ includedir = @includedir@/glite/security/voms
 pkgconfigdir = $(libdir)/pkgconfig
 pkgconfig_DATA = voms-1.0.pc
 
-lib_LTLIBRARIES = \
-	$(WANTED_API_LIBS) # may add the libraries defined in EXTRA_LTLIBRARIES
+lib_LTLIBRARIES = libvomsapi.la
 
-CCSOURCES = \
+libvomsapi_la_SOURCES = \
 	api_util.cc \
 	voms_api.cc \
 	ccval.cc \
 	internal.cc \
 	cinterface.cc
 
-API_INCLUDES = \
-	-I$(top_srcdir)/src/include
-
-libvomsapi_la_SOURCES = \
-	$(CCSOURCES)
 
 libvomsapi_la_CXXFLAGS = \
 	$(NO_GLOBUS_FLAGS) \
 	-DNOGLOBUS \
-	$(API_INCLUDES)
+	-I$(top_srcdir)/src/include
 
 libvomsapi_la_LDFLAGS = \
 	-rpath $(libdir) \
   -version-info 1:0:0
 
-NOGLIBADD = \
+libvomsapi_la_LIBADD = \
 	$(EXPAT_LIBS) \
 	$(OPENSSL_LIBS) \
 	$(top_builddir)/src/replib/librep.la \
-	$(top_builddir)/src/common/libutilities.la \
+	$(top_builddir)/src/common/libutilities_nog.la \
 	$(top_builddir)/src/common/libutilc_nog.la \
 	$(top_builddir)/src/sslutils/libssl_utils_nog.la \
 	$(top_builddir)/src/log/liblog.la\
-	$(top_builddir)/src/socklib/libsock_nog.la
-
-libvomsapi_la_LIBADD = \
-	$(NOGLIBADD) \
+	$(top_builddir)/src/socklib/libsock_nog.la \
 	$(top_builddir)/src/ac/libattributes_nog.la
 
-
-#CCLIBADD = \
-#	$(EXPAT_LIBS) \
-# $(GLOBUS_LIBS) \
-#	$(top_builddir)/src/replib/librep.la \
-#	$(top_builddir)/src/common/libutilities.la \
-#	$(top_builddir)/src/log/liblog.la 
-#	$(top_builddir)/src/sslutils/$(USE_SSL_UTILS_LIB)
 
 
 # test programs
@@ -61,303 +44,6 @@ libvomsapi_la_LIBADD = \
 #ctest_SOURCES = ctest.c
 #ctest_LDADD = libvomsc.la
 #ctest_CFLAGS = -I$(top_srcdir)/src/include $(GLOBUS_CFLAGS)
-
-EXTRA_LTLIBRARIES = \
-	libvomsapi_gcc32.la \
-	libvomsapi_gcc32dbg.la \
-	libvomsapi_gcc32pthr.la \
-	libvomsapi_gcc32dbgpthr.la \
-	libvomsapi_gcc64.la \
-	libvomsapi_gcc64dbg.la \
-	libvomsapi_gcc64pthr.la \
-	libvomsapi_gcc64dbgpthr.la \
-	libvomsapi_nog.la \
-	libvomsapi.la \
-	libvomsc_gcc32.la \
-	libvomsc_gcc32dbg.la \
-	libvomsc_gcc32pthr.la \
-	libvomsc_gcc32dbgpthr.la \
-	libvomsc_gcc64.la \
-	libvomsc_gcc64dbg.la \
-	libvomsc_gcc64pthr.la \
-	libvomsc_gcc64dbgpthr.la \
-	libvomsc.la
-
-libvomsapi_gcc32_la_SOURCES = \
-	$(CCSOURCES)
-
-libvomsapi_gcc32_la_CXXFLAGS = \
-	-I$(top_srcdir)/src/include \
-	$(API_INCLUDES) \
-	$(GLOBUS_GCC32_CFLAGS)
-
-libvomsapi_gcc32_la_LIBADD = \
-	$(CCLIBADD) \
-	$(top_builddir)/src/socklib/libsock_gcc32.la \
-	$(top_builddir)/src/ac/libccattcert_gcc32.la
-
-libvomsapi_gcc32_la_LDFLAGS = \
-	-rpath $(libdir) \
-  -version-info 1:0:0
-
-libvomsapi_gcc32dbg_la_SOURCES = \
-	$(CCSOURCES)
-
-libvomsapi_gcc32dbg_la_CXXFLAGS = \
-	-I$(top_srcdir)/src/include \
-	$(GLOBUS_GCC32DBG_CFLAGS) \
-	$(API_INCLUDES)
-
-libvomsapi_gcc32dbg_la_LIBADD = \
-	$(CCLIBADD) \
-	$(top_builddir)/src/socklib/libsock_gcc32dbg.la \
-	$(top_builddir)/src/ac/libccattcert_gcc32dbg.la
-
-libvomsapi_gcc32dbg_la_LDFLAGS = \
-	-rpath $(libdir) \
-  -version-info 1:0:0
-
-libvomsapi_gcc32pthr_la_SOURCES = \
-	$(CCSOURCES)
-
-libvomsapi_gcc32pthr_la_CXXFLAGS = \
-	-I$(top_srcdir)/src/include \
-	$(API_INCLUDES) \
-	$(GLOBUS_GCC32PTHR_CFLAGS)
-
-libvomsapi_gcc32pthr_la_LIBADD = \
-	$(CCLIBADD) \
-	$(top_builddir)/src/socklib/libsock_gcc32pthr.la \
-	$(top_builddir)/src/ac/libccattcert_gcc32pthr.la
-
-libvomsapi_gcc32pthr_la_LDFLAGS = \
-	-rpath $(libdir) \
-  -version-info 1:0:0
-
-libvomsapi_gcc32dbgpthr_la_SOURCES = \
-	$(CCSOURCES)
-
-libvomsapi_gcc32dbgpthr_la_CXXFLAGS = \
-	-I$(top_srcdir)/src/include \
-	$(API_INCLUDES) \
-	$(GLOBUS_GCC32DBGPTHR_CFLAGS)
-
-libvomsapi_gcc32dbgpthr_la_LIBADD = \
-	$(CCLIBADD) \
-	$(top_builddir)/src/socklib/libsock_gcc32dbgpthr.la \
-	$(top_builddir)/src/ac/libccattcert_gcc32dbgpthr.la
-
-libvomsapi_gcc32dbgpthr_la_LDFLAGS = \
-	-rpath $(libdir) \
-  -version-info 1:0:0
-
-libvomsc_gcc32_la_SOURCES = \
-	$(CSOURCES)
-
-libvomsc_gcc32_la_CXXFLAGS = \
-	-I$(top_srcdir)/src/include \
-	$(API_INCLUDES) \
-	$(GLOBUS_GCC32_CFLAGS)
-
-libvomsc_gcc32_la_LIBADD = \
-	$(CCLIBADD) \
-	$(top_builddir)/src/socklib/libsock_gcc32.la \
-	$(top_builddir)/src/ac/libccattcert_gcc32.la
-
-libvomsc_gcc32_la_LDFLAGS = \
-	-rpath $(libdir) \
-  -version-info 1:0:0
-
-libvomsc_gcc32dbg_la_SOURCES = \
-	$(CSOURCES)
-
-libvomsc_gcc32dbg_la_CXXFLAGS = \
-	-I$(top_srcdir)/src/include \
-	$(API_INCLUDES) \
-	$(GLOBUS_GCC32DBG_CFLAGS)
-
-libvomsc_gcc32dbg_la_LIBADD = \
-	$(CCLIBADD) \
-	$(top_builddir)/src/socklib/libsock_gcc32dbg.la \
-	$(top_builddir)/src/ac/libccattcert_gcc32dbg.la
-
-libvomsc_gcc32dbg_la_LDFLAGS = \
-	-rpath $(libdir) \
-  -version-info 1:0:0
-
-libvomsc_gcc32pthr_la_SOURCES = \
-	$(CSOURCES)
-
-libvomsc_gcc32pthr_la_CXXFLAGS = \
-	-I$(top_srcdir)/src/include \
-	$(API_INCLUDES) \
-	$(GLOBUS_GCC32PTHR_CFLAGS)
-
-libvomsc_gcc32pthr_la_LIBADD = \
-	$(CCLIBADD) \
-	$(top_builddir)/src/socklib/libsock_gcc32pthr.la \
-	$(top_builddir)/src/ac/libccattcert_gcc32pthr.la
-
-libvomsc_gcc32pthr_la_LDFLAGS = \
-	-rpath $(libdir) \
-  -version-info 1:0:0
-
-libvomsc_gcc32dbgpthr_la_SOURCES = \
-	$(CSOURCES)
-
-libvomsc_gcc32dbgpthr_la_CXXFLAGS = \
-	-I$(top_srcdir)/src/include \
-	$(API_INCLUDES) \
-	$(GLOBUS_GCC32DBGPTHR_CFLAGS)
-
-libvomsc_gcc32dbgpthr_la_LIBADD = \
-	$(CCLIBADD) \
-	$(top_builddir)/src/socklib/libsock_gcc32dbgpthr.la \
-	$(top_builddir)/src/ac/libccattcert_gcc32dbgpthr.la
-
-libvomsc_gcc32dbgpthr_la_LDFLAGS = \
-	-rpath $(libdir) \
-  -version-info 1:0:0
-
-
-
-
-libvomsapi_gcc64_la_SOURCES = \
-	$(CCSOURCES)
-
-libvomsapi_gcc64_la_CXXFLAGS = \
-	-I$(top_srcdir)/src/include \
-	$(API_INCLUDES) \
-	$(GLOBUS_GCC64_CFLAGS)
-
-libvomsapi_gcc64_la_LIBADD = \
-	$(CCLIBADD) \
-	$(top_builddir)/src/socklib/libsock_gcc64.la \
-	$(top_builddir)/src/ac/libccattcert_gcc64.la
-
-libvomsapi_gcc64_la_LDFLAGS = \
-	-rpath $(libdir) \
-  -version-info 1:0:0
-
-libvomsapi_gcc64dbg_la_SOURCES = \
-	$(CCSOURCES)
-
-libvomsapi_gcc64dbg_la_CXXFLAGS = \
-	-I$(top_srcdir)/src/include \
-	$(API_INCLUDES) \
-	$(GLOBUS_GCC64DBG_CFLAGS)
-
-libvomsapi_gcc64dbg_la_LIBADD = \
-	$(CCLIBADD) \
-	$(top_builddir)/src/socklib/libsock_gcc64dbg.la \
-	$(top_builddir)/src/ac/libccattcert_gcc64dbg.la
-
-libvomsapi_gcc64dbg_la_LDFLAGS = \
-	-rpath $(libdir) \
-  -version-info 1:0:0
-
-libvomsapi_gcc64pthr_la_SOURCES = \
-	$(CCSOURCES)
-
-libvomsapi_gcc64pthr_la_CXXFLAGS = \
-	-I$(top_srcdir)/src/include \
-	$(API_INCLUDES) \
-	$(GLOBUS_GCC64PTHR_CFLAGS)
-
-libvomsapi_gcc64pthr_la_LIBADD = \
-	$(CCLIBADD) \
-	$(top_builddir)/src/socklib/libsock_gcc64pthr.la \
-	$(top_builddir)/src/ac/libccattcert_gcc64pthr.la
-
-libvomsapi_gcc64pthr_la_LDFLAGS = \
-	-rpath $(libdir) \
-  -version-info 1:0:0
-
-libvomsapi_gcc64dbgpthr_la_SOURCES = \
-	$(CCSOURCES)
-
-libvomsapi_gcc64dbgpthr_la_CXXFLAGS = \
-	-I$(top_srcdir)/src/include \
-	$(API_INCLUDES) \
-	$(GLOBUS_GCC64DBGPTHR_CFLAGS)
-
-libvomsapi_gcc64dbgpthr_la_LIBADD = \
-	$(CCLIBADD) \
-	$(top_builddir)/src/socklib/libsock_gcc64dbgpthr.la \
-	$(top_builddir)/src/ac/libccattcert_gcc64dbgpthr.la
-
-libvomsapi_gcc64dbgpthr_la_LDFLAGS = \
-	-rpath $(libdir) \
-  -version-info 1:0:0
-
-libvomsc_gcc64_la_SOURCES = \
-	$(CSOURCES)
-
-libvomsc_gcc64_la_CXXFLAGS = \
-	-I$(top_srcdir)/src/include \
-	$(API_INCLUDES) \
-	$(GLOBUS_GCC64_CFLAGS)
-
-libvomsc_gcc64_la_LIBADD = \
-	$(CCLIBADD) \
-	$(top_builddir)/src/socklib/libsock_gcc64.la \
-	$(top_builddir)/src/ac/libccattcert_gcc64.la
-
-libvomsc_gcc64_la_LDFLAGS = \
-	-rpath $(libdir) \
-  -version-info 1:0:0
-
-libvomsc_gcc64dbg_la_SOURCES = \
-	$(CSOURCES)
-
-libvomsc_gcc64dbg_la_CXXFLAGS = \
-	-I$(top_srcdir)/src/include \
-	$(API_INCLUDES) \
-	$(GLOBUS_GCC64DBG_CFLAGS)
-
-libvomsc_gcc64dbg_la_LIBADD = \
-	$(CCLIBADD) \
-	$(top_builddir)/src/socklib/libsock_gcc64dbg.la \
-	$(top_builddir)/src/ac/libccattcert_gcc64dbg.la
-
-libvomsc_gcc64dbg_la_LDFLAGS = \
-	-rpath $(libdir) \
-  -version-info 1:0:0
-
-libvomsc_gcc64pthr_la_SOURCES = \
-	$(CSOURCES)
-
-libvomsc_gcc64pthr_la_CXXFLAGS = \
-	-I$(top_srcdir)/src/include \
-	$(API_INCLUDES) \
-	$(GLOBUS_GCC64PTHR_CFLAGS)
-
-libvomsc_gcc64pthr_la_LIBADD = \
-	$(CCLIBADD) \
-	$(top_builddir)/src/socklib/libsock_gcc64pthr.la \
-	$(top_builddir)/src/ac/libccattcert_gcc64pthr.la
-
-
-libvomsc_gcc64pthr_la_LDFLAGS = \
-	-rpath $(libdir) \
-  -version-info 1:0:0
-
-libvomsc_gcc64dbgpthr_la_SOURCES = \
-	$(CSOURCES)
-
-libvomsc_gcc64dbgpthr_la_CXXFLAGS = \
-	-I$(top_srcdir)/src/include \
-	$(API_INCLUDES) \
-	$(GLOBUS_GCC64DBGPTHR_CFLAGS)
-
-libvomsc_gcc64dbgpthr_la_LIBADD = \
-	$(CCLIBADD) \
-	$(top_builddir)/src/socklib/libsock_gcc64dbgpthr.la \
-	$(top_builddir)/src/ac/libccattcert_gcc64dbgpthr.la
-
-libvomsc_gcc64dbgpthr_la_LDFLAGS = \
-	-rpath $(libdir) \
-  -version-info 1:0:0
 
 if BUILD_INTERFACES
 include_HEADERS = \
@@ -375,25 +61,7 @@ EXTRA_DIST = \
 endif
 
 CLEANFILES = \
-	libvomsapi_gcc32.la \
-	libvomsapi_gcc32dbg.la \
-	libvomsapi_gcc32pthr.la \
-	libvomsapi_gcc32dbgpthr.la \
-	libvomsapi_gcc64.la \
-	libvomsapi_gcc64dbg.la \
-	libvomsapi_gcc64pthr.la \
-	libvomsapi_gcc64dbgpthr.la \
-	libvomsapi_gcc32.la \
-	libvomsapi_gcc32dbg.la \
-	libvomsapi_gcc32pthr.la \
-	libvomsapi_gcc32dbgpthr.la \
-	libvomsc_gcc32.la \
-	libvomsc_gcc32dbg.la \
-	libvomsc_gcc32pthr.la \
-	libvomsc_gcc32dbgpthr.la \
-	libvomsapi.la \
-	libvomsc.la \
-	libvomsapi_nog.la
+	libvomsapi.la
 
 ###
 
