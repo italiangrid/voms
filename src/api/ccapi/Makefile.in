@@ -88,7 +88,8 @@ SOURCES = $(libvomsapi_la_SOURCES)
 DIST_SOURCES = $(libvomsapi_la_SOURCES)
 pkgconfigDATA_INSTALL = $(INSTALL_DATA)
 DATA = $(pkgconfig_DATA)
-am__include_HEADERS_DIST = voms_api.h voms_apic.h
+am__include_HEADERS_DIST = voms_api.h voms_apic.h voms_api_nog.h \
+	voms_apic_nog.h
 includeHEADERS_INSTALL = $(INSTALL_HEADER)
 HEADERS = $(include_HEADERS)
 ETAGS = etags
@@ -209,7 +210,7 @@ host_cpu = @host_cpu@
 host_os = @host_os@
 host_vendor = @host_vendor@
 htmldir = @htmldir@
-includedir = @includedir@/voms
+includedir = @includedir@/glite/security/voms
 infodir = @infodir@
 install_sh = @install_sh@
 libdir = @libdir@
@@ -283,7 +284,9 @@ libvomsapi_la_LIBADD = \
 #ctest_CFLAGS = -I$(top_srcdir)/src/include $(GLOBUS_CFLAGS)
 @BUILD_INTERFACES_TRUE@include_HEADERS = \
 @BUILD_INTERFACES_TRUE@	voms_api.h \
-@BUILD_INTERFACES_TRUE@	voms_apic.h 
+@BUILD_INTERFACES_TRUE@	voms_apic.h \
+@BUILD_INTERFACES_TRUE@	voms_api_nog.h \
+@BUILD_INTERFACES_TRUE@	voms_apic_nog.h
 
 @BUILD_INTERFACES_TRUE@EXTRA_DIST = \
 @BUILD_INTERFACES_TRUE@	api_util.h \
