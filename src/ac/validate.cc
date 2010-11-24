@@ -639,5 +639,11 @@ static int interpret_attributes(AC_FULL_ATTRIBUTES *full_attr, realdata *rd)
     rd->attributes->push_back(al);
   }
 
-  return rd->attributes->size() != 0;
+  /*
+   * Deal with voms-server < 1.9, which generated an empty AC_FULL_ATTRIBUTES
+   * extension when no GAs were present, rather than omitting the extension
+   * in its entirety, which would have been the right behaviour.
+   */
+  return !(sk_AC_ATT_HOLDER_num(providers)) || (rd->attributes->size() != 0);
+
 }
