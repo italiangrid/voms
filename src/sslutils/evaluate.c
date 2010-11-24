@@ -290,7 +290,7 @@ static int restriction_evaluate_signing(STACK_OF(X509) *chain, struct policy **s
   return result;
 }
 
-int restriction_evaluate(STACK_OF(X509) *chain, struct policy **namespaces,
+int PRIVATE restriction_evaluate(STACK_OF(X509) *chain, struct policy **namespaces,
 			 struct policy **signings)
 {
   int result = 0;
@@ -318,7 +318,7 @@ static void free_policy(struct policy *pol)
   free(pol);
 }
 
-void free_policies(struct policy **policies)
+void PRIVATE voms_free_policies(struct policy **policies)
 {
   listfree((char**)policies, (freefn)free_policy);
 }
@@ -336,7 +336,7 @@ static FILE *open_from_dir(char *path, char *filename)
 }
 
 
-void read_pathrestriction(STACK_OF(X509) *chain, char *path,
+void PRIVATE read_pathrestriction(STACK_OF(X509) *chain, char *path,
 			  struct policy ***names, 
 			  struct policy ***signs)
 {

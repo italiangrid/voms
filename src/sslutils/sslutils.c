@@ -112,7 +112,7 @@ static X509_NAME *make_DN(const char *dnstring);
 
 extern int restriction_evaluate(STACK_OF(X509) *chain, struct policy **namespaces,
                                 struct policy **signings);
-extern void free_policies(struct policy **policies);
+extern void voms_free_policies(struct policy **policies);
 extern int read_pathrestriction(STACK_OF(X509) *chain, char *path,
                                 struct policy ***namespaces, 
                                 struct policy ***signings);
@@ -2156,8 +2156,8 @@ proxy_verify_callback(
 
                 result = restriction_evaluate(ctx->chain, namespaces, signings);
                 
-                free_policies(namespaces);
-                free_policies(signings);
+                voms_free_policies(namespaces);
+                voms_free_policies(signings);
 
                 if (result != SUCCESS_PERMIT)
                 {
