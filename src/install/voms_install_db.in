@@ -45,6 +45,10 @@ if [ "$@LOCATION_ENV@" != "/usr" ] ; then
     datapath=$@LOCATION_ENV@
 fi
 
+if [ "x$datapath@" = "x" ] ; then
+    datapath=@prefix@
+fi
+
 # Default Suffix
 code=0
 compat_mode=""
@@ -300,5 +304,5 @@ fi
 if test "x$newformat" = "xyes"; then
     $ECHO -en "--newformat\n" >> $datapath/etc/voms/$voms_vo/voms.conf
 fi
-$ECHO -en "--x509_user_cert=$vomscert\n" >> \$datapath/etc/voms/\$voms_vo/voms.conf
-$ECHO -en "--x509_user_key=$vomskey\n" >> \$datapath/etc/voms/\$voms_vo/voms.conf
+$ECHO -en "--x509_user_cert=$vomscert\n" >> $datapath/etc/voms/$voms_vo/voms.conf
+$ECHO -en "--x509_user_key=$vomskey\n" >> $datapath/etc/voms/$voms_vo/voms.conf
