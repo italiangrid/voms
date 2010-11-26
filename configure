@@ -15769,13 +15769,15 @@ $as_echo_n "checking for EXPAT installation at ${with_expat_prefix:-/usr}... " >
     ac_save_CFLAGS=$CFLAGS
     ac_save_LIBS=$LIBS
     if test -n "$with_expat_prefix" -a "$with_expat_prefix" != "/usr" ; then
-  EXPAT_CFLAGS="-I$with_expat_prefix/include"
-	EXPAT_LIBS="-L$with_expat_prefix/lib"
-  EXPAT_LIBS64="-L$with_expat_prefix/lib64"
+      EXPAT_CFLAGS="-I$with_expat_prefix/include"
+    	EXPAT_LIBS="-L$with_expat_prefix/lib"
+      EXPAT_LIBS64="-L$with_expat_prefix/lib64"
     else
-	EXPAT_CFLAGS=""
-	EXPAT_LIBS="-L/usr/lib"
-	EXPAT_LIBS64="-L/usr/lib64"
+    	EXPAT_CFLAGS=""
+#      EXPAT_LIBS="-L/usr/lib"
+#      EXPAT_LIBS64="-L/usr/lib64"
+      EXPAT_LIBS=""
+      EXPAT_LIBS64=""
     fi
 
     EXPAT_LIBS="$EXPAT_LIBS -lexpat"
@@ -15888,7 +15890,8 @@ rm -f core conftest.err conftest.$ac_objext conftest_ipa8_conftest.oo \
     if test x$ac_cv_expat_valid64 = xyes ; then
       EXPAT_INSTALL_PATH=$with_expat_prefix
     	EXPAT_STATIC_LIBS="$with_expat_prefix/lib/libexpat.a"
-      EXPAT_LIBS="-L$with_expat_prefix/lib64 -lexpat"
+#      EXPAT_LIBS="-L$with_expat_prefix/lib64 -lexpat"
+      EXPAT_LIBS=$EXPAT_LIBS64
       { $as_echo "$as_me:$LINENO: result: $ac_cv_expat_valid64 (in lib64)" >&5
 $as_echo "$ac_cv_expat_valid64 (in lib64)" >&6; }
     	have_expat=yes
