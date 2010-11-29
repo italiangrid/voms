@@ -111,28 +111,68 @@ AC_DEFUN([AC_OPENSSL],
               [with_openssl_prefix="$withval"],
               [with_openssl_prefix=/usr])
 
-  SAVE_LD_LIBRARY_PATH=$LD_LIBRARY_PATH
-  LD_LIBRARY_PATH="$with_openssl_prefix/lib"
+  if test "x$with_openssl_prefix" = "x/usr" ; then
+    AC_CHECK_LIB(crypto, CRYPTO_num_locks, [found=yes], [found=no])
 
-  AC_LANG_PUSH(C)
-  AC_CHECK_LIB(crypto, CRYPTO_num_locks, [found=yes], [found=no])
-  AC_LANG_POP(C)  
-  NO_GLOBUS_FLAGS="-I$with_openssl_prefix/include"
+    if test "x$found" = "xyes" ; then
+	OPENSSL_LIBS="-lcrypto -lssl"
+	NO_GLOBUS_FLAGS=""
+    fi
+  else
+    SAVE_LD_LIBRARY_PATH=$LD_LIBRARY_PATH
+    LD_LIBRARY_PATH="$with_openssl_prefix/lib"
 
-  if test "x$found" = "xyes"; then
-    OPENSSL_LIBS="-L$with_openssl_prefix/lib -lcrypto -lssl"
-    AC_SUBST(OPENSSL_LIBS)
-    AC_SUBST(NO_GLOBUS_FLAGS)
-    AC_MSG_CHECKING([for system OpenSSL version])
-    cat >conftest.h <<HERE
+    AC_LANG_PUSH(C)
+    AC_CHECK_LIB(crypto, CRYPTO_num_locks, [found=yes], [found=no])
+    AC_LANG_POP(C)  
+    NO_GLOBUS_FLAGS="-I$with_openssl_prefix/include"
+
+    if test "x$found" = "xyes"; then
+      OPENSSL_LIBS="-L$with_openssl_prefix/lib -lcrypto -lssl"
+      AC_MSG_CHECKING([for system OpenSSL version])
+      cat >conftest.h <<HERE
 #include <openssl/opensslv.h>
 OPENSSL_VERSION_TEXT
 HERE
-    openssl_version=`$CPP $NO_GLOBUS_FLAGS -o - -P conftest.h`
-    AC_MSG_RESULT($openssl_version)
-    rm -f conftest.h
+      openssl_version=`$CPP $NO_GLOBUS_FLAGS -o - -P conftest.h`
+      AC_MSG_RESULT($openssl_version)
+      rm -f conftest.h
+    fi
+    LD_LIBRARY_PATH="$SAVE_LD_LIBRARY_PATH"
   fi
-  LD_LIBRARY_PATH="$SAVE_LD_LIBRARY_PATH"
+
+  SAVE_CFLAGS=$CFLAGS
+  CFLAGS="$CFLAGS -Werror"
+  AC_MSG_CHECKING(if asn1.h functions need const)
+  AC_TRY_COMPILE(
+	[
+	#include <openssl/asn1.h>
+	],
+	[
+	char **pp;
+	long length;
+	ASN1_PRINTABLESTRING *p;
+
+	(void)M_d2i_ASN1_PRINTABLESTRING(&p, pp, length);
+        ],
+	[ac_need_const="no"],
+	[ac_need_const="yes"])
+  CFLAGS="$SAVE_CFLAGS"
+
+  AC_MSG_RESULT($ac_need_const)
+
+  AC_SUBST(OPENSSL_LIBS)
+  AC_SUBST(NO_GLOBUS_FLAGS)
+
+  if test "x$ac_need_const" = "xyes" ; then
+    AC_DEFINE(NEEDCONST, 1, [Define to 1 if openssl needs "consted" parameters])
+  fi
+
+  AH_BOTTOM([#if defined(NEEDCONST)
+#define MAYBECONST const
+#else
+#define MAYBECONST
+#endif])
 ])
 
 # AC_COMPILER add switch to enable debug and warning

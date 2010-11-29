@@ -68,10 +68,41 @@ extern "C" {
 
 #include <string>
 
+extern "C" {
 #if OPENSSL_VERSION_NUMBER < 0x0090807fL
-DECL_STACK(GENERAL_NAMES)
-IMPL_STACK(GENERAL_NAMES)
+
+  /* The following have to be declared explicitly rather than relying
+   * on macros because openssl prototype unreliability makes the correct
+   * declaration impossible without requiring a rewrite of relying programs.
+   */
+DECLARE_STACK_OF(GENERAL_NAMES)
+
+STACK_OF(GENERAL_NAMES) *sk_GENERAL_NAMES_new (int (*cmp)(const GENERAL_NAMES * const *, const GENERAL_NAMES * const *))
+{ 
+  return sk_new ( (int (*)(const char * const *, const char * const *))cmp);
+}
+
+STACK_OF(GENERAL_NAMES) *sk_GENERAL_NAMES_new_null () 
+{ 
+  return sk_new_null(); 
+}
+
+void   sk_GENERAL_NAMES_free (STACK_OF(GENERAL_NAMES) *st) 
+{ 
+  sk_free(st); 
+}
+
+int    sk_GENERAL_NAMES_num (const STACK_OF(GENERAL_NAMES) *st) 
+{ 
+  return sk_num(st); 
+}
+
+GENERAL_NAMES *sk_GENERAL_NAMES_value (const STACK_OF(GENERAL_NAMES) *st, int i) 
+{ 
+  return (GENERAL_NAMES *)sk_value(st, i); 
+}
 #endif
+}
 
 static std::string getfqdn(void);
 static int checkAttributes(STACK_OF(AC_ATTR) *, voms&);

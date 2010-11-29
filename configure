@@ -15517,16 +15517,8 @@ else
 fi
 
 
-  SAVE_LD_LIBRARY_PATH=$LD_LIBRARY_PATH
-  LD_LIBRARY_PATH="$with_openssl_prefix/lib"
-
-  ac_ext=c
-ac_cpp='$CPP $CPPFLAGS'
-ac_compile='$CC -c $CFLAGS $CPPFLAGS conftest.$ac_ext >&5'
-ac_link='$CC -o conftest$ac_exeext $CFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
-ac_compiler_gnu=$ac_cv_c_compiler_gnu
-
-  { $as_echo "$as_me:$LINENO: checking for CRYPTO_num_locks in -lcrypto" >&5
+  if test "x$with_openssl_prefix" = "x/usr" ; then
+    { $as_echo "$as_me:$LINENO: checking for CRYPTO_num_locks in -lcrypto" >&5
 $as_echo_n "checking for CRYPTO_num_locks in -lcrypto... " >&6; }
 if test "${ac_cv_lib_crypto_CRYPTO_num_locks+set}" = set; then
   $as_echo_n "(cached) " >&6
@@ -15597,30 +15589,188 @@ else
   found=no
 fi
 
-  ac_ext=c
+
+    if test "x$found" = "xyes" ; then
+	OPENSSL_LIBS="-lcrypto -lssl"
+	NO_GLOBUS_FLAGS=""
+    fi
+  else
+    SAVE_LD_LIBRARY_PATH=$LD_LIBRARY_PATH
+    LD_LIBRARY_PATH="$with_openssl_prefix/lib"
+
+    ac_ext=c
 ac_cpp='$CPP $CPPFLAGS'
 ac_compile='$CC -c $CFLAGS $CPPFLAGS conftest.$ac_ext >&5'
 ac_link='$CC -o conftest$ac_exeext $CFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
 ac_compiler_gnu=$ac_cv_c_compiler_gnu
 
-  NO_GLOBUS_FLAGS="-I$with_openssl_prefix/include"
+    { $as_echo "$as_me:$LINENO: checking for CRYPTO_num_locks in -lcrypto" >&5
+$as_echo_n "checking for CRYPTO_num_locks in -lcrypto... " >&6; }
+if test "${ac_cv_lib_crypto_CRYPTO_num_locks+set}" = set; then
+  $as_echo_n "(cached) " >&6
+else
+  ac_check_lib_save_LIBS=$LIBS
+LIBS="-lcrypto  $LIBS"
+cat >conftest.$ac_ext <<_ACEOF
+/* confdefs.h.  */
+_ACEOF
+cat confdefs.h >>conftest.$ac_ext
+cat >>conftest.$ac_ext <<_ACEOF
+/* end confdefs.h.  */
 
-  if test "x$found" = "xyes"; then
-    OPENSSL_LIBS="-L$with_openssl_prefix/lib -lcrypto -lssl"
+/* Override any GCC internal prototype to avoid an error.
+   Use char because int might match the return type of a GCC
+   builtin and then its argument prototype would still apply.  */
+#ifdef __cplusplus
+extern "C"
+#endif
+char CRYPTO_num_locks ();
+int
+main ()
+{
+return CRYPTO_num_locks ();
+  ;
+  return 0;
+}
+_ACEOF
+rm -f conftest.$ac_objext conftest$ac_exeext
+if { (ac_try="$ac_link"
+case "(($ac_try" in
+  *\"* | *\`* | *\\*) ac_try_echo=\$ac_try;;
+  *) ac_try_echo=$ac_try;;
+esac
+eval ac_try_echo="\"\$as_me:$LINENO: $ac_try_echo\""
+$as_echo "$ac_try_echo") >&5
+  (eval "$ac_link") 2>conftest.er1
+  ac_status=$?
+  grep -v '^ *+' conftest.er1 >conftest.err
+  rm -f conftest.er1
+  cat conftest.err >&5
+  $as_echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); } && {
+	 test -z "$ac_c_werror_flag" ||
+	 test ! -s conftest.err
+       } && test -s conftest$ac_exeext && {
+	 test "$cross_compiling" = yes ||
+	 $as_test_x conftest$ac_exeext
+       }; then
+  ac_cv_lib_crypto_CRYPTO_num_locks=yes
+else
+  $as_echo "$as_me: failed program was:" >&5
+sed 's/^/| /' conftest.$ac_ext >&5
 
+	ac_cv_lib_crypto_CRYPTO_num_locks=no
+fi
 
-    { $as_echo "$as_me:$LINENO: checking for system OpenSSL version" >&5
+rm -rf conftest.dSYM
+rm -f core conftest.err conftest.$ac_objext conftest_ipa8_conftest.oo \
+      conftest$ac_exeext conftest.$ac_ext
+LIBS=$ac_check_lib_save_LIBS
+fi
+{ $as_echo "$as_me:$LINENO: result: $ac_cv_lib_crypto_CRYPTO_num_locks" >&5
+$as_echo "$ac_cv_lib_crypto_CRYPTO_num_locks" >&6; }
+if test "x$ac_cv_lib_crypto_CRYPTO_num_locks" = x""yes; then
+  found=yes
+else
+  found=no
+fi
+
+    ac_ext=c
+ac_cpp='$CPP $CPPFLAGS'
+ac_compile='$CC -c $CFLAGS $CPPFLAGS conftest.$ac_ext >&5'
+ac_link='$CC -o conftest$ac_exeext $CFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
+ac_compiler_gnu=$ac_cv_c_compiler_gnu
+
+    NO_GLOBUS_FLAGS="-I$with_openssl_prefix/include"
+
+    if test "x$found" = "xyes"; then
+      OPENSSL_LIBS="-L$with_openssl_prefix/lib -lcrypto -lssl"
+      { $as_echo "$as_me:$LINENO: checking for system OpenSSL version" >&5
 $as_echo_n "checking for system OpenSSL version... " >&6; }
-    cat >conftest.h <<HERE
+      cat >conftest.h <<HERE
 #include <openssl/opensslv.h>
 OPENSSL_VERSION_TEXT
 HERE
-    openssl_version=`$CPP $NO_GLOBUS_FLAGS -o - -P conftest.h`
-    { $as_echo "$as_me:$LINENO: result: $openssl_version" >&5
+      openssl_version=`$CPP $NO_GLOBUS_FLAGS -o - -P conftest.h`
+      { $as_echo "$as_me:$LINENO: result: $openssl_version" >&5
 $as_echo "$openssl_version" >&6; }
-    rm -f conftest.h
+      rm -f conftest.h
+    fi
+    LD_LIBRARY_PATH="$SAVE_LD_LIBRARY_PATH"
   fi
-  LD_LIBRARY_PATH="$SAVE_LD_LIBRARY_PATH"
+
+  SAVE_CFLAGS=$CFLAGS
+  CFLAGS="$CFLAGS -Werror"
+  { $as_echo "$as_me:$LINENO: checking if asn1.h functions need const" >&5
+$as_echo_n "checking if asn1.h functions need const... " >&6; }
+  cat >conftest.$ac_ext <<_ACEOF
+/* confdefs.h.  */
+_ACEOF
+cat confdefs.h >>conftest.$ac_ext
+cat >>conftest.$ac_ext <<_ACEOF
+/* end confdefs.h.  */
+
+	#include <openssl/asn1.h>
+
+int
+main ()
+{
+
+	char **pp;
+	long length;
+	ASN1_PRINTABLESTRING *p;
+
+	(void)M_d2i_ASN1_PRINTABLESTRING(&p, pp, length);
+
+  ;
+  return 0;
+}
+_ACEOF
+rm -f conftest.$ac_objext
+if { (ac_try="$ac_compile"
+case "(($ac_try" in
+  *\"* | *\`* | *\\*) ac_try_echo=\$ac_try;;
+  *) ac_try_echo=$ac_try;;
+esac
+eval ac_try_echo="\"\$as_me:$LINENO: $ac_try_echo\""
+$as_echo "$ac_try_echo") >&5
+  (eval "$ac_compile") 2>conftest.er1
+  ac_status=$?
+  grep -v '^ *+' conftest.er1 >conftest.err
+  rm -f conftest.er1
+  cat conftest.err >&5
+  $as_echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); } && {
+	 test -z "$ac_c_werror_flag" ||
+	 test ! -s conftest.err
+       } && test -s conftest.$ac_objext; then
+  ac_need_const="no"
+else
+  $as_echo "$as_me: failed program was:" >&5
+sed 's/^/| /' conftest.$ac_ext >&5
+
+	ac_need_const="yes"
+fi
+
+rm -f core conftest.err conftest.$ac_objext conftest.$ac_ext
+  CFLAGS="$SAVE_CFLAGS"
+
+  { $as_echo "$as_me:$LINENO: result: $ac_need_const" >&5
+$as_echo "$ac_need_const" >&6; }
+
+
+
+
+  if test "x$ac_need_const" = "xyes" ; then
+
+cat >>confdefs.h <<\_ACEOF
+#define NEEDCONST 1
+_ACEOF
+
+  fi
+
+
+
 
 
 # check for dependencies based on project/*m4

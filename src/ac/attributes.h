@@ -40,6 +40,14 @@
 #include "acerrors.h"
 #include "acstack.h"
 
+#ifndef VOMS_MAYBECONST
+#if defined(D2I_OF)
+#define VOMS_MAYBECONST const
+#else
+#define VOMS_MAYBECONST
+#endif
+#endif
+
 typedef struct ACATTRIBUTE {
   ASN1_OCTET_STRING *name;
   ASN1_OCTET_STRING *qualifier;
@@ -63,9 +71,9 @@ extern int i2d_AC_ATTRIBUTE(AC_ATTRIBUTE *, unsigned char **);
 extern int i2d_AC_ATT_HOLDER(AC_ATT_HOLDER *, unsigned char **);
 extern int i2d_AC_FULL_ATTRIBUTES(AC_FULL_ATTRIBUTES *, unsigned char **);
 
-extern AC_ATTRIBUTE *d2i_AC_ATTRIBUTE(AC_ATTRIBUTE **, unsigned char **, long);
-extern AC_ATT_HOLDER *d2i_AC_ATT_HOLDER(AC_ATT_HOLDER **, unsigned char **, long);
-extern AC_FULL_ATTRIBUTES *d2i_AC_FULL_ATTRIBUTES(AC_FULL_ATTRIBUTES **, unsigned char **, long);
+extern AC_ATTRIBUTE *d2i_AC_ATTRIBUTE(AC_ATTRIBUTE **, VOMS_MAYBECONST unsigned char **, long);
+extern AC_ATT_HOLDER *d2i_AC_ATT_HOLDER(AC_ATT_HOLDER **, VOMS_MAYBECONST unsigned char **, long);
+extern AC_FULL_ATTRIBUTES *d2i_AC_FULL_ATTRIBUTES(AC_FULL_ATTRIBUTES **, VOMS_MAYBECONST unsigned char **, long);
 
 extern AC_ATTRIBUTE *AC_ATTRIBUTE_new();
 extern AC_ATT_HOLDER *AC_ATT_HOLDER_new();

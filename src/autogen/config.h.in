@@ -278,6 +278,9 @@
    */
 #undef LT_OBJDIR
 
+/* Define to 1 if openssl needs "consted" parameters */
+#undef NEEDCONST
+
 /* Name of package */
 #undef PACKAGE
 
@@ -363,6 +366,12 @@
 
 /* Define as `fork' if `vfork' does not work. */
 #undef vfork
+
+#if defined(NEEDCONST)
+#define MAYBECONST const
+#else
+#define MAYBECONST
+#endif
 
 #ifdef __cplusplus
 #include <new>
