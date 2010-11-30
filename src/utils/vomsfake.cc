@@ -446,6 +446,11 @@ void Fake::CleanAll()
   X509_free(ucert);
   EVP_PKEY_free(upkey);
   sk_X509_pop_free(cert_chain, X509_free);
+  cacertfile = certdir = outfile = certfile = keyfile = NULL;
+
+  ucert = NULL;
+  upkey = NULL;
+  cert_chain = NULL;
 }
 
 Fake::~Fake() 
