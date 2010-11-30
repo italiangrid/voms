@@ -23,7 +23,7 @@ voms_LDADD = \
 	$(top_builddir)/src/replib/librep.la \
 	$(top_builddir)/src/log/liblog.la \
 	$(top_builddir)/src/api/ccapi/libvomsapi.la \
-	$(EXPAT_LIBS)
+	$(OPENSSL_LIBS) $(EXPAT_LIBS) -ldl
 
 voms_LDFLAGS =
 

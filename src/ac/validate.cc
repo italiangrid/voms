@@ -45,9 +45,11 @@ extern "C" {
 #include <openssl/evp.h>
 #include <openssl/buffer.h>
 #include <openssl/bn.h>
+#include <openssl/opensslv.h>
 
 #include "newformat.h"
 #include "acerrors.h"
+#include "acstack.h"
 
 #include "attributes.h"
 #include "acstack.h"
@@ -65,6 +67,42 @@ extern "C" {
 #include "../api/ccapi/realdata.h"
 
 #include <string>
+
+extern "C" {
+#if OPENSSL_VERSION_NUMBER < 0x0090807fL
+
+  /* The following have to be declared explicitly rather than relying
+   * on macros because openssl prototype unreliability makes the correct
+   * declaration impossible without requiring a rewrite of relying programs.
+   */
+DECLARE_STACK_OF(GENERAL_NAMES)
+
+STACK_OF(GENERAL_NAMES) *sk_GENERAL_NAMES_new (int (*cmp)(const GENERAL_NAMES * const *, const GENERAL_NAMES * const *))
+{ 
+  return sk_new ( (int (*)(const char * const *, const char * const *))cmp);
+}
+
+STACK_OF(GENERAL_NAMES) *sk_GENERAL_NAMES_new_null () 
+{ 
+  return sk_new_null(); 
+}
+
+void   sk_GENERAL_NAMES_free (STACK_OF(GENERAL_NAMES) *st) 
+{ 
+  sk_free(st); 
+}
+
+int    sk_GENERAL_NAMES_num (const STACK_OF(GENERAL_NAMES) *st) 
+{ 
+  return sk_num(st); 
+}
+
+GENERAL_NAMES *sk_GENERAL_NAMES_value (const STACK_OF(GENERAL_NAMES) *st, int i) 
+{ 
+  return (GENERAL_NAMES *)sk_value(st, i); 
+}
+#endif
+}
 
 static std::string getfqdn(void);
 static int checkAttributes(STACK_OF(AC_ATTR) *, voms&);
@@ -265,14 +303,18 @@ int validate(X509 *cert, X509 *issuer, AC *ac, voms &v, verify_type valids, time
         }
       }    
       else if (ac->acinfo->holder->name) {
-        names = ac->acinfo->holder->name;
-        if ((sk_GENERAL_NAME_num(names) == 1) || 
-            ((name = sk_GENERAL_NAME_value(names,0))) ||
-            (name->type != GEN_DIRNAME)) {
-          if (X509_NAME_cmp(name->d.dirn, cert->cert_info->issuer)) {
-            /* CHECK ALT_NAMES */
-            /* in VOMS ACs, checking into alt names is assumed to always fail. */
-            ERROR(AC_ERR_UID_MISMATCH);
+        STACK_OF(GENERAL_NAMES) *gnames = ac->acinfo->holder->name;
+        GENERAL_NAMES *gname;
+        if ((sk_GENERAL_NAMES_num(gnames) == 1) || 
+            ((gname = sk_GENERAL_NAMES_value(gnames,0)))) {
+          if ((sk_GENERAL_NAME_num(gname) == 1) ||
+              ((name = sk_GENERAL_NAME_value(gname,0)) ||
+               (name->type != GEN_DIRNAME))) {
+            if (X509_NAME_cmp(name->d.dirn, cert->cert_info->issuer)) {
+              /* CHECK ALT_NAMES */
+              /* in VOMS ACs, checking into alt names is assumed to always fail. */
+              ERROR(AC_ERR_UID_MISMATCH);
+            }
           }
         }
       }
@@ -356,7 +398,7 @@ static int checkAttributes(STACK_OF(AC_ATTR) *atts, voms &v)
 
   /* find AC_ATTR with IETFATTR type */
   nid3 = OBJ_txt2nid("idatcap");
-  pos3 = X509at_get_attr_by_NID(atts, nid3, -1);
+  pos3 = X509at_get_attr_by_NID((STACK_OF(X509_ATTRIBUTE)*)atts, nid3, -1);
   if (!(pos3 >=0))
     return AC_ERR_ATTRIBS;
   caps = sk_AC_ATTR_value(atts, pos3);
@@ -628,5 +670,11 @@ static int interpret_attributes(AC_FULL_ATTRIBUTES *full_attr, realdata *rd)
     rd->attributes->push_back(al);
   }
 
-  return rd->attributes->size() != 0;
+  /*
+   * Deal with voms-server < 1.9, which generated an empty AC_FULL_ATTRIBUTES
+   * extension when no GAs were present, rather than omitting the extension
+   * in its entirety, which would have been the right behaviour.
+   */
+  return !(sk_AC_ATT_HOLDER_num(providers)) || (rd->attributes->size() != 0);
+
 }

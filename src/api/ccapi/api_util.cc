@@ -67,6 +67,14 @@ extern "C" {
 #include "internal.h"
 #include "normalize.h"
 
+#ifndef VOMS_MAYBECONST
+#if defined(D2I_OF)
+#define VOMS_MAYBECONST const
+#else
+#define VOMS_MAYBECONST
+#endif
+#endif
+
 extern proxy_verify_desc *setup_initializers(char *cadir);
 extern void destroy_initializers(void *data);
 static bool dncompare(const char *mut, const char *fixed);
@@ -277,8 +285,8 @@ vomsdata::verifydata(std::string &message, UNUSED(std::string subject),
 
   error = VERR_FORMAT;
 
-  unsigned char *str  = (unsigned char *)(const_cast<char *>(message.data()));
-  unsigned char *orig = str;
+  VOMS_MAYBECONST unsigned char *str  = (VOMS_MAYBECONST unsigned char *)(message.data());
+  VOMS_MAYBECONST unsigned char *orig = str;
 
   AC   *tmp    = d2i_AC(NULL, &str, message.size());
 

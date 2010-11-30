@@ -48,9 +48,8 @@ libvomsapi_la_LIBADD = \
 if BUILD_INTERFACES
 include_HEADERS = \
 	voms_api.h \
-	voms_apic.h \
-	voms_api_nog.h \
-	voms_apic_nog.h
+	voms_apic.h
+
 EXTRA_DIST = \
 	api_util.h \
 	ccval.h \

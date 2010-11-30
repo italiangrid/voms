@@ -63,7 +63,7 @@ am__DEPENDENCIES_1 =
 @BUILD_SERVER_TRUE@	$(top_builddir)/src/replib/librep.la \
 @BUILD_SERVER_TRUE@	$(top_builddir)/src/log/liblog.la \
 @BUILD_SERVER_TRUE@	$(top_builddir)/src/api/ccapi/libvomsapi.la \
-@BUILD_SERVER_TRUE@	$(am__DEPENDENCIES_1)
+@BUILD_SERVER_TRUE@	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1)
 voms_LINK = $(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) \
 	--mode=link $(CXXLD) $(AM_CXXFLAGS) $(CXXFLAGS) \
 	$(voms_LDFLAGS) $(LDFLAGS) -o $@
@@ -260,7 +260,7 @@ with_valgrind = @with_valgrind@
 @BUILD_SERVER_TRUE@	$(top_builddir)/src/replib/librep.la \
 @BUILD_SERVER_TRUE@	$(top_builddir)/src/log/liblog.la \
 @BUILD_SERVER_TRUE@	$(top_builddir)/src/api/ccapi/libvomsapi.la \
-@BUILD_SERVER_TRUE@	$(EXPAT_LIBS)
+@BUILD_SERVER_TRUE@	$(OPENSSL_LIBS) $(EXPAT_LIBS) -ldl
 
 @BUILD_SERVER_TRUE@voms_LDFLAGS = 
 @BUILD_SERVER_TRUE@AM_CPPFLAGS = \

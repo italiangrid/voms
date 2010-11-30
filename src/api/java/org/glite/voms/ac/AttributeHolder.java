@@ -32,7 +32,7 @@ import java.util.Vector;
 
 import org.bouncycastle.asn1.ASN1Sequence;
 import org.bouncycastle.asn1.DEREncodable;
-import org.bouncycastle.asn1.DEREncodableVector;
+import org.bouncycastle.asn1.ASN1EncodableVector;
 import org.bouncycastle.asn1.DERIA5String;
 import org.bouncycastle.asn1.DERObject;
 import org.bouncycastle.asn1.DERSequence;
@@ -119,11 +119,11 @@ public class AttributeHolder implements DEREncodable {
      * @return the DERObject
      */
     public DERObject getDERObject() {
-        DEREncodableVector v = new DEREncodableVector();
+        ASN1EncodableVector v = new ASN1EncodableVector();
 
         v.add(grantor);
         
-        DEREncodableVector v2 = new DEREncodableVector();
+        ASN1EncodableVector v2 = new ASN1EncodableVector();
 
         for (ListIterator li = l.listIterator(); li.hasNext(); ) {
             GenericAttribute att = (GenericAttribute)li.next();

@@ -31,7 +31,7 @@ import java.util.Vector;
 
 import org.bouncycastle.asn1.ASN1Sequence;
 import org.bouncycastle.asn1.DEREncodable;
-import org.bouncycastle.asn1.DEREncodableVector;
+import org.bouncycastle.asn1.ASN1EncodableVector;
 import org.bouncycastle.asn1.DERObject;
 import org.bouncycastle.asn1.DERSequence;
 
@@ -94,7 +94,7 @@ public class FullAttributes implements DEREncodable {
      * @return the DERObject
      */
     public DERObject getDERObject() {
-        DEREncodableVector v2 = new DEREncodableVector();
+        ASN1EncodableVector v2 = new ASN1EncodableVector();
 
         for (ListIterator li = l.listIterator(); li.hasNext(); ) {
             AttributeHolder holder = (AttributeHolder)li.next();
@@ -102,7 +102,7 @@ public class FullAttributes implements DEREncodable {
         }
 
         ASN1Sequence seq = (ASN1Sequence) new DERSequence(v2);
-        DEREncodableVector v = new DEREncodableVector();
+        ASN1EncodableVector v = new ASN1EncodableVector();
         v.add(seq);
 
         return new DERSequence(v);

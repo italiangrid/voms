@@ -39,6 +39,14 @@
 #include "acerrors.h"
 #include "attributes.h"
 
+#ifndef VOMS_MAYBECONST
+#if defined(D2I_OF)
+#define VOMS_MAYBECONST const
+#else
+#define VOMS_MAYBECONST
+#endif
+#endif
+
 int i2d_AC_ATTR(AC_ATTR *a, unsigned char **pp)
 {
   char text[1000];
@@ -58,7 +66,7 @@ int i2d_AC_ATTR(AC_ATTR *a, unsigned char **pp)
   M_ASN1_I2D_finish();
 }
 
-AC_ATTR *d2i_AC_ATTR(AC_ATTR **a, unsigned char **pp, long length)
+AC_ATTR *d2i_AC_ATTR(AC_ATTR **a, VOMS_MAYBECONST unsigned char **pp, long length)
 {
   char text[1000];
 
@@ -110,7 +118,7 @@ int i2d_AC_IETFATTR(AC_IETFATTR *a, unsigned char **pp)
   M_ASN1_I2D_finish();
 }
 
-AC_IETFATTR *d2i_AC_IETFATTR(AC_IETFATTR **a, unsigned char **pp, long length)
+AC_IETFATTR *d2i_AC_IETFATTR(AC_IETFATTR **a, VOMS_MAYBECONST unsigned char **pp, long length)
 {
   M_ASN1_D2I_vars(a, AC_IETFATTR *, AC_IETFATTR_new);
 
@@ -153,7 +161,7 @@ int i2d_AC_IETFATTRVAL(AC_IETFATTRVAL *a, unsigned char **pp)
   return -1;
 }
 
-AC_IETFATTRVAL *d2i_AC_IETFATTRVAL(AC_IETFATTRVAL **a, unsigned char **pp, long length)
+AC_IETFATTRVAL *d2i_AC_IETFATTRVAL(AC_IETFATTRVAL **a, VOMS_MAYBECONST unsigned char **pp, long length)
 {
   unsigned char tag;
   tag = **pp & ~V_ASN1_CONSTRUCTED;
@@ -193,7 +201,7 @@ int i2d_AC_DIGEST(AC_DIGEST *a, unsigned char **pp)
   M_ASN1_I2D_finish();
 }
 
-AC_DIGEST *d2i_AC_DIGEST(AC_DIGEST **a, unsigned char **pp, long length)
+AC_DIGEST *d2i_AC_DIGEST(AC_DIGEST **a, VOMS_MAYBECONST unsigned char **pp, long length)
 {
   M_ASN1_D2I_vars(a, AC_DIGEST *, AC_DIGEST_new);
 
@@ -246,7 +254,7 @@ int i2d_AC_IS(AC_IS *a, unsigned char **pp)
   M_ASN1_I2D_finish();
 }
 
-AC_IS *d2i_AC_IS(AC_IS **a, unsigned char **pp, long length)
+AC_IS *d2i_AC_IS(AC_IS **a, VOMS_MAYBECONST unsigned char **pp, long length)
 {
   M_ASN1_D2I_vars(a, AC_IS *, AC_IS_new);
 
@@ -296,7 +304,7 @@ int i2d_AC_FORM(AC_FORM *a, unsigned char **pp)
   M_ASN1_I2D_finish();
 }
 
-AC_FORM *d2i_AC_FORM(AC_FORM **a, unsigned char **pp, long length)
+AC_FORM *d2i_AC_FORM(AC_FORM **a, VOMS_MAYBECONST unsigned char **pp, long length)
 {
   M_ASN1_D2I_vars(a, AC_FORM *, AC_FORM_new);
 
@@ -388,7 +396,7 @@ int i2d_AC_HOLDER(AC_HOLDER *a, unsigned char **pp)
   M_ASN1_I2D_finish();
 }
 
-AC_HOLDER *d2i_AC_HOLDER(AC_HOLDER **a, unsigned char **pp, long length)
+AC_HOLDER *d2i_AC_HOLDER(AC_HOLDER **a, VOMS_MAYBECONST unsigned char **pp, long length)
 {
   M_ASN1_D2I_vars(a, AC_HOLDER *, AC_HOLDER_new);
 
@@ -455,7 +463,7 @@ int i2d_AC_VAL(AC_VAL *a, unsigned char **pp)
   M_ASN1_I2D_finish();
 }
 
-AC_VAL *d2i_AC_VAL(AC_VAL **a, unsigned char **pp, long length)
+AC_VAL *d2i_AC_VAL(AC_VAL **a, VOMS_MAYBECONST unsigned char **pp, long length)
 {
   M_ASN1_D2I_vars(a, AC_VAL *, AC_VAL_new);
 
@@ -510,7 +518,7 @@ int i2d_AC_INFO(AC_INFO *a, unsigned char **pp)
   M_ASN1_I2D_finish();
 }
 
-AC_INFO *d2i_AC_INFO(AC_INFO **a, unsigned char **pp, long length)
+AC_INFO *d2i_AC_INFO(AC_INFO **a, VOMS_MAYBECONST unsigned char **pp, long length)
 {
   M_ASN1_D2I_vars(a, AC_INFO *, AC_INFO_new);
 
@@ -580,7 +588,7 @@ int i2d_AC(AC *a, unsigned char **pp)
   M_ASN1_I2D_finish();
 }
 
-AC *d2i_AC(AC **a, unsigned char **pp, long length)
+AC *d2i_AC(AC **a, VOMS_MAYBECONST unsigned char **pp, long length)
 {
   M_ASN1_D2I_vars(a, AC *, AC_new);
 

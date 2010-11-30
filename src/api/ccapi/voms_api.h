@@ -30,7 +30,7 @@
 #include <string>
 #include <vector>
 
-
+#define NOGLOBUS
 extern "C" {
 #ifndef GSSAPI_H_
 typedef void * gss_cred_id_t;

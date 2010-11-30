@@ -33,7 +33,7 @@ import java.io.IOException;
 
 import javax.security.auth.x500.X500Principal;
 
-import org.bouncycastle.asn1.DEREncodableVector;
+import org.bouncycastle.asn1.ASN1EncodableVector;
 import org.bouncycastle.asn1.DEROutputStream;
 import org.bouncycastle.asn1.DERSequence;
 import org.bouncycastle.asn1.x509.GeneralName;
@@ -49,7 +49,7 @@ import org.bouncycastle.jce.X509Principal;
  */
 public class Util {
     public static GeneralNames generalNameToGeneralNames(GeneralName name) {
-        DEREncodableVector v = new DEREncodableVector();
+        ASN1EncodableVector v = new ASN1EncodableVector();
         v.add(name);
 
         return GeneralNames.getInstance(new DERSequence(v));

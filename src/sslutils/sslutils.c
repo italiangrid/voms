@@ -112,7 +112,7 @@ static X509_NAME *make_DN(const char *dnstring);
 
 extern int restriction_evaluate(STACK_OF(X509) *chain, struct policy **namespaces,
                                 struct policy **signings);
-extern void free_policies(struct policy **policies);
+extern void voms_free_policies(struct policy **policies);
 extern int read_pathrestriction(STACK_OF(X509) *chain, char *path,
                                 struct policy ***namespaces, 
                                 struct policy ***signings);
@@ -1869,8 +1869,9 @@ proxy_verify_callback(
                                     PVD_STORE_EX_DATA_IDX)))
     {
         ssl = (SSL *)X509_STORE_CTX_get_app_data(ctx);
-        pvd = (proxy_verify_desc *)SSL_get_ex_data(ssl,
-                                                   PVD_SSL_EX_DATA_IDX);
+        if (ssl)
+          pvd = (proxy_verify_desc *)SSL_get_ex_data(ssl,
+                                                     PVD_SSL_EX_DATA_IDX);
     }
 
     /*
@@ -1881,10 +1882,11 @@ proxy_verify_callback(
      * how the callback and app_data are handled
      */
 
-    if(pvd->magicnum != PVD_MAGIC_NUMBER)
-    {
-        PRXYerr(PRXYERR_F_VERIFY_CB, PRXYERR_R_BAD_MAGIC);
-        return(0);
+    if (pvd) {
+      if(pvd->magicnum != PVD_MAGIC_NUMBER) {
+          PRXYerr(PRXYERR_F_VERIFY_CB, PRXYERR_R_BAD_MAGIC);
+          return(0);
+      }
     }
 
     /*
@@ -1909,7 +1911,21 @@ proxy_verify_callback(
             break;
 
 #endif
+
+#if OPENSSL_VERSION_NUMBER >= 0x10000000L
+        case X509_V_ERR_UNABLE_TO_VERIFY_LEAF_SIGNATURE:
+          /*
+           * OpenSSL 1.0 causes the cert to be added twice to 
+           * the store.
+           */
+          if (proxy_check_proxy_name(ctx->cert) && 
+              !X509_cmp(ctx->cert, ctx->current_cert))
+            ok = 1;
+          break;
+#endif
+
         case X509_V_ERR_INVALID_CA:
+        case X509_V_ERR_UNABLE_TO_GET_ISSUER_CERT:
           /*
            * This may happen since proxy issuers are not CAs
            */
@@ -1963,6 +1979,15 @@ proxy_verify_callback(
         return(ok);
     }
 
+    /* Note: OpenSSL will try to verify the client's chain on the client side 
+       before sending it abroad.  However, to properly verify proxy conditions, 
+       we need access to pvd, which is not passed.  For this reason, in this
+       scenario we assume that if the checks above passed, everything is ok. If
+       it is not, it will be discovered during server-side validation of the cert. 
+    */
+    if (!pvd)
+      return ok;
+
     /* 
      * All of the OpenSSL tests have passed and we now get to 
      * look at the certificate to verify the proxy rules, 
@@ -2002,18 +2027,17 @@ proxy_verify_callback(
              * one. A Caller can then reject. 
              */
 
-            pvd->limited_proxy = 1; /* its a limited proxy */
+          pvd->limited_proxy = 1; /* its a limited proxy */
 
-            if (ctx->error_depth && !pvd->multiple_limited_proxy_ok)
-            {
-                /* tried to sign a cert with a limited proxy */
-                /* i.e. there is still another cert on the chain */
-                /* indicating we are trying to sign it! */
-                PRXYerr(PRXYERR_F_VERIFY_CB,PRXYERR_R_LPROXY_MISSED_USED);
-                ERR_set_continue_needed();
-                ctx->error = X509_V_ERR_CERT_SIGNATURE_FAILURE;
-                goto fail_verify;
-            }
+          if (ctx->error_depth && !pvd->multiple_limited_proxy_ok) {
+            /* tried to sign a cert with a limited proxy */
+            /* i.e. there is still another cert on the chain */
+            /* indicating we are trying to sign it! */
+            PRXYerr(PRXYERR_F_VERIFY_CB,PRXYERR_R_LPROXY_MISSED_USED);
+            ERR_set_continue_needed();
+            ctx->error = X509_V_ERR_CERT_SIGNATURE_FAILURE;
+            goto fail_verify;
+          }
         }
 
         pvd->proxy_depth++;
@@ -2132,8 +2156,8 @@ proxy_verify_callback(
 
                 result = restriction_evaluate(ctx->chain, namespaces, signings);
                 
-                free_policies(namespaces);
-                free_policies(signings);
+                voms_free_policies(namespaces);
+                voms_free_policies(signings);
 
                 if (result != SUCCESS_PERMIT)
                 {
@@ -3704,10 +3728,14 @@ int load_credentials(const char *certname, const char *keyname,
 err:
   if (chain)
     sk_X509_free(chain);
-  if (cert)
+  if (cert) {
     X509_free(*cert);
-  if (key)
+    *cert = NULL;
+  }
+  if (key) {
     EVP_PKEY_free(*key);
+    *key = NULL;
+  }
   return 0;
 }
 

@@ -25,7 +25,7 @@
 package org.glite.voms.contact;
 
 import org.bouncycastle.asn1.DEREncodable;
-import org.bouncycastle.asn1.DEREncodableVector;
+import org.bouncycastle.asn1.ASN1EncodableVector;
 import org.bouncycastle.asn1.DERObject;
 import org.bouncycastle.asn1.ASN1Sequence;
 import org.bouncycastle.asn1.DERSequence;
@@ -62,7 +62,7 @@ public class ProxyPolicy implements DEREncodable {
     }
 
     public DERObject getDERObject() {
-        DEREncodableVector vec = new DEREncodableVector();
+        ASN1EncodableVector vec = new ASN1EncodableVector();
 
         vec.add(oid);
         if (policy != null)

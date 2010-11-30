@@ -55,6 +55,7 @@ voms_proxy_init_OBJECTS = $(am_voms_proxy_init_OBJECTS)
 am__DEPENDENCIES_1 =
 @BUILD_CLIENTS_TRUE@voms_proxy_init_DEPENDENCIES = $(top_builddir)/src/api/ccapi/libvomsapi.la \
 @BUILD_CLIENTS_TRUE@	$(top_builddir)/src/sslutils/libssl_utils_nog.la \
+@BUILD_CLIENTS_TRUE@	$(am__DEPENDENCIES_1) \
 @BUILD_CLIENTS_TRUE@	$(top_builddir)/src/common/libutilc_nog.la \
 @BUILD_CLIENTS_TRUE@	$(am__DEPENDENCIES_1)
 DEFAULT_INCLUDES = -I.@am__isrc@ -I$(top_builddir)/src/autogen
@@ -237,6 +238,7 @@ with_valgrind = @with_valgrind@
 @BUILD_CLIENTS_TRUE@voms_proxy_init_LDADD = \
 @BUILD_CLIENTS_TRUE@  $(top_builddir)/src/api/ccapi/libvomsapi.la \
 @BUILD_CLIENTS_TRUE@  $(top_builddir)/src/sslutils/libssl_utils_nog.la \
+@BUILD_CLIENTS_TRUE@	$(OPENSSL_LIBS) \
 @BUILD_CLIENTS_TRUE@  $(top_builddir)/src/common/libutilc_nog.la \
 @BUILD_CLIENTS_TRUE@	$(EXPAT_LIBS)
 

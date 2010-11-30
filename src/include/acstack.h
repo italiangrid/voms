@@ -29,6 +29,15 @@
 #include <openssl/stack.h>
 #include <openssl/safestack.h>
 
+#ifndef VOMS_MAYBECONST
+#if defined(D2I_OF)
+#define VOMS_MAYBECONST const
+#else
+#define VOMS_MAYBECONST
+/* typedef void *d2i_of_void(void *, unsigned char **); */
+#endif
+#endif
+
 #if 0
 #define IMPL_STACK(type) \
    DECLARE_STACK_OF(type) \
@@ -72,7 +81,7 @@
    type  *sk_##type##_value (const STACK_OF(type) *st, int i) { return (type *)sk_value(st, i); } \
    int    sk_##type##_push (STACK_OF(type) *st, type *val) { return sk_push(st, (char *)val); } \
    STACK_OF(type) *sk_##type##_dup (STACK_OF(type) *st) { return sk_dup(st); } \
-   STACK_OF(type) *d2i_ASN1_SET_OF_##type (STACK_OF(type) **st, unsigned char **pp, long length, type *(*d2ifunc)(), void (*freefunc)(type *), int ex_tag, int ex_class) \
+   STACK_OF(type) *d2i_ASN1_SET_OF_##type (STACK_OF(type) **st, VOMS_MAYBECONST unsigned char **pp, long length, type *(*d2ifunc)(), void (*freefunc)(type *), int ex_tag, int ex_class) \
        { return d2i_ASN1_SET(st, pp, length, (char *(*)())d2ifunc, (void (*)(void *))freefunc, ex_tag, ex_class); } \
    int i2d_ASN1_SET_OF_##type (STACK_OF(type) *st, unsigned char **pp, int (*i2dfunc)(), int ex_tag, int ex_class, int is_set) \
        { return i2d_ASN1_SET(st, pp, i2dfunc, ex_tag, ex_class, is_set); } \
@@ -109,9 +118,11 @@
    extern type  *sk_##type##_shift (STACK_OF(type) *); \
    extern type  *sk_##type##_pop (STACK_OF(type) *); \
    extern void   sk_##type##_sort (STACK_OF(type) *); \
-   extern STACK_OF(type) *d2i_ASN1_SET_OF_##type (STACK_OF(type) **, unsigned char **, long, type *(*)(), void (*)(type *), int, int); \
+   extern STACK_OF(type) *d2i_ASN1_SET_OF_##type (STACK_OF(type) **, VOMS_MAYBECONST unsigned char **, long, type *(*)(), void (*)(type *), int, int); \
    extern int i2d_ASN1_SET_OF_##type (STACK_OF(type) *, unsigned char **, int (*)(), int, int, int); \
    extern unsigned char *ASN1_seq_pack_##type (STACK_OF(type) *, int (*)(), unsigned char **, int *); \
    extern STACK_OF(type) *ASN1_seq_unpack_##type (unsigned char *, int, type *(*)(), void (*)(type *)) ;
+
+
 
 #endif

@@ -47,6 +47,7 @@ extern "C" {
 #include <openssl/x509v3.h>
 #include <openssl/err.h>
 #include <openssl/bio.h>
+#include <openssl/opensslv.h>
 #include <unistd.h>
 #include <fcntl.h>
 
@@ -285,6 +286,9 @@ GSISocketClient::Open()
         }
       }
     }
+#if OPENSSL_VERSION_NUMBER >= 0x10000000L
+    X509_STORE_set_verify_cb(ctx->cert_store, proxy_verify_callback);
+#endif
   }
 
   snprintf(portstring, 35, "%ld", (long int)port);
