@@ -17,6 +17,7 @@ proc mytest {} {
     set res [log_exec outname {voms-proxy-init --voms voms1}]
     _vomsStop voms1
 
+
     if $res then {
         addlog $outname
         testmessage "voms-proxy-init --dont-verify-ac failed."
@@ -26,5 +27,8 @@ proc mytest {} {
     testmessage "voms-proxy-init --dont-verify-ac succeeded."
     return $::PASSTEST
 }
+
+test_set_prolog myprolog
+test_set_epilog myepilog
 
 do_test
