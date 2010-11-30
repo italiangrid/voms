@@ -85,6 +85,7 @@ std::string USERCONFILENAME;
 
 bool debug = false;
 bool quiet = false;
+bool dontverifyac = false;
 
 extern "C" {
   
@@ -258,6 +259,7 @@ Client::Client(int argc, char ** argv) :
       "    -old                           Creates GT2 compliant proxy (synonymous with -proxyver 2)\n" \
       "    -timeout <num>                 Timeout for server connections, in seconds.\n"
       "    -includeac <file>              get AC from file.\n"
+      "    -dont-verify-ac                Skips AC verification.\n"
       "\n";
 
     set_usage(LONG_USAGE);
@@ -308,6 +310,7 @@ Client::Client(int argc, char ** argv) :
 #endif
       {"timeout",         1,        &timeout,     OPT_NUM},
       {"includeac",       1, (int *)&acfile,      OPT_STRING},
+      {"dont-verify-ac",  0, (int *)&dontverifyac,OPT_BOOL},
       {0, 0, 0, 0}
     };
 
@@ -400,6 +403,10 @@ Client::Client(int argc, char ** argv) :
     Print(FORCED) << SUBPACKAGE << "\nVersion: " << VERSION << std::endl;
     Print(FORCED) << "Compiled: " << __DATE__ << " " << __TIME__ << std::endl;
     exit(0);
+  }
+
+  if (getenv("VOMS_PROXY_INIT_DONT_VERIFY_AC") != NULL) {
+      dontverifyac = true;
   }
 
   /* set globus version */
@@ -970,14 +977,15 @@ int Client::Verify()
 
   if (proxy_verify_cert_chain(cert, chain, &pvd)) {
     /* Second step: Verify AC. */
-    if (!v->Retrieve(cert, chain, RECURSE_CHAIN)) {
-      if (v->error != VERR_NOEXT) {
-        Print(ERROR) << "Error: verify failed." << std::endl
-                     << v->ErrorMessage() << std::endl;
-        goto err;
+    if (!dontverifyac) {
+      if (!v->Retrieve(cert, chain, RECURSE_CHAIN)) {
+        if (v->error != VERR_NOEXT) {
+          Print(ERROR) << "Error: verify failed." << std::endl
+                       << v->ErrorMessage() << std::endl;
+          goto err;
+        }
       }
     }
-
     if (verify) 
       Print(FORCED) << "verify OK" << std::endl; 
 

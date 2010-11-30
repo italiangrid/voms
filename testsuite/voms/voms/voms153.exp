@@ -1,0 +1,30 @@
+load_lib vomstest.exp
+testheader "See if voms-proxy-init --dont-verify-ac works."
+
+proc myprolog {} {
+    set ::env(VOMS_PROXY_INIT_DONT_VERIFY_AC) "1"
+}
+
+proc myepilog {} {
+    unset ::env(VOMS_PROXY_INIT_DONT_VERIFY_AC)
+}
+
+proc mytest {} {
+    _activateCert mycert2
+    _cleanproxy
+
+    _vomsStart voms1
+    set res [log_exec outname {voms-proxy-init --voms voms1}]
+    _vomsStop voms1
+
+    if $res then {
+        addlog $outname
+        testmessage "voms-proxy-init --dont-verify-ac failed."
+        return $::FAILTEST
+    }
+
+    testmessage "voms-proxy-init --dont-verify-ac succeeded."
+    return $::PASSTEST
+}
+
+do_test
