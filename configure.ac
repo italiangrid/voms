@@ -76,19 +76,11 @@ AC_STRUCT_TM
 # Checks for library functions.
 AC_FUNC_ALLOCA
 AC_FUNC_CLOSEDIR_VOID
-#AC_FUNC_ERROR_AT_LINE
 AC_FUNC_FORK
-#AC_HEADER_MAJOR
-#AC_FUNC_MALLOC
 AC_FUNC_MEMCMP
-#AC_FUNC_MKTIME
 AC_FUNC_MMAP
-#AC_FUNC_REALLOC
 AC_FUNC_SETVBUF_REVERSED
-#AC_TYPE_SIGNAL
-#AC_FUNC_STAT
 AC_FUNC_STRFTIME
-#AC_FUNC_STRTOD
 AC_CHECK_FUNCS([alarm atexit dup2 gethostbyaddr gethostname gethostbyname gethostname memmove memset mkfifo mktime munmap putenv select setenv sigaction socket strchr strdup strerror strndup strrchr strspn strstr strtod strtol strtoul strtoull tzset uname getpwnam timegm])
 #AC_CHECK_FUNCS([mktime lstat error strtod realloc malloc stat])
 
@@ -102,10 +94,8 @@ NEW_ISSUES
 AC_DEFINE(_SVID_SOURCE, 1, [Get SVID extensions])
 AC_VOMS_TIME_T_TIMEZONE
 AM_WITH_DMALLOC
-AC_VOMS_STRUCT_IOVEC
 AC_VOMS_SOCKLEN_T
 AC_VOMS_FIND_FUNC
-AC_VOMS_LONG_LONG
 AC_VOMS_STRNDUP
 AC_BUILD_API_ONLY
 AC_BUILD_PARTS

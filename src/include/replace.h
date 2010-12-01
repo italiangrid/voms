@@ -27,14 +27,6 @@
 #define VOMS_REPLACES_H
 #include "config.h"
 
-#ifndef HAVE_GLOBUS_OFF_T
-#ifdef HAVE_LONG_LONG_T
-#define GLOBUS_OFF_T long long
-#else
-#define GLOBUS_OFF_T long
-#endif
-#endif
-
 #ifdef __cplusplus
 extern "C" {
 #endif

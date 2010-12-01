@@ -15788,7 +15788,7 @@ $as_echo "$as_me: error: bad value $(enableval) for --enable-glite" >&2;}
           esac
 
 else
-  glite="yes"
+  glite="no"
 fi
 
 
@@ -15840,10 +15840,10 @@ fi
 
     if test -n "with_glite_location" ; then
     	GLITE_LOCATION="$with_glite_location"
-	GLITE_CFLAGS="-I$GLITE_LOCATION/include"
+      	GLITE_CFLAGS="-I$GLITE_LOCATION/include"
     else
-	GLITE_LOCATION=""
-	GLITE_CFLAGS=""
+    	GLITE_LOCATION=""
+      	GLITE_CFLAGS=""
     fi
 
     { $as_echo "$as_me:$LINENO: result: GLITE_LOCATION set to $GLITE_LOCATION" >&5
@@ -18512,7 +18512,6 @@ _ACEOF
 
 fi
 
-#AC_FUNC_ERROR_AT_LINE
 
 for ac_header in vfork.h
 do
@@ -19018,8 +19017,6 @@ _ACEOF
 
 fi
 
-#AC_HEADER_MAJOR
-#AC_FUNC_MALLOC
 { $as_echo "$as_me:$LINENO: checking for working memcmp" >&5
 $as_echo_n "checking for working memcmp... " >&6; }
 if test "${ac_cv_func_memcmp_working+set}" = set; then
@@ -19113,7 +19110,6 @@ test $ac_cv_func_memcmp_working = no && case " $LIBOBJS " in
 esac
 
 
-#AC_FUNC_MKTIME
 
 
 for ac_header in stdlib.h unistd.h
@@ -19551,7 +19547,6 @@ _ACEOF
 fi
 rm -f conftest.mmap
 
-#AC_FUNC_REALLOC
 if test "${ac_cv_func_setvbuf_reversed+set}" = set; then
   $as_echo_n "(cached) " >&6
 else
@@ -19559,8 +19554,6 @@ else
 fi
 
 
-#AC_TYPE_SIGNAL
-#AC_FUNC_STAT
 
 for ac_func in strftime
 do
@@ -19737,7 +19730,6 @@ fi
 fi
 done
 
-#AC_FUNC_STRTOD
 
 
 
@@ -20397,69 +20389,6 @@ fi
 
 
 
-    { $as_echo "$as_me:$LINENO: checking for struct iovec" >&5
-$as_echo_n "checking for struct iovec... " >&6; }
-
-    cat >conftest.$ac_ext <<_ACEOF
-/* confdefs.h.  */
-_ACEOF
-cat confdefs.h >>conftest.$ac_ext
-cat >>conftest.$ac_ext <<_ACEOF
-/* end confdefs.h.  */
-
-        #include <sys/uio.h>
-
-int
-main ()
-{
-
-        struct iovec v;
-
-  ;
-  return 0;
-}
-_ACEOF
-rm -f conftest.$ac_objext
-if { (ac_try="$ac_compile"
-case "(($ac_try" in
-  *\"* | *\`* | *\\*) ac_try_echo=\$ac_try;;
-  *) ac_try_echo=$ac_try;;
-esac
-eval ac_try_echo="\"\$as_me:$LINENO: $ac_try_echo\""
-$as_echo "$ac_try_echo") >&5
-  (eval "$ac_compile") 2>conftest.er1
-  ac_status=$?
-  grep -v '^ *+' conftest.er1 >conftest.err
-  rm -f conftest.er1
-  cat conftest.err >&5
-  $as_echo "$as_me:$LINENO: \$? = $ac_status" >&5
-  (exit $ac_status); } && {
-	 test -z "$ac_c_werror_flag" ||
-	 test ! -s conftest.err
-       } && test -s conftest.$ac_objext; then
-  ac_have_struct_iovec="yes"
-else
-  $as_echo "$as_me: failed program was:" >&5
-sed 's/^/| /' conftest.$ac_ext >&5
-
-	ac_have_struct_iovec="no"
-
-fi
-
-rm -f core conftest.err conftest.$ac_objext conftest.$ac_ext
-
-    if test "x$ac_have_struct_iovec" = "xyes" ; then
-
-cat >>confdefs.h <<\_ACEOF
-#define HAVE_STRUCT_IOVEC 1
-_ACEOF
-
-    fi
-
-    { $as_echo "$as_me:$LINENO: result: $ac_have_struct_iovec" >&5
-$as_echo "$ac_have_struct_iovec" >&6; }
-
-
     { $as_echo "$as_me:$LINENO: checking for (sane) socklen_t" >&5
 $as_echo_n "checking for (sane) socklen_t... " >&6; }
 
@@ -20673,67 +20602,6 @@ _ACEOF
 
     { $as_echo "$as_me:$LINENO: result: $ac_have_func" >&5
 $as_echo "$ac_have_func" >&6; }
-
-
-    { $as_echo "$as_me:$LINENO: checking for long long" >&5
-$as_echo_n "checking for long long... " >&6; }
-
-    cat >conftest.$ac_ext <<_ACEOF
-/* confdefs.h.  */
-_ACEOF
-cat confdefs.h >>conftest.$ac_ext
-cat >>conftest.$ac_ext <<_ACEOF
-/* end confdefs.h.  */
-
-int
-main ()
-{
-
-        long long i;
-
-  ;
-  return 0;
-}
-_ACEOF
-rm -f conftest.$ac_objext
-if { (ac_try="$ac_compile"
-case "(($ac_try" in
-  *\"* | *\`* | *\\*) ac_try_echo=\$ac_try;;
-  *) ac_try_echo=$ac_try;;
-esac
-eval ac_try_echo="\"\$as_me:$LINENO: $ac_try_echo\""
-$as_echo "$ac_try_echo") >&5
-  (eval "$ac_compile") 2>conftest.er1
-  ac_status=$?
-  grep -v '^ *+' conftest.er1 >conftest.err
-  rm -f conftest.er1
-  cat conftest.err >&5
-  $as_echo "$as_me:$LINENO: \$? = $ac_status" >&5
-  (exit $ac_status); } && {
-	 test -z "$ac_c_werror_flag" ||
-	 test ! -s conftest.err
-       } && test -s conftest.$ac_objext; then
-  ac_have_long_long_t="yes"
-else
-  $as_echo "$as_me: failed program was:" >&5
-sed 's/^/| /' conftest.$ac_ext >&5
-
-	ac_have_long_long_t="no"
-
-fi
-
-rm -f core conftest.err conftest.$ac_objext conftest.$ac_ext
-
-    if test "x$ac_have_long_long_t" = "xyes" ; then
-
-cat >>confdefs.h <<\_ACEOF
-#define HAVE_LONG_LONG_T 1
-_ACEOF
-
-    fi
-
-    { $as_echo "$as_me:$LINENO: result: $ac_have_long_long_t" >&5
-$as_echo "$ac_have_long_long_t" >&6; }
 
 
     { $as_echo "$as_me:$LINENO: checking for strndup" >&5
@@ -21227,6 +21095,7 @@ fi
   if test "x$enable_coverage" = "xyes" ; then
      CFLAGS="$CFLAGS -fprofile-arcs -ftest-coverage"
      CXXFLAGS="$CXXFLAGS -fprofile-arcs -ftest-coverage"
+     LDFLAGS="$LDFLAGS -lgcov"
   fi
 
 

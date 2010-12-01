@@ -375,7 +375,7 @@ AC_DEFUN([AC_ENABLE_GLITE],
           *) AC_MSG_ERROR(bad value $(enableval) for --enable-glite) ;;
           esac
         ],
-        [glite="yes"])
+        [glite="no"])
 
     AM_CONDITIONAL(ENABLE_GLITE, test x$glite = xyes)
 
@@ -497,28 +497,6 @@ AC_DEFUN([AC_VOMS_SOCKLEN_T],
     AC_MSG_RESULT([$ac_have_socklen_t])
 ])
 
-# AC_VOMS_LONG_LONG check whether long long type is present
-# ------------------------------------------------------------
-AC_DEFUN([AC_VOMS_LONG_LONG],
-[
-    AC_MSG_CHECKING([for long long])
-
-    AC_TRY_COMPILE(
-      [],
-      [
-        long long i;
-      ],
-      [ac_have_long_long_t="yes"],
-      [ac_have_long_long_t="no"]
-    )
-
-    if test "x$ac_have_long_long_t" = "xyes" ; then
-      AC_DEFINE(HAVE_LONG_LONG_T, 1, [Define to 1 if you have long long]) 
-    fi
-
-    AC_MSG_RESULT([$ac_have_long_long_t])
-])
-
 # AC_VOMS_FIND_FUNC
 # -------------------------------------------------------------------
 AC_DEFUN([AC_VOMS_FIND_FUNC],
@@ -555,30 +533,6 @@ AC_DEFUN([AC_VOMS_FIND_FUNC],
     AC_MSG_RESULT([$ac_have_func])
 ])
 
-# AC_VOMS_STRUCT_IOVEC check whether you have the iovec struct
-# in uio.h
-# -------------------------------------------------------------------
-AC_DEFUN([AC_VOMS_STRUCT_IOVEC],
-[
-    AC_MSG_CHECKING([for struct iovec])
-
-    AC_TRY_COMPILE(
-      [
-        #include <sys/uio.h>
-      ], 
-      [
-        struct iovec v;
-      ],
-      [ac_have_struct_iovec="yes"], 
-      [ac_have_struct_iovec="no"]
-    )
-
-    if test "x$ac_have_struct_iovec" = "xyes" ; then
-      AC_DEFINE(HAVE_STRUCT_IOVEC, 1, [Define to 1 if you have iovec struct in uio.h]) 
-    fi
-
-    AC_MSG_RESULT([$ac_have_struct_iovec])
-])
 
 AC_DEFUN([NEW_ISSUES],
 [
@@ -778,6 +732,7 @@ AC_DEFUN([AC_TESTSUITE],
   if test "x$enable_coverage" = "xyes" ; then
      CFLAGS="$CFLAGS -fprofile-arcs -ftest-coverage"
      CXXFLAGS="$CXXFLAGS -fprofile-arcs -ftest-coverage"
+     LDFLAGS="$LDFLAGS -lgcov"
   fi
 
   AC_ARG_WITH(cobertura,
