@@ -913,9 +913,11 @@ vomsdata::vomsdata(const vomsdata &orig) : ca_cert_dir(orig.ca_cert_dir),
                                            vdp(NULL)
 {}
 
-int getMajorVersionNumber(void) {return 2;}
-int getMinorVersionNumber(void) {return 0;}
-int getPatchVersionNumber(void) {return 0;}
+extern "C" {
+int getVOMSMajorVersionNumber(void) {return 2;}
+int getVOMSMinorVersionNumber(void) {return 0;}
+int getVOMSPatchVersionNumber(void) {return 0;}
+}
 
 void vomsdata::SetRetryCount(int retryCount)
 {

@@ -752,9 +752,9 @@ vomsdata::check_cert(STACK_OF(X509) *stack)
 }
 
 bool
-vomsdata::my_conn(const std::string &hostname, int port, UNUSED(const std::string &contact),
-	const std::string &command, std::string &u, std::string &uc,
-                  std::string &buf, int timeout)
+vomsdata::contact(const std::string &hostname, int port, UNUSED(const std::string &contact),
+	const std::string &command, std::string &buf, std::string &u, std::string &uc,
+                  int timeout)
 {
   GSISocketClient sock(hostname, port);
 
@@ -829,47 +829,4 @@ vomsdata::my_conn(const std::string &hostname, int port, UNUSED(const std::strin
 
   sock.Close();
   return true;
-}
-
-bool
-vomsdata::contact(const std::string &hostname, int port, const std::string &contact,
-	const std::string &command, std::string &buffer, std::string &username,
-                  std::string &ca, int timeout)
-{
-  return my_conn(hostname, port, contact, command, username, ca,
-                 buffer, timeout);
-}   
-
-/*
- * Kept for binary compatibility.
- * No one calls these.
- */
-X509 *
-vomsdata::check(UNUSED(check_sig f), UNUSED(void *data))
-{
-  return NULL;
-}
-
-bool
-vomsdata::my_conn(UNUSED(const std::string &hostname), UNUSED(int port), 
-		  UNUSED(const std::string &contact),
-		  UNUSED(const std::string &command), UNUSED(std::string &u), 
-		  UNUSED(std::string &uc), UNUSED(std::string &buf))
-{
-  return false;
-}
-
-bool
-vomsdata::contact(UNUSED(const std::string &hostname), UNUSED(int port), 
-		  UNUSED(const std::string &contact),
-		  UNUSED(const std::string &command), 
-		  UNUSED(std::string &buffer), UNUSED(std::string &username),
-                  UNUSED(std::string &ca))
-{
-  return false;
-}   
-
-STACK_OF(X509) *vomsdata::load_chain(UNUSED(BIO *in))
-{
-  return NULL;
 }
