@@ -356,14 +356,6 @@ void AC_FULL_ATTRIBUTES_free(AC_FULL_ATTRIBUTES *a)
   OPENSSL_free(a);
 }
 
-#if 0
-IMPL_STACK(AC_ATTRIBUTE)
-IMPL_STACK(AC_ATT_HOLDER)
-/*
-IMPL_STACK(AC_FULL_ATTRIBUTES)
-*/
-#endif
-
 static char *norep()
 {
   static char *buffer = 0;
