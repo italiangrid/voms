@@ -308,11 +308,10 @@ public class VOMSProxyBuilder {
         ProxyPolicy policy = null;
         BigInteger serialNum = null;
 
-	if (issuerKey == null) {
-	  log.error("Passed issuer key is null");
-	  throw new VOMSException("Passed issuerKey is null!");
-	}
-
+        if (issuerKey == null) {
+            log.error("Passed issuer key is null");
+            throw new VOMSException("Passed issuerKey is null!");
+        }
 
         switch (gtVersion) {
         case GT2_PROXY:
@@ -383,6 +382,9 @@ public class VOMSProxyBuilder {
                                                          new MyProxyCertInfo(policy, gtVersion).getDERObject()));
             }
         }
+
+        if (cnValue == null)
+            throw new IllegalArgumentException("Type of delegation unspecified");
 
         ExtensionData[] exts = (ExtensionData[])extensions.values().toArray(new ExtensionData[] {});
         for (int i = 0; i <  exts.length; i++)

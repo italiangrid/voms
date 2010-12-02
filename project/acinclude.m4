@@ -111,28 +111,68 @@ AC_DEFUN([AC_OPENSSL],
               [with_openssl_prefix="$withval"],
               [with_openssl_prefix=/usr])
 
-  SAVE_LD_LIBRARY_PATH=$LD_LIBRARY_PATH
-  LD_LIBRARY_PATH="$with_openssl_prefix/lib"
+  if test "x$with_openssl_prefix" = "x/usr" ; then
+    AC_CHECK_LIB(crypto, CRYPTO_num_locks, [found=yes], [found=no])
 
-  AC_LANG_PUSH(C)
-  AC_CHECK_LIB(crypto, CRYPTO_num_locks, [found=yes], [found=no])
-  AC_LANG_POP(C)  
-  NO_GLOBUS_FLAGS="-I$with_openssl_prefix/include"
+    if test "x$found" = "xyes" ; then
+	OPENSSL_LIBS="-lcrypto -lssl"
+	NO_GLOBUS_FLAGS=""
+    fi
+  else
+    SAVE_LD_LIBRARY_PATH=$LD_LIBRARY_PATH
+    LD_LIBRARY_PATH="$with_openssl_prefix/lib"
 
-  if test "x$found" = "xyes"; then
-    OPENSSL_LIBS="-L$with_openssl_prefix/lib -lcrypto -lssl"
-    AC_SUBST(OPENSSL_LIBS)
-    AC_SUBST(NO_GLOBUS_FLAGS)
-    AC_MSG_CHECKING([for system OpenSSL version])
-    cat >conftest.h <<HERE
+    AC_LANG_PUSH(C)
+    AC_CHECK_LIB(crypto, CRYPTO_num_locks, [found=yes], [found=no])
+    AC_LANG_POP(C)  
+    NO_GLOBUS_FLAGS="-I$with_openssl_prefix/include"
+
+    if test "x$found" = "xyes"; then
+      OPENSSL_LIBS="-L$with_openssl_prefix/lib -lcrypto -lssl"
+      AC_MSG_CHECKING([for system OpenSSL version])
+      cat >conftest.h <<HERE
 #include <openssl/opensslv.h>
 OPENSSL_VERSION_TEXT
 HERE
-    openssl_version=`$CPP $NO_GLOBUS_FLAGS -o - -P conftest.h`
-    AC_MSG_RESULT($openssl_version)
-    rm -f conftest.h
+      openssl_version=`$CPP $NO_GLOBUS_FLAGS -o - -P conftest.h`
+      AC_MSG_RESULT($openssl_version)
+      rm -f conftest.h
+    fi
+    LD_LIBRARY_PATH="$SAVE_LD_LIBRARY_PATH"
   fi
-  LD_LIBRARY_PATH="$SAVE_LD_LIBRARY_PATH"
+
+  SAVE_CFLAGS=$CFLAGS
+  CFLAGS="$CFLAGS -Werror"
+  AC_MSG_CHECKING(if asn1.h functions need const)
+  AC_TRY_COMPILE(
+	[
+	#include <openssl/asn1.h>
+	],
+	[
+	char **pp;
+	long length;
+	ASN1_PRINTABLESTRING *p;
+
+	(void)M_d2i_ASN1_PRINTABLESTRING(&p, pp, length);
+        ],
+	[ac_need_const="no"],
+	[ac_need_const="yes"])
+  CFLAGS="$SAVE_CFLAGS"
+
+  AC_MSG_RESULT($ac_need_const)
+
+  AC_SUBST(OPENSSL_LIBS)
+  AC_SUBST(NO_GLOBUS_FLAGS)
+
+  if test "x$ac_need_const" = "xyes" ; then
+    AC_DEFINE(NEEDCONST, 1, [Define to 1 if openssl needs "consted" parameters])
+  fi
+
+  AH_BOTTOM([#if defined(NEEDCONST)
+#define MAYBECONST const
+#else
+#define MAYBECONST
+#endif])
 ])
 
 # AC_COMPILER add switch to enable debug and warning
@@ -335,7 +375,7 @@ AC_DEFUN([AC_ENABLE_GLITE],
           *) AC_MSG_ERROR(bad value $(enableval) for --enable-glite) ;;
           esac
         ],
-        [glite="yes"])
+        [glite="no"])
 
     AM_CONDITIONAL(ENABLE_GLITE, test x$glite = xyes)
 
@@ -457,28 +497,6 @@ AC_DEFUN([AC_VOMS_SOCKLEN_T],
     AC_MSG_RESULT([$ac_have_socklen_t])
 ])
 
-# AC_VOMS_LONG_LONG check whether long long type is present
-# ------------------------------------------------------------
-AC_DEFUN([AC_VOMS_LONG_LONG],
-[
-    AC_MSG_CHECKING([for long long])
-
-    AC_TRY_COMPILE(
-      [],
-      [
-        long long i;
-      ],
-      [ac_have_long_long_t="yes"],
-      [ac_have_long_long_t="no"]
-    )
-
-    if test "x$ac_have_long_long_t" = "xyes" ; then
-      AC_DEFINE(HAVE_LONG_LONG_T, 1, [Define to 1 if you have long long]) 
-    fi
-
-    AC_MSG_RESULT([$ac_have_long_long_t])
-])
-
 # AC_VOMS_FIND_FUNC
 # -------------------------------------------------------------------
 AC_DEFUN([AC_VOMS_FIND_FUNC],
@@ -515,30 +533,6 @@ AC_DEFUN([AC_VOMS_FIND_FUNC],
     AC_MSG_RESULT([$ac_have_func])
 ])
 
-# AC_VOMS_STRUCT_IOVEC check whether you have the iovec struct
-# in uio.h
-# -------------------------------------------------------------------
-AC_DEFUN([AC_VOMS_STRUCT_IOVEC],
-[
-    AC_MSG_CHECKING([for struct iovec])
-
-    AC_TRY_COMPILE(
-      [
-        #include <sys/uio.h>
-      ], 
-      [
-        struct iovec v;
-      ],
-      [ac_have_struct_iovec="yes"], 
-      [ac_have_struct_iovec="no"]
-    )
-
-    if test "x$ac_have_struct_iovec" = "xyes" ; then
-      AC_DEFINE(HAVE_STRUCT_IOVEC, 1, [Define to 1 if you have iovec struct in uio.h]) 
-    fi
-
-    AC_MSG_RESULT([$ac_have_struct_iovec])
-])
 
 AC_DEFUN([NEW_ISSUES],
 [
@@ -738,6 +732,7 @@ AC_DEFUN([AC_TESTSUITE],
   if test "x$enable_coverage" = "xyes" ; then
      CFLAGS="$CFLAGS -fprofile-arcs -ftest-coverage"
      CXXFLAGS="$CXXFLAGS -fprofile-arcs -ftest-coverage"
+     LDFLAGS="$LDFLAGS -lgcov"
   fi
 
   AC_ARG_WITH(cobertura,

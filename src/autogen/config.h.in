@@ -80,9 +80,6 @@
 /* Define to 1 if you have the <limits.h> header file. */
 #undef HAVE_LIMITS_H
 
-/* Define to 1 if you have long long */
-#undef HAVE_LONG_LONG_T
-
 /* Define to 1 if you have the <malloc.h> header file. */
 #undef HAVE_MALLOC_H
 
@@ -197,9 +194,6 @@
 /* Define to 1 if you have the `strtoull' function. */
 #undef HAVE_STRTOULL
 
-/* Define to 1 if you have iovec struct in uio.h */
-#undef HAVE_STRUCT_IOVEC
-
 /* Define to 1 if `st_rdev' is member of `struct stat'. */
 #undef HAVE_STRUCT_STAT_ST_RDEV
 
@@ -277,6 +271,9 @@
 /* Define to the sub-directory in which libtool stores uninstalled libraries.
    */
 #undef LT_OBJDIR
+
+/* Define to 1 if openssl needs "consted" parameters */
+#undef NEEDCONST
 
 /* Name of package */
 #undef PACKAGE
@@ -363,6 +360,12 @@
 
 /* Define as `fork' if `vfork' does not work. */
 #undef vfork
+
+#if defined(NEEDCONST)
+#define MAYBECONST const
+#else
+#define MAYBECONST
+#endif
 
 #ifdef __cplusplus
 #include <new>

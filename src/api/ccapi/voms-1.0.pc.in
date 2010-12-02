@@ -8,4 +8,4 @@ Description: VOMS C/C++ APIs
 Requires: openssl
 Version: 1.0.0
 Libs: -L${libdir} -lvomsapi
-Cflags: -I${includedir}/voms -I${includedir}/glite/security/voms
+Cflags: -I${includedir} -I${includedir}/glite/security

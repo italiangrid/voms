@@ -67,6 +67,14 @@ extern "C" {
 #include "internal.h"
 #include "normalize.h"
 
+#ifndef VOMS_MAYBECONST
+#if defined(D2I_OF)
+#define VOMS_MAYBECONST const
+#else
+#define VOMS_MAYBECONST
+#endif
+#endif
+
 extern proxy_verify_desc *setup_initializers(char *cadir);
 extern void destroy_initializers(void *data);
 static bool dncompare(const char *mut, const char *fixed);
@@ -277,8 +285,8 @@ vomsdata::verifydata(std::string &message, UNUSED(std::string subject),
 
   error = VERR_FORMAT;
 
-  unsigned char *str  = (unsigned char *)(const_cast<char *>(message.data()));
-  unsigned char *orig = str;
+  VOMS_MAYBECONST unsigned char *str  = (VOMS_MAYBECONST unsigned char *)(message.data());
+  VOMS_MAYBECONST unsigned char *orig = str;
 
   AC   *tmp    = d2i_AC(NULL, &str, message.size());
 
@@ -744,9 +752,9 @@ vomsdata::check_cert(STACK_OF(X509) *stack)
 }
 
 bool
-vomsdata::my_conn(const std::string &hostname, int port, UNUSED(const std::string &contact),
-	const std::string &command, std::string &u, std::string &uc,
-                  std::string &buf, int timeout)
+vomsdata::contact(const std::string &hostname, int port, UNUSED(const std::string &contact),
+	const std::string &command, std::string &buf, std::string &u, std::string &uc,
+                  int timeout)
 {
   GSISocketClient sock(hostname, port);
 
@@ -821,47 +829,4 @@ vomsdata::my_conn(const std::string &hostname, int port, UNUSED(const std::strin
 
   sock.Close();
   return true;
-}
-
-bool
-vomsdata::contact(const std::string &hostname, int port, const std::string &contact,
-	const std::string &command, std::string &buffer, std::string &username,
-                  std::string &ca, int timeout)
-{
-  return my_conn(hostname, port, contact, command, username, ca,
-                 buffer, timeout);
-}   
-
-/*
- * Kept for binary compatibility.
- * No one calls these.
- */
-X509 *
-vomsdata::check(UNUSED(check_sig f), UNUSED(void *data))
-{
-  return NULL;
-}
-
-bool
-vomsdata::my_conn(UNUSED(const std::string &hostname), UNUSED(int port), 
-		  UNUSED(const std::string &contact),
-		  UNUSED(const std::string &command), UNUSED(std::string &u), 
-		  UNUSED(std::string &uc), UNUSED(std::string &buf))
-{
-  return false;
-}
-
-bool
-vomsdata::contact(UNUSED(const std::string &hostname), UNUSED(int port), 
-		  UNUSED(const std::string &contact),
-		  UNUSED(const std::string &command), 
-		  UNUSED(std::string &buffer), UNUSED(std::string &username),
-                  UNUSED(std::string &ca))
-{
-  return false;
-}   
-
-STACK_OF(X509) *vomsdata::load_chain(UNUSED(BIO *in))
-{
-  return NULL;
 }

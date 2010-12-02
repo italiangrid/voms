@@ -647,17 +647,9 @@ int VOMS_RetrieveFromCred(gss_cred_id_t cred, int how, struct vomsdatar *vd, int
 
 int VOMS_RetrieveFromCtx(gss_ctx_id_t ctx, int how, struct vomsdatar *vd, int *error)
 {
-  if (!vd || !vd->real || !error) {
-    *error = VERR_PARAM;
-    return 0;
-  }
-  
-  vomsdata *v = vd->real;
+  if (error)
+    *error = VERR_NOTAVAIL;
 
-  if (v->RetrieveFromCtx(ctx, recurse_type(how)))
-    return TranslateVOMS(vd, v->data, error);
-
-  *error = v->error;
   return 0;
 }
 

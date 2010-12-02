@@ -42,6 +42,14 @@
 #include "attributes.h"
 #include <string.h>
 
+#ifndef VOMS_MAYBECONST
+#if defined(D2I_OF)
+#define VOMS_MAYBECONST const
+#else
+#define VOMS_MAYBECONST
+#endif
+#endif
+
 int i2d_AC_SEQ(AC_SEQ *a, unsigned char **pp)
 {
   M_ASN1_I2D_vars(a);
@@ -59,7 +67,7 @@ int i2d_AC_SEQ(AC_SEQ *a, unsigned char **pp)
   M_ASN1_I2D_finish();
 }
 
-AC_SEQ *d2i_AC_SEQ(AC_SEQ **a, unsigned char **pp, long length)
+AC_SEQ *d2i_AC_SEQ(AC_SEQ **a, VOMS_MAYBECONST unsigned char **pp, long length)
 {
   M_ASN1_D2I_vars(a, AC_SEQ *, AC_SEQ_new);
 
@@ -96,7 +104,7 @@ int i2d_AC_TARGETS(AC_TARGETS *a, unsigned char **pp)
   M_ASN1_I2D_put_SEQUENCE(a->targets, i2d_AC_TARGET);
   M_ASN1_I2D_finish();
 }
-AC_TARGETS *d2i_AC_TARGETS(AC_TARGETS **a, unsigned char **pp, long length)
+AC_TARGETS *d2i_AC_TARGETS(AC_TARGETS **a, VOMS_MAYBECONST unsigned char **pp, long length)
 {
   M_ASN1_D2I_vars(a, AC_TARGETS *, AC_TARGETS_new);
 
@@ -140,7 +148,7 @@ int i2d_AC_TARGET(AC_TARGET *a, unsigned char **pp)
   M_ASN1_I2D_finish();
 }
 
-AC_TARGET *d2i_AC_TARGET(AC_TARGET **a, unsigned char **pp, long length)
+AC_TARGET *d2i_AC_TARGET(AC_TARGET **a, VOMS_MAYBECONST unsigned char **pp, long length)
 {
   M_ASN1_D2I_vars(a, AC_TARGET *, AC_TARGET_new);
 
@@ -182,7 +190,7 @@ int i2d_AC_CERTS(AC_CERTS *a, unsigned char **pp)
   M_ASN1_I2D_finish();
 }
 
-AC_CERTS *d2i_AC_CERTS(AC_CERTS **a, unsigned char **pp, long length)
+AC_CERTS *d2i_AC_CERTS(AC_CERTS **a, VOMS_MAYBECONST unsigned char **pp, long length)
 {
   M_ASN1_D2I_vars(a, AC_CERTS *, AC_CERTS_new);
 
@@ -227,7 +235,7 @@ int i2d_AC_ATTRIBUTE(AC_ATTRIBUTE *a, unsigned char **pp)
   M_ASN1_I2D_finish();
 }
 
-AC_ATTRIBUTE *d2i_AC_ATTRIBUTE(AC_ATTRIBUTE **a, unsigned char **pp, long length)
+AC_ATTRIBUTE *d2i_AC_ATTRIBUTE(AC_ATTRIBUTE **a, VOMS_MAYBECONST unsigned char **pp, long length)
 {
   M_ASN1_D2I_vars(a, AC_ATTRIBUTE *, AC_ATTRIBUTE_new);
 
@@ -277,7 +285,7 @@ int i2d_AC_ATT_HOLDER(AC_ATT_HOLDER *a, unsigned char **pp)
 }
 
 
-AC_ATT_HOLDER *d2i_AC_ATT_HOLDER(AC_ATT_HOLDER **a, unsigned char **pp, long length)
+AC_ATT_HOLDER *d2i_AC_ATT_HOLDER(AC_ATT_HOLDER **a, VOMS_MAYBECONST unsigned char **pp, long length)
 {
   M_ASN1_D2I_vars(a, AC_ATT_HOLDER *, AC_ATT_HOLDER_new);
 
@@ -319,7 +327,7 @@ int i2d_AC_FULL_ATTRIBUTES(AC_FULL_ATTRIBUTES *a, unsigned char **pp)
   M_ASN1_I2D_finish();
 }
 
-AC_FULL_ATTRIBUTES *d2i_AC_FULL_ATTRIBUTES(AC_FULL_ATTRIBUTES **a, unsigned char **pp, long length)
+AC_FULL_ATTRIBUTES *d2i_AC_FULL_ATTRIBUTES(AC_FULL_ATTRIBUTES **a, VOMS_MAYBECONST unsigned char **pp, long length)
 {
   M_ASN1_D2I_vars(a, AC_FULL_ATTRIBUTES *, AC_FULL_ATTRIBUTES_new);
 
@@ -347,14 +355,6 @@ void AC_FULL_ATTRIBUTES_free(AC_FULL_ATTRIBUTES *a)
   sk_AC_ATT_HOLDER_pop_free(a->providers, AC_ATT_HOLDER_free);
   OPENSSL_free(a);
 }
-
-#if 0
-IMPL_STACK(AC_ATTRIBUTE)
-IMPL_STACK(AC_ATT_HOLDER)
-/*
-IMPL_STACK(AC_FULL_ATTRIBUTES)
-*/
-#endif
 
 static char *norep()
 {

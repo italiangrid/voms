@@ -376,7 +376,6 @@ private:
   bool loadfile0(std::string, uid_t uid, gid_t gid);
   bool verifydata(std::string &message, std::string subject, std::string ca, 
                   X509 *holder, voms &v);
-  X509 *check(check_sig f, void *data); /*!< Unused.  Only left here for binary compatibility. */
   bool check_cert(X509 *cert);
   bool retrieve(X509 *cert, STACK_OF(X509) *chain, recurse_type how,
                 AC_SEQ **listnew, std::string &subject, std::string &ca,
@@ -388,18 +387,8 @@ private:
   
   void seterror(verror_type, std::string);
 
-  bool verifyac(X509 *, X509 *, AC*, voms&);
   bool check_sig_ac(X509 *, void *);
   X509 *check(void *);
-  bool my_conn(const std::string&, int, const std::string&, 
-               const std::string&, std::string&, std::string&,
-               std::string&);
-  bool contact(const std::string&, int, const std::string&,
-               const std::string&, std::string&, std::string&,
-               std::string&);
-  bool my_conn(const std::string&, int, const std::string&, 
-               const std::string&, std::string&, std::string&,
-               std::string&, int timeout);
   bool contact(const std::string&, int, const std::string&,
                const std::string&, std::string&, std::string&,
                std::string&, int timeout);
@@ -454,9 +443,6 @@ private:
 public:
   void SetRetryCount(int retryCount);
   
-private:
-  STACK_OF(X509) *load_chain(BIO *in);
-                                
 public:
   void SetVerificationTime(time_t);
                                   
@@ -476,8 +462,10 @@ private:
 };
 
 
-int getMajorVersionNumber(void);
-int getMinorVersionNumber(void);
-int getPatchVersionNumber(void);
+extern "C" {
+int getVOMSMajorVersionNumber(void);
+int getVOMSMinorVersionNumber(void);
+int getVOMSPatchVersionNumber(void);
+}
 
 #endif
