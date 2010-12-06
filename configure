@@ -15840,10 +15840,10 @@ fi
 
     if test -n "with_glite_location" ; then
     	GLITE_LOCATION="$with_glite_location"
-      	GLITE_CFLAGS="-I$GLITE_LOCATION/include"
+	GLITE_CFLAGS="-I$GLITE_LOCATION/include"
     else
-    	GLITE_LOCATION=""
-      	GLITE_CFLAGS=""
+	GLITE_LOCATION=""
+	GLITE_CFLAGS=""
     fi
 
     { $as_echo "$as_me:$LINENO: result: GLITE_LOCATION set to $GLITE_LOCATION" >&5

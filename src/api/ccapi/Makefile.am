@@ -1,5 +1,5 @@
 
-includedir = @includedir@/glite/security/voms
+includedir = @includedir@/voms
 pkgconfigdir = $(libdir)/pkgconfig
 pkgconfig_DATA = voms-1.0.pc
 
