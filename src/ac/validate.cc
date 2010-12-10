@@ -69,7 +69,7 @@ extern "C" {
 #include <string>
 
 extern "C" {
-#if OPENSSL_VERSION_NUMBER < 0x0090807fL
+#if OPENSSL_VERSION_NUMBER <= 0x0090807fL
 
   /* The following have to be declared explicitly rather than relying
    * on macros because openssl prototype unreliability makes the correct
