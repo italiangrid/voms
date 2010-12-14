@@ -1032,6 +1032,9 @@ static std::string parse_commands(const std::string& commands)
   if (commands[0] == '/')
     return commands;
 
+  if (commands[0] == 'A')
+    return std::string("all");
+
   std::string temp = commands;
 
   change(temp, ":", "/Role=");
