@@ -369,6 +369,7 @@ proc _unsetJavaProperty { name } {
 proc _buildJava { name } {
     set realname "[file dirname [info script]]/$name"
     set realout  "$::SCRATCHDIR/a.out"
+    puts "javac -classpath $::INSTALLDIR/share/java/vomsjapi.jar:$::JAVAPATH:$::env(CLASSPATH) $realname >& $::_buildout"
     if [file exists $realname] then {
         return [catch {set out [ exec javac -classpath $::INSTALLDIR/share/java/vomsjapi.jar:$::JAVAPATH:$::env(CLASSPATH) $realname >& $::_buildout]}]
     } else {
