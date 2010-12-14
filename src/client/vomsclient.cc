@@ -662,7 +662,8 @@ int Client::Run()
 
     if (listing) {
       /* when called as voms-proxy-list or --list is specified */
-      command = "N";
+      v->SetVerificationType(VERIFY_NONE);
+      command = "A";
     }
     else {
       /* check if other requests for the same vo exists */
@@ -713,8 +714,19 @@ int Client::Run()
         AC *ac;
 
         if ((ac = getAC(buffer))) {
+          if (listing) {
+            v->Retrieve(ac);
+
+            voms vv;
+
+            if (v->DefaultData(vv)) {
+              for (std::vector<std::string>::iterator fqan = vv.fqan.begin(); fqan != vv.fqan.end(); fqan++)
+                data += *fqan + "\n";
+            }
+            break;
+          }
           /* retrieve AC and add to list */
-          if (!AddToList(ac)) {
+          else if (!AddToList(ac)) {
             Print(ERROR) << "Error while handling AC." << std::endl;
             if (!noregen)
               unlink(proxyfile.c_str()); 
