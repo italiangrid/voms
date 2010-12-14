@@ -669,6 +669,22 @@ int VOMS_RetrieveFromProxy(int how, struct vomsdatar *vd, int *error)
   return 0;
 }
 
+int VOMS_RetrieveFromAC(AC *ac, struct vomsdatar *vd, int *error)
+{
+  if (!vd || !vd->real || !error) {
+    *error = VERR_PARAM;
+    return 0;
+  }
+
+  vomsdata *v = vd->real;
+
+  if (v->Retrieve(ac))
+    return TranslateVOMS(vd, v->data, error);
+
+  *error = v->error;
+  return 0;
+}
+
 int VOMS_Import(char *buffer, int buflen, struct vomsdatar *vd, int *error)
 {
   if (!buffer || !buflen || !vd || !vd->real || !error) {

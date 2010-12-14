@@ -486,6 +486,22 @@ bool vomsdata::Retrieve(X509_EXTENSION *ext)
   return ret;
 }
 
+bool vomsdata::Retrieve(AC *ac)
+{
+  verify_type v = ver_type;
+
+  ver_type = (verify_type)((int) ver_type & (~VERIFY_ID));
+
+  voms vv;
+
+  bool ret = verifydata(ac, "", "", NULL, vv);
+
+  if (ret)
+    data.push_back(vv);
+
+  return ret;
+}
+
 bool vomsdata::Retrieve(X509 *cert, STACK_OF(X509) *chain, recurse_type how)
 {
   bool ok = false;
