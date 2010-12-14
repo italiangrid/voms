@@ -628,7 +628,9 @@ int Client::Run()
   
   v->SetLifetime(ac_hours * 3600 + ac_minutes * 60);
   v->Order(ordering);
-  v->AddTarget(targetlist);
+
+  if (!targetlist.empty())
+    v->AddTarget(targetlist);
 
   (void)v->LoadCredentials(ucert, private_key, cert_chain);
 
