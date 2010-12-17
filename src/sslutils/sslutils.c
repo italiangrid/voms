@@ -557,37 +557,6 @@ static int checkstat(const char* filename)
 
 }
 
-/***********************************************************************
-Function: proxy_cred_desc_new()
-
-Description:
-        alloc a new proxy_cred_desc
-*********************************************************************/
-
-proxy_cred_desc PRIVATE *
-proxy_cred_desc_new() 
-{
-    proxy_cred_desc *                   pcd;
-
-    pcd = (proxy_cred_desc *)malloc(sizeof(proxy_cred_desc));
-    
-    if (pcd)
-    {
-        pcd->ucert = NULL;
-        pcd->upkey = NULL;
-        pcd->cert_chain = NULL;
-        pcd->gs_ctx = NULL;
-        pcd->hSession = 0;
-        pcd->hPrivKey = 0;
-        pcd->certdir = NULL;
-        pcd->certfile = NULL;
-        pcd->num_null_enc_ciphers = 0;
-        pcd->type = CRED_TYPE_PERMANENT;
-        pcd->owner = CRED_OWNER_USER;
-    }
-    
-    return pcd;
-}
 /**********************************************************************
 Function: proxy_load_user_proxy()
 
