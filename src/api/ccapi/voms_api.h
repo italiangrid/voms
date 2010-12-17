@@ -427,6 +427,11 @@ public:
                                \return failure (F) or success (T)
 
                                Note: Does NOT verify that the proxy is valid.  Such verification must be obtained through other means. */
+
+  bool Retrieve(AC *ac);/*!< Gets VOMS information from the AC
+             \param ext The extension to parse.
+             \return failure (F) or success (T) */
+
   ~vomsdata();
 private:
   //  X509 *check_file(void *);
