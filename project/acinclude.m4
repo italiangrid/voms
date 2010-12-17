@@ -320,7 +320,7 @@ AC_DEFUN([AC_JAVA],
   fi
 
           
-  JAVA_CLASSPATH=".:$wbc:$wlog4j:$wcomcli:$wcomlang"
+  JAVA_CLASSPATH=".:$wbc:$wlog4j:$wcomcli:$wcomlang:$CLASSPATH"
 
   AC_MSG_CHECKING([CLASSPATH is $JAVA_CLASSPATH])
   AC_SUBST(JAVA_CLASSPATH)    
