@@ -1122,6 +1122,8 @@ bool Client::pcdInit()
 
   ERR_load_prxyerr_strings(0);
   SSLeay_add_ssl_algorithms();
+  ERR_load_crypto_strings();
+  OpenSSL_add_all_ciphers();
   PKCS12_PBE_add();
   
   if (!determine_filenames(&cacertfile, &certdir, &outfile, &certfile, &keyfile, noregen ? 1 : 0))
