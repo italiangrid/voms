@@ -41,6 +41,7 @@ extern "C" {
 #include "soapH.h"
 #include "VOMSServer.h"
 #include "fqan.h"
+#include "data.h"
 
 static int (*pw_cb)() = NULL;
 static char *canonicalize_string(char *original);
@@ -48,7 +49,6 @@ static bool makeACSSL(vomsresult &vr, SSL *ssl, const std::string& command, cons
 static int makeACREST(struct soap *soap, const std::string& command, const std::string& orderstring, const std::string& targets, int requested, int unknown);
 int http_get(soap *soap);
 static int pwstdin_callback(char * buf, int num, UNUSED(int w));
-static int hexint(char c);
 static bool get_parameter(char **path, char **name, char **value);
 
 extern VOMSServer *selfpointer;
@@ -253,20 +253,6 @@ static bool get_parameter(char **path, char **name, char **value)
   return true;
 }
 
-static int hexint(char c)
-{
-  if (c >= '0' && c <= '9')
-    return c - '0';
-
-  if (c >= 'a' && c <= 'f')
-    return c - 'a' + 10;
-
-  if (c >= 'A' && c <= 'F')
-    return c - 'A' + 10;
-
-  return 0;
-}
-
 static char *canonicalize_string(char *original)
 {
   char *currentin  = original;
@@ -283,7 +269,7 @@ static char *canonicalize_string(char *original)
 
         if (second != '\0') {
           if (isxdigit(first) && isxdigit(second)) {
-            *currentout++=hexint(first)*16 + hexint(second);
+            *currentout++=hex2num(first)<<4 + hex2num(second);
             currentin += 3;
           }
           else

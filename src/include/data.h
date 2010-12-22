@@ -25,6 +25,7 @@
 #ifndef VOMS_DATA_H
 #define VOMS_DATA_H
 
+#ifdef __cplusplus
 #include <string>
 #include <vector>
 
@@ -35,4 +36,11 @@ extern std::string stringify(int i, std::string &s);
 extern std::string OpenSSLError(bool debug);
 extern std::string readfile(std::string filename);
 extern char **vectoarray(std::vector<std::string>& vector);
+
+extern "C" {
+#endif
+extern int hex2num(char c);
+#ifdef __cplusplus
+}
+#endif
 #endif

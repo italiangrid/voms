@@ -37,6 +37,7 @@ Description:
 #include "sslutils.h"
 #include "parsertypes.h"
 #include "doio.h"
+#include "data.h"
 
 #ifdef HAVE_UNISTD_H
 #include <unistd.h>
@@ -3789,21 +3790,13 @@ end:
   return(ret);
 }
 
-static char htoi(char r) 
-{
-  if (isdigit(r))
-    return r - '0';
-  else
-    return 10 + r -'a';
-}
-
 static char hextoint(char r, char s)
 {
   int v = 0;
   if (isxdigit(r) && isxdigit(s)) {
-    v = htoi(r);
+    v = hex2num(r);
     v <<= 4;
-    v += htoi(s);
+    v += hex2num(s);
   }
   return v;
 }
