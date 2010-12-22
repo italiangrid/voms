@@ -295,36 +295,10 @@ ERR_set_continue_needed(void);
 #define PRXYERR_R_UNKNOWN_CRIT_EXT             PRXYERR_R_BASE + 63
 /* NOTE: Don't go over 1500 here or will conflict with errors in scutils.h */
 
-/* constants for gsi error messages 
- *  this information is kept internally by the
- *  proxy_cred_desc structure
- */
-
-#define CRED_TYPE_PERMANENT             0
-#define CRED_TYPE_PROXY                 1
-#define CRED_OWNER_SERVER               0  
-#define CRED_OWNER_USER                 1 
 
 /**********************************************************************
                                Type definitions
 **********************************************************************/
-
-typedef struct proxy_cred_desc_struct
-{
-    X509 *                              ucert;
-    EVP_PKEY *                          upkey;
-    STACK_OF(X509) *                    cert_chain;
-    SSL_CTX *                           gs_ctx;
-    /* smart card session handle */
-    unsigned long                       hSession;
-    /* private key session handle */
-    unsigned long                       hPrivKey; 
-    char *                              certdir;
-    char *                              certfile;
-    int                                 num_null_enc_ciphers;
-    int                      	        type;  /* for gsi error messages */
-    int                                 owner; /* for gsi error messages */
-} proxy_cred_desc;
 
 /* proxy_verify_ctx_desc - common to all verifys */
 
@@ -363,12 +337,6 @@ struct proxy_verify_desc_struct {
 int
 ERR_load_prxyerr_strings(int i);
 
-proxy_cred_desc * 
-proxy_cred_desc_new();
-
-int
-proxy_cred_desc_free(proxy_cred_desc * pcd);
-
 int proxy_load_user_cert_and_key_pkcs12(const char *user_cert,
                                         X509 **cert,
                                         STACK_OF(X509) **stack,
@@ -398,19 +366,6 @@ proxy_load_user_key(
     const char *                        user_key,
     int                                 (*pw_cb)(),
     unsigned long *                     hSession);
-
-int
-proxy_create_local(
-    proxy_cred_desc *                   pcd,
-    const char *                        outfile,
-    int                                 hours,
-    int                                 bits,
-    int                                 limited_proxy,
-    int                                 proxyver,
-    int                                 (*kpcallback)(),
-    char *                              buffer,
-    int                                 length);
-
 
 void
 proxy_verify_init(

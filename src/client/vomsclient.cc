@@ -628,7 +628,9 @@ int Client::Run()
   
   v->SetLifetime(ac_hours * 3600 + ac_minutes * 60);
   v->Order(ordering);
-  v->AddTarget(targetlist);
+
+  if (!targetlist.empty())
+    v->AddTarget(targetlist);
 
   (void)v->LoadCredentials(ucert, private_key, cert_chain);
 
@@ -660,7 +662,8 @@ int Client::Run()
 
     if (listing) {
       /* when called as voms-proxy-list or --list is specified */
-      command = "N";
+      v->SetVerificationType(VERIFY_NONE);
+      command = "A";
     }
     else {
       /* check if other requests for the same vo exists */
@@ -711,8 +714,19 @@ int Client::Run()
         AC *ac;
 
         if ((ac = getAC(buffer))) {
+          if (listing) {
+            v->Retrieve(ac);
+
+            voms vv;
+
+            if (v->DefaultData(vv)) {
+              for (std::vector<std::string>::iterator fqan = vv.fqan.begin(); fqan != vv.fqan.end(); fqan++)
+                data += *fqan + "\n";
+            }
+            break;
+          }
           /* retrieve AC and add to list */
-          if (!AddToList(ac)) {
+          else if (!AddToList(ac)) {
             Print(ERROR) << "Error while handling AC." << std::endl;
             if (!noregen)
               unlink(proxyfile.c_str()); 
@@ -1108,6 +1122,8 @@ bool Client::pcdInit()
 
   ERR_load_prxyerr_strings(0);
   SSLeay_add_ssl_algorithms();
+  ERR_load_crypto_strings();
+  OpenSSL_add_all_ciphers();
   PKCS12_PBE_add();
   
   if (!determine_filenames(&cacertfile, &certdir, &outfile, &certfile, &keyfile, noregen ? 1 : 0))

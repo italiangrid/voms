@@ -1,5 +1,5 @@
 
-includedir = @includedir@/glite/security/voms
+includedir = @includedir@/voms
 
 if BUILD_INTERFACES
 include_HEADERS = \

@@ -89,7 +89,6 @@ extern int writeac(const X509 *issuerc, const STACK_OF(X509) *certstack, const X
 static int time_to_sec(std::string timestring);
 static long mystrtol(char *number, long int limit);
 static std::string hextostring(const std::string &data);
-static int hex2value(char c);
 
 extern int AC_Init();
 
@@ -1195,15 +1194,6 @@ X509_EXTENSION *Fake::create_extension(const std::string &string)
   return CreateProxyExtension((char*)oid.c_str(), (char*)data.c_str(), data.size(), critical);
 }
 
-static int hex2value(char c)
-{
-  if (c >= '0' && c <= '9')
-    return c - '0';
-  else if (tolower(c) >= 'a' && tolower(c) <= 'f')
-    return tolower(c) - 'a' + 10;
-  return -1;
-}
-
 static std::string hextostring(const std::string &data)
 {
   std::string temp = data;
@@ -1221,7 +1211,7 @@ static std::string hextostring(const std::string &data)
     char second = temp[i*2+1];
 
     if (isxdigit(first) && isxdigit(second))
-      newdata[i] = (hex2value(first) << 4) +hex2value(second);
+      newdata[i] = (hex2num(first) << 4) +hex2num(second);
     else {
       delete[] newdata;
       return "";

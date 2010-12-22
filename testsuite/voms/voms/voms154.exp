@@ -1,0 +1,53 @@
+load_lib vomstest.exp
+testheader "See if LSC files work with multiple chains."
+
+proc myprolog {} {
+    file mkdir $::_vomsdir/voms1
+    set id [open "$::_vomsdir/voms1/testsite.lsc" "w+"]
+    puts $id "
+/C=false
+/Dn=CA
+------ NEXT CHAIN ------
+/C=IT/CN=003
+/C=IT/O=INFN/CN=CAFromthisCN
+
+/C=IT/O=INFN/CN=CAFromthisCN
+/C=IT/O=INFN/ST=IT/L=THISL/OU=INFN/CN=thisCN"
+    close $id
+    _addVOMSOption voms1 uri testsite:10000
+}
+
+proc myepilog {} {
+    file delete $::_vomsdir/voms1/testsite.lsc
+    _removeVOMSOption voms1 uri
+}
+
+proc mytest {} {
+    _activateCert mycert2
+
+    _vomsStart voms1
+    set res [log_exec outname {voms-proxy-init --voms voms1}]
+    _vomsStop voms1
+    
+    if  $res then {
+        addlog $outname
+        testmessage "voms-proxy-init did not work."
+        return $::FAILTEST
+    }
+
+    set res [log_exec outname {voms-proxy-info --all}]
+
+    if $res then {
+        addlog $outname
+        testmessage "voms-proxy-info execution failed."
+        return $::FAILTEST
+    } else {
+        testmessage "voms-proxy-info succeeded."
+        return $::PASSTEST
+    }
+}
+
+test_set_prolog myprolog
+test_set_epilog myepilog
+
+do_test

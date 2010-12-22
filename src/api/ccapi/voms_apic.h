@@ -399,6 +399,12 @@ extern int VOMS_RetrieveFromProxy(int how, struct vomsdata *vd, int *error); /*!
              \param error RETURN PARAMETER: Qualifies the error message
              \return failure (0) or success (<>0)*/
 
+extern int VOMS_RetrieveFromAC(AC*ac, struct vomsdata *vd, int *error);  /*!< Gets VOMS information from an existing globus proxy
+             \param ac AC from which to get the credentials
+             \param vd RETURN PARAMETER: contains the data returned by the connection
+             \param error RETURN PARAMETER: Qualifies the error message
+             \return failure (0) or success (<>0)*/
+
 extern int VOMS_GetAttributeSourcesNumber(struct voms *v, struct vomsdata *vd, int *error);
 extern int VOMS_GetAttributeSourceHandle(struct voms *v, int num, struct vomsdata *vd, int *error);
 extern const char *VOMS_GetAttributeGrantor(struct voms *v, int handle, struct vomsdata *vd, int *error);

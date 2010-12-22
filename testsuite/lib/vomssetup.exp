@@ -342,7 +342,7 @@ proc _buildC { name } {
     set realname "[file dirname [info script]]/$name"
     set realout  "$::SCRATCHDIR/a.out"
     if [file exists $realname] then {
-        return [catch {set out [ exec gcc -g -O0 -o $realout -I$::INSTALLDIR/include/glite/security/voms $realname -L $::INSTALLDIR/lib64 -L $::INSTALLDIR/lib -lvomsapi >& $::_buildout ]}]
+        return [catch {set out [ exec gcc -g -O0 -o $realout -I$::INSTALLDIR/include/voms $realname -L $::INSTALLDIR/lib64 -L $::INSTALLDIR/lib -lvomsapi >& $::_buildout ]}]
     } else {
         fail "File does not exists!"
     }
@@ -352,7 +352,7 @@ proc _buildCC { name } {
     set realname "[file dirname [info script]]/$name"
     set realout  "$::SCRATCHDIR/a.out"
     if [file exists $realname] then {
-        return [catch {set out [ exec g++ -g -O0 -o $realout -I$::INSTALLDIR/include/glite/security/voms $realname -L $::INSTALLDIR/lib64 -L $::INSTALLDIR/lib -lvomsapi >& $::_buildout ]}]
+        return [catch {set out [ exec g++ -g -O0 -o $realout -I$::INSTALLDIR/include/voms $realname -L $::INSTALLDIR/lib64 -L $::INSTALLDIR/lib -lvomsapi >& $::_buildout ]}]
     } else {
         fail "File does not exists!"
     }
@@ -370,7 +370,7 @@ proc _buildJava { name } {
     set realname "[file dirname [info script]]/$name"
     set realout  "$::SCRATCHDIR/a.out"
     if [file exists $realname] then {
-        return [catch {set out [ exec javac -classpath $::INSTALLDIR/share/java/vomsjapi.jar:$::JAVAPATH:$::env(CLASSPATH) $realname >& $::_buildout]}]
+        return [catch {set out [ exec javac -classpath $::INSTALLDIR/share/java/vomsjapi.jar:$::JAVAPATH $realname >& $::_buildout]}]
     } else {
         fail "File does not exists!"
     }
@@ -394,9 +394,9 @@ proc _execJava { name {arg1 ""} {arg2 ""} {arg3 ""}} {
 
         set DIRNAME "[file dirname [info script]]"
 	if [expr ![string equal $::COBERTURA "no"]] then {
-	    set VALUE "java [format %s $PROPERTIES] -classpath $::COBERTURA/cobertura.jar:.:$::INSTALLDIR/share/java/vomsjapi.jar:$::JAVAPATH:$::env(CLASSPATH):$DIRNAME $classname"
+	    set VALUE "java [format %s $PROPERTIES] -classpath $::COBERTURA/cobertura.jar:.:$::INSTALLDIR/share/java/vomsjapi.jar:$::JAVAPATH:$DIRNAME $classname"
 	} else {
-	    set VALUE "java [format %s $PROPERTIES] -classpath .:$::INSTALLDIR/share/java/vomsjapi.jar:$::JAVAPATH:$::env(CLASSPATH):$DIRNAME $classname"
+	    set VALUE "java [format %s $PROPERTIES] -classpath .:$::INSTALLDIR/share/java/vomsjapi.jar:$::JAVAPATH:$DIRNAME $classname"
 	}
         if [string equal $arg1 ""] then {
             set VALUE "$VALUE"

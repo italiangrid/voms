@@ -284,6 +284,8 @@ proc real_do_test { name } {
 
         if { $res == 0 } then {
             set res $out
+        } else {
+            logvar out
         }
         if [expr ! [ string equal $::_test_epilog ""]] then {
             set res2 [catch {set out2 [$::_test_epilog]} out2]
