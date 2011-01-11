@@ -1,0 +1,22 @@
+load_lib vomstest.exp
+
+testheader "See if \"Email\" OID is redefined somewhere."
+
+proc mytest {} {
+    set res1 [log_exec outnama1 {strings $::INSTALLDIR/bin/* $::INSTALLDIR/sbin/* | grep "Email" | grep -v "/Email"} ]
+    set res2 [log_exec outname2 {strings $::INSTALLDIR/lib/lib* | grep "Email" | grep -v "/Email"}]
+    set res3 [log_exec outname2 {strings $::INSTALLDIR/lib64/lib* | grep "Email" | grep -v "/Email"} ]
+
+    if [expr $res1 && $res2 && $res3]  then {
+        testmessage "Email OID is not redefined."
+        return $::PASSTEST
+    } else {
+        addlog outname1
+        addlog outname2
+        addlog outname3
+        testmessage "Email OID is redefined somewhere."
+        return $::FAILTEST
+    }
+}
+
+do_test

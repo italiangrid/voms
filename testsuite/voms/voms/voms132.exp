@@ -1,5 +1,5 @@
 load_lib vomstest.exp
-testheader "See if voms-proxy-init --voms <notexists> fails correctly."
+testheader "See if voms-proxy-init --voms \"notexists\" fails correctly."
 
 proc mytest {} {
     _activateCert mycert2

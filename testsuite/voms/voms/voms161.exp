@@ -1,0 +1,25 @@
+load_lib vomstest.exp
+testheader "check if there are world writable files/dirs in the installed software."
+
+proc mytest {} {
+    set res "[glob $::INSTALLDIR/*] [glob -nocomplain $::INSTALLDIR/*/*] [glob -nocomplain $::INSTALLDIR/*/*/*] [glob -nocomplain %::INSTALLDIR/*/*/*/*] [glob -nocomplain $::INSTALLDIR/*/*/*/*/*]"
+
+    set files ""
+    set err 0
+    foreach var $res {
+        set perms [file attributes $var -permissions]
+        set lc [string range $perms end end]
+        if [expr [string first $lc "2367"] != -1] then {
+            set files "$var $files"
+            set err 1
+        }
+    }
+
+    if $err then {
+        testmessage "The following files or dirs:$files were world writable."
+        return $::FAILTEST
+    }
+    return $::PASSTEST
+}
+
+do_test
