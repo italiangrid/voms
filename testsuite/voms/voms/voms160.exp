@@ -1,0 +1,28 @@
+load_lib vomstest.exp
+testheader "check if voms-proxy-info suceeds on a plain proxy."
+
+proc mytest {} {
+    _activateCert mycert2
+    _cleanproxy
+
+    set res [log_exec outname {voms-proxy-init}]
+
+    if $res then {
+        testmessage "proxy creation failed."
+        addlog $outname
+        return $::FAILTEST
+    }
+
+    set res [log_exec outname {voms-proxy-info}]
+
+    if $res then {
+        testmessage "voms-proxy-info failed on a plain proxy."
+        addlog $outname
+        return $::FAILTEST
+    } else {
+        testmessage "voms-proxy-info succeeded on a plain proxy."
+        return $::PASSTEST
+    }
+}
+
+do_test

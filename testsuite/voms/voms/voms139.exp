@@ -1,5 +1,5 @@
 load_lib vomstest.exp
-testheader "See if voms correctly exits when the password is not terminated by a newline."
+testheader "See if the "VO" field is included in the proxy."
 
 proc my_prolog {} {
     set ::env(VO) "myvo"

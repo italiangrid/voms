@@ -1,0 +1,25 @@
+load_lib vomstest.exp
+testheader "check if the jar file has executable permissions."
+
+proc mytest {} {
+    set res "[glob -nocomplain $::INSTALLDIR/share/java/vomsjapi.jar] [glob -nocomplain $::INSTALLDIR/usr/share/java/vomsjapi.jar]"
+
+    set files ""
+    set err 0
+    foreach var $res {
+        set perms [file attributes $var -permissions]
+        set lc [string range $perms end end]
+        if [expr [string first $lc "1357"] != -1] then {
+            set files "$var $files"
+            set err 1
+        }
+    }
+
+    if $err then {
+        testmessage "The jar file: $fileshas executable permissions."
+        return $::FAILTEST
+    }
+    return $::PASSTEST
+}
+
+do_test

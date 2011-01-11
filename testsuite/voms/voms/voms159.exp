@@ -1,0 +1,18 @@
+load_lib vomstest.exp
+
+testheader "check if references to edg have been removed from the manpages."
+
+proc mytest {} {
+    set res [log_exec outname {grep -r edg $::INSTALLDIR/share/man}]
+
+    if $res  then {
+        testmessage "No reference to edg remains in the man pages."
+        return $::PASSTEST
+    } else {
+        testmessage "some references to edg remain in the man pages."
+        addlog $outname
+        return $::FAILTEST
+    }
+}
+
+do_test
