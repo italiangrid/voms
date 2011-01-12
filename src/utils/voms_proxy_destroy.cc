@@ -185,6 +185,7 @@ int destroy_proxy(char *file, bool dry)
     if (dry) {
       if (!quiet)
         std::cerr << "Would remove " << file << std::endl;
+      close(fd);
     }
     else {
       memset(delblock, 0, 100);

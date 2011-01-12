@@ -446,6 +446,7 @@ struct VOMSProxy *VOMS_MakeProxy(struct VOMSProxyArguments *args, int *warning, 
       if (policy) {
         myPROXYPOLICY_set_policy(proxypolicy, (unsigned char*)policy, policysize);
         free(policy);
+        policy = NULL;
       }
       else if (args->policytext)
         myPROXYPOLICY_set_policy(proxypolicy, 
@@ -474,6 +475,7 @@ struct VOMSProxy *VOMS_MakeProxy(struct VOMSProxyArguments *args, int *warning, 
         if (!args->policytext) {
           value = snprintf_wrap("language:%s,pathlen:%s,policy:text:%s", policylang, buffer, policy);
           free(policy);
+          policy = NULL;
         }
         else 
           value = snprintf_wrap("language:%s,pathlen:%s,policy:text:%s", policylang, buffer, args->policytext);
@@ -506,6 +508,9 @@ struct VOMSProxy *VOMS_MakeProxy(struct VOMSProxyArguments *args, int *warning, 
         ex7 = X509V3_EXT_conf_nid(NULL, NULL, my_txt2nid(PROXYCERTINFO_V4), (char*)value);
       value = NULL;
     }
+
+    if (policy)
+      free(policy);
 
     if (ex7 == NULL) {
       PRXYerr(PRXYERR_F_PROXY_SIGN, PRXYERR_R_CLASS_ADD_EXT);

@@ -2879,8 +2879,10 @@ proxy_get_filenames(
                 /* Support for pkcs12 credentials. */
                 {
                   int fd = open(default_user_cert, O_RDONLY);
-                  if (fd == -1) {
-
+                  if (fd >= 0)
+                    close(fd);
+                  else {
+                    /* Cannot open normal file -- look for pkcs12. */
                     char *certname = NULL;
 
                     free(default_user_cert);
