@@ -120,14 +120,18 @@ proc _vomsStart {name } {
     catch {set saved $::env(GLITE_LOCATION)}
     set ::env(GLITE_LOCATION) $::INSTALLDIR
     exec /bin/sh -c "rm -f $::INSTALLDIR/var/log/voms.$name*"
+    set myname [exec mktemp $::SCRATCHDIR/voms-stop-XXXXXX]
 
     if {[info exists ::VALGRIND]} then {
         set VALGRINDPART [_do_valgrind_cl]
         set voms_start "$::SCRATCHDIR/voms-start"
         log_exec voms_start {$::INSTALLDIR/sbin/edg-voms --conf $::INSTALLDIR/etc/voms/$name/voms.conf >/dev/null}
+        exec touch $myname
     } else {
-        exec $::INSTALLDIR/etc/init.d/voms start [exec cat $::_vomsdefinitions/$name/options/voms-vo] >/dev/null
+        exec $::INSTALLDIR/etc/init.d/voms start [exec cat $::_vomsdefinitions/$name/options/voms-vo] >& $myname
     }
+
+    loadvar ::startOutput $myname
 
     if [expr ! [string equal $saved ""]] then {
         set ::env(GLITE_LOCATION) $saved
