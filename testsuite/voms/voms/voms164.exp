@@ -1,0 +1,34 @@
+load_lib vomstest.exp
+
+testheader "See if /etc/init.d/voms fails correctly to start correctly when the lokfile points to the wrong process."
+
+proc myepilog {} {
+    _vomsStop voms1
+    exec rm $::INSTALLDIR/var/lock/subsys/voms.voms1
+}
+proc mytest {} {
+
+    if {[info exists ::VALGRIND]} then {
+        return $::UNDECIDEDTEST
+    }
+    set pid [exec ps | grep bash | grep -v grep | head -1]
+    set ppid [string range $pid 0 [string first " " $pid]]
+    set id [open $::INSTALLDIR/var/lock/subsys/voms.voms1 "w+"]
+    puts $id $pid
+    close $id
+
+    _activateCert mycert2
+    _vomsStart voms1
+
+    set correct "lock file $::INSTALLDIR/var/lock/subsys/voms.voms1 seems to be stale"
+    if [regexp $correct $::startOutput] then {
+        testmessage "voms failed to start with the correct error."
+        return $::PASSTEST
+    }
+    logvar ::startOutput
+    testmessage "voms returned an incorrect error message"
+    return $::FAILTEST
+}
+
+test_set_epilog myepilog
+do_test
