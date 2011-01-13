@@ -292,6 +292,8 @@ struct VOMSProxy *VOMS_MakeProxy(struct VOMSProxyArguments *args, int *warning, 
   if (args->exkusage) {
     if ((ex10 = set_ExtendedKeyUsageFlags(args->exkusage)) == NULL) {
       PRXYerr(PRXYERR_F_PROXY_SIGN, PRXYERR_R_CLASS_ADD_EXT);
+      setWarning(warning, PROXY_ERROR_UNKNOWN_EXTENDED_BIT);
+      setAdditional(additional,args->exkusage);
       goto err;
     }
 
@@ -856,6 +858,10 @@ char *ProxyCreationError(int error, void *additional)
 
   case PROXY_ERROR_UNKNOWN_BIT:
     return snprintf_wrap("KeyUsage bit: %s unknown\n", additional);
+    break;
+
+  case PROXY_ERROR_UNKNOWN_EXTENDED_BIT:
+    return snprintf_wrap("ExtKeyUsage bit value: %s invalid.  One or more of the bits are unknown\n", additional);
     break;
 
   case PROXY_WARNING_GSI_ASSUMED:

@@ -1,0 +1,31 @@
+load_lib vomstest.exp
+
+testheader "See if voms-proxy-fake with incorrect -extkeyusage fails correctly."
+
+proc mytest {} {
+    _activateCert mycert2
+    _cleanproxy
+
+    set res [log_exec outname {voms-proxy-fake --voms voms1 --hostcert $::INSTALLDIR/certs/hostcert.pem --hostkey $::INSTALLDIR/certs/hostkey.pem --extkeyusage serverAuth,timeStampig}]
+
+    if $res then {
+        set correct "ExtKeyUsage bit value: serverAuth,timeStampig invalid.  One or more of the bits are unknown"
+        loadvar out2 $outname
+        if [regexp $correct $out2] then {
+            testmessage "voms-proxy-fake succeeded with the correct error."
+            return $::PASSTEST
+        }
+        addlog $outname
+        logvar correct
+        testmessage "voms-proxy-fake failed with the wrong error."
+        return $::FAILTEST
+    }
+
+    testmessage "voms-proxy-fake succeeded when it should have failed."
+
+    addlog $outname
+    return $::FAILTEST
+
+}
+
+do_test

@@ -92,6 +92,7 @@ char *ProxyCreationError(int error, void *additional);
 #define PROXY_ERROR_OUT_OF_MEMORY                 3
 #define PROXY_ERROR_FILE_READ                     4
 #define PROXY_ERROR_UNKNOWN_BIT                   5
+#define PROXY_ERROR_UNKNOWN_EXTENDED_BIT          6
 #define PROXY_WARNING_GSI_ASSUMED              1000
 #define PROXY_WARNING_GENERIC_LANGUAGE_ASSUMED 1001
 
