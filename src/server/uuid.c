@@ -49,12 +49,8 @@ void initialize_uuid_generator()
 
 void generate_uuid(unsigned char uuid[16])
 {
-  int i = 0;
-
-  int fd = -1;
-
   if (have_urandom) {
-    fd = open("/dev/urandom", O_RDONLY);
+    int fd = open("/dev/urandom", O_RDONLY);
     int hasread = 0;
     int readb = 0;
     do {
@@ -64,6 +60,8 @@ void generate_uuid(unsigned char uuid[16])
     close(fd);
   }
   else {
+    int i;
+
     for (i =0 ; i < 16; i ++)
       uuid[i] = (random() & 0x000ff000) >> 12;
   }

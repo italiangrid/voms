@@ -559,7 +559,7 @@ static bool print(X509 *cert, STACK_OF(X509) *chain, vomsdata &vd)
   }    
   
   if (all) {
-    for (std::vector<voms>::iterator v = vd.data.begin(); v != vd.data.end(); v++) {
+    for (std::vector<voms>::iterator v = vd.data.begin(); v != vd.data.end(); ++v) {
       ASN1_TIME * after  = convtime(v->date2);
       leftac = stillvalid(after) - now;	
       leftac = (leftac<0) ? 0 : leftac;
@@ -570,11 +570,11 @@ static bool print(X509 *cert, STACK_OF(X509) *chain, vomsdata &vd)
       std::cout << "subject   : " << v->user << "\n";
       std::cout << "issuer    : " << v->server << "\n";
 
-      for (std::vector<std::string>::iterator s = v->fqan.begin(); s != v->fqan.end(); s++)
+      for (std::vector<std::string>::iterator s = v->fqan.begin(); s != v->fqan.end(); ++s)
         std::cout << "attribute : " << *s << "\n";
       std::vector<attributelist> alist = v->GetAttributes();
-      for (std::vector<attributelist>::iterator s = alist.begin(); s != alist.end(); s++)
-        for (std::vector<attribute>::iterator t = s->attributes.begin(); t != s->attributes.end(); t++)
+      for (std::vector<attributelist>::iterator s = alist.begin(); s != alist.end(); ++s)
+        for (std::vector<attribute>::iterator t = s->attributes.begin(); t != s->attributes.end(); ++t)
           std::cout << "attribute : " << t->name + " = " + t->value + 
             (t->qualifier.empty() ? "" : " (" + t->qualifier + ")") << std::endl;
       std::cout << "timeleft  : " << leftac/3600 << ":" << std::setw(2) << std::setfill('0')
@@ -582,7 +582,7 @@ static bool print(X509 *cert, STACK_OF(X509) *chain, vomsdata &vd)
 
       std::vector<std::string> targetlist = v->GetTargets();
       if (!targetlist.empty()) {
-        for (std::vector<std::string>::iterator targ = targetlist.begin(); targ != targetlist.end(); targ++)
+        for (std::vector<std::string>::iterator targ = targetlist.begin(); targ != targetlist.end(); ++targ)
           std::cout << "target    : " << *targ << "\n";
       }
       std::cout << "uri       : " << v->uri  << "\n";
@@ -638,7 +638,7 @@ static bool print(X509 *cert, STACK_OF(X509) *chain, vomsdata &vd)
     if (vo || acsubject || acissuer || actimeleft || fqan || serial || targets || printuri)
       res = false;
 
-  for (std::vector<voms>::iterator v = vd.data.begin(); v != vd.data.end(); v++) {
+  for (std::vector<voms>::iterator v = vd.data.begin(); v != vd.data.end(); ++v) {
     if(vo)
         std::cout << v->voname << "\n";
 
@@ -660,7 +660,7 @@ static bool print(X509 *cert, STACK_OF(X509) *chain, vomsdata &vd)
         std::cout << leftac << "\n";
 
     if (fqan) {
-      for (std::vector<std::string>::iterator s = v->fqan.begin(); s != v->fqan.end(); s++)
+      for (std::vector<std::string>::iterator s = v->fqan.begin(); s != v->fqan.end(); ++s)
         std::cout << *s << "\n";
       if (v->fqan.empty())
         res = false;
@@ -673,7 +673,7 @@ static bool print(X509 *cert, STACK_OF(X509) *chain, vomsdata &vd)
       std::vector<std::string> targetlist = v->GetTargets();
 
       if (!targetlist.empty()) {
-        for (std::vector<std::string>::iterator targ = targetlist.begin(); targ != targetlist.end(); targ++)
+        for (std::vector<std::string>::iterator targ = targetlist.begin(); targ != targetlist.end(); ++targ)
           std::cout << "target    : " << *targ << "\n";
       }
     }

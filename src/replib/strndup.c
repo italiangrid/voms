@@ -29,7 +29,6 @@
 
 char *strndup(const char *s, size_t n)
 {
-  int l;
   char *r;
 
   if (!s)

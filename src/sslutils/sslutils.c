@@ -425,7 +425,9 @@ ERR_load_prxyerr_strings(
 #else
     char *                              randfile;
 #endif
+#if SSLEAY_VERSION_NUMBER >=  0x0090581fL
     char *                              egd_path;
+#endif
     char                                buffer[200];
         
     if (init)
@@ -878,10 +880,10 @@ proxy_sign(
 
     unsigned char                       md[SHA_DIGEST_LENGTH];
     unsigned int                        len;
-    unsigned int                        dig_len = -1;
-    long                                sub_hash;
+
 
     if(proxyver>=3) {
+      long sub_hash;
 
       user_public_key = X509_get_pubkey(user_cert);
 #ifdef TYPEDEF_I2D_OF
@@ -906,7 +908,7 @@ proxy_sign(
       if(proxy_construct_name(
                               user_cert,
                               &subject_name,
-                              newcn, dig_len)) {
+                              newcn, -1)) {
         PRXYerr(PRXYERR_F_PROXY_SIGN,PRXYERR_R_PROCESS_SIGN);
         if (proxyver >= 3)
           free(newcn);
@@ -1393,7 +1395,6 @@ proxy_marshal_bp(
     X509 *                              ucert,
     STACK_OF(X509) *                    cert_chain)
 {
-    int                                 i;
     X509 *                              cert;
 
     if (!PEM_write_bio_X509(bp,ncert))
@@ -1425,6 +1426,7 @@ proxy_marshal_bp(
          * add additional certs, but not our cert, or the 
          * proxy cert, or any self signed certs
          */
+        int i;
 
         for(i=0; i < sk_X509_num(cert_chain); i++)
         {
@@ -1599,9 +1601,6 @@ int proxy_check_proxy_name(
     int nidv3, nidv4 = 0;
     int indexv3 = -1, indexv4 = -1;
 
-    ASN1_OBJECT *objv3;
-    ASN1_OBJECT *objv4;
-
     nidv3 = my_txt2nid(PROXYCERTINFO_V3);
     nidv4 = my_txt2nid(PROXYCERTINFO_V4);
 
@@ -1624,8 +1623,8 @@ int proxy_check_proxy_name(
           myPROXYPOLICY *policy = myPROXYCERTINFO_get_proxypolicy(certinfo);
 
           if (policy) {
-            ASN1_OBJECT *policylang;
-            policylang = myPROXYPOLICY_get_policy_language(policy);
+/*             ASN1_OBJECT *policylang; */
+/*             policylang = myPROXYPOLICY_get_policy_language(policy); */
 
             /* TO DO:  discover exact type of proxy. */
 
@@ -1805,19 +1804,19 @@ proxy_verify_callback(
 {
     X509_OBJECT                         obj;
     X509 *                              cert = NULL;
+#ifdef X509_V_ERR_CERT_REVOKED
     X509_CRL *                          crl;
     X509_CRL_INFO *                     crl_info;
     X509_REVOKED *                      revoked;
+#endif
     STACK_OF(X509_EXTENSION) *          extensions;
     X509_EXTENSION *                    ex;
     ASN1_OBJECT *                       extension_obj;
     int                                 nid;
-    char *                              s = NULL;
     SSL *                               ssl = NULL;
     proxy_verify_desc *                 pvd;
     int                                 itsaproxy = 0;
     int                                 i;
-    int                                 n;
     int                                 ret;
     time_t                              goodtill;
     char *                              ca_policy_file_path = NULL;
@@ -2018,6 +2017,7 @@ proxy_verify_callback(
     {
                         
 #ifdef X509_V_ERR_CERT_REVOKED
+        int n = 0;
         /* 
          * SSLeay 0.9.0 handles CRLs but does not check them. 
          * We will check the crl for this cert, if there
@@ -2089,6 +2089,7 @@ proxy_verify_callback(
                 {
                     long serial;
                     char buf[256];
+                    char *s;
                     PRXYerr(PRXYERR_F_VERIFY_CB,PRXYERR_R_CERT_REVOKED);
                     serial = ASN1_INTEGER_get(revoked->serialNumber);
                     sprintf(buf,"%ld (0x%lX)",serial,serial);
@@ -2345,8 +2346,6 @@ proxy_verify_cert_chain(
     STACK_OF(X509) *                    cert_chain,
     proxy_verify_desc *                 pvd)
 {
-    int                                 i;
-    int                                 j;
     int                                 retval = 0;
     X509_STORE *                        cert_store = NULL;
     X509_LOOKUP *                       lookup = NULL;
@@ -2360,6 +2359,7 @@ proxy_verify_cert_chain(
     X509_STORE_set_verify_cb_func(cert_store, proxy_verify_callback);
     if (cert_chain != NULL)
     {
+        int i =0;
         for (i=0;i<sk_X509_num(cert_chain);i++)
         {
             xcert = sk_X509_value(cert_chain,i);
@@ -2369,7 +2369,7 @@ proxy_verify_cert_chain(
             }
             else
             {
-                j = X509_STORE_add_cert(cert_store, xcert);
+                int j = X509_STORE_add_cert(cert_store, xcert);
                 if (!j)
                 {
                     if ((ERR_GET_REASON(ERR_peek_error()) ==
@@ -3184,8 +3184,6 @@ proxy_load_user_key(
     int                                 (*pw_cb)(),
     UNUSED(unsigned long *                     hSession))
 {
-    unsigned long                       error;
-    int                                 mismatch = 0;
     int                                 status = -1;
     FILE *                              fp;
     EVP_PKEY *                          ucertpkey;
@@ -3305,8 +3303,9 @@ proxy_load_user_key(
       if (PEM_read_PrivateKey(fp,
                               private_key,
                               OPENSSL_PEM_CB(xpw_cb,NULL)) == NULL) {
+        unsigned long error = ERR_peek_error();
         fclose(fp);
-        error = ERR_peek_error();
+
 #ifdef PEM_F_PEM_DEF_CALLBACK
         if (error == ERR_PACK(ERR_LIB_PEM,
                               PEM_F_PEM_DEF_CALLBACK,
@@ -3352,6 +3351,8 @@ proxy_load_user_key(
     {
         X509_PUBKEY *key = X509_get_X509_PUBKEY(ucert);
         ucertpkey =  X509_PUBKEY_get(key);
+        int mismatch = 0;
+
         if (ucertpkey!= NULL  && ucertpkey->type == 
             (*private_key)->type)
         {

@@ -387,8 +387,9 @@ void PRIVATE read_pathrestriction(STACK_OF(X509) *chain, char *path,
       fclose(file);
     }
 
-    int j = 0;
     if (*names) {
+      int j = 0;
+
       while ((*names)[j]) {
         if ((*names)[j]->self)
           (*names)[j]->caname = strdup(hash);

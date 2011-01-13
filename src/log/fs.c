@@ -212,9 +212,7 @@ void *FILEStreamerAdd(void *h)
  
 static int logfile_rotate(const char * name)
 {
-  int i = 0;
   char *pos, *dirname, *newname, *oldname, *basename;
-  int max = 0;
   DIR * dir = NULL;
   struct dirent * de = NULL;
   int result = 0;
@@ -231,6 +229,9 @@ static int logfile_rotate(const char * name)
     goto err;
 
   if ((fd = open(fname, O_CREAT|O_EXCL|O_RDONLY, S_IRUSR|S_IWUSR)) != -1) {
+    int i = 0;
+    int max = 0;
+
     pos = strrchr(name, '/');
   
     if (pos == NULL) {

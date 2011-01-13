@@ -315,7 +315,6 @@ int LogMessageF(const char *func, int line, const char *file, void *data, loglev
 {
   va_list v;
   char *str = NULL;
-  int res = 0;
   struct LogInfo *li=(struct LogInfo *)data;
 
 
@@ -327,6 +326,8 @@ int LogMessageF(const char *func, int line, const char *file, void *data, loglev
 
   if (li) {
     if ((li->currlev >= lev) || (li->currlev == LEV_DEBUG)) {
+      int res = 0;
+
       va_start(v, format);
       str = vsnprintf_wrap(format, v);
       va_end(v);
@@ -368,7 +369,6 @@ static signed int GetLen(const char **message)
 int LogMessage(void *data, loglevels lev, logtypes type, const char *message, const char *func, int line, const char *file)
 {
   struct LogInfo *li=(struct LogInfo *)data;
-  signed int len = 0;
   char *msgcopy = NULL;
 
   if (!data)
@@ -389,6 +389,7 @@ int LogMessage(void *data, loglevels lev, logtypes type, const char *message, co
       int mode = 0;
       char *str = NULL;
       char *holder = NULL;
+      signed int len = 0;
 
       msgcopy = strdup(message);
       holder = msgcopy;

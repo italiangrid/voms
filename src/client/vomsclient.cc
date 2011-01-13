@@ -545,7 +545,7 @@ Client::Client(int argc, char ** argv) :
   
     ordering = parse_fqan(order, true);
 
-    for (std::vector<std::string>::iterator i = targets.begin(); i != targets.end(); i++)
+    for (std::vector<std::string>::iterator i = targets.begin(); i != targets.end(); ++i)
       targetlist += (i == targets.begin() ? ("") : std::string(",")) + *i;
   
     /* preliminary checks if at least a server for each 
@@ -686,7 +686,7 @@ int Client::Run()
     int version;
 
     /* contact each server until one answers */
-    for (std::vector<contactdata>::iterator beg = servers.begin(); beg != servers.end(); beg++) {
+    for (std::vector<contactdata>::iterator beg = servers.begin(); beg != servers.end(); ++beg) {
 
       /* create a temporary proxy to contact the server */  
       if (!noregen) {
@@ -720,7 +720,7 @@ int Client::Run()
             voms vv;
 
             if (v->DefaultData(vv)) {
-              for (std::vector<std::string>::iterator fqan = vv.fqan.begin(); fqan != vv.fqan.end(); fqan++)
+              for (std::vector<std::string>::iterator fqan = vv.fqan.begin(); fqan != vv.fqan.end(); ++fqan)
                 data += *fqan + "\n";
             }
             break;
@@ -972,7 +972,7 @@ bool Client::WriteSeparate()
       return false;
     }
     else {
-      for (std::string::iterator pos = data.begin(); pos != data.end(); pos++)
+      for (std::string::iterator pos = data.begin(); pos != data.end(); ++pos)
         fs << *pos;
       fs.close();
     }
@@ -1208,7 +1208,7 @@ bool Client::LoadVomses()
   bool failfatal   = failonwarn  || confiles.size() == 1;
   bool alwaysprint = !ignorewarn || confiles.size() == 1;
 
-  for (std::vector<std::string>::iterator i = confiles.begin(); i != confiles.end(); i++) {
+  for (std::vector<std::string>::iterator i = confiles.begin(); i != confiles.end(); ++i) {
     if (debug)
       std::cout << "Using configuration file "<< *i << std::endl;
 

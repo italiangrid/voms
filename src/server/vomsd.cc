@@ -95,7 +95,7 @@ std::string vomsresult::makeRESTAnswer(int& code)
   if (!data.empty())
     output += "<bitstr>"+Encode(data, true)+"</bitstr>";
 
-  for (std::vector<errorp>::iterator i = errs.begin(); i != errs.end(); i++) {
+  for (std::vector<errorp>::iterator i = errs.begin(); i != errs.end(); ++i) {
     bool warning = i->num < ERROR_OFFSET ? true : false;
     
     std::string strcode;
@@ -998,7 +998,7 @@ bool VOMSServer::makeAC(vomsresult& vr, EVP_PKEY *key, X509 *issuer,
           fqan += "/Role=NULL/Capability=NULL";
         LOGM(VARP, logh, LEV_DEBUG, T_PRE, "Processed FQAN: %s", fqan.c_str());
         fqans.push_back(fqan);
-        i++;
+        ++i;
       }
     }
 
@@ -1038,7 +1038,7 @@ bool VOMSServer::makeAC(vomsresult& vr, EVP_PKEY *key, X509 *issuer,
   if (!fqans.empty()) {
     // test logging retrieved attributes
 
-    for (std::vector<std::string>::iterator i = fqans.begin(); i != fqans.end(); i++)
+    for (std::vector<std::string>::iterator i = fqans.begin(); i != fqans.end(); ++i)
       LOGM(VARP, logh, LEV_INFO, T_PRE, "Request Result: %s",  (*i).c_str());
 
     if (LogLevelMin(logh, LEV_DEBUG)) {
@@ -1052,11 +1052,11 @@ bool VOMSServer::makeAC(vomsresult& vr, EVP_PKEY *key, X509 *issuer,
 
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-    int res = 1;
     std::string codedac;
     std::string data;
 
     if (comm[0] != "N") {
+      int res = 1;
       BIGNUM * serial = get_serial();
 
       if (!serial)
@@ -1108,7 +1108,7 @@ bool VOMSServer::makeAC(vomsresult& vr, EVP_PKEY *key, X509 *issuer,
     else {
       /* comm[0] == "N" */
 
-      for (std::vector<std::string>::iterator i = fqans.begin(); i != fqans.end(); i++)
+      for (std::vector<std::string>::iterator i = fqans.begin(); i != fqans.end(); ++i)
         data += (*i).c_str() + std::string("\n");
     }
 

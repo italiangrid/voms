@@ -30,7 +30,6 @@ int memcmp(const void *s1, const void *s2, size_t n)
 {
   const char *st1 = (const char *)s1;
   const char *st2 = (const char *)s2;
-  int i;
 
   while (n--) {
     if (!(*st1++ != *st2++)) break;

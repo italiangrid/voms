@@ -385,7 +385,6 @@ static int checkAttributes(STACK_OF(AC_ATTR) *atts, voms &v)
 {
   int nid3;
   int pos3;
-  int i;
 
   AC_ATTR *caps;
   STACK_OF(AC_IETFATTRVAL) *values;
@@ -432,7 +431,7 @@ static int checkAttributes(STACK_OF(AC_ATTR) *atts, voms &v)
     return AC_ERR_ATTRIB_URI;
 
   /* scan the stack of IETFATTRVAL to put attribute in voms struct */
-  for (i=0; i<sk_AC_IETFATTRVAL_num(values); i++) {
+  for (int i=0; i<sk_AC_IETFATTRVAL_num(values); i++) {
     capname = sk_AC_IETFATTRVAL_value(values, i);
 
     if (!(capname->type == V_ASN1_OCTET_STRING))
@@ -512,7 +511,6 @@ static int checkExtensions(STACK_OF(X509_EXTENSION) *exts, X509 *iss, int valids
       if (valids & VERIFY_TARGET) {
         std::string fqdn = getfqdn();
         int ok = 0;
-        int i;
         ASN1_IA5STRING *fqdns = ASN1_IA5STRING_new();
         if (fqdns) {
           ret = AC_ERR_TARGET_NO_MATCH;
@@ -520,7 +518,7 @@ static int checkExtensions(STACK_OF(X509_EXTENSION) *exts, X509 *iss, int valids
           targets = (AC_TARGETS *)X509V3_EXT_d2i(ex);
 
           if (targets) {
-            for (i = 0; i < sk_AC_TARGET_num(targets->targets); i++) {
+            for (int i = 0; i < sk_AC_TARGET_num(targets->targets); i++) {
               name = sk_AC_TARGET_value(targets->targets, i);
 
               if (name->name && name->name->type == GEN_URI) {

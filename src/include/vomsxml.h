@@ -49,9 +49,9 @@ struct answer {
 extern std::string XML_Req_Encode(const std::string&, const std::string&, 
                                   const std::string&, const int);
 extern std::string XML_Ans_Encode(const std::string&,  const std::string&,
-                                  const std::vector<errorp>, bool);
+                                  const std::vector<errorp>&, bool);
 extern bool XML_Req_Decode(const std::string&, request &);
 extern bool XML_Ans_Decode(const std::string&, answer &);
 extern std::string Encode(std::string data, int base64);
-extern std::string Decode(const std::string data);
+extern std::string Decode(const std::string& data);
 #endif
