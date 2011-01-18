@@ -3,11 +3,13 @@ testheader "See proxies can be created when server certificate contains \"Email\
 
 proc myprolog {} {
     _activateHostCertificate mycert5
+    file copy -force "$::_certdir/mycert5-cert.pem" $::_vomsdir/voms1.pem
     _makeVomses voms1
 }
 
 proc myepilog {} {
     _activateHostCertificate mycert3
+    file copy -force "$::_certdir/mycert3-cert.pem" $::_vomsdir/voms1.pem
     _makeVomses voms1
 }
 
