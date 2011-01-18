@@ -44,6 +44,13 @@ import java.util.Set;
 import java.security.Security;
 import java.security.SecureRandom;
 import java.security.Principal;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
+import java.security.NoSuchProviderException;
+import java.security.cert.CertificateFactory;
+import java.security.cert.X509Certificate;
+import java.security.cert.Certificate;
+
 
 import org.apache.log4j.Logger;
 import org.glite.voms.PKIVerifier;
@@ -64,6 +71,8 @@ import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 
 import java.net.URL;
+
+import org.bouncycastle.jce.provider.BouncyCastleProvider;
 
 
 /**
@@ -96,6 +105,12 @@ public class VOMSProxyInit {
     private int bits = 1024;
 
     private VOMSWarningMessage[] warnings = null;
+
+    static {
+        if (Security.getProvider("BC") == null) {
+            Security.addProvider(new BouncyCastleProvider());
+        }
+    }
 
     public VOMSProxyInit(String privateKeyPassword){
     
@@ -612,8 +627,14 @@ class GSIVerifier implements HostnameVerifier {
     private HostnameVerifier verifier;
     private static final Logger log = Logger.getLogger( GSIVerifier.class );
 
+    static {
+        if (Security.getProvider("BC") == null) {
+            Security.addProvider(new BouncyCastleProvider());
+        }
+    }
+
     public GSIVerifier(HostnameVerifier defaultVerifier, String DN) {
-        name = PKIUtils.Normalize(DN);
+        name = DN;
         verifier = defaultVerifier;
     }
 
@@ -621,9 +642,9 @@ class GSIVerifier implements HostnameVerifier {
         boolean res = false;
         if (!verifier.verify(hostname, session)) {
             try {
-                Principal p = session.getPeerPrincipal();
-                String normal = PKIUtils.getOpenSSLFormatPrincipal(p, false);
-                String reversed = PKIUtils.getOpenSSLFormatPrincipal(p, true);
+                X509Certificate c = (X509Certificate) session.getPeerCertificates()[0];
+                String normal = PKIUtils.getOpenSSLFormatPrincipal(c.getSubjectDN(), false);
+                String reversed = PKIUtils.getOpenSSLFormatPrincipal(c.getSubjectDN(), true);
             
                 res = PKIUtils.DNCompare(name, normal) || PKIUtils.DNCompare(name, reversed);
                 log.debug("result of DN verifier: " + res);
