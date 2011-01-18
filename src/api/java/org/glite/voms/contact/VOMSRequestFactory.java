@@ -160,9 +160,9 @@ public class VOMSRequestFactory {
             return "/generate-ac?fqans=all";
         }
 
-        String FQANList = "";
-        String TargetList = "";
-        String OrderList = "";
+        StringBuilder request = new StringBuilder();
+
+        request.append("/generate-ac?fqans=");
 
         if (options.getRequestedFQANs().isEmpty()){
             
@@ -173,27 +173,34 @@ public class VOMSRequestFactory {
             if (!voName.startsWith( "/"))
                 voName = "/"+voName;
 
-            FQANList = voName;
+            request.append(voName);
         }
         else {
             List FQANs = options.getRequestedFQANs();
             Iterator i = FQANs.iterator();
+            boolean first = true;
 
             while ( i.hasNext()) {
-                String FQAN = (String) i.next();
-                if (FQANList.trim().length() != 0)
-                    FQANList += ",";
-                FQANList += FQAN;
+                if (!first)
+                    request.append(",");
+                request.append((String)i.next());
+                first = false;
             }
         }
-        if (targetString != null && targetString.trim().length() != 0)
-            TargetList = "&targets=" + targetString;
+        if (targetString != null && targetString.trim().length() != 0) {
+            request.append("&targets=");
+            request.append(targetString);
+        }
 
-        if (orderString != null && orderString.trim().length() != 0)
-            OrderList = "&order=" + orderString;
+        if (orderString != null && orderString.trim().length() != 0) {
+            request.append("&order=");
+            request.append(orderString);
+        }
 
-        log.debug("Generated request: /generate-ac?fqans="+FQANList+TargetList+OrderList+"&lifetime=" + lifetime);
-        return "/generate-ac?fqans="+FQANList+TargetList+OrderList+"&lifetime=" + lifetime; 
+        request.append("&lifetime=");
+        request.append(lifetime);
+        log.debug("Generated request: " + request.toString());
+        return request.toString();
     }
 
     public Document buildRequest(VOMSRequestOptions options){

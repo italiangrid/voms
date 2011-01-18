@@ -252,12 +252,14 @@ public class VOMSProxyInit {
                             AttributeCertificate ac = VOMSProxyBuilder.buildAC(response.getAC());
                             if (ac != null) {
                                 List fqans = ac.getFullyQualifiedAttributes();
-                                String result = "";
+                                StringBuilder result = new StringBuilder();
                                 if (fqans != null) {
-                                    for (int i =0; i < fqans.size(); i++)
-                                        result += (String)(fqans.get(i))+"\n";
+                                    for (int i =0; i < fqans.size(); i++) {
+                                        result.append((String)(fqans.get(i)));
+                                        result.append("\n");
+                                    }
                                 }
-                                return result;
+                                return result.toString();
                             }
                             else
                                 return null;
