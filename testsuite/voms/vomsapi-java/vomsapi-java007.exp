@@ -33,4 +33,7 @@ proc mytest {} {
     return $::PASSTEST
 }
 
+test_set_prolog myprolog
+test_set_epilog myepilog
+
 do_test
