@@ -171,9 +171,8 @@ public class VOMSProxyInit {
             try{
             
                 VOMSResponse response = contactServer( serverInfo, requestOptions );
-                
                 if (!response.hasErrors()){
-                    
+                    log.debug("No errors");
                     if (response.hasWarnings())
                         logAndSetWarningMessages(response);
 
@@ -418,9 +417,7 @@ public class VOMSProxyInit {
     }
 
     private void logAndSetWarningMessages(VOMSResponse response){
-        
         VOMSWarningMessage[] msgs = response.warningMessages();
-        
         setWarnings(msgs);
         for ( int i = 0; i < msgs.length; i++ ) {
             log.warn(msgs[i]);
@@ -463,20 +460,10 @@ public class VOMSProxyInit {
             conn.setSSLSocketFactory(factory);
             HostnameVerifier v = conn.getDefaultHostnameVerifier();
             conn.setHostnameVerifier(new GSIVerifier(v, sInfo.getHostDn()));
-            log.debug("Trying connection.");
             conn.connect();
             Object o = conn.getContent();
 
-            log.debug("output is: " + o);
-
-            DocumentBuilderFactory docfactory = DocumentBuilderFactory.newInstance();
-            docfactory.setIgnoringComments( true );
-            docfactory.setNamespaceAware( false );
-            docfactory.setValidating( false );
-            DocumentBuilder docBuild = docfactory.newDocumentBuilder();
-
-            log.debug("Creating Response");
-            resp = new VOMSResponse(docBuild.parse((InputStream)o));
+            resp = VOMSParser.instance().parseResponse((InputStream)o);
 
         } catch ( Exception e ) {
             
@@ -485,27 +472,20 @@ public class VOMSProxyInit {
             try {
                 log.error("Error code is: " + conn.getResponseCode());
 
-                if (conn.getResponseCode() == HttpURLConnection.HTTP_INTERNAL_ERROR) {
+                //                if (conn.getResponseCode() == HttpURLConnection.HTTP_INTERNAL_ERROR) {
                     InputStream is = conn.getErrorStream();
-                    DocumentBuilderFactory docfactory = DocumentBuilderFactory.newInstance();
-                    docfactory.setIgnoringComments( true );
-                    docfactory.setNamespaceAware( false );
-                    docfactory.setValidating( false );
-                    DocumentBuilder docBuild = docfactory.newDocumentBuilder();
-
-                    log.debug("Creating Response");
-                    resp = new VOMSResponse(docBuild.parse(is));
+                    resp = VOMSParser.instance().parseResponse(is);
                     return resp;
-                }
+                    //                }
             } catch (Exception ex) {
                 if (log.isDebugEnabled())
                     log.error(e.getMessage(),e);
 
                 throw new VOMSException("Error connecting to "+sInfo.compactString()+":"+ex.getMessage() ,ex);
             }
-            if (log.isDebugEnabled())
-                log.error(e.getMessage(),e);
-            throw new VOMSException("Error connecting to "+sInfo.compactString()+":"+e.getMessage() ,e);
+            // if (log.isDebugEnabled())
+            //     log.error(e.getMessage(),e);
+            // throw new VOMSException("Error connecting to "+sInfo.compactString()+":"+e.getMessage() ,e);
         }
 
         return resp;
@@ -519,54 +499,52 @@ public class VOMSProxyInit {
         VOMSResponse resp = contactServerREST(sInfo, reqOptions);
         if (resp != null) {
             return resp;
-        } else {
-        return null;
         }
 
-        // int gridProxyType = sInfo.getGlobusVersionAsInt();
+        int gridProxyType = sInfo.getGlobusVersionAsInt();
         
-        // if (gridProxyType > 0)
-        //     socket = VOMSSocket.instance( userCredentials, sInfo.getHostDn(), gridProxyType );
-        // else
-        //     socket = VOMSSocket.instance( userCredentials, sInfo.getHostDn());
+        if (gridProxyType > 0)
+            socket = VOMSSocket.instance( userCredentials, sInfo.getHostDn(), gridProxyType );
+        else
+            socket = VOMSSocket.instance( userCredentials, sInfo.getHostDn());
         
-        // try {
-        //     socket.connect( sInfo.getHostName(), sInfo.getPort());
+        try {
+            socket.connect( sInfo.getHostName(), sInfo.getPort());
             
-        // } catch ( Exception e ) {
+        } catch ( Exception e ) {
             
-        //     log.error( "Error connecting to "+sInfo.compactString()+":"+e.getMessage() );
+            log.error( "Error connecting to "+sInfo.compactString()+":"+e.getMessage() );
             
-        //     if (log.isDebugEnabled())
-        //         log.error(e.getMessage(),e);
-        //     throw new VOMSException("Error connecting to "+sInfo.compactString()+":"+e.getMessage() ,e);
+            if (log.isDebugEnabled())
+                log.error(e.getMessage(),e);
+            throw new VOMSException("Error connecting to "+sInfo.compactString()+":"+e.getMessage() ,e);
             
-        // } 
+        } 
         
-        // VOMSResponse response;
+        VOMSResponse response;
         
-        // try {
+        try {
 
-        //     // re-set the reqOptions voName property to be the true voName recorded by the 
-        //     // sInfo object (the reqOptions voName could actually be an alias rather than 
-        //     // the true vo name).  
-        //     reqOptions.setVoName(sInfo.getVoName()); 
+            // re-set the reqOptions voName property to be the true voName recorded by the 
+            // sInfo object (the reqOptions voName could actually be an alias rather than 
+            // the true vo name).  
+            reqOptions.setVoName(sInfo.getVoName()); 
             
-        //     protocol.sendRequest( reqOptions, socket.getOutputStream());
-        //     response = protocol.getResponse( socket.getInputStream() );
+            protocol.sendRequest( reqOptions, socket.getOutputStream());
+            response = protocol.getResponse( socket.getInputStream() );
             
-        //     socket.close();
+            socket.close();
             
             
-        // } catch ( IOException e ) {
-        //     log.error( "Error communicating with server "+sInfo.getHostName()+":"+sInfo.getPort()+":"+e.getMessage() );
+        } catch ( IOException e ) {
+            log.error( "Error communicating with server "+sInfo.getHostName()+":"+sInfo.getPort()+":"+e.getMessage() );
             
-        //     if (log.isDebugEnabled())
-        //         log.error(e.getMessage(),e);
-        //     throw new VOMSException("Error communicating with server "+sInfo.getHostName()+":"+sInfo.getPort()+":"+e.getMessage(),e);
-        // }
+            if (log.isDebugEnabled())
+                log.error(e.getMessage(),e);
+            throw new VOMSException("Error communicating with server "+sInfo.getHostName()+":"+sInfo.getPort()+":"+e.getMessage(),e);
+        }
         
-        // return response;
+        return response;
            
     }
     

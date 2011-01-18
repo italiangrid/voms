@@ -47,12 +47,20 @@ public class VOMSResponse {
     protected Document xmlResponse;
 
     public boolean hasErrors() {
+        // handle REST case first
+        if (xmlResponse.getElementsByTagName("error").getLength() != 0)
+            return true;
+
         // errors imply that no AC were created
         return ((xmlResponse.getElementsByTagName( "item" ).getLength() != 0) &&
                 (xmlResponse.getElementsByTagName( "ac" ).getLength() == 0));
     }
 
     public boolean hasWarnings() {
+        // handle REST case first
+        if (xmlResponse.getElementsByTagName("warning").getLength() != 0)
+            return true;
+
         // warnings imply that ACs were created
         return ((xmlResponse.getElementsByTagName( "item" ).getLength() != 0) &&
                 (xmlResponse.getElementsByTagName( "ac" ).getLength() != 0));
@@ -186,7 +194,6 @@ public class VOMSResponse {
     }
 
     public VOMSWarningMessage[] warningMessages() {
-
         VOMSWarningMessage[] result = warningMessagesREST();
         if (result != null)
             return result;
@@ -220,7 +227,6 @@ public class VOMSResponse {
     }
 
     private VOMSWarningMessage[] warningMessagesREST() {
-
         NodeList nodes = xmlResponse.getElementsByTagName( "warning" );
 
         if ( nodes.getLength() == 0 )
@@ -247,6 +253,7 @@ public class VOMSResponse {
             else
                 number = 4;
 
+            log.debug("Message = " + message + " number = " + number);
             if (number < ERROR_OFFSET) {
                 result[i] = new VOMSWarningMessage( number, message);
             }
@@ -262,12 +269,5 @@ public class VOMSResponse {
      */
     public VOMSResponse(Document res){
         this.xmlResponse = res;
-
-        // String str = this.xmlResponse.getTextContent();
-        // log.debug("Document = " + res);
-        // if (str != null) 
-        //     log.debug("RAW answer = " +str);
-        // else
-        //     log.debug("RAW answer = null");
     }
 }
