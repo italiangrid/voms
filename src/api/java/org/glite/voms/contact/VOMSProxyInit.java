@@ -29,6 +29,9 @@ package org.glite.voms.contact;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.ByteArrayInputStream;
+import java.io.InputStream;
+
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -38,9 +41,29 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
+import java.security.Security;
+import java.security.SecureRandom;
+import java.security.Principal;
+
 import org.apache.log4j.Logger;
 import org.glite.voms.PKIVerifier;
+import org.glite.voms.PKIUtils;
 import org.glite.voms.ac.AttributeCertificate;
+
+import java.net.HttpURLConnection;
+
+import javax.net.ssl.SSLContext;
+import javax.net.ssl.SSLSocket;
+import javax.net.ssl.SSLSession;
+import javax.net.ssl.SSLSocketFactory;
+import javax.net.ssl.HttpsURLConnection;
+import javax.net.ssl.HostnameVerifier;
+import javax.net.ssl.SSLPeerUnverifiedException;
+
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+
+import java.net.URL;
 
 
 /**
@@ -220,8 +243,29 @@ public class VOMSProxyInit {
                         logAndSetWarningMessages(response);
 
                     byte[] data = response.getData();
-                    log.info( "Got Data from VOMS server "+Arrays.toString(data) );
-                    return new String(data);
+                    if (data != null) {
+                        log.info( "Got Data from VOMS server "+Arrays.toString(data) );
+                        return new String(data);
+                    }
+                    else {
+                        if (requestOptions.isRequestList()) {
+                            // List requests used to put the output in the <data> field.
+                            AttributeCertificate ac = VOMSProxyBuilder.buildAC(response.getAC());
+                            if (ac != null) {
+                                List fqans = ac.getFullyQualifiedAttributes();
+                                String result = "";
+                                if (fqans != null) {
+                                    for (int i =0; i < fqans.size(); i++)
+                                        result += (String)(fqans.get(i))+"\n";
+                                }
+                                return result;
+                            }
+                            else
+                                return null;
+                        }
+                        else
+                            return null;
+                    }
                 }
                 
                 log.error( "Got error response from VOMS server "+serverInfo.compactString() );
@@ -395,11 +439,12 @@ public class VOMSProxyInit {
         return warnings;
     }
 
-    protected VOMSResponse contactServer(VOMSServerInfo sInfo, VOMSRequestOptions reqOptions) {
-        
-        log.info("Contacting server "+sInfo.compactString() );
+    private VOMSResponse contactServerREST(VOMSServerInfo sInfo, VOMSRequestOptions reqOptions) {
+        String url = "https://" + sInfo.getHostName() + ":" + sInfo.getPort() + VOMSRequestFactory.instance().buildRESTRequest(reqOptions);
         VOMSSocket socket;
-        
+        VOMSResponse resp = null;
+
+        log.debug("Final URL is: " + url);
         int gridProxyType = sInfo.getGlobusVersionAsInt();
         
         if (gridProxyType > 0)
@@ -407,43 +452,121 @@ public class VOMSProxyInit {
         else
             socket = VOMSSocket.instance( userCredentials, sInfo.getHostDn());
         
+        HttpsURLConnection conn = null;
+
         try {
-            socket.connect( sInfo.getHostName(), sInfo.getPort());
-            
+            SSLSocketFactory factory = socket.getFactory();
+
+            URL vomsUrl = new URL(url);
+            conn = (HttpsURLConnection) vomsUrl.openConnection();
+
+            conn.setSSLSocketFactory(factory);
+            HostnameVerifier v = conn.getDefaultHostnameVerifier();
+            conn.setHostnameVerifier(new GSIVerifier(v, sInfo.getHostDn()));
+            log.debug("Trying connection.");
+            conn.connect();
+            Object o = conn.getContent();
+
+            log.debug("output is: " + o);
+
+            DocumentBuilderFactory docfactory = DocumentBuilderFactory.newInstance();
+            docfactory.setIgnoringComments( true );
+            docfactory.setNamespaceAware( false );
+            docfactory.setValidating( false );
+            DocumentBuilder docBuild = docfactory.newDocumentBuilder();
+
+            log.debug("Creating Response");
+            resp = new VOMSResponse(docBuild.parse((InputStream)o));
+
         } catch ( Exception e ) {
             
             log.error( "Error connecting to "+sInfo.compactString()+":"+e.getMessage() );
-            
+
+            try {
+                log.error("Error code is: " + conn.getResponseCode());
+
+                if (conn.getResponseCode() == HttpURLConnection.HTTP_INTERNAL_ERROR) {
+                    InputStream is = conn.getErrorStream();
+                    DocumentBuilderFactory docfactory = DocumentBuilderFactory.newInstance();
+                    docfactory.setIgnoringComments( true );
+                    docfactory.setNamespaceAware( false );
+                    docfactory.setValidating( false );
+                    DocumentBuilder docBuild = docfactory.newDocumentBuilder();
+
+                    log.debug("Creating Response");
+                    resp = new VOMSResponse(docBuild.parse(is));
+                    return resp;
+                }
+            } catch (Exception ex) {
+                if (log.isDebugEnabled())
+                    log.error(e.getMessage(),e);
+
+                throw new VOMSException("Error connecting to "+sInfo.compactString()+":"+ex.getMessage() ,ex);
+            }
             if (log.isDebugEnabled())
                 log.error(e.getMessage(),e);
             throw new VOMSException("Error connecting to "+sInfo.compactString()+":"+e.getMessage() ,e);
-            
-        } 
-        
-        VOMSResponse response;
-        
-        try {
-
-            // re-set the reqOptions voName property to be the true voName recorded by the 
-            // sInfo object (the reqOptions voName could actually be an alias rather than 
-            // the true vo name).  
-            reqOptions.setVoName(sInfo.getVoName()); 
-            
-            protocol.sendRequest( reqOptions, socket.getOutputStream());
-            response = protocol.getResponse( socket.getInputStream() );
-            
-            socket.close();
-            
-            
-        } catch ( IOException e ) {
-            log.error( "Error communicating with server "+sInfo.getHostName()+":"+sInfo.getPort()+":"+e.getMessage() );
-            
-            if (log.isDebugEnabled())
-                log.error(e.getMessage(),e);
-            throw new VOMSException("Error communicating with server "+sInfo.getHostName()+":"+sInfo.getPort()+":"+e.getMessage(),e);
         }
+
+        return resp;
+    }
+
+    protected VOMSResponse contactServer(VOMSServerInfo sInfo, VOMSRequestOptions reqOptions) {
         
-        return response;
+        log.info("Contacting server "+sInfo.compactString() );
+        VOMSSocket socket;
+
+        VOMSResponse resp = contactServerREST(sInfo, reqOptions);
+        if (resp != null) {
+            return resp;
+        } else {
+        return null;
+        }
+
+        // int gridProxyType = sInfo.getGlobusVersionAsInt();
+        
+        // if (gridProxyType > 0)
+        //     socket = VOMSSocket.instance( userCredentials, sInfo.getHostDn(), gridProxyType );
+        // else
+        //     socket = VOMSSocket.instance( userCredentials, sInfo.getHostDn());
+        
+        // try {
+        //     socket.connect( sInfo.getHostName(), sInfo.getPort());
+            
+        // } catch ( Exception e ) {
+            
+        //     log.error( "Error connecting to "+sInfo.compactString()+":"+e.getMessage() );
+            
+        //     if (log.isDebugEnabled())
+        //         log.error(e.getMessage(),e);
+        //     throw new VOMSException("Error connecting to "+sInfo.compactString()+":"+e.getMessage() ,e);
+            
+        // } 
+        
+        // VOMSResponse response;
+        
+        // try {
+
+        //     // re-set the reqOptions voName property to be the true voName recorded by the 
+        //     // sInfo object (the reqOptions voName could actually be an alias rather than 
+        //     // the true vo name).  
+        //     reqOptions.setVoName(sInfo.getVoName()); 
+            
+        //     protocol.sendRequest( reqOptions, socket.getOutputStream());
+        //     response = protocol.getResponse( socket.getInputStream() );
+            
+        //     socket.close();
+            
+            
+        // } catch ( IOException e ) {
+        //     log.error( "Error communicating with server "+sInfo.getHostName()+":"+sInfo.getPort()+":"+e.getMessage() );
+            
+        //     if (log.isDebugEnabled())
+        //         log.error(e.getMessage(),e);
+        //     throw new VOMSException("Error communicating with server "+sInfo.getHostName()+":"+sInfo.getPort()+":"+e.getMessage(),e);
+        // }
+        
+        // return response;
            
     }
     
@@ -502,4 +625,38 @@ public class VOMSProxyInit {
     
         this.delegationType = delegationType;
     }    
+}
+
+class GSIVerifier implements HostnameVerifier {
+    private String name;
+    private HostnameVerifier verifier;
+    private static final Logger log = Logger.getLogger( GSIVerifier.class );
+
+    public GSIVerifier(HostnameVerifier defaultVerifier, String DN) {
+        name = PKIUtils.Normalize(DN);
+        verifier = defaultVerifier;
+    }
+
+    public boolean verify(String hostname, SSLSession session) {
+        boolean res = false;
+        if (!verifier.verify(hostname, session)) {
+            try {
+                Principal p = session.getPeerPrincipal();
+                String normal = PKIUtils.getOpenSSLFormatPrincipal(p, false);
+                String reversed = PKIUtils.getOpenSSLFormatPrincipal(p, true);
+            
+                res = PKIUtils.DNCompare(name, normal) || PKIUtils.DNCompare(name, reversed);
+                log.debug("result of DN verifier: " + res);
+
+            } catch (SSLPeerUnverifiedException e) {
+                log.debug("Unauthenticate peer.  Verify failed.");
+                res = false;
+            }
+        }
+        else {
+            res = true;
+            log.debug("Verified by default verifier");
+        }
+        return res;
+    }
 }

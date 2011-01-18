@@ -29,17 +29,20 @@ package org.glite.voms.contact;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
+import org.apache.log4j.Logger;
 
 /**
  * 
  * This class is used to parse and represent VOMS server responses.
  *  
  * @author Andrea Ceccanti
+ * @author Vincenzo Ciaschini
  *
  */
 public class VOMSResponse {
 
     private static int ERROR_OFFSET = 1000;
+    private static final Logger log = Logger.getLogger( VOMSResponse.class );
 
     protected Document xmlResponse;
 
@@ -78,9 +81,10 @@ public class VOMSResponse {
         Element acElement = (Element) xmlResponse.getElementsByTagName( "bitstr" )
                 .item( 0 );
         
-        return VOMSDecoder.decode( acElement.getFirstChild().getNodeValue()); 
-
-
+        if (acElement != null)
+            return VOMSDecoder.decode( acElement.getFirstChild().getNodeValue()); 
+        else
+            return null;
     }
 
     /**
@@ -119,12 +123,16 @@ public class VOMSResponse {
      */
     public VOMSErrorMessage[] errorMessages() {
 
+        VOMSErrorMessage[] result = errorMessagesREST();
+        if (result != null)
+            return result;
+
         NodeList nodes = xmlResponse.getElementsByTagName( "item" );
 
         if ( nodes.getLength() == 0 )
             return null;
 
-        VOMSErrorMessage[] result = new VOMSErrorMessage[nodes.getLength()];
+        result = new VOMSErrorMessage[nodes.getLength()];
 
         for ( int i = 0; i < nodes.getLength(); i++ ) {
 
@@ -147,14 +155,48 @@ public class VOMSResponse {
         return result;
     }
 
+    private VOMSErrorMessage[] errorMessagesREST() {
+        NodeList nodes = xmlResponse.getElementsByTagName( "error");
+
+        if (nodes.getLength() == 0)
+            return null;
+
+        VOMSErrorMessage[] result = new VOMSErrorMessage[nodes.getLength()];
+
+        for (int i = 0; i < nodes.getLength(); i++) {
+            Element itemElement = (Element) nodes.item(i);
+
+            Element codeElement = (Element)itemElement.getElementsByTagName("code").item(0);
+            Element messageElement = (Element)itemElement.getElementsByTagName("message").item(0);
+            String strcode = codeElement.getFirstChild().getNodeValue();
+            int code;
+
+            if (strcode.equals("NoSuchUser"))
+                code = 1001;
+            else if (strcode.equals("BadRequest"))
+                code = 1005;
+            else if (strcode.equals("SuspendedUser"))
+                code = 1004;
+            else // InternalError
+                code = 1006;
+
+            result[i] = new VOMSErrorMessage(code, messageElement.getFirstChild().getNodeValue());
+        }
+        return result;
+    }
+
     public VOMSWarningMessage[] warningMessages() {
+
+        VOMSWarningMessage[] result = warningMessagesREST();
+        if (result != null)
+            return result;
 
         NodeList nodes = xmlResponse.getElementsByTagName( "item" );
 
         if ( nodes.getLength() == 0 )
             return null;
 
-        VOMSWarningMessage[] result = new VOMSWarningMessage[nodes.getLength()];
+        result = new VOMSWarningMessage[nodes.getLength()];
 
         for ( int i = 0; i < nodes.getLength(); i++ ) {
 
@@ -177,6 +219,42 @@ public class VOMSResponse {
         return result;
     }
 
+    private VOMSWarningMessage[] warningMessagesREST() {
+
+        NodeList nodes = xmlResponse.getElementsByTagName( "warning" );
+
+        if ( nodes.getLength() == 0 )
+            return null;
+
+        VOMSWarningMessage[] result = new VOMSWarningMessage[nodes.getLength()];
+
+        for ( int i = 0; i < nodes.getLength(); i++ ) {
+
+            Element itemElement = (Element) nodes.item( i );
+
+            Element messageElement = (Element) itemElement
+                    .getElementsByTagName( "message" ).item( 0 );
+
+            String message = itemElement.getFirstChild().getNodeValue();
+            int number;
+
+            if (message.contains("validity"))
+                number = 2;
+            else if (message.contains("selected"))
+                number = 1;
+            else if (message.contains("contains attributes"))
+                number = 3;
+            else
+                number = 4;
+
+            if (number < ERROR_OFFSET) {
+                result[i] = new VOMSWarningMessage( number, message);
+            }
+        }
+        
+        return result;
+    }
+
     /**
      * Builds a VOMSResponse starting from a DOM an XML document (see {@link Document}).
      * 
@@ -184,5 +262,12 @@ public class VOMSResponse {
      */
     public VOMSResponse(Document res){
         this.xmlResponse = res;
+
+        // String str = this.xmlResponse.getTextContent();
+        // log.debug("Document = " + res);
+        // if (str != null) 
+        //     log.debug("RAW answer = " +str);
+        // else
+        //     log.debug("RAW answer = null");
     }
 }

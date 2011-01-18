@@ -25,7 +25,9 @@
  *
  *********************************************************************/
 package org.glite.voms.contact;
+
 import java.util.Iterator;
+import java.util.List;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -44,6 +46,7 @@ import org.w3c.dom.Element;
  * This class builds VOMS XML requests starting from {@link VOMSRequestOptions} objects.
  *  
  * @author Andrea Ceccanti
+ * @author Vincenzo Ciaschini
  *
  */
 public class VOMSRequestFactory {
@@ -147,7 +150,52 @@ public class VOMSRequestFactory {
         setTargetString( options.getTargetsAsString() );
         
     }
-    
+
+    public String buildRESTRequest(VOMSRequestOptions options) {
+        loadOptions(options);
+
+        if (options.isRequestList()) {
+            /* handle list requests */
+
+            return "/generate-ac?fqans=all";
+        }
+
+        String FQANList = "";
+        String TargetList = "";
+        String OrderList = "";
+
+        if (options.getRequestedFQANs().isEmpty()){
+            
+            if (options.getVoName() == null)
+                throw new VOMSException("No vo name specified for AC retrieval.");
+            String voName = options.getVoName();
+            
+            if (!voName.startsWith( "/"))
+                voName = "/"+voName;
+
+            FQANList = voName;
+        }
+        else {
+            List FQANs = options.getRequestedFQANs();
+            Iterator i = FQANs.iterator();
+
+            while ( i.hasNext()) {
+                String FQAN = (String) i.next();
+                if (FQANList.trim().length() != 0)
+                    FQANList += ",";
+                FQANList += FQAN;
+            }
+        }
+        if (targetString != null && targetString.trim().length() != 0)
+            TargetList = "&targets=" + targetString;
+
+        if (orderString != null && orderString.trim().length() != 0)
+            OrderList = "&order=" + orderString;
+
+        log.debug("Generated request: /generate-ac?fqans="+FQANList+TargetList+OrderList+"&lifetime=" + lifetime);
+        return "/generate-ac?fqans="+FQANList+TargetList+OrderList+"&lifetime=" + lifetime; 
+    }
+
     public Document buildRequest(VOMSRequestOptions options){
         
         loadOptions( options );
@@ -263,11 +311,9 @@ class VOMSRequestFragment{
                 FQANs[i] = PathNamingScheme.toOldQualifiedRoleSyntax( FQANs[i] );
         }
         
-        return StringUtils.join( FQANs, ",");
-
-        
-        
+        return StringUtils.join( FQANs, ",");        
     }
+
     void buildCommandElement(String cmdString){
         
         command = doc.createElement( "command");

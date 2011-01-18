@@ -97,6 +97,38 @@ public class VOMSSocket {
     private SSLContext context = null;
     private SSLSocket socket = null;
 
+    protected SSLSocketFactory getFactory() throws IOException, GeneralSecurityException {
+        SSLSocketFactory socketFactory = null;
+
+        if (Security.getProvider("BC") == null) {
+            Security.addProvider(new BouncyCastleProvider());
+        }
+        log.debug("Creating socket Factory");
+
+        try {
+            context = SSLContext.getInstance("SSLv3");
+            log.debug("CONTEXT CREATED: "+context.getProtocol());
+            log.debug("Context: " + context);
+            context.init(new VOMSKeyManager[] {new VOMSKeyManager(cred)}, new VOMSTrustManager[] {new VOMSTrustManager("")}, SecureRandom.getInstance("SHA1PRNG"));
+
+            return context.getSocketFactory();
+        } catch (SSLException e) {
+            log.fatal( "Error opening SSL socket: "+e.getMessage() );
+
+            if (log.isDebugEnabled())
+                log.debug( e.getMessage(),e );
+            throw e;
+        } catch ( IOException e ) {
+
+            log.fatal( "Error opening SSL socket: "+e.getMessage() );
+
+            if (log.isDebugEnabled())
+                log.debug( e.getMessage(),e );
+            throw e;
+        }
+
+    }
+
     protected void connect(String host, int port) throws IOException, GeneralSecurityException{
 
         SSLSocketFactory socketFactory = null;
@@ -107,12 +139,7 @@ public class VOMSSocket {
 
         log.debug("Initting CONNECCTION");
         try {
-            context = SSLContext.getInstance("SSLv3");
-            log.debug("CONTEXT CREATED: "+context.getProtocol());
-            log.debug("Context: " + context);
-            context.init(new VOMSKeyManager[] {new VOMSKeyManager(cred)}, new VOMSTrustManager[] {new VOMSTrustManager("")}, SecureRandom.getInstance("SHA1PRNG"));
-
-            socketFactory = context.getSocketFactory();
+            socketFactory = getFactory();
             log.debug("Factory Created");
             log.debug(socketFactory.toString());
             log.debug("ABOUT to open CONNECTION");
