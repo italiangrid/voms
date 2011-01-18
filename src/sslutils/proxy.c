@@ -132,6 +132,7 @@ struct VOMSProxy *VOMS_MakeProxy(struct VOMSProxyArguments *args, int *warning, 
   X509_REQ * req = NULL;
   STACK_OF(X509_EXTENSION) * extensions = NULL;
   int ku_flags = 0;
+  char *policy = NULL;
 
   X509_EXTENSION *ex1 = NULL, *ex2 = NULL, *ex3 = NULL, 
     *ex4 = NULL, *ex5 = NULL, *ex6 = NULL, *ex7 = NULL, 
@@ -139,7 +140,6 @@ struct VOMSProxy *VOMS_MakeProxy(struct VOMSProxyArguments *args, int *warning, 
     *ex12 = NULL, *ex13 = NULL;
 
   int i = 0;
-  int proxyindex;
   
   struct VOMSProxy *proxy = NULL;
 
@@ -178,6 +178,8 @@ struct VOMSProxy *VOMS_MakeProxy(struct VOMSProxyArguments *args, int *warning, 
 
   /* Add passed extensions */
   if (args->extensions) {
+    int proxyindex;
+
     for (proxyindex = 0; proxyindex < sk_X509_EXTENSION_num(args->extensions); proxyindex++) {
       X509_EXTENSION *ext = X509_EXTENSION_dup(sk_X509_EXTENSION_value(args->extensions, i));
       if (ext) {
@@ -290,6 +292,8 @@ struct VOMSProxy *VOMS_MakeProxy(struct VOMSProxyArguments *args, int *warning, 
   if (args->exkusage) {
     if ((ex10 = set_ExtendedKeyUsageFlags(args->exkusage)) == NULL) {
       PRXYerr(PRXYERR_F_PROXY_SIGN, PRXYERR_R_CLASS_ADD_EXT);
+      setWarning(warning, PROXY_ERROR_UNKNOWN_EXTENDED_BIT);
+      setAdditional(additional,args->exkusage);
       goto err;
     }
 
@@ -391,7 +395,6 @@ struct VOMSProxy *VOMS_MakeProxy(struct VOMSProxyArguments *args, int *warning, 
 
     /* getting contents of policy file */
 
-    char *policy = NULL;
     int policysize = 0;
     char *policylang = args->policylang;
 
@@ -446,6 +449,7 @@ struct VOMSProxy *VOMS_MakeProxy(struct VOMSProxyArguments *args, int *warning, 
       if (policy) {
         myPROXYPOLICY_set_policy(proxypolicy, (unsigned char*)policy, policysize);
         free(policy);
+        policy = NULL;
       }
       else if (args->policytext)
         myPROXYPOLICY_set_policy(proxypolicy, 
@@ -474,6 +478,7 @@ struct VOMSProxy *VOMS_MakeProxy(struct VOMSProxyArguments *args, int *warning, 
         if (!args->policytext) {
           value = snprintf_wrap("language:%s,pathlen:%s,policy:text:%s", policylang, buffer, policy);
           free(policy);
+          policy = NULL;
         }
         else 
           value = snprintf_wrap("language:%s,pathlen:%s,policy:text:%s", policylang, buffer, args->policytext);
@@ -506,6 +511,9 @@ struct VOMSProxy *VOMS_MakeProxy(struct VOMSProxyArguments *args, int *warning, 
         ex7 = X509V3_EXT_conf_nid(NULL, NULL, my_txt2nid(PROXYCERTINFO_V4), (char*)value);
       value = NULL;
     }
+
+    if (policy)
+      free(policy);
 
     if (ex7 == NULL) {
       PRXYerr(PRXYERR_F_PROXY_SIGN, PRXYERR_R_CLASS_ADD_EXT);
@@ -595,10 +603,9 @@ struct VOMSProxy *VOMS_MakeProxy(struct VOMSProxyArguments *args, int *warning, 
   X509_EXTENSION_free(ex3);
   X509_EXTENSION_free(ex4);
   X509_EXTENSION_free(ex1);
-
+  free(policy);
   free(value);
   return proxy;
-
 }
 
 X509_EXTENSION *CreateProxyExtension(char * name, char *data, int datalen, int crit) 
@@ -704,13 +711,14 @@ static void setAdditional(void **additional, void *data)
 
 static X509_EXTENSION *set_KeyUsageFlags(int flags)
 {
-  int len =0;
   unsigned char data[2];
 
   X509_EXTENSION  *ext = NULL;
   ASN1_BIT_STRING *str = ASN1_BIT_STRING_new();
   
   if (str) {
+    int len =0;
+
     data[0] =  flags & 0x00ff;
     data[1] = (flags & 0xff00) >> 8;
 
@@ -850,6 +858,10 @@ char *ProxyCreationError(int error, void *additional)
 
   case PROXY_ERROR_UNKNOWN_BIT:
     return snprintf_wrap("KeyUsage bit: %s unknown\n", additional);
+    break;
+
+  case PROXY_ERROR_UNKNOWN_EXTENDED_BIT:
+    return snprintf_wrap("ExtKeyUsage bit value: %s invalid.  One or more of the bits are unknown\n", additional);
     break;
 
   case PROXY_WARNING_GSI_ASSUMED:

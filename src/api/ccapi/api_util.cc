@@ -182,8 +182,6 @@ vomsdata::retrieve(X509 *cert, STACK_OF(X509) *chain, recurse_type how,
   /*
    * check credential and get the globus name
    */
-  int chain_length;
-  int position = 0;
   ca.clear();
   subject.clear();
 
@@ -231,7 +229,8 @@ vomsdata::retrieve(X509 *cert, STACK_OF(X509) *chain, recurse_type how,
    * May need to travel up the chain.
    */
   if (how != RECURSE_NONE) {
-    chain_length = sk_X509_num(chain);
+    int chain_length = sk_X509_num(chain);
+    int position = 0;
     
     while (position < chain_length) {  
       cert = sk_X509_value(chain,position);

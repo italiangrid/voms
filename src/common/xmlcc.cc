@@ -142,7 +142,7 @@ static char *base64Decode(const char *data, int size, int *j)
   return buffer;
 }
 
-std::string Decode(const std::string data)
+std::string Decode(const std::string& data)
 {
   int j = 0;
   char * tmp = NULL;
@@ -163,8 +163,6 @@ std::string Decode(const std::string data)
 
 static char *MyEncode(const char *data, int size, int *j)
 {
-  int bit = 0;
-  int i   = 0;
   char *res;
 
   if (!data || !size) {
@@ -173,6 +171,9 @@ static char *MyEncode(const char *data, int size, int *j)
   }
 
   if ((res = (char *)calloc(1, (size*4)/3+2))) {
+    int i = 0;
+    int bit = 0;
+
     *j = 0;
 
     while (i < size) {
@@ -215,13 +216,14 @@ static char *MyEncode(const char *data, int size, int *j)
 
 static char *MyDecode(const char *data, int size, int *n)
 {
-  int bit = 0;
-  int i = 0;
   char *res;
 
   if (!data || !size) return NULL;
 
   if ((res = (char *)calloc(1, (size*3)/4 + 2))) {
+    int bit = 0;
+    int i = 0;
+
     *n = 0;
 
     while (i < size) {
@@ -319,7 +321,7 @@ std::string Encode(std::string data, int base64)
   return result;
 }
 
-std::string XML_Ans_Encode(const std::string &ac, const std::string &data, const std::vector<errorp> e, bool base64)
+std::string XML_Ans_Encode(const std::string &ac, const std::string &data, const std::vector<errorp>& e, bool base64)
 {
   char *str = NULL;
 
@@ -338,7 +340,7 @@ std::string XML_Ans_Encode(const std::string &ac, const std::string &data, const
   if (!e.empty()) {
     res += "<error>";
 
-    for (std::vector<errorp>::const_iterator i = e.begin(); i != e.end(); i++) {
+    for (std::vector<errorp>::const_iterator i = e.begin(); i != e.end(); ++i) {
       res +="<item><number>";
       str = snprintf_wrap("%d", (*i).num);
       res += std::string(str ? str : "");

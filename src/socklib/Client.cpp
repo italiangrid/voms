@@ -243,7 +243,6 @@ GSISocketClient::Open()
 #endif
   int fd = -1;
   char portstring[36];
-  int flags;
   std::string error;
 
   meth = SSLv3_method();
@@ -295,7 +294,7 @@ GSISocketClient::Open()
   fd = sock_connect(host.c_str(), portstring);
 
   if (fd != -1) {
-    flags = fcntl(fd, F_GETFL, 0);
+    int flags = fcntl(fd, F_GETFL, 0);
     (void)fcntl(fd, F_SETFL, flags | O_NONBLOCK);
 
     conn = BIO_new_socket(fd, BIO_NOCLOSE);

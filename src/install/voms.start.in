@@ -138,8 +138,17 @@ function start() {
             if [ -f $@VAR_LOCATION_ENV@/lock/subsys/voms.$vo ]; then
                 read pid < $@VAR_LOCATION_ENV@/lock/subsys/voms.$vo
                 if test "x$pid" != "x"; then
-                    if checkpid $pid; then
+                    checkpid $pid
+                    value=$?
+                    if test $value -eq 0; then
                         echo "VOMS ($pid) is already running"
+                        continue;
+                    fi
+
+                    if test $value -eq 2; then
+                        echo "lock file $VOMS_LOCATION_VAR/lock/subsys/voms.$vo seems to be stale"
+                        echo "it points to a process which does not seem to be a voms server."
+                        echo "If you are certain that this is the case, remove it and restart voms again."
                         continue;
                     fi
                 fi
@@ -220,12 +229,14 @@ checkpid()
 
         ps --pid $1 | grep voms >>/dev/null
         if [ $? == 0 ]; then 
+            #pid file is current. The Process is a VOMS
             return 0
         else
             #pid file is stale.  The Process running is not a voms.
-            return 1
+            return 2
         fi
     else
+        #pid file is stale.  The Process does not exist anymore.
         return 1
     fi
 }

@@ -25,7 +25,9 @@
  *
  *********************************************************************/
 package org.glite.voms.contact;
+
 import java.util.Iterator;
+import java.util.List;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -44,6 +46,7 @@ import org.w3c.dom.Element;
  * This class builds VOMS XML requests starting from {@link VOMSRequestOptions} objects.
  *  
  * @author Andrea Ceccanti
+ * @author Vincenzo Ciaschini
  *
  */
 public class VOMSRequestFactory {
@@ -147,7 +150,59 @@ public class VOMSRequestFactory {
         setTargetString( options.getTargetsAsString() );
         
     }
-    
+
+    public String buildRESTRequest(VOMSRequestOptions options) {
+        loadOptions(options);
+
+        if (options.isRequestList()) {
+            /* handle list requests */
+
+            return "/generate-ac?fqans=all";
+        }
+
+        StringBuilder request = new StringBuilder();
+
+        request.append("/generate-ac?fqans=");
+
+        if (options.getRequestedFQANs().isEmpty()){
+            
+            if (options.getVoName() == null)
+                throw new VOMSException("No vo name specified for AC retrieval.");
+            String voName = options.getVoName();
+            
+            if (!voName.startsWith( "/"))
+                voName = "/"+voName;
+
+            request.append(voName);
+        }
+        else {
+            List FQANs = options.getRequestedFQANs();
+            Iterator i = FQANs.iterator();
+            boolean first = true;
+
+            while ( i.hasNext()) {
+                if (!first)
+                    request.append(",");
+                request.append((String)i.next());
+                first = false;
+            }
+        }
+        if (targetString != null && targetString.trim().length() != 0) {
+            request.append("&targets=");
+            request.append(targetString);
+        }
+
+        if (orderString != null && orderString.trim().length() != 0) {
+            request.append("&order=");
+            request.append(orderString);
+        }
+
+        request.append("&lifetime=");
+        request.append(lifetime);
+        log.debug("Generated request: " + request.toString());
+        return request.toString();
+    }
+
     public Document buildRequest(VOMSRequestOptions options){
         
         loadOptions( options );
@@ -263,11 +318,9 @@ class VOMSRequestFragment{
                 FQANs[i] = PathNamingScheme.toOldQualifiedRoleSyntax( FQANs[i] );
         }
         
-        return StringUtils.join( FQANs, ",");
-
-        
-        
+        return StringUtils.join( FQANs, ",");        
     }
+
     void buildCommandElement(String cmdString){
         
         command = doc.createElement( "command");

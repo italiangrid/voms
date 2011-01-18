@@ -131,8 +131,9 @@ CK_FUNCTION_LIST_PTR
 sc_get_function_list()
 {
   CK_RV                               status;
+#if defined(USE_PKCS11_DL) || defined(WIN32)
   CK_RV                               (*gfl)(CK_FUNCTION_LIST_PTR_PTR);
-	
+#endif
   if (pFunctionList) {
     return pFunctionList;
   }
@@ -409,7 +410,6 @@ sc_init_open_login(
     char *                              ppin,
     CK_USER_TYPE                        userType)
 {
-  int                                 rc;
   CK_RV                               status;
   char *                              pin;
   char                                rpin[256];

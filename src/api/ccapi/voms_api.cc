@@ -242,7 +242,7 @@ bool vomsdata::InterpretOutput(const std::string &message, std::string& output)
       output = a.ac;
       if (a.errs.size() != 0) {
         for (std::vector<errorp>::iterator i = a.errs.begin();
-             i != a.errs.end(); i++) {
+             i != a.errs.end(); ++i) {
           serverrors += i->message;
           if (i->num > ERROR_OFFSET)
             result = false;
@@ -285,7 +285,7 @@ bool vomsdata::ContactRaw(std::string hostname, int port, std::string servsubjec
     return ret;
 
   for (std::vector<std::string>::iterator i = targets.begin(); 
-       i != targets.end(); i++) {
+       i != targets.end(); ++i) {
     if (i == targets.begin())
       targs = *i;
     else
@@ -331,7 +331,7 @@ bool vomsdata::ContactRESTRaw(const std::string& hostname, int port, const std::
     std::string targs;
 
     for (std::vector<std::string>::iterator i = targets.begin(); 
-         i != targets.end(); i++) {
+         i != targets.end(); ++i) {
       if (i == targets.begin())
         targs = *i;
       else
@@ -586,7 +586,7 @@ bool vomsdata::Export(std::string &buffer)
     return true;
   }
 
-  for (std::vector<voms>::iterator v=data.begin(); v != data.end(); v++) {
+  for (std::vector<voms>::iterator v=data.begin(); v != data.end(); ++v) {
     /* Dump owner's certificate */
     int l;
     unsigned char *xtmp, *xtmp2;
@@ -809,7 +809,7 @@ vomsdata::FindByAlias(std::string nick)
   while (beg != end) {
     if (beg->nick == nick)
       results.push_back(*beg);
-    beg++;
+    ++beg;
   }
 
   return std::vector<contactdata>(results);
@@ -823,7 +823,7 @@ std::vector<contactdata> vomsdata::FindByVO(std::string vo)
   while (beg != end) {
     if (beg->vo == vo)
       results.push_back(*beg);
-    beg++;
+    ++beg;
   }
 
   return std::vector<contactdata>(results);

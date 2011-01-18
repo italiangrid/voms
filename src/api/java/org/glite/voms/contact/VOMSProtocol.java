@@ -48,7 +48,6 @@ import org.w3c.dom.Document;
  *
  */
 public class VOMSProtocol {
-    
     private static final Logger log = Logger.getLogger(VOMSProtocol.class);
 
     private VOMSRequestFactory requestFactory = VOMSRequestFactory.instance();

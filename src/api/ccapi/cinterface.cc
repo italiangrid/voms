@@ -53,16 +53,16 @@ int TranslateVOMS(struct vomsdatar *vd, std::vector<voms> &v, UNUSED(int *error)
   }
 
   struct vomsr **arr2 = (struct vomsr **)malloc((v.size()+1) * sizeof(struct vomsr *));
-  int i = 0;
 
   if (arr2) {
     std::vector<voms>::iterator cur = v.begin();
+    int i = 0;
     while (cur != v.end()) {
       arr2[i] = cur->translate();
       arr2[i]->mydata = i;
       arr2[i]->my2    = (void *)vd;
       i++;
-      cur++;
+      ++cur;
     }
     arr2[i] = NULL;
     
@@ -210,7 +210,7 @@ static struct contactdatar **Arrayize(std::vector<contactdata> &cd, int *error)
       cda[i].port    = cur->port;
       cda[i].version = cur->version;
       i++;
-      cur++;
+      ++cur;
     }
     cdr[i] = NULL;
     
@@ -316,7 +316,7 @@ struct vomsr *voms::translate()
       int j = 0;
 
       for (std::vector<data>::iterator i = std.begin();
-             i != std.end(); i++) {
+             i != std.end(); ++i) {
         struct datar *d = (struct datar *)calloc(1, sizeof(struct datar));
         if (d) {
           dst->std[j++] = d;
@@ -444,7 +444,7 @@ char *VOMS_ListTargets(struct vomsdatar *vd, int *error)
     if (cur != list.begin())
       total += ",";
     total += *cur;
-    cur++;
+    ++cur;
   }
 
   char *res = mystrdup(total.c_str());

@@ -245,7 +245,7 @@ bool do_read(SSL *ssl, int timeout, std::string& output)
         expected = error = SSL_get_error(ssl, ret2);
       }
     }
-  } while (TEST_SELECT(ret, ret2, timeout, curtime, starttime, expected)); 
+  } while (TEST_SELECT(ret, ret2, timeout, curtime, starttime, error)); 
             
   if (ret <= 0 || ret2 < 0) {
     if (timeout != -1 && (curtime - starttime <= timeout))

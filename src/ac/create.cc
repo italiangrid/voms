@@ -59,7 +59,7 @@ int createac(X509 *issuerc, STACK_OF(X509) *issuerstack, X509 *holder, EVP_PKEY 
   if ((array = vectoarray(fqan)) && (array2 = vectoarray(attributes))) {
 
     std::string complete;
-    for (std::vector<std::string>::iterator i = targets.begin(); i != targets.end(); i++)
+    for (std::vector<std::string>::iterator i = targets.begin(); i != targets.end(); ++i)
       if (i == targets.begin())
         complete = (*i);
       else

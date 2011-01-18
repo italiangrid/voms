@@ -59,13 +59,13 @@ using __cxxabiv1::__cxa_demangle;
 # define REGFORMAT "%x"
 #endif
 
-void signal_segv(int signum, siginfo_t* info, void*ptr) {
-
-	int i, f = 0;
+void signal_segv(int signum, siginfo_t* info, void*ptr) 
+{
 	ucontext_t *ucontext = (ucontext_t*)ptr;
 	Dl_info dlinfo;
 	void **bp = 0;
 	void *ip = 0;
+  int f = 0;
 	static const char *si_codes[3] = {"", "SEGV_MAPERR", "SEGV_ACCERR"};
 
   FILE *outfile = fopen("/tmp/sigsegv_report", "w+");
@@ -126,6 +126,7 @@ void signal_segv(int signum, siginfo_t* info, void*ptr) {
 #else
   sigsegv_outp("Stack trace (non-dedicated):");
   {
+    int i;
     int sz;
     char *bt[21];
     char **strings;

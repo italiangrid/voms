@@ -324,8 +324,9 @@ proc do_test { {name "" } } {
                             loadvar filecontent $f
 
                             set match "definitely lost: 0"
+                            set match2 "All heap blocks were freed"
 
-                            if [expr ![regexp $match $filecontent dummy]] then {
+                            if [expr ![regexp $match $filecontent dummy] && ![regexp $match2 $filecontent dummy]] then {
                                 set failed 1
                                 addlog $f
                             }
