@@ -241,8 +241,9 @@ bool vomsdata::InterpretOutput(const std::string &message, std::string& output)
     if (!a.ac.empty()) {
       output = a.ac;
       if (a.errs.size() != 0) {
-        for (std::vector<errorp>::iterator i = a.errs.begin();
-             i != a.errs.end(); ++i) {
+        std::vector<errorp>::const_iterator end = a.errs.end();
+        for (std::vector<errorp>::const_iterator i = a.errs.begin();
+             i != end; ++i) {
           serverrors += i->message;
           if (i->num > ERROR_OFFSET)
             result = false;
@@ -284,9 +285,10 @@ bool vomsdata::ContactRaw(std::string hostname, int port, std::string servsubjec
   if (ret)
     return ret;
 
-  for (std::vector<std::string>::iterator i = targets.begin(); 
-       i != targets.end(); ++i) {
-    if (i == targets.begin())
+  std::vector<std::string>::const_iterator end = targets.end();
+  std::vector<std::string>::const_iterator begin = targets.begin();
+  for (std::vector<std::string>::const_iterator i = begin; i != end; ++i) {
+    if (i == begin)
       targs = *i;
     else
       targs += std::string(",") + *i;
@@ -330,9 +332,11 @@ bool vomsdata::ContactRESTRaw(const std::string& hostname, int port, const std::
   if (targets.size() != 0) {
     std::string targs;
 
-    for (std::vector<std::string>::iterator i = targets.begin(); 
-         i != targets.end(); ++i) {
-      if (i == targets.begin())
+    std::vector<std::string>::const_iterator end = targets.end();
+    std::vector<std::string>::const_iterator begin = targets.begin();
+
+    for (std::vector<std::string>::const_iterator i = targets.begin(); i != end; ++i) {
+      if (i == begin)
         targs = *i;
       else
         targs += std::string(",") + *i;
@@ -586,7 +590,10 @@ bool vomsdata::Export(std::string &buffer)
     return true;
   }
 
-  for (std::vector<voms>::iterator v=data.begin(); v != data.end(); ++v) {
+
+  std::vector<voms>::const_iterator end = data.end();
+
+  for (std::vector<voms>::const_iterator v=data.begin(); v != end; ++v) {
     /* Dump owner's certificate */
     int l;
     unsigned char *xtmp, *xtmp2;
@@ -803,7 +810,7 @@ bool vomsdata::LoadUserContacts(std::string dir)
 std::vector<contactdata>
 vomsdata::FindByAlias(std::string nick)
 {
-  std::vector<contactdata>::iterator beg = servers.begin(), end = servers.end();
+  std::vector<contactdata>::const_iterator beg = servers.begin(), end = servers.end();
   std::vector<contactdata> results;
 
   while (beg != end) {
@@ -817,7 +824,7 @@ vomsdata::FindByAlias(std::string nick)
 
 std::vector<contactdata> vomsdata::FindByVO(std::string vo)
 {
-  std::vector<contactdata>::iterator beg = servers.begin(), end = servers.end();
+  std::vector<contactdata>::const_iterator beg = servers.begin(), end = servers.end();
   std::vector<contactdata> results;
 
   while (beg != end) {

@@ -95,7 +95,8 @@ std::string vomsresult::makeRESTAnswer(int& code)
   if (!data.empty())
     output += "<bitstr>"+Encode(data, true)+"</bitstr>";
 
-  for (std::vector<errorp>::iterator i = errs.begin(); i != errs.end(); ++i) {
+  std::vector<errorp>::const_iterator end = errs.end();
+  for (std::vector<errorp>::const_iterator i = errs.begin(); i != end; ++i) {
     bool warning = i->num < ERROR_OFFSET ? true : false;
     
     std::string strcode;
@@ -854,7 +855,8 @@ bool VOMSServer::makeAC(vomsresult& vr, EVP_PKEY *key, X509 *issuer,
 
   /* Parse and execute requests */
 
-  for(std::vector<std::string>::iterator i = comm.begin(); i != comm.end(); ++i) {
+  std::vector<std::string>::const_iterator end = comm.end();
+  for(std::vector<std::string>::const_iterator i = comm.begin(); i != end; ++i) {
     char commletter = '\0';
     command = comm[k++];
     char *group = NULL;
@@ -977,7 +979,8 @@ bool VOMSServer::makeAC(vomsresult& vr, EVP_PKEY *key, X509 *issuer,
 
     /* find the attributes corresponding to the vo */
     std::vector<std::string> existing;
-    for(std::vector<voms>::iterator index = (vd.data).begin(); index != (vd.data).end(); ++index) {
+    std::vector<voms>::iterator end = (vd.data).end();
+    for(std::vector<voms>::iterator index = (vd.data).begin(); index != end; ++index) {
       if(index->voname == voname)
         existing.insert(existing.end(),
                      index->fqan.begin(),
@@ -989,7 +992,9 @@ bool VOMSServer::makeAC(vomsresult& vr, EVP_PKEY *key, X509 *issuer,
       std::vector<std::string> newfqans(fqans);
       fqans.clear();
       std::vector<std::string>::iterator i = newfqans.begin();
-      while (i != newfqans.end()) {
+      std::vector<std::string>::iterator end = newfqans.end();
+
+      while (i != end) {
         std::string fqan = *i;
         LOGM(VARP, logh, LEV_DEBUG, T_PRE, "Initial FQAN: %s", fqan.c_str());
         if (fqan.find("/Role=") != std::string::npos)
@@ -1003,14 +1008,14 @@ bool VOMSServer::makeAC(vomsresult& vr, EVP_PKEY *key, X509 *issuer,
     }
 
     /* if attributes were found, only release an intersection beetween the requested and the owned */
-    std::vector<std::string>::iterator end = fqans.end();
+    std::vector<std::string>::iterator fend = fqans.end();
     bool subset = false;
 
     if (!existing.empty())
       if (fqans.erase(remove_if(fqans.begin(),
                                 fqans.end(),
                                 bind2nd(std::ptr_fun(not_in), existing)),
-                      fqans.end()) != end)
+                      fqans.end()) != fend)
         subset = true;
 
     if (subset) {
@@ -1037,13 +1042,15 @@ bool VOMSServer::makeAC(vomsresult& vr, EVP_PKEY *key, X509 *issuer,
 
   if (!fqans.empty()) {
     // test logging retrieved attributes
+    std::vector<std::string>::const_iterator end = fqans.end();
 
-    for (std::vector<std::string>::iterator i = fqans.begin(); i != fqans.end(); ++i)
+    for (std::vector<std::string>::const_iterator i = fqans.begin(); i != end; ++i)
       LOGM(VARP, logh, LEV_INFO, T_PRE, "Request Result: %s",  (*i).c_str());
 
     if (LogLevelMin(logh, LEV_DEBUG)) {
       if(result && !attribs.empty()) {
-        for(std::vector<gattrib>::iterator i = attribs.begin(); i != attribs.end(); ++i)
+        std::vector<gattrib>::const_iterator end = attribs.end();
+        for(std::vector<gattrib>::const_iterator i = attribs.begin(); i != end; ++i)
           LOGM(VARP, logh, LEV_DEBUG, T_PRE,  "User got attributes: %s", i->str().c_str());
       }
       else
@@ -1069,7 +1076,8 @@ bool VOMSServer::makeAC(vomsresult& vr, EVP_PKEY *key, X509 *issuer,
         if (a) {
           std::vector<std::string> attributes_compact;
 
-          for(std::vector<gattrib>::iterator i = attribs.begin(); i != attribs.end(); ++i)
+          std::vector<gattrib>::const_iterator end = attribs.end();
+          for(std::vector<gattrib>::const_iterator i = attribs.begin(); i != end; ++i)
             attributes_compact.push_back(i->str());
 
           res = createac(issuer, sock.own_stack, holder, key, serial,
@@ -1108,7 +1116,8 @@ bool VOMSServer::makeAC(vomsresult& vr, EVP_PKEY *key, X509 *issuer,
     else {
       /* comm[0] == "N" */
 
-      for (std::vector<std::string>::iterator i = fqans.begin(); i != fqans.end(); ++i)
+      std::vector<std::string>::const_iterator end = fqans.end();
+      for (std::vector<std::string>::const_iterator i = fqans.begin(); i != end; ++i)
         data += (*i).c_str() + std::string("\n");
     }
 

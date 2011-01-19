@@ -559,7 +559,8 @@ static bool print(X509 *cert, STACK_OF(X509) *chain, vomsdata &vd)
   }    
   
   if (all) {
-    for (std::vector<voms>::iterator v = vd.data.begin(); v != vd.data.end(); ++v) {
+    std::vector<voms>::const_iterator vend = vd.data.end();
+    for (std::vector<voms>::iterator v = vd.data.begin(); v != vend; ++v) {
       ASN1_TIME * after  = convtime(v->date2);
       leftac = stillvalid(after) - now;	
       leftac = (leftac<0) ? 0 : leftac;
@@ -570,19 +571,27 @@ static bool print(X509 *cert, STACK_OF(X509) *chain, vomsdata &vd)
       std::cout << "subject   : " << v->user << "\n";
       std::cout << "issuer    : " << v->server << "\n";
 
-      for (std::vector<std::string>::iterator s = v->fqan.begin(); s != v->fqan.end(); ++s)
+      std::vector<std::string>::const_iterator send = v->fqan.end();
+      for (std::vector<std::string>::const_iterator s = v->fqan.begin(); s != send; ++s)
         std::cout << "attribute : " << *s << "\n";
+
       std::vector<attributelist> alist = v->GetAttributes();
-      for (std::vector<attributelist>::iterator s = alist.begin(); s != alist.end(); ++s)
-        for (std::vector<attribute>::iterator t = s->attributes.begin(); t != s->attributes.end(); ++t)
+      std::vector<attributelist>::const_iterator aend = alist.end();
+      
+      for (std::vector<attributelist>::const_iterator s = alist.begin(); s != aend; ++s) {
+        std::vector<attribute>::const_iterator tend = s->attributes.end();
+        for (std::vector<attribute>::const_iterator t = s->attributes.begin(); t != tend; ++t)
           std::cout << "attribute : " << t->name + " = " + t->value + 
             (t->qualifier.empty() ? "" : " (" + t->qualifier + ")") << std::endl;
+      }
+
       std::cout << "timeleft  : " << leftac/3600 << ":" << std::setw(2) << std::setfill('0')
                 << (leftac%3600)/60 << ":" << std::setw(2) << std::setfill('0') << (leftac%3600)%60 << "\n";
 
       std::vector<std::string> targetlist = v->GetTargets();
       if (!targetlist.empty()) {
-        for (std::vector<std::string>::iterator targ = targetlist.begin(); targ != targetlist.end(); ++targ)
+        std::vector<std::string>::const_iterator tend = targetlist.end();
+        for (std::vector<std::string>::const_iterator targ = targetlist.begin(); targ != tend; ++targ)
           std::cout << "target    : " << *targ << "\n";
       }
       std::cout << "uri       : " << v->uri  << "\n";
@@ -638,7 +647,8 @@ static bool print(X509 *cert, STACK_OF(X509) *chain, vomsdata &vd)
     if (vo || acsubject || acissuer || actimeleft || fqan || serial || targets || printuri)
       res = false;
 
-  for (std::vector<voms>::iterator v = vd.data.begin(); v != vd.data.end(); ++v) {
+  std::vector<voms>::const_iterator vend = vd.data.end();
+  for (std::vector<voms>::iterator v = vd.data.begin(); v != vend; ++v) {
     if(vo)
         std::cout << v->voname << "\n";
 
@@ -660,7 +670,8 @@ static bool print(X509 *cert, STACK_OF(X509) *chain, vomsdata &vd)
         std::cout << leftac << "\n";
 
     if (fqan) {
-      for (std::vector<std::string>::iterator s = v->fqan.begin(); s != v->fqan.end(); ++s)
+      std::vector<std::string>::const_iterator send = v->fqan.end();
+      for (std::vector<std::string>::const_iterator s = v->fqan.begin(); s != send; ++s)
         std::cout << *s << "\n";
       if (v->fqan.empty())
         res = false;
@@ -673,7 +684,8 @@ static bool print(X509 *cert, STACK_OF(X509) *chain, vomsdata &vd)
       std::vector<std::string> targetlist = v->GetTargets();
 
       if (!targetlist.empty()) {
-        for (std::vector<std::string>::iterator targ = targetlist.begin(); targ != targetlist.end(); ++targ)
+        std::vector<std::string>::const_iterator tend = targetlist.end();
+        for (std::vector<std::string>::const_iterator targ = targetlist.begin(); targ != tend; ++targ)
           std::cout << "target    : " << *targ << "\n";
       }
     }
@@ -693,10 +705,13 @@ static bool print(X509 *cert, STACK_OF(X509) *chain, vomsdata &vd)
   /* -acexists */
 
   if(res) {
-    for (std::vector<std::string>::iterator i = acexists.begin(); i != acexists.end(); ++i) {
+    std::vector<std::string>::const_iterator acend = acexists.end();
+
+    for (std::vector<std::string>::const_iterator i = acexists.begin(); i != acend; ++i) {
       bool found = false;
 
       if(res) {
+        std::vector<voms>::const_iterator vend = vd.data.end();
         for (std::vector<voms>::iterator v = vd.data.begin(); v != vd.data.end(); ++v) {
           if(v->voname == *i) {
             found = true;

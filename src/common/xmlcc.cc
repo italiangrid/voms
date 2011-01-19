@@ -340,7 +340,8 @@ std::string XML_Ans_Encode(const std::string &ac, const std::string &data, const
   if (!e.empty()) {
     res += "<error>";
 
-    for (std::vector<errorp>::const_iterator i = e.begin(); i != e.end(); ++i) {
+    std::vector<errorp>::const_iterator end = e.end();
+    for (std::vector<errorp>::const_iterator i = e.begin(); i != end; ++i) {
       res +="<item><number>";
       str = snprintf_wrap("%d", (*i).num);
       res += std::string(str ? str : "");

@@ -285,7 +285,8 @@ char **vectoarray(std::vector<std::string>& vector)
   if (array) {
     int j = 0;
 
-    for (std::vector<std::string>::iterator i = vector.begin(); i != vector.end(); ++i) {
+    std::vector<std::string>::const_iterator end = vector.end();
+    for (std::vector<std::string>::const_iterator i = vector.begin(); i != end; ++i) {
       array[j] = strdup((*i).c_str());
       if (!array[j]) {
         listfree(array, free);

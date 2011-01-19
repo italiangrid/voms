@@ -580,8 +580,9 @@ bool Fake::CreateProxy(std::string data, AC ** aclist, int version)
     args->selfsigned = (selfsigned ? 1 : 0);
 
     /* Read through extensions */
-    for (std::vector<std::string>::iterator i = extensions.begin();
-         i != extensions.end(); ++i) {
+    std::vector<std::string>::const_iterator end = extensions.end();
+    for (std::vector<std::string>::const_iterator i = extensions.begin();
+         i != end; ++i) {
       args->extensions = create_and_add_extension(*i, args->extensions);
     }
 

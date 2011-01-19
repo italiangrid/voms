@@ -56,8 +56,9 @@ int TranslateVOMS(struct vomsdatar *vd, std::vector<voms> &v, UNUSED(int *error)
 
   if (arr2) {
     std::vector<voms>::iterator cur = v.begin();
+    std::vector<voms>::iterator end = v.end();
     int i = 0;
-    while (cur != v.end()) {
+    while (cur != end) {
       arr2[i] = cur->translate();
       arr2[i]->mydata = i;
       arr2[i]->my2    = (void *)vd;
@@ -196,7 +197,7 @@ static struct contactdatar **Arrayize(std::vector<contactdata> &cd, int *error)
   struct contactdatar *cda = (struct contactdatar *)malloc(size1);
 
   if (cdr && cda) {
-    std::vector<contactdata>::iterator cur = cd.begin(),
+    std::vector<contactdata>::const_iterator cur = cd.begin(),
       end = cd.end();
 
     int i = 0;
@@ -315,8 +316,9 @@ struct vomsr *voms::translate()
 
       int j = 0;
 
-      for (std::vector<data>::iterator i = std.begin();
-             i != std.end(); ++i) {
+      std::vector<data>::const_iterator end = std.end();
+      for (std::vector<data>::const_iterator i = std.begin();
+             i != end; ++i) {
         struct datar *d = (struct datar *)calloc(1, sizeof(struct datar));
         if (d) {
           dst->std[j++] = d;
@@ -436,12 +438,13 @@ char *VOMS_ListTargets(struct vomsdatar *vd, int *error)
 
   std::vector<std::string> list = v->ListTargets();
 
-  std::vector<std::string>::iterator cur = list.begin();
-
+  std::vector<std::string>::const_iterator cur = list.begin();
+  std::vector<std::string>::const_iterator begin = list.begin();
+  std::vector<std::string>::const_iterator end = list.end();
   std::string total = "";
 
-  while(cur != list.end()) {
-    if (cur != list.begin())
+  while(cur != end) {
+    if (cur != begin)
       total += ",";
     total += *cur;
     ++cur;
