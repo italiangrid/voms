@@ -15890,19 +15890,6 @@ _ACEOF
     fi
  # embed AC_GLITE
 
-if test "x$host_cpu" = "xx86_64"; then
-    libdir='${exec_prefix}/lib64'
-
-fi
-
-if test -h /usr/lib64 ; then
-    libdir='${exec_prefix}/lib'
-fi
-
-if ! test -e /usr/lib64 ; then
-    libdir='${exec_prefix}/lib'
-fi
-
 
 
 # Check whether --with-expat_prefix was given.

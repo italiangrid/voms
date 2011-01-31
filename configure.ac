@@ -34,18 +34,6 @@ AC_OPENSSL
 
 AC_ENABLE_GLITE([], have_glite=yes, have_glite=no) # embed AC_GLITE
 
-if test "x$host_cpu" = "xx86_64"; then
-    AC_SUBST([libdir], ['${exec_prefix}/lib64'])
-fi
-
-if test -h /usr/lib64 ; then
-    libdir='${exec_prefix}/lib'
-fi
-
-if ! test -e /usr/lib64 ; then
-    libdir='${exec_prefix}/lib'
-fi
-
 AC_EXPAT([], have_expat=yes, have_expat=no)        # taken from org.glite
 
 AC_JAVA
