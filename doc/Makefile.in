@@ -204,7 +204,7 @@ SGML = $(srcdir)/voms-proxy-init.xml \
        $(srcdir)/voms-install-replica.xml \
        $(srcdir)/voms-proxy-fake.xml
 
-SGML_DIST = voms-proxy-init.xml voms.sgml voms-proxy-info.xml \
+SGML_DIST = voms-proxy-init.xml voms.xml voms-proxy-info.xml \
             voms-proxy-destroy.xml voms-install-replica.xml \
             voms-proxy-fake.xml voms-proxy-list.xml
 
