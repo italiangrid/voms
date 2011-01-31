@@ -188,7 +188,7 @@ Client::Client(int argc, char ** argv) :
                                          cert_chain(NULL),
                                          ucert(NULL),
                                          private_key(NULL),
-                                         timeout(-1),
+                                         timeout(60),
 					 acfile(""),
                                          v(NULL)
 {
