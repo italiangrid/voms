@@ -1311,6 +1311,13 @@ static bool determine_group_and_role(std::string command, char *comm, char **gro
 
   char *string = strdup(command.c_str()+1);
 
+  if (strcmp(string, "all") == 0) {
+    *comm = 'A';
+    *role = *group = NULL;
+    free(string);
+    return true;
+  }
+
   if (string[0] != '/') {
     /* old syntax */
     *comm = command[0];
