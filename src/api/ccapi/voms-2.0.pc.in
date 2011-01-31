@@ -6,6 +6,6 @@ includedir=@includedir@
 Name: voms api
 Description: VOMS C/C++ APIs
 Requires: openssl
-Version: 1.0.0
+Version: 2.0.0
 Libs: -L${libdir} -lvomsapi
-Cflags: -I${includedir} -I${includedir}/glite/security
+Cflags: -I${includedir}

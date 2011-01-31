@@ -1,7 +1,7 @@
 
 includedir = @includedir@/voms
 pkgconfigdir = $(libdir)/pkgconfig
-pkgconfig_DATA = voms-1.0.pc
+pkgconfig_DATA = voms-2.0.pc
 
 lib_LTLIBRARIES = libvomsapi.la
 

@@ -720,8 +720,9 @@ vomsdata::check_cert(STACK_OF(X509) *stack)
     proxy_verify_desc *pvd = setup_initializers(strdup((char*)ca_cert_dir.c_str()));
 
     X509_STORE_set_verify_cb_func(ctx,proxy_verify_callback);
+    
 #ifdef SIGPIPE
-    signal(SIGPIPE,SIG_IGN);
+    sighandler_t oldsignal = signal(SIGPIPE,SIG_IGN);
 #endif
     CRYPTO_malloc_init();
     if ((lookup = X509_STORE_add_lookup(ctx, X509_LOOKUP_file()))) {
@@ -740,6 +741,9 @@ vomsdata::check_cert(STACK_OF(X509) *stack)
         index = X509_verify_cert(csc);
       }
     }
+#ifdef SIGPIPE
+    signal(SIGPIPE, oldsignal);
+#endif
     destroy_initializers(pvd);
   }
   X509_STORE_free(ctx);

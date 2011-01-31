@@ -118,6 +118,8 @@ extern int read_pathrestriction(STACK_OF(X509) *chain, char *path,
                                 struct policy ***namespaces, 
                                 struct policy ***signings);
 
+static int check_critical_extensions(X509 *cert, int itsaproxy);
+
 /**********************************************************************
                                Type definitions
 **********************************************************************/
@@ -1809,10 +1811,6 @@ proxy_verify_callback(
     X509_CRL_INFO *                     crl_info;
     X509_REVOKED *                      revoked;
 #endif
-    STACK_OF(X509_EXTENSION) *          extensions;
-    X509_EXTENSION *                    ex;
-    ASN1_OBJECT *                       extension_obj;
-    int                                 nid;
     SSL *                               ssl = NULL;
     proxy_verify_desc *                 pvd;
     int                                 itsaproxy = 0;
@@ -1902,6 +1900,14 @@ proxy_verify_callback(
             if (proxy_check_issued(ctx, ctx->cert, ctx->current_cert)) {
               ok = 1;
             }
+          }
+          break;
+
+        case X509_V_ERR_UNHANDLED_CRITICAL_EXTENSION:
+          if (proxy_check_proxy_name(ctx->cert) >= 1) {
+            if (check_critical_extensions(ctx->cert, 1))
+              /* Allows proxy specific extensions on proxies. */
+              ok = 1;
           }
           break;
 
@@ -2184,47 +2190,10 @@ proxy_verify_callback(
         free(ca_policy_file_path);
     }
 
-    extensions = ctx->current_cert->cert_info->extensions;
-
-    for (i=0;i<sk_X509_EXTENSION_num(extensions);i++)
-    {
-        ex = (X509_EXTENSION *) sk_X509_EXTENSION_value(extensions,i);
-
-        if(X509_EXTENSION_get_critical(ex))
-        {
-            extension_obj = X509_EXTENSION_get_object(ex);
-
-            nid = OBJ_obj2nid(extension_obj);
-
-            if (itsaproxy) {
-              if (nid != NID_basic_constraints &&
-                  nid != NID_key_usage &&
-                  nid != NID_ext_key_usage &&
-                  nid != NID_netscape_cert_type &&
-                  nid != NID_subject_key_identifier &&
-                  nid != NID_authority_key_identifier &&
-                  nid != my_txt2nid(PROXYCERTINFO_V3) &&
-                  nid != my_txt2nid(PROXYCERTINFO_V4))
-                {
-                  PRXYerr(PRXYERR_F_VERIFY_CB, PRXYERR_R_UNKNOWN_CRIT_EXT);
-                  ctx->error = X509_V_ERR_CERT_REJECTED;
-                  goto fail_verify;
-                }
-            }
-            else {
-              if (nid != NID_basic_constraints &&
-                  nid != NID_key_usage &&
-                  nid != NID_ext_key_usage &&
-                  nid != NID_netscape_cert_type &&
-                  nid != NID_subject_key_identifier &&
-                  nid != NID_authority_key_identifier)
-                {
-                  PRXYerr(PRXYERR_F_VERIFY_CB, PRXYERR_R_UNKNOWN_CRIT_EXT);
-                  ctx->error = X509_V_ERR_CERT_REJECTED;
-                  goto fail_verify;
-                }
-            }
-        }
+    if (!check_critical_extensions(ctx->current_cert, itsaproxy)) {
+      PRXYerr(PRXYERR_F_VERIFY_CB, PRXYERR_R_UNKNOWN_CRIT_EXT);
+      ctx->error = X509_V_ERR_CERT_REJECTED;
+      goto fail_verify;
     }
 
     /*
@@ -3949,4 +3918,51 @@ static X509_NAME *make_DN(const char *dnstring)
 
   return NULL;
 
+}
+
+static int check_critical_extensions(X509 *cert, int itsaproxy)
+{
+  int i = 0;
+  ASN1_OBJECT *extension_obj;
+  int nid;
+  X509_EXTENSION *ex;
+
+  int nid_pci3 = my_txt2nid(PROXYCERTINFO_V3);
+  int nid_pci4 = my_txt2nid(PROXYCERTINFO_V4);
+
+  STACK_OF(X509_EXTENSION) *extensions = cert->cert_info->extensions;
+
+  for (i=0; i < sk_X509_EXTENSION_num(extensions); i++) {
+    ex = (X509_EXTENSION *) sk_X509_EXTENSION_value(extensions,i);
+
+    if(X509_EXTENSION_get_critical(ex)) {
+      extension_obj = X509_EXTENSION_get_object(ex);
+
+      nid = OBJ_obj2nid(extension_obj);
+
+      if (itsaproxy) {
+        if (nid != NID_basic_constraints &&
+            nid != NID_key_usage &&
+            nid != NID_ext_key_usage &&
+            nid != NID_netscape_cert_type &&
+            nid != NID_subject_key_identifier &&
+            nid != NID_authority_key_identifier &&
+            nid != nid_pci3 &&
+            nid != nid_pci4) {
+          return 0;
+        }
+      }
+      else {
+        if (nid != NID_basic_constraints &&
+            nid != NID_key_usage &&
+            nid != NID_ext_key_usage &&
+            nid != NID_netscape_cert_type &&
+            nid != NID_subject_key_identifier &&
+            nid != NID_authority_key_identifier) {
+           return 0;
+        }
+      }
+    }
+  }
+  return 1;
 }

@@ -21166,7 +21166,7 @@ fi
 
 ac_config_files="$ac_config_files Makefile src/Makefile src/ac/Makefile src/api/Makefile src/api/ccapi/Makefile src/api/java/Makefile src/client/Makefile src/common/Makefile src/include/Makefile src/install/Makefile src/log/Makefile src/replib/Makefile src/replica/Makefile src/server/Makefile src/socklib/Makefile src/sslutils/Makefile src/utils/Makefile doc/Makefile project/Makefile testsuite/Makefile testsuite/SuiteConfig"
 
-ac_config_files="$ac_config_files src/install/voms_install_db src/install/voms.start src/replica/voms_install_replica src/install/upgrade1to2 src/install/mysql2oracle src/api/ccapi/voms-1.0.pc"
+ac_config_files="$ac_config_files src/install/voms_install_db src/install/voms.start src/replica/voms_install_replica src/install/upgrade1to2 src/install/mysql2oracle src/api/ccapi/voms-2.0.pc"
 
 cat >confcache <<\_ACEOF
 # This file is a shell script that caches the results of configure
@@ -22272,7 +22272,7 @@ do
     "src/replica/voms_install_replica") CONFIG_FILES="$CONFIG_FILES src/replica/voms_install_replica" ;;
     "src/install/upgrade1to2") CONFIG_FILES="$CONFIG_FILES src/install/upgrade1to2" ;;
     "src/install/mysql2oracle") CONFIG_FILES="$CONFIG_FILES src/install/mysql2oracle" ;;
-    "src/api/ccapi/voms-1.0.pc") CONFIG_FILES="$CONFIG_FILES src/api/ccapi/voms-1.0.pc" ;;
+    "src/api/ccapi/voms-2.0.pc") CONFIG_FILES="$CONFIG_FILES src/api/ccapi/voms-2.0.pc" ;;
 
   *) { { $as_echo "$as_me:$LINENO: error: invalid argument: $ac_config_target" >&5
 $as_echo "$as_me: error: invalid argument: $ac_config_target" >&2;}
