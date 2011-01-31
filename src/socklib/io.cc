@@ -132,7 +132,7 @@ bool do_connect(SSL *ssl, int fd, int timeout, std::string& error)
 
 
   if (ret2 <= 0 || ret <= 0) {
-    if (timeout != -1 && (curtime - starttime <= timeout))
+    if (timeout != -1 && (curtime - starttime >= timeout))
       error = "Connection stuck during handshake: timeout reached.";
     else
       error = "Error during SSL handshake:" + OpenSSLError(true);
@@ -201,7 +201,7 @@ bool do_write(SSL *ssl, int timeout, const std::string& text, std::string &error
   } while (ret <= 0 && do_continue);
            
   if (ret <=0) {
-    if (timeout != -1 && (curtime - starttime <= timeout))
+    if (timeout != -1 && (curtime - starttime >= timeout))
       error ="Connection stuck during write: timeout reached.";
     else
       error = "Error during SSL write:" + OpenSSLError(true);
@@ -248,7 +248,7 @@ bool do_read(SSL *ssl, int timeout, std::string& output)
   } while (TEST_SELECT(ret, ret2, timeout, curtime, starttime, error)); 
             
   if (ret <= 0 || ret2 < 0) {
-    if (timeout != -1 && (curtime - starttime <= timeout))
+    if (timeout != -1 && (curtime - starttime >= timeout))
       output = "Connection stuck during read: timeout reached.";
     else
       output = "Error during SSL read:" + OpenSSLError(true);

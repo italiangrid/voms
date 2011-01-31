@@ -385,7 +385,7 @@ GSISocketServer::AcceptGSIAuthentication()
             errorcode == SSL_ERROR_WANT_WRITE)));
 
   if (ret2 <= 0 || ret <= 0) {
-    if (timeout != -1 && (curtime - starttime <= timeout))
+    if (timeout != -1 && (curtime - starttime >= timeout))
       SetError("Connection stuck during handshake: timeout reached.");
     else
       SetErrorOpenSSL("Error during SSL handshake:");
@@ -523,7 +523,7 @@ bool GSISocketServer::Peek(int bufsize, std::string& s)
               (error == SSL_ERROR_WANT_WRITE)))));
             
   if (ret <= 0 || ret2 <= 0) {
-    if (timeout != -1 && (curtime - starttime <= timeout))
+    if (timeout != -1 && (curtime - starttime >= timeout))
       SetError("Connection stuck during read: timeout reached.");
     else
       SetErrorOpenSSL("Error during SSL read:");
