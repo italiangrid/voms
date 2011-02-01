@@ -722,7 +722,7 @@ vomsdata::check_cert(STACK_OF(X509) *stack)
     X509_STORE_set_verify_cb_func(ctx,proxy_verify_callback);
     
 #ifdef SIGPIPE
-    sighandler_t oldsignal = signal(SIGPIPE,SIG_IGN);
+    void (*oldsignal)(int) = signal(SIGPIPE,SIG_IGN);
 #endif
     CRYPTO_malloc_init();
     if ((lookup = X509_STORE_add_lookup(ctx, X509_LOOKUP_file()))) {
