@@ -423,6 +423,7 @@ extern char **VOMS_GetTargetsList(struct voms *v, struct vomsdata *vd, int *erro
 extern void VOMS_FreeTargetsList(char **);
 
 extern int VOMS_SetTimeout(int t, struct vomsdata *vd, int *error);
+extern int VOMS_LoadCredentials(X509 *cert, EVP_PKEY *pkey, STACK_OF(X509)* chain, struct vomsdata *vd, int *error);
 
 #ifdef __cplusplus
 }

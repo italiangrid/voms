@@ -399,6 +399,17 @@ void VOMS_Destroy(struct vomsdatar *vd)
   }
 }
 
+int VOMS_LoadCredentials(X509 *cert, EVP_PKEY *pkey, STACK_OF(X509) *chain, struct vomsdatar *vd, int *error)
+{
+  if (!vd || !vd->real || !error) {
+    *error = VERR_PARAM;
+    return 0;
+  }
+
+  vomsdata *v = vd->real;
+
+  return v->LoadCredentials(cert, pkey, chain) ? 1 : 0;
+}
 
 int VOMS_AddTarget(struct vomsdatar *vd, char *target, int *error)
 {
