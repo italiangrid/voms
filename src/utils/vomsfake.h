@@ -37,7 +37,7 @@ extern "C" {
   
 #include "sslutils.h"
 #include "newformat.h"
-#include "parsertypes.h"  
+#include "fakeparsertypes.h"  
 }
 
 enum message_type {FORCED, INFO, WARN, ERROR, DEBUG};

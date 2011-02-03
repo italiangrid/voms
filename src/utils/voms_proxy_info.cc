@@ -71,7 +71,7 @@ extern int AC_Init(void);
 #include "options.h"
 
 #include <string>
-#include "voms_api_nog.h"
+#include "voms_api.h"
 
 #include <vector>
 #include <iostream>

@@ -34,7 +34,7 @@ host_triplet = @host@
 subdir = project
 DIST_COMMON = $(srcdir)/Makefile.am $(srcdir)/Makefile.in compile \
 	config.guess config.sub depcomp install-sh ltmain.sh missing \
-	mkinstalldirs
+	mkinstalldirs ylwrap
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 am__aclocal_m4_deps = $(top_srcdir)/project/acinclude.m4 \
 	$(top_srcdir)/project/expat.m4 $(top_srcdir)/project/glite.m4 \
@@ -192,6 +192,7 @@ with_mysqlconf = @with_mysqlconf@
 with_reportdir = @with_reportdir@
 with_scratchdir = @with_scratchdir@
 with_valgrind = @with_valgrind@
+EXTRA_DIST = voms.m4
 all: all-am
 
 .SUFFIXES:
@@ -361,6 +362,7 @@ uninstall-am:
 	maintainer-clean maintainer-clean-generic mostlyclean \
 	mostlyclean-generic mostlyclean-libtool pdf pdf-am ps ps-am \
 	uninstall uninstall-am
+
 
 @BUILD_INTERFACES_TRUE@install-exec-hook:
 @BUILD_INTERFACES_TRUE@	$(mkinstalldirs) $(DESTDIR)/$(datadir)/m4

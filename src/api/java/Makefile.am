@@ -61,6 +61,8 @@ JAVA_CLASSES = org/glite/voms/BasicVOMSTrustStore.class \
 							 org/glite/voms/contact/VOMSProxyConstants.class \
 							 org/glite/voms/contact/VOMSSyntaxException.class
 
+SOURCES = $(JAVA_CLASSES:.class=.java)
+EXTRA_DIST = $(SOURCES) Manifest.add log4j.properties
 
 all-local: $(top_builddir)/src/api/java/vomsjapi.jar
 

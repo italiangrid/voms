@@ -29,7 +29,7 @@
 #include <string.h>
 #include <stdlib.h>
 
-#include "parsertypes.h"
+#include "fakeparsertypes.h"
 #include "vomsparser.h"
 %}
 

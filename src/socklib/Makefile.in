@@ -242,7 +242,7 @@ libsock_nog_la_LIBADD = \
 
 #	$(top_builddir)/src/sslutils/libssl_utils_nog.la \
 #	$(top_builddir)/src/common/libutilc_nog.la
-EXTRA_DIST = vomsssl.h
+EXTRA_DIST = vomsssl.h ipv6sock.h io.h
 
 ###
 CLEANFILES = \

@@ -9,9 +9,12 @@ noinst_LTLIBRARIES = libssl_utils_nog.la
 
 SOURCES= scutils.c scutils.h sslutils.c proxycertinfo.c \
 	signing_policy.c lex.signing.c namespaces.c lex.namespaces.c \
-	evaluate.c proxy.c vomsproxy.h
+	evaluate.c proxy.c vomsproxy.h 
 
-evaluate.$(OBJEXT): signing_policy.h namespaces.h
+
+EXTRA_DIST = namespaces.l namespaces.y signing_policy.y signing_policy.l parsertypes.h
+
+evaluate.$(OBJEXT): signing_policy.h namespaces.h parsertypes.h evaluate.c
 
 signing_policy.$(OBJEXT): signing_policy.h
 

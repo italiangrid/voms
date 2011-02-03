@@ -72,7 +72,7 @@ void *logh = NULL;
 
 #include "dbwrap.h"
 
-#include "voms_api_nog.h"
+#include "voms_api.h"
 
 #include "soapH.h"
 

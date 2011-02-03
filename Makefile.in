@@ -37,7 +37,8 @@ DIST_COMMON = README $(am__configure_deps) $(srcdir)/Makefile.am \
 	$(top_srcdir)/src/autogen/config.h.in ./project/compile \
 	./project/config.guess ./project/config.sub ./project/depcomp \
 	./project/install-sh ./project/ltmain.sh ./project/missing \
-	./project/mkinstalldirs AUTHORS ChangeLog INSTALL NEWS
+	./project/mkinstalldirs ./project/ylwrap AUTHORS ChangeLog \
+	INSTALL NEWS
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 am__aclocal_m4_deps = $(top_srcdir)/project/acinclude.m4 \
 	$(top_srcdir)/project/expat.m4 $(top_srcdir)/project/glite.m4 \

@@ -250,6 +250,7 @@ with_valgrind = @with_valgrind@
 @BUILD_SERVER_TRUE@	soapC.c \
 @BUILD_SERVER_TRUE@	stdsoap2.c
 
+@BUILD_SERVER_TRUE@EXTRA_DIST = soapH.h soapdefs.h stdsoap2.h soapStub.h
 
 #	$(top_builddir)/src/sslutils/libssl_utils_nog.la 
 @BUILD_SERVER_TRUE@voms_LDADD = \

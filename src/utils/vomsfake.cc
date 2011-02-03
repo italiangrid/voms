@@ -35,7 +35,7 @@
 #include <sstream>
 #include <algorithm>
 
-#include <voms_api_nog.h>
+#include <voms_api.h>
 
 extern "C" {
 #include <stdio.h>
@@ -61,7 +61,7 @@ extern "C" {
 
 #include "listfunc.h"
 #include "credentials.h"
-#include "parsertypes.h"
+#include "fakeparsertypes.h"
 #define YYTOKENTYPE
 #include "vomsparser.h"
 #include "vomsproxy.h"
@@ -71,7 +71,7 @@ extern int yyparse();
 extern FILE *yyin;
 }
 
-#include <voms_api_nog.h>
+#include <voms_api.h>
 
 #include "vomsfake.h"
 #include "ccwrite.h"

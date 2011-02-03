@@ -13,6 +13,8 @@ voms_SOURCES = \
 	soapC.c \
 	stdsoap2.c
 
+EXTRA_DIST = soapH.h soapdefs.h stdsoap2.h soapStub.h
+
 #	$(top_builddir)/src/sslutils/libssl_utils_nog.la 
 
 voms_LDADD = \

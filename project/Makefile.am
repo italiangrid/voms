@@ -1,3 +1,5 @@
+EXTRA_DIST = voms.m4
+
 if BUILD_INTERFACES
 install-exec-hook:
 	$(mkinstalldirs) $(DESTDIR)/$(datadir)/m4

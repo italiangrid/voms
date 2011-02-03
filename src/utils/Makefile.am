@@ -30,6 +30,8 @@ voms_proxy_fake_SOURCES = \
 	vomsparser.c \
 	lex.yy.c 
 
+EXTRA_DIST = vomsfake.y vomsparser.l vomsparser.h fakeparsertypes.h
+
 vomsfake.$(OBJEXT): vomsparser.h
 
 vomsparser.$(OBJEXT): vomsparser.h
