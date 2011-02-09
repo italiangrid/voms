@@ -51,7 +51,7 @@ touch -r src/utils/vomsfake.y src/utils/lex.yy.c
 
 %build
 %configure --disable-glite --with-all=no --enable-java=no --with-clients=yes \
-    --libexecdir=%{_datadir} --sysconfdir=%{_datadir}
+    --disable-glite --with-config=yes
 
 make %{?_smp_mflags}
 
@@ -61,6 +61,8 @@ make install DESTDIR=$RPM_BUILD_ROOT
 
 mkdir -p $RPM_BUILD_ROOT%{_docdir}/%{name}-%{version}
 install -m 644 -p LICENSE AUTHORS $RPM_BUILD_ROOT%{_docdir}/%{name}-%{version}
+rm -rf $RPM_BUILD_ROOT%{_libexecdir}/voms
+rm -rf $RPM_BUILD_ROOT%{_libdir}/pkgconfig
 
 %clean
 rm -rf $RPM_BUILD_ROOT
@@ -79,6 +81,8 @@ rm -rf $RPM_BUILD_ROOT
 %{_mandir}/man1/voms-proxy-list.1*
 %{_docdir}/%{name}-%{version}/AUTHORS
 %{_docdir}/%{name}-%{version}/LICENSE
+%{_sysconfdir}/vomses.template
+%{_sysconfdir}/voms/voms.data
 
 %changelog
 * Tue Sep 28 2010 Vincenzo Ciaschini <vincenzo.ciaschini@cnaf.infn.it> - 2.0.0

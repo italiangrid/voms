@@ -17,19 +17,19 @@ Source:		%{name}-%{version}.tar.gz
 #Source1:	%{name}.INSTALL
 BuildRoot:	%{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 
-BuildRequires:	java-devel >= 1:1.6.0
-BuildRequires:	jpackage-utils
-BuildRequires:	bouncycastle >= 1.39
-BuildRequires:	jakarta-commons-cli
-BuildRequires:	jakarta-commons-lang
-BuildRequires:	log4j
+#BuildRequires:	java-devel
+#BuildRequires:	jpackage-utils
+#BuildRequires:	bouncycastle >= 1.39
+#BuildRequires:	jakarta-commons-cli
+#BuildRequires:	jakarta-commons-lang
+#BuildRequires:	log4j
 %if %{with_gcj}
-BuildRequires:	java-gcj-compat-devel
+#BuildRequires:	java-gcj-compat-devel
 %endif
 
 %if %{with_gcj}
-Requires(post):		java-gcj-compat
-Requires(postun):	java-gcj-compat
+#Requires(post):		java-gcj-compat
+#Requires(postun):	java-gcj-compat
 %else
 %if %{?fedora}%{!?fedora:0} >= 10 || %{?rhel}%{!?rhel:0} >= 6
 BuildArch:	noarch
@@ -63,12 +63,11 @@ touch -r src/utils/vomsfake.y src/utils/lex.yy.c
 #install -m 644 %{SOURCE1} INSTALL.Fedora
 
 %build
-%configure --disable-glite --libexecdir=%{_datadir} --sysconfdir=%{_datadir} \
+%configure --disable-glite --with-all=no \
 	   --with-java-home=/usr --with-bc=/usr/share/java/bcprov.jar \
-	   --with-log4j=/usr/share/java/log4j.jar \
-	   --with-commons-cli=/usr/share/java/commons-cli.jar \
+	   --with-log4j=/usr/share/java/log4j.jar --enable-java=yes \
+	   --with-commons-cli=/usr/share/java/commons-cli.jar --with-config=no \
 	   --with-commons-lang=/usr/share/java/commons-lang.jar --with-java-only=yes
-
 
 %install
 rm -rf $RPM_BUILD_ROOT
@@ -77,10 +76,10 @@ make install DESTDIR=$RPM_BUILD_ROOT
 
 mv $RPM_BUILD_ROOT%{_javadir}/vomsjapi.jar \
    $RPM_BUILD_ROOT%{_javadir}/vomsjapi-%{version}.jar
-ln -s $RPM_BUILD_ROOT%{_javadir}/vomsjapi-%{version}.jar $RPM_BUILD_ROOT%{_javadir}/vomsjapi.jar
+cp $RPM_BUILD_ROOT%{_javadir}/vomsjapi-%{version}.jar $RPM_BUILD_ROOT%{_javadir}/vomsjapi.jar
 
 %if %{with_gcj}
-%{_bindir}/aot-compile-rpm
+#%{_bindir}/aot-compile-rpm
 %endif
 
 %clean
@@ -101,7 +100,7 @@ rm -rf $RPM_BUILD_ROOT
 %{_javadir}/vomsjapi.jar
 %{_javadir}/vomsjapi-%{version}.jar
 %if %{with_gcj}
-%{_libdir}/gcj/%{name}
+#%{_libdir}/gcj/%{name}
 %endif
 %doc AUTHORS LICENSE
 

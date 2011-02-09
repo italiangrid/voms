@@ -52,8 +52,8 @@ touch -r src/utils/vomsfake.y src/utils/lex.yy.c
 
 %build
 %configure --disable-glite --disable-java --with-all=no --with-cpp-api=yes \
-    --with-config=yes --libexecdir=%{_datadir} \
-    --sysconfdir=%{_datadir} 
+    --enable-java=no --disable-glite --with-config=yes --libexecdir=%{_datadir} \
+    --sysconfdir=%{_datadir}
 
 make %{?_smp_mflags}
 
@@ -91,7 +91,7 @@ rm -rf $RPM_BUILD_ROOT
 %files
 %defattr(-,root,root,-)
 %{_libdir}/libvomsapi.so.*
-%{_libdir}/libvomsapi_nog.so.*
+%{_libdir}/pkgconfig/voms-2.0.pc
 %config(noreplace) %{_sysconfdir}/vomses
 %dir %{_sysconfdir}/grid-security
 %dir %{_sysconfdir}/grid-security/vomsdir

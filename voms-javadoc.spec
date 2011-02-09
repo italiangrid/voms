@@ -71,7 +71,7 @@ rm -rf $RPM_BUILD_ROOT
 %doc %{_javadocdir}/vomsjapi-%{version}
 
 %changelog
-* Fri Ovt 01 2010 Vincenzo Ciaschini <vincenzo.ciaschini@cnaf.infn.it> - 2.0.0
+* Fri Oct 01 2010 Vincenzo Ciaschini <vincenzo.ciaschini@cnaf.infn.it> - 2.0.0
 - Split into separate spec files.  This is the javadoc specfile
 
 * Thu Jul 08 2010 Mattias Ellert <mattias.ellert@fysast.uu.se> - 1.9.17.1-2

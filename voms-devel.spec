@@ -67,9 +67,6 @@ rm -f $RPM_BUILD_ROOT%{_libdir}/*.a
 rm -f $RPM_BUILD_ROOT%{_libdir}/*.la
 rm -f $RPM_BUILD_ROOT%{_libdir}/*_gcc32*.so.*
 rm -f $RPM_BUILD_ROOT%{_libdir}/*.so.*
-
-mv $RPM_BUILD_ROOT%{_includedir}/glite/security/voms \
-   $RPM_BUILD_ROOT%{_includedir}/voms
 rm -rf $RPM_BUILD_ROOT%{_includedir}/glite
 
 mv $RPM_BUILD_ROOT%{_datadir}/m4 $RPM_BUILD_ROOT%{_datadir}/aclocal
@@ -85,17 +82,15 @@ rm -rf $RPM_BUILD_ROOT
 %files
 %defattr(-,root,root,-)
 %{_libdir}/libvomsapi.so
-%{_libdir}/libvomsapi_nog.so
 %dir %{_includedir}/voms
 %{_includedir}/voms/acstack.h
 %{_includedir}/voms/newformat.h
 %{_includedir}/voms/vomsssl.h
 %{_includedir}/voms/voms_api.h
-%{_includedir}/voms/voms_api_nog.h
-%{_includedir}/voms/voms_apic_nog.h
 %{_includedir}/voms/voms_apic.h
 %{_includedir}/voms/vomsproxy.h
 %{_datadir}/aclocal/voms.m4
+%{_libdir}/pkgconfig/voms-2.0.pc
 
 
 %changelog

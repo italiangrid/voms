@@ -230,7 +230,7 @@ LATEX_DIST = software.tex capi.tex c++api.tex AC-RFC.tex
 @BUILD_CLIENTS_TRUE@@BUILD_SERVER_TRUE@	voms-proxy-fake.1 \
 @BUILD_CLIENTS_TRUE@@BUILD_SERVER_TRUE@	voms-proxy-list.1
 
-EXTRA_DIST = $(SGML_INCLUDES) $(SGML_DIST) $(LATEX_DIST)
+EXTRA_DIST = $(SGML_INCLUDES) $(SGML_DIST) $(LATEX_DIST) $(man_MANS)
 MAINTAINERCLEANFILES = Makefile.in \
                        manpage.links \
                        manpage.refs

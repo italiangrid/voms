@@ -109,6 +109,7 @@ echo VOMS_USER=voms > $RPM_BUILD_ROOT%{_sysconfdir}/sysconfig/voms
 
 mkdir -p $RPM_BUILD_ROOT%{_docdir}/%{name}-%{version}
 install -m 644 -p LICENSE AUTHORS $RPM_BUILD_ROOT%{_docdir}/%{name}-%{version}
+rm -rf $RPM_BUILD_ROOT%{_libdir}/pkgconfig
 
 %clean
 rm -rf $RPM_BUILD_ROOT

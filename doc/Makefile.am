@@ -54,7 +54,7 @@ man_MANS =
 endif
 endif
 
-EXTRA_DIST = $(SGML_INCLUDES) $(SGML_DIST) $(LATEX_DIST)
+EXTRA_DIST = $(SGML_INCLUDES) $(SGML_DIST) $(LATEX_DIST) $(man_MANS)
 
 MAINTAINERCLEANFILES = Makefile.in \
                        manpage.links \
