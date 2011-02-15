@@ -20,8 +20,8 @@ if test "x$action" = "xpost"; then
 rm -f $dir/usr/bin/edg-voms*
 rm -f $dir/usr/sbin/edg-voms*
 
-rm -f $dir/usr/lib/*.a
-rm -f $dir/usr/lib/*.la
+rm -f $dir/usr/lib/
+rm -f $dir/usr/lib64/
 
 rm $dir/usr/share/vomses.template
 

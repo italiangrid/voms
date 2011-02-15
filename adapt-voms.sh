@@ -51,4 +51,6 @@ touch $dir/etc/sysconfig/vomses
 
 mkdir -p $dir/usr/share/voms-$version
 install -m 644 -p LICENSE AUTHORS $dir/usr/share/voms-$version
+rm -rf $dir/usr/libexec/voms/mysql2oracle
+rm -rf $dir/usr/libexec/voms/voms_intall_db
 fi
