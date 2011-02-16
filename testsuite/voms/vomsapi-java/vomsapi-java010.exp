@@ -10,6 +10,11 @@ proc myepilog {} {
 proc mytest {} {
     _activateCert mycert2
 
+    if [expr [exec id -u] == 0] then {
+	set ::_test_epilog ""
+	return $::UNDECIDEDTEST
+    }
+
     # Create a proxy to validate.
     _vomsStart voms1
 
