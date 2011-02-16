@@ -117,6 +117,7 @@ public class VOMSESFileParser {
         File vomsVomses = new File( System.getProperty( "user.home" )
                 + File.separator + ".voms" + File.separator + "vomses" );
 
+	log.debug("Tried file: "+ vomsVomses.getAbsolutePath());
         if ( vomsVomses.exists() )
             list.add( vomsVomses );
 

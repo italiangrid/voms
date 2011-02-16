@@ -14,6 +14,11 @@ proc myepilog {} {
 proc mytest {} {
     _activateCert mycert2
 
+    if [expr [exec id -u] == 0] then {
+	set ::_test_epilog ""
+	return $::UNDECIDEDTEST
+    }
+
     set res [log_exec outname {voms-proxy-init --out $::SCRATCHDIR/tmp/file}]
 
     if $res then {

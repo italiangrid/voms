@@ -696,7 +696,7 @@ int Client::Run()
         int tmp = hours;
         hours = 1;
         if (CreateProxy("", NULL, (beg->version == -1 ? proxyver : beg->version/10)))
-          goto err;
+          goto err2;
         hours = tmp;
       }
       
@@ -802,7 +802,7 @@ int Client::Run()
   Print(DEBUG) << "to " << proxyfile << " " << std::flush;
 
   if (CreateProxy(data, aclist, proxyver)) {
-    goto err;
+    goto err2;
   }
   //  else  {
     //    free(aclist);
@@ -831,6 +831,8 @@ int Client::Run()
   Error();
   if (!v->ErrorMessage().empty())
     Print(ERROR) << "ERROR: " << v->ErrorMessage() << std::endl;
+
+ err2:
   return 1;
 }
 
