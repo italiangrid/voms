@@ -512,8 +512,10 @@ struct VOMSProxy *VOMS_MakeProxy(struct VOMSProxyArguments *args, int *warning, 
       value = NULL;
     }
 
-    if (policy)
+    if (policy) {
       free(policy);
+      policy = NULL;
+    }
 
     if (ex7 == NULL) {
       PRXYerr(PRXYERR_F_PROXY_SIGN, PRXYERR_R_CLASS_ADD_EXT);

@@ -40,14 +40,14 @@ rm -rf $dir/usr/include
 sed -e 's!${datapath}/etc/voms/voms!${basepath}/share/voms/voms!' \
     -e 's/useradd/\#&/' -e 's/groupadd/\#&/' \
     -e 's/vomsd(8)/voms(8)/' \
-    -i $dir/usr/share/voms/voms_install_db
+    -i $dir/usr/libexec/voms/voms_install_db
 
 # Turn off default enabling of the service
 mkdir -p $dir/etc/rc.d/init.d
 sed -e 's/\(chkconfig: \)\w*/\1-/' \
     -e '/Default-Start/d' \
     -e 's/\(Default-Stop:\s*\).*/\10 1 2 3 4 5 6/' \
-   $dir/usr/share/init.d/voms > \
+   $dir/etc/init.d/voms > \
    $dir/etc/rc.d/init.d/voms
 chmod 755 $dir/etc/rc.d/init.d/voms
 rm -rf $dir/usr/share/init.d
