@@ -118,8 +118,12 @@ public class VOMSESFileParser {
                 + File.separator + ".voms" + File.separator + "vomses" );
 
 	log.debug("Tried file: "+ vomsVomses.getAbsolutePath());
-        if ( vomsVomses.exists() )
+	log.debug("file exists ? "+ vomsVomses.exists());
+
+        if ( vomsVomses.exists() ) {
+
             list.add( vomsVomses );
+	}
 
         vomsesPaths = list;
 
