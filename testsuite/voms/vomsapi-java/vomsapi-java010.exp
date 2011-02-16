@@ -17,7 +17,7 @@ proc mytest {} {
     file mkdir $::env(HOME)/.voms
     file copy -force $::INSTALLDIR/etc/vomses/voms1 $::env(HOME)/.voms/vomses
     file delete -force $::INSTALLDIR/etc/vomses/voms1
-
+    set location "$::env(HOME)/.voms/vomses"
     set res [_execJava contactvoms1.java $::_certdir/mycert2-cert.pem $::_certdir/mycert2-key.pem voms1]
     _vomsStop voms1
 
@@ -26,6 +26,8 @@ proc mytest {} {
     if $res then {
         testmessage "Server connection failed."
         addlog $::INSTALLDIR/var/log/voms.voms1
+	logvar location
+	addlog $::env(HOME)/.voms/vomses
         return $::FAILTEST
     } else {
         testmessage "Connection was successfull."
