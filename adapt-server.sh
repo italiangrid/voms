@@ -35,6 +35,8 @@ rm -f $dir/etc/vomses
 rm -rf $dir/include
 rm -rf $dir/lib
 rm -rf $dir/lib64
+rm -rf $dir/usr/lib
+rm -rf $dir/usr/lib64
 rm -rf $dir/usr/include
 
 sed -e 's!${datapath}/etc/voms/voms!${basepath}/share/voms/voms!' \
@@ -51,6 +53,7 @@ sed -e 's/\(chkconfig: \)\w*/\1-/' \
    $dir/etc/rc.d/init.d/voms
 chmod 755 $dir/etc/rc.d/init.d/voms
 rm -rf $dir/usr/share/init.d
+rm -rf $dir/etc/init.d
 
 mkdir -p $dir/etc/sysconfig
 echo VOMS_USER=voms > $dir/etc/sysconfig/voms
