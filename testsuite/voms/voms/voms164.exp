@@ -18,9 +18,12 @@ proc mytest {} {
     close $id
 
     _activateCert mycert2
+    set var "$::INSTALLDIR/var/lock/subsys/voms.voms1"
+    logvar var
     _vomsStart voms1
 
     set correct "lock file $::INSTALLDIR/var/lock/subsys/voms.voms1 seems to be stale"
+    logvar correct
     if [regexp $correct $::startOutput] then {
         testmessage "voms failed to start with the correct error."
         return $::PASSTEST
