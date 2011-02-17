@@ -11,11 +11,19 @@ proc mytest {} {
     if {[info exists ::VALGRIND]} then {
         return $::UNDECIDEDTEST
     }
+    set start "start"
+    logvar start
     set pid [exec ps | grep bash | grep -v grep | head -1]
+    logvar pid
     set ppid [string range $pid 0 [string first " " $pid]]
+    logvar ppid
+    set file "$::INSTALLDIR/var/lock/subsys/voms.voms1"
+    logvar file
     set id [open $::INSTALLDIR/var/lock/subsys/voms.voms1 "w+"]
     puts $id $pid
     close $id
+    set opened "op"
+    logvar opened
 
     _activateCert mycert2
     set var "$::INSTALLDIR/var/lock/subsys/voms.voms1"
