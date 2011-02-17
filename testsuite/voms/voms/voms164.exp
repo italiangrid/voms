@@ -13,7 +13,7 @@ proc mytest {} {
     }
     set start "start"
     logvar start
-    set prid [exec ps |grep -v grep]
+    set prid [exec ps]
     logvar prid
     set pid [exec ps | grep sh | grep -v grep | head -1]
     logvar pid
