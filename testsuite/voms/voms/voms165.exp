@@ -6,7 +6,7 @@ proc mytest {} {
 
     _vomsStart voms1
     set res [log_exec outname {voms-proxy-init --rfc}]
-    set res [log_exec outname {voms-proxy-init --voms voms1 --noregen}]
+    set res [log_exec outname {voms-proxy-init --valid 01:00 --voms voms1 --noregen}]
     _vomsStop voms1
 
     if $res then {
