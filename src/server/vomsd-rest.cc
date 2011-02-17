@@ -34,6 +34,7 @@ extern "C" {
 
 #include "sslutils.h"
 #include "log.h"
+#include "credentials.h"
 }
 
 #include <string>
@@ -77,6 +78,9 @@ static bool
 makeACSSL(vomsresult &vr, SSL *ssl, const std::string& command, const std::string &orderstring, const std::string& targets, int requested, VOMSServer *v)
 {
   X509 *holder = SSL_get_peer_certificate(ssl);
+  STACK_OF(X509) *chain = SSL_get_peer_cert_chain(ssl);
+
+  X509 *realholder = get_real_cert(holder, chain);
   X509 *issuer = NULL;
   EVP_PKEY *key = NULL;
   pw_cb =(int (*)())(pwstdin_callback);
@@ -98,7 +102,7 @@ makeACSSL(vomsresult &vr, SSL *ssl, const std::string& command, const std::strin
 
   std::string message = XML_Req_Encode(command, orderstring, targets, requested);
 
-  bool ret = selfpointer->makeAC(vr, key, issuer, holder, message);
+  bool ret = selfpointer->makeAC(vr, key, issuer, realholder, message);
   X509_free(issuer);
   EVP_PKEY_free(key);
 
