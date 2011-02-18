@@ -49,6 +49,7 @@ mkdir -p $dir/etc/rc.d/init.d
 sed -e 's/\(chkconfig: \)\w*/\1-/' \
     -e '/Default-Start/d' \
     -e 's/\(Default-Stop:\s*\).*/\10 1 2 3 4 5 6/' \
+    -e 's/VOMS_LOCATION:-\(.*\)/VOMS_LOCATION:-\/}/' \
    $dir/etc/init.d/voms > \
    $dir/etc/rc.d/init.d/voms
 chmod 755 $dir/etc/rc.d/init.d/voms
