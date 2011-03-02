@@ -67,7 +67,7 @@ EXTRA_DIST = $(SOURCES) Manifest.add log4j.properties
 all-local: $(top_builddir)/src/api/java/vomsjapi.jar
 
 %.class : %.java
-	$(JAVAC) -sourcepath $(top_srcdir)/src/api/java -classpath $(JAVA_CLASSPATH):$(JAVA_CLASSPATH2):$(CLASSPATH) -d $(top_builddir)/src/api/java $< 
+	$(JAVAC) -target 1.5 -sourcepath $(top_srcdir)/src/api/java -classpath $(JAVA_CLASSPATH):$(JAVA_CLASSPATH2):$(CLASSPATH) -d $(top_builddir)/src/api/java $< 
 
 if USE_COBERTURA
 $(top_builddir)/src/api/java/vomsjapi.jar: makedirs $(JAVA_CLASSES)
