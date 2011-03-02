@@ -43,6 +43,7 @@ extern "C" {
 #include "listfunc.h"
 #include "credentials.h"
 #include "replace.h"
+#include "doio.h"
 
 #include <openssl/pkcs12.h>
 }
@@ -88,6 +89,7 @@ const std::string SUBPACKAGE      = "voms-proxy-init";
 std::string location;
 std::string CONFILENAME;
 std::string USERCONFILENAME;
+std::string OLDDIR;
 
 /* global variable for output control */
 
@@ -208,6 +210,7 @@ Client::Client(int argc, char ** argv) :
   location = (getenv(LOCATION_ENV) ? getenv(LOCATION_ENV) : LOCATION_DIR);
   CONFILENAME     = (location + "/etc/vomses");
   USERCONFILENAME = std::string(USER_DIR) + std::string("/vomses");
+  OLDDIR = ".voms/vomses";
 
   if (strrchr(argv[0],'/'))
     program = strrchr(argv[0],'/') + 1;
@@ -535,10 +538,17 @@ Client::Client(int argc, char ** argv) :
        was not defined */
     if (userconf.empty()) {
       char *uc = getenv("HOME");
-      if (uc && (strlen(uc) != 0))
+      if (uc && (strlen(uc) != 0)) {
         userconf = std::string(uc) + "/" + USERCONFILENAME;
-      else
+        if (!fileexists(userconf.c_str()))
+          userconf = std::string(uc) + "/" + OLDDIR;
+      }
+      else {
         userconf = std::string("~/") + USERCONFILENAME;
+        if (!fileexists(userconf.c_str()))
+          userconf = std::string("~/") + OLDDIR;
+      }
+
     }
   
     /* parse order and target vector to a comma-separated list */

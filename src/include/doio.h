@@ -30,4 +30,5 @@
 
 extern char *snprintf_wrap(const char *format, ...);
 extern char *vsnprintf_wrap(const char *format, va_list v);
+extern int   fileexists(const char*);
 #endif

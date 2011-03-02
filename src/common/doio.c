@@ -62,3 +62,11 @@ char *snprintf_wrap(const char *format, ...)
   return str;
 }
 
+int fileexists(const char *file) 
+{
+  FILE *f = fopen(file, "r");
+  close(f);
+
+  return f != NULL;
+}
+
