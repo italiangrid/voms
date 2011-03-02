@@ -208,6 +208,10 @@ Client::Client(int argc, char ** argv) :
   bool pwstdin = false;
 
   location = (getenv(LOCATION_ENV) ? getenv(LOCATION_ENV) : LOCATION_DIR);
+
+  if (location == "/usr")
+    location="/";
+
   CONFILENAME     = (location + "/etc/vomses");
   USERCONFILENAME = std::string(USER_DIR) + std::string("/vomses");
   OLDDIR = ".voms/vomses";
