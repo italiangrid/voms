@@ -15806,8 +15806,14 @@ fi
 
     	LOCATION_ENV="VOMS_LOCATION"
 
-    	LOCATION_DIR="${prefix}"
+      #setup the default location so that it works also for EPEL, not just for EMI.
+      if test "x${prefix}" = "x/"; then
+        LOCATION_DIR="/usr"
 
+      else
+    	  LOCATION_DIR="${prefix}"
+
+      fi
     	VAR_LOCATION_ENV="VOMS_LOCATION_VAR"
 
 

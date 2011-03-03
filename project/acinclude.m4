@@ -383,7 +383,12 @@ AC_DEFUN([AC_ENABLE_GLITE],
     	DISTTAR=$WORKDIR
     	AC_SUBST(DISTTAR)
     	AC_SUBST(LOCATION_ENV, "VOMS_LOCATION")
-    	AC_SUBST(LOCATION_DIR, "${prefix}")
+      #setup the default location so that it works also for EPEL, not just for EMI.
+      if test "x${prefix}" = "x/"; then
+        AC_SUBST(LOCATION_DIR, "/usr")
+      else
+    	  AC_SUBST(LOCATION_DIR, "${prefix}")
+      fi
     	AC_SUBST(VAR_LOCATION_ENV, "VOMS_LOCATION_VAR")
     	AC_DEFINE(LOCATION_ENV, "VOMS_LOCATION", [Environment variable name])
     	AC_DEFINE_UNQUOTED(LOCATION_DIR, "", [Location of system directory])
