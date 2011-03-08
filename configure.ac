@@ -99,7 +99,7 @@ AC_PREFIX_DEFAULT("/opt/glite")
 
 AM_CONFIG_HEADER([src/autogen/config.h])
 
-if test "x$build_cpp_api" = "xyes"; then
+if test "x$build_cpp_api" = "xyes" -o "x$build_interfaces" = "xyes"; then
 # both C and CPP
 INSTALL_API_LIBS="libvomsapi.la"
 else
