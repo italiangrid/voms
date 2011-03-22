@@ -130,7 +130,7 @@ The format of the file is the following:
 <emphasis remap='I'>nick</emphasis> <emphasis remap='I'>host</emphasis> <emphasis remap='I'>port</emphasis> <emphasis remap='I'>subject</emphasis> <emphasis remap='I'>vo</emphasis>
 where nick is the nickname, host and port are the hostname and port of the server to contact, subject is the
 subject of the server's certificate, while vo is the name of the VO that owns the server. The default
-filenames are $PREFIX/etc/vomses and $HOME/.glite/vomses.</para>
+filenames are $PREFIX/etc/vomses and $HOME/.voms/vomses.</para>
 
 <para>Moreover, permissions must be 644 if a file is specified,
 and 755 if a directory is specified</para>

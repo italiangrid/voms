@@ -78,7 +78,7 @@ Displays version
 \fB\-valid\fR  \fIHH:MM\fRThis option attempts to set the validity for both the proxy and the credentials returned by the VOMS server\&. The latter validity may however be shortened due to server policy\&. This option obsoletes both \-hours and \-vomslife, and should be used in preference to both
 
 .PP
-\fB\-bits\fR  \fIB\fR Number of bits in key {512|1024|2048|4096}
+\fB\-bits\fR  \fIB\fR Number of bits in key {0|512|1024|2048|4096}\&. 0 is a special value which means: same number of bits as in the issuing certificate\&.
 
 .PP
 \fB\-cert\fR  \fIcertfile\fR Non\-standard location of user certificate
@@ -114,7 +114,7 @@ Example : voms\-proxy\-init \-\-voms myVO:/myVO/Role=VO\-Admin
 \fB\-userconf\fR  \fIfile\fR
 
 .PP
-\fB\-vomses\fR  \fIfile\fR Specifies the name of a configuration file from which a list of nicknames is read\&. The format of the file is the following: nick  host  port  subject  vo where nick is the nickname, host and port are the hostname and port of the server to contact, subject is the subject of the server's certificate, while vo is the name of the VO that owns the server\&. The default filenames are $PREFIX/etc/vomses and $HOME/\&.glite/vomses\&.
+\fB\-vomses\fR  \fIfile\fR Specifies the name of a configuration file from which a list of nicknames is read\&. The format of the file is the following: nick  host  port  subject  vo where nick is the nickname, host and port are the hostname and port of the server to contact, subject is the subject of the server's certificate, while vo is the name of the VO that owns the server\&. The default filenames are $PREFIX/etc/vomses and $HOME/\&.voms/vomses\&.
 
 .PP
 Moreover, permissions must be 644 if a file is specified, and 755 if a directory is specified

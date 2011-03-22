@@ -66,7 +66,7 @@ Options may be specified indifferently with either a "\-" or "\-\-" prefix\&.
 \fB\-vomslife\fR  \fIH\fR Tries to get an AC with information valid for H hours\&. The default is "as long as the proxy certificate"\&. The special value 0 means as long as the server will allow\&.
 
 .PP
-\fB\-bits\fR  \fIB\fR Number of bits in key {512|1024|2048|4096}
+\fB\-bits\fR  \fIB\fR Number of bits in key {0|512|1024|2048|4096}\&. 0 is a special value which means: same number of bits as in the issuing certificate\&.
 
 .PP
 \fB\-cert\fR  \fIcertfile\fR Non\-standard location of user certificate
