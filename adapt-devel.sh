@@ -12,6 +12,14 @@ touch -r src/utils/vomsfake.y src/utils/vomsparser.h
 touch -r src/utils/vomsfake.y src/utils/vomsparser.c
 touch -r src/utils/vomsfake.y src/utils/lex.yy.c
 
+touch -r src/sslutils/namespaces.l src/sslutils/lex.namespaces.c
+touch -r src/sslutils/namespaces.y src/sslutils/namespaces.c
+touch -r src/sslutils/namespaces.y src/sslutils/namespaces.h
+
+touch -r src/sslutils/signing_policy.l src/sslutils/lex.signing.c
+touch -r src/sslutils/signing_policy.y src/sslutils/signing_policy.c
+touch -r src/sslutils/signing_policy.y src/sslutils/signing_policy.h
+
 # rebootstrap
 ./autogen.sh
 fi
