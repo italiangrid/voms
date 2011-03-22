@@ -1,0 +1,61 @@
+load_lib vomstest.exp
+testheader "See if voms-proxy-init reads ~/.glite/vomses if ~/.voms/vomses is absent."
+
+global ::__ENVVAR
+
+proc myprolog {} {
+    # protect .voms if it already exists
+    if [file exists ~/.voms] {
+        if [file exists ~/.voms.testsuite] {
+            file delete -force ~/.voms.testsuite
+        }
+        file rename ~/.voms ~/.voms.testsuite
+    }
+
+    if [file exists ~/.glite] {
+        if [file exists ~/.glite.testsuite] {
+            file delete -force ~/.glite.testsuite
+        }
+        file rename ~/.glite ~/.glite.testsuite
+    }
+
+    file mkdir ~/.glite
+    file rename $::INSTALLDIR/etc/vomses ~/.glite/vomses
+    set ::__ENVVAR $::env(VOMS_USERCONF)
+    unset ::env(VOMS_USERCONF)
+}
+
+proc myepilog {} {
+    file rename ~/.glite/vomses $::INSTALLDIR/etc/vomses
+
+    if [file exists ~/.voms.testsuite] {
+        file rename ~/.voms.testsuite ~/.voms
+    }
+
+    if [file exists ~/.glite.testsuite] {
+        file rename ~/.glite.testsuite ~/.glite
+    }
+
+    set ::env(VOMS_USERCONF) $::__ENVVAR
+    unset ::__ENVVAR
+}
+
+proc mytest {} {
+    _activateCert mycert2
+
+    _vomsStart voms1
+    set res [log_exec outname {voms-proxy-init --voms voms1}]
+    _vomsStop voms1
+
+    if $res then {
+        addlog $outname
+        testmessage "voms-proxy-init failed."
+        return $::FAILTEST
+    }
+
+    return $::PASSTEST
+}
+
+test_set_prolog myprolog
+test_set_epilog myepilog
+do_test

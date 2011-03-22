@@ -214,7 +214,7 @@ Client::Client(int argc, char ** argv) :
 
   CONFILENAME     = (location + "/etc/vomses");
   USERCONFILENAME = std::string(USER_DIR) + std::string("/vomses");
-  OLDDIR = ".voms/vomses";
+  OLDDIR = (strcmp(USER_DIR, ".glite") ? ".glite/vomses" : ".voms/vomses");
 
   if (strrchr(argv[0],'/'))
     program = strrchr(argv[0],'/') + 1;
