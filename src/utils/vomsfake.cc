@@ -89,6 +89,7 @@ extern int writeac(const X509 *issuerc, const STACK_OF(X509) *certstack, const X
 static int time_to_sec(std::string timestring);
 static long mystrtol(char *number, long int limit);
 static std::string hextostring(const std::string &data);
+static int parse_ga_value(char *ga, char **id, char **value, char **qual);
 
 extern int AC_Init();
 
@@ -267,6 +268,7 @@ Fake::Fake(int argc, char ** argv) :   confile(CONFILENAME),
     "    -extension <OID</crit><value>> Add Extension with the specified OID and with the specified value\n"\
     "    -acextension <OID</crit><value>> Add Extension to the AC with the specified OID and with the specified value\n"\
     "    -selfsigned                    Create a self-signed certificate.\n"\
+    "    -ga <id>=<value> [(context)]   Set a GA with name 'id', value 'value' and optional context.\n"\
     "\n";
 
   set_usage(LONG_USAGE);
@@ -321,6 +323,7 @@ Fake::Fake(int argc, char ** argv) :   confile(CONFILENAME),
     {"extension",       1, (int *)&extensions,  OPT_MULTI},
     {"acextension",     1, (int *)&acextensions,OPT_MULTI},
     {"selfsigned",      0, (int *)&selfsigned,  OPT_BOOL},
+    {"ga",              1, (int *)&galist,      OPT_MULTI},
 #ifdef CLASS_ADD
     {"classadd",        1, (int *)class_add_buf,OPT_STRING},
 #endif
@@ -391,7 +394,24 @@ Fake::Fake(int argc, char ** argv) :   confile(CONFILENAME),
     for (unsigned int i  = 0; i < fqans.size(); i++)
       voelem->fqans[i] = (char*)strdup((fqans[i].c_str()));
     voelem->fqans[fqans.size()] = NULL;
-    
+
+    voelem->gas = (char **)malloc(sizeof(char*)*(galist.size()+1));
+    int down = 0;
+    for (unsigned int i = 0; i < galist.size(); i++) {
+      char *temp = strdup(galist[i].c_str());
+      char *id, *value, *qual;
+      if (parse_ga_value(temp, &id, &value, &qual)) {
+        std::string realga = std::string(qual) + "::" + id + "=" + value;
+        voelem->gas[i] = (char*)strdup((realga.c_str()));
+      }
+      else {
+        Print(ERROR) << "ga: " << galist[i] << "Does not respect 'id = value [{qual}]' syntax!\n";
+        down++;
+      }
+      free(temp);
+    }
+    voelem->gas[galist.size()-down] = NULL;
+
     std::string targ;
     for (unsigned int i  = 0; i < targets.size(); i++)
       targ += targets[i];
@@ -520,6 +540,47 @@ bool Fake::Run()
 
   return false;
 
+}
+
+static int parse_ga_value(char *ga, char **id, char **value, char **qual)
+{
+  static char *empty="";
+  char *eqpoint = strchr(ga, '=');
+  char *qualpoint = strchr(ga, '(');
+  char *qualend = strchr(ga, ')');
+
+  if (!eqpoint)
+    return 0;
+
+  *id = ga;
+  *eqpoint='\0';
+  *value = ++eqpoint;
+
+  --eqpoint;
+  while (isspace(*(--eqpoint)))
+    *eqpoint='\0';
+
+  eqpoint = *value;
+  while (isspace(*eqpoint))
+    eqpoint++;
+  *value =eqpoint;
+
+  if (!qualpoint)
+    *qual = empty;
+  else {
+    if (qualpoint && !qualend)
+      return 0;
+
+    *qualpoint='\0';
+
+    *qual = ++qualpoint;
+    *qualend='\0';
+
+    while (isspace(*(--qualpoint)))
+      *qualpoint='\0';
+  }
+
+  return 1;
 }
 
 bool Fake::CreateProxy(std::string data, AC ** aclist, int version) 

@@ -241,6 +241,10 @@ of: <emphasis remap='I'>seconds</emphasis>, <emphasis remap='I'>hours:minutes</e
   of the string. '+' means that <emphasis remap='I'>content</emphasis>
   is the name of a file which will contain the actual data.</para>
 
+<para><option>-ga</option> <replaceable>id</replaceable> = <replaceable>value</replaceable> <replaceable>[(qualifier)]</replaceable></para>
+
+<para>This option adds the generic attribute specified to the AC generated.  Please note that spaces before and after the  '=' char are swallowed in the command line.</para>
+
 <para><option>-voinfo</option> <replaceable>file</replaceable></para>
 
 <para>

@@ -114,7 +114,7 @@ class Fake {
   Fake(int argc, char** argv);
   ~Fake();
   bool Run();
-
+  std::vector<std::string> galist;
  private:
   
   bool CreateProxy(std::string filedata, AC ** aclist, int version);
