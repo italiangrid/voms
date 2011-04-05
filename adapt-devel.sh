@@ -35,10 +35,10 @@ rm -f $dir/usr/lib64/*_gcc*.so.*
 rm -f $dir/usr/lib64/*.so.*
 
 mkdir -p $dir/usr/include
-mv $dir/include/voms $dir/usr/include/voms
+#mv $dir/include/voms $dir/usr/include/voms
 rm -rf $dir/include
 
-mv $dir/usr/share/mv $dir/usr/share/aclocal
+#mv $dir/usr/share/mv $dir/usr/share/aclocal
 
 rm -rf $dir/etc/
 rm -rf $dir/usr/bin
