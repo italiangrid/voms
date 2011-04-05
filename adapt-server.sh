@@ -28,8 +28,8 @@ if test "x$action" = "xpost"; then
 rm -f $dir/usr/bin/edg-voms*
 rm -f $dir/usr/sbin/edg-voms*
 
-rm -f $dir/usr/lib/
-rm -f $dir/usr/lib64/
+rm -rf $dir/usr/lib/
+rm -rf $dir/usr/lib64/
 
 rm $dir/usr/share/vomses.template
 
@@ -39,7 +39,7 @@ mkdir -p $dir/etc/voms
 mkdir -p $dir/var/log/voms
 
 #touch $dir/etc/vomses
-rm -f $dir/etc/vomses
+rm -rf $dir/etc/vomses
 rm -rf $dir/include
 rm -rf $dir/lib
 rm -rf $dir/lib64
