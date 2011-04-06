@@ -31,7 +31,7 @@ rm -f $dir/usr/sbin/edg-voms*
 rm -rf $dir/usr/lib/
 rm -rf $dir/usr/lib64/
 
-rm $dir/usr/share/vomses.template
+rm -f $dir/usr/share/vomses.template
 
 mkdir -p $dir/etc/grid-security/vomsdir
 mkdir -p $dir/etc/grid-security/voms
