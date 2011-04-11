@@ -153,6 +153,13 @@ if test "x$mysql_version" = "x5" ; then
     else
         $MYSQLDUMP -u$mysql_username_admin -p$mysql_password_admin -B $master_db >$master_db.dump
     fi
+
+    if test "x$mysql_password_admin" = "x" ; then
+	$MYSQL -e "FLUSH TABLES WITH READ LOCK; SHOW MASTER STATUS" >/tmp/outfile
+    else
+	$MYSQL -e "FLUSH TABLES WITH READ LOCK; SHOW MASTER STATUS" > /tmp/outfile
+    fi
+
 else
 if test "x$mysql_password_admin" = "x" ; then
     $MYSQL -e "FLUSH TABLES WITH READ LOCK; SHOW MASTER STATUS; SYSTEM $MYSQLDUMP -u$mysql_username_admin -B $master_db >$master_db.dump;" >/tmp/outfile
@@ -191,7 +198,9 @@ $oldpass
 log-bin
 server-id=1
 sync_binlog=1
+innodb_flush_log_at_trx_commit=1
 EOF
+
 
 if test "z$mysql_version" = "z4"; then
     cat >>$mysql_conf_file <<EOF
