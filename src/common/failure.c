@@ -19,6 +19,7 @@
 
 #include "config.h"
 
+#if 0
 #ifdef RUN_ON_LINUX
 #ifndef _GNU_SOURCE
 #define _GNU_SOURCE
@@ -163,4 +164,5 @@ void __attribute__((constructor)) setup_sigsegv() {
 }
 #else
 static int dummy = 0;
+#endif
 #endif
