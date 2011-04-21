@@ -19,8 +19,9 @@
 
 #include "config.h"
 
+static int dummy = 0;
 #if 0
-#ifdef RUN_ON_LINUX
+#if 0
 #ifndef _GNU_SOURCE
 #define _GNU_SOURCE
 #endif
