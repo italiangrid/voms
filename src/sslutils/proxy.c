@@ -475,21 +475,24 @@ struct VOMSProxy *VOMS_MakeProxy(struct VOMSProxyArguments *args, int *warning, 
       if (args->pathlength != -1) {
         char *buffer = snprintf_wrap("%d", args->pathlength);
 
-        if (!args->policytext) {
+        if (policy) {
           value = snprintf_wrap("language:%s,pathlen:%s,policy:text:%s", policylang, buffer, policy);
           free(policy);
           policy = NULL;
         }
-        else 
+        else if (args->policytext)
           value = snprintf_wrap("language:%s,pathlen:%s,policy:text:%s", policylang, buffer, args->policytext);
-
+        else
+          value = snprintf_wrap("language:%s,pathlen:%s", policylang, buffer);
         free(buffer);
       }
       else {
-        if (!args->policytext)
+        if (policy)
           value = snprintf_wrap("language:%s,policy:text:%s", policylang, policy);
-        else
+        else if (args->policytext)
           value = snprintf_wrap("language:%s,policy:text:%s", policylang, args->policytext);
+        else
+          value = snprintf_wrap("language:%s", policylang);
       }
     }
 
