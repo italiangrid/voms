@@ -86,12 +86,17 @@ proc _make_crl { ca } {
     file copy -force $::_capath/$ca/$ca.crl $::_cadir/$hashname.r0
 }
 
-proc _make_ca { dn name { day 365 } {condsubject "" }} {
+proc _make_ca { dn name len { day 365 } {condsubject "" }} {
     if [expr ![file exists "$::_capath/$name"]] then {
         file mkdir $::_capath/$name
         file mkdir $::_capath/$name/private
 
-        _ca_make_config $dn $name "$::_capath/$name"
+        if [string equal $len "-1"] then {
+            _ca_make_config $dn $name "$::_capath/$name" ""
+        } else {
+            _ca_make_config $dn $name "$::_capath/$name" $len
+        }
+
         exec touch $::_capath/$name/index.txt
         set id [open "$::_capath/$name/serial" w+]
         puts $id "00"
@@ -130,28 +135,41 @@ cond_subjects      globus   '\"$out\"'"
     }
 }
 
-proc _make_ca_from_ca { dn fathername name {day 365 } {condsubject ""}} {
+proc _make_ca_from_ca { dn fathername name len {day 365 } {condsubject ""}} {
     if [expr ![file exists "$::_capath/$name"]] then {
         file mkdir $::_capath/$name
         file mkdir $::_capath/$name/private
 
-        _ca_make_config $dn $name "$::_capath/$name"
+        _ca_make_config $dn $name "$::_capath/$name" ""
+
         exec touch $::_capath/$name/index.txt
         set id [open "$::_capath/$name/serial" w+]
         puts $id "00"
         flush $id
         close $id
 
+        set id [open "$::_capath/$name/extfile" w+]
+        if [string equal $len "-1"] then {
+            puts $id "basicConstraints=CA:TRUE"
+        } else {
+            puts $id "basicConstraints=CA:TRUE,pathlen:$len"
+        }
+        puts $id "nsComment			= \"OpenSSL Generated Certificate for VOMS testing purposes\""
+        puts $id "subjectKeyIdentifier=hash"
+        puts $id "authorityKeyIdentifier=keyid,issuer:always"
+        puts $id "keyUsage = critical, keyCertSign, cRLSign"
+        close $id
+
         exec openssl req -config $::_capath/$fathername/$fathername.cnf -new -nodes -keyout $::_capath/$name/certkey.pem -subj "$dn" -out $::_capath/$name/careq.pem -extensions usrca_cert -batch 2>/dev/null
 
         if [expr $day >= 0] then {
-            exec openssl ca  -config $::_capath/$fathername/$fathername.cnf -days $day -policy policy_anything -days 2 -out $::_capath/$name/cacert.pem -in $::_capath/$name/careq.pem -extensions usrca_cert -batch 2>/dev/null
+            exec openssl ca  -config $::_capath/$fathername/$fathername.cnf -days $day -policy policy_anything -days 2 -out $::_capath/$name/cacert.pem -in $::_capath/$name/careq.pem -extfile $::_capath/$name/extfile -batch 2>/dev/null
 
         } else {
             set seconds     [clock scan [exec date -u]]
             set expireddate [clock format [expr $seconds + (86400 * $day)] -format "%y%m%d%H%M%SZ" ] 
             set startdate   [clock format [expr $seconds + (86400 * ($day - 1))] -format "%y%m%d%H%M%SZ" ] 
-            exec openssl ca  -config $::_capath/$fathername/$fathername.cnf -startdate "$startdate" -enddate "$expireddate" -policy policy_anything -days 2 -out $::_capath/$name/cacert.pem -in $::_capath/$name/careq.pem -extensions usrca_cert -batch 2>/dev/null
+            exec openssl ca  -config $::_capath/$fathername/$fathername.cnf -startdate "$startdate" -enddate "$expireddate" -policy policy_anything -days 2 -out $::_capath/$name/cacert.pem -in $::_capath/$name/careq.pem -extfile $::_capath/$name/extfile -batch 2>/dev/null
 
         }
 
@@ -203,8 +221,7 @@ proc _make_cert_from_ca { dn name certname {day 2}} {
     }    
 }
 
-proc _ca_make_config { dn name path } {
-
+proc _ca_make_config { dn name path {len ""}} {
     if [catch {set cadesc [open $path/$name.cnf w+]}] then {
         puts "ERROR"
         exit
@@ -224,6 +241,12 @@ proc _ca_make_config { dn name path } {
     regexp {.*/CN=([^/]*).*}    $dn dummy CNVAL
     regexp {.*/Email=([^/]*).*} $dn dummy EVAL
     regexp {.*/L=([^/]*).*}     $dn dummy LVAL
+
+    if [string length $len] then {
+        set PATHLEN ", pathlen:$len"
+    } else {
+        set PATHLEN ""
+    }
 
 #
 # OpenSSL example configuration file.
@@ -265,6 +288,7 @@ default_crl_days= 30			# how long before next CRL
 default_md	= sha1			# which md to use.
 preserve	= no			# keep passed DN ordering
 policy		= policy_anything
+basicConstraints = CA:TRUE$PATHLEN
 
 \[ policy_match \]
 countryName		= match
@@ -327,7 +351,7 @@ unstructuredName		= An optional company name
 
 \[ usr_cert \]
 
-basicConstraints=CA:FALSE
+basicConstraints=CA:FALSE$PATHLEN
 
 nsComment			= \"OpenSSL Generated Certificate for VOMS testing purposes\"
 
@@ -337,7 +361,7 @@ keyUsage = nonRepudiation, digitalSignature, keyEncipherment
 
 \[ usrca_cert \]
 
-basicConstraints=CA:TRUE
+basicConstraints=CA:TRUE$PATHLEN
 
 nsComment			= \"OpenSSL Generated Certificate for VOMS testing purposes\"
 
@@ -347,7 +371,7 @@ keyUsage = critical, keyCertSign, cRLSign
 
 \[ v3_req \]
 
-basicConstraints = CA:FALSE
+basicConstraints = CA:FALSE$PATHLEN
 keyUsage = critical, nonRepudiation, digitalSignature, keyEncipherment
 
 \[ v3_ca \]
@@ -356,7 +380,7 @@ subjectKeyIdentifier=hash
 
 authorityKeyIdentifier=keyid,issuer:always
 
-basicConstraints = CA:true
+basicConstraints = CA:TRUE$PATHLEN
 
 \[ crl_ext \]
 

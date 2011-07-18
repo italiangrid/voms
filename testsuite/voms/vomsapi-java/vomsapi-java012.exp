@@ -1,0 +1,31 @@
+load_lib vomstest.exp
+testheader "See if verification works with cert created from pathlimited CA."
+
+proc mytest {} {
+    _activateCert limitedcert
+
+    # Create a proxy to validate.
+    _vomsStart voms1
+    set res [log_exec outname {voms-proxy-init --voms voms1 --out $::SCRATCHDIR/proxy.pem}]
+    _vomsStop voms1
+
+    if $res then {
+        addlog $outname
+        testmessage "voms-proxy-init failed."
+        return $::FAILTEST
+    }
+
+    set ::_buildout [exec mktemp $::SCRATCHDIR/program-out-XXXXXX]
+    set res [_execJava basicvalidation.java $::SCRATCHDIR/proxy.pem]
+
+    if $res then {
+        addlog $::_buildout
+        testmessage "Basic validation failed."
+        return $::FAILTEST
+    }
+
+    testmessage "basic validation succeeded"
+    return $::PASSTEST
+}
+
+do_test

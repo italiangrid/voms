@@ -147,9 +147,11 @@ proc _vomsServersInit {} {
     _vomscreaterole  voms1 TestRole
     _vomscreateuser  voms1 mycert2
     _vomscreateuser  voms1 passcert
+    _vomscreateuser  voms1 limitedcert
     puts -nonewline "."
     _vomsaddusertogroup voms1 mycert2 "/voms1"
     _vomsaddusertogroup voms1 passcert "/voms1"
+    _vomsaddusertogroup voms1 limitedcert "/voms1"
     _vomsaddusertogroup voms1 mycert2 "/voms1/group1"
     _vomsaddusertogroupandrole voms1 mycert2 "/voms1/group1" TestRole
     _vomscreatega voms1 shortid
@@ -190,11 +192,13 @@ proc _readConfigFile {file} {
 proc _setupPKI {} {
     puts -nonewline "."
     _do_ca_dir_setup
-    _make_ca "/C=IT/O=INFN/ST=IT/L=THISL/OU=INFN/CN=thisCN" testCA
+    _make_ca "/C=IT/O=INFN/ST=IT/L=THISL/OU=INFN/CN=thisCN" testCA -1
     _make_crl testCA
     puts -nonewline "."
-    _make_ca_from_ca "/C=IT/O=INFN/CN=CAFromthisCN" testCA caFromTestCA
+    _make_ca_from_ca "/C=IT/O=INFN/CN=CAFromthisCN" testCA caFromTestCA -1
     _make_crl caFromTestCA
+    puts -nonewline "."
+    _make_ca_from_ca "/C=IT/O=INFN/CN=pathlimitedCA" testCA pathLimitedCA 0
     puts -nonewline "."
     _make_cert_from_ca "/C=IT/CN=000" caFromTestCA mycert1
     _make_cert_from_ca "/C=IT/CN=001" caFromTestCA mycert2
@@ -207,11 +211,12 @@ proc _setupPKI {} {
     _make_cert_from_ca "/C=IT/CN=001" testCA mycertsameasmycert2
     _make_cert_from_ca "/C=IT/CN=passcert" testCA passcert
     _protect_key passcert
+    _make_cert_from_ca "/C=IT/CN=limited" pathLimitedCA limitedcert
     puts -nonewline "."
     _revoke_cert mycertrevoked caFromTestCA
     puts -nonewline "."
     _make_crl caFromTestCA
-    _make_ca_from_ca "/C=IT/O=INFN/CN=RevokedCA" testCA revokedCA
+    _make_ca_from_ca "/C=IT/O=INFN/CN=RevokedCA" testCA revokedCA -1
     puts -nonewline "."
     _make_crl revokedCA
     _make_cert_from_ca "/C=IT/CN=Valid From Revoked" revokedCA validFromRevoked

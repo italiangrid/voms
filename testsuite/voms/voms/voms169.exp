@@ -1,0 +1,22 @@
+load_lib vomstest.exp
+testheader "See if verification works with cert created from pathlimited CA."
+
+global ::__ENVVAR
+
+proc mytest {} {
+    _activateCert limitedcert
+
+    _vomsStart voms1
+    set res [log_exec outname {voms-proxy-init --voms voms1}]
+    _vomsStop voms1
+
+    if $res then {
+        addlog $outname
+        testmessage "voms-proxy-init failed."
+        return $::FAILTEST
+    }
+
+    return $::PASSTEST
+}
+
+do_test
