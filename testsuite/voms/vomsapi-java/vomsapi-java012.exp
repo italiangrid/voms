@@ -16,7 +16,7 @@ proc mytest {} {
     }
 
     set ::_buildout [exec mktemp $::SCRATCHDIR/program-out-XXXXXX]
-    set res [_execJava basicvalidation.java $::SCRATCHDIR/proxy.pem]
+    set res [_execJava onlycertvalidation.java $::SCRATCHDIR/proxy.pem]
 
     if $res then {
         addlog $::_buildout
