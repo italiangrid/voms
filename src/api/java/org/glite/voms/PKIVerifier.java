@@ -518,6 +518,8 @@ public class PKIVerifier {
 
         Stack certStack = new Stack();
 
+        int proxyCount = 0;
+
         // First, build the certification path
         certStack.push( certs[0] );
 
@@ -601,6 +603,9 @@ public class PKIVerifier {
                             certStack.push( candidate );
                             currentCert = candidate;
 
+                            if (PKIUtils.isProxy(candidate))
+                                proxyCount ++;
+
                             if ( logger.isDebugEnabled() )
                                 logger.debug( "ELEMENT: "
                                         + candidate.getSubjectDN().getName() );
@@ -639,10 +644,14 @@ public class PKIVerifier {
         int stackSize = certStack.size();
         int stackPos = stackSize+1;
         Stack constructedStack = new Stack();
+        int certCount = 0;
 
         while ( !certStack.isEmpty() ) {
             currentCert = (X509Certificate) certStack.pop();
             stackPos = stackPos -1;
+
+            if (!PKIUtils.isProxy(currentCert))
+                certCount ++;
 
             if ( logger.isDebugEnabled() )
                 logger.debug( "VERIFYING : "
@@ -742,7 +751,7 @@ public class PKIVerifier {
                         + " maxPath = " + maxPath );
 
                 if ( maxPath != -1 ) {
-                    if ( maxPath < certStack.size() ) {
+                    if ( maxPath < certStack.size() - proxyCount - certCount  ) {
                         logger
                                 .error( "Certificate verification: Maximum certification path length exceeded." );
                         success = false;
