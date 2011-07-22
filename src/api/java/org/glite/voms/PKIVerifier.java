@@ -538,6 +538,11 @@ public class PKIVerifier {
 
                 logger.debug( "Is issuer" );
 
+                if (PKIUtils.isProxy(currentCert)) {
+                    logger.debug("Increase proxycount");
+                    proxyCount ++;
+                }
+
                 certStack.push( certs[i] );
                 currentCert = certs[i];
 
@@ -603,8 +608,8 @@ public class PKIVerifier {
                             certStack.push( candidate );
                             currentCert = candidate;
 
-                            if (PKIUtils.isProxy(candidate))
-                                proxyCount ++;
+//                             if (PKIUtils.isProxy(candidate))
+//                                 proxyCount ++;
 
                             if ( logger.isDebugEnabled() )
                                 logger.debug( "ELEMENT: "
@@ -751,7 +756,7 @@ public class PKIVerifier {
                         + " maxPath = " + maxPath );
 
                 if ( maxPath != -1 ) {
-                    if ( maxPath < certStack.size() - proxyCount - certCount  ) {
+                    if ( maxPath < certStack.size() - proxyCount - 1  ) {
                         logger
                                 .error( "Certificate verification: Maximum certification path length exceeded." );
                         success = false;
