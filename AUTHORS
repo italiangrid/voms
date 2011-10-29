@@ -1,5 +1,6 @@
 Vincenzo Ciaschini <vincenzo.ciaschini@cnaf.infn.it> 
 Valerio Venturi <valerio.venturi@cnaf.infn.it> 
+Andrea Ceccanti <andrea.ceccanti@cnaf.infn.it>
 
 src/sslutils is a modified version of the globus_ssl_utils library,
 originally developed by Globus.
