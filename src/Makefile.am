@@ -1,7 +1,4 @@
 if BUILD_ALL
-if BUILD_JAVA_ONLY
-SUBDIRS = api
-else
 SUBDIRS = \
 	include \
 	replib \
@@ -16,7 +13,6 @@ SUBDIRS = \
 	server \
 	install \
 	replica
-endif
 else
 SUBDIRS = \
 	include \

@@ -88,3 +88,8 @@ gtags:
 
 tags:
 	rm -f TAGS; find . '(' '(' -name '*.c' -o -name '*.h' -o -name '*.cpp' -o -name '*.hpp' -o -name '*.cc' ')' -a -not -path '*/test/*' ')' -exec etags -a '{}' ';'
+
+distclean-local: 
+	rm -f configure aclocal.m4 m4/*;
+	rm -rf autom4te.cache
+	find . -name Makefile.in -exec rm {} \;

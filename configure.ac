@@ -32,11 +32,8 @@ AC_OPENSSL
 
 # check for dependencies based on project/*m4
 
-AC_ENABLE_GLITE([], have_glite=yes, have_glite=no) # embed AC_GLITE
-
 AC_EXPAT([], have_expat=yes, have_expat=no)        # taken from org.glite
 
-AC_JAVA
 AC_ENABLE_DOCS
 
 
@@ -70,7 +67,7 @@ AC_FUNC_MMAP
 AC_FUNC_SETVBUF_REVERSED
 AC_FUNC_STRFTIME
 AC_CHECK_FUNCS([alarm atexit dup2 gethostbyaddr gethostname gethostbyname gethostname memmove memset mkfifo mktime munmap putenv select setenv sigaction socket strchr strdup strerror strndup strrchr strspn strstr strtod strtol strtoul strtoull tzset uname getpwnam timegm])
-#AC_CHECK_FUNCS([mktime lstat error strtod realloc malloc stat])
+
 
 AC_CHECK_DECLS(getopt_data)
 AC_REPLACE_FUNCS(getopt_long getopt_long_only daemon setenv memset)
@@ -87,7 +84,6 @@ AC_VOMS_FIND_FUNC
 AC_VOMS_STRNDUP
 AC_BUILD_API_ONLY
 AC_BUILD_PARTS
-AC_EMI_LIBS
 
 GLITE_DOCBOOK_MAN
 
@@ -95,7 +91,8 @@ AC_LINUX
 AC_TESTSUITE
 PUT_PRIVATES
 
-AC_PREFIX_DEFAULT("/opt/glite")
+AC_PREFIX_DEFAULT("/")
+AC_VOMS_LOCATIONS
 
 AM_CONFIG_HEADER([src/autogen/config.h])
 
@@ -106,7 +103,6 @@ else
 INSTALL_API_LIBS=""
 fi
 
-
 AC_SUBST(INSTALL_API_LIBS)
 
 AC_CONFIG_FILES([Makefile
@@ -114,7 +110,6 @@ AC_CONFIG_FILES([Makefile
                  src/ac/Makefile
                  src/api/Makefile
                  src/api/ccapi/Makefile
-                 src/api/java/Makefile
                  src/client/Makefile
                  src/common/Makefile
                  src/include/Makefile
@@ -130,6 +125,7 @@ AC_CONFIG_FILES([Makefile
                  project/Makefile
                  testsuite/Makefile
                  testsuite/SuiteConfig])
+                 
 AC_CONFIG_FILES([src/install/voms_install_db
                  src/install/voms.start
                  src/replica/voms_install_replica

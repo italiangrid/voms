@@ -67,23 +67,16 @@ maintainer-clean-local:
 
 all-local: userdoc-local
 
-if BUILD_JAVA_ONLY
-userdoc-local:
-else
 if BUILD_DOCS
 userdoc-local: $(man_MANS)
 else
 userdoc-local:
 endif
-endif
 
 userdoc: userdoc-local
 
-if BUILD_JAVA_ONLY
-install-data-hook:
-else
 install-data-hook: install-man1 install-man8
-endif
+
 
 MAN_STYLESHEET = http://docbook.sourceforge.net/release/xsl/current/manpages/docbook.xsl
 

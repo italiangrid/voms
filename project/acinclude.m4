@@ -45,11 +45,6 @@ AC_DEFUN([AC_BUILD_PARTS],
     ],
     [ build_server="$build_all" ])
 
-  AC_ARG_WITH(java-only,
-    [ --with-java-only     Builds only the java APIs ],
-    [ wjavaall="$withval" ],
-    [ wjavaall="no"])
-
   AC_ARG_WITH(c-api,
     [  --with-c-api   No effect],
     [
@@ -94,7 +89,6 @@ AC_DEFUN([AC_BUILD_PARTS],
     ],
     [ build_config="$build_all" ])
 
-  AM_CONDITIONAL(BUILD_JAVA_ONLY,  test x$wjavaall = xyes)
   AM_CONDITIONAL(BUILD_CPP_API,    test x$build_cpp_api = xyes)
   AM_CONDITIONAL(BUILD_INTERFACES, test x$build_interfaces = xyes)
   AM_CONDITIONAL(BUILD_CLIENTS,    test x$build_clients = xyes)
@@ -217,117 +211,6 @@ AC_DEFUN([AC_BUILD_API_ONLY],
   AM_CONDITIONAL(BUILD_ALL, test x$have_api_only = xno)
 ])
   
-AC_DEFUN([AC_JAVA],
-[
-  AC_ARG_ENABLE(java, 
-    [  --enable-java   Enable compilation of the Java libraries],
-    [
-      case "$enableval" in
-      yes) have_java="yes" ;;
-      no)  have_java="no" ;;
-      *) AC_MSG_ERROR([bad value $(enableval) for --enable-java]) ;;
-      esac
-    ],
-    [ have_java="yes" ])
-
-  AM_CONDITIONAL(BUILD_JAVA, test x$have_java = xyes)
-
-  if test "x$have_java" = "xyes"; then
-    AC_MSG_CHECKING([for JAVA])
-    AC_ARG_WITH(java-home,
-      [  --with-java-home=DIR    Specifies where to find the java installation, default=$JAVA_HOME],
-      [ javahome="$withval"],
-      [ javahome="$JAVA_HOME"])
-    JHOME="$javahome"
-    AC_MSG_RESULT($javahome)
-    AC_SUBST(JHOME)
-  fi
-
-  if test "x$have_java" = "xyes"; then
-    AC_MSG_CHECKING([for bouncycastle])
-  fi
-
-  AC_ARG_WITH(bc,
-    [  --with-bc=FILE          Specifies the location of the bouncycastle jar, default=$CLASSPATH],
-    [ wbc="$withval"],
-    [ wbc=""])
-
-  if test "x$wbc" = "x"; then
-    if test "x$have_java" = "xyes"; then
-      AC_MSG_RESULT([hope it is in $CLASSPATH])
-    fi
-  elif test -e "$wbc" -a `basename "$wbc"` == "bcprov.jar" ; then
-    AC_MSG_RESULT([specified: $wbc])
-  else
-    if test `basename "$wbc"` == "bcprov.jar" ; then
-      wbc=`dirname "$wbc"`
-    fi
-    candidatebc=`find $wbc -name bcprov.jar`
-    if test "$candidatebc" != "x" ; then
-      wbc="$candidatebc"
-      AC_MSG_RESULT([found: $wbc])
-    else
-      AC_MSG_RESULT([hope it is in $CLASSPATH])
-    fi
-  fi
-
-  if test "x$have_java" = "xyes"; then
-    AC_MSG_CHECKING([for log4j])
-  fi
-
-  AC_ARG_WITH(log4j,
-    [  --with-log4j=FILE        Specifies the location of the log4j jar, default=$CLASSPATH],
-    [ wlog4j="$withval"],
-    [ wlog4j=""])
-  if test "x$wlog4j" = "x"; then
-    if test "x$have_java" = "xyes"; then
-      AC_MSG_RESULT([hope it is in $CLASSPATH])
-    fi
-  else
-    AC_MSG_RESULT([specified: $wlog4j])
-  fi
-
-  if test "x$have_java" = "xyes"; then
-    AC_MSG_CHECKING([for commons-cli])
-  fi
-
-  AC_ARG_WITH(commons-cli,
-    [  --with-commons-cli=jars  Specifies the location of the commons-cli jar, default = $CLASSPATH],
-    [  wcomcli="$withval"],
-    [  wcomcli=""])
-  if test "x$wcomcli" = "x"; then
-    if test "x$have_java" = "xyes"; then
-      AC_MSG_RESULT([hope it is in $CLASSPATH])
-    fi
-  else
-    AC_MSG_RESULT([specified: $wcomcli])
-  fi
-
-  if test "x$have_java" = "xyes"; then
-    AC_MSG_CHECKING([for commons-lang])
-  fi
-
-  AC_ARG_WITH(commons-lang,
-    [  --with-commons-lang=jars  Specifies the location of the commons-lang jar, default = $CLASSPATH],
-    [  wcomlang="$withval"],
-    [  wcomlang=""])
-  if test "x$wcomlang" = "x"; then
-    if test "x$have_java" = "xyes"; then
-      AC_MSG_RESULT([hope it is in $CLASSPATH])
-    fi
-  else
-    AC_MSG_RESULT([specified: $wcomlang])
-  fi
-
-          
-  JAVA_CLASSPATH=".:$wbc:$wlog4j:$wcomcli:$wcomlang:$CLASSPATH"
-
-  AC_MSG_CHECKING([CLASSPATH is $JAVA_CLASSPATH])
-  AC_SUBST(JAVA_CLASSPATH)    
-  
-])
-
-
 
 # AC_ENABLE_DOCS add switch to enable debug and warning
 # options for gcc
@@ -348,62 +231,6 @@ AC_DEFUN([AC_ENABLE_DOCS],
     AM_CONDITIONAL(BUILD_DOCS, test x$build_docs = xyes)
 ])
 
-AC_DEFUN([AC_EMI_LIBS],
-[
-    AC_ARG_ENABLE(emi-libs,
-      [ --enable-emi-libs Enable Library generation with EMI rules ],
-      [
-        case "$enableval" in
-        yes) build_emi="yes" ;;
-        no) build_emi="no" ;;
-        *) AC_MSG_ERROR(bad value $(enableval) for --enable-emi-libs) ;;
-        esac
-      ],
-      [ build_emi="no"])    
-])
-
-# AC_ENABLE_GLITE switch for glite
-# -------------------------------------------------------
-AC_DEFUN([AC_ENABLE_GLITE],
-[
-    AC_ARG_ENABLE(glite,
-        [  --enable-glite     enable gLite  ],
-        [
-          case "$enableval" in
-          yes) glite="yes" ;;
-          no) glite="no" ;;
-          *) AC_MSG_ERROR(bad value $(enableval) for --enable-glite) ;;
-          esac
-        ],
-        [glite="no"])
-
-    AM_CONDITIONAL(ENABLE_GLITE, test x$glite = xyes)
-
-    if test "x$glite" = "xno"; then
-    	DISTTAR=$WORKDIR
-    	AC_SUBST(DISTTAR)
-    	AC_SUBST(LOCATION_ENV, "VOMS_LOCATION")
-      #setup the default location so that it works also for EPEL, not just for EMI.
-      if test "x${prefix}" = "x/"; then
-        AC_SUBST(LOCATION_DIR, "/usr")
-      else
-    	  AC_SUBST(LOCATION_DIR, "${prefix}")
-      fi
-    	AC_SUBST(VAR_LOCATION_ENV, "VOMS_LOCATION_VAR")
-    	AC_DEFINE(LOCATION_ENV, "VOMS_LOCATION", [Environment variable name])
-    	AC_DEFINE_UNQUOTED(LOCATION_DIR, "", [Location of system directory])
-    	AC_DEFINE(USER_DIR, ".voms", [Location of user directory])
-    else
-    	AC_MSG_RESULT([Preparing for gLite environment])
-    	AC_GLITE
-    	AC_SUBST(LOCATION_ENV, "GLITE_LOCATION")
-    	AC_SUBST(LOCATION_DIR, "/opt/glite")
-    	AC_SUBST(VAR_LOCATION_ENV, "GLITE_LOCATION_VAR")
-    	AC_DEFINE(LOCATION_ENV, "GLITE_LOCATION", [Environment variable name])
-    	AC_DEFINE(LOCATION_DIR, "/opt/glite", [Location of system directory])
-    	AC_DEFINE(USER_DIR, ".glite", [Location of user directory])
-    fi
-])
 
 # AC_VOMS_TIME_T_TIMEZONE test whether time_t timezone is present
 # int time.h
@@ -815,3 +642,12 @@ EOF
 	fi
 	AM_CONDITIONAL([HAVE_DOCBOOK_MAN], [test "$glite_cv_docbook_man" = yes])
 ])
+
+AC_DEFUN([AC_VOMS_LOCATIONS],
+[
+	AC_SUBST(LOCATION_ENV, "VOMS_LOCATION")
+	AC_DEFINE(LOCATION_ENV, "VOMS_LOCATION", "Name of the voms location environment variable")
+	AC_DEFINE(LOCATION_DIR, "/usr", "Location of the system directory")
+	AC_SUBST(LOCATION_DIR, "/usr")
+	AC_DEFINE(USER_DIR, ".voms", [VOMS user preferences directory])
+])	

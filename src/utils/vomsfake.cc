@@ -97,11 +97,10 @@ extern int AC_Init();
 
 const std::string SUBPACKAGE      = "voms-proxy-fake";
 
-/* use name specific to each distribution (defined in configure.in) */
-
-const std::string location = (getenv(LOCATION_ENV) ? getenv(LOCATION_ENV) : LOCATION_DIR);
-const std::string CONFILENAME     = (location + "/etc/vomses");
-const std::string USERCONFILENAME = std::string(USER_DIR) + std::string("/vomses");
+/* FIXME: should take locations from /etc/sysconfig/voms */
+const std::string location = (getenv("VOMS_LOCATION") ? getenv("VOMS_LOCATION") : "");
+const std::string conf_file_name     = (location + "/etc/vomses");
+const std::string USERCONFILENAME = std::string(".voms") + std::string("/vomses");
 
 /* global variable for output control */
 
@@ -170,7 +169,7 @@ int main(int argc, char** argv)
 }
 
 extern int yydebug;
-Fake::Fake(int argc, char ** argv) :   confile(CONFILENAME), 
+Fake::Fake(int argc, char ** argv) :   confile(conf_file_name),
                                        cacertfile(NULL), certdir(NULL),
                                        certfile(NULL), keyfile(NULL),
                                        outfile(NULL),
