@@ -1,4 +1,3 @@
-
 includedir = @includedir@/voms
 pkgconfigdir = @libdir@/pkgconfig
 pkgconfig_DATA = voms-2.0.pc
@@ -268,10 +267,6 @@ $(PDF): $(LATEX)
 	pdflatex refman.tex; \
 	pdflatex refman.tex;
 
-#	cd ../..; \
-#	$(mkinstalldirs) $(OUTPUT_DIR)/pdf; \
-#	$(INSTALL_DATA) $(OUTPUT_DIR)/latex/refman.pdf $(PDF);
-
 $(PS): $(LATEX)
 	cd $(CCDOCPLC_DIR)/latex; \
 	latex refman.tex; \
@@ -285,10 +280,6 @@ $(PS): $(LATEX)
 	latex refman.tex; \
 	latex refman.tex; \
 	dvips -f <refman.dvi >refman.ps; 
-#	cd ../..; \
-#	$(mkinstalldirs) $(OUTPUT_DIR)/ps; \
-#	$(INSTALL_DATA) $(OUTPUT_DIR)/latex/refman.ps $(PS);
-
 endif
 
 if BUILD_DOCS

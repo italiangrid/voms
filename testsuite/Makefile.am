@@ -1,3 +1,2 @@
 AUTOMAKE_OPTIONS = dejagnu
 DEJATOOL = voms
-

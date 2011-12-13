@@ -1,9 +1,0 @@
-load_lib vomstest.exp
-testheader "See if the Java API testsuite starts."
-
-proc mytest {} {
-    testmessage "noerror"
-    return $::PASSTEST
-}
-
-do_test
