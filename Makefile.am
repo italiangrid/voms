@@ -1,5 +1,5 @@
 ACLOCAL_AMFLAGS=-I m4
-SUBDIRS = src doc project testsuite
+SUBDIRS = src doc m4 testsuite
 
 EXTRA_DIST = autogen.sh LICENSE
 
@@ -90,6 +90,7 @@ tags:
 	rm -f TAGS; find . '(' '(' -name '*.c' -o -name '*.h' -o -name '*.cpp' -o -name '*.hpp' -o -name '*.cc' ')' -a -not -path '*/test/*' ')' -exec etags -a '{}' ';'
 
 distclean-local: 
-	rm -f configure aclocal.m4 m4/*;
-	rm -rf autom4te.cache
+	rm -f configure aclocal.m4;
+	rm -f m4/libtool.m4 m4/ltoptions.m4 m4/ltsugar.m4 m4/ltversion.m4 m4/lt~obsolete.m4
+	rm -rf autom4te.cache aux
 	find . -name Makefile.in -exec rm {} \;

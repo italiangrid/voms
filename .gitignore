@@ -1,4 +1,3 @@
-/m4
 /aclocal.m4
 /configure
 /autom4te.cache
@@ -6,3 +5,4 @@
 /.project
 /.cproject
 /.settings
+/.test
