@@ -122,7 +122,7 @@ AC_CONFIG_FILES([Makefile
                  src/sslutils/Makefile
                  src/utils/Makefile
                  doc/Makefile
-                 project/Makefile
+                 m4/Makefile
                  testsuite/Makefile
                  testsuite/SuiteConfig])
                  

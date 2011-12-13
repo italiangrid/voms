@@ -1,3 +1,3 @@
 #! /bin/sh
-mkdir -p m4 aux
+mkdir -p aux src/autogen
 autoreconf -i -f
