@@ -1,4 +1,4 @@
-AC_INIT([GLite Security VOMS], [2.0.7])
+AC_INIT([VOMS], [2.0.7])
 AC_PREREQ(2.57)
 AC_CONFIG_AUX_DIR([./aux])
 AM_INIT_AUTOMAKE

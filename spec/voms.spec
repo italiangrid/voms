@@ -34,11 +34,19 @@ will bind to.
 
 %prep
 %setup -q
+# Touch to avoid rerunning bison and flex
+touch -r src/utils/vomsfake.y src/utils/vomsparser.h
+touch -r src/utils/vomsfake.y src/utils/vomsparser.c
+touch -r src/utils/vomsfake.y src/utils/lex.yy.c
+
 ./autogen.sh
 
 %build
 
-%configure --libexecdir=%{_datadir} --sysconfdir=%{_datadir}
+%configure --libexecdir=%{_datadir} --sysconfdir=%{_datadir} \
+	--disable-static --disable-docs --with-api-only
+
+
 make %{?_smp_mflags}
 
 %install
