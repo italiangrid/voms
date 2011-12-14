@@ -1,8 +1,9 @@
+sysconfigdir = @sysconfdir@/sysconfig
 
-defaultsysconfdir = @sysconfdir@
+vomsesdir = @datadir@/voms
 
 if BUILD_CONFIG
-defaultsysconf_DATA = \
+vomses_DATA = \
 	vomses.template
 endif
 
@@ -13,7 +14,7 @@ sysconf_DATA = \
 	voms.data
 endif
 
-libexecdir = @libexecdir@/voms
+libexecdir = @datadir@/voms
 
 if BUILD_CONFIG
 libexec_SCRIPTS = \
@@ -23,7 +24,7 @@ libexec_SCRIPTS = \
 	mysql2oracle
 endif
 
-initdir = @sysconfdir@/init.d
+initdir = @sysconfdir@/rc.d/init.d
 
 EXTRA_DIST = \
 	vomses.template \
@@ -33,7 +34,8 @@ EXTRA_DIST = \
 	upgrade1to2 \
 	voms.start \
 	voms-ping \
-	voms.sh.in
+	voms.sh.in \
+	sysconfig-voms
 
 MAINTAINERCLEANFILES = Makefile.in
 
@@ -41,4 +43,8 @@ if BUILD_SERVER
 install-exec-hook: voms.start
 	$(mkinstalldirs) $(DESTDIR)$(initdir)
 	$(INSTALL) $(top_builddir)/src/install/voms.start $(DESTDIR)$(initdir)/voms
+
+install-data-hook: sysconfig-voms
+	$(mkinstalldirs) $(DESTDIR)$(sysconfigdir)
+	$(INSTALL) -m 644 $(top_builddir)/src/install/sysconfig-voms $(DESTDIR)$(sysconfigdir)/voms
 endif
