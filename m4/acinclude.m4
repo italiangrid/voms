@@ -101,7 +101,7 @@ AC_DEFUN([AC_BUILD_PARTS],
 AC_DEFUN([AC_OPENSSL],
 [
   AC_ARG_WITH(openssl_prefix,
-              [ --with-openssl-prefix=PFX    prefix where OpenSSL is installed. (/usr)],
+              [  --with-openssl-prefix=PFX    prefix where OpenSSL is installed. (/usr)],
               [with_openssl_prefix="$withval"],
               [with_openssl_prefix=/usr])
 
@@ -568,24 +568,31 @@ AC_DEFUN([AC_TESTSUITE],
   fi
 
   AC_ARG_WITH(cobertura,
-	      [ --with-cobertura=PFX    prefix where cobertura is placed (no default)],
+	      [  --with-cobertura=PFX    prefix where cobertura is placed (no default)],
 	      [with_cobertura_prefix="$withval"],
 	      [with_cobertura_prefix="no"])
 
   AC_ARG_WITH(valgrind,
-        [ --with-valgrind=PFX     Also test memory leaks with valgrind],
+        [  --with-valgrind=PFX     Also test memory leaks with valgrind],
         [with_valgrind="$withval"],
         [with_valgrind="no"])
 
-  echo "with_valgrind=$with_valgrind"
-  if test "x$with_valgrind" == "x" ; then
-     with_valgrind=`which valgrind` 2>/dev/null;
-  fi
-  echo "with_valgrind=$with_valgrind"
+  AC_MSG_CHECKING(valgrind installation)
+
   if test "x$with_valgrind" == "xno" ; then
      with_valgrind="";
+     if test "x$with_valgrind" == "x" ; then
+     	valgrind_path=`which valgrind 2>/dev/null`;
+        if test "x$valgrind_path" == "x"; then
+	   AC_MSG_RESULT(valgrind not found.)
+        else
+	   with_valgrind=$valgrind_path
+	   AC_MSG_RESULT(valgrind found at: $with_valgrind.)
+        fi
+     fi
+  else
+     AC_MSG_RESULT($with_valgrind.)
   fi
-  echo "with_valgrind=$with_valgrind"
 
   AM_CONDITIONAL(USE_COBERTURA, test ! x$with_cobertura_prefix = xno)
   AC_SUBST(with_valgrind)

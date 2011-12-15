@@ -140,6 +140,7 @@ rm $RPM_BUILD_ROOT%{_mandir}/man3/data.3*
 mkdir -p $RPM_BUILD_ROOT%{_sysconfdir}/grid-security/vomsdir
 mkdir -p $RPM_BUILD_ROOT%{_sysconfdir}/grid-security/%{name}
 mkdir -p $RPM_BUILD_ROOT%{_localstatedir}/log/%{name}
+mkdir -p $RPM_BUILD_ROOT%{_sysconfdir}/%{name}
 
 mkdir -p $RPM_BUILD_ROOT%{_docdir}/%{name}-%{version}
 install -m 644 -p LICENSE AUTHORS $RPM_BUILD_ROOT%{_docdir}/%{name}-%{version}
@@ -251,3 +252,7 @@ fi
 %{_mandir}/man8/voms.8*
 
 %changelog
+
+* Thu Dec 15 2011 Andrea Ceccanti <andrea.ceccanti at cnaf.infn.it> - 2.0.7-1
+- Restructured EMI build to leverage EPEL spec files by Mattias Ellert
+- Removed voms-java-apis from the main c-based source tree  

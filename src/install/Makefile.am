@@ -4,13 +4,7 @@ vomsesdir = @datadir@/voms
 
 if BUILD_CONFIG
 vomses_DATA = \
-	vomses.template
-endif
-
-sysconfdir = @sysconfdir@/voms
-
-if BUILD_CONFIG
-sysconf_DATA = \
+	vomses.template \
 	voms.data
 endif
 

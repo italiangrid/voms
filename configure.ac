@@ -94,6 +94,14 @@ PUT_PRIVATES
 AC_PREFIX_DEFAULT("/")
 AC_VOMS_LOCATIONS
 
+AC_ARG_WITH(vomsuser,
+  [  --with-voms-user=USR    Sets the user used to run voms],
+  [with_vomsuser="$withval"],
+  [with_vomsuser="root"]
+)
+  
+AC_SUBST(with_vomsuser)
+
 AM_CONFIG_HEADER([src/autogen/config.h])
 
 if test "x$build_cpp_api" = "xyes" -o "x$build_interfaces" = "xyes"; then
@@ -131,5 +139,6 @@ AC_CONFIG_FILES([src/install/voms_install_db
                  src/replica/voms_install_replica
                  src/install/upgrade1to2
                  src/install/mysql2oracle
+                 src/install/sysconfig-voms
                  src/api/ccapi/voms-2.0.pc])
 AC_OUTPUT
