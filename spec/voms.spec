@@ -12,9 +12,10 @@ BuildRequires: libtool
 BuildRequires: expat-devel
 BuildRequires: pkgconfig
 BuildRequires: openssl-devel%{?_isa}
-BuildRequires:  libxslt
-BuildRequires:  docbook-style-xsl
-BuildRequires:  doxygen
+BuildRequires: libxslt
+BuildRequires: docbook-style-xsl
+BuildRequires: doxygen
+BuildRequires: bison
 
 %if %{?fedora}%{!?fedora:0} >= 9 || %{?rhel}%{!?rhel:0} >= 5
 BuildRequires:  tex(latex)
