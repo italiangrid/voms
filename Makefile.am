@@ -57,4 +57,5 @@ rpm: dist
 
 etics: clean rpm 
 	mkdir -p tgz RPMS
+	cp $(distdir).tar.gz tgz
 	cp -r $(rpmbuild_dir)/RPMS/* $(rpmbuild_dir)/SRPMS/* RPMS

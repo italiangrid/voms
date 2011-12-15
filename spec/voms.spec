@@ -69,8 +69,6 @@ Requires:	%{name} = %{version}-%{release}
 Documentation for the Virtual Organization Membership Service.
 
 %package clients
-Version:	%{version}
-Release:	%{release}%{?dist}
 Summary:	Virtual Organization Membership Service Clients
 Group:		Applications/Internet
 Requires:	%{name}%{?_isa} = %{version}-%{release}
