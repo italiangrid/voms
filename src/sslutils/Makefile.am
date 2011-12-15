@@ -19,18 +19,18 @@ evaluate.$(OBJEXT): signing_policy.h namespaces.h parsertypes.h evaluate.c
 signing_policy.$(OBJEXT): signing_policy.h
 
 signing_policy.h signing_policy.c: signing_policy.y
-	bison -t -d -o signing_policy.c signing_policy.y
+	$(YACC) -t -d -o signing_policy.c signing_policy.y
 
 lex.signing.c: signing_policy.l signing_policy.h signing_policy.c
-	flex -b -f -d signing_policy.l
+	$(LEX) -b -f -d signing_policy.l
 
 namespaces.$(OBJEXT): namespaces.h
 
 namespaces.h namespaces.c: namespaces.y
-	bison -t -d -o namespaces.c namespaces.y
+	$(YACC) -t -d -o namespaces.c namespaces.y
 
 lex.namespaces.c: namespaces.l namespaces.h namespaces.c
-	flex -b -f -d namespaces.l
+	$(LEX) -b -f -d namespaces.l
 
 libssl_utils_nog_la_SOURCES= $(SOURCES)
 

@@ -37,10 +37,10 @@ vomsfake.$(OBJEXT): vomsparser.h
 vomsparser.$(OBJEXT): vomsparser.h
 
 vomsparser.h vomsparser.c: vomsfake.y
-	bison -t -d -o vomsparser.c vomsfake.y
+	$(YACC) -t -d -o vomsparser.c vomsfake.y
 
 lex.yy.c: vomsparser.l vomsparser.h
-	flex vomsparser.l
+	$(LEX) vomsparser.l
 
 voms_proxy_fake_LDADD = \
 	$(top_builddir)/src/api/ccapi/libvomsapi.la  \
