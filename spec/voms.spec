@@ -17,12 +17,6 @@ BuildRequires: docbook-style-xsl
 BuildRequires: doxygen
 BuildRequires: bison
 
-%if %{?fedora}%{!?fedora:0} >= 9 || %{?rhel}%{!?rhel:0} >= 5
-BuildRequires:  tex(latex)
-%else
-BuildRequires:  tetex-latex
-%endif
-
 Requires: expat
 Requires: openssl
 
@@ -120,12 +114,9 @@ find . '(' -name '*.h' -o -name '*.c' -o -name '*.cpp' -o \
 
 %build
 
-%configure --disable-static --enable-docs 
+%configure --disable-static --enable-docs
 
 make %{?_smp_mflags}
-
-( cd doc/apidoc/api/VOMS_C_API/latex ; make )
-( cd doc/apidoc/api/VOMS_CC_API/latex ; make )
 
 %install
 
@@ -146,20 +137,14 @@ install -m 644 -p LICENSE AUTHORS $RPM_BUILD_ROOT%{_docdir}/%{name}-%{version}
 
 ## C API documentation
 mkdir -p $RPM_BUILD_ROOT%{_docdir}/%{name}-%{version}/VOMS_C_API
-cp -pr doc/apidoc/api/VOMS_C_API/html \
-$RPM_BUILD_ROOT%{_docdir}/%{name}-%{version}/VOMS_C_API
-
+cp -pr  doc/apidoc/api/VOMS_C_API/html \
+	$RPM_BUILD_ROOT%{_docdir}/%{name}-%{version}/VOMS_C_API
 rm -f $RPM_BUILD_ROOT%{_docdir}/%{name}-%{version}/VOMS_C_API/html/installdox
-#install -m 644 doc/apidoc/api/VOMS_C_API/latex/refman.pdf \
-#	$RPM_BUILD_ROOT%{_docdir}/%{name}-%{version}/VOMS_C_API
 
 mkdir -p $RPM_BUILD_ROOT%{_docdir}/%{name}-%{version}/VOMS_CC_API
-cp -pr doc/apidoc/api/VOMS_CC_API/html \
+cp -pr  doc/apidoc/api/VOMS_CC_API/html \
 	$RPM_BUILD_ROOT%{_docdir}/%{name}-%{version}/VOMS_CC_API
 rm -f $RPM_BUILD_ROOT%{_docdir}/%{name}-%{version}/VOMS_CC_API/html/installdox
-#install -m 644 doc/apidoc/api/VOMS_CC_API/latex/refman.pdf \
-#	$RPM_BUILD_ROOT%{_docdir}/%{name}-%{version}/VOMS_CC_API
-
 
 %clean
 
