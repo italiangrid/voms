@@ -9,15 +9,15 @@ AC_DEFUN([AC_LINUX],
     fi
 ])
 
-AC_DEFUN([AC_REGENERATE_PARSERS],
+AC_DEFUN([AC_PARSER_GEN],
 [
 
-	AC_ARG_ENABLE([regenparsers],
-		[  --disable-parser-regeneration 	disable the generation the parser code. ],
-		[ regenparsers=${enableval} ],
-		[ regenparsers="yes" ])
+	AC_ARG_ENABLE([parser-gen],
+		[  --disable-parser-gen 	disable the generation the parser code with flex/bison. ],
+		[ parser_gen=${enableval} ],
+		[ parser_gen="yes" ])
 
-	AM_CONDITIONAL([REGENERATE_PARSERS], [test "x${regenparsers}" = xyes])
+	AM_CONDITIONAL([REGENERATE_PARSERS], [test "x${parser_gen}" = xyes])
 ])
 
 AC_DEFUN([AC_BUILD_PARTS],

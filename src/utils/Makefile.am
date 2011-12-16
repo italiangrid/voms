@@ -36,10 +36,10 @@ vomsfake.$(OBJEXT): vomsparser.h
 
 vomsparser.$(OBJEXT): vomsparser.h
 
+if REGENERATE_PARSERS
+
 vomsparser.h vomsparser.c: vomsfake.y
 	$(YACC) -t -d -o vomsparser.c vomsfake.y
-
-if REGENERATE_PARSERS
 
 lex.yy.c: vomsparser.l vomsparser.h
 	$(LEX) vomsparser.l

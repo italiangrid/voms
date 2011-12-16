@@ -12,27 +12,31 @@ SOURCES= scutils.c scutils.h sslutils.c proxycertinfo.c \
 	evaluate.c proxy.c vomsproxy.h 
 
 
-EXTRA_DIST = namespaces.l namespaces.y signing_policy.y signing_policy.l parsertypes.h
+EXTRA_DIST = 	namespaces.l namespaces.y namespaces.h \
+		signing_policy.y signing_policy.l signing_policy.h \
+		parsertypes.h
 
 evaluate.$(OBJEXT): signing_policy.h namespaces.h parsertypes.h evaluate.c
 
 signing_policy.$(OBJEXT): signing_policy.h
 
+if REGENERATE_PARSERS
+
 signing_policy.h signing_policy.c: signing_policy.y
 	$(YACC) -t -d -o signing_policy.c signing_policy.y
 
 
-if REGENERATE_PARSERS
 lex.signing.c: signing_policy.l signing_policy.h signing_policy.c
 	$(LEX) -b -f -d signing_policy.l
 endif
 
 namespaces.$(OBJEXT): namespaces.h
 
+if REGENERATE_PARSERS
+
 namespaces.h namespaces.c: namespaces.y
 	$(YACC) -t -d -o namespaces.c namespaces.y
 
-if REGENERATE_PARSERS
 lex.namespaces.c: namespaces.l namespaces.h namespaces.c
 	$(LEX) -b -f -d namespaces.l
 endif

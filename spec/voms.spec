@@ -102,18 +102,6 @@ This package provides the VOMS service.
 
 %prep
 %setup -q
-# Touch to avoid rerunning bison and flex
-#touch -r src/utils/vomsfake.y src/utils/vomsparser.h
-#touch -r src/utils/vomsfake.y src/utils/vomsparser.c
-#touch -r src/utils/vomsfake.y src/utils/lex.yy.c
-
-#touch -r src/sslutils/namespaces.y src/sslutils/namespaces.h
-#touch -r src/sslutils/namespaces.y src/sslutils/namespaces.c
-#touch -r src/sslutils/namespaces.y src/sslutils/lex.namespaces.c
-
-#touch -r src/sslutils/signing_policy.y src/sslutils/signing_policy.h
-#touch -r src/sslutils/signing_policy.y src/sslutils/signing_policy.c
-#touch -r src/sslutils/signing_policy.y src/sslutils/lex.signing.c
 
 # Fix bad permissions (which otherwise end up in the debuginfo package)
 find . '(' -name '*.h' -o -name '*.c' -o -name '*.cpp' -o \
@@ -122,7 +110,7 @@ find . '(' -name '*.h' -o -name '*.c' -o -name '*.cpp' -o \
 
 %build
 
-%configure --disable-static --enable-docs
+%configure --disable-static --enable-docs --disable-parser-gen
 
 make %{?_smp_mflags}
 
@@ -160,6 +148,7 @@ rm -rf $RPM_BUILD_ROOT
 
 %post -p /sbin/ldconfig
 %postun -p /sbin/ldconfig
+
 %posttrans
 # Recover /etc/vomses...
 if [ -r %{_sysconfdir}/vomses.rpmsave -a ! -r %{_sysconfdir}/vomses ] ; then

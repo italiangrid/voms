@@ -103,7 +103,7 @@ AC_ARG_WITH(vomsuser,
 )
   
 AC_SUBST(with_vomsuser)
-AC_REGENERATE_PARSERS
+AC_PARSER_GEN
 
 AM_CONFIG_HEADER([src/autogen/config.h])
 
