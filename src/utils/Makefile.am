@@ -39,8 +39,11 @@ vomsparser.$(OBJEXT): vomsparser.h
 vomsparser.h vomsparser.c: vomsfake.y
 	$(YACC) -t -d -o vomsparser.c vomsfake.y
 
+if REGENERATE_PARSERS
+
 lex.yy.c: vomsparser.l vomsparser.h
 	$(LEX) vomsparser.l
+endif
 
 voms_proxy_fake_LDADD = \
 	$(top_builddir)/src/api/ccapi/libvomsapi.la  \

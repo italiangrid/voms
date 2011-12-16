@@ -21,16 +21,21 @@ signing_policy.$(OBJEXT): signing_policy.h
 signing_policy.h signing_policy.c: signing_policy.y
 	$(YACC) -t -d -o signing_policy.c signing_policy.y
 
+
+if REGENERATE_PARSERS
 lex.signing.c: signing_policy.l signing_policy.h signing_policy.c
 	$(LEX) -b -f -d signing_policy.l
+endif
 
 namespaces.$(OBJEXT): namespaces.h
 
 namespaces.h namespaces.c: namespaces.y
 	$(YACC) -t -d -o namespaces.c namespaces.y
 
+if REGENERATE_PARSERS
 lex.namespaces.c: namespaces.l namespaces.h namespaces.c
 	$(LEX) -b -f -d namespaces.l
+endif
 
 libssl_utils_nog_la_SOURCES= $(SOURCES)
 

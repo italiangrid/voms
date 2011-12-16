@@ -9,6 +9,17 @@ AC_DEFUN([AC_LINUX],
     fi
 ])
 
+AC_DEFUN([AC_REGENERATE_PARSERS],
+[
+
+	AC_ARG_ENABLE([regenparsers],
+		[  --disable-parser-regeneration 	disable the generation the parser code. ],
+		[ regenparsers=${enableval} ],
+		[ regenparsers="yes" ])
+
+	AM_CONDITIONAL([REGENERATE_PARSERS], [test "x${regenparsers}" = xyes])
+])
+
 AC_DEFUN([AC_BUILD_PARTS],
 [
 
@@ -218,7 +229,7 @@ AC_DEFUN([AC_BUILD_API_ONLY],
 AC_DEFUN([AC_ENABLE_DOCS],
 [
     AC_ARG_ENABLE(docs,
-	    [ --enable-docs Enable doc generation],
+	    [  --enable-docs Enable doc generation],
 	    [
 	      case "$enableval" in
 	      yes) build_docs="yes" ;;
