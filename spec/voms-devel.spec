@@ -1,12 +1,11 @@
-Name: voms
+Name: voms-devel
 Version: 2.0.7
 Release: 1%{?dist}
-Summary: The Virtual Organisation Membership Service C++ APIs
 
-Group:          System Environment/Libraries
+Summary:	Virtual Organization Membership Service Development Files
+
+Group:		Development/Libraries
 License:        ASL 2.0
-URL: https://twiki.cnaf.infn.it/twiki/bin/view/VOMS
-Source: %{name}-%{version}.tar.gz
 
 BuildRequires: libtool
 BuildRequires: expat-devel
@@ -17,9 +16,18 @@ BuildRequires: docbook-style-xsl
 BuildRequires: doxygen
 BuildRequires: bison
 
-Requires: expat
-Requires: openssl
+Requires:   expat
+Requires:   openssl
+Requires:	voms%{?_isa} = %{version}-%{release}
+Requires:	openssl-devel%{?_isa}
+Requires:	automake
 
+Summary: The Virtual Organisation Membership Service C++ APIs (Development files)
+
+Group: System Environment/Libraries
+
+URL: https://twiki.cnaf.infn.it/twiki/bin/view/VOMS
+Source: voms-%{version}.tar.gz
 BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 
 Packager: Andrea Ceccanti <andrea.ceccanti@cnaf.infn.it>
@@ -31,9 +39,6 @@ providing support for sorting users into group hierarchies, keeping track of
 their roles and other attributes in order to issue trusted attribute
 certificates and SAML assertions used in the Grid environment for
 authorization purposes.
-
-This package provides libraries that applications using the VOMS functionality
-will bind to.
 
 %prep
 %setup -q
@@ -58,14 +63,6 @@ rm $RPM_BUILD_ROOT%{_libdir}/*.la
 rm $RPM_BUILD_ROOT%{_mandir}/man8/voms-install-replica.8
 rm $RPM_BUILD_ROOT%{_mandir}/man3/data.3*
 
-mkdir -p $RPM_BUILD_ROOT%{_sysconfdir}/grid-security/vomsdir
-mkdir -p $RPM_BUILD_ROOT%{_sysconfdir}/grid-security/%{name}
-mkdir -p $RPM_BUILD_ROOT%{_localstatedir}/log/%{name}
-mkdir -p $RPM_BUILD_ROOT%{_sysconfdir}/%{name}
-
-mkdir -p $RPM_BUILD_ROOT%{_docdir}/%{name}-%{version}
-install -m 644 -p LICENSE AUTHORS $RPM_BUILD_ROOT%{_docdir}/%{name}-%{version}
-
 %clean
 
 rm -rf $RPM_BUILD_ROOT
@@ -81,14 +78,11 @@ fi
 
 %files
 %defattr(-,root,root,-)
-%{_libdir}/libvomsapi.so.1*
-%dir %{_sysconfdir}/grid-security
-%dir %{_sysconfdir}/grid-security/vomsdir
-%dir %{_datadir}/%{name}
-%{_datadir}/%{name}/vomses.template
-%doc %dir %{_docdir}/%{name}-%{version}
-%doc %{_docdir}/%{name}-%{version}/AUTHORS
-%doc %{_docdir}/%{name}-%{version}/LICENSE
+%{_libdir}/libvomsapi.so
+%{_includedir}/%{name}
+%{_libdir}/pkgconfig/%{name}-2.0.pc
+%{_datadir}/aclocal/%{name}.m4
+%{_mandir}/man3/*
 
 %changelog
 
