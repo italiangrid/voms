@@ -16,8 +16,8 @@ BuildRequires: docbook-style-xsl
 BuildRequires: doxygen
 BuildRequires: bison
 
-Requires:   expat
-Requires:   openssl
+Requires:   	expat
+Requires:   	openssl
 Requires:	voms%{?_isa} = %{version}-%{release}
 Requires:	openssl-devel%{?_isa}
 Requires:	automake
@@ -27,6 +27,7 @@ Summary: The Virtual Organisation Membership Service C++ APIs (Development files
 Group: System Environment/Libraries
 
 URL: https://twiki.cnaf.infn.it/twiki/bin/view/VOMS
+
 Source: voms-%{version}.tar.gz
 BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 
@@ -41,7 +42,7 @@ certificates and SAML assertions used in the Grid environment for
 authorization purposes.
 
 %prep
-%setup -q
+%setup -q -n voms-%{version}
 
 # Fix bad permissions (which otherwise end up in the debuginfo package)
 find . '(' -name '*.h' -o -name '*.c' -o -name '*.cpp' -o \
@@ -50,7 +51,8 @@ find . '(' -name '*.h' -o -name '*.c' -o -name '*.cpp' -o \
 
 %build
 
-%configure --disable-static --disable-parser-gen --with-api-only
+%configure --enable-docs --disable-static --disable-parser-gen --with-api-only
+	
 
 make %{?_smp_mflags}
 
@@ -60,8 +62,9 @@ rm -rf $RPM_BUILD_ROOT
 make install DESTDIR=$RPM_BUILD_ROOT
 
 rm $RPM_BUILD_ROOT%{_libdir}/*.la
-rm $RPM_BUILD_ROOT%{_mandir}/man8/voms-install-replica.8
-rm $RPM_BUILD_ROOT%{_mandir}/man3/data.3*
+rm $RPM_BUILD_ROOT%{_mandir}/man8/*.8
+rm $RPM_BUILD_ROOT%{_mandir}/man1/*.1
+rm $RPM_BUILD_ROOT%{_libdir}/libvomsapi.so.1*
 
 %clean
 
@@ -79,9 +82,9 @@ fi
 %files
 %defattr(-,root,root,-)
 %{_libdir}/libvomsapi.so
-%{_includedir}/%{name}
-%{_libdir}/pkgconfig/%{name}-2.0.pc
-%{_datadir}/aclocal/%{name}.m4
+%{_includedir}/voms
+%{_libdir}/pkgconfig/voms-2.0.pc
+%{_datadir}/aclocal/voms.m4
 %{_mandir}/man3/*
 
 %changelog

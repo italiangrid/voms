@@ -1,6 +1,9 @@
 includedir = @includedir@/voms
+
+if BUILD_INTERFACES
 pkgconfigdir = @libdir@/pkgconfig
 pkgconfig_DATA = voms-2.0.pc
+endif
 
 lib_LTLIBRARIES = libvomsapi.la
 
@@ -34,16 +37,6 @@ libvomsapi_la_LIBADD = \
 
 
 
-# test programs
-
-#noinst_PROGRAMS = test ctest
-#test_SOURCES = test.cc
-#test_LDADD = libvomsapi.la
-#test_CXXFLAGS = -I$(top_srcdir)/src/include $(GLOBUS_CFLAGS)
-#ctest_SOURCES = ctest.c
-#ctest_LDADD = libvomsc.la
-#ctest_CFLAGS = -I$(top_srcdir)/src/include $(GLOBUS_CFLAGS)
-
 if BUILD_INTERFACES
 include_HEADERS = \
 	voms_api.h \
@@ -75,23 +68,24 @@ HTML  = $(CCDOCPLC_DIR)/html/index.html
 				$(CDOCPLC_DIR)/html/index.html
 
 if BUILD_DOCS
+
 MAN3  = $(CCDOCPLC_DIR)/man/man3/data.3 \
         $(CCDOCPLC_DIR)/man/man3/voms.3 \
         $(CCDOCPLC_DIR)/man/man3/voms_api.h.3 \
         $(CCDOCPLC_DIR)/man/man3/vomsdata.3 \
-				$(CDOCPLC_DIR)/man/man3/voms_apic.h.3
+	$(CDOCPLC_DIR)/man/man3/voms_apic.h.3
 endif
 
 PDF   = $(CCDOCPLC_DIR)/pdf/VOMS_CC_API.pdf \
-				$(CDOCPLC_DIR)/pdf/VOMS_C_API.pdf
+	$(CDOCPLC_DIR)/pdf/VOMS_C_API.pdf
 
 PS    = $(CCDOCPLC_DIR)/ps/VOMS_CC_API.ps \
-				$(CDOCPLC_DIR)/pdf/VOMS_C_API.ps
+	$(CDOCPLC_DIR)/pdf/VOMS_C_API.ps
 
 LATEX = $(CCDOCPLC_DIR)/latex/Makefile \
         $(CCDOCPLC_DIR)/latex/refman.tex \
         $(CCDOCPLC_DIR)/latex/doxygen.sty \
-				$(CDOCPLC_DIR)/latex/Makefile \
+	$(CDOCPLC_DIR)/latex/Makefile \
         $(CDOCPLC_DIR)/latex/refman.tex \
         $(CDOCPLC_DIR)/latex/doxygen.sty
 
@@ -241,19 +235,12 @@ endif
 install-exec-am: lib_LTLIBRARIES = $(INSTALL_API_LIBS)
 install-exec-am: install-libLTLIBRARIES
 
-apidoc-recursive:
-#	$(MAKE) apidoc -C capi
-
 apidoc: apidoc-local apidoc-recursive
 
 if BUILD_DOCS
 $(MAN3) $(HTML) $(LATEX): $(DOXY)
 	doxygen $(CCDOCPLC_DIR)/Doxyfile
 	doxygen $(CDOCPLC_DIR)/Doxyfile
-
-
-#$(OUTPUT_DIR)/man/man3/%.3: $(DOXY)
-#	doxygen
 
 $(PDF): $(LATEX)
 	cd $(CCDOCPLC_DIR)/latex; \

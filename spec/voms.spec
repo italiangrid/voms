@@ -45,7 +45,8 @@ find . '(' -name '*.h' -o -name '*.c' -o -name '*.cpp' -o \
 
 %build
 
-%configure --disable-static --disable-parser-gen --with-api-only
+%configure --disable-static --disable-parser-gen --with-api-only \
+	--without-interfaces --disable-docs
 
 make %{?_smp_mflags}
 
@@ -55,16 +56,23 @@ rm -rf $RPM_BUILD_ROOT
 make install DESTDIR=$RPM_BUILD_ROOT
 
 rm $RPM_BUILD_ROOT%{_libdir}/*.la
-rm $RPM_BUILD_ROOT%{_mandir}/man8/voms-install-replica.8
-rm $RPM_BUILD_ROOT%{_mandir}/man3/data.3*
 
 mkdir -p $RPM_BUILD_ROOT%{_sysconfdir}/grid-security/vomsdir
 mkdir -p $RPM_BUILD_ROOT%{_sysconfdir}/grid-security/%{name}
 mkdir -p $RPM_BUILD_ROOT%{_localstatedir}/log/%{name}
 mkdir -p $RPM_BUILD_ROOT%{_sysconfdir}/%{name}
 
+mkdir -p $RPM_BUILD_ROOT%{_datadir}/%{name}
+install -m 644 -p ./src/install/vomses.template $RPM_BUILD_ROOT%{_datadir}/%{name}
+
 mkdir -p $RPM_BUILD_ROOT%{_docdir}/%{name}-%{version}
 install -m 644 -p LICENSE AUTHORS $RPM_BUILD_ROOT%{_docdir}/%{name}-%{version}
+
+# Remove unwanted files produced by the build
+rm $RPM_BUILD_ROOT%{_mandir}/man1/*.1
+rm $RPM_BUILD_ROOT%{_mandir}/man8/*.8
+
+rm $RPM_BUILD_ROOT%{_libdir}/libvomsapi.so
 
 %clean
 

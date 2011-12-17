@@ -9,7 +9,7 @@ USERDOC_DIR = $(top_builddir)/doc/userdoc
 APIDOC_FILES = $(top_srcdir)/AUTHORS $(top_srcdir)/INSTALL $(top_srcdir)/LICENSE $(top_srcdir)/README
 USERDOC_FILES = $(APIDOC_FILES)
 
-spec=spec/voms.spec
+spec=spec/voms-all.spec
 rpmbuild_dir=$(shell pwd)/rpmbuild
 
 all-local: apidoc-local
@@ -42,6 +42,9 @@ gtags:
 
 tags:
 	rm -f TAGS; find . '(' '(' -name '*.c' -o -name '*.h' -o -name '*.cpp' -o -name '*.hpp' -o -name '*.cc' ')' -a -not -path '*/test/*' ')' -exec etags -a '{}' ';'
+
+clean-local:
+	rm -rf rpmbuild $(distdir).tar.gz
 
 distclean-local: 
 	rm -f configure aclocal.m4 $(distdir).tar.gz 
