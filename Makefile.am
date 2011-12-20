@@ -11,6 +11,7 @@ USERDOC_FILES = $(APIDOC_FILES)
 
 spec=spec/voms-all.spec
 rpmbuild_dir=$(shell pwd)/rpmbuild
+stage_dir=dist
 
 all-local: apidoc-local
 
@@ -44,7 +45,7 @@ tags:
 	rm -f TAGS; find . '(' '(' -name '*.c' -o -name '*.h' -o -name '*.cpp' -o -name '*.hpp' -o -name '*.cc' ')' -a -not -path '*/test/*' ')' -exec etags -a '{}' ';'
 
 clean-local:
-	rm -rf rpmbuild $(distdir).tar.gz
+	rm -rf rpmbuild $(distdir).tar.gz dist
 
 distclean-local: 
 	rm -f configure aclocal.m4 $(distdir).tar.gz 
@@ -62,3 +63,13 @@ etics: clean rpm
 	mkdir -p tgz RPMS
 	cp $(distdir).tar.gz tgz
 	cp -r $(rpmbuild_dir)/RPMS/* $(rpmbuild_dir)/SRPMS/* RPMS
+
+stage:
+	mkdir -p $(stage_dir)
+	
+	for r in $(shell find $(rpmbuild_dir)/RPMS -name '*.rpm') ; do \
+                echo "Istalling `basename $$r` in $(stage_dir)..."; \
+                pushd . ; cp $$r $(stage_dir); cd $(stage_dir); \
+                rpm2cpio `basename $$r` | cpio -idm; \
+                rm `basename $$r`; popd; \
+        done
