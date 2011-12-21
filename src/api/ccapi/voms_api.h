@@ -33,8 +33,15 @@
 #define NOGLOBUS
 extern "C" {
 #ifndef GSSAPI_H_
+/*
+ *  Also check against _GSSAPI_H_ as that is what the Kerberos 5 code defines and
+ *  what header files on some systems look for.
+ */
+
+#ifndef _GSSAPI_H_
 typedef void * gss_cred_id_t;
 typedef void * gss_ctx_id_t;
+#endif
 #endif
 
 #include <openssl/x509.h>
