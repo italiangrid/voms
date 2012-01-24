@@ -66,7 +66,7 @@ deb: dist
 	cp $(distdir).tar.gz $(debbuild_dir)/$(PACKAGE)_$(VERSION).orig.tar.gz
 	tar -C $(debbuild_dir) -xvzf $(distdir).tar.gz
 	cp -r debian $(debbuild_dir)/$(PACKAGE)-$(VERSION)
-	cd $(debbuild_dir)/$(PACKAGE)-$(VERSION); debuild
+	cd $(debbuild_dir)/$(PACKAGE)-$(VERSION); debuild -uc -us
 
 etics: clean rpm 
 	mkdir -p tgz RPMS
@@ -79,6 +79,12 @@ etics-deb: clean deb
 	cp $(debbuild_dir)/*.deb debs
 	cp $(debbuild_dir)/*.tar.gz $(debbuild_dir)/*.dsc tgz
 
+stage-deb:
+	mkdir -p $(stage_dir)
+	for d in debs/*.deb; do \
+		dpkg-deb --extract $$d $(stage_dir) ; \
+	done
+	
 stage:
 	mkdir -p $(stage_dir)
 	
@@ -87,4 +93,4 @@ stage:
                 pushd . ; cp $$r $(stage_dir); cd $(stage_dir); \
                 rpm2cpio `basename $$r` | cpio -idm; \
                 rm `basename $$r`; popd; \
-        done
+    done
