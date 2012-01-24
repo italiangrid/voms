@@ -1,0 +1,5 @@
+debian/tmp/usr/include/voms/*
+debian/tmp/usr/lib/libvomsapi.a
+debian/tmp/usr/lib/libvomsapi.so
+debian/tmp/usr/lib/pkgconfig/voms-2.0.pc
+debian/tmp/usr/share/aclocal/voms.m4

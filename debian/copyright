@@ -1,0 +1,28 @@
+This work was packaged for Debian by:
+
+    Andrea Ceccanti <andrea.ceccanti@cnaf.infn.it> on Tue, 24 Jan 2012 15:29:27 +0100
+
+It was downloaded from:
+	
+	https://github.com/italiangrid/voms
+
+Upstream Author(s):
+
+    Vincenzo Ciaschini <vincenzo.ciaschini@cnaf.infn.it>
+	Valerio Venturi <valerio.venturi@cnaf.infn.it>
+	Andrea Ceccanti <andrea.ceccanti@cnaf.infn.it>
+
+Copyright:
+
+    <Copyright (C) 2004-2012 Istituto Nazionale di Fisica Nucleare>
+
+License:
+
+	Apache Sotware License 2.0
+
+The Debian packaging is:
+
+    Copyright (C) 2012 Andrea Ceccanti <andrea.ceccanti@cnaf.infn.it>
+
+and is licensed under the GPL version 3,
+see "/usr/share/common-licenses/GPL-3".

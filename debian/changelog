@@ -1,0 +1,5 @@
+voms (2.0.7-1) unstable; urgency=low
+
+  * Initial release (Closes: #nnnn)  <nnnn is the bug number of your ITP>
+
+ -- Andrea Ceccanti <andrea@grizzly.cnaf.infn.it>  Tue, 24 Jan 2012 15:29:27 +0100

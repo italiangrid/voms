@@ -1,0 +1,135 @@
+#!/usr/bin/make -f
+# -*- makefile -*-
+# Sample debian/rules that uses debhelper.
+# This file was originally written by Joey Hess and Craig Small.
+# As a special exception, when this file is copied by dh-make into a
+# dh-make output file, you may use that output file without restriction.
+# This special exception was added by Craig Small in version 0.37 of dh-make.
+
+# Uncomment this to turn on verbose mode.
+export DH_VERBOSE=1
+
+DEB_HOST_GNU_TYPE  ?= $(shell dpkg-architecture -qDEB_HOST_GNU_TYPE)
+DEB_BUILD_GNU_TYPE ?= $(shell dpkg-architecture -qDEB_BUILD_GNU_TYPE)
+
+CFLAGS = -Wall -g
+
+ifneq (,$(findstring noopt,$(DEB_BUILD_OPTIONS)))
+CFLAGS += -O0
+else
+CFLAGS += -O2
+endif
+
+ifneq (,$(filter parallel=%,$(DEB_BUILD_OPTIONS)))
+NUMJOBS = $(patsubst parallel=%,%,$(filter parallel=%,$(DEB_BUILD_OPTIONS)))
+MAKEFLAGS += -j$(NUMJOBS)
+endif
+
+name=voms
+version=2.0.7
+
+include /usr/share/quilt/quilt.make
+
+INSTALLDIR = $(CURDIR)/debian/tmp
+
+_prefix = /usr
+_bindir = $(_prefix)/bin
+_sbindir = $(_prefix)/sbin
+_libdir = $(_prefix)/lib
+_includedir = $(_prefix)/include
+_sysconfdir = /etc
+_localstatedir = /var
+_datadir = $(_prefix)/share
+_mandir = $(_datadir)/man
+_docdir = $(_datadir)/doc
+
+configure: configure-stamp
+    :
+
+configure-stamp: $(QUILT_STAMPFN)
+	dh_testdir 
+
+	find . '(' -name '*.h' -o -name '*.c' -o -name '*.cpp' -o \
+		-name '*.cc' -o -name '*.java' ')' -exec chmod a-x {} ';'
+	./autogen.sh
+	
+	CFLAGS="$(CFLAGS)" CXXFLAGS="$(CFLAGS)" FFLAGS="$(CFLAGS)" \
+	LDFLAGS="-Wl,-z,defs" ./configure \
+		--host=$(DEB_HOST_GNU_TYPE) \
+    	--build=$(DEB_BUILD_GNU_TYPE) \
+		--prefix=$(_prefix) \
+		--sysconfdir=$(_datadir) \
+		--mandir='$${datadir}/man' \
+		--infodir='$${datadir}/info' \
+		--libexecdir=$(_datadir) \
+		--disable-parser-gen \
+		--with-api-only \
+		--disable-docs
+
+
+build: build-indep build-arch
+	:
+
+build-indep: build-stamp
+	:
+
+build-arch: build-stamp
+	:
+
+build-stamp: configure-stamp
+	dh_testdir
+
+	$(MAKE)
+
+	touch $@
+
+unpatch: cleanup
+
+clean: unpatch
+	:
+
+cleanup:
+	dh_testdir
+	dh_testroot
+
+
+	if [ -r Makefile ] ; then $(MAKE) clean && $(MAKE) distclean ; fi
+
+	rm -f build-stamp configure-stamp
+
+install: build-stamp
+	dh_testdir
+	dh_testroot
+	dh_prep
+
+	$(MAKE) install DESTDIR=$(INSTALLDIR)
+	rm $(INSTALLDIR)$(_libdir)/*.la
+	mkdir -p $(INSTALLDIR)$(_sysconfdir)/grid-security/vomsdir
+	mkdir -p $(INSTALLDIR)$(_sysconfdir)/grid-security/$(name)
+	mkdir -p $(INSTALLDIR)$(_localstatedir)/log/$(name)
+	
+binary-indep:
+	:
+
+binary-arch: install
+	dh_testdir
+	dh_testroot
+	dh_installchangelogs ChangeLog
+	dh_installdocs
+	dh_installman
+	dh_install 
+	dh_link
+	dh_lintian
+	dh_compress
+	dh_fixperms
+	dh_makeshlibs  
+	dh_installdeb
+	dh_shlibdeps -l debian/libvomsapi1/usr/lib
+	dh_gencontrol
+	dh_md5sums
+	dh_builddeb
+
+binary: binary-indep binary-arch
+	:
+
+.PHONY: build-indep build-arch build clean binary-indep binary-arch binary install configure

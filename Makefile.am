@@ -10,7 +10,9 @@ APIDOC_FILES = $(top_srcdir)/AUTHORS $(top_srcdir)/INSTALL $(top_srcdir)/LICENSE
 USERDOC_FILES = $(APIDOC_FILES)
 
 spec=spec/voms-all.spec
-rpmbuild_dir=$(shell pwd)/rpmbuild
+rpmbuild_dir=$(top_srcdir)/rpmbuild
+debbuild_dir=$(top_srcdir)/debbuild
+
 stage_dir=dist
 
 all-local: apidoc-local
@@ -45,12 +47,12 @@ tags:
 	rm -f TAGS; find . '(' '(' -name '*.c' -o -name '*.h' -o -name '*.cpp' -o -name '*.hpp' -o -name '*.cc' ')' -a -not -path '*/test/*' ')' -exec etags -a '{}' ';'
 
 clean-local:
-	rm -rf rpmbuild $(distdir).tar.gz dist
+	rm -rf $(rpmbuild_dir) $(debbuild_dir) $(distdir).tar.gz dist
 
 distclean-local: 
 	rm -f configure aclocal.m4 $(distdir).tar.gz 
 	rm -f m4/libtool.m4 m4/ltoptions.m4 m4/ltsugar.m4 m4/ltversion.m4 m4/lt~obsolete.m4
-	rm -rf autom4te.cache aux src/autogen rpmbuild
+	rm -rf autom4te.cache aux src/autogen $(rpmbuild_dir) $(debbuild_dir)
 	find . -name Makefile.in -exec rm {} \;
 
 
@@ -59,10 +61,23 @@ rpm: dist
 	cp $(distdir).tar.gz $(rpmbuild_dir)/SOURCES
 	rpmbuild --nodeps -v -ba $(spec) --define "_topdir $(rpmbuild_dir)"
 
+deb: dist
+	mkdir -p $(debbuild_dir)
+	cp $(distdir).tar.gz $(debbuild_dir)/$(PACKAGE)_$(VERSION).orig.tar.gz
+	tar -C $(debbuild_dir) -xvzf $(distdir).tar.gz
+	cp -r debian $(debbuild_dir)/$(PACKAGE)-$(VERSION)
+	cd $(debbuild_dir)/$(PACKAGE)-$(VERSION); debuild
+
 etics: clean rpm 
 	mkdir -p tgz RPMS
 	cp $(distdir).tar.gz tgz
 	cp -r $(rpmbuild_dir)/RPMS/* $(rpmbuild_dir)/SRPMS/* RPMS
+
+etics-deb: clean deb
+	mkdir -p tgz debs
+	cp $(distdir).tar.gz tgz
+	cp $(debbuild_dir)/*.deb debs
+	cp $(debbuild_dir)/*.tar.gz $(debbuild_dir)/*.dsc tgz
 
 stage:
 	mkdir -p $(stage_dir)

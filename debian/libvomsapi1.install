@@ -1,0 +1,2 @@
+debian/tmp/usr/lib/libvomsapi.so.*
+debian/tmp/etc/grid-security/vomsdir
