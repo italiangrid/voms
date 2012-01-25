@@ -12,8 +12,8 @@ USERDOC_FILES = $(APIDOC_FILES)
 spec=spec/voms-all.spec
 deb_comp="libvomsapi1 voms-dev voms-clients voms-server"
 
-rpmbuild_dir=$(top_builddir)/rpmbuild
-debbuild_dir=$(top_builddir)/debbuild
+rpmbuild_dir=$(shell pwd)/rpmbuild
+debbuild_dir=$(shell pwd)/debbuild
 
 stage_dir=dist
 
