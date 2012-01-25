@@ -10,8 +10,10 @@ APIDOC_FILES = $(top_srcdir)/AUTHORS $(top_srcdir)/INSTALL $(top_srcdir)/LICENSE
 USERDOC_FILES = $(APIDOC_FILES)
 
 spec=spec/voms-all.spec
-rpmbuild_dir=$(top_srcdir)/rpmbuild
-debbuild_dir=$(top_srcdir)/debbuild
+deb_comp="libvomsapi1 voms-dev voms-clients voms-server"
+
+rpmbuild_dir=$(top_builddir)/rpmbuild
+debbuild_dir=$(top_builddir)/debbuild
 
 stage_dir=dist
 
@@ -66,6 +68,10 @@ deb: dist
 	cp $(distdir).tar.gz $(debbuild_dir)/$(PACKAGE)_$(VERSION).orig.tar.gz
 	tar -C $(debbuild_dir) -xvzf $(distdir).tar.gz
 	cp -r debian $(debbuild_dir)/$(PACKAGE)-$(VERSION)
+	for c in $(deb_comp); do \
+		echo >> $(debbuild_dir)/$(PACKAGE)-$(VERSION)/debian/control; \
+		cat debian/$$c.control >> $(debbuild_dir)/$(PACKAGE)-$(VERSION)/debian/control; \
+	done
 	cd $(debbuild_dir)/$(PACKAGE)-$(VERSION); debuild -uc -us
 
 etics: clean rpm 

@@ -63,7 +63,6 @@ configure-stamp: $(QUILT_STAMPFN)
 		--infodir='$${datadir}/info' \
 		--libexecdir=$(_datadir) \
 		--disable-parser-gen \
-		--with-api-only \
 		--disable-docs
 
 
@@ -104,6 +103,9 @@ install: build-stamp
 
 	$(MAKE) install DESTDIR=$(INSTALLDIR)
 	rm $(INSTALLDIR)$(_libdir)/*.la
+	rm $(INSTALLDIR)$(_mandir)/man8/voms-install-replica.8
+
+	mkdir -p $(INSTALLDIR)$(_sysconfdir)/$(name)
 	mkdir -p $(INSTALLDIR)$(_sysconfdir)/grid-security/vomsdir
 	mkdir -p $(INSTALLDIR)$(_sysconfdir)/grid-security/$(name)
 	mkdir -p $(INSTALLDIR)$(_localstatedir)/log/$(name)
