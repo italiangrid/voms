@@ -27,6 +27,9 @@
 #include "vomsxml.h"
 #include "errors.h"
 
+#include <sstream>
+
+
 extern "C" {
 #include <expat.h>
 #include <string.h>
@@ -264,42 +267,35 @@ static char *MyDecode(const char *data, int size, int *n)
 std::string XML_Req_Encode(const std::string &command, const std::string &order,
                           const std::string &targets, const int lifetime)
 {
-  std::string res = "<?xml version=\"1.0\" encoding = \"US-ASCII\"?><voms>";
+  
+  std::ostringstream res;
+  std::istringstream cmds(command);
 
-  char *str = NULL;
+  std::string preamble = "<?xml version=\"1.0\" encoding=\"US-ASCII\"?><voms>";
 
-  std::string::size_type begin = 0;
-  std::string::size_type pos = 0;
+  res << preamble;
+   
+  std::string c;
 
-  do {
-    pos = command.find_first_of(',', begin);
-    res += "<command>";
-
-    if (pos != std::string::npos) {
-      res += command.substr(begin, pos);
-      begin = pos + 1;
-    }
-    else
-      res += command.substr(begin);
-
-    res += "</command>";
-  } while (pos != std::string::npos);
+  while(getline(cmds,c,','))
+    res << "<command>" << c << "</command>";
 
   if (!order.empty())
-    res += "<order>"+order+"</order>";
+    res << "<order>" << order << "</order>";
 
   if (!targets.empty())
-    res += "<targets>"+targets+"</targets>";
+    res << "<targets>" << targets << "</targets>";
 
-  res += "<base64>1</base64><version>4</version>";
+  res << "<base64>1</base64><version>4</version>";
+  if (lifetime <= 0)
+    res << "<lifetime></lifetime>";
+  else
+    res << "<lifetime>" << lifetime  << "</lifetime>";
 
-  str = snprintf_wrap("%d", lifetime);
+  res << "</voms>";
 
-  res += "<lifetime>"+std::string(str ? str : "")+"</lifetime></voms>";
-
-  free(str);
-
-  return res;
+  return res.str();
+	
 }
 
 std::string Encode(std::string data, int base64)
