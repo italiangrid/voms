@@ -13,8 +13,8 @@ spec=spec/voms-all.spec
 rpmdist=""
 deb_comp="libvomsapi1 voms-dev voms-clients voms-server"
 
-rpmbuild_dir=$(shell pwd)/rpmbuild
-debbuild_dir=$(shell pwd)/debbuild
+rpmbuild_dir=@WORKDIR@/rpmbuild
+debbuild_dir=@WORKDIR@/debbuild
 
 stage_dir=dist
 

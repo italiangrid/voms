@@ -663,9 +663,45 @@ EOF
 
 AC_DEFUN([AC_VOMS_LOCATIONS],
 [
-	AC_SUBST(LOCATION_ENV, "VOMS_LOCATION")
+    
+    if test "x$prefix" = "xNONE"; then
+        actual_prefix=$ac_default_prefix
+    else
+        actual_prefix=$prefix
+    fi 
+
+
+    loc_dir=${actual_prefix%%/}/usr
+
+    if test "x"'${prefix}/etc' = "x$sysconfdir"; then
+        etc_dir=${actual_prefix%%/}/etc
+    else
+        etc_dir=$sysconfdir
+    fi
+
+    if test "x"'${prefix}/var' = "x$localstatedir"; then
+        var_dir=${actual_prefix%%/}/var
+    else
+        var_dir=$localstatedir
+    fi
+
+    # Uncomment when debugging macros
+    # echo '$loc_dir:'$loc_dir
+    # echo '$etc_dir:'$etc_dir
+    # echo '$var_dir:'$var_dir
+
+    AC_SUBST(LOCATION_ENV, "VOMS_LOCATION")
+    AC_SUBST(VAR_LOCATION_ENV, "VOMS_LOCATION_VAR")
+
 	AC_DEFINE(LOCATION_ENV, "VOMS_LOCATION", "Name of the voms location environment variable")
-	AC_DEFINE(LOCATION_DIR, "/usr", "Location of the system directory")
-	AC_SUBST(LOCATION_DIR, "/usr")
+	AC_DEFINE(VAR_LOCATION_ENV, "VOMS_LOCATION_VAR", "Name of the var voms location environment variable")
+
+    AC_DEFINE(VAR_LOCATION_DIR, "$var_dir", "Location of the var directory)
+	AC_DEFINE(LOCATION_DIR, "$loc_dir", "Location of the system directory")
+    
+	AC_SUBST(LOCATION_DIR, "$loc_dir")
+    AC_SUBST(VAR_LOCATION_DIR, "$var_dir")
+    AC_SUBST(ETC_DIR, "$etc_dir")
+
 	AC_DEFINE(USER_DIR, ".voms", [VOMS user preferences directory])
 ])	

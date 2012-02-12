@@ -44,22 +44,21 @@
 # Description:       Virtual Organization Membership Service
 ### END INIT INFO
 
-# Source networking configuration and check that networking is up.
-if [ -r /etc/sysconfig/network ] ; then
-    . /etc/sysconfig/network
-    [ ${NETWORKING} = "no" ] && exit 0
+etcpath=@ETC_DIR@
+
+# Source an auxiliary profile file if we have one and pick up VOMS_USER and RUN
+if [ -r ${etcpath}/default/voms ] ; then
+    . ${etcpath}/default/voms
+fi
+if [ -r ${etcpath}/sysconfig/voms ] ; then
+    . ${etcpath}/sysconfig/voms
 fi
 
 # Default prefix
-@LOCATION_ENV@=${@LOCATION_ENV@:-@LOCATION_DIR@}
+@LOCATION_ENV@=@LOCATION_DIR@
+@VAR_LOCATION_ENV@=@VAR_LOCATION_DIR@
 
-if [ -z "$@VAR_LOCATION_ENV@" ] ; then
-    if [ "$@LOCATION_ENV@" = "/usr" ] ; then
-        @VAR_LOCATION_ENV@=/var
-    else
-        @VAR_LOCATION_ENV@=$@LOCATION_ENV@/var
-    fi
-fi
+RUN=yes
 
 # check whether $@VAR_LOCATION_ENV@/lock/subsys exists
 if ! test -d $@VAR_LOCATION_ENV@/lock/subsys ; then
@@ -70,36 +69,11 @@ fi
 basepath=$@LOCATION_ENV@
 binpath=${basepath}/sbin
 
-if [ "$basepath" = "/usr" ] ; then
-    etcpath=/etc
-else
-    etcpath=${basepath}/etc
-fi
-
-RUN=yes
-
-# Source an auxiliary profile file if we have one and pick up VOMS_USER and RUN
-if [ -r ${etcpath}/default/voms ] ; then
-    . ${etcpath}/default/voms
-fi
-if [ -r ${etcpath}/sysconfig/voms ] ; then
-    . ${etcpath}/sysconfig/voms
-fi
-
 # Don't run until configuration is done
 if [ "x$RUN" != "xyes" ] ; then
     echo "voms disabled, please adjust the configuration to your needs "
     echo "and then set RUN to 'yes' in /etc/default/voms to enable it."
     exit 0
-fi
-
-# add lib directory to LD_LIBRARY_PATH
-if [ "$@LOCATION_ENV@" != "/usr" ] ; then
-if test "x$LD_LIBRARY_PATH" == "x" ; then
-    export LD_LIBRARY_PATH="$@LOCATION_ENV@/lib"
-else
-    export LD_LIBRARY_PATH="$@LOCATION_ENV@/lib:$LD_LIBRARY_PATH"
-fi
 fi
 
 voms=${binpath}/voms

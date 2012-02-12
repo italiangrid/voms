@@ -358,9 +358,6 @@ VOMSServer::VOMSServer(int argc, char *argv[]) : sock(0,NULL,50,false),
   ac = argc;
   av = argv;
 
-  if ((stat("/etc/nologin", &statbuf)) == 0)
-    throw VOMSInitException("/etc/nologin present\n");
-
   InitProxyCertInfoExtension(1);
 
   bool progversion = false;

@@ -6,8 +6,10 @@ AC_CONFIG_SRCDIR([src/utils/voms_proxy_destroy.cc])
 AC_CONFIG_MACRO_DIR([m4])
 AM_MAINTAINER_MODE
 
+AC_PREFIX_DEFAULT("/")
+
 # Notices.
-AC_COPYRIGHT([Copyright (c) 2004 The EU EGEE Project
+AC_COPYRIGHT([Copyright (c) 2004-2012 Istituto Nazionale di Fisica Nucleare 
 See LICENCE file for details
 ])
 
@@ -26,14 +28,12 @@ AC_PROG_MAKE_SET
 AC_PROG_LIBTOOL
 AC_PROG_YACC
 AC_PROG_LEX
-
 AC_COMPILER
 
 # Checks for libraries.
 AC_OPENSSL
 
 # check for dependencies based on project/*m4
-
 AC_EXPAT([], have_expat=yes, have_expat=no)        # taken from org.glite
 
 AC_ENABLE_DOCS
@@ -70,34 +70,34 @@ AC_FUNC_SETVBUF_REVERSED
 AC_FUNC_STRFTIME
 AC_CHECK_FUNCS([alarm atexit dup2 gethostbyaddr gethostname gethostbyname gethostname memmove memset mkfifo mktime munmap putenv select setenv sigaction socket strchr strdup strerror strndup strrchr strspn strstr strtod strtol strtoul strtoull tzset uname getpwnam timegm])
 
-
 AC_CHECK_DECLS(getopt_data)
 AC_REPLACE_FUNCS(getopt_long getopt_long_only daemon setenv memset)
 
-
 TEST_USE_BSD
 TEST_USE_POSIX
-NEW_ISSUES
+
+# NEW_ISSUES
+
 AC_DEFINE(_SVID_SOURCE, 1, [Get SVID extensions])
 AC_VOMS_TIME_T_TIMEZONE
 AM_WITH_DMALLOC
+
 AC_VOMS_SOCKLEN_T
 AC_VOMS_FIND_FUNC
 AC_VOMS_STRNDUP
+
 AC_BUILD_API_ONLY
 AC_BUILD_PARTS
-
 GLITE_DOCBOOK_MAN
 
 AC_LINUX
 AC_TESTSUITE
 PUT_PRIVATES
 
-AC_PREFIX_DEFAULT("")
 AC_VOMS_LOCATIONS
 
 AC_ARG_WITH(vomsuser,
-  [  --with-voms-user=USR    Sets the user used to run voms],
+  [  --with-vomsuser=USR    Sets the user used to run voms],
   [with_vomsuser="$withval"],
   [with_vomsuser="root"]
 )
