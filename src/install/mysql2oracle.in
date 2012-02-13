@@ -82,10 +82,7 @@ if [ "${mysql_username_admin}" = "" ]; then
 fi
 
 # Default prefix
-@LOCATION_ENV@=${@LOCATION_ENV@:-@LOCATION_DIR@}
-if [ "${@LOCATION_ENV@}" = "" ]; then
-    echo -e "\nERROR : \$@LOCATION_ENV@ not set, supposing @LOCATION_DIR@. \n"
-fi
+@LOCATION_ENV@=@LOCATION_DIR@
 
 # check TNS_ADMIN is set
 TNS_ADMIN=${TNS_ADMIN}

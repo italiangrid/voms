@@ -69,8 +69,7 @@ HTML  = $(CCDOCPLC_DIR)/html/index.html
 
 if BUILD_DOCS
 
-MAN3  = $(CCDOCPLC_DIR)/man/man3/data.3 \
-        $(CCDOCPLC_DIR)/man/man3/voms.3 \
+MAN3  = $(CCDOCPLC_DIR)/man/man3/voms.3 \
         $(CCDOCPLC_DIR)/man/man3/voms_api.h.3 \
         $(CCDOCPLC_DIR)/man/man3/vomsdata.3 \
 	$(CDOCPLC_DIR)/man/man3/voms_apic.h.3
@@ -275,6 +274,12 @@ install-data-local:
 	for file in $(MAN3); do \
 	  $(INSTALL_DATA) $${file} $(DESTDIR)$(mandir)/man3; \
 	done
+	
+	$(mkinstalldirs) $(DESTDIR)$(sysconfdir)/grid-security/vomsdir
+	$(mkinstalldirs) $(DESTDIR)$(sysconfdir)/grid-security/voms
+	$(mkinstalldirs) $(DESTDIR)$(sysconfdir)/voms
+	$(mkinstalldirs) $(DESTDIR)$(localstatedir)/log/voms
+	$(mkinstalldirs) $(DESTDIR)$(datadir)/voms
 
 install-data-hook:
 	(cd $(DESTDIR)$(mandir)/man3; \

@@ -86,7 +86,7 @@ const std::string SUBPACKAGE      = "voms-proxy-init";
 
 /* use name specific to each distribution (defined in configure.in) */
 
-std::string location;
+std::string conf_location;
 std::string CONFILENAME;
 std::string USERCONFILENAME;
 std::string OLDDIR;
@@ -207,12 +207,9 @@ Client::Client(int argc, char ** argv) :
   bool old = false;
   bool pwstdin = false;
 
-  location = (getenv(LOCATION_ENV) ? getenv(LOCATION_ENV) : LOCATION_DIR);
+  conf_location = ETC_DIR;
 
-  if (location == "/usr")
-    location="/";
-
-  CONFILENAME     = (location + "/etc/vomses");
+  CONFILENAME     = (conf_location + "/vomses");
   USERCONFILENAME = std::string(USER_DIR) + std::string("/vomses");
   OLDDIR = (strcmp(USER_DIR, ".glite") ? ".glite/vomses" : ".voms/vomses");
 

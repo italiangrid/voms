@@ -56,7 +56,7 @@ fi
 
 # Default prefix
 @LOCATION_ENV@=@LOCATION_DIR@
-@VAR_LOCATION_ENV@=@VAR_LOCATION_DIR@
+@VAR_LOCATION_ENV@=@VAR_DIR@
 
 RUN=yes
 
@@ -67,7 +67,7 @@ fi
 
 # Default path
 basepath=$@LOCATION_ENV@
-binpath=${basepath}/sbin
+binpath=@BIN_DIR@/sbin
 
 # Don't run until configuration is done
 if [ "x$RUN" != "xyes" ] ; then

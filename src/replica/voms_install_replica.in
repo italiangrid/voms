@@ -1,11 +1,8 @@
 #!/bin/sh
 #
 # Default prefix
-@LOCATION_ENV@=${@LOCATION_ENV@:-@LOCATION_DIR@}
-
-if test -z $@VAR_LOCATION_ENV@ ; then
-    @VAR_LOCATION_ENV@=$@LOCATION_ENV@/var
-fi
+@LOCATION_ENV@=@LOCATION_DIR@
+@VAR_LOCATION_ENV@=@VAR_DIR@
 
 CERTDIR=${CERTDIR:-/etc/grid-security/certificates} #CERTDIR
 SSLPROG="openssl"                                   #openssl
@@ -120,7 +117,7 @@ $MYSQL -h $master_host -u $master_mysql_user -p$master_mysql_pwd -e "UNLOCK TABL
 #./voms_install_replica --db=voms_myvo --master_mysql_user="replica" --master_mysql_pwd="replicapass" --mysql_password_admin="camman33"
 #
 ##############################  Client side
-# cat >> @LOCATION_DIR@/etc/vomses <<EOF
+# cat >> @ETC_DIR@/etc/vomses <<EOF
 # "myvo"  "grid-voms.pr.infn.it" "15010" "/C=IT/O=INFN/OU=Host/L=Parma/CN=grid-voms.pr.infn.it" "myvo"                
 # "myvo2" "grid-se.pr.infn.it"   "15010" "/C=IT/O=INFN/OU=Host/L=Parma/CN=grid-se.pr.infn.it"   "myvo"            
 # EOF

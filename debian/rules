@@ -103,7 +103,6 @@ install: build-stamp
 
 	$(MAKE) install DESTDIR=$(INSTALLDIR)
 	rm $(INSTALLDIR)$(_libdir)/*.la
-	rm $(INSTALLDIR)$(_mandir)/man8/voms-install-replica.8
 
 	mkdir -p $(INSTALLDIR)$(_sysconfdir)/$(name)
 	mkdir -p $(INSTALLDIR)$(_sysconfdir)/grid-security/vomsdir

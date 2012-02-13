@@ -56,7 +56,6 @@ rm -rf $RPM_BUILD_ROOT
 make install DESTDIR=$RPM_BUILD_ROOT
 
 rm $RPM_BUILD_ROOT%{_mandir}/man3/*.3*
-rm $RPM_BUILD_ROOT%{_mandir}/man8/voms-install-replica.8*
 rm $RPM_BUILD_ROOT%{_datadir}/voms/vomses.template
 
 mkdir -p $RPM_BUILD_ROOT%{_sysconfdir}/grid-security/vomsdir

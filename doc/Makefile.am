@@ -5,11 +5,10 @@ SGML = $(srcdir)/voms-proxy-init.xml \
        $(srcdir)/voms.xml \
        $(srcdir)/voms-proxy-info.xml \
        $(srcdir)/voms-proxy-destroy.xml \
-       $(srcdir)/voms-install-replica.xml \
        $(srcdir)/voms-proxy-fake.xml
 
 SGML_DIST = voms-proxy-init.xml voms.xml voms-proxy-info.xml \
-            voms-proxy-destroy.xml voms-install-replica.xml \
+            voms-proxy-destroy.xml \
             voms-proxy-fake.xml voms-proxy-list.xml
 
 LATEX_DIST  = software.tex capi.tex c++api.tex AC-RFC.tex
@@ -20,7 +19,6 @@ if BUILD_SERVER
 if BUILD_CLIENTS
 man_MANS = \
 	voms.8 \
-	voms-install-replica.8 \
 	voms-proxy-init.1 \
 	voms-proxy-info.1 \
 	voms-proxy-destroy.1 \
@@ -32,8 +30,7 @@ endif
 if BUILD_SERVER
 if !BUILD_CLIENTS
 man_MANS = \
-	voms.8 \
-	voms-install-replica.8
+	voms.8 
 endif
 endif
 

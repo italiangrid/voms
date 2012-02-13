@@ -2,14 +2,8 @@
 #set -x
 
 # Default prefix
-@LOCATION_ENV@=${@LOCATION_ENV@:-@LOCATION_DIR@}
-if test -z $@VAR_LOCATION_ENV@ ; then
-    if [ "$@LOCATION_ENV@" = "/usr" ] ; then
-        @VAR_LOCATION_ENV@=/var
-    else
-        @VAR_LOCATION_ENV@=$@LOCATION_ENV@/var
-    fi
-fi
+@LOCATION_ENV@=@LOCATION_DIR@
+@VAR_LOCATION_ENV@=@VAR_DIR@
 
 # CERTDIR
 CERTDIR=${CERTDIR:-/etc/grid-security/certificates}
