@@ -21,7 +21,7 @@ Unspecified proxy version, settling on Globus version: 2
 Number of bits in key :1024
 Files being used:
  CA certificate file: none
- Trusted certificates directory : $::INSTALLDIR/etc/grid-security/certificates
+ Trusted certificates directory : $::ETC_DIR/grid-security/certificates
  Proxy certificate file : /tmp/x509up_u\[0-9\]*
  User certificate file: $::env(X509_USER_CERT)
  User key file: $::env(X509_USER_KEY)

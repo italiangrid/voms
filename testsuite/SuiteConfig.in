@@ -1,4 +1,7 @@
 INSTALLDIR @prefix@
+ETC_DIR	   @ETC_DIR@
+LOG_DIR	   @VAR_DIR@/log/voms
+LOCK_DIR   @VAR_DIR@/lock/subsys
 REPORTDIR  @with_reportdir@
 HAVEORACLE @enable_oracletests@
 HAVEMYSQL  @enable_mysqltests@

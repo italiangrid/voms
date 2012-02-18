@@ -10,20 +10,20 @@ proc mytest {} {
     set res [catch {set out [exec $::INSTALLDIR/bin/voms-proxy-init --voms voms1 >>& $outname]}]
     set res [expr $res + [catch {set out [exec $::INSTALLDIR/bin/voms-proxy-init --voms voms1 >>& $outname]}]]
     set res [expr $res + [catch {set out [exec $::INSTALLDIR/bin/voms-proxy-init --voms voms1 >>& $outname]}]]
-    file delete $::INSTALLDIR/var/log/voms.voms1.2
+    file delete $::LOG_DIR/voms.voms1.2
     set res [expr $res + [catch {set out [exec $::INSTALLDIR/bin/voms-proxy-init --voms voms1 >>& $outname]}]]
     set res [expr $res + [catch {set out [exec $::INSTALLDIR/bin/voms-proxy-init --voms voms1 >>& $outname]}]]
     _vomsStop voms1
 
-    if [file exists $::INSTALLDIR/var/log/voms.voms1] then {
+    if [file exists $::LOG_DIR/voms.voms1] then {
         testmessage "Making rotation less sensible to missing files worked."
         return $::PASSTEST
     } else {
         set outname1 [exec mktemp $::SCRATCHDIR/voms-proxy-init-XXXXXX]
-        exec ls $::INSTALLDIR/var/log >& $outname1
+        exec ls $::LOG_DIR >& $outname1
 
-        file delete -force $::INSTALLDIR/var/log
-        file mkdir $::INSTALLDIR/var/log
+        file delete -force $::LOG_DIR
+        file mkdir $::LOG_DIR
         addlog $outname1
         testmessage "State of logs is inconsistent."
         return $::FAILTEST

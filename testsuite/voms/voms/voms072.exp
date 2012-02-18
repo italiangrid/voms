@@ -5,9 +5,9 @@ proc mytest {} {
     _activateCert mycert2
 
     _removeVOMSOption voms1 syslog
-    file delete -force $::INSTALLDIR/var/log
+    file delete -force $::LOG_DIR
     set out [catch { _vomsStart voms1 } var]
-    file mkdir $::INSTALLDIR/var/log
+    file mkdir $::LOG_DIR
     catch { _vomsStop voms1 }
 
     if {$out == 1 } then {

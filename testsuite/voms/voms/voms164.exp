@@ -1,10 +1,10 @@
 load_lib vomstest.exp
 
-testheader "See if /etc/init.d/voms fails correctly to start correctly when the lokfile points to the wrong process."
+testheader "See if /etc/rc.d/init.d/voms fails correctly to start correctly when the lokfile points to the wrong process."
 
 proc myepilog {} {
     _vomsStop voms1
-    exec rm $::INSTALLDIR/var/lock/subsys/voms.voms1
+    exec rm $::LOCK_DIR/voms.voms1
 }
 proc mytest {} {
 
@@ -19,20 +19,20 @@ proc mytest {} {
     logvar pid
     set ppid [string range $pid 0 [string first " " $pid]]
     logvar ppid
-    set file "$::INSTALLDIR/var/lock/subsys/voms.voms1"
+    set file "$::LOCK_DIR/voms.voms1"
     logvar file
-    set id [open $::INSTALLDIR/var/lock/subsys/voms.voms1 "w+"]
+    set id [open $::LOCK_DIR/voms.voms1 "w+"]
     puts $id $pid
     close $id
     set opened "op"
     logvar opened
 
     _activateCert mycert2
-    set var "$::INSTALLDIR/var/lock/subsys/voms.voms1"
+    set var "$::LOCK_DIR/voms.voms1"
     logvar var
     _vomsStart voms1
 
-    set correct "lock file $::INSTALLDIR/var/lock/subsys/voms.voms1 seems to be stale"
+    set correct "lock file $::LOCK_DIR/voms.voms1 seems to be stale"
     logvar correct
     if [regexp $correct $::startOutput] then {
         testmessage "voms failed to start with the correct error."

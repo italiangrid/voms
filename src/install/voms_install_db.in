@@ -3,9 +3,11 @@
 
 # Default prefix
 @LOCATION_ENV@=@LOCATION_DIR@
-@VAR_LOCATION_ENV@=@VAR_DIR@
 
-# CERTDIR
+# Logfile location
+LOG_DIR=@VAR_DIR@/log/voms
+
+# Trust anchors location
 CERTDIR=${CERTDIR:-/etc/grid-security/certificates}
 
 # openssl
@@ -35,13 +37,7 @@ ECHO=/bin/echo
 
 # Default path
 basepath=$@LOCATION_ENV@
-if [ "$@LOCATION_ENV@" != "/usr" ] ; then
-    datapath=$@LOCATION_ENV@
-fi
-
-if [ "x$datapath@" = "x" ] ; then
-    datapath=@prefix@
-fi
+datapath=@ETC_DIR@
 
 # Default Suffix
 code=0
@@ -270,12 +266,15 @@ done
 #useradd -g voms voms 2>/dev/null
 
 # Setting ownership and permission for voms_password_query file
-mkdir -p $datapath/etc/voms/$voms_vo
-mkdir -p $@VAR_LOCATION_ENV@/log/
+mkdir -p $datapath/voms/$voms_vo
+mkdir -p $LOG_DIR
 #$datapath/log
-$ECHO $voms_password_query > $datapath/etc/voms/$voms_vo/voms.pass
-chown root.voms $datapath/etc/voms/$voms_vo/voms.pass
-chmod 640 $datapath/etc/voms/$voms_vo/voms.pass
+$ECHO $voms_password_query > $datapath/voms/$voms_vo/voms.pass
+
+uid=`/usr/bin/id -u`
+
+[ $uid = "0" ] && chown root.voms $datapath/voms/$voms_vo/voms.pass 
+chmod 640 $datapath/voms/$voms_vo/voms.pass
 
 if test -z $voms_vo ; then
     logname=voms
@@ -283,20 +282,20 @@ else
     logname=voms.$voms_vo
 fi
  
-$ECHO -en "--vo=$voms_vo\n--dbname=$voms_database\n--port=$port\n--username=$voms_username_query\n--passfile=$datapath/etc/voms/$voms_vo/voms.pass\n--sqlloc=$sqlloc\n--logfile=$@VAR_LOCATION_ENV@/log/$logname\n" > $datapath/etc/voms/$voms_vo/voms.conf
-$ECHO -en "--socktimeout=$timeout\n--loglevel=$loglevel\n--logtype=$logtype\n" >>$datapath/etc/voms/$voms_vo/voms.conf
+$ECHO -en "--vo=$voms_vo\n--dbname=$voms_database\n--port=$port\n--username=$voms_username_query\n--passfile=$datapath/voms/$voms_vo/voms.pass\n--sqlloc=$sqlloc\n--logfile=$LOG_DIR/$logname\n" > $datapath/voms/$voms_vo/voms.conf
+$ECHO -en "--socktimeout=$timeout\n--loglevel=$loglevel\n--logtype=$logtype\n" >>$datapath/voms/$voms_vo/voms.conf
 
 if test "x$compat_mode" = "x-compat"; then
-    $ECHO -en "--compat\n" >> $datapath/etc/voms/$voms_vo/voms.conf
+    $ECHO -en "--compat\n" >> $datapath/voms/$voms_vo/voms.conf
 fi
 if test "x$logformat" != "x"; then
-    $ECHO -en "--logformat=\"$logformat\"\n" >> $datapath/etc/voms/$voms_vo/voms.conf
+    $ECHO -en "--logformat=\"$logformat\"\n" >> $datapath/voms/$voms_vo/voms.conf
 fi
 if test "x$logdateformat" != "x"; then
-    $ECHO -en "--logdateformat=\"$logdateformat\"\n" >> $datapath/etc/voms/$voms_vo/voms.conf
+    $ECHO -en "--logdateformat=\"$logdateformat\"\n" >> $datapath/voms/$voms_vo/voms.conf
 fi
 if test "x$newformat" = "xyes"; then
-    $ECHO -en "--newformat\n" >> $datapath/etc/voms/$voms_vo/voms.conf
+    $ECHO -en "--newformat\n" >> $datapath/voms/$voms_vo/voms.conf
 fi
-$ECHO -en "--x509_user_cert=$vomscert\n" >> $datapath/etc/voms/$voms_vo/voms.conf
-$ECHO -en "--x509_user_key=$vomskey\n" >> $datapath/etc/voms/$voms_vo/voms.conf
+$ECHO -en "--x509_user_cert=$vomscert\n" >> $datapath/voms/$voms_vo/voms.conf
+$ECHO -en "--x509_user_key=$vomskey\n" >> $datapath/voms/$voms_vo/voms.conf

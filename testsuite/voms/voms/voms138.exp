@@ -2,9 +2,9 @@ load_lib vomstest.exp
 testheader "See if voms correctly exits when the password is incorrect."
 
 proc my_prolog {} {
-    file copy -force $::INSTALLDIR/etc/voms/voms1/voms.pass $::SCRATCHDIR/temp.pass
-    file delete $::INSTALLDIR/etc/voms/voms1/voms.pass
-    set id [open $::INSTALLDIR/etc/voms/voms1/voms.pass "w+"]
+    file copy -force $::ETC_DIR/voms/voms1/voms.pass $::SCRATCHDIR/temp.pass
+    file delete $::ETC_DIR/voms/voms1/voms.pass
+    set id [open $::ETC_DIR/voms/voms1/voms.pass "w+"]
     puts -nonewline $id "pppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppp"
     puts -nonewline $id "pppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppp"
     puts -nonewline $id "pppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppp"
@@ -20,13 +20,13 @@ proc my_prolog {} {
     puts -nonewline $id "pppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppp"
     puts $id "pppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppp"
     close $id
-    file attributes $::INSTALLDIR/etc/voms/voms1/voms.pass -permissions 00640
+    file attributes $::ETC_DIR/voms/voms1/voms.pass -permissions 00640
 }
 
 proc my_epilog {} {
-    file delete $::INSTALLDIR/etc/voms/voms1/voms.pass
-    file copy -force $::SCRATCHDIR/temp.pass $::INSTALLDIR/etc/voms/voms1/voms.pass 
-    file attributes $::INSTALLDIR/etc/voms/voms1/voms.pass -permissions 00640
+    file delete $::ETC_DIR/voms/voms1/voms.pass
+    file copy -force $::SCRATCHDIR/temp.pass $::ETC_DIR/voms/voms1/voms.pass 
+    file attributes $::ETC_DIR/voms/voms1/voms.pass -permissions 00640
 }
 
 proc mytest {} {
@@ -45,7 +45,7 @@ proc mytest {} {
         #VOMS did not run.  Let's check the logs
         set correct ".*Unable to connect to database: Access denied for user.*"
 
-        loadvar logs $::INSTALLDIR/var/log/voms.voms1
+        loadvar logs $::LOG_DIR/voms.voms1
 
         if [regexp $correct $logs] then {
             testmessage "the reason for failure was the correct one."

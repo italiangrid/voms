@@ -20,7 +20,7 @@ proc mytest {} {
         testmessage "proxy successfully created."
         return $::PASSTEST
     } else {
-        addlog $::INSTALLDIR/var/log/voms.voms1
+        addlog $::LOG_DIR/voms.voms1
         testmessage "voms proxy init returned error message."
         return $::FAILTEST
     }

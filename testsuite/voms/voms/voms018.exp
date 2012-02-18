@@ -7,14 +7,14 @@ proc mytest {} {
     _vomsStart voms1
     _vomsStop voms1
 
-    set attrs [file attributes $::INSTALLDIR/var/log/voms.voms1 -permissions]
+    set attrs [file attributes $::LOG_DIR/voms.voms1 -permissions]
 
     if [expr $attrs == 0600] then {
         testmessage "Attributes on log file are ok."
         return $::PASSTEST
     } else {
         set outname [exec mktemp $::SCRATCHDIR/voms-XXXXXX]
-        exec ls -l $::INSTALLDIR/var/log/voms.voms1 > $outname
+        exec ls -l $::LOG_DIR/voms.voms1 > $outname
         addlog $outname
         testmessage "Log file permissions incorrect."
         return $::FAILTEST

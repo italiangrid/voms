@@ -2,11 +2,11 @@ load_lib vomstest.exp
 testheader "See if voms correctly exits when the password file has the wrong privileges."
 
 proc my_prolog {} {
-    file attributes $::INSTALLDIR/etc/voms/voms1/voms.pass -permissions 00500
+    file attributes $::ETC_DIR/voms/voms1/voms.pass -permissions 00500
 }
 
 proc my_epilog {} {
-    file attributes $::INSTALLDIR/etc/voms/voms1/voms.pass -permissions 00640
+    file attributes $::ETC_DIR/voms/voms1/voms.pass -permissions 00640
 }
 
 proc mytest {} {
@@ -25,7 +25,7 @@ proc mytest {} {
         #VOMS did not run.  Let's check the logs
         set correct ".*Wrong permissions of password file\!.Needs to be 640.."
 
-        loadvar logs $::INSTALLDIR/var/log/voms.voms1
+        loadvar logs $::LOG_DIR/voms.voms1
 
         if [regexp $correct $logs] then {
             testmessage "the reason for failure was the correct one."

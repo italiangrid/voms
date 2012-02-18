@@ -64,7 +64,7 @@ proc _revoke_cert { cert name } {
 }
 
 proc _do_ca_dir_setup {} {
-    set ::_cadir   $::INSTALLDIR/etc/grid-security/certificates
+    set ::_cadir   $::ETC_DIR/grid-security/certificates
     set ::_capath  $::INSTALLDIR/ca
     set ::_certdir $::INSTALLDIR/certs
 

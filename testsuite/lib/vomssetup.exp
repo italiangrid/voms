@@ -69,16 +69,16 @@ proc _undefVOMSOption {name option} {
 }
 
 proc _makeVomses {name} {
-    file mkdir $::INSTALLDIR/etc/vomses
-    file attributes $::INSTALLDIR/etc/vomses -permissions 00700
-    set id [open "$::INSTALLDIR/etc/vomses/$name" "w+"]
+    file mkdir $::ETC_DIR/vomses
+    file attributes $::ETC_DIR/vomses -permissions 00700
+    set id [open "$::ETC_DIR/vomses/$name" "w+"]
     puts $id "\"$name\" \"localhost\" \"[exec cat $::_vomsdefinitions/$name/options/port]\" \"[_getdnfile $::INSTALLDIR/certs/hostcert.pem]\" \"$name\""
     close $id
-    file attributes $::INSTALLDIR/etc/vomses/$name -permissions 00644
+    file attributes $::ETC_DIR/vomses/$name -permissions 00644
 }
 
 proc _addVOMSOption {name option {value ""}} {
-    set filename $::INSTALLDIR/etc/voms/$name/voms.conf
+    set filename $::ETC_DIR/voms/$name/voms.conf
     set id [open $filename "a"]
     if [expr ! [string equal $value ""]] then {
         puts $id "--$option=$value"
@@ -89,23 +89,23 @@ proc _addVOMSOption {name option {value ""}} {
 }
 
 proc _removeVOMSOption {name option} {
-    exec grep -v "^--$option" $::INSTALLDIR/etc/voms/$name/voms.conf >$::SCRATCHDIR/newconf.conf
-    file copy -force $::SCRATCHDIR/newconf.conf $::INSTALLDIR/etc/voms/$name/voms.conf
+    exec grep -v "^--$option" $::ETC_DIR/voms/$name/voms.conf >$::SCRATCHDIR/newconf.conf
+    file copy -force $::SCRATCHDIR/newconf.conf $::ETC_DIR/voms/$name/voms.conf
 }
 
 proc _backupVOMS {name} {
-    file copy -force $::INSTALLDIR/etc/voms/$name/voms.conf $::INSTALLDIR/etc/voms/$name/voms.conf.back
+    file copy -force $::ETC_DIR/voms/$name/voms.conf $::ETC_DIR/voms/$name/voms.conf.back
 }
 
 proc _restoreVOMS {name} {
-    file copy -force $::INSTALLDIR/etc/voms/$name/voms.conf.back $::INSTALLDIR/etc/voms/$name/voms.conf
+    file copy -force $::ETC_DIR/voms/$name/voms.conf.back $::ETC_DIR/voms/$name/voms.conf
 }
 
 proc _vomsReload { name } {
     set saved ""
     catch {set saved $::env(GLITE_LOCATION)}
     set ::env(GLITE_LOCATION) $::INSTALLDIR
-    exec $::INSTALLDIR/etc/init.d/voms reload [exec cat $::_vomsdefinitions/$name/options/voms-vo] >/dev/null
+    exec $::ETC_DIR/rc.d/init.d/voms reload [exec cat $::_vomsdefinitions/$name/options/voms-vo] >/dev/null
     if [expr ! [string equal $saved ""]] then {
         set ::env(GLITE_LOCATION) $saved
     } else {
@@ -119,16 +119,16 @@ proc _vomsStart {name } {
     set ::_vomschannel ""
     catch {set saved $::env(GLITE_LOCATION)}
     set ::env(GLITE_LOCATION) $::INSTALLDIR
-    exec /bin/sh -c "rm -f $::INSTALLDIR/var/log/voms.$name*"
+    exec /bin/sh -c "rm -f $::LOG_DIR/voms.$name*"
     set myname [exec mktemp $::SCRATCHDIR/voms-stop-XXXXXX]
 
     if {[info exists ::VALGRIND]} then {
         set VALGRINDPART [_do_valgrind_cl]
         set voms_start "$::SCRATCHDIR/voms-start"
-        log_exec voms_start {$::INSTALLDIR/sbin/edg-voms --conf $::INSTALLDIR/etc/voms/$name/voms.conf >/dev/null}
+        log_exec voms_start {$::INSTALLDIR/sbin/edg-voms --conf $::ETC_DIR/voms/$name/voms.conf >/dev/null}
         exec touch $myname
     } else {
-        exec $::INSTALLDIR/etc/init.d/voms start [exec cat $::_vomsdefinitions/$name/options/voms-vo] >& $myname
+        exec $::ETC_DIR/rc.d/init.d/voms start [exec cat $::_vomsdefinitions/$name/options/voms-vo] >& $myname
     }
 
     loadvar ::startOutput $myname
@@ -156,7 +156,7 @@ proc _vomsStop {name } {
         catch {exec kill -9 `ps aux |grep valgrind | grep -v grep | tr -s ' ' | cut -d' ' -f2`}
         exec touch $myname
     } else {
-        exec $::INSTALLDIR/etc/init.d/voms stop [exec cat $::_vomsdefinitions/$name/options/voms-vo] >& $myname
+        exec $::ETC_DIR/rc.d/init.d/voms stop [exec cat $::_vomsdefinitions/$name/options/voms-vo] >& $myname
     }
 
     loadvar ::stopOutput $myname
@@ -189,7 +189,7 @@ proc _vomsSetup {name} {
             set options "$options --[file tail $f]=[exec cat $f] "
         }
     }
-    puts $id "GLITE_LOCATION=$::INSTALLDIR CERTDIR=$::INSTALLDIR/etc/grid-security/certificates $::INSTALLDIR/libexec/voms/voms_install_db $options"
+    puts $id "GLITE_LOCATION=$::INSTALLDIR CERTDIR=$::ETC_DIR/grid-security/certificates $::INSTALLDIR/share/voms/voms_install_db $options"
     flush $id
     close $id
 

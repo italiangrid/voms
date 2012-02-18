@@ -28,7 +28,7 @@ proc mytest {} {
         #VOMS did not run.  Let's check the logs
         set correct ".*LOG_ERROR:STARTUP:VOMSServer \\(vomsd.cc:\[0-9\]*\\):can\'t read password file\!.\""
 
-        loadvar logs $::INSTALLDIR/var/log/voms.voms1
+        loadvar logs $::LOG_DIR/voms.voms1
 
         if [regexp $correct $logs] then {
             testmessage "the reason for failure was the correct one."

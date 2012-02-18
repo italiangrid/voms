@@ -10,7 +10,7 @@ proc mytest {} {
 
     if $res then {
         addlog $outname 
-        addlog $::INSTALLDIR/var/log/voms.voms1
+        addlog $::LOG_DIR/voms.voms1
         testmessage "voms-proxy-init returned error message."
         return $::FAILTEST
     } else {

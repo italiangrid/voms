@@ -5,25 +5,25 @@ proc mytest {} {
     _activateCert mycert2
 
     _addVOMSOption voms1 logmax 0
-    file delete -force $::INSTALLDIR/var/log
-    file mkdir $::INSTALLDIR/var/log
-    exec dd if=/dev/zero of=$::INSTALLDIR/var/log/voms.voms1 count=21K >&/dev/null
+    file delete -force $::LOG_DIR
+    file mkdir $::LOG_DIR
+    exec dd if=/dev/zero of=$::LOG_DIR/voms.voms1 count=21K >&/dev/null
 
     _vomsStart voms1
     set res [log_exec outname {voms-proxy-init --voms voms1}]
     _vomsStop voms1
 
-    if [file exists $::INSTALLDIR/var/log/voms.voms1.1] then {
+    if [file exists $::LOG_DIR/voms.voms1.1] then {
         set outname1 [exec mktemp $::SCRATCHDIR/voms-proxy-init-XXXXXX]
-        exec ls $::INSTALLDIR/var/log >& $outname1
-        file delete -force $::INSTALLDIR/var/log
-        file mkdir $::INSTALLDIR/var/log
+        exec ls $::LOG_DIR >& $outname1
+        file delete -force $::LOG_DIR
+        file mkdir $::LOG_DIR
         addlog $outname1
         testmessage "Rotation happened anyway."
         return $::FAILTEST
     } else {
-        file delete -force $::INSTALLDIR/var/log
-        file mkdir $::INSTALLDIR/var/log
+        file delete -force $::LOG_DIR
+        file mkdir $::LOG_DIR
         testmessage "Rotation stopped as expected."
         return $::PASSTEST
     }

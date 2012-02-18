@@ -8,7 +8,7 @@ proc mytest {} {
     set res [log_exec outname {voms-proxy-init --voms voms1}]
     _vomsStop voms1
 
-    addlog $::INSTALLDIR/etc/voms/voms1/voms.conf
+    addlog $::ETC_DIR/voms/voms1/voms.conf
 
     if $res then {
         testmessage "certificates were considered different."

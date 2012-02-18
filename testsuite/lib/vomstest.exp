@@ -92,7 +92,7 @@ proc _inittests {} {
         puts -nonewline "."
         _activateHostCertificate mycert3
         puts -nonewline "."
-        set ::env(CERTDIR) "$::INSTALLDIR/etc/grid-security/certificates"
+        set ::env(CERTDIR) "$::ETC_DIR/grid-security/certificates"
         _vomsServersInit
         puts -nonewline "."
         set ::env(X509_USER_CERT) $::env(HOME)/.globus2/usercert.pem
@@ -100,16 +100,16 @@ proc _inittests {} {
         set ::env(X509_USER_PROXY) "/tmp/x509up_u[exec id -u]"
         set ::env(X509_CERT_DIR)  $::_cadir
         set ::env(X509_VOMS_DIR)  $::_vomsdir
-        set ::env(VOMS_USERCONF)  $::INSTALLDIR/etc/vomses
+        set ::env(VOMS_USERCONF)  $::ETC_DIR/vomses
 
         if [catch {set ::env(LD_LIBRARY_PATH) "$::INSTALLDIR/lib64:$::INSTALLDIR/lib:$::env(LD_LIBRARY_PATH)"}] then {
             set ::env(LD_LIBRARY_PATH) "$::INSTALLDIR/lib64:$::INSTALLDIR/lib"
         }
 
         puts -nonewline "."
-        _setJavaProperty CADIR   $::INSTALLDIR/etc/grid-security/certificates
+        _setJavaProperty CADIR   $::ETC_DIR/grid-security/certificates
         _setJavaProperty VOMSDIR $::INSTALLDIR/vomsdir
-        _setJavaProperty VOMSES_LOCATION $::INSTALLDIR/etc
+        _setJavaProperty VOMSES_LOCATION $::ETC_DIR
 	_setJavaProperty net.sourceforge.cobertura.datafile /home/marotta/gits/voms/src/api/java/cobertura.ser
         puts -nonewline "."
 

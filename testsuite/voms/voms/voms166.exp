@@ -12,13 +12,13 @@ proc myprolog {} {
         file rename ~/.voms ~/.voms.testsuite
     }
     file mkdir ~/.voms
-    file rename $::INSTALLDIR/etc/vomses ~/.voms/vomses
+    file rename $::ETC_DIR/vomses ~/.voms/vomses
     set ::__ENVVAR $::env(VOMS_USERCONF)
     unset ::env(VOMS_USERCONF)
 }
 
 proc myepilog {} {
-    file rename ~/.voms/vomses $::INSTALLDIR/etc/vomses
+    file rename ~/.voms/vomses $::ETC_DIR/vomses
 
     if [file exists ~/.voms.testsuite] {
         file rename ~/.voms.testsuite ~/.voms

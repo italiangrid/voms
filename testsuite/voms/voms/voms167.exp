@@ -20,13 +20,13 @@ proc myprolog {} {
     }
 
     file mkdir ~/.glite
-    file rename $::INSTALLDIR/etc/vomses ~/.glite/vomses
+    file rename $::ETC_DIR/vomses ~/.glite/vomses
     set ::__ENVVAR $::env(VOMS_USERCONF)
     unset ::env(VOMS_USERCONF)
 }
 
 proc myepilog {} {
-    file rename ~/.glite/vomses $::INSTALLDIR/etc/vomses
+    file rename ~/.glite/vomses $::ETC_DIR/vomses
 
     if [file exists ~/.voms.testsuite] {
         file rename ~/.voms.testsuite ~/.voms
