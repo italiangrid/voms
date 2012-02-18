@@ -32,25 +32,27 @@ proc fail message {
     global LOG_DIR
 
     addlog $LOG_DIR/voms.voms1
-    puts $_logdescriptor "<td align=\"left\" bgcolor=\"red\">failed</td><td>$message</td>"
-    puts $_logdescriptor "<td>"
+    puts $_logdescriptor "<td>$message</td>"
+    puts $_logdescriptor "<td class='test-artifacts'><ul>"
 
     foreach name [split $LOGOUTS] {
         if [file exists $name] then {
             set newname [exec mktemp $REPORTDIR/out-XXXXXX]
             file copy -force $name $newname
-            puts $_logdescriptor "<a href=\"$newname\">$name</a>"
+            puts $_logdescriptor "<li><a href=\"./[exec basename $newname]\">$name</a></li>"
         }
     }
-    puts $_logdescriptor "</td><tr>"
+	puts $_logdescriptor "</ul>"
+    puts $_logdescriptor "</td>"
+    puts $_logdescriptor "<td align=\"left\" class='test-failure'>failed</td></tr>"
     flush $_logdescriptor
     _fail $message
 }
 
 proc pass message {
     global _logdescriptor
-    puts $_logdescriptor "<td align=\"left\" bgcolor=\"green\">passed</td><td></td>"
-    puts $_logdescriptor "<td></td><tr>"
+    puts $_logdescriptor "<td colspan=2></td><td align=\"left\" class='test-success'>passed</td>"
+    puts $_logdescriptor "</tr>"
     flush $_logdescriptor
     _pass $message
 }
@@ -176,7 +178,7 @@ proc cleanup {} {
     catch {exec rm -rf $::SCRATCHDIR}
 }
 
-proc testheader {description {testname ""}} {
+proc testheader {description {related_issue ""}} {
     global REPORTDIR
 
     set scriptname [file normalize [uplevel info script]]
@@ -185,7 +187,14 @@ proc testheader {description {testname ""}} {
     set realname [string range $scriptname [string length $$fname] end]
     set newname [exec mktemp $REPORTDIR/out-XXXXXX]
     file copy -force $scriptname $newname
-    puts $::_logdescriptor "<tr><td align=\"left\"><a href=\"$newname\">$realname</a></td><td align=\"left\">$description</td>"
+	puts $::_logdescriptor "<tr><td><span class='test-description'>$description</span><span class='test-file'><a href=\"./[exec basename $newname]\">$realname</a></span>"
+
+	if { [string length $related_issue] > 0 } then {
+		
+		puts $::_logdescriptor "<div class='related-issue'><a href='$related_issue'>$related_issue</a></div>" 
+	}
+
+	puts $::_logdescriptor "</td>"
     set ::LOGOUTS ""
     set ::_testmessage ""
 }
@@ -226,6 +235,7 @@ proc real_do_test { name } {
     set realname [string range $scriptname [string length $$fname] end]
 
     #kill everything, just to be sure
+    catch {exec killall voms 2>/dev/null}
     catch {exec killall edg-voms 2>/dev/null}
     catch {exec killall middleman 2>/dev/null}
     catch {exec killall valgrind 2>/dev/null}

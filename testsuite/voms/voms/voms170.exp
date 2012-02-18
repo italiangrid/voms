@@ -1,0 +1,21 @@
+load_lib vomstest.exp
+testheader "Check that voms-proxy-init requesting more than two FQANs works as expected." "https://savannah.cern.ch/bugs/?91228"
+
+proc mytest {} {
+    _activateCert test_91228
+
+    _vomsStart voms1
+    set res [log_exec outname {voms-proxy-init -voms voms1:/voms1/Role=TestRole2 -voms voms1:/voms1/Role=TestRole3 -voms voms1:/voms1/Role=TestRole4 -voms voms1:/voms1/Role=TestRole5}]
+    _vomsStop voms1
+
+	if $res then {
+		addlog $outname
+		testmessage "voms-proxy-init failed in requesting > 2 FQANS!"
+		return $::FAILTEST
+	}
+
+	addlog $outname
+	return $::PASSTEST
+}
+
+do_test

@@ -69,16 +69,54 @@ proc _inittests {} {
         }
 
         puts -nonewline "."
-        puts $::_logdescriptor "<html><head><title>Test results on: [exec hostname] running [exec uname -a]</title></head>
-                <body>
-                      <h1>Test results on: [exec hostname] running [exec uname -a] on [exec date]</h3>
-                <table style=\"width: 100%;\" border=\"1\"><d>
+		puts $::_logdescriptor "<html><head><title>VOMS Testsuite results</title>
+			<style>
+			body { color: #333333; font-family: arial,sans-serif;
+				font: 81.25%/1 arial,helvetica,sans-serif;;
+			}
+			.test-file {
+				    font-size: x-small;
+			}
+			.test-description {
+				    font-weight: bold;
+			}
+			td.test-success {
+				    background-color: green;
+					    color: white;
+			}
+			td.test-failure {
+				    background-color: red;
+					    color: white;
+			}
+			td.test-artifacts {
+				    font-size: x-small;
+			}
+			td {
+				    padding: 1em;
+			}
+			th {
+				    background-color: #F5F5F5;
+				    padding: 1em;
+				    text-align: left;
+			}
+			</style>
+			</head>
+            <body>
+				<h1>VOMS testsuite results</h1>
+				<ul>
+					  	<li>Date: [exec date]</li>
+					  	<li>Hostname: [exec hostname]</li>
+						<li>Architecture: [exec uname -a]</li>
+					  </ul>
+					  	
+                <table style=\"width: 100%;\"><d>
                 <tr>
-                <th align=\"left\">test file</th>
-                <th align=\"left\">test name</th>
-                <th align=\"left\">result</th>
-                <th align=\"left\">comment</th>
-                <th align=\"left\">artifacts</th><tr>"
+                <th align=\"left\" width=\"70%\">Test info</th>
+                <th align=\"left\">Comment</th>
+                <th align=\"left\">Artifacts</th>
+                <th align=\"left\">Result</th>
+				</tr>"
+
         puts -nonewline "."
         if [string equal $::DOCOVERAGE "yes"] then {
             exec lcov --directory ../src/common --directory ../src/ac --directory ../src/sslutils --directory ../src/socklib --directory ../src/server --directory ../src/client --directory ../src/api/ccapi --directory ../src/utils -z -q >/dev/null
@@ -110,7 +148,7 @@ proc _inittests {} {
         _setJavaProperty CADIR   $::ETC_DIR/grid-security/certificates
         _setJavaProperty VOMSDIR $::INSTALLDIR/vomsdir
         _setJavaProperty VOMSES_LOCATION $::ETC_DIR
-	_setJavaProperty net.sourceforge.cobertura.datafile /home/marotta/gits/voms/src/api/java/cobertura.ser
+		_setJavaProperty net.sourceforge.cobertura.datafile /home/marotta/gits/voms/src/api/java/cobertura.ser
         puts -nonewline "."
 
         set ::vomsproxyinit    $::INSTALLDIR/bin/voms-proxy-init
@@ -144,11 +182,19 @@ proc _vomsServersInit {} {
     _vomscreategroup voms1 /voms1/group2 /voms1
     _vomscreategroup voms1 /voms1/group1/subgroup1 /voms1/group1
     puts -nonewline "."
+
     _vomscreaterole  voms1 TestRole
+	_vomscreaterole  voms1 TestRole2
+	_vomscreaterole  voms1 TestRole3
+	_vomscreaterole  voms1 TestRole4
+	_vomscreaterole  voms1 TestRole5
+
     _vomscreateuser  voms1 mycert2
     _vomscreateuser  voms1 passcert
     _vomscreateuser  voms1 limitedcert
+
     puts -nonewline "."
+
     _vomsaddusertogroup voms1 mycert2 "/voms1"
     _vomsaddusertogroup voms1 passcert "/voms1"
     _vomsaddusertogroup voms1 limitedcert "/voms1"
@@ -160,6 +206,17 @@ proc _vomsServersInit {} {
     _vomsgivegatogroupandrole  voms1 "/voms1/group1" "TestRole" shortid mycert2-r
 
     puts -nonewline "."
+
+	## Test for https://savannah.cern.ch/bugs/?91228
+	## Create user with multiple roles
+	_vomscreateuser voms1 test_91228
+	_vomsaddusertogroup voms1 test_91228 "/voms1"
+	_vomsaddusertogroup voms1 test_91228 "/voms1/group1"
+	_vomsaddusertogroupandrole voms1 test_91228 "/voms1" TestRole2
+	_vomsaddusertogroupandrole voms1 test_91228 "/voms1" TestRole3
+	_vomsaddusertogroupandrole voms1 test_91228 "/voms1" TestRole4
+	_vomsaddusertogroupandrole voms1 test_91228 "/voms1" TestRole5
+
     if {[string equal $::HAVEORACLE "yes"] } then {
         _setupNormalVomsOracle
         puts -nonewline "."
@@ -200,6 +257,7 @@ proc _setupPKI {} {
     puts -nonewline "."
     _make_ca_from_ca "/C=IT/O=INFN/CN=pathlimitedCA" testCA pathLimitedCA 0
     puts -nonewline "."
+	_make_cert_from_ca "/C=IT/CN=test-91228" caFromTestCA test_91228
     _make_cert_from_ca "/C=IT/CN=000" caFromTestCA mycert1
     _make_cert_from_ca "/C=IT/CN=001" caFromTestCA mycert2
     _make_cert_from_ca "/C=IT/CN=003" caFromTestCA mycert3
