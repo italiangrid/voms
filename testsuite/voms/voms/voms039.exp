@@ -1,5 +1,5 @@
 load_lib vomstest.exp
-testheader "See if voms-proxy-init --verify works."
+testheader "Check that revoked certificate is not accepted by VOMS."
 
 proc mytest {} {
     _activateCert mycertrevoked
@@ -10,6 +10,7 @@ proc mytest {} {
 
     if $res then {
         testmessage "certificate detected as revoked."
+		addlog $outname
         return $::PASSTEST
     } else {
         addlog $outname

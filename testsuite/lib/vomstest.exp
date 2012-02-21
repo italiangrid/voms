@@ -217,6 +217,10 @@ proc _vomsServersInit {} {
 	_vomsaddusertogroupandrole voms1 test_91228 "/voms1" TestRole4
 	_vomsaddusertogroupandrole voms1 test_91228 "/voms1" TestRole5
 
+	## Put user with revoked certificate inside VOMS database
+	_vomscreateuser voms1 mycertrevoked
+	_vomsaddusertogroup voms1 mycertrevoked "/voms1"
+
     if {[string equal $::HAVEORACLE "yes"] } then {
         _setupNormalVomsOracle
         puts -nonewline "."

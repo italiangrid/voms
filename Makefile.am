@@ -10,7 +10,6 @@ APIDOC_FILES = $(top_srcdir)/AUTHORS $(top_srcdir)/INSTALL $(top_srcdir)/LICENSE
 USERDOC_FILES = $(APIDOC_FILES)
 
 spec=spec/voms-all.spec
-rpmdist=""
 deb_comp="libvomsapi1 voms-dev voms-clients voms-server"
 
 rpmbuild_dir=@WORKDIR@/rpmbuild
@@ -63,7 +62,7 @@ distclean-local:
 rpm: dist
 	mkdir -p $(rpmbuild_dir)/BUILD $(rpmbuild_dir)/RPMS $(rpmbuild_dir)/SOURCES $(rpmbuild_dir)/SPECS $(rpmbuild_dir)/SRPMS
 	cp $(distdir).tar.gz $(rpmbuild_dir)/SOURCES
-	rpmbuild --nodeps -v -ba $(spec) --define "_topdir $(rpmbuild_dir)" --define "dist $(rpmdist)"
+	rpmbuild --nodeps -v -ba $(spec) --define "_topdir $(rpmbuild_dir)"
 
 deb: dist
 	mkdir -p $(debbuild_dir)

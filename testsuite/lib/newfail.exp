@@ -50,8 +50,26 @@ proc fail message {
 }
 
 proc pass message {
+    global LOGOUTS
+    global REPORTDIR
     global _logdescriptor
-    puts $_logdescriptor "<td colspan=2></td><td align=\"left\" class='test-success'>passed</td>"
+    global INSTALLDIR
+    global LOG_DIR
+
+    addlog $LOG_DIR/voms.voms1
+
+    puts $_logdescriptor "<td></td><td><ul>"
+
+	foreach name [split $LOGOUTS] {
+        if [file exists $name] then {
+            set newname [exec mktemp $REPORTDIR/out-XXXXXX]
+            file copy -force $name $newname
+            puts $_logdescriptor "<li><a href=\"./[exec basename $newname]\">$name</a></li>"
+        }
+    }
+
+	puts $_logdescriptor "</ul></td>"
+    puts $_logdescriptor "<td align=\"left\" class='test-success'>passed</td>"
     puts $_logdescriptor "</tr>"
     flush $_logdescriptor
     _pass $message
