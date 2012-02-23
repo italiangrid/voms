@@ -69,10 +69,6 @@ deb: dist
 	cp $(distdir).tar.gz $(debbuild_dir)/$(PACKAGE)_$(VERSION).orig.tar.gz
 	tar -C $(debbuild_dir) -xvzf $(distdir).tar.gz
 	cp -r debian $(debbuild_dir)/$(PACKAGE)-$(VERSION)
-	for c in $(deb_comp); do \
-		echo >> $(debbuild_dir)/$(PACKAGE)-$(VERSION)/debian/control; \
-		cat debian/$$c.control >> $(debbuild_dir)/$(PACKAGE)-$(VERSION)/debian/control; \
-	done
 	cd $(debbuild_dir)/$(PACKAGE)-$(VERSION); debuild -uc -us
 
 etics: clean rpm 
