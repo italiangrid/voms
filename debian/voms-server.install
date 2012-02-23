@@ -1,0 +1,12 @@
+debian/tmp/usr/sbin/voms
+debian/tmp/usr/share/voms/mysql2oracle
+debian/tmp/usr/share/voms/upgrade1to2
+debian/tmp/usr/share/voms/voms.data
+debian/tmp/usr/share/voms/voms_install_db
+debian/tmp/usr/share/voms/voms-ping
+debian/tmp/usr/share/voms/voms_replica_master_setup.sh
+debian/tmp/usr/share/voms/voms_replica_slave_setup.sh
+debian/tmp/usr/share/man/man8/voms.8*
+debian/tmp/etc/voms
+debian/tmp/etc/grid-security/voms
+debian/tmp/var/log/voms

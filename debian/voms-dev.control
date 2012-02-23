@@ -1,0 +1,14 @@
+Package: voms-dev
+Section: libdevel
+Architecture: any
+Depends: libvomsapi1 (= ${binary:Version}), libssl-dev, ${misc:Depends}
+Suggests: voms-doc
+Description: The Virtual Organisation Membership Service C++ APIs (Development files)
+ The Virtual Organization Membership Service (VOMS) is an attribute authority
+ which serves as central repository for VO user authorization information,
+ providing support for sorting users into group hierarchies, keeping track of
+ their roles and other attributes in order to issue trusted attribute
+ certificates and SAML assertions used in the Grid environment for
+ authorization purposes.
+ This package offers header files for programming with the VOMS libraries.
+

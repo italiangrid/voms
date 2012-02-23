@@ -1,0 +1,25 @@
+#!/bin/sh
+
+set -e
+
+if test "$1" = "configure" -o "$1" = "reconfigure" ; then
+
+    test -r /etc/default/voms && . /etc/default/voms
+
+    if test -z "$VOMS_USER" -o "$VOMS_USER" = "voms" ; then
+
+	getent group voms > /dev/null || \
+	    addgroup --quiet --system voms
+
+	getent passwd voms > /dev/null || \
+	    adduser --quiet --system --home /etc/voms --shell /bin/false \
+	    --ingroup voms --disabled-password --disabled-login \
+	    --gecos "VOMS Server Account" voms
+
+	chown voms:voms /var/log/voms
+
+    fi
+
+fi
+
+#DEBHELPER#
