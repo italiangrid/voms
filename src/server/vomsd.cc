@@ -350,7 +350,6 @@ VOMSServer::VOMSServer(int argc, char *argv[]) : sock(0,NULL,50,false),
                                                  base64encoding(false),
                                                  nologfile(false)
 {
-  struct stat statbuf;
   selfpointer = this;
 
   signal(SIGCHLD, sigchld_handler);
@@ -588,10 +587,12 @@ VOMSServer::VOMSServer(int argc, char *argv[]) : sock(0,NULL,50,false),
     if (v < 2) {
       LOGM(VARP, logh, LEV_ERROR, T_PRE, "Detected DB Version: %d. Required DB version >= 2", v);
       std::cerr << "Detected DB Version: " << v << ". Required DB version >= 2";
+
       throw VOMSInitException("wrong database version");
     }
   }
   else {
+
     LOGM(VARP, logh, LEV_ERROR, T_PRE, "Error connecting to the database : %s", errormessage.c_str());
     throw VOMSInitException((std::string("Error connecting to the database : ") + errormessage));
   }
@@ -700,18 +701,24 @@ void VOMSServer::Run()
           (void)SetCurLogType(logh, T_REQUEST);
 
           if (!gatekeeper_test && !debug) {
+            
             pid = fork();
+            
             if (pid) {
-              LOGM(VARP, logh, LEV_INFO, T_PRE, "Starting Executor with pid = %d", pid);
+            
+              LOGM(VARP, logh, LEV_INFO, T_PRE, "Started Executor with pid = %d", pid);
               sock.CloseListened();
             }
           }
 
           if (!pid) {
+
+            // Children process executor
             bool value = false;
 
             if (!debug && !gatekeeper_test)
               sock.CloseListener();
+
             if (sock.AcceptGSIAuthentication()) {
 
               LOGM(VARP, logh, LEV_INFO, T_PRE, "Self    : %s", sock.own_subject.c_str());
@@ -741,17 +748,31 @@ void VOMSServer::Run()
                 LOGM(VARP, logh, LEV_DEBUG, T_PRE, "peek data: %s", peek.c_str());
               }
 
+              // This is where all the handling logic happens now, when
+              // a REST request is received.
+
+              LOG(logh, LEV_DEBUG, T_PRE, "Starting Execution.");
               if (peek == "GET") {
+
+                LOG(logh, LEV_DEBUG, T_PRE, "Received REST request.");
                 sop->socket = sock.newsock;
                 sop->ssl = sock.ssl;
                 sop->fparse(sop);
-                return;
+
+                sock.Close();
+                exit(1);
               }
-              LOG(logh, LEV_DEBUG, T_PRE, "Starting Execution.");
+
+              // Old legacy interface (pre voms 2.0)
               Execute(sock.own_key, sock.own_cert, sock.peer_cert);
             }
             else {
-              LOGM(VARP, logh, LEV_INFO, T_PRE, "Failed to authenticate peer");
+              
+              std::string openssl_error = OpenSSLError(true);
+
+              LOGM(VARP, logh, LEV_INFO, T_PRE, "Failed to authenticate peer.");
+              LOGM(VARP, logh, LEV_INFO, T_PRE, "OpenSSL error: %s", openssl_error.c_str());
+
               sock.CleanSocket();
             }
 
