@@ -88,7 +88,7 @@ fi
 %{_mandir}/man3/*
 
 %changelog
-* Tue Apr 10 2011 Andrea Ceccanti <andrea.ceccanti at cnaf.infn.it> - 2.0.8-1
+* Tue Apr 10 2012 Andrea Ceccanti <andrea.ceccanti at cnaf.infn.it> - 2.0.8-1
 - EMI 2 release.
 
 * Thu Dec 15 2011 Andrea Ceccanti <andrea.ceccanti at cnaf.infn.it> - 2.0.7-1
