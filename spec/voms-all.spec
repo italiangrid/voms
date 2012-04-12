@@ -160,9 +160,9 @@ getent passwd %{name} >/dev/null || useradd -r -g %{name} \
 exit 0
 
 %post server
-if [ $1 = 1 ]; then
-    /sbin/chkconfig --add %{name}
-fi
+
+/sbin/chkconfig --add %{name}
+
 
 %preun server
 if [ $1 = 0 ]; then
