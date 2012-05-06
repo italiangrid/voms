@@ -263,13 +263,35 @@ GSISocketClient::Open()
   SSL_CTX_set_cipher_list(ctx, "ALL:!LOW:!EXP:!MD5:!MD2");    
   SSL_CTX_set_purpose(ctx, X509_PURPOSE_ANY);
   SSL_CTX_set_mode(ctx, SSL_MODE_AUTO_RETRY);
-  
 
+  if (cert_chain){
+    int num_certs = sk_X509_num(cert_chain);
+    for (int i=0; i< num_certs;i++){
+      
+      // Dup certificate
+      X509* cert = X509_dup(sk_X509_value(cert_chain,i));
+
+      if(!SSL_CTX_add_extra_chain_cert(ctx, cert)){
+
+        if (ERR_GET_REASON(ERR_peek_error()) == X509_R_CERT_ALREADY_IN_HASH_TABLE) {
+          ERR_clear_error();
+          continue;
+        } else {
+          SetErrorOpenSSL("Cannot add certificate to the SSL context's certificate store");
+          goto err;
+          
+        }    
+      }
+    }
+  }
+  
+#if 0
   if (cert_chain) {
     /*
      * Certificate was a proxy with a cert. chain.
      * Add the certificates one by one to the chain.
      */
+    
     X509_STORE_add_cert(ctx->cert_store, ucert);
     for (int i = 0; i <sk_X509_num(cert_chain); ++i) {
       X509 *cert = (sk_X509_value(cert_chain,i));
@@ -285,10 +307,13 @@ GSISocketClient::Open()
         }
       }
     }
+
 #if OPENSSL_VERSION_NUMBER >= 0x10000000L
     X509_STORE_set_verify_cb(ctx->cert_store, proxy_verify_callback);
 #endif
+
   }
+#endif
 
   snprintf(portstring, 35, "%ld", (long int)port);
   fd = sock_connect(host.c_str(), portstring);

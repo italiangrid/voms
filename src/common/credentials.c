@@ -71,8 +71,10 @@ get_real_cert(X509 *base, STACK_OF(X509) *stk)
   if (!proxy_check_proxy_name(base))
     return base;
 
+  int num_certs = sk_X509_num(stk);
+
   /* Determine id data */
-  for (i = 0; i < sk_X509_num(stk); i++) {
+  for (i = 0; i < num_certs; i++) {
     cert = sk_X509_value(stk, i);
     if (!proxy_check_proxy_name(cert)) {
       return cert;

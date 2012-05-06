@@ -1597,11 +1597,13 @@ int proxy_check_proxy_name(
 {
     int                                 ret = 0;
     X509_NAME *                         subject;
-    X509_NAME *                         name = NULL;
-    X509_NAME_ENTRY *                   ne = NULL;
+    X509_NAME *                         issuer_name = NULL;
+    X509_NAME_ENTRY *                   last_cn = NULL;
     ASN1_STRING *                       data;
     int nidv3, nidv4 = 0;
     int indexv3 = -1, indexv4 = -1;
+    unsigned char found_proxy = 0,
+		found_limited_proxy = 0;
 
     nidv3 = my_txt2nid(PROXYCERTINFO_V3);
     nidv4 = my_txt2nid(PROXYCERTINFO_V4);
@@ -1613,6 +1615,7 @@ int proxy_check_proxy_name(
     indexv4 = X509_get_ext_by_NID(cert, nidv4, -1);
 
     if (indexv3 != -1 || indexv4 != -1) {
+
       /* Its a proxy! */
       X509_EXTENSION *ext = X509_get_ext(cert, (indexv3 == -1 ? indexv4 : indexv3));
 
@@ -1641,58 +1644,69 @@ int proxy_check_proxy_name(
         return 1;
       }
     }
+
     subject = X509_get_subject_name(cert);
-    ne = X509_NAME_get_entry(subject, X509_NAME_entry_count(subject)-1);
-    
-    if (!OBJ_cmp(ne->object,OBJ_nid2obj(NID_commonName)))
+    last_cn = X509_NAME_get_entry(subject, X509_NAME_entry_count(subject)-1);
+
+    /* If the last part of the subject name is a CN */
+    if (!OBJ_cmp(last_cn->object,OBJ_nid2obj(NID_commonName)))
     {
-        data = X509_NAME_ENTRY_get_data(ne);
-        if ((data->length == 5 && 
-             !memcmp(data->data,"proxy",5)) || 
-            (data->length == 13 && 
-             !memcmp(data->data,"limited proxy",13)))
-        {
-        
-            if (data->length == 13)
+        data = X509_NAME_ENTRY_get_data(last_cn);
+
+	if (data->length == 5 && !strncmp(data->data, "proxy",5))
+	{
+		found_proxy = 1;
+		ret = 1;
+	}
+
+	if (data->length == 13 && !strncmp(data->data, "limited proxy",13))
+	{
+		found_limited_proxy = 1;
+		ret = 2;
+	}
+
+	if (found_proxy || found_limited_proxy)
+	{
+
+      	    /* 
+	     * We now check equality between this subject and
+	     * the issuer plus an additional CN=proxy.
+	     *
+             * /
+
+	    /* We dup the issuer name */
+            issuer_name = X509_NAME_dup(X509_get_issuer_name(cert));
+
+	    /* Create additional CN object */
+	    unsigned char *last_cn_entry;
+            
+            if (found_proxy) last_cn_entry = "proxy";
+            if (found_limited_proxy) last_cn_entry = "limited proxy";
+
+	    last_cn = X509_NAME_ENTRY_create_by_NID(NULL,
+                                                NID_commonName,
+                                                V_ASN1_APP_CHOOSE,
+                                                last_cn_entry,
+                                                -1);
+            /* Add last CN to issuer name */
+            X509_NAME_add_entry(issuer_name,
+                                last_cn,
+                                X509_NAME_entry_count(issuer_name),
+				0);
+            
+            /* Check equality between subject and the just built issuer */
+
+            if (X509_NAME_cmp_no_set(issuer_name, subject))
             {
-                ret = 2; /* its a limited proxy */
+                /* Reject certificate */
+                ret=-1;
             }
-            else
-            {
-                ret = 1; /* its a proxy */
-            }
-            /*
-             * Lets dup the issuer, and add the CN=proxy. This should
-             * match the subject. i.e. proxy can only be signed by
-             * the owner.  We do it this way, to double check
-             * all the ANS1 bits as well.
-             */
 
-            /* DEE? needs some more err processing here */
 
-            name = X509_NAME_dup(X509_get_issuer_name(cert));
-            ne = X509_NAME_ENTRY_create_by_NID(NULL,
-                                               NID_commonName,
-                                               V_ASN1_APP_CHOOSE,
-                                               (ret == 2) ?
-                                               (unsigned char *)
-                                               "limited proxy" :
-                                               (unsigned char *)"proxy",
-                                               -1);
-
-            X509_NAME_add_entry(name,ne,X509_NAME_entry_count(name),0);
-            X509_NAME_ENTRY_free(ne);
-            ne = NULL;
-
-            if (X509_NAME_cmp_no_set(name,subject))
-            {
-                /*
-                 * Reject this certificate, only the user
-                 * may sign the proxy
-                 */
-                ret = -1;
-            }
-            X509_NAME_free(name);
+            /* Cleanup */
+            X509_NAME_ENTRY_free(last_cn);
+            X509_NAME_free(issuer_name);
+            last_cn = NULL;
         }
     }
 
@@ -1707,7 +1721,6 @@ int proxy_check_proxy_name(
     }
 #endif
 #endif
-
     return ret;
 }
 

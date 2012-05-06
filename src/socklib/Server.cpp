@@ -392,19 +392,20 @@ GSISocketServer::AcceptGSIAuthentication()
     goto err;
   }
 
-
+  
+  // Context enstabilished
   actual_cert = SSL_get_peer_certificate(ssl);
   peer_stack  = SSL_get_peer_cert_chain(ssl);
 
   char buffer[1000];
 
-  if (LogLevelMin(logh, LEV_DEBUG)) {
+//  if (LogLevelMin(logh, LEV_DEBUG)) {
       LOGM(VARP, logh, LEV_DEBUG, T_PRE, "Certificate DN: %s",
            X509_NAME_oneline(X509_get_subject_name(actual_cert), buffer, 999));
       LOGM(VARP, logh, LEV_DEBUG, T_PRE, "Certificate CA: %s",
            X509_NAME_oneline(X509_get_issuer_name(actual_cert), buffer, 999));
       LOGM(VARP, logh, LEV_DEBUG, T_PRE, "Stack Size: %d", sk_X509_num(peer_stack));
-  }
+//  }
 
   peer_cert = get_real_cert(actual_cert, peer_stack);
 
@@ -414,7 +415,7 @@ GSISocketServer::AcceptGSIAuthentication()
     OPENSSL_free(name);
   }
 
-  if (LogLevelMin(logh, LEV_DEBUG)) {
+  if (LogLevelMin(logh, LEV_DEBUG)){
     for (int i = 0; i < sk_X509_num(peer_stack); i++) {
       X509 *cert = sk_X509_value(peer_stack, i);
       LOGM(VARP, logh, LEV_DEBUG, T_PRE, "Certificate DN: %s",
