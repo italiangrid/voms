@@ -285,36 +285,6 @@ GSISocketClient::Open()
     }
   }
   
-#if 0
-  if (cert_chain) {
-    /*
-     * Certificate was a proxy with a cert. chain.
-     * Add the certificates one by one to the chain.
-     */
-    
-    X509_STORE_add_cert(ctx->cert_store, ucert);
-    for (int i = 0; i <sk_X509_num(cert_chain); ++i) {
-      X509 *cert = (sk_X509_value(cert_chain,i));
-
-      if (!X509_STORE_add_cert(ctx->cert_store, cert)) {
-        if (ERR_GET_REASON(ERR_peek_error()) == X509_R_CERT_ALREADY_IN_HASH_TABLE) {
-          ERR_clear_error();
-          continue;
-        }
-        else {
-          SetErrorOpenSSL("Cannot add certificate to the SSL context's certificate store");
-          goto err;
-        }
-      }
-    }
-
-#if OPENSSL_VERSION_NUMBER >= 0x10000000L
-    X509_STORE_set_verify_cb(ctx->cert_store, proxy_verify_callback);
-#endif
-
-  }
-#endif
-
   snprintf(portstring, 35, "%ld", (long int)port);
   fd = sock_connect(host.c_str(), portstring);
 
