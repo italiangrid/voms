@@ -778,7 +778,17 @@ proxy_genreq(
     name = NULL;
     X509_REQ_set_pubkey(req,pkey);
 
-    if (!X509_REQ_sign(req,pkey,EVP_sha1()))
+    EVP_MD* md = EVP_get_digestbyobj(req->sig_alg->algorithm);
+
+    if ( ucert ){
+     
+     md = EVP_get_digestbyobj(ucert->sig_alg->algorithm); 
+    
+    }
+
+    if (md == NULL) md = EVP_sha1();
+
+    if (!X509_REQ_sign(req,pkey,md))
     {
         PRXYerr(PRXYERR_F_PROXY_GENREQ,PRXYERR_R_PROCESS_SIGN);
         goto err;
@@ -882,16 +892,21 @@ proxy_sign(
 
     unsigned char                       md[SHA_DIGEST_LENGTH];
     unsigned int                        len;
+    EVP_MD* sig_algo; 
+    
+    sig_algo = EVP_get_digestbyobj(req->sig_alg->algorithm);
+    if (sig_algo == NULL) sig_algo = EVP_sha1();
 
 
     if(proxyver>=3) {
       long sub_hash;
 
       user_public_key = X509_get_pubkey(user_cert);
+
 #ifdef TYPEDEF_I2D_OF
-      ASN1_digest((i2d_of_void*)i2d_PUBKEY, EVP_sha1(), (char *) user_public_key, md, &len);
+      ASN1_digest((i2d_of_void*)i2d_PUBKEY, sig_algo, (char *) user_public_key, md, &len);
 #else
-      ASN1_digest(i2d_PUBKEY, EVP_sha1(), (char *) user_public_key, md, &len);
+      ASN1_digest(i2d_PUBKEY, sig_algo, (char *) user_public_key, md, &len);
 #endif
       EVP_PKEY_free(user_public_key);
 
@@ -927,7 +942,7 @@ proxy_sign(
 
     if(proxy_sign_ext(user_cert,
                       user_private_key,
-                      EVP_sha1(), 
+                      sig_algo, 
                       req,
                       new_cert,
                       subject_name,
@@ -1024,6 +1039,10 @@ proxy_sign_ext(
     int                                 i;
     unsigned char                       md[SHA_DIGEST_LENGTH];
     unsigned int                        len;
+    EVP_MD*                             sig_algo;
+
+    sig_algo = EVP_get_digestbyobj(req->sig_alg->algorithm);
+    if (sig_algo == NULL) sig_algo = EVP_sha1();
 
     if (!selfsigned)
       user_cert_info = user_cert->cert_info;
@@ -1098,9 +1117,9 @@ proxy_sign_ext(
           
       new_public_key = X509_REQ_get_pubkey(req);
 #ifdef TYPEDEF_I2D_OF
-      ASN1_digest((i2d_of_void*)i2d_PUBKEY, EVP_sha1(), (char *) new_public_key, md, &len);
+      ASN1_digest((i2d_of_void*)i2d_PUBKEY, sig_algo, (char *) new_public_key, md, &len);
 #else
-      ASN1_digest(i2d_PUBKEY, EVP_sha1(), (char *) new_public_key, md, &len);
+      ASN1_digest(i2d_PUBKEY, sig_algo, (char *) new_public_key, md, &len);
 #endif
       EVP_PKEY_free(new_public_key);
       new_public_key = NULL;

@@ -332,8 +332,16 @@ int writeac(X509 *issuerc, STACK_OF(X509) *issuerstack, X509 *holder, EVP_PKEY *
   sk_GENERAL_NAME_push(a->acinfo->form->names, dirn2);
   a->acinfo->id = uid;
 
+  /* Use same signature algorithm used to sign the certificate */
+  EVP_MD *md = EVP_get_digestbyobj(a->sig_alg->algorithm);
+
+  if (md == NULL){
+    /* fall back to SHA1 */
+    md = EVP_sha1();
+  }
+
   ASN1_sign((int (*)())i2d_AC_INFO, a->acinfo->alg, a->sig_alg, a->signature,
-	    (char *)a->acinfo, pkey, EVP_sha1());
+	    (char *)a->acinfo, pkey, md);
 
   *ac = a;
   return 0;
