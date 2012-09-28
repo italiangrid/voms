@@ -261,19 +261,24 @@ struct VOMSProxy *VOMS_MakeProxy(struct VOMSProxyArguments *args, int *warning, 
   }
   else {
     ku_flags = get_KeyUsageFlags(args->cert);
-    ku_flags &= ~X509v3_KU_KEY_CERT_SIGN;
-    ku_flags &= ~X509v3_KU_NON_REPUDIATION;
+
+    if (ku_flags != 0) {
+      ku_flags &= ~X509v3_KU_KEY_CERT_SIGN;
+      ku_flags &= ~X509v3_KU_NON_REPUDIATION;
+    }
   }
 
-  if ((ex8 = set_KeyUsageFlags(ku_flags)) == NULL) {
-    PRXYerr(PRXYERR_F_PROXY_SIGN, PRXYERR_R_CLASS_ADD_EXT);
-    goto err;
+  if (ku_flags != 0) {
+    if ((ex8 = set_KeyUsageFlags(ku_flags)) == NULL) {
+      PRXYerr(PRXYERR_F_PROXY_SIGN, PRXYERR_R_CLASS_ADD_EXT);
+      goto err;
+    }
+
+    X509_EXTENSION_set_critical(ex8, 1);
+
+    if (!SET_EXT(ex8))
+      goto err;
   }
-
-  X509_EXTENSION_set_critical(ex8, 1);
-
-  if (!SET_EXT(ex8))
-    goto err;
 
   /* netscapeCert extension */
   if (args->netscape) {
