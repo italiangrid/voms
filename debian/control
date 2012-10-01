@@ -1,7 +1,7 @@
 Source: voms
 Priority: optional
 Maintainer: Andrea Ceccanti <andrea.ceccanti@cnaf.infn.it>
-Build-Depends: debhelper (>= 7.0.50~), autotools-dev,autoconf, automake,quilt,libssl-dev,libexpat1-dev,pkg-config,xsltproc,docbook-xml,docbook-xsl
+Build-Depends: debhelper (>= 7.0.50~), libtool, autotools-dev, autoconf, automake,quilt,libssl-dev,libexpat1-dev,pkg-config,xsltproc,docbook-xml,docbook-xsl
 Standards-Version: 3.8.4
 Section: libs
 Homepage: https://wiki.italiangrid.it/VOMS
