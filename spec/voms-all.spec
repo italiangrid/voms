@@ -232,8 +232,9 @@ fi
 
 %changelog
 
-* Fri Jun 22 2012 Andrea Ceccanti <andrea.ceccanti at cnaf.infn.it> - 2.0.9-1
-- SHA-2 support
+* Sat Oct 27 2012 Andrea Ceccanti <andrea.ceccanti at cnaf.infn.it> - 2.0.9-1
+- Fix for https://savannah.cern.ch/bugs/?91183
+- Fix for http://issues.cnaf.infn.it/browse/VOMS-128
 
 * Tue Apr 10 2012 Andrea Ceccanti <andrea.ceccanti at cnaf.infn.it> - 2.0.8-1
 - EMI 2 release.
