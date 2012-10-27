@@ -30,11 +30,22 @@ In order to build the pdf documentation you will need as well:
 
 # Build instructions
 
-```bash ./autogen.sh ./configure make make install ```
+```bash 
+./autogen.sh 
+./configure 
+make 
+make install 
+```
 
-In case you want to build rpm packages, run: ```bash make rpm ```
+In case you want to build rpm packages, run: 
+```bash 
+make rpm
+```
 
-To build debian packages run ```bash make deb ```
+To build debian packages run 
+```bash 
+make deb 
+```
 
 The usual rpm and deb packaging tools are required for the packaging to be
 successfull.
