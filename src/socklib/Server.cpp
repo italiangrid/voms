@@ -298,7 +298,8 @@ GSISocketServer::AcceptGSIAuthentication()
   int   flags;
 
   time_t curtime, starttime;
-  int ret, ret2;
+  int ret, accept_status;
+  bool accept_timed_out = false;
   int expected = 0;
   BIO *bio = NULL;
   char *cert_file, *user_cert, *user_key, *user_proxy;
@@ -368,30 +369,73 @@ GSISocketServer::AcceptGSIAuthentication()
 
   curtime = starttime = time(NULL);
 
-  ret = ret2 = -1;
+  ret = accept_status = -1;
   expected = 0;
 
   do {
-    ret = do_select(newsock, starttime, timeout, expected);
-    if (ret > 0) {
-      ret2 = SSL_accept(ssl);
-      curtime = time(NULL);
-      expected = errorcode = SSL_get_error(ssl, ret2);
-    }
-  } while (ret > 0 && (ret2 <= 0 && ((timeout == -1) ||
-           ((timeout != -1) &&
-            (curtime - starttime) < timeout)) &&
-           (errorcode == SSL_ERROR_WANT_READ ||
-            errorcode == SSL_ERROR_WANT_WRITE)));
 
-  if (ret2 <= 0 || ret <= 0) {
-    if (timeout != -1 && (curtime - starttime >= timeout))
-      SetError("Connection stuck during handshake: timeout reached.");
-    else
-      SetErrorOpenSSL("Error during SSL handshake:");
+    ret = do_select(newsock, starttime, timeout, expected);
+    LOGM(VARP, logh, LEV_DEBUG, T_PRE, "Select status: %d",ret);
+
+
+    if (ret == 0){
+
+      LOGM(VARP, logh, LEV_DEBUG, T_PRE, "Select timed out.");
+
+      if (curtime - starttime > timeout){
+        accept_timed_out = true;
+        break;
+
+      }else{
+
+        continue;
+      }
+      
+    }
+    
+    if (ret > 0) {
+      accept_status = SSL_accept(ssl);
+      curtime = time(NULL);
+      expected = errorcode = SSL_get_error(ssl, accept_status);
+
+      LOGM(VARP, logh, LEV_DEBUG, T_PRE, "Accept status: %d",accept_status);
+      LOGM(VARP, logh, LEV_DEBUG, T_PRE, "Error code: %d",errorcode);
+      LOGM(VARP, logh, LEV_DEBUG, T_PRE, "SSL_WANT_READ: %d, SSL_WANT_WRITE: %d",SSL_ERROR_WANT_READ, SSL_ERROR_WANT_WRITE);
+    }
+
+    if (ret < 0)
+      // No more data from the select
+      break;
+
+    if (accept_status == 1)
+      // SSL handshake completed
+      break;
+
+    if (timeout != -1 && (curtime - starttime > timeout)){
+      // Timeout reached
+      accept_timed_out = true;
+      break;
+    }
+
+    if (accept_status <= 0 && ( errorcode != SSL_ERROR_WANT_READ && errorcode != SSL_ERROR_WANT_WRITE ))
+      // SSL handshake error
+      break;
+    
+  } while (true);
+  
+  // Error enstabilishing context
+  if (accept_status != 1){
+
+    LOGM(VARP, logh, LEV_INFO, T_PRE, "Error enstabilishing SSL context.");
+
+    if (accept_timed_out){
+      SetError("SSL Handshake failed due to server timeout!");
+    }else{
+      SetErrorOpenSSL("SSL Handshake error:");
+    }
+
     goto err;
   }
-
   
   // Context enstabilished
   actual_cert = SSL_get_peer_certificate(ssl);
@@ -567,10 +611,13 @@ void GSISocketServer::SetError(const std::string &g)
   error = g;
 }
 
-void GSISocketServer::SetErrorOpenSSL(const std::string &message)
+void GSISocketServer::SetErrorOpenSSL(const std::string &preamble)
 {
-  error = message;
+  error = preamble;
 
-  error += OpenSSLError(true);
+  while( ERR_peek_error() ){
+    long error_code = ERR_get_error();
+    const char * error_message = ERR_error_string(error_code, NULL);
+    error += error_message;
+  }
 }
-

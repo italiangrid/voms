@@ -1,5 +1,5 @@
 Name: voms
-Version: 2.0.9
+Version: 2.0.10
 Release: 1%{?dist}
 Summary: The Virtual Organisation Membership Service C++ APIs
 
@@ -231,6 +231,8 @@ fi
 %{_mandir}/man8/voms.8*
 
 %changelog
+* Tue Jan 8 2013 Andrea Ceccanti <andrea.ceccanti at cnaf.infn.it> - 2.0.10-1
+- Fix for https://issues.infn.it/browse/VOMS-196
 
 * Sat Oct 27 2012 Andrea Ceccanti <andrea.ceccanti at cnaf.infn.it> - 2.0.9-1
 - Fix for https://savannah.cern.ch/bugs/?91183

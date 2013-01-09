@@ -149,5 +149,6 @@ public:
   bool            do_syslog;
   bool            base64encoding;
   bool            nologfile;
+  int             max_active_requests;
 };
 #endif

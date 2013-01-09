@@ -348,7 +348,8 @@ VOMSServer::VOMSServer(int argc, char *argv[]) : sock(0,NULL,50,false),
                                                  shortfqans(false),
                                                  do_syslog(false),
                                                  base64encoding(false),
-                                                 nologfile(false)
+                                                 nologfile(false),
+                                                 max_active_requests(50)
 {
   selfpointer = this;
 
@@ -405,6 +406,7 @@ VOMSServer::VOMSServer(int argc, char *argv[]) : sock(0,NULL,50,false),
     {"syslog",          0, (int *)&do_syslog,         OPT_BOOL},
     {"base64",          0, (int *)&base64encoding,    OPT_BOOL},
     {"nologfile",       0, (int *)&nologfile,         OPT_BOOL},
+    {"max-reqs",         1, &max_active_requests,      OPT_NUM},
     {0, 0, 0, 0}
   };
 
@@ -423,16 +425,15 @@ VOMSServer::VOMSServer(int argc, char *argv[]) : sock(0,NULL,50,false),
             "[-loglevel lev] [-logtype type] [-logformat format]\n"
             "[-logdateformat format] [-debug] [-backlog num] [-skipcacheck]\n"
             "[-version] [-sqlloc path] [-compat] [-logmax n] [-socktimeout n]\n"
-            "[-shortfqans] [-newformat] [-syslog] [-base64] [-nologfile]\n");
+            "[-shortfqans] [-newformat] [-syslog] [-base64] [-nologfile]\n"
+            "[-max_reqs max_concurrent_request_number]\n");
 
   if (!getopts(argc, argv, opts))
     throw VOMSInitException("unable to read options");
 
   maingroup = snprintf_wrap("/%s", voname.c_str());
 
-  if (socktimeout == -1 && debug)
-    socktimeout = 0;
-  else
+  if (socktimeout == -1)
     socktimeout = DEFAULT_TIMEOUT;
 
   if (code == -1)
@@ -477,9 +478,6 @@ VOMSServer::VOMSServer(int argc, char *argv[]) : sock(0,NULL,50,false),
       case 5: lev = LEV_DEBUG; break;
       default: lev = LEV_DEBUG; break;
       }
-      if (debug)
-        lev = LEV_DEBUG;
-
       if (lev == LEV_DEBUG)
         logt = T_STARTUP|T_REQUEST|T_RESULT;
 
@@ -501,13 +499,11 @@ VOMSServer::VOMSServer(int argc, char *argv[]) : sock(0,NULL,50,false),
   else
     throw VOMSInitException("logging startup failure");
 
-  if (debug) {
-    LOGM(VARP, logh, LEV_INFO, T_PRE, "Package: %s", SUBPACKAGE);
-    LOGM(VARP, logh, LEV_INFO, T_PRE, "Version: %s", VERSION);
-    LOGM(VARP, logh, LEV_INFO, T_PRE, "Compiled: %s %s", __DATE__, __TIME__);
-    for (int i = 0; i < argc; i++)
-      LOGM(VARP, logh, LEV_DEBUG, T_PRE, "argv[%d] = \"%s\"", i, argv[i]);
-  }
+  LOGM(VARP, logh, LEV_INFO, T_PRE, "Package: %s", SUBPACKAGE);
+  LOGM(VARP, logh, LEV_INFO, T_PRE, "Version: %s", VERSION);
+  LOGM(VARP, logh, LEV_INFO, T_PRE, "Compiled: %s %s", __DATE__, __TIME__);
+  for (int i = 0; i < argc; i++)
+    LOGM(VARP, logh, LEV_DEBUG, T_PRE, "argv[%d] = \"%s\"", i, argv[i]);
 
 
   LOG(logh, LEV_INFO, T_PRE, "Reconfigured server.");
@@ -597,6 +593,14 @@ VOMSServer::VOMSServer(int argc, char *argv[]) : sock(0,NULL,50,false),
     throw VOMSInitException((std::string("Error connecting to the database : ") + errormessage));
   }
 
+  /* Check the value of max_active_requests passed in from voms configuration */
+  if (max_active_requests <= 0){
+    LOGM(VARP, logh, LEV_ERROR, T_PRE, "Wrong value set for max_reqs option. Resetting default value: 50");
+    max_active_requests = 50;
+  }
+
+  LOGM(VARP, logh, LEV_INFO, T_PRE, "Maximum number of active requests: %d", max_active_requests);
+
   AdjustURI(uri, daemon_port);
 
   sock = GSISocketServer(daemon_port, NULL, backlog);
@@ -645,6 +649,8 @@ void VOMSServer::Run()
 {
   pid_t pid = 0;
   struct soap *sop = NULL;
+  int active_requests = 0;
+  int wait_status = 0;
 
   if (!x509_user_cert.empty())
     hostcert = (char*)x509_user_cert.c_str();
@@ -655,9 +661,10 @@ void VOMSServer::Run()
   if (!x509_cert_dir.empty())
     cacertdir = (char *)x509_cert_dir.c_str();
 
-  if (!debug)
+  if (!debug) {
     if (daemon(0,0))
       exit(0);
+  }
 
   fd_set rset;
   FD_ZERO(&rset);
@@ -697,104 +704,109 @@ void VOMSServer::Run()
       }
 
       if (FD_ISSET(sock.sck, &rset)) {
-        if (sock.Listen()) {
-          (void)SetCurLogType(logh, T_REQUEST);
 
-          if (!gatekeeper_test && !debug) {
-            
-            pid = fork();
-            
-            if (pid) {
-            
-              LOGM(VARP, logh, LEV_INFO, T_PRE, "Started Executor with pid = %d", pid);
-              sock.CloseListened();
-            }
-          }
-
-          if (!pid) {
-
-            // Children process executor
-            bool value = false;
-
-            if (!debug && !gatekeeper_test)
-              sock.CloseListener();
-
-            if (sock.AcceptGSIAuthentication()) {
-
-              LOGM(VARP, logh, LEV_INFO, T_PRE, "Self    : %s", sock.own_subject.c_str());
-              LOGM(VARP, logh, LEV_INFO, T_PRE, "Self CA : %s", sock.own_ca.c_str());
-
-              std::string user    = sock.peer_subject;
-              std::string userca  = sock.peer_ca;
-              subject = sock.own_subject;
-              ca = sock.own_ca;
-
-              LOGM(VARP, logh, LEV_INFO, T_PRE, "At: %s Received Contact :", timestamp());
-              LOGM(VARP, logh, LEV_INFO, T_PRE, " user: %s", user.c_str());
-              LOGM(VARP, logh, LEV_INFO, T_PRE, " ca  : %s", userca.c_str());
-              LOGM(VARP, logh, LEV_INFO, T_PRE, " serial: %s", sock.peer_serial.c_str());
-              std::string peek;
-
-              (void)sock.Peek(3, peek);
-
-              LOGM(VARP, logh, LEV_DEBUG, T_PRE, "peek data: %s", peek.c_str());
-
-              if (peek == "0") {
-                LOG(logh, LEV_DEBUG, T_PRE, "worhtless message for GSI compatibility. Discard");
-                std::string tmp;
-                sock.Receive(tmp); 
-                LOGM(VARP, logh, LEV_DEBUG, T_PRE, " discarded: %s", tmp.c_str());
-                (void)sock.Peek(3, peek);
-                LOGM(VARP, logh, LEV_DEBUG, T_PRE, "peek data: %s", peek.c_str());
-              }
-
-              // This is where all the handling logic happens now, when
-              // a REST request is received.
-
-              LOG(logh, LEV_DEBUG, T_PRE, "Starting Execution.");
-              if (peek == "GET") {
-
-                LOG(logh, LEV_DEBUG, T_PRE, "Received REST request.");
-                sop->socket = sock.newsock;
-                sop->ssl = sock.ssl;
-                sop->fparse(sop);
-
-                sock.Close();
-                exit(1);
-              }
-
-              // Old legacy interface (pre voms 2.0)
-              Execute(sock.own_key, sock.own_cert, sock.peer_cert);
-            }
-            else {
-              
-              std::string openssl_error = OpenSSLError(true);
-
-              LOGM(VARP, logh, LEV_INFO, T_PRE, "Failed to authenticate peer.");
-              LOGM(VARP, logh, LEV_INFO, T_PRE, "OpenSSL error: %s", openssl_error.c_str());
-
-              sock.CleanSocket();
-            }
-
-            if (!debug && !gatekeeper_test) {
-              sock.Close();
-              exit(value == false ? 1 : 0);
-            }
-            else {
-              sock.CloseListened();
-            }
-          }
-        }
-        else {
+        if (!sock.Listen()){
           LOGM(VARP, logh, LEV_ERROR, T_PRE, "Cannot listen on port %d", daemon_port);
           exit(1);
+        } 
+
+        (void)SetCurLogType(logh, T_REQUEST);
+
+        active_requests++;
+
+        // Wait for children termination before accepting
+        // new requests if we exceeded the number of active
+        // requests
+        if (active_requests > max_active_requests){
+
+          for (; active_requests > max_active_requests; --active_requests){
+            LOGM( VARP, 
+                logh, 
+                LEV_INFO, 
+                T_PRE, 
+                "Reached number of maximum active requests: %d. Waiting for some children process to finish.", 
+                max_active_requests);
+
+            wait(&wait_status);
+          }
         }
-      }
+
+        pid = fork();
+
+        if (pid) {
+
+          LOGM(VARP, logh, LEV_INFO, T_PRE, "Started child executor with pid = %d", pid);
+          sock.CloseListened();
+        }
+
+        if (!pid) {
+          //Children process
+          if (!sock.AcceptGSIAuthentication()){
+            // Print out handshake errors to logs
+            LOGM(VARP, logh, LEV_INFO, T_PRE, "Failed to authenticate peer.");
+            LOGM(VARP, logh, LEV_INFO, T_PRE, "OpenSSL error: %s", sock.error.c_str());
+            sock.CleanSocket();
+            sock.Close();
+            exit(1);
+          }
+
+          LOGM(VARP, logh, LEV_INFO, T_PRE, "SSL handshake completed succesfully.");
+          LOGM(VARP, logh, LEV_INFO, T_PRE, "Self    : %s", sock.own_subject.c_str());
+          LOGM(VARP, logh, LEV_INFO, T_PRE, "Self CA : %s", sock.own_ca.c_str());
+
+          std::string user    = sock.peer_subject;
+          std::string userca  = sock.peer_ca;
+          subject = sock.own_subject;
+          ca = sock.own_ca;
+
+          LOGM(VARP, logh, LEV_INFO, T_PRE, "At: %s Received Contact :", timestamp());
+          LOGM(VARP, logh, LEV_INFO, T_PRE, " user: %s", user.c_str());
+          LOGM(VARP, logh, LEV_INFO, T_PRE, " ca  : %s", userca.c_str());
+          LOGM(VARP, logh, LEV_INFO, T_PRE, " serial: %s", sock.peer_serial.c_str());
+          std::string peek;
+
+          (void)sock.Peek(3, peek);
+
+          LOGM(VARP, logh, LEV_DEBUG, T_PRE, "peek data: %s", peek.c_str());
+
+          if (peek == "0") {
+            LOG(logh, LEV_DEBUG, T_PRE, "worhtless message for GSI compatibility. Discard");
+            std::string tmp;
+            sock.Receive(tmp); 
+            LOGM(VARP, logh, LEV_DEBUG, T_PRE, " discarded: %s", tmp.c_str());
+            (void)sock.Peek(3, peek);
+            LOGM(VARP, logh, LEV_DEBUG, T_PRE, "peek data: %s", peek.c_str());
+          }
+
+          // This is where all the handling logic happens now, when
+          // a REST request is received.
+
+          LOG(logh, LEV_DEBUG, T_PRE, "Starting Execution.");
+          if (peek == "GET") {
+
+            LOG(logh, LEV_DEBUG, T_PRE, "Received REST request.");
+            sop->socket = sock.newsock;
+            sop->ssl = sock.ssl;
+            sop->fparse(sop);
+
+            sock.Close();
+            exit(0);
+          }
+
+          // Old legacy interface (pre voms 2.0)
+          Execute(sock.own_key, sock.own_cert, sock.peer_cert);
+          sock.Close();
+          exit(0);
+
+        } // Children execution frame   
+      } // if (FD_ISSET(sock.sck, &rset))
+
       FD_ZERO(&rset);
       FD_SET(sock.sck, &rset);
-    }
-  }
-  catch (...) {}
+
+    } // Outer foor loop
+  }catch (...) {}
+
 }
 
 bool VOMSServer::makeAC(vomsresult& vr, EVP_PKEY *key, X509 *issuer, 
@@ -1260,8 +1272,7 @@ void VOMSServer::UpdateOpts(void)
     case 5: lev = LEV_DEBUG; break;
     default: lev = LEV_DEBUG; break;
     }
-    if (debug)
-      lev = LEV_DEBUG;
+
     (void)LogLevel(logh, lev);
 
     if (lev == LEV_DEBUG)
@@ -1301,11 +1312,6 @@ void VOMSServer::UpdateOpts(void)
   if (!x509_user_key.empty()) {
     setenv("X509_USER_KEY", x509_user_key.c_str(), 1);
   }
-
-  if (debug)
-    LOG(logh, LEV_INFO, T_PRE, "DEBUG MODE ACTIVE ");
-  else
-    LOG(logh, LEV_INFO, T_PRE, "DEBUG MODE INACTIVE ");
 
   LOG(logh, LEV_INFO, T_PRE, "Reconfigured server.");
 }

@@ -37,5 +37,5 @@ int AC_Init(void)
   declareOIDs();
   ERR_load_AC_strings();
   return initEx();
-  PKCS12_PBE_add();
+  // PKCS12_PBE_add();
 }

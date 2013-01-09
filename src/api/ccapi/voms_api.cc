@@ -118,10 +118,6 @@ vomsdata::vomsdata(std::string voms_dir, std::string cert_dir) :  ca_cert_dir(ce
                                                                   verificationtime(0),
                                                                   vdp(NULL)
 {
-#ifndef NOGLOBUS
-   (void)globus_thread_once(&l_globus_once_control, l_init_globus_once_func);
-#endif
-
    if (!initialized) {
      initialized = true;
 #ifdef NOGLOBUS

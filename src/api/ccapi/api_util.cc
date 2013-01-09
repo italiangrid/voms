@@ -793,7 +793,6 @@ vomsdata::contact(const std::string &hostname, int port, UNUSED(const std::strin
     }
   }
   sock.LoadCredentials(ca_cert_dir.c_str(), ucert, cert_chain, upkey);
-  //  sock.SetFlags(GSS_C_MUTUAL_FLAG | GSS_C_CONF_FLAG | GSS_C_INTEG_FLAG);
   sock.SetTimeout(timeout);
 
   if (!sock.Open()) {
