@@ -700,6 +700,179 @@ A user can get help about all the commands provided by voms-admin by typing:
 ```bash
 voms-admin --help-commands
 ```
+# Command line clients
+
+## User credentials
+
+While user credentials may be put anywhere, and then their location passed to `voms-proxy-init` via the appropriate options, there are obviously default values.
+User credentials should be put in the .globus subdirectory. Both PKCS12 and PEM formatted credentials are okay. The default name for the PKCS12 are usercert.p12 or usercred.p12, while usercert.pem and userkey.pem are the default names for the PEM formatted one. In case both the PEM and PKCS12 formats are present, PEM takes precedence. The user certiﬁcate should at the most have permission 600, while the user key shoud be 400.
+
+## Creating a proxy
+
+This command `voms-proxy-init` is used to contact the VOMS server and retrieve an AC containing user attributes that will be included in the proxy certiﬁcates.
+
+```bash
+$ voms-proxy-init --voms voname
+```
+
+where voname is the name of the VO to which the user belongs. This will create a proxy containing all the groups
+to which the user belongs, but none of the roles. Also, the -voms option may be speciﬁed multiple times in case the
+user belongs to more than one VO. It is also possible to omit the –voms option entirely. This will however result in
+the creation of a completely globus-standard proxy, and is not advised since such proxies will not be usable under 
+gLite 3.0.0 and beyond.
+
+As stated above, no roles are ever include in proxy by default. In case they are needed, they must be
+explicitly requested. For example, to request the role sgm in the /test/italian group, the following
+syntax should be used:
+```bash
+$ voms-proxy-init --voms test:/test/italian/Role=sgm
+```
+
+thus obtaining a role that will be included in the AC, in addition to all the other information that will be
+normally present. In case multiple roles are needed, the -voms option may be used several times.
+
+By default, all FQANs explicitly requested on the command line will be present in the returned credentials,
+if they were granted, and in the exact order speciﬁed, with all other FQANs following in an unspeciﬁed
+ordering. If a speciﬁc order is needed, it should be explicitly requested via the -order option. For
+example, the following command line:
+
+```bash
+$ voms-proxy-init --voms test:/test/Role=sgm --order /test
+```
+
+asks for the Role sgm in the root group, and speciﬁes that the resulting AC should begin with membership
+in the root group instead, while posing no requirements on the ordering of the remaining FQANs. This
+also means that with the above command line there is no guarantee that the role will end up as the second
+FQAN. If this is desired, use the following command line instead:
+```bash
+$ voms-proxy-init --voms test:/test/Role=sgm --order /test --order /test/Role=sgm
+```
+
+The validity of an AC created by VOMS will generally be as long as the proxy which contains it. However,
+this cannot always be true. For starters, the VOMS server is conﬁgured with a maximum validity for all
+the ACs it will create, and a request to exceed it will simply be ignored. If this happens, the output of
+voms-proxy-init will indicate the fact.
+
+For example, in the following output (slightly reformatted for a shorter line then on screen):
+
+```bash
+$ voms-proxy-init --voms valerio --vomslife 50:15
+Enter GRID pass phrase:
+Your identity: /C=IT/O=INFN/OU=Personal Certificate/L=CNAF/CN=Vincenzo Ciaschini
+Creating temporary proxy .................................... Done
+Contacting datatag6.cnaf.infn.it:50002
+[/C=IT/O=INFN/OU=Host/L=CNAF/CN=datatag6.cnaf.infn.it] "valerio" Done
+Warning: datatag6.cnaf.infn.it:50002:
+The validity of this VOMS AC in your proxy is shortened to 86400 seconds!
+Creating proxy ......................................... Done
+Your proxy is valid until Fri Sep 8 01:55:34 2006
+```
+
+You can see that the life of the voms AC has been clearly shortened to 24 hours, even though 50 hours
+and 15 minutes had been requested.
+If your certiﬁcate is not in the default place, you may specify it explicitly by using the –cert and –key
+options, like in the following example:
+voms-proxy-init --voms valerio --cert \$HOME/cert.pem --key \$HOME/key.pem
+Finally, in case several options have to be speciﬁed several times, proﬁles can be created. For examples:
+[marotta@datatag6 marotta]$ cat voms.profile
+--voms=valerio
+--lifetime=50:15
+--cert=/home/marotta/mycert.pem
+--key=/home/marotta/mykey.pem
+--order=/valerio/group1
+```
+
+followed by:
+
+```bash
+[marotta@datatag6 marotta]$ voms-proxy-init --conf voms.profile
+[marotta@datatag6 marotta]$ voms-proxy-init --voms valerio \
+--lifetime 50:15 --cert /home/marotta/mycert.pem \
+--key /home/marotta/mykey.pem --order /valerio/group1
+```
+with the obvious advantages of being much less error-prone
+
+The `voms-proxy-init` command can be invoked with the following options:
+
+<table>
+	<tr>
+		<td>-help, -usage</td>
+		<td>These two options are synonymous and will print
+			a short usage reminder and then quit.</td>
+	</tr>
+</table>
+
+## Showing proxy information
+
+Once a proxy has been created, the voms-proxy-info command allowes the user to retrieve several
+information from it. The two most basic uses are:
+
+```bash
+$ voms-proxy-info
+subject : /C=IT/O=INFN/OU=Personal Certificate/L=CNAF/CN=Vincenzo Ciaschini/CN=proxy
+issuer : /C=IT/O=INFN/OU=Personal Certificate/L=CNAF/CN=Vincenzo Ciaschini
+identity : /C=IT/O=INFN/OU=Personal Certificate/L=CNAF/CN=Vincenzo Ciaschini
+type : proxy
+strength : 512 bits
+path : /tmp/x509up_u502
+timeleft : 10:33:52
+```
+
+which, as you can see, prints the same information that would be printed by a plain grid-proxy-info,
+and then there is:
+
+```
+$ voms-proxy-info --all
+subject : /C=IT/O=INFN/OU=Personal Certificate/L=CNAF/CN=Vincenzo Ciaschini/CN=proxy
+issuer : /C=IT/O=INFN/OU=Personal Certificate/L=CNAF/CN=Vincenzo Ciaschini
+identity : /C=IT/O=INFN/OU=Personal Certificate/L=CNAF/CN=Vincenzo Ciaschini
+type : proxy
+strength : 512 bits
+path : /tmp/x509up_u502
+timeleft : 11:59:59
+=== VO valerio extension information ===
+VO : valerio
+subject : /C=IT/O=INFN/OU=Personal Certificate/L=CNAF/CN=Vincenzo Ciaschini
+issuer : /C=IT/O=INFN/OU=Host/L=CNAF/CN=datatag6.cnaf.infn.it
+attribute : /valerio
+attribute : /valerio/asdasd
+attribute : /valerio/qwerty
+attribute : attributeOne = 111 (valerio)
+attribute : attributeTwo = 222 (valerio)
+timeleft : 11:59:59
+uri : datatag6.cnaf.infn.it:15000
+```
+
+which prints everything that there is to know about the proxy and the included ACs. Several options enable
+the user to select just a subset of the information shown here.
+
+The `voms-proxy-info` command con be invoked with the following options
+
+<table>
+	<tr>
+		<td>-help, -usage</td>
+		<td>These two options are synonymous and will print
+			a short usage reminder and then quit.</td>
+	</tr>
+</table>
+
+
+## Destroyng a proxy
+
+The `voms-proxy-destroy` command erases an existing proxy from the system. Its basic use is:
+
+```bash
+$ voms-proxy-destroy
+```
+The `voms-proxy-destroy` command con be invoked with the following options
+
+<table>
+	<tr>
+		<td>-help, -usage</td>
+		<td>These two options are synonymous and will print
+			a short usage reminder and then quit.</td>
+	</tr>
+</table>
 
 # Support
 
