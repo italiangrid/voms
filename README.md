@@ -189,7 +189,7 @@ To start and stop VOMS admin, use the tomcat scripts (that's for SL5, would be `
 
 ```bash
 service tomcat5 start
-```bash
+```
 
 If you want to restart individual VOMS admin VO web applications, you can use:
 
