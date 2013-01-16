@@ -7,6 +7,9 @@ their roles and other attributes in order to issue trusted attribute
 certificates and SAML assertions used in the Grid environment for authorization
 purposes.
 
+This documentation covers [system installation and operations](#for-system-administrators), [virtual organization administration](virtual-organization-administration),
+and the use of [voms command line clients](command-line-clients).
+
 # For system administrators
 
 ## Quickstart
@@ -216,7 +219,7 @@ To restore the database contents on the new VOMS installation machine, ensure th
 mysql -uroot -p<PASSWORD> < voms_database_dump.sql
 ```
 
-# Virtual Organization Administrator
+# Virtual Organization Administration
 
 ## The voms admin authorization framework
 
@@ -857,7 +860,7 @@ The `voms-proxy-info` command con be invoked with the following options
 </table>
 
 
-## Destroyng a proxy
+## Destroying a proxy
 
 The `voms-proxy-destroy` command erases an existing proxy from the system. Its basic use is:
 
