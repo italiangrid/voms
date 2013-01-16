@@ -7,8 +7,8 @@ their roles and other attributes in order to issue trusted attribute
 certificates and SAML assertions used in the Grid environment for authorization
 purposes.
 
-This documentation covers [system installation and operations](#for-system-administrators), [virtual organization administration](virtual-organization-administration),
-and the use of [voms command line clients](command-line-clients).
+This documentation covers [system installation and operations](#for-system-administrators), [virtual organization administration](#virtual-organization-administration),
+and the use of [voms command line clients](#command-line-clients).
 
 # For system administrators
 
