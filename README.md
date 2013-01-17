@@ -7,8 +7,26 @@ their roles and other attributes in order to issue trusted attribute
 certificates and SAML assertions used in the Grid environment for authorization
 purposes.
 
-This documentation covers [system installation and operations](#for-system-administrators), [virtual organization administration](#virtual-organization-administration),
-and the use of [voms command line clients](#command-line-clients).
+- [VOMS](#voms)
+- [For system administrators](#for-system-administrators)
+	- [Quickstart](#quickstart)
+	- [Prerequisites and recommendations](#prerequisites-and-recommendations)
+	- [Recommended deployment scenarios](#recommended-deployment-scenarios)
+	- [Installation](#installation)
+	- [Configuration](#configuration)
+	- [Service operation](#service-operation)
+- [Virtual Organization Administration](#virtual-organization-administration)
+	- [The voms admin authorization framework](#the-voms-admin-authorization-framework)
+	- [Using the admin web application](#using-the-admin-web-application)
+	- [Using the command line utilities](#using-the-command-line-utilities)
+- [Command line clients](#command-line-clients)
+	- [User credentials](#user-credentials)
+	- [Creating a proxy](#creating-a-proxy)
+	- [Showing proxy information](#showing-proxy-information)
+	- [Destroying a proxy](#destroying-a-proxy)
+- [Support](#support)
+- [License](#license)
+
 
 # For system administrators
 
@@ -775,8 +793,14 @@ You can see that the life of the voms AC has been clearly shortened to 24 hours,
 and 15 minutes had been requested.
 If your certiﬁcate is not in the default place, you may specify it explicitly by using the –cert and –key
 options, like in the following example:
+
+```bash
 voms-proxy-init --voms valerio --cert \$HOME/cert.pem --key \$HOME/key.pem
+```
+
 Finally, in case several options have to be speciﬁed several times, proﬁles can be created. For examples:
+
+```bash
 [marotta@datatag6 marotta]$ cat voms.profile
 --voms=valerio
 --lifetime=50:15
@@ -793,6 +817,7 @@ followed by:
 --lifetime 50:15 --cert /home/marotta/mycert.pem \
 --key /home/marotta/mykey.pem --order /valerio/group1
 ```
+
 with the obvious advantages of being much less error-prone
 
 See `voms-proxy-init --help` or the man page for a complete list of available options.
