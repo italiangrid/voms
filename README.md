@@ -795,15 +795,7 @@ followed by:
 ```
 with the obvious advantages of being much less error-prone
 
-The `voms-proxy-init` command can be invoked with the following options:
-
-<table>
-	<tr>
-		<td>-help, -usage</td>
-		<td>These two options are synonymous and will print
-			a short usage reminder and then quit.</td>
-	</tr>
-</table>
+See `voms-proxy-init --help` or the man page for a complete list of available options.
 
 ## Showing proxy information
 
@@ -849,16 +841,7 @@ uri : datatag6.cnaf.infn.it:15000
 which prints everything that there is to know about the proxy and the included ACs. Several options enable
 the user to select just a subset of the information shown here.
 
-The `voms-proxy-info` command con be invoked with the following options
-
-<table>
-	<tr>
-		<td>-help, -usage</td>
-		<td>These two options are synonymous and will print
-			a short usage reminder and then quit.</td>
-	</tr>
-</table>
-
+See `voms-proxy-info --help` or the man page for a complete list of available options.
 
 ## Destroying a proxy
 
@@ -867,15 +850,8 @@ The `voms-proxy-destroy` command erases an existing proxy from the system. Its b
 ```bash
 $ voms-proxy-destroy
 ```
-The `voms-proxy-destroy` command con be invoked with the following options
 
-<table>
-	<tr>
-		<td>-help, -usage</td>
-		<td>These two options are synonymous and will print
-			a short usage reminder and then quit.</td>
-	</tr>
-</table>
+See `voms-proxy-destroy --help` or the man page for a complete list of available options.
 
 # Support
 
