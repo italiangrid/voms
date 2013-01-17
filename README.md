@@ -1,3 +1,45 @@
+**Table of Contents**  *generated with [DocToc](http://doctoc.herokuapp.com/)*
+
+- [VOMS](#voms)
+- [For system administrators](#for-system-administrators)
+	- [Quickstart](#quickstart)
+	- [Prerequisites and recommendations](#prerequisites-and-recommendations)
+		- [Hardware](#hardware)
+		- [Operating system](#operating-system)
+		- [Installed software](#installed-software)
+	- [Recommended deployment scenarios](#recommended-deployment-scenarios)
+	- [Installation](#installation)
+		- [Repositories](#repositories)
+		- [Clean installation](#clean-installation)
+		- [Upgrade from gLite 3.2](#upgrade-from-glite-32)
+		- [Upgrade from EMI 1 VOMS](#upgrade-from-emi-1-voms)
+	- [Configuration](#configuration)
+		- [MySQL configuration](#mysql-configuration)
+		- [Oracle configuration](#oracle-configuration)
+	- [Configuring the VOMS server](#configuring-the-voms-server)
+	- [Service operation](#service-operation)
+		- [Migration](#migration)
+- [Virtual Organization Administration](#virtual-organization-administration)
+	- [The voms admin authorization framework](#the-voms-admin-authorization-framework)
+	- [Using the admin web application](#using-the-admin-web-application)
+		- [The Home page](#the-home-page)
+		- [Managing users](#managing-users)
+		- [ACL Management](#acl-management)
+		- [Managing VOMS generic attributes](#managing-voms-generic-attributes)
+		- [Acceptable Usage Policies (AUP) management](#acceptable-usage-policies-aup-management)
+		- [The Configuration Info section](#the-configuration-info-section)
+		- [The Other VOs section](#the-other-vos-section)
+	- [Using the command line utilities](#using-the-command-line-utilities)
+		- [The voms-db-util.py command](#the-voms-db-utilpy-command)
+		- [The voms-admin command line client](#the-voms-admin-command-line-client)
+- [Command line clients](#command-line-clients)
+	- [User credentials](#user-credentials)
+	- [Creating a proxy](#creating-a-proxy)
+	- [Showing proxy information](#showing-proxy-information)
+	- [Destroying a proxy](#destroying-a-proxy)
+- [Support](#support)
+- [License](#license)
+
 # VOMS
 
 The Virtual Organization Membership Service (VOMS) is an attribute authority
@@ -7,38 +49,16 @@ their roles and other attributes in order to issue trusted attribute
 certificates and SAML assertions used in the Grid environment for authorization
 purposes.
 
-- [VOMS](#voms)
-- [For system administrators](#for-system-administrators)
-	- [Quickstart](#quickstart)
-	- [Prerequisites and recommendations](#prerequisites-and-recommendations)
-	- [Recommended deployment scenarios](#recommended-deployment-scenarios)
-	- [Installation](#installation)
-	- [Configuration](#configuration)
-	- [Service operation](#service-operation)
-- [Virtual Organization Administration](#virtual-organization-administration)
-	- [The voms admin authorization framework](#the-voms-admin-authorization-framework)
-	- [Using the admin web application](#using-the-admin-web-application)
-	- [Using the command line utilities](#using-the-command-line-utilities)
-- [Command line clients](#command-line-clients)
-	- [User credentials](#user-credentials)
-	- [Creating a proxy](#creating-a-proxy)
-	- [Showing proxy information](#showing-proxy-information)
-	- [Destroying a proxy](#destroying-a-proxy)
-- [Support](#support)
-- [License](#license)
-
-
 # For system administrators
 
 ## Quickstart
 
 This quickstart guide covers the MySQL installation of VOMS.
 
-* Install the EMI 2 release package.
-* Install the emi-voms-mysql metapackage.
-* Install the xml-commons-apis package to avoid useless warnings when running Tomcat.
+* Install the EMI release package.
+* Install the `emi-voms-mysql` metapackage.
 * Set a sensible password for the MySQL root user, as explained in the instructions below.
-* Configure the VOMS service with YAIM as explained in this section.
+* Configure the VOMS service using `voms-admin-configure`.
 
 ## Prerequisites and recommendations
 
@@ -57,7 +77,10 @@ This quickstart guide covers the MySQL installation of VOMS.
 
 ### Installed software
 
-Besides the usual OS and EMI release packages, you will need the `oracle-instantclient-basic` package, version 10.2.0.4, installed on the system (in case of an Oracle-based installation).
+Besides the usual OS and EMI release packages, in case of an Oracle based installation you will need the `oracle-instantclient-basic` package, version 10.2.0.4.
+```bash
+yum localinstall oracle-instantclient-basic-10.2.0.4-1.x86_64.rpm
+```
 
 All the other dependencies are resolved by the installation of the VOMS metapackages, i.e.:
 
@@ -72,88 +95,43 @@ A single-node installation, with the hardware recommendations given above should
 
 ### Repositories
 
-Follow the general EMI 1 or 2 installation instructions. VOMS requires that the OS and EPEL repositories are active and correctly configured on the target machine. If oracle is used, a repository where Oracle packages are available should also be provided. Otherwise Oracle packages need to be installed manually.
+Follow the general EMI installation instructions. VOMS requires that the OS and EPEL repositories are active and correctly configured on the target machine. If Oracle is used, a repository where Oracle packages are available should also be provided. Otherwise Oracle packages need to be installed manually.
 
 ### Clean installation
 
-In case you plan to install the `emi-voms-oracle` metapackage, download and install the Oracle instant client basic libraries (v. 10.2.0.4-1) on your system:
+Install the `emi-voms-mysql` metapackage, or `emi-voms-oracle` depending on the database backend you are using
 ```bash
-yum localinstall oracle-instantclient-basic-10.2.0.4-1.x86_64.rpm
-```
-
-Install the `emi-voms-mysql` metapackage or `emi-voms-oracle` depending on the database backend you are using (mysql or Oracle):
-```bash
-yum install emi-voms-mysql or yum install emi-voms-oracle
-```
-
-Manually install `xml-commons-apis` libraries (after having installed the right metapackage for your installation), as the ones provided by the default OS JREs cause warnings when starting/stopping tomcat:
-```bash
-yum install xml-commons-apis
+yum install emi-voms-mysql
 ```
 
 ### Upgrade from gLite 3.2
 
-#### Install and configure a SL5 or SL6 X86_64 EPEL machine
-
-In order to install the EMI VOMS metapackage you will need a clean SL5 or SL6 X86_64 machine with the EPEL repository configured and the emi release package correctly installed.
-
-SL5, as configured by gLite 3.2, is not suitable for installing the EMI VOMS since gLite uses the DAG repository, which is alternative and incompatible with EPEL.
-
-Once you have a clean machine configured, install the `emi-voms-mysql` metapackage, without **launching yaim configuration**.
-
-#### VOMS database dump and YAIM configuration
+In order to install the EMI VOMS metapackage you will need a clean SL5 or SL6 X86_64 machine with the EPEL repository configured and the emi release package correctly installed. SL5, as configured by gLite 3.2, is not suitable for installing the EMI VOMS since gLite uses the DAG repository, which is alternative and incompatible with EPEL. Once you have a clean machine configured, install the `emi-voms-mysql` metapackage, without **launching yaim configuration**.
 
 On your existing gLite 3.2 VOMS node dump the VOMS database for all the VOs issuing the following command:
-
 ```bash
 mysqldump -uroot -p<MYSQL_ROOT_PASSWORD> --all-databases --flush-privileges > voms_database_dump.sql
 ```
 
-You will then copy the dump file on the new EMI VOMS node.
-
-Remember to save your YAIM configuration (in most cases, `site-info.def` and `services/glite-voms` in your `siteinfo` directory) and copy it on the new EMI VOMS node.
-
-#### Restoring the VOMS database on the EMI node
-
 You should now have the mysql daemon installed in your EMI machine (it was installed as a dependency of the `emi-voms-mysql` metapackage). Follow the instructions in this section to properly configure the mysql root account.
 
 Once the root account is configured and working (check that you can login issuing the command `mysql -uroot -p<MYSQL_ROOT_PASSWORD>`), you can restore the VOMS database issuing the following command:
-
 ```bash
 mysql -uroot -p<PASSWORD> < voms_database_dump.sql
 ```
 
-#### Configuring VOMS on the EMI node
+Use `voms-admin-configure` to configure the service. Just check that no gLite-specific paths are referenced in your configuration and possibly integrate it with the new options provided by EMI VOMS.
 
-The gLite 3.2 YAIM configuration should work in your EMI installation. Just check that no gLite-specific paths are referenced in your configuration and possibly integrate it with the new options provided by EMI VOMS.
+When upgrading an Oracle installation, a database schema upgrade is required when upgrading from gLite 3.2 or EMI 1. The schema upgrade should be performed before running the YAIM configuration following this procedure:
 
-When upgrading an Oracle installation follow these instructions before configuring the VOMS services with YAIM.
+* Backup the contents of the VOMS databases uses the appropriate tools as described in Oracle documentation.
+* Run voms-admin-configure upgrade
 
-In order to configure VOMS, place the YAIM configuration files in your favorite directory and launch the following command:
+Reconfigure the services as described above.
 
-```bash
-/opt/glite/yaim/bin/yaim -c -s site-info.def -n VOMS
-```
-
-#### Upgrading a VOMS Oracle installation
-
-On Oracle, a database schema upgrade is required when upgrading from gLite 3.2 or EMI 1. The schema upgrade should be performed before running the YAIM configuration following this procedure:
-
-Backup the contents of the VOMS databases uses the appropriate tools as described in Oracle documentation.
-
-Run voms-admin-configure upgrade
-
-Reconfigure the services with YAIM (as described in the previous section)
-
-####  Known issues for the gLite 3.2 to EMI upgrade
-
-The AUP may not be shown correctly after upgrade to EMI. After upgrading a gLite 3.2 VOMS Admin the URL pointing to the default AUP text (/var/glite/etc/voms-admin//vo-aup.txt) is not upgraded to the new location (/etc/voms-admin//vo-aup.txt). This issue lead to an empty AUP shown to the users for the upgraded VOMS. To solve this issue, change the AUP url from the VOMS admin web interface by pointing your browser to: https://<voms-hostname>:8443/voms/<vo>/aup/load.action
-The default URL for the new aup is:
-file:/etc/voms-admin/<vo>/vo-aup.txt
+There is a known issue with upgrading from gLite 3.2. The AUP may not be shown correctly after upgrade to EMI. After upgrading a gLite 3.2 VOMS Admin the URL pointing to the default AUP text (`/var/glite/etc/voms-admin/vo-aup.txt`) is not upgraded to the new location (`/etc/voms-admin//vo-aup.txt`). This issue lead to an empty AUP shown to the users for the upgraded VOMS. To solve this issue, change the AUP url from the VOMS admin web interface by pointing your browser to: `https://<voms-hostname>:8443/voms/<vo>/aup/load.action`. The default URL for the new aup is: `file:/etc/voms-admin/<vo>/vo-aup.txt`.
 
 ### Upgrade from EMI 1 VOMS
-
-#### Upgrading an SL5 EMI 1 installation
 
 * Install the emi-release package for EMI 2.
 * Update packages via yum update.
@@ -163,18 +141,16 @@ When upgrading an Oracle installation, follow this procedure:
 
 * Install the emi-release package for EMI 2.
 * Update packages via yum update.
-* Stop the services (voms and tomcat)
+* Stop the services (voms and voms-admin)
 * Backup the contents of the VOMS databases uses the appropriate tools as described in Oracle documentation.
 * Run voms-admin-configure upgrade
 * Restart the services
 
 ## Configuration
 
-### Configuring the database backend
+### MySQL configuration
 
-#### MySQL configuration
-
-Make sure that the MySQL administrator password that you specify in the YAIM VOMS configuration files matches the password that is set for the root MySQL account. Yaim configuration script does not set it for you. If you want to set a MySQL administrator password:
+Make sure that the MySQL administrator password that you specify when running `voms-admin-configure` matches the password that is set for the root MySQL account, as `voms-admin-configure` will not set it for you. If you want to set a MySQL administrator password:
 
 Check that mySQL is running; if it is not, launch it using `service mysqld start`. Then issue the following commands as root in order to set a password for the mysql root account
 ```bash
@@ -193,34 +169,130 @@ In order to properly configure the library load path for the VOMS oracle backend
 
 In case you use a different version of the the instantclient libraries (not recommended) , adjust the above accordingly.
 
-### Configuring the VOMS server with YAIM
+## Configuring the VOMS server
 
-Check the VOMS YAIM configuration guide.
+Run `voms-admin-configure` to configure both voms-admin and voms. The general syntax of the command is
+```bash
+voms-admin-configure COMMAND [OPTIONS]
+```
 
+Available commands are:
+
+* install: is used to configure a VO
+* remove: is used to unconfigure a VO
+* upgrade: is used to upgrade the configuration of a VO installed with an older version of voms-admin.
+
+Usually, you do not have a dedicated MySQL administrator working for you, so you will use voms-admin tools to create the database schema, configure the accounts and deploy the voms database. If this is the case, you need to run the following command:
+
+```bash
+voms-admin-configure install --dbtype mysql
+--vo <vo name> 
+--createdb 
+–deploy-database  
+--dbauser <mysql root admin  username>
+--dbapwd <mysql root admin  password>
+--dbusername <mysql voms username>
+--dbpassword  <mysql voms password>
+--port <voms core service port>
+--smtp-host <STMP relay host>
+--mail-from <Sender address for service-generated emails>
+```
+	
+Note that the above command is entered as a single command; it has been broken up into multiple lines for clarity. The command creates and initializes a VOMS database, and configures the VOMS core and admin services that use such database. The required options are described below:
+
+<table>
+	<tr>
+		<th>Option</th>
+		<th>Meaning</th>
+	</tr>
+	<tr>
+		<td>createdb</td>
+		<td>This option is MySQL specific and is used to specify that the MySQL database for VOMS must be created by the script.</td>
+	</tr>
+	<tr>
+		<td>deploy-database</td>
+		<td>This option tells the script that it must create the tables for VOMS and fill in the necessary bootstrap information (e.g., admin accounts, supported CAs, ...)</td>
+	</tr>
+	<tr>
+		<td>dbauser,dbapwd</td>
+		<td>These options are MySQL specific and are used to set the MySQL root user account username and password respectively. These credentials are needed to create the MySQL database for VOMS, and thus required when the createdb option is set. If MySQL is configured with an empty password for the root account, the dbapwd option may be omitted.</td>
+	</tr>
+	<tr>
+		<td>dbusername, dbpassword</td>
+		<td>These options are used to specify the MySQL account that VOMS will use when contacting the database. If the createdb option is set, voms-admin creates the account for you.</td>
+	</tr>
+	<tr>
+		<td>port</td>
+		<td>This option specifies on which port the VOMS core server will listen for requests.</td>
+	</tr>
+	<tr>
+		<td>mail-from, smtp-host</td>
+		<td>These options specify, respectively, the address that must be used for service-generated emails and the SMTP service that must be used to send them.</td>
+	</tr>
+</table>
+
+An example MySQL VO installation command is shown below:
+
+```bash
+/usr/sbin/voms-admin-configure install --dbtype mysql \ 
+--vo test_vo_mysql --createdb --deploy-database \ 
+--dbauser root --dbapwd pwd \ 
+--dbusername voms_admin_20 --dbpassword pwd \ 
+--port 54322 --mail-from ciccio@cnaf.infn.it \ 
+–smtp-host iris.cnaf.infn.it
+```
+
+Oracle VO configuration is different from MySQL configuration. In Oracle you need to setup the database account for VOMS before launching voms-admin configure. Moreover, Oracle instant client libraries must be installed and configured before running voms-admin configuration.
+
+Once you have configured Oracle stuff, you can install a new Oracle VO using the following command:
+
+```bash
+voms-admin-configure install --dbtype oracle 
+--vo <VO name> 
+--dbname <TNS alias of the database backend> 
+--deploy-database
+--dbusername <voms db account username> 
+--dbpassword <voms db account password> 
+--port <voms core service port> 
+--smtp-host <SMTP relay host> 
+--mail-from <Sender address for service-generated emails>
+```
+Note that the above command is entered as a single command; it has been broken up into multiple lines for clarity. This command is indeed very simliar to the one used to configure a MySQL VO. The main difference lies in the dbname option, that is used to specify the TNS alias for the Oracle database backend. This TNS alias is needed to build the connection string that VOMS will use to communicate with the database backend.Usually, TNS aliases are maintained in the tnsnames.ora file, located in a directory that is usually exported to applications via the TNS_ADMIN Oracle environment variable. For more information regarding TNS aliases, consult the Oracle online documentation (http://www.oracle.com/pls/db102/homepage).
+
+An example Oracle VO installation command is shown below:
+
+```bash
+voms-admin-configure install --dbtype oracle \ 
+--vo test_vo --dbname test --deploy-database \ 
+--dbusername voms_admin_20 --dbpassword pwd \ 
+--dbhost datatag6.cnaf.infn.it --port 54321 \ 
+--mail-from ciccio@cnaf.infn.it --smtphost iris.cnaf.infn.it
+```
+
+`voms-admin-configure` is used also for removing already configured vos
+
+```bash
+voms-admin-configure remove --vo VONAME
+```
+
+Available options are:
+
+* undeploy-database:	 Undeploys the VOMS database. By default when removing a VO the database is left untouched. All the database content is lost.
+* dropdb (MySQL only):	 This flag is used to drop the mysql database schema created for MySQL installations using the --createdb option
 
 ## Service operation
 
-The YAIM configuration step is enough to have the VOMS core and admin services up and running. To start and stop the VOMS core service use:
-
+To start and stop the VOMS core service for all the vos on the machine, use:
 ```bash
 service voms start
 ```
-
-To start and stop VOMS admin, use the tomcat scripts (that's for SL5, would be `tomcat6` on SL6)
-
+while to start and stop a specific vo
 ```bash
-service tomcat5 start
+service voms start <vo>
 ```
+The same applies for voms-admin.
 
-If you want to restart individual VOMS admin VO web applications, you can use:
-
-```bash
-service voms-admin start/stop <vo>
-```
-
-Use the above commands only in exceptional cases, and to deal with potential issues that affect only individual VOs. The recommended way to start and stop VOMS admin is by using the tomcat startup scripts.
-
-### 1.5.2 Migration
+### Migration
 
 In order to migrate VOMS to a different machine, you first need to move the configurations files. Archive the contents of the YAIM configuration directory and move this archive to the new installation. In case YAIM is not used, you will need to archive and move the `/etc/voms/*` and `/etc/voms-admin/*` directories if on a EMI-1 installation, or `$GLITE_LOCATION/etc/voms/*` and `$GLITE_LOCATION_VAR/etc/voms-admin/*` on a gLite 3.2 installation.
 
@@ -415,20 +487,15 @@ In the top part of the page, the header provides information about the current u
 
 By clicking on the home link in the main navbar one can reach his home page.
 
-#### The Administrator home page
 If the current client has administrator rights, he/she will be directed to the admins home page. User requests for membership and group/role assignments can be managed from this page, as shown in the image below.
 
 ![Alt text](https://wiki.italiangrid.it/twiki/pub/VOMS/VOMSAdminUserGuide/admin-home.png)
 
 An administrator that is also a VO user will have a link to his user home page in the upper right part of the page.
 
-#### The VO user home page
-
-The VO user home page shows information about the user membership. From this page, the user can request group membership and role assignment and update his personal information. The page also shows information about AUP acceptance records and an history record of user's requests.
+If the current client has not admin rights, the VO user home page shows information about the user membership. From this page, the user can request group membership and role assignment and update his personal information. The page also shows information about AUP acceptance records and an history record of user's requests.
 
 ![Alt text](https://wiki.italiangrid.it/twiki/pub/VOMS/VOMSAdminUserGuide/user-home.png)
-
-##### Requesting the addition of a new certificate to the membership
 
 VO members can request the addition of a new certificate to their membership by clicking on the "Request new certificate" button in the Certificates panel, as shown in the picture below:
 
@@ -444,20 +511,18 @@ The certificate subject should be entered following the usual /-separated openss
 After this step a notification is sent to the VO admin who has to approve the member's request. The user will be informed via email of the VO admin decision on the request.
 
 ### Managing users
+
 The user management section of the VOMS-Admin web interface allows administrators to manage all the information regarding VO membership, i.e., membership status, certificates, groups, roles, generic attributes etc.
 
-#### Suspending users
 It is now possible to suspend users. Suspended users will still be part of the VO, but will not be able to obtain VOMS attribute certificates from the VOMS server.
 
-When suspending a user a reason for the suspension must be given. This reason will be included in a supension notification that will be sent to the user, and shown at voms-proxy-init time to suspended users that attempt to get a VOMS proxy.
+When suspending a user a reason for the suspension must be given. This reason will be included in a supension notification that will be sent to the user, and shown at `voms-proxy-init` time to suspended users that attempt to get a VOMS proxy.
 
 ### ACL Management
 
 The ACL link the navigation bar leads to the ACL management page. The ACL management pane displays ACL entries in the form of (Voms Administrator, Set of permissions) couples. The display uses the compact representation for VOMS permissions that has been already introduced earlier.
 
 ![](https://wiki.italiangrid.it/twiki/pub/VOMS/VOMSAdminUserGuide/acl-management.png)
-
-#### Adding access control entries
 
 ACL entries can be added to ACL or default ACLs by clicking on the “add entry” link. Permissions can be set for:
 
@@ -486,14 +551,16 @@ The GA classes management page can be reached by clicking on the “Attributes�
 ![](https://wiki.italiangrid.it/twiki/pub/VOMS/VOMSAdminUserGuide/ga-classes.png)
 
 #### Managing GAs at the user, group and role level
+
 Once a GA class has been created, GA values can be assigned to users, groups and role within groups. As mentioned above, when one GA is assigned directly to a user, the (name,value) couple is added by VOMS to the attribute certificate returned to user. When a GA is assigned to a group, or role within a group, such (name, value) pair ends up in the Attribute Certificate of all the VO members belonging to that group (or that have such role within a group).
 
 #### Search GA assignments
+
 VOMS Admin implements search over user GA assignments, so that an administrator can easily know the status of GA assignments. The search functions deal only with GA assigned directly to user, i.e., group and role assignements search and centralized display is currently not supported.
 
 ![](https://wiki.italiangrid.it/twiki/pub/VOMS/VOMSAdminUserGuide/ga-assignments.png)
 
-###&nbsp;Acceptable Usage Policies (AUP) management
+### Acceptable Usage Policies (AUP) management
 
 Starting with version 2.5, VOMS Admin implements AUP management. AUP acceptance records are linked to each VO membership, to keep track of which version of the AUP was accepted and when.
 
@@ -533,36 +600,7 @@ This section provides links to the other VOs configured on the server.
 
 ## Using the command line utilities
 
-### The voms-admin-configure script
-
-`voms-admin-configure` is the script used to configure voms-admin and voms. Its usage has already been introduced in Section 2.2. The syntax of the command is:
-
-```bash
-voms-admin-configure COMMAND [OPTIONS]
-```
-
-Available commands are:
-
-* install: is used to configure a VO
-* remove: is used to unconfigure a VO
-* upgrade: is used to upgrade the configuration of a VO installed with an older version of voms-admin.
-
-Installation commands have already been covered in the installation section.
-
-#### Removing a VO
-
-To remove an already configured VO, type:
-
-```bash
-voms-admin-configure remove --vo VONAME
-```
-
-Available options are:
-
-* undeploy-database:	 Undeploys the VOMS database. By default when removing a VO the database is left untouched. All the database content is lost.
-* dropdb (MySQL only):	 This flag is used to drop the mysql database schema created for MySQL installations using the --createdb option
-
-### The voms-db-deploy.py command
+### The voms-db-util.py command
 
 The `voms-db-deploy.py` command is used to manage the deployment of the VOMS database and to add/remove administrators without requriing voms-admin VOs to be active.
 
@@ -584,24 +622,6 @@ voms-db-deploy.py remove-admin --vo [VONAME] --dn [ADMIN_DN] --ca [ADMIN_CA]
 voms-db-deploy.py check-connectivity --vo [VONAME]
 
 voms-db-deploy.py grant-read-only-access --vo [VONAME]
-```
-
-### The init-voms-admin.py command
-
-The `init-voms-admin.py` (linked by the /etc/init.d/voms-admin) command is used to start, stop and check the status of configured VOs.`
-
-``` bash
-Usage:
-    init-voms-admin.py [--context=CONTEXT_FILE] [--use-manager] start [VONAME]
-    init-voms-admin.py [--use-manager] (stop|reload|status) [VONAME]
-    init-voms-admin.py [--use-manager] (start-siblings|stop-siblings)
-    
-    VONAME is the name of the vo. 
-    CONTEXT_FILE is a a file that contains the web application context descriptor
-    use-manager uses of the tomcat manager application to manage vo apps.
-    
-    The start-siblings and stop-siblings commands are used to start/stop the 
-    siblings webapp indipendently from other vos.
 ```
 
 ### The voms-admin command line client
