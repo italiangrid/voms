@@ -99,7 +99,7 @@ AC_VOMS_LOCATIONS
 AC_ARG_WITH(vomsuser,
   [  --with-vomsuser=USR    Sets the user used to run voms],
   [with_vomsuser="$withval"],
-  [with_vomsuser="root"]
+  [with_vomsuser="voms"]
 )
   
 AC_SUBST(with_vomsuser)
