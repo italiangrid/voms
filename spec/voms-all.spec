@@ -162,7 +162,7 @@ exit 0
 %post server
 /sbin/chkconfig --add %{name}
 
-if [ $1 -eq 1 ]; then
+if [ $1 -eq 2 ]; then
     chown -R %{name} /var/log/voms
     chown -R %{name} /etc/voms
 fi
