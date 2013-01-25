@@ -160,9 +160,12 @@ getent passwd %{name} >/dev/null || useradd -r -g %{name} \
 exit 0
 
 %post server
-
 /sbin/chkconfig --add %{name}
 
+if [ $1 -eq 1 ]; then
+    chown -R %{name} /var/log/voms
+    chown -R %{name} /etc/voms
+fi
 
 %preun server
 if [ $1 = 0 ]; then
