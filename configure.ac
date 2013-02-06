@@ -105,7 +105,7 @@ AC_ARG_WITH(vomsuser,
 AC_SUBST(with_vomsuser)
 AC_PARSER_GEN
 
-AM_CONFIG_HEADER([src/autogen/config.h])
+AC_CONFIG_HEADER([src/autogen/config.h])
 
 if test "x$build_cpp_api" = "xyes" -o "x$build_interfaces" = "xyes"; then
 # both C and CPP
