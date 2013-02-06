@@ -23,12 +23,20 @@
  *
  *********************************************************************/
 
+#include "config.h"
+
+#ifndef _POSIX_SOURCE
+#  define _POSIX_SOURCE 1
+#endif
+
 #include <sys/types.h>
 #include <netdb.h>
 #include <sys/socket.h>
 #include <arpa/inet.h>
 #include <stdlib.h>
 #include <string.h>
+
+#include <strings.h>
 
 extern "C" {
 #include "log.h"
