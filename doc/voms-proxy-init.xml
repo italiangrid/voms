@@ -73,7 +73,8 @@ as long as the server will allow.
 
 This option is deprecated, since it does not set the validity of the generated proxy.  Use -valid instead.</para>
 
-<para><option>-valid</option> <replaceable>HH:MM</replaceable>This option attempts to set the validity for both the proxy and the credentials returned by the VOMS server.  The latter validity may however be shortened due to server policy.
+<para><option>-valid</option> <replaceable>HH:MM</replaceable>
+This option attempts to set the validity for both the proxy and the credentials returned by the VOMS server.  The latter validity may however be shortened due to server policy.
 
 This option obsoletes both -hours and -vomslife, and should be used in preference to both</para>
 
