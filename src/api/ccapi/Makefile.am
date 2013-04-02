@@ -64,15 +64,21 @@ OUTPUT_DIR = VOMS_CC_API VOMS_C_API
 CCDOCPLC_DIR = $(top_builddir)/doc/apidoc/api/VOMS_CC_API
 CDOCPLC_DIR = $(top_builddir)/doc/apidoc/api/VOMS_C_API
 
-HTML  = $(CCDOCPLC_DIR)/html/index.html
-				$(CDOCPLC_DIR)/html/index.html
+CCHTML = $(CCDOCPLC_DIR)/html/index.html
+CHTML = $(CDOCPLC_DIR)/html/index.html
+
+HTML = $(CCHTML) $(CHTML)
 
 if BUILD_DOCS
 
-MAN3  = $(CCDOCPLC_DIR)/man/man3/voms.3 \
+CCMAN3 = $(CCDOCPLC_DIR)/man/man3/voms.3 \
         $(CCDOCPLC_DIR)/man/man3/voms_api.h.3 \
-        $(CCDOCPLC_DIR)/man/man3/vomsdata.3 \
-	$(CDOCPLC_DIR)/man/man3/voms_apic.h.3
+        $(CCDOCPLC_DIR)/man/man3/vomsdata.3
+
+CMAN3 = $(CDOCPLC_DIR)/man/man3/voms_apic.h.3
+
+MAN3 = $(CCMAN3) $(CMAN3)
+
 endif
 
 PDF   = $(CCDOCPLC_DIR)/pdf/VOMS_CC_API.pdf \
@@ -81,14 +87,15 @@ PDF   = $(CCDOCPLC_DIR)/pdf/VOMS_CC_API.pdf \
 PS    = $(CCDOCPLC_DIR)/ps/VOMS_CC_API.ps \
 	$(CDOCPLC_DIR)/pdf/VOMS_C_API.ps
 
-LATEX = $(CCDOCPLC_DIR)/latex/Makefile \
+CCLATEX = $(CCDOCPLC_DIR)/latex/Makefile \
         $(CCDOCPLC_DIR)/latex/refman.tex \
-        $(CCDOCPLC_DIR)/latex/doxygen.sty \
-	$(CDOCPLC_DIR)/latex/Makefile \
+        $(CCDOCPLC_DIR)/latex/doxygen.sty
+
+CLATEX = $(CDOCPLC_DIR)/latex/Makefile \
         $(CDOCPLC_DIR)/latex/refman.tex \
         $(CDOCPLC_DIR)/latex/doxygen.sty
 
-DOXY = $(CCDOCPLC_DIR)/Doxyfile $(CDOCPLC_DIR)/Doxyfile $(include_HEADERS)
+LATEX = $(CCLATEX) $(CLATEX)
 
 $(CCDOCPLC_DIR)/Doxyfile:
 	-mkdir -p $(CCDOCPLC_DIR)
@@ -136,7 +143,7 @@ GENERATE_TREEVIEW      = NO\n\
 GENERATE_LATEX         = YES\n\
 COMPACT_LATEX          = NO\n\
 PDF_HYPERLINKS         = YES\n\
-USE_PDFLATEX           = NO\n\
+USE_PDFLATEX           = YES\n\
 LATEX_BATCHMODE        = YES\n\
 GENERATE_RTF           = NO\n\
 GENERATE_MAN           = YES\n\
@@ -201,7 +208,7 @@ GENERATE_TREEVIEW      = NO\n\
 GENERATE_LATEX         = YES\n\
 COMPACT_LATEX          = NO\n\
 PDF_HYPERLINKS         = YES\n\
-USE_PDFLATEX           = NO\n\
+USE_PDFLATEX           = YES\n\
 LATEX_BATCHMODE        = YES\n\
 GENERATE_RTF           = NO\n\
 GENERATE_MAN           = YES\n\
@@ -237,9 +244,15 @@ install-exec-am: install-libLTLIBRARIES
 apidoc: apidoc-local apidoc-recursive
 
 if BUILD_DOCS
-$(MAN3) $(HTML) $(LATEX): $(DOXY)
+$(CCHTML): $(CCDOCPLC_DIR)/Doxyfile $(include_HEADERS)
 	doxygen $(CCDOCPLC_DIR)/Doxyfile
+
+$(CHTML): $(CDOCPLC_DIR)/Doxyfile $(include_HEADERS)
 	doxygen $(CDOCPLC_DIR)/Doxyfile
+
+$(CCMAN3) $(CCLATEX): $(CCHTML)
+
+$(CMAN3) $(CLATEX): $(CHTML)
 
 $(PDF): $(LATEX)
 	cd $(CCDOCPLC_DIR)/latex; \
@@ -274,7 +287,6 @@ install-data-local:
 	for file in $(MAN3); do \
 	  $(INSTALL_DATA) $${file} $(DESTDIR)$(mandir)/man3; \
 	done
-	
 	$(mkinstalldirs) $(DESTDIR)$(sysconfdir)/grid-security/vomsdir
 	$(mkinstalldirs) $(DESTDIR)$(sysconfdir)/grid-security/voms
 	$(mkinstalldirs) $(DESTDIR)$(sysconfdir)/voms
