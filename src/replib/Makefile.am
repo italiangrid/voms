@@ -1,6 +1,6 @@
 noinst_LTLIBRARIES = librep.la
 
-librep_la_SOURCES =
+librep_la_SOURCES = dummy.c
 librep_la_LIBADD	= @LTLIBOBJS@
 
 librep_la_CFLAGS = \
