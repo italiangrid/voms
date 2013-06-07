@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8"/>
+    <title>{{ page.title }}</title>
+
+	<!-- see 
+		https://github.com/mojombo/jekyll/issues/332#issuecomment-18952908 
+		for a recipe on how to solve Jekyll base URL issues -->
+    <link href="{{ site.baseurl }}/assets/css/bootstrap.min.css" rel="stylesheet"/>    
+    <link href="{{ site.baseurl }}/assets/css/bootstrap-responsive.min.css" rel="stylesheet"/>
+    <link href="{{ site.baseurl }}/assets/css/style.css" rel="stylesheet"/>
+	<link href="{{ site.baseurl }}/assets/css/pygments.css" rel="stylesheet"/>
+  </head> 
+  <body>
+	
+	<div id="wrap">
+  		{% include navbar.html %}
+		
+		<!-- Main page content here -->
+		<div class="container">
+			<div id="vomscontent">
+				{{content}}
+			</div>
+		</div>
+		
+		<div id="push"></div>
+	</div> <!-- wrap element -->
+	
+	<!-- Footer -->
+	<div id="footer">
+		<div class="container">
+		</div>
+	</div>
+	<!-- Scripts included at the end  of the page -->
+	<script type="text/javascript" src="{{ site.baseurl }}/assets/js/jquery-1.10.1.min.js">
+	</script>
+	<script type="text/javascript" src="{{ site.baseurl }}/assets/js/bootstrap.min.js">
+	</script>
+  </body>
+</html>

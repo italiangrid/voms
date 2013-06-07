@@ -1,0 +1,22 @@
+exclude: [README.md]
+
+markdown: redcarpet
+# pygments: false
+
+authors:
+  andrea:
+    display_name: Andrea Ceccanti
+    gravatar: f371f6284e5f3b10c555a24fd728a1ef    
+    email: andrea.ceccanti@cnaf.infn.it
+    github: andreaceccanti
+  valerio:
+    display_name: Valerio Venturi
+    gravatar: 25170d7bd06dd4d753053e12888d1bb0    
+    email: valerio.venturi@cnaf.infn.it
+    github: valerioventuri
+  daniele:
+    display_name: Daniele Andreotti
+    email: daniele.andreotti@cnaf.infn.it
+  enrico:
+    display_name: Enrico Vianello
+    email: enrico.vianello@cnaf.infn.it
