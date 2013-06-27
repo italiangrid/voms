@@ -11,7 +11,7 @@ html,body {
 	   of #push and #footer (and also consider eventually 
 	   border sizes in the footer element)
 	*/
-	margin: 0 auto -65px;
+	margin: 0 auto -60px;
 }
 
 /* set a max-width for horizontal fluid layout 
@@ -26,6 +26,10 @@ and make it centered */
 	height: 60px;
 }
 
+#vomscontent {
+	margin-top: 25px;
+}
+
 #vomscontent p {
 	line-height: 1.7;
 }
@@ -33,7 +37,7 @@ and make it centered */
 #footer{
 	/* border-top: 5px solid #e4c90f;*/
 	background-color: #3d3f42;
-	margin-top: 20px;
+	/* margin-top: 20px; */
 }
 
 .highlight pre code {
@@ -46,7 +50,7 @@ and make it centered */
           margin-right: -20px;
           padding-left: 20px;
           padding-right: 20px;
-		}
+		}		
 }
 
 #wrap > .container {
@@ -79,7 +83,6 @@ h1 {
 	line-height: normal;
 	height: 37px;
 	margin-bottom: 25px;
-	margin-top: 35px;
 }
 
 h2 {
@@ -88,7 +91,6 @@ h2 {
 	border-bottom-style: solid;
 	border-bottom-width: 1px;
 	margin-bottom: 15px;
-	margin-top: 30px;
 }
 
 .highlight pre code {
