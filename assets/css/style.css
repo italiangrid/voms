@@ -2,6 +2,13 @@ html,body {
 	height: 100%; 
 }
 
+code{
+	color: rgb(31, 26, 168);
+}
+
+.vo-highlight {
+	color: rgb(25, 100, 11);
+}
 #wrap { 
 	
 	min-height: 100%; 
@@ -28,11 +35,17 @@ and make it centered */
 
 #vomscontent {
 	margin-top: 25px;
+	margin-bottom: 60px;
 }
 
 #vomscontent p {
-	line-height: 1.7;
+	line-height: 25px;
 }
+
+#vomscontent li{
+	line-height: 25px;
+}
+
 
 #footer{
 	/* border-top: 5px solid #e4c90f;*/
@@ -64,8 +77,8 @@ and make it centered */
 /** This is required to make anchors not disappear
  under fixed navbar **/
 a[name] {
-  padding-top: 41px;
-  margin-top: -41px;
+  padding-top: 66px;
+  margin-top: -66px;
   display: inline-block; /* required for webkit browsers */
 }
 
@@ -91,6 +104,7 @@ h2 {
 	border-bottom-style: solid;
 	border-bottom-width: 1px;
 	margin-bottom: 15px;
+	margin-top: 25px;
 }
 
 .highlight pre code {
