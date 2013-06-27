@@ -14,6 +14,14 @@ html,body {
 	margin: 0 auto -65px;
 }
 
+/* set a max-width for horizontal fluid layout 
+and make it centered */
+.container {
+  margin-right: auto;
+  margin-left: auto;
+  max-width: 940px;
+}
+
 #push, #footer {
 	height: 60px;
 }
@@ -25,7 +33,7 @@ html,body {
 #footer{
 	border-top: 5px solid #e4c90f; 
 	background-color: #3d3f42;
-
+	margin-top: 20px;
 }
 
 .highlight pre code {
@@ -39,7 +47,6 @@ html,body {
           padding-right: 20px;
 		}
 }
-
 
 #wrap > .container {
 	padding-top: 41px;
@@ -62,6 +69,32 @@ h1, h2, h3, h4, h5 {
 	color: #3d3f42;
 }
 
+/** headings, paragraphs, and code got to look like 
+on github wiki */
+
+h1 {
+	color: rgb(51, 51, 51);
+	font-size: 36px;
+	line-height: normal;
+	height: 37px;
+	margin-bottom: 25px;
+	margin-top: 35px;
+}
+
+h2 {
+	color: rgb(51, 51, 51);
+	border-bottom-color: rgb(238, 238, 238);
+	border-bottom-style: solid;
+	border-bottom-width: 1px;
+	margin-bottom: 15px;
+	margin-top: 30px;
+}
+
+.highlight pre code {
+	font-size: 13px;
+	font-family: Consolas, "Liberation Mono", Courier, monospace;
+	line-height: 19px;
+}
 
 /**
 .navbar-inverse .navbar-inner{
