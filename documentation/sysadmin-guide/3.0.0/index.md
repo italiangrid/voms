@@ -562,7 +562,6 @@ The database content can then be restored using the following command:
 mysql -uroot -p<PASSWORD> < voms_database_dump.sql
 ```
 
-
 ## Troubleshooting <a name="Troubleshooting">&nbsp;</a>
 
-See the [ known issues page](https://github.com/italiangrid/voms/wiki/Known-issues)
+See the [known issues page]({{ site.baseurl }}/documentation/known-issues)

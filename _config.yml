@@ -1,7 +1,13 @@
 exclude: [README.md]
 
 markdown: redcarpet
-# pygments: false
+redcarpet:
+  extensions: [ "tables" ]
+
+issue_base_url: https://issues.infn.it/browse/
+
+voms:
+    website: http://italiangrid.github.io/voms
 
 authors:
   andrea:
