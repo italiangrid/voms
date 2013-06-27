@@ -109,3 +109,64 @@ h2 {
 	font-size:24px;
 	font-weight: bold;
 }
+
+/** for the home page **/
+
+hr.soften {
+	margin: 40px 0;
+}
+
+.marketing {
+	color: #5a5a5a;
+}
+
+.marketing h1 {
+	color: #5a5a5a;
+	margin: 15px 0;
+	font-size: 80px;
+	font-weight: 200;
+	line-height: 1;
+	letter-spacing: -1px;
+	height: auto;
+}
+
+.marketing h2 {
+	border-bottom: none;
+	color: #5a5a5a;
+	font-weight: 200;
+}
+
+.marketing h3 {
+	font-weight: 200;
+}
+
+.marketing h4 {
+	font-weight: 200;
+}
+
+.marketing ul li h4 a {
+	color: #5a5a5a;
+}
+
+.marketing ul li h4 a:hover {
+	color: #ad141e;
+	text-decoration:none;
+}
+
+.marketing h3 a {
+	color: #5a5a5a;
+}
+
+.marketing h3 a:hover {
+	color: #ad141e;
+	text-decoration:none;
+}
+
+.marketing h2 a {
+	color: #5a5a5a;
+}
+
+.marketing h2 a:hover {
+	color: #ad141e;
+	text-decoration:none;
+}
