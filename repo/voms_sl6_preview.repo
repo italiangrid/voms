@@ -1,0 +1,8 @@
+[VOMS-Preview-SL6]
+name=VOMS 
+baseurl=https://ci-01.cnaf.infn.it/download/voms/preview/sl6/x86_64
+protect=1
+enabled=1
+priority=1
+gpgcheck=0
+sslverify=0
