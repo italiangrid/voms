@@ -23,7 +23,7 @@ html,body {
 }
 
 #footer{
-	border-top: 5px solid #e4c90f; 
+	/* border-top: 5px solid #e4c90f;*/
 	background-color: #3d3f42;
 
 }
@@ -31,6 +31,7 @@ html,body {
 .highlight pre code {
 	font-size: 110%;
 }
+
 @media (max-width: 767px) {
         #footer {
           margin-left: -20px;
@@ -70,6 +71,6 @@ h1, h2, h3, h4, h5 {
 }
 **/
 .navbar .brand{
-	font-size:20px;
+	font-size:24px;
 	font-weight: bold;
 }
