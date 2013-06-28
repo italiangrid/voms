@@ -1,0 +1,25 @@
+---
+layout: default
+---
+
+{% assign author = site.authors[page.author] %}
+
+<div class="container">
+	<div class="marketing">
+
+  	<div class="media">
+    	<img class="media-object pull-left img-polaroid" src="http://www.gravatar.com/avatar/{{ author.gravatar }}?s=80">
+      <div class="media-body">
+      	<h3 class="media-heading">{{ page.title }}</h3>
+        <h4 class="media-heading">{{ author.display_name }}</h4>
+      </div>
+    </div>
+        
+    <br/>
+    
+		<p>{{ page.date | date_to_string}}</p>
+        
+    {{ content }}
+
+	</div>
+</div>
