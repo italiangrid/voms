@@ -148,6 +148,8 @@ hr.soften {
 	border-bottom: none;
 	color: #5a5a5a;
 	font-weight: 200;
+	margin-top: 0px;
+	margin-bottom: 10px;
 }
 
 .marketing h3 {
@@ -157,6 +159,11 @@ hr.soften {
 .marketing h4 {
 	font-weight: 200;
 }
+
+.marketing p {
+	line-weight: 20px;
+}
+
 
 .marketing ul li h4 a {
 	color: #5a5a5a;
