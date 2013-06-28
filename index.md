@@ -3,25 +3,24 @@ layout: default
 title: VOMS home
 ---
 
+<div class="marketing">
+	<h1>VOMS</h1>
+	<p class="lead">VOMS (Virtual Organization Membership Service) enables Virtual Organization access control in distributes services. It is the tool used by <a href="http://wlcg.web.cern.ch/">WLCG</a> to authorize the use of the storage and computing resources that were used in discovering the <a href="http://press.web.cern.ch/press-releases/2012/07/cern-experiments-observe-particle-consistent-long-sought-higgs-boson">Higgs boson</a>.</p> 
+	<p>VOMS is an attribute authority that issues signed tokens (Attribute Certificate or SAML assertions) stating a user membership to an organisation. Attributes are used by services to allow or deny us of resources that are.</p>
+</div>
+
+<hr class="soften">
+
+{% for post in site.posts limit:2 %}
 <div class="row-fluid marketing">
-	<div class="span8">
-		<h1>VOMS</h1>
-		<p class="lead">VOMS (Virtual Organization Membership Service) enables Virtual Organization access control in distributes services. It is the tool used by <a href="http://wlcg.web.cern.ch/">WLCG</a> to authorize the use of the storage and computing resources that were used in discovering the <a href="http://press.web.cern.ch/press-releases/2012/07/cern-experiments-observe-particle-consistent-long-sought-higgs-boson">Higgs boson</a>.</p> 
-		<p>VOMS is an attribute authority that releases signed tokens (Attribute Certificate or SAML assertions) stating a user membership to an organisation. Attributes are used by services to allow or deny us of resources that are.
-		</p>
+	<div class="span2">
+		<p class="text-left">{{ post.date | date_to_long_string }}</p>
 	</div>
-	<div class="span4">
-  	<h3>News</a></h3>
-		<ul class="unstyled">
-		{% for post in site.posts limit:2 %}
-    	<li>
-       	<h4><a href="{{ post.url }}">{{ post.title }}</a></h4>
-        <p>{{ post.summary }}</p>
-    	</li>
-    {% endfor %}
-		</ul>
+	<div class="span10">
+		<p><span class="news-title">{{ post.title }}</span> {{ post.summary }}</p>
   </div>
 </div>
+{% endfor %}
 
 <hr class="soften">
 

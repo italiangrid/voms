@@ -144,8 +144,8 @@ hr.soften {
 .marketing h1 {
 	color: #5a5a5a;
 	margin: 15px 0;
-	font-size: 80px;
-	font-weight: 200;
+	font-size: 60px;
+	font-weight: 500;
 	line-height: 1;
 	letter-spacing: -1px;
 	height: auto;
@@ -161,6 +161,12 @@ hr.soften {
 
 .marketing h3 {
 	font-weight: 200;
+}
+
+span.news-title {
+	font-size: 24px;
+	font-weight: 200;
+	margin-right: 10px;
 }
 
 .marketing h4 {

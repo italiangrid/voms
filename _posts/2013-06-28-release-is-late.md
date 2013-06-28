@@ -1,6 +1,6 @@
 ---
 layout: post
-title: The release scheduled for today is late 
+title: The release is late 
 author: valerio
 summary: We will release on Monday
 ---
