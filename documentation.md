@@ -1,6 +1,6 @@
 ---
 layout: default
-title: VOMS documentation
+title: VOMS Documentation
 ---
 
 # Documentation

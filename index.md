@@ -1,29 +1,24 @@
 ---
-layout: default
+layout: home
 title: VOMS home
 ---
-
-<div class="marketing">
-	<h1>VOMS</h1>
-	<p class="lead">VOMS (Virtual Organization Membership Service) enables Virtual Organization access control in distributes services. It is the tool used by <a href="http://wlcg.web.cern.ch/">WLCG</a> to authorize the use of the storage and computing resources that were used in discovering the <a href="http://press.web.cern.ch/press-releases/2012/07/cern-experiments-observe-particle-consistent-long-sought-higgs-boson">Higgs boson</a>.</p> 
-	<p>VOMS is an attribute authority that issues signed tokens (Attribute Certificate or SAML assertions) stating a user membership to an organisation. Attributes are used by services to allow or deny us of resources that are.</p>
-</div>
-
-<hr class="soften">
-
-{% for post in site.posts limit:2 %}
+<!--
 <div class="row-fluid marketing">
-	<div class="span2">
-		<p class="text-left">{{ post.date | date_to_long_string }}</p>
-	</div>
-	<div class="span10">
-		<p><span class="news-title">{{ post.title }}</span> {{ post.summary }}</p>
-  </div>
+	<h2>News</h2>
+</div>
+{% for post in site.posts limit:2 %}
+<div class="row-fluid marketing news-row">
+	    <div class="span2 news-date">
+		    <p class="text-left">{{ post.date | date_to_long_string }}</p>
+	    </div>
+	    <div class="span10">
+            <h3>{{post.title}}</h3>
+            <p>{{post.summary}} <a href="{{post.url}}">more</a></p>
+			
+        </div>
 </div>
 {% endfor %}
-
-<hr class="soften">
-
+-->
 <div class="row-fluid marketing">
 	<div class="span6">
 		<h2 class="">Organization management</h2>
@@ -53,7 +48,7 @@ title: VOMS home
 
 <div class="row-fluid marketing">
 	<div class="span6">
-		<h2>Enable attribute based authorization</h2>
+		<h2>APIs for attribute based authorization</h2>
 		<p>Services can uses VOMS attributes to allow access to resources. When authenticating users using proxy certificates, they can extract VOMS attributes from the proxy using the VOMS API and use them in the authorization process.</p>
 		<p>The VOMS API come in Java and C/C++ bindings. It allows services to extract VO membership information from the proxy certificate authentication and use it to take authorization decisions.</p>
 	</div>

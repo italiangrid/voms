@@ -5,7 +5,7 @@ title: VOMS downloads
 
 # VOMS releases
 
-StoRM packages can be obtained from the EMI repository or from the VOMS produt team package repository.
+VOMS packages can be obtained from the EMI repository or from the VOMS product team package repository.
 
 ### Repository configuration 
 
@@ -30,31 +30,40 @@ To install the repository files, run the following commands (as root):
     (SL6) # wget http://italiangrid.github.io/voms/repo/voms_sl6.repo -O /etc/yum.repos.d/voms_sl6.repo
 
 
-## Current release
+## Current releases
 
-The current release is [VOMS v. 0.0.0](release-notes-v0_0_0.html).
+
+|  Component   |  Version   | Repo availability   |
+| :----------: | :--------: | :-----------------: |
+| VOMS clients | [3.0.2]({{site.baseurl}}release-notes/voms-clients/3.0.2) | <span class="label label-info">voms pt</span> |
+| VOMS core service | [2.0.10][voms-emi3] | <span class="label label-info">voms pt</span> <span class="label">emi</span> |
+| VOMS admin service | [3.2.0]({{site.baseurl}}release-notes/voms-admin-server/3.2.0) | <span class="label label-info">voms pt</span> |
+| VOMS admin client | [2.0.19]({{site.baseurl}}release-notes/voms-admin-client/2.0.19) | <span class="label label-info">voms pt</span> |
+| VOMS C/C++ APIs | [2.0.10][voms-emi3] | <span class="label label-info">voms pt</span> <span class="label">emi</span> |
+| VOMS Java APIs | [3.0.0][voms-emi3] | <span class="label label-info">voms pt</span> <span class="label">emi</span> <span class="label label-success">maven central</span> |
+
 
 ## Previous releases
 
-### VOMS v. 0.0.0-1
-
-This was the VOMS released in EMI-3.
-
-See the [release notes](http://www.eu-emi.eu/releases/emi-3-montebianco/products/-/asset_publisher/5dKm/content/storm-se-2) on the EMI project web pages.
+Information about previous releases can be found on the [EMI website](http://www.eu-emi.eu).
 
 ---
 
-## Testing versions
+## Beta releases
 
-We are going provide a repository for testing versions, i.e versions for which the development has finished and can be passed to early adopters for the staged roll-out.
+A repository providing beta versions of the VOMS components, i.e. versions for which the development
+and internal testing has been completed succesfully, can be found [here](#stucaz). 
 
 ---
 
-## Development versions
+## Nightly builds
 
 Development versions are built regularly on our [continuos integration infrastructure](http://radiohead.cnaf.infn.it:9999/view/VOMS/). 
 
-Artifacts for the last commit can be found on our yum repos for [VOMS SL5](http://radiohead.cnaf.infn.it:9999/view/VOMS/job/repo_voms_SL5/lastSuccessfulBuild/artifcact/voms.repo), 
+Artifacts produced from the development branch can be found on our yum repos for [VOMS SL5](http://radiohead.cnaf.infn.it:9999/view/VOMS/job/repo_voms_SL5/lastSuccessfulBuild/artifcact/voms.repo), 
 [VOMS Client SL5](http://radiohead.cnaf.infn.it:9999/view/VOMS/job/repo_voms_clients_3_0_SL5/lastSuccessfulBuild/artifact/voms-clients.repo), 
 [VOMS SL6](http://radiohead.cnaf.infn.it:9999/view/VOMS/job/repo_voms_SL6/artifacts/voms.repo) or
 [VOMS Client SL6](http://radiohead.cnaf.infn.it:9999/view/VOMS/job/repo_voms_clients_3_0_SL6/lastSuccessfulBuild/artifact/voms-clients.repo).
+
+
+[voms-emi3]: http://www.eu-emi.eu/releases/emi-3-montebianco/products/-/asset_publisher/5dKm/content/voms-2

@@ -9,7 +9,7 @@ code{
 .vo-highlight {
 	color: rgb(25, 100, 11);
 }
-#wrap { 
+#wrap, #home-wrap { 
 	
 	min-height: 100%; 
 	height: auto !important;
@@ -73,6 +73,7 @@ and make it centered */
 		}		
 }
 
+
 #wrap > .container {
 	padding-top: 41px;
 }
@@ -101,7 +102,6 @@ h1 {
 	color: rgb(51, 51, 51);
 	font-size: 36px;
 	line-height: normal;
-	height: 37px;
 	margin-bottom: 25px;
 }
 
@@ -120,19 +120,20 @@ h2 {
 	line-height: 19px;
 }
 
-/**
-.navbar-inverse .navbar-inner{
-	background-color: #3d3f42;
-	background-image: linear-gradient(to bottom, #3d3f42, #3d3f38);
-}
-**/
 .navbar .brand{
 	font-size:24px;
 	font-weight: bold;
 }
 
 /** for the home page **/
+.news-row {
+	margin-bottom: 1em;
+}
 
+.news-row h3 {
+	margin-top: 0;
+	line-height: 24px;
+}
 hr.soften {
 	margin: 40px 0;
 }
@@ -174,7 +175,7 @@ span.news-title {
 }
 
 .marketing p {
-	line-weight: 20px;
+	line-height: 24px;
 }
 
 
@@ -203,4 +204,10 @@ span.news-title {
 .marketing h2 a:hover {
 	color: #ad141e;
 	text-decoration:none;
+}
+
+/* Hero unit */
+.hero-unit .container h1{
+	margin-bottom: 10px;
+	
 }

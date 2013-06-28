@@ -10,20 +10,17 @@ rfcs:
 
 # VOMS Clients v. 3.0.2 
 
-This release provides the following bug fixes.
+This release fixes some backward incompatibilities introduced with version 3.0.0 of the clients in
+the `voms-proxy-init` and `voms-proxy-info` commands.
 
 ### Bug fixes
 
 {% include list-rfcs.liquid %}
 
-### Other news
-
-* The VOMS web site is now hosted on [Github]({{ site.voms.website }}).
-
 ### Installation and configuration
+
+For clean and update installation instructions, follow the instructions in the [VOMS clients guide]({{site.baseurl}}/documentation/voms-clients-guide). 
 
 ### Known issues
 
-None at the moment
-
-
+None at the moment.

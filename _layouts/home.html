@@ -14,14 +14,13 @@
 	<link href="{{ site.baseurl }}/assets/css/github-fork-ribbon.css" rel="stylesheet"/>
   </head> 
   <body>
-	<div id="wrap">
+	<div id="home-wrap">
 	    {% include github-ribbon.html %}
   		{% include navbar.html %}
+        {% include hero-unit.html %}
 		
 		<div class="container">
-			<div id="vomscontent">
-				{{content}}
-			</div>
+		{{content}}
 		</div>
 		
 		<div id="push"></div>
