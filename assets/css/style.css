@@ -46,6 +46,13 @@ and make it centered */
 	line-height: 25px;
 }
 
+.alert{
+	line-height: 25px;
+}
+
+.alert h4{
+	margin-bottom: 1em;
+}
 
 #footer{
 	/* border-top: 5px solid #e4c90f;*/
