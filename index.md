@@ -27,7 +27,7 @@ title: VOMS home
 		
 	</div>
 	<div class="span6">
-		<img src="http://docs.openstack.org/trunk/openstack-compute/admin/content/figures/1/figures/horizon-screenshot.jpg" class="img-rounded">
+		<img src="assets/img/webapp.png" class="img-rounded">
 	</div>
 </div>
 
@@ -40,7 +40,7 @@ title: VOMS home
 		</p>
 	</div>
 	<div class="span6">
-		<img src="assets/img/clients.png" class="img-polaroid">
+		<img src="assets/img/clients.png" class="img-rounded">
 	</div>
 </div>
 
