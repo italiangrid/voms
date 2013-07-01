@@ -22,9 +22,8 @@ title: VOMS home
 <div class="row-fluid marketing">
 	<div class="span6">
 		<h2 class="">Organization management</h2>
-		<p class="">VOMS provides a web application for managing organizations. It support a rich registration process with AUP acceptance enforcement and membership expiration. Users can be assigned to groups and can be given roles and generics attributes.</p>
-		<p class="">Or VO administrators can use a command line client for management.</p>
-		
+		<p>VOMS provides a web application for managing organizations. It support a rich registration process with AUP acceptance enforcement and membership expiration. Users can be assigned to groups and can be given roles and generics attributes.</p>
+		<p>Or VO administrators can use a command line client for management.</p>
 	</div>
 	<div class="span6">
 		<img src="assets/img/webapp.png" class="img-rounded">
