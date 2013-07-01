@@ -1,1 +1,1 @@
-3.2.0/index.md
+../../documentation/voms-admin-guide/3.2.0/index.md
