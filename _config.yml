@@ -28,3 +28,8 @@ authors:
   enrico:
     display_name: Enrico Vianello
     email: enrico.vianello@cnaf.infn.it
+
+versions:
+    sysadmin_guide : 3.0.0
+    voms_admin_guide : 3.2.0
+    voms_clients_guide: 3.0.2

@@ -17,7 +17,7 @@ You can find [general EMI 3 installation instructions](https://twiki.cern.ch/twi
 	wget http://emisoft.web.cern.ch/emisoft/dist/EMI/3/sl5/x86_64/base/emi-release-3.0.0-2.el5.noarch.rpm
 	yum localinstall -y emi-release-3.0.0-2.el5.noarch.rpm
 
-Follow the [system administrator guide]({{site.baseurl}}documentation/sysadmin-guide) for detailed installation instructions.
+Follow the [system administrator guide]({{site.baseurl}}documentation/sysadmin-guide/{{site.versions.sysadmin_guide}}) for detailed installation instructions.
 
 #### VOMS
 
@@ -35,10 +35,10 @@ To install the repository files, run the following commands (as root):
 
 |  Component   |  Version   | Repo availability   |
 | :----------: | :--------: | :-----------------: |
-| VOMS clients | [3.0.2]({{site.baseurl}}release-notes/voms-clients/3.0.2) | <span class="label label-info">voms pt</span> |
+| VOMS clients | [3.0.2]({{site.baseurl}}/release-notes/voms-clients/3.0.2) | <span class="label label-info">voms pt</span> |
 | VOMS core service | [2.0.10][voms-emi3] | <span class="label label-info">voms pt</span> <span class="label">emi</span> |
-| VOMS admin service | [3.2.0]({{site.baseurl}}release-notes/voms-admin-server/3.2.0) | <span class="label label-info">voms pt</span> |
-| VOMS admin client | [2.0.19]({{site.baseurl}}release-notes/voms-admin-client/2.0.19) | <span class="label label-info">voms pt</span> |
+| VOMS admin service | [3.2.0]({{site.baseurl}}/release-notes/voms-admin-server/3.2.0) | <span class="label label-info">voms pt</span> |
+| VOMS admin client | [2.0.19]({{site.baseurl}}/release-notes/voms-admin-client/2.0.19) | <span class="label label-info">voms pt</span> |
 | VOMS C/C++ APIs | [2.0.10][voms-emi3] | <span class="label label-info">voms pt</span> <span class="label">emi</span> |
 | VOMS Java APIs | [3.0.0][voms-emi3] | <span class="label label-info">voms pt</span> <span class="label">emi</span> <span class="label label-success">maven central</span> |
 
