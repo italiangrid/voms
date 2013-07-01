@@ -17,7 +17,7 @@ You can find [general EMI 3 installation instructions](https://twiki.cern.ch/twi
 	wget http://emisoft.web.cern.ch/emisoft/dist/EMI/3/sl5/x86_64/base/emi-release-3.0.0-2.el5.noarch.rpm
 	yum localinstall -y emi-release-3.0.0-2.el5.noarch.rpm
 
-Follow the [system administrator guide]({{site.baseurl}}documentation/sysadmin-guide/{{site.versions.sysadmin_guide}}) for detailed installation instructions.
+Follow the [system administrator guide]({{site.baseurl}}/documentation/sysadmin-guide}}) for detailed installation instructions.
 
 #### VOMS
 
@@ -29,8 +29,9 @@ To install the repository files, run the following commands (as root):
     (SL5) # wget http://italiangrid.github.io/voms/repo/voms_sl5.repo -O /etc/yum.repos.d/voms_sl5.repo
     (SL6) # wget http://italiangrid.github.io/voms/repo/voms_sl6.repo -O /etc/yum.repos.d/voms_sl6.repo
 
+---
 
-## Current releases
+### Current releases
 
 
 |  Component   |  Version   | Repo availability   |
@@ -43,20 +44,20 @@ To install the repository files, run the following commands (as root):
 | VOMS Java APIs | [3.0.0][voms-emi3] | <span class="label label-info">voms pt</span> <span class="label">emi</span> <span class="label label-success">maven central</span> |
 
 
-## Previous releases
+### Previous releases
 
 Information about previous releases can be found on the [EMI website](http://www.eu-emi.eu).
 
 ---
 
-## Beta releases
+### Beta releases
 
 A repository providing beta versions of the VOMS components, i.e. versions for which the development
 and internal testing has been completed succesfully, can be found [here](#stucaz). 
 
 ---
 
-## Nightly builds
+### Nightly builds
 
 Development versions are built regularly on our [continuos integration infrastructure](http://radiohead.cnaf.infn.it:9999/view/VOMS/). 
 
@@ -65,5 +66,17 @@ Artifacts produced from the development branch can be found on our yum repos for
 [VOMS SL6](http://radiohead.cnaf.infn.it:9999/view/VOMS/job/repo_voms_SL6/artifacts/voms.repo) or
 [VOMS Client SL6](http://radiohead.cnaf.infn.it:9999/view/VOMS/job/repo_voms_clients_3_0_SL6/lastSuccessfulBuild/artifact/voms-clients.repo).
 
+---
+
+### Source code
+
+The VOMS source is available on [Github](https://github.com) in the following repositories:
+
+- [VOMS clients](https://github.com/italiangrid/voms-clients)
+- [VOMS core](https://github.com/italiangrid/voms)
+- [VOMS Admin server](https://github.com/italiangrid/voms-admin-server)
+- [VOMS Admin client](https://github.com/italiangrid/voms-admin-client)
+- [VOMS C/C++ APIs](https://github.com/italiangrid/voms)
+- [VOMS Java APIs](https://github.com/italiangrid/voms-api-java)
 
 [voms-emi3]: http://www.eu-emi.eu/releases/emi-3-montebianco/products/-/asset_publisher/5dKm/content/voms-2

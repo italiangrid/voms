@@ -5,9 +5,10 @@ title: VOMS Known issues page
 
 # Known issues
 
-### VOMS 3.0.0 (aka EMI-3)
+### Latest VOMS release (available in VOMS and EMI-3 repos)
 
+No known issues.
 
-### VOMS 2.x (aka EMI-2)
+### EMI 2 and EMI 1 packages 
 
 See [ItalianGrid known issues page](https://wiki.italiangrid.it/twiki/bin/view/VOMS/KnownIssues)

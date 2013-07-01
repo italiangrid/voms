@@ -1,9 +1,12 @@
 ---
 layout: default
 title: VOMS Client Guide
+version: 3.0.2
 ---
 
-# VOMS Client guide
+# VOMS Clients guide
+
+Version: {{page.version}}
 
 #### Table of contents
 * [Installing the clients](#install)

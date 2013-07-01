@@ -8,7 +8,7 @@ version: 3.2.0
 
 Version: {{ page.version }}
 
-### Table of contents
+#### Table of contents
 
 - [Introduction](#intro)
 - [Configuration](#config)

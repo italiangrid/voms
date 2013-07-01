@@ -22,8 +22,9 @@ title: VOMS home
 <div class="row-fluid marketing">
 	<div class="span6">
 		<h2 class="">Organization management</h2>
-		<p>VOMS provides a web application for managing organizations. It support a rich registration process with AUP acceptance enforcement and membership expiration. Users can be assigned to groups and can be given roles and generics attributes.</p>
-		<p>Or VO administrators can use a command line client for management.</p>
+        <p>In a nutshell, VOMS provides the tools to enable Virtual Organizations and attribute-based authorization in distributed contexts.</p>
+		<p>VOMS supports a rich registration process compliant with the <a href="https://documents.egi.eu/public/RetrieveFile?docid=79&version=6&filename=EGI-SPG-VOManagement-V1_0.pdf">EGI policies on VO registration services</a>. Users can be organized in groups and can be assigned roles and other types of
+        attributes.</p>
 	</div>
 	<div class="span6">
 		<img src="assets/img/webapp.png" class="img-rounded">
@@ -35,7 +36,11 @@ title: VOMS home
 <div class="row-fluid marketing">
 	<div class="span6">
 		<h2 class="">Client tools</h2>
-		<p class="">A user can use the VOMS clients to request a signed token (an Attribute Certificate compliant to <a href="http://www.ietf.org/rfc/rfc3281.txt">RFC 3281</a>) from a VOMS server that state that she belongs to the VO and embed it in to an <a href="http://www.ietf.org/rfc/rfc3820.txt">X509 Proxy Certificate</a>. When authenticating to third party services using the proxy, the user brings along this information that services may use to drive authorization decisions.
+		<p class="">
+			VOMS clients are used to request a signed token (an Attribute Certificate compliant with 
+			<a href="http://www.ietf.org/rfc/rfc3281.txt">RFC 3281</a>) from a VOMS server. 
+			This token carries the attributes that a person holds in a certain VO, and is usually embedded inside an <a href="http://www.ietf.org/rfc/rfc3820.txt">X509 Proxy Certificate</a>. 
+			The proxy certificate is used to drive authentication and authorization decisions when accessing third party services.
 		</p>
 	</div>
 	<div class="span6">
@@ -48,8 +53,7 @@ title: VOMS home
 <div class="row-fluid marketing">
 	<div class="span6">
 		<h2>APIs for attribute based authorization</h2>
-		<p>Services can uses VOMS attributes to allow access to resources. When authenticating users using proxy certificates, they can extract VOMS attributes from the proxy using the VOMS API and use them in the authorization process.</p>
-		<p>The VOMS API come in Java and C/C++ bindings. It allows services to extract VO membership information from the proxy certificate authentication and use it to take authorization decisions.</p>
+		<p>VOMS APIs come in Java and C/C++ bindings and enable easy integration of VOMS-based authorization in existing services.</p>
 	</div>
 	<div class="span6">
 		<img src="assets/img/snippet.png" class="img-rounded">

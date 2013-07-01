@@ -1,11 +1,15 @@
 ---
 layout: default
 title: VOMS System Administrator Guide
+version: 3.0.0
 ---
 
 # VOMS System Administrator guide
 
+Version : {{page.version}}
+
 #### Table of contents
+
 * [Introduction](#Intro)
 * [Prerequisites and recommendations](#Prereq)
 * [Upgrade instructions](#Upgrade)
@@ -74,9 +78,41 @@ Also archive the configuration files for VOMS and VOMS-Admin, which live in the 
 
 ### EMI repository configuration
 
-Follow the [general EMI 3 installation instructions](https://twiki.cern.ch/twiki/bin/view/EMI/GenericInstallationConfigurationEMI3) for installing the EMI-3 repositories. 
+Follow the [general EMI 3 installation instructions](https://twiki.cern.ch/twiki/bin/view/EMI/GenericInstallationConfigurationEMI3) for installing the EMI-3 repositories.
 
-### Upgrade <a name="Upgrading">&nbsp;</a>
+If installing from the VOMS PT repository, also follow the instructions given [here]({{site.baseurl}}/download.html).
+
+### Upgrading from EMI 3 to the latest VOMS release <a name="Upgrading from EMI 3">&nbsp;</a>
+
+After having properly configured the repositories as explained in the previous section, just run:
+
+```bash
+yum update
+```
+
+to get the latest versions of the VOMS packages.
+
+If the release notes indicate that a reconfiguration of the services is required, run `voms-configure` with the same parameters
+that you used the first time you configured the VO. See the [Configuration section](#conf) for more information on how
+to install and reconfigure the VOMS services.
+
+#### Upgrading the VOMS database
+
+If the release notes of the version that you are installing indicate that an upgrade of the VOMS database is required, run 
+
+```bash
+voms-configure upgrade --vo <vo_name>
+```
+
+for each of your configured VOs.
+
+<div class="alert alert-error">
+	<h4>Important!</h4>
+	Always backup the contents of the VOMS databse before running the database upgrade procedure described above.
+</div>
+
+
+### Upgrading from EMI 2 <a name="Upgrading from EMI 2">&nbsp;</a>
 
 Before upgrading, stop the running VOMS services issuing the following commands
 
