@@ -4,8 +4,7 @@ markdown: redcarpet
 redcarpet:
   extensions: [ "tables" ]
 
-site:
-    baseurl: /voms
+baseurl: /voms
 
 issue_base_url: https://issues.infn.it/browse/
 
