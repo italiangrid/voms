@@ -12,7 +12,7 @@ title: News
 	    <div class="span10">
             <h3>{{post.title}}</h3>
             <p>{{post.summary}}</p>
-			<a href="{{post.url}}">Read more</a>
+			<a href="{{ site.baseurl }}{{post.url}}">Read more</a>
         </div>
 </div>
 {% endfor %}
