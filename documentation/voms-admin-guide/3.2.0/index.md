@@ -29,10 +29,6 @@ Version: {{ page.version }}
    - [ACL inheritance and VOMS groups](#authz-acl)
    - [VOMS Admin operations and required permissions](#authz-ops-perms)
 - [The command line utilities](#cli)
-   - [voms-admin](#cli-voms-admin)
-   - [voms-configure](#cli-voms-configure)
-   - [voms-db-util](#cli-voms-db-util)
-   - [voms-mysql-util](#cli-voms-mysql-util)
 
 ## Introduction <a name="intro">&nbsp;</a>
 
@@ -247,7 +243,8 @@ To disable the registration service add the `--disable-registration` flag when c
 voms.registration.enabled = False
 ```
 
-in the `/etc/voms/VO_NAME/service.properties` for a given VO.
+in the `/etc/voms/VO_NAME/service.properties` for a given VO. Please refer to the [VOMS System administrator guide]({{site.baseurl}}/documentation/sysadmin-guide)
+for more information.
 
 #### AUP management page<a name="web-app-aup-manage">&nbsp;</a>
 
@@ -259,7 +256,7 @@ For VOMS Admin basically an AUP is the URL of a text file, so any file on the lo
 
 #### Setting the VO AUP url at VO configuration time<a name="web-app-aup-manage-url">&nbsp;</a>
 
-The `voms-configure` --vo-aup-url option can be used to set the URL for the initial version of the VO acceptable usage policy. 
+The `voms-configure` --vo-aup-url option can be used to set the URL for the initial version of the VO acceptable usage policy. Please refer to the [VOMS System administrator guide]({{site.baseurl}}/documentation/sysadmin-guide) for more information.
 
 If this option is not set a template vo-aup file will be created in vo runtime configuration directory /etc/voms-admin/<vo-name>/vo-aup.txt
 
@@ -532,9 +529,7 @@ The table below lists operations on the left and required permissions on the rig
 
 ## The command line utilities <a name="cli">&nbsp;</a>
 
-### voms-admin<a name="cli-voms-admin">&nbsp;</a>
-
-VOMS Admin comes with a python command line client utility, called voms-admin, that can be used to perform most of the operations on the VOMS database that are implemented by the Web interface.
+VOMS Admin comes with a command line client utility, called voms-admin, that can be used to perform most of the operations on the VOMS database that are implemented by the Web interface.
 
 `voms-admin` uses the UNIX effective user ID to choose which X509 credential it must use to connect to a (possibly remote) VOMS Admin instance. When ran as root, `voms-admin` uses the host credentials found in /etc/gridsecurity. When running as a normal user, `voms-admin does the following:`
 
@@ -649,13 +644,5 @@ A user can get help about all the commands provided by voms-admin by typing:
 ```bash
 voms-admin --help-commands
 ```
-### voms-db-util <a name="cli-voms-db-util">&nbsp;</a>
-
-The `voms-db-util` command is used to manage the deployment of the VOMS database and to add/remove administrators without requriing voms-admin VOs to be active. See the `voms-db-util` man page
-for more details.
-
-### voms-mysql-util <a name="cli-voms-mysql-util">&nbsp;</a>
-
-### voms-configure <a name="cli-voms-configure">&nbsp;</a>
 
 [jspg-policies]: https://documents.egi.eu/public/RetrieveFile?docid=79&version=6&filename=EGI-SPG-VOManagement-V1_0.pdf

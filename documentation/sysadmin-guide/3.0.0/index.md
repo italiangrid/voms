@@ -206,7 +206,7 @@ VOMS_JAVA_OPTS="-Xms375m -Xmx750m -XX:MaxPermSize=1125m"
 The upgrade to EMI3 requires a reconfiguration of the deployed VOs. The VOs can be reconfigured using the `voms-configure` configuration tool (YAIM is no longer supported).
 
 This tool is the evolution of the `voms-admin-configure` script, and provides access to all the VOMS
-and VOMS-Admin service configuration parameters. For more detailed information about the `voms-configure` tool, see the  [FIXME](#tbd).
+and VOMS-Admin service configuration parameters. For more detailed information about the `voms-configure` tool, see the [configuration section](#Configuration).
 
 The following command shows a basic reconfiguration of the VO:
 
@@ -247,11 +247,11 @@ If you wish to configure EMIR follow the instructions [here](#EMIR).
 
 ## Clean installation instructions<a name="Installation">&nbsp;</a>
 
-These are the full instructions for a clean installation. If you are upgrading, see the [upgrade instructions section](#Upgrading).
+These are the full instructions for a clean installation. If you are upgrading, see the [upgrade instructions section](#Upgrade).
 
 ### Repositories
 
-Follow the [general EMI 3 installation instructions](https://twiki.cern.ch/twiki/bin/view/EMI/GenericInstallationConfigurationEMI3)
+Follow the [general EMI 3 installation instructions](https://twiki.cern.ch/twiki/bin/view/EMI/GenericInstallationConfigurationEMI3) for installing the repositories.
 
 ### Certificate revocation lists
 
@@ -270,6 +270,7 @@ and enable a cron job that periodically refresh CRLs on the filesystem as follow
 ### Clean installation
 
 Install the `emi-voms-mysql` metapackage, or `emi-voms-oracle` depending on the database backend you are using
+
 ```bash
 yum install emi-voms-mysql
 ```
@@ -333,9 +334,9 @@ voms-configure COMMAND [OPTIONS]
 
 Available commands are:
 
-* install: is used to configure a VO
-* remove: is used to unconfigure a VO
-* upgrade: is used to upgrade the configuration of a VO installed with an older version of voms-admin.
+* `install` is used to configure a VO
+* `remove`: is used to remove a VO configuration
+* `upgrade`: is used to upgrade the configuration of a VO installed with an older version of voms-admin.
 
 Usually, you do not have a dedicated MySQL administrator working for you, so you will use voms-admin tools to create the database schema, configure the accounts and deploy the voms database. If this is the case, you need to run the following command:
 
@@ -405,6 +406,76 @@ Available options are:
 * undeploy-database:	 Undeploys the VOMS database. By default when removing a VO the database is left untouched. All the database content is lost.
 * dropdb (MySQL only):	 This flag is used to drop the mysql database schema created for MySQL installations using the --createdb option
 
+See the `voms-configure` help for a list of all the supported option and their meaning.
+
+### Other configuration utilities
+
+#### voms-mysql-util
+
+The `voms-mysql-util` command is used for the creation or removal of the database that will host the VOMS services tables on a MySQL database backend. This command does not create the tables. This is done by the `voms-db-util` command, which is described below. As `voms-mysql-util` is used by `voms-configure` normally system administrator does not use it, but it can sometimes be of help.
+
+The general invocation is
+
+```bash
+voms-mysql-util COMMAND OPTIONS
+```
+
+Available options are:
+
+* `create_db`  creates a MySQL database and grants read and write access
+* `drop_db`  drops a MySQL database
+* `grant_rw_access`  grants read and write access to a user
+* `grant_ro_access`  grants read-only access to a user
+
+The options are described in the following table
+
+| Option | Description | Default value |
+|:--------:|:-----------:|:-------------:|
+| `--dbhost HOST` | Uses HOST when connecting to MySQL. | localhost |
+| `--dbport PORT` | Uses PORT when connecting to MySQL. | 3306 |
+| `--mysql-command CMD` | Uses CMD ad mysql command. | mysql |
+| `--dbauser USER` | Uses USER when connecting to MySQL. USER must have the rights to create database and grant access to them. | root |
+| `--dbapwd PWD` | Uses PWD when connecting to MySQL. This is the password of the user specified using the --dbauser option.|
+| `--dbapwdfile FILE` | Reads the password to connect to the database from FILE. |
+| `--dbusername USER` | Sets the database username to USER. |
+| `--dbpassword PWD` | Sets the database password to PWD |
+| `--vomshost HOST` | Sets the HOST where VOMS is running. This is the host from which MySQL will receive connections for the database. |
+| `--dbname DBNAME` | Sets the VOMS database name to DBNAME. |
+
+#### voms-db-util
+
+The `voms-db-util` command is used to manage the deployment of the VOMS database, and to add/remove administrators without requiring voms-admin VOs to be active. As `voms-db-util` is used by `voms-configure` normally system administrator does not use it, but it can sometimes be of help.
+
+The general invocation is
+
+```bash
+voms-db-util COMMAND [OPTIONS]
+```
+
+The commands for installing or removing the database are
+
+* `check-connectivity` check whether the database can be contacted
+* `deploy` deploys the database for a given VO
+* `undeploy` undeploys the database for a given VO
+* `upgrade` upgrades the database for a given VO
+
+The commands for adding or removing administrators are
+
+* `add-admin` creates an administrator with full privileges for a given VO
+* `remove-admin` removes an administrator from a given VO
+* `grant-read-only-access`  creates ACLs so that VO structure is readable for any authenticated user
+
+The options are described in the following table
+
+| Option | Description |
+|:--------:|:-----------:|
+| `--vo` | The VO for which database operations are performed |
+| `--dn` | The DN of the administrator certificate |
+| `--ca` | the DN of the CA that issued the administrator certificate |
+| `--email` | the EMAIL address of the administrator |
+| `--cert` | the x.509 CERTIFICATE of the administrator being created |
+| `--ignore-cert-email` | Ignores the email address in the certificate passed in with the --cert option |
+
 ### Configuration files
 
 The VOMS server configuration lives in the `/etc/voms/<VO_NAME>` directory and is composed of two files:
@@ -423,6 +494,8 @@ of the following files:
 - *service.properties*, which contains the main VO configuration
 - *database.properties*, which contains database access and connection pool configuration for the VO
 - *logback.xml*, which controls logging of the VO application
+
+Detailed information on configuration files can be found in the [VOMS Configuration guide]({{site.baseurl}}/documentation/sysadmin-guide/{{page.version}}/configuration.html).
 
 ### Information system
 
@@ -557,7 +630,6 @@ Log levels are numeric values which have the meaning defined in the following ta
 
 The `--logtype` flag controls which type of information is logged by the voms server.
 The default value for this option is `7` and should be left configured so.
-
 
 #### VOMS admin
 
