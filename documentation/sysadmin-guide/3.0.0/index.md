@@ -96,15 +96,28 @@ If the release notes indicate that a reconfiguration of the services is required
 that you used the first time you configured the VO. See the [Configuration section](#conf) for more information on how
 to install and reconfigure the VOMS services.
 
-#### Upgrading the VOMS database
-
-If the release notes of the version that you are installing indicate that an upgrade of the VOMS database is required, run 
+If the release notes indicate that restarting the VOMS services is required, run
 
 ```bash
-voms-configure upgrade --vo <vo_name>
+service voms restart
+service voms-admin restart
 ```
 
-for each of your configured VOs.
+#### Upgrading the VOMS database <a name="db-upgrade">&nbsp;</a>
+
+If the release notes of the version that you are installing indicate that an upgrade of the VOMS database is required, follow 
+the procedure described below:
+
+1. Stop the services.
+2. Backup the contents of the VOMS database following the instructions in the [database migration section](#Migration).
+3. Run the upgrade script for each configured vo as follows:
+
+   ```bash
+   voms-configure upgrade --vo <vo_name>
+   ```
+
+4. Restart the services
+
 
 <div class="alert alert-error">
 	<h4>Important!</h4>
@@ -193,7 +206,7 @@ VOMS_JAVA_OPTS="-Xms375m -Xmx750m -XX:MaxPermSize=1125m"
 The upgrade to EMI3 requires a reconfiguration of the deployed VOs. The VOs can be reconfigured using the `voms-configure` configuration tool (YAIM is no longer supported).
 
 This tool is the evolution of the `voms-admin-configure` script, and provides access to all the VOMS
-and VOMS-Admin service configuration parameters. For more detailed information about the `voms-configure` tool, see the [VOMS Admin user's guide](#tbd).
+and VOMS-Admin service configuration parameters. For more detailed information about the `voms-configure` tool, see the  [FIXME](#tbd).
 
 The following command shows a basic reconfiguration of the VO:
 
@@ -209,7 +222,16 @@ voms-configure install \
 --smtp-host <smtp-host>
 ```
 
-Once the configuration is over you can restart the VOMS services:
+The above command will migrate the configuration to the latest supported version.
+
+Once the configuration is over, you will need to upgrade the database as explained in the [database upgrade section](#db-upgrade), i.e.
+running:
+
+```bash
+voms-configure upgrade --vo <vo_name>
+```
+
+for each configured VO and then restart the services with the following commands:
 
 ```bash
 service voms start
