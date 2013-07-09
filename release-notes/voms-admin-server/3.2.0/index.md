@@ -22,7 +22,7 @@ features:
 This release provides several bug fixes and improvements for VOMS Admin server.
 In particular:
 
-- VOMS Admin now support **Group managers**, a mechanism which allow the hierarchical dispatching
+- VOMS Admin now supports **Group managers**, a mechanism which allow the hierarchical dispatching
 of the notification resulting from user VO membership and group membership requests.
 
 - A **Request log** section has been added to the VOMS Admin web application. The log shows information
@@ -39,8 +39,14 @@ about requests handled (approval time, who approved the request etc.)
 
 ### Installation and configuration
 
-This release requires a reconfiguration and the upgrade of the VOMS database. Follow the instructions in the
-VOMS [System Administrator Guide]({{site.baseurl}}/documentation/sysadmin-guide).
+Upgrading to this version requires an upgrade of the database and a reconfiguration depending on the version of VOMS admin which is being upgraded.
+
+Follow the instructions in the VOMS [System Administrator Guide]({{site.baseurl}}/documentation/sysadmin-guide).
+
+| Upgrade from | Actions required |
+|:------------:|:----------------:|
+| EMI-3 (v. 3.1.0) | <span class="label label-important">db upgrade</span> |
+| EMI-2 (v. 2.7.0) | <span class="label label-important">db upgrade</span> <span class="label label-info">reconfiguration</span> |
 
 ### Known issues
 

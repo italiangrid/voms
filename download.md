@@ -36,7 +36,7 @@ To install the repository files, run the following commands (as root):
 
 |  Component   |  Version   | Repo availability   |
 | :----------: | :--------: | :-----------------: |
-| VOMS clients | [3.0.2]({{site.baseurl}}/release-notes/voms-clients/3.0.2) | <span class="label label-info">voms pt</span> |
+| VOMS clients | [3.0.2]({{site.baseurl}}/release-notes/voms-clients/3.0.2) | <span class="label label-info">voms pt</span> <span class="label">emi</span> |
 | VOMS core service | [2.0.10][voms-emi3] | <span class="label label-info">voms pt</span> <span class="label">emi</span> |
 | VOMS admin service | [3.2.0]({{site.baseurl}}/release-notes/voms-admin-server/3.2.0) | <span class="label label-info">voms pt</span> |
 | VOMS admin client | [2.0.19]({{site.baseurl}}/release-notes/voms-admin-client/2.0.19) | <span class="label label-info">voms pt</span> |
@@ -78,5 +78,7 @@ The VOMS source is available on [Github](https://github.com) in the following re
 - [VOMS Admin client](https://github.com/italiangrid/voms-admin-client)
 - [VOMS C/C++ APIs](https://github.com/italiangrid/voms)
 - [VOMS Java APIs](https://github.com/italiangrid/voms-api-java)
+- [VOMS mysql plugin](https://github.com/italiangrid/voms-mysql-plugin)
+- [VOMS oracle plugin](https://github.com/italiangrid/voms-oracle-plugin)
 
 [voms-emi3]: http://www.eu-emi.eu/releases/emi-3-montebianco/products/-/asset_publisher/5dKm/content/voms-2

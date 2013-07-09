@@ -8,18 +8,18 @@ layout: default
 	<div class="marketing">
 
   	<div class="media">
-    	<img class="media-object pull-left img-polaroid" src="http://www.gravatar.com/avatar/{{ author.gravatar }}?s=80">
+       
+    	<img class="media-object pull-left img-rounded" src="http://www.gravatar.com/avatar/{{ author.gravatar }}?s=64">
+      
       <div class="media-body">
       	<h3 class="media-heading">{{ page.title }}</h3>
-        <h4 class="media-heading">{{ author.display_name }}</h4>
+         <p style="vertical-align: middle"><i class="icon-calendar"></i> {{ page.date | date_to_string }} <i class="icon-user"></i> {{ author.display_name }}</p>
       </div>
     </div>
-        
-    <br/>
-    
-		<p>{{ page.date | date_to_string }}</p>
+    <hr style="margin: 0px 0px 20px 0px" />
         
     {{ content }}
 
 	</div>
+    <hr/>
 </div>

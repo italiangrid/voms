@@ -103,8 +103,7 @@ service voms restart
 service voms-admin restart
 ```
 
-#### Upgrading the VOMS database <a name="db-upgrade">&nbsp;</a>
-
+#### <span class="label label-important">db upgrade</span> Upgrading the VOMS database <a name="db-upgrade">&nbsp;</a> 
 If the release notes of the version that you are installing indicate that an upgrade of the VOMS database is required, follow 
 the procedure described below:
 
@@ -117,12 +116,6 @@ the procedure described below:
    ```
 
 4. Restart the services
-
-
-<div class="alert alert-error">
-	<h4>Important!</h4>
-	Always backup the contents of the VOMS databse before running the database upgrade procedure described above.
-</div>
 
 
 ### Upgrading from EMI 2 <a name="Upgrading from EMI 2">&nbsp;</a>
@@ -201,9 +194,10 @@ For example, for 15 VOs, the memory should be configued as follows:
 VOMS_JAVA_OPTS="-Xms375m -Xmx750m -XX:MaxPermSize=1125m"
 ```
 
-### Reconfiguring the VOs
+### <span class="label label-info">reconfiguration</span> Reconfiguring the VOs
 
-The upgrade to EMI3 requires a reconfiguration of the deployed VOs. The VOs can be reconfigured using the `voms-configure` configuration tool (YAIM is no longer supported).
+The upgrade from EMI 2 VOMS to EMI 3 VOMS (and, in particular, VOMS Admin v. 3.x) requires a reconfiguration of the deployed VOs. 
+The VOs can be reconfigured using the `voms-configure` configuration tool (YAIM is no longer supported).
 
 This tool is the evolution of the `voms-admin-configure` script, and provides access to all the VOMS
 and VOMS-Admin service configuration parameters. For more detailed information about the `voms-configure` tool, see the [configuration section](#Configuration).
@@ -224,6 +218,10 @@ voms-configure install \
 
 The above command will migrate the configuration to the latest supported version.
 
+<div class="alert alert-info">
+	<i class="icon-eye-open"></i> Save the command you use to configure your VOs in a script for future reference. 
+</div>
+
 Once the configuration is over, you will need to upgrade the database as explained in the [database upgrade section](#db-upgrade), i.e.
 running:
 
@@ -238,12 +236,13 @@ service voms start
 service voms-admin start
 ```
 
+
+
 ### Reconfiguring the information system
 
-Configuration files for voms information providers are now provided by voms. In order to properly configure
-the informaton provider for voms follow the instructions [here](#bdii).
+Configuration files for voms information providers are now provided by voms. To configure the information providers for voms follow the instructions [here](#bdii).
 
-If you wish to configure EMIR follow the instructions [here](#EMIR).
+To configure EMIR follow the instructions [here](#emir).
 
 ## Clean installation instructions<a name="Installation">&nbsp;</a>
 
@@ -406,13 +405,13 @@ Available options are:
 * undeploy-database:	 Undeploys the VOMS database. By default when removing a VO the database is left untouched. All the database content is lost.
 * dropdb (MySQL only):	 This flag is used to drop the mysql database schema created for MySQL installations using the --createdb option
 
-See the `voms-configure` help for a list of all the supported option and their meaning.
+See the `voms-configure` help for a list of all the supported options and their meaning.
 
 ### Other configuration utilities
 
 #### voms-mysql-util
 
-The `voms-mysql-util` command is used for the creation or removal of the database that will host the VOMS services tables on a MySQL database backend. This command does not create the tables. This is done by the `voms-db-util` command, which is described below. As `voms-mysql-util` is used by `voms-configure` normally system administrator does not use it, but it can sometimes be of help.
+The `voms-mysql-util` command is used for the creation or removal of the database that will host the VOMS services tables on a MySQL database backend. This command does not create the VOMS tables. This is done by the `voms-db-util` command, which is described below. As `voms-mysql-util` is invoked internally by `voms-configure` normally system administrators do not use it, but it can sometimes be of help.
 
 The general invocation is
 
@@ -444,7 +443,7 @@ The options are described in the following table
 
 #### voms-db-util
 
-The `voms-db-util` command is used to manage the deployment of the VOMS database, and to add/remove administrators without requiring voms-admin VOs to be active. As `voms-db-util` is used by `voms-configure` normally system administrator does not use it, but it can sometimes be of help.
+The `voms-db-util` command is used to manage the deployment and upgrade of the VOMS database tables, and to add/remove administrators without requiring VOMS Admin VOs to be active. As `voms-db-util` is invoked internally by `voms-configure` normally system administrators do not use it, but it can sometimes be of help.
 
 The general invocation is
 
@@ -495,11 +494,11 @@ of the following files:
 - *database.properties*, which contains database access and connection pool configuration for the VO
 - *logback.xml*, which controls logging of the VO application
 
-Detailed information on configuration files can be found in the [VOMS Configuration guide]({{site.baseurl}}/documentation/sysadmin-guide/{{page.version}}/configuration.html).
+Detailed information on configuration files can be found in the [VOMS Configuration reference]({{site.baseurl}}/documentation/sysadmin-guide/{{page.version}}/configuration.html).
 
-### Information system
+### Information system <a name="information-system">&nbsp;</a>
 
-#### BDII
+#### BDII <a name="bdii">&nbsp;</a>
 
 ##### Fix BDII default configuration on SL5
 
@@ -531,7 +530,7 @@ ldapsearch -x -h localhost -p 2170 -b 'GLUE2GroupID=resource,o=glue' objectCLass
 
 should return a service for each virtual organization.
 
-#### EMIR
+#### EMIR <a name="emir">&nbsp;</a>
 
 You can use [EMIR-SERP](https://twiki.cern.ch/twiki/bin/view/EMI/SERP) to publish VOMS information to EMIR. EMIR-SERP uses the information already available in the resource bdii and publish it to an EMIR DSR endpoint. You have to know the EMIR endpoint to do this, in the following example the EMI testbed EMIR
 endpoint is used.

@@ -10,7 +10,7 @@ title: News
 		    <p class="text-left">{{ post.date | date_to_long_string }}</p>
 	    </div>
 	    <div class="span10">
-            <h3>{{post.title}}</h3>
+            <h3><a href="{{post.url}}">{{post.title}}</a></h3>
             <p>{{post.summary}}</p>
 			<a href="{{ site.baseurl }}{{post.url}}">Read more</a>
         </div>
