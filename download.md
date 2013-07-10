@@ -50,13 +50,6 @@ Information about previous releases can be found on the [EMI website](http://www
 
 ---
 
-### Beta releases
-
-A repository providing beta versions of the VOMS components, i.e. versions for which the development
-and internal testing has been completed succesfully, can be found [here](#stucaz). 
-
----
-
 ### Nightly builds
 
 Development versions are built regularly on our [continuos integration infrastructure](http://radiohead.cnaf.infn.it:9999/view/VOMS/). 
