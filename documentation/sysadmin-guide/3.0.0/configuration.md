@@ -170,9 +170,9 @@ This is a Java properties file.
 
 | Property | Description | Default value |
 |:---------|:------------|:--------------|
-| `voms.request.vo_membership.enable_attribute_requests` | Enable attribute request at registration time. Setting this option to true will allow users to request membership in groups also when first registering at the VO. The VO manager will be given the chance to approve every membership request. | True |
+| `voms.request.vo_membership.enable_attribute_requests` | Enables the attribute request at registration time. Setting this option to true will allow users to request membership in groups also during their first registration at the VO. The VO manager will be given the chance to approve every membership request. | True |
 | `voms.request.vo_membership.lifetime` | Time (in seconds) that unconfirmed membership requests are kept inside the voms database. | 604800 |
-| `voms.request.vo_membership.warn_when_expired` | Should voms-admin send a warning email to the user when his/her uncorfimed request is removed from the database? | True |
+| `voms.request.vo_membership.warn_when_expired` | Should voms-admin send a warning email to the user when his/her unconfirmed request is removed from the database? | True |
 | `voms.mkgridmap.translate_dn_email_format` | Should voms-admin generate gridmapfiles that encode the email part of the DN using the "emailAddress" format in addition to the "Email=" format used by default? | False |
 
 #### AUP options

@@ -40,12 +40,12 @@ purposes.
 
 * NTP Time synchronization: required.
 * Host certificates: required
-* Networking: for the service ports see the [Service Reference Card](service-ref-card.html)
+* Networking: for the service ports see the [Service Reference Card]({{site.baseurl}}/documentation/sysadmin-guide/{{page.version}}/service-ref-card.html)
 
 ### Installed software
 
 Besides the usual OS and EMI release packages, in case of an Oracle based installation you will need the **oracle-instantclient-basic** package, version 11.2.0.3,
-as repackaged by CERN:
+as repackaged by CERN. Download it from [here](http://emisoft.web.cern.ch/emisoft/dist/elcaro/oracle-instantclient/11/repo/) and install it as follow:
 
 ```bash
 yum localinstall oracle-instantclient-basic-11.2.0.3-1.x86_64.rpm
@@ -76,7 +76,7 @@ Also archive the configuration files for VOMS and VOMS-Admin, which live in the 
 /etc/voms-admin
 ```
 
-### EMI repository configuration
+### EMI repository configuration <a name="Repository">&nbsp;</a>
 
 Follow the [general EMI 3 installation instructions](https://twiki.cern.ch/twiki/bin/view/EMI/GenericInstallationConfigurationEMI3) for installing the EMI-3 repositories.
 
@@ -188,7 +188,7 @@ VOMS_JAVA_OPTS="-Xms256m -Xmx512m -XX:MaxPermSize=512m"
 In case your server will host more VOs, you should adapt the memory configuration for the container accordingly.
 This can be done by setting the `VOMS_JAVA_OPTS` variable in the `/etc/sysconfig/voms-admin` file.
 We recommend to allocate roughly 50m of heap space and 75m of permanent space per VO.
-For example, for 15 VOs, the memory should be configued as follows:
+For example, for 15 VOs, the memory should be configured as follows:
 
 ```bash
 VOMS_JAVA_OPTS="-Xms375m -Xmx750m -XX:MaxPermSize=1125m"
@@ -250,7 +250,7 @@ These are the full instructions for a clean installation. If you are upgrading, 
 
 ### Repositories
 
-Follow the [general EMI 3 installation instructions](https://twiki.cern.ch/twiki/bin/view/EMI/GenericInstallationConfigurationEMI3) for installing the repositories.
+See the instructions [above](#Repository).
 
 ### Certificate revocation lists
 
@@ -392,7 +392,7 @@ The main difference lies in the `dbname` option, that is used to specify the TNS
 
 This TNS alias is needed to build the connection string that VOMS will use to communicate with the database backend.
 Usually, TNS aliases are maintained in the tnsnames.ora file, located in a directory that is usually exported to applications via the TNS_ADMIN Oracle environment variable. 
-For more information regarding TNS aliases, consult the Oracle online documentation (http://www.oracle.com/pls/db102/homepage).
+For more information regarding TNS aliases, consult the [Oracle online documentation](http://www.oracle.com/pls/db102/homepage).
 
 `voms-configure` is used also for removing already configured vos
 
@@ -470,9 +470,9 @@ The options are described in the following table
 |:--------:|:-----------:|
 | `--vo` | The VO for which database operations are performed |
 | `--dn` | The DN of the administrator certificate |
-| `--ca` | the DN of the CA that issued the administrator certificate |
-| `--email` | the EMAIL address of the administrator |
-| `--cert` | the x.509 CERTIFICATE of the administrator being created |
+| `--ca` | The DN of the CA that issued the administrator certificate |
+| `--email` | The EMAIL address of the administrator |
+| `--cert` | The x.509 CERTIFICATE of the administrator being created |
 | `--ignore-cert-email` | Ignores the email address in the certificate passed in with the --cert option |
 
 ### Configuration files

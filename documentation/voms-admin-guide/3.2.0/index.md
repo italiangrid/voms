@@ -47,7 +47,7 @@ In order to be compliant with the [JSPG policies on VO registration services][js
 implements two membership validation mechanisms:
 
 - The Acceptable Usage Policy (AUP) signature verification mechanism
-- the Membership expiration mechanism
+- The Membership expiration mechanism
 
 ### The AUP acceptance validation<a name="validation-aup">&nbsp;</a>
 
@@ -531,11 +531,11 @@ The table below lists operations on the left and required permissions on the rig
 
 VOMS Admin comes with a command line client utility, called voms-admin, that can be used to perform most of the operations on the VOMS database that are implemented by the Web interface.
 
-`voms-admin` uses the UNIX effective user ID to choose which X509 credential it must use to connect to a (possibly remote) VOMS Admin instance. When ran as root, `voms-admin` uses the host credentials found in /etc/gridsecurity. When running as a normal user, `voms-admin does the following:`
+`voms-admin` uses the UNIX effective user ID to choose which X509 credential it must use to connect to a (possibly remote) VOMS Admin instance. When ran as root, `voms-admin` uses the host credentials found in /etc/grid-security. When running as a normal user, `voms-admin does the following:`
 
-* if the X509_USER_PROXY environment variable is set, voms-admin uses the credentials pointed by such environment variable,
+* if the X509\_USER\_PROXY environment variable is set, voms-admin uses the credentials pointed by such environment variable,
 * otherwise If a proxy exists in /tmp, the proxy is used,
-* otherwise if the X509_USER_CERT environment variable is set, voms-admin uses the credentials pointed by X509_USER_CERT and X509_USER_KEY environment variables,
+* otherwise if the X509\_USER\_CERT environment variable is set, voms-admin uses the credentials pointed by X509\_USER\_CERT and X509\_USER\_KEY environment variables,
 * otherwise the usercert.pem and userkey.pem credentials from the $HOME/.globus are used.
 
 A user can get the list of supported commands by typing:
