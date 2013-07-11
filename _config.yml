@@ -1,0 +1,39 @@
+exclude: [README.md]
+
+markdown: redcarpet
+redcarpet:
+  extensions: [ "tables" ]
+
+baseurl: /voms
+
+issue_base_url: https://issues.infn.it/browse/
+
+voms:
+    website: http://italiangrid.github.io/voms
+
+authors:
+  andrea:
+    display_name: Andrea Ceccanti
+    gravatar: f371f6284e5f3b10c555a24fd728a1ef    
+    email: andrea.ceccanti@cnaf.infn.it
+    github: andreaceccanti
+  valerio:
+    display_name: Valerio Venturi
+    gravatar: 25170d7bd06dd4d753053e12888d1bb0    
+    email: valerio.venturi@cnaf.infn.it
+    github: valerioventuri
+  daniele:
+    display_name: Daniele Andreotti
+    gravatar:
+    email: daniele.andreotti@cnaf.infn.it
+    github: dandreotti
+  enrico:
+    display_name: Enrico Vianello
+    gravatar: 4f496230f3e42d606024e16c5f389611
+    email: enrico.vianello@cnaf.infn.it
+    github: enricovianello
+
+versions:
+    sysadmin_guide : 3.0.0
+    voms_admin_guide : 3.2.0
+    voms_clients_guide: 3.0.2
