@@ -1,0 +1,5 @@
+<ul>
+{% for rfc in page.rfcs %}
+<li><a href="{{ site.issue_base_url }}{{ rfc.id }}">{{ rfc.id }}</a> : {{ rfc.title }}</li>
+{% endfor %}
+</ul>
