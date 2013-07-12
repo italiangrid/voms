@@ -28,6 +28,7 @@ of the notification resulting from user VO membership and group membership reque
 - A **Request log** section has been added to the VOMS Admin web application. The log shows information
 about requests handled (approval time, who approved the request etc.)
 
+The updated VOMS Admin user guide describing the new features can be found [here][voms-admin-guide].
 
 ### Bug fixes
 
@@ -53,3 +54,4 @@ Follow the instructions in the VOMS [System Administrator Guide]({{site.baseurl}
 None at the moment
 
 [voms-website]: http://italiangrid.github.io/voms
+[voms-admin-guide]: {{site.baseurl}}/documentation/voms-admin-guide/3.2.0
