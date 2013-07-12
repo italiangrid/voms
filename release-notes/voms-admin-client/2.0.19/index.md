@@ -14,19 +14,16 @@ This release provides the following bug fixes.
 
 {% include list-rfcs.liquid %}
 
-### Other news
-
-* The VOMS web site is now hosted on [Github][voms-website].
-
 ### Installation and configuration
 
-No configuration changes. 
+No configuration changes. Just run `yum update` to get
+the latest package from the repository.
 
 ```bash
 yum update voms-admin-client 
 ```
 
-For clean installations, follow the instructions in the VOMS [System Administrator Guide][sysadmin-guide].
+For clean installations, follow the instructions in the VOMS [System Administrator Guide]({{site.baseurl}}/documentation/sysadmin-guide).
 
 ### Known issues
 
