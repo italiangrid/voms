@@ -1,5 +1,5 @@
-voms (2.0.10-1) unstable; urgency=low
+voms (2.0.11-1) unstable; urgency=low
 
-  * Fixes https://issues.infn.it/browse/VOMS-196 
+  * Fixes https://issues.infn.it/browse/VOMS-379
 
  -- Andrea Ceccanti <andrea@grizzly.cnaf.infn.it>  Tue, 24 Jan 2012 15:29:27 +0100
