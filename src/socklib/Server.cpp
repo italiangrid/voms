@@ -377,6 +377,8 @@ GSISocketServer::AcceptGSIAuthentication()
     ret = do_select(newsock, starttime, timeout, expected);
     LOGM(VARP, logh, LEV_DEBUG, T_PRE, "Select status: %d",ret);
 
+    curtime = time(NULL);
+
 
     if (ret == 0){
 
