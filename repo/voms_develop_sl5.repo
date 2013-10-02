@@ -1,0 +1,7 @@
+[VOMS-Develop-SL5] 
+name=VOMS-Develop
+baseurl=http://radiohead.cnaf.infn.it:9999/job/repo_voms_develop_SL5/lastSuccessfulBuild/artifact/yum/
+protect=1
+enabled=1
+priority=1
+gpgcheck=0
