@@ -36,12 +36,12 @@ To install the repository files, run the following commands (as root):
 
 |  Component   |  Version   | Repo availability   |
 | :----------: | :--------: | :-----------------: |
-| VOMS clients | [3.0.3]({{site.baseurl}}/release-notes/voms-clients/3.0.3) | <span class="label label-info">voms pt</span> |
+| VOMS clients | [3.0.4]({{site.baseurl}}/release-notes/voms-clients/3.0.4) | <span class="label label-info">voms pt</span> |
 | VOMS core service | [2.0.10][voms-emi3] | <span class="label label-info">voms pt</span> <span class="label">emi</span> |
 | VOMS admin service | [3.2.0]({{site.baseurl}}/release-notes/voms-admin-server/3.2.0) | <span class="label label-info">voms pt</span> <span class="label">emi</span>|
 | VOMS admin client | [2.0.19]({{site.baseurl}}/release-notes/voms-admin-client/2.0.19) | <span class="label label-info">voms pt</span> <span class="label">emi</span>|
 | VOMS C/C++ APIs | [2.0.10][voms-emi3] | <span class="label label-info">voms pt</span> <span class="label">emi</span> |
-| VOMS Java APIs | [3.0.1]({{site.baseurl}}/release-notes/voms-api-java/3.0.1) | <span class="label label-info">voms pt</span> <span class="label label-success">maven central</span> |
+| VOMS Java APIs | [3.0.2]({{site.baseurl}}/release-notes/voms-api-java/3.0.2) | <span class="label label-info">voms pt</span> <span class="label label-success">maven central</span> |
 
 
 ### Previous releases
