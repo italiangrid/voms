@@ -54,10 +54,8 @@ Information about previous releases can be found on the [EMI website](http://www
 
 Development versions are built regularly on our [continuos integration infrastructure](http://radiohead.cnaf.infn.it:9999/view/VOMS/). 
 
-Artifacts produced from the development branch can be found on our yum repos for [VOMS SL5](http://radiohead.cnaf.infn.it:9999/view/VOMS/job/repo_voms_SL5/lastSuccessfulBuild/artifcact/voms.repo), 
-[VOMS Client SL5](http://radiohead.cnaf.infn.it:9999/view/VOMS/job/repo_voms_clients_3_0_SL5/lastSuccessfulBuild/artifact/voms-clients.repo), 
-[VOMS SL6](http://radiohead.cnaf.infn.it:9999/view/VOMS/job/repo_voms_SL6/artifacts/voms.repo) or
-[VOMS Client SL6](http://radiohead.cnaf.infn.it:9999/view/VOMS/job/repo_voms_clients_3_0_SL6/lastSuccessfulBuild/artifact/voms-clients.repo).
+Artifacts produced from the development branch can be found on our development yum repos for [SL5 x86/64][repo_develop_sl5] and [SL6 x86/64][repo_develop_sl6].
+
 
 ---
 
@@ -75,3 +73,5 @@ The VOMS source is available on [Github](https://github.com) in the following re
 - [VOMS oracle plugin](https://github.com/italiangrid/voms-oracle-plugin)
 
 [voms-emi3]: http://www.eu-emi.eu/releases/emi-3-montebianco/products/-/asset_publisher/5dKm/content/voms-2
+[repo_develop_sl5]: http://italiangrid.github.io/voms/repo/voms_develop_sl5.repo
+[repo_develop_sl6]: http://italiangrid.github.io/voms/repo/voms_develop_sl6.repo
