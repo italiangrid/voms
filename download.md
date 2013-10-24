@@ -37,10 +37,10 @@ To install the repository files, run the following commands (as root):
 |  Component   |  Version   | Repo availability   |
 | :----------: | :--------: | :-----------------: |
 | VOMS clients | [3.0.4]({{site.baseurl}}/release-notes/voms-clients/3.0.4) | <span class="label label-info">voms pt</span> |
-| VOMS core service | [2.0.10][voms-emi3] | <span class="label label-info">voms pt</span> <span class="label">emi</span> |
+| VOMS core service | [2.0.11][rn-voms-core] | <span class="label label-info">voms pt</span> |
 | VOMS admin service | [3.2.0]({{site.baseurl}}/release-notes/voms-admin-server/3.2.0) | <span class="label label-info">voms pt</span> <span class="label">emi</span>|
 | VOMS admin client | [2.0.19]({{site.baseurl}}/release-notes/voms-admin-client/2.0.19) | <span class="label label-info">voms pt</span> <span class="label">emi</span>|
-| VOMS C/C++ APIs | [2.0.10][voms-emi3] | <span class="label label-info">voms pt</span> <span class="label">emi</span> |
+| VOMS C/C++ APIs | [2.0.11][rn-voms-capi] | <span class="label label-info">voms pt</span> |
 | VOMS Java APIs | [3.0.2]({{site.baseurl}}/release-notes/voms-api-java/3.0.2) | <span class="label label-info">voms pt</span> <span class="label label-success">maven central</span> |
 
 
@@ -73,5 +73,7 @@ The VOMS source is available on [Github](https://github.com) in the following re
 - [VOMS oracle plugin](https://github.com/italiangrid/voms-oracle-plugin)
 
 [voms-emi3]: http://www.eu-emi.eu/releases/emi-3-montebianco/products/-/asset_publisher/5dKm/content/voms-2
+[rn-voms-core]: {{site.baseurl}}/release-notes/voms-server/2.0.11
+[rn-voms-capi]: {{site.baseurl}}/release-notes/voms-api-c/2.0.11
 [repo_develop_sl5]: http://italiangrid.github.io/voms/repo/voms_develop_sl5.repo
 [repo_develop_sl6]: http://italiangrid.github.io/voms/repo/voms_develop_sl6.repo
