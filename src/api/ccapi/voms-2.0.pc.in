@@ -5,7 +5,7 @@ includedir=@includedir@
 
 Name: voms api
 Description: VOMS C/C++ APIs
-Requires: openssl
+Requires.private: openssl
 Version: 2.0.0
 Libs: -L${libdir} -lvomsapi
 Cflags: -I${includedir}
