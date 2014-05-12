@@ -736,9 +736,16 @@ vomsdata::check_cert(STACK_OF(X509) *stack)
 
         ERR_clear_error();
         error = VERR_VERIFY;
-        X509_STORE_CTX_init(csc, ctx, sk_X509_value(stack, 0), NULL);
-        X509_STORE_CTX_set_ex_data(csc, PVD_STORE_EX_DATA_IDX, pvd);
-        index = X509_verify_cert(csc);
+        if (X509_STORE_CTX_init(csc, ctx, sk_X509_value(stack, 0), NULL)==0) {
+	    error = VERR_MEM;
+	} else	{
+	    X509_STORE_CTX_set_ex_data(csc, PVD_STORE_EX_DATA_IDX, pvd);
+	    /* X509_STORE_CTX_get0_param() only returns NULL if
+	     * X509_STORE_CTX_init() has failed  */
+	    X509_VERIFY_PARAM_set_time(X509_STORE_CTX_get0_param(csc),
+				       verificationtime);
+	    index = X509_verify_cert(csc);
+	}
       }
     }
 #ifdef SIGPIPE
