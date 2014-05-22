@@ -135,7 +135,7 @@ int http_get(soap *soap)
   char *path = strdup(soap->path);
   int unknown = 0;
 
-  LOGM(VARP, logh, LEV_DEBUG, T_PRE, "REST Request: %s", soap->path);
+  LOGM(VARP, logh, LEV_DEBUG, T_PRE, "HTTP request: %s", soap->path);
 
   if (!path)
     return SOAP_GET_METHOD;

@@ -307,7 +307,8 @@ GSISocketServer::AcceptGSIAuthentication()
 
   cert_file = user_cert = user_key = user_proxy = NULL;
 
-  if (proxy_get_filenames(0, &cert_file, &cacertdir, &user_proxy, &user_cert, &user_key) == 0) {
+  if (proxy_get_filenames(0, &cert_file, &cacertdir, &user_proxy, &user_cert, &user_key) == 0) 
+  {
     (void)load_credentials(user_cert, user_key, &ucert, &own_stack, &upkey, NULL);
   }
 
@@ -372,24 +373,24 @@ GSISocketServer::AcceptGSIAuthentication()
   ret = accept_status = -1;
   expected = 0;
 
+  LOGM(VARP, logh, LEV_DEBUG, T_PRE, "timeout: %d", timeout);
+
   do {
 
     ret = do_select(newsock, starttime, timeout, expected);
-    LOGM(VARP, logh, LEV_DEBUG, T_PRE, "Select status: %d",ret);
-
     curtime = time(NULL);
-
 
     if (ret == 0){
 
-      LOGM(VARP, logh, LEV_DEBUG, T_PRE, "Select timed out.");
+      if ((timeout != -1) && (curtime - starttime > timeout)){
 
-      if (curtime - starttime > timeout){
+        LOGM(VARP, logh, LEV_DEBUG, T_PRE, "Socket timed out. Failing the handshake.");
         accept_timed_out = true;
         break;
 
       }else{
 
+        LOGM(VARP, logh, LEV_DEBUG, T_PRE, "Socket timed out, but global timeout still not reached. Continuing...");
         continue;
       }
       
@@ -397,7 +398,6 @@ GSISocketServer::AcceptGSIAuthentication()
     
     if (ret > 0) {
       accept_status = SSL_accept(ssl);
-      curtime = time(NULL);
       expected = errorcode = SSL_get_error(ssl, accept_status);
 
       LOGM(VARP, logh, LEV_DEBUG, T_PRE, "Accept status: %d",accept_status);
@@ -406,26 +406,33 @@ GSISocketServer::AcceptGSIAuthentication()
     }
 
     if (ret < 0)
-      // No more data from the select
+    {
+      LOGM(VARP, logh, LEV_DEBUG, T_PRE, "No more data from select.");
       break;
+    }
 
     if (accept_status == 1)
-      // SSL handshake completed
+    {
+      LOGM(VARP, logh, LEV_DEBUG, T_PRE, "SSL accept completed.");
       break;
+    }
 
-    if (timeout != -1 && (curtime - starttime > timeout)){
-      // Timeout reached
+    curtime = time(NULL);
+
+    if (timeout != -1 && (curtime - starttime > timeout))
+    {
       accept_timed_out = true;
+      LOGM(VARP, logh, LEV_DEBUG, T_PRE, "Handshake timeout.");
       break;
     }
 
     if (accept_status <= 0 && ( errorcode != SSL_ERROR_WANT_READ && errorcode != SSL_ERROR_WANT_WRITE ))
-      // SSL handshake error
+    {
       break;
+    }
     
   } while (true);
   
-  // Error enstabilishing context
   if (accept_status != 1){
 
     LOGM(VARP, logh, LEV_INFO, T_PRE, "Error enstabilishing SSL context.");
@@ -439,19 +446,21 @@ GSISocketServer::AcceptGSIAuthentication()
     goto err;
   }
   
-  // Context enstabilished
+  curtime = time(NULL);
+  LOGM(VARP, logh, LEV_INFO, T_PRE, "SSL handshake took %d seconds.", (curtime - starttime));
+
   actual_cert = SSL_get_peer_certificate(ssl);
   peer_stack  = SSL_get_peer_cert_chain(ssl);
 
   char buffer[1000];
 
-//  if (LogLevelMin(logh, LEV_DEBUG)) {
-      LOGM(VARP, logh, LEV_DEBUG, T_PRE, "Certificate DN: %s",
-           X509_NAME_oneline(X509_get_subject_name(actual_cert), buffer, 999));
-      LOGM(VARP, logh, LEV_DEBUG, T_PRE, "Certificate CA: %s",
-           X509_NAME_oneline(X509_get_issuer_name(actual_cert), buffer, 999));
-      LOGM(VARP, logh, LEV_DEBUG, T_PRE, "Stack Size: %d", sk_X509_num(peer_stack));
-//  }
+  LOGM(VARP, logh, LEV_DEBUG, T_PRE, "Certificate DN: %s",
+      X509_NAME_oneline(X509_get_subject_name(actual_cert), buffer, 999));
+
+  LOGM(VARP, logh, LEV_DEBUG, T_PRE, "Certificate CA: %s",
+      X509_NAME_oneline(X509_get_issuer_name(actual_cert), buffer, 999));
+
+  LOGM(VARP, logh, LEV_DEBUG, T_PRE, "Stack Size: %d", sk_X509_num(peer_stack));
 
   peer_cert = get_real_cert(actual_cert, peer_stack);
 
