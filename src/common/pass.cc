@@ -47,7 +47,6 @@ extern "C" {
 #define MAXSIZE 1024
 static char password[MAXSIZE]; /* Will contain the password */
 
-static struct rlimit newlimit = {0,0};
 static pid_t fatherpid=0;      /* Will contain the pid of the process that
 				* obtained the password.*/
 
@@ -133,10 +132,6 @@ getpasswd(std::string passfile, void *logh)
   atexit(fun);
 
   uid = geteuid();
-
-  /* no core dumps */
-  if (setrlimit(RLIMIT_CORE, &newlimit) != 0)
-    return false;
 
   if (uid == 0) {
     /* Need to be root to lock memory */
