@@ -193,7 +193,7 @@ sigchld_handler(int signo)
   int save_errno = errno;
   pid_t pid;
   int status;
-	
+  
   do{
 
     pid = waitpid(-1,&status, WNOHANG);
@@ -205,7 +205,7 @@ sigchld_handler(int signo)
         active_requests = 0;
     }
 
-	} while ((pid > 0) || (pid < 0 && errno == EINTR));
+  } while ((pid > 0) || (pid < 0 && errno == EINTR));
 
   errno = save_errno;
 }
@@ -743,7 +743,7 @@ void VOMSServer::Run()
 
         if (pid) {
           // Parent process
-					active_requests++;
+          active_requests++;
           LOGM(VARP, logh, LEV_INFO, T_PRE, "Started child executor with pid = %d. Active requests = %d", 
             pid, active_requests);
 
@@ -825,7 +825,7 @@ void VOMSServer::Run()
 }
 
 bool VOMSServer::makeAC(vomsresult& vr, EVP_PKEY *key, X509 *issuer, 
-			X509 *holder, const std::string &message)
+      X509 *holder, const std::string &message)
 {
   LOGM(VARP, logh, LEV_DEBUG, T_PRE, "Received Request: %s", message.c_str());
 
