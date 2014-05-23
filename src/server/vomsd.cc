@@ -760,7 +760,7 @@ void VOMSServer::Run()
           if (!sock.AcceptGSIAuthentication()){
 
             LOGM(VARP, logh, LEV_INFO, T_PRE, "Failed to authenticate peer.");
-            LOGM(VARP, logh, LEV_INFO, T_PRE, "OpenSSL error: %s", sock.error.c_str());
+            LOGM(VARP, logh, LEV_INFO, T_PRE, "Error: %s", sock.error.c_str());
 
             sock.CleanSocket();
             sock.Close();

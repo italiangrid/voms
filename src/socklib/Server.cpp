@@ -396,13 +396,10 @@ GSISocketServer::AcceptGSIAuthentication()
       
     }
     
-    if (ret > 0) {
+    if (ret > 0) 
+    {
       accept_status = SSL_accept(ssl);
       expected = errorcode = SSL_get_error(ssl, accept_status);
-
-      LOGM(VARP, logh, LEV_DEBUG, T_PRE, "Accept status: %d",accept_status);
-      LOGM(VARP, logh, LEV_DEBUG, T_PRE, "Error code: %d",errorcode);
-      LOGM(VARP, logh, LEV_DEBUG, T_PRE, "SSL_WANT_READ: %d, SSL_WANT_WRITE: %d",SSL_ERROR_WANT_READ, SSL_ERROR_WANT_WRITE);
     }
 
     if (ret < 0)
@@ -464,25 +461,54 @@ GSISocketServer::AcceptGSIAuthentication()
 
   peer_cert = get_real_cert(actual_cert, peer_stack);
 
-  if (peer_cert) {
-    char *name = X509_NAME_oneline(X509_get_subject_name(peer_cert), NULL, 0);
+  if (!peer_cert) 
+  {
+    LOGM(VARP, logh, LEV_INFO, T_PRE, "No end user certificate found for peer...");
+    goto err;
+  }
+
+  if (!peer_stack)
+  {
+    LOGM(VARP, logh, LEV_INFO, T_PRE, "No certificate stack found for peer. Exiting...");
+    goto err;
+  }
+
+  if (peer_cert) 
+  {
+    char* name = X509_NAME_oneline(X509_get_subject_name(peer_cert), NULL, 0);
+
+    if (!name)
+    {
+      LOGM(VARP, logh, LEV_INFO, T_PRE, "Could not fetch name from peer cert. Exiting...");
+      goto err;
+    }
+
     own_subject = std::string(name);
     OPENSSL_free(name);
   }
 
-  if (LogLevelMin(logh, LEV_DEBUG)){
-    for (int i = 0; i < sk_X509_num(peer_stack); i++) {
+  if (LogLevelMin(logh, LEV_DEBUG))
+  {
+    for (int i = 0; i < sk_X509_num(peer_stack); i++) 
+    {
       X509 *cert = sk_X509_value(peer_stack, i);
-      LOGM(VARP, logh, LEV_DEBUG, T_PRE, "Certificate DN: %s",
-           X509_NAME_oneline(X509_get_subject_name(cert), buffer, 999));
-      LOGM(VARP, logh, LEV_DEBUG, T_PRE, "Certificate CA: %s",
-           X509_NAME_oneline(X509_get_issuer_name(cert), buffer, 999));
+      
+      if (cert) 
+      {
+        LOGM(VARP, logh, LEV_DEBUG, T_PRE, "Certificate DN: %s",
+            X509_NAME_oneline(X509_get_subject_name(cert), buffer, 999));
+
+        LOGM(VARP, logh, LEV_DEBUG, T_PRE, "Certificate CA: %s",
+            X509_NAME_oneline(X509_get_issuer_name(cert), buffer, 999));
+      }
     }
   }
 
   name = X509_NAME_oneline(X509_get_subject_name(peer_cert), NULL, 0);
+
   if (name)
     peer_subject = std::string(name); 
+
   OPENSSL_free(name);
 
   name = X509_NAME_oneline(X509_get_issuer_name(peer_cert), NULL, 0);
@@ -492,6 +518,7 @@ GSISocketServer::AcceptGSIAuthentication()
 
   serial = get_peer_serial(actual_cert);
   peer_serial = std::string(serial ? serial : "");
+
   OPENSSL_free(serial);
 
   return true;
