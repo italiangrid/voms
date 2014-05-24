@@ -1015,24 +1015,50 @@ bool VOMSServer::makeAC(vomsresult& vr, EVP_PKEY *key, X509 *issuer,
     }
   }
 
+  // Adjust for long/short format
+  if (!shortfqans && !fqans.empty()) {
+
+    LOGM(VARP, logh, LEV_DEBUG, T_PRE,  "Translating FQANs to long format.");
+    std::vector<std::string> newfqans(fqans);
+    fqans.clear();
+    std::vector<std::string>::iterator i = newfqans.begin();
+    std::vector<std::string>::iterator end = newfqans.end();
+
+    while (i != end) {
+      std::string fqan = *i;
+      if (fqan.find("/Role=") != std::string::npos)
+        fqan += "/Capability=NULL";
+      else
+        fqan += "/Role=NULL/Capability=NULL";
+      LOGM(VARP, logh, LEV_DEBUG, T_PRE, "Translated FQAN: %s", fqan.c_str());
+      fqans.push_back(fqan);
+      ++i;
+    }
+  }
 
   if(!fqans.empty()) {
     
     LOGM(VARP, logh, LEV_DEBUG, T_PRE,  "Checking if user comes with valid fqans.");
 
     vomsdata vd("", "");
-    vd.SetVerificationType((verify_type)(VERIFY_SIGN));
-    bool retrieve_success = vd.Retrieve(sock.actual_cert, sock.peer_stack, RECURSE_DEEP);
+    vd.SetVerificationType((verify_type)(VERIFY_SIGN | VERIFY_DATE));
     
-    LOGM(VARP, logh, LEV_DEBUG, T_PRE,  "FQAN retrieve_success: %s", retrieve_success ? "true" : "false");
+    if (!vd.Retrieve(sock.actual_cert, sock.peer_stack, RECURSE_DEEP)){
+
+      std::string voms_error = vd.ErrorMessage();
+
+      LOGM(VARP, logh, LEV_DEBUG, T_PRE,  
+        "No valid VOMS attributes found in client cert chain. VOMS retrieve error: %s",
+        voms_error.c_str());
+    }
 
     std::vector<std::string> existing;
     std::vector<voms>::iterator end = (vd.data).end();
+
     for (std::vector<voms>::iterator index = (vd.data).begin(); index != end; ++index) 
     {
       if (index->voname == voname)
       {
-
         std::vector<std::string>::iterator fqan_it = index->fqan.begin();
 
         for ( ; fqan_it != index->fqan.end(); ++fqan_it)
@@ -1040,35 +1066,9 @@ bool VOMSServer::makeAC(vomsresult& vr, EVP_PKEY *key, X509 *issuer,
           LOGM(VARP, logh, LEV_DEBUG, T_PRE,  "Found fqan in user credential: %s", fqan_it->c_str());
           existing.push_back(*fqan_it);
         }
-          
-        /*
-        existing.insert(existing.end(),
-            index->fqan.begin(),
-            index->fqan.end());
-        */
       }
     }
 
-    // Adjust for long/short format
-    if (!shortfqans && !fqans.empty()) {
-      
-      LOGM(VARP, logh, LEV_DEBUG, T_PRE,  "Translating FQANs to long format.");
-      std::vector<std::string> newfqans(fqans);
-      fqans.clear();
-      std::vector<std::string>::iterator i = newfqans.begin();
-      std::vector<std::string>::iterator end = newfqans.end();
-
-      while (i != end) {
-        std::string fqan = *i;
-        if (fqan.find("/Role=") != std::string::npos)
-          fqan += "/Capability=NULL";
-        else
-          fqan += "/Role=NULL/Capability=NULL";
-        LOGM(VARP, logh, LEV_DEBUG, T_PRE, "Translated FQAN: %s", fqan.c_str());
-        fqans.push_back(fqan);
-        ++i;
-      }
-    }
 
     /* if attributes were found, only release an intersection beetween the requested and the owned */
     std::vector<std::string>::iterator fend = fqans.end();
@@ -1105,17 +1105,23 @@ bool VOMSServer::makeAC(vomsresult& vr, EVP_PKEY *key, X509 *issuer,
 
     if(subset) 
     {
-      LOG(logh, LEV_ERROR, T_PRE, "Error in executing request!");
-      vr.setError(WARN_ATTR_SUBSET, voname + " : your certificate already contains attributes, only a subset of them can be issued.");
+      LOG(logh, LEV_WARN, T_PRE, "Only a subset of the requested attributes will be issued.");
+      vr.setError(WARN_ATTR_SUBSET, voname + 
+      " : your certificate already contains attributes, only a subset of them can be issued.");
     }
   }
 
-  if (!fqans.empty()) {
-    // test logging retrieved attributes
+  if (fqans.empty()) {
+
+    vr.setError(ERR_NOT_MEMBER, std::string("You are not a member of the ") + voname + " VO!");
+    return false;
+
+  } else {
+
     std::vector<std::string>::const_iterator end = fqans.end();
 
     for (std::vector<std::string>::const_iterator i = fqans.begin(); i != end; ++i)
-      LOGM(VARP, logh, LEV_INFO, T_PRE, "Request Result: %s",  (*i).c_str());
+      LOGM(VARP, logh, LEV_INFO, T_PRE, "Issued FQAN: %s",  (*i).c_str());
 
     if (LogLevelMin(logh, LEV_DEBUG)) {
       if(result && !attribs.empty()) {
@@ -1127,12 +1133,18 @@ bool VOMSServer::makeAC(vomsresult& vr, EVP_PKEY *key, X509 *issuer,
         LOGM(VARP, logh, LEV_DEBUG, T_PRE,  "No generic attributes found for user.");
     }
 
-    ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
     std::string codedac;
     std::string data;
 
-    if (comm[0] != "N") {
+    if (comm[0] == "N") {
+
+      std::vector<std::string>::const_iterator end = fqans.end();
+      for (std::vector<std::string>::const_iterator i = fqans.begin(); i != end; ++i)
+        data += (*i).c_str() + std::string("\n");
+
+    } else {
+
+      // This is the real AC encoding
       int res = 1;
       BIGNUM * serial = get_serial();
 
@@ -1183,13 +1195,6 @@ bool VOMSServer::makeAC(vomsresult& vr, EVP_PKEY *key, X509 *issuer,
         return false;
       }
     }
-    else {
-      /* comm[0] == "N" */
-
-      std::vector<std::string>::const_iterator end = fqans.end();
-      for (std::vector<std::string>::const_iterator i = fqans.begin(); i != end; ++i)
-        data += (*i).c_str() + std::string("\n");
-    }
 
     (void)SetCurLogType(logh, T_RESULT);
 
@@ -1197,10 +1202,7 @@ bool VOMSServer::makeAC(vomsresult& vr, EVP_PKEY *key, X509 *issuer,
     vr.setData(data);
     return true;
   }
-  else {
-    vr.setError(ERR_NOT_MEMBER, std::string("You are not a member of the ") + voname + " VO!");
-    return false;
-  }
+
 }
 
 void
