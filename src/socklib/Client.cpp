@@ -314,11 +314,16 @@ GSISocketClient::Open()
   }
 
  err:
-  destroy_SSL_proxy_handler(ssl);
-  SSL_clear(ssl);
-  SSL_free(ssl);
-  SSL_CTX_free(ctx);
-  BIO_free(conn);
+  if (opened) {
+
+    destroy_SSL_proxy_handler(ssl);
+    SSL_clear(ssl);
+    SSL_free(ssl);
+    SSL_CTX_free(ctx);
+    BIO_free(conn);
+    opened = false;
+
+  }
 
   return false;
 }

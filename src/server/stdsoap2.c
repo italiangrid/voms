@@ -4418,7 +4418,10 @@ soap_accept(struct soap *soap)
       {
 #ifdef WITH_IPV6
 /* Use soap->host to store the numeric form of the remote host */
-        getnameinfo((struct sockaddr*)&soap->peer, n, soap->host, sizeof(soap->host), NULL, 0, NI_NUMERICHOST | NI_NUMERICSERV); 
+        if (getnameinfo((struct sockaddr*)&soap->peer, n, soap->host, sizeof(soap->host), NULL, 0, NI_NUMERICHOST | NI_NUMERICSERV)){
+          DBGLOG(TEST,SOAP_MESSAGE(fdebug, "getnameinfo() lookup failed in soap_accept()\n"));
+          return SOAP_INVALID_SOCKET;
+        }
         DBGLOG(TEST,SOAP_MESSAGE(fdebug, "Accept socket %d from %s\n", soap->socket, soap->host));
         soap->ip = 0; /* info stored in soap->peer and soap->host */
         soap->port = 0; /* info stored in soap->peer and soap->host */

@@ -39,6 +39,7 @@ extern "C" {
 #include <sys/types.h>
 #include <unistd.h>
 #include <sys/socket.h>
+#include <sys/time.h>
 #include <fcntl.h>
 
 #include <memory.h>
@@ -373,7 +374,7 @@ GSISocketServer::AcceptGSIAuthentication()
   ret = accept_status = -1;
   expected = 0;
 
-  LOGM(VARP, logh, LEV_DEBUG, T_PRE, "timeout: %d", timeout);
+  LOGM(VARP, logh, LEV_DEBUG, T_PRE, "Handshake timeout: %d", timeout);
 
   do {
 
@@ -382,7 +383,7 @@ GSISocketServer::AcceptGSIAuthentication()
 
     if (ret == 0){
 
-      if ((timeout != -1) && (curtime - starttime > timeout)){
+      if ((timeout != -1) && (curtime - starttime >= timeout)){
 
         LOGM(VARP, logh, LEV_DEBUG, T_PRE, "Socket timed out. Failing the handshake.");
         accept_timed_out = true;
@@ -416,7 +417,7 @@ GSISocketServer::AcceptGSIAuthentication()
 
     curtime = time(NULL);
 
-    if (timeout != -1 && (curtime - starttime > timeout))
+    if (timeout != -1 && (curtime - starttime >= timeout))
     {
       accept_timed_out = true;
       LOGM(VARP, logh, LEV_DEBUG, T_PRE, "Handshake timeout.");
@@ -443,9 +444,6 @@ GSISocketServer::AcceptGSIAuthentication()
     goto err;
   }
   
-  curtime = time(NULL);
-  LOGM(VARP, logh, LEV_INFO, T_PRE, "SSL handshake took %d seconds.", (curtime - starttime));
-
   actual_cert = SSL_get_peer_certificate(ssl);
   peer_stack  = SSL_get_peer_cert_chain(ssl);
 
