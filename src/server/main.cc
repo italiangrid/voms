@@ -29,6 +29,7 @@
 
 #include "VOMSServer.h"
 #include "dbwrap.h"
+#include <cstdlib>
 
 extern "C" {
 #include <openssl/ssl.h>
@@ -48,19 +49,17 @@ int main(int argc, char *argv[])
   catch(voms_init_error& e)
   {
     std::cout << "Initialization error: " << e.what() << std::endl;
-    exit(1);
+    return EXIT_FAILURE;
   }
   catch(std::exception& e)
   {
     std::cout << "Error: " << e.what() << std::endl;
-    exit(1);
+    return EXIT_FAILURE;
   }
   catch(...)
   {
     std::cout << "Undefined error." << std::endl;
-    exit(1);
+    return EXIT_FAILURE;
   }
-
-  exit(0);
 
 }

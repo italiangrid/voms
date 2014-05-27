@@ -102,11 +102,6 @@ static mode_type detect_mode(unsigned char *beginning)
     return SSL2;
   }
 
-#if 0
-  if (beginning[0] & 0xc0)
-    return SSL2;
-#endif
-
   return GSI;
 }
 

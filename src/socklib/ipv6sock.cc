@@ -33,10 +33,8 @@
 #include <netdb.h>
 #include <sys/socket.h>
 #include <arpa/inet.h>
-#include <stdlib.h>
-#include <string.h>
-
-#include <strings.h>
+#include <cstdlib>
+#include <cstring>
 
 extern "C" {
 #include "log.h"
@@ -45,22 +43,17 @@ extern "C" {
 static void logconnection(struct sockaddr *client, void *logh)
 {
 
-  static const int buf_size = 512;
-  static const int port_no_buf_size = 6;
-
-  static char hostname_buf[buf_size], port_no_buf[port_no_buf_size];
-
-  memset(hostname_buf,'\0',buf_size);
-  memset(port_no_buf,'\0',port_no_buf_size);
+  char hostname_buf[NI_MAXHOST];
+  char port_no_buf[NI_MAXSERV];
 
   int nameinfo_status = getnameinfo(
       client,
-      sizeof(struct sockaddr_storage),
+      sizeof(sockaddr_storage),
       hostname_buf, 
-      buf_size,
+      NI_MAXHOST,
       port_no_buf, 
-      port_no_buf_size,
-      0);
+      NI_MAXSERV,
+      NI_NUMERICHOST | NI_NUMERICSERV);
 
   if (nameinfo_status){
     LOGM(VARP, logh, LEV_ERROR, T_PRE,

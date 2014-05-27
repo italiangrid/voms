@@ -54,6 +54,8 @@ void *logh = NULL;
 #include "myproxycertinfo.h"
 }
 
+#include <sstream>
+
 #include "Server.h"
 
 #include "options.h"
@@ -86,9 +88,7 @@ extern int http_get(soap *soap);
 
 static bool file_is_readable(const char* filename){
   std::ifstream f(filename);
-  bool good = f.good();
-  f.close();
-  return good;
+  return f.good();
 }
 
 std::string vomsresult::makeRESTAnswer(int& code)
@@ -738,8 +738,12 @@ void VOMSServer::Run()
       if (FD_ISSET(sock.sck, &rset)) {
 
         if (!sock.Listen()){
-          LOGM(VARP, logh, LEV_ERROR, T_PRE, "Cannot listen on port %d", daemon_port);
-          throw voms_execution_error("Cannot listen on port " + daemon_port);
+
+          std::ostringstream error_msg;
+          error_msg << "Cannot listen on port " << daemon_port;
+
+          LOGM(VARP, logh, LEV_ERROR, T_PRE, error_msg.str().c_str());
+          throw voms_execution_error(error_msg.str());
         } 
 
         (void)SetCurLogType(logh, T_REQUEST);
@@ -878,9 +882,9 @@ bool VOMSServer::makeAC(vomsresult& vr, EVP_PKEY *key, X509 *issuer,
 
   parse_targets(r.targets, targs);
 
-  std::string tmp("");
+  std::string tmp;
   
-  if (comm.size() == 0){
+  if (comm.empty()){
     throw voms_execution_error("Invalid VOMS request received: no command found!");
   }
   
@@ -893,13 +897,19 @@ bool VOMSServer::makeAC(vomsresult& vr, EVP_PKEY *key, X509 *issuer,
   /* Shorten validity if needed */
 
   if (requested != 0) {
-    if (requested == -1)
+    if (requested == -1){
+
       requested = validity;
-    else if (validity < requested) {
-      vr.setError(WARN_SHORT_VALIDITY,
-                  uri + ": The validity of this VOMS AC in your proxy is shortened to " +
-                  stringify(validity, tmp) + " seconds!");
+
+    } else if (validity < requested) {
+
       requested = validity;
+      std::ostringstream msg;
+
+      msg << uri << ": The validity of this VOMS AC in your proxy is shortened to "
+        << validity << " seconds!";
+
+      vr.setError(WARN_SHORT_VALIDITY, msg.str());
     }
   }
 
