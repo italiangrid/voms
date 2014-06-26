@@ -892,21 +892,22 @@ proxy_sign(
 
     unsigned char                       md[SHA_DIGEST_LENGTH];
     unsigned int                        len;
-    EVP_MD* sig_algo; 
-    
+    EVP_MD*                             sig_algo;
+
     sig_algo = EVP_get_digestbyobj(req->sig_alg->algorithm);
     if (sig_algo == NULL) sig_algo = EVP_sha1();
 
-
     if(proxyver>=3) {
       long sub_hash;
+      EVP_MD* cn_sig_algo;
 
+      cn_sig_algo = EVP_sha1();
       user_public_key = X509_get_pubkey(user_cert);
 
 #ifdef TYPEDEF_I2D_OF
-      ASN1_digest((i2d_of_void*)i2d_PUBKEY, sig_algo, (char *) user_public_key, md, &len);
+      ASN1_digest((i2d_of_void*)i2d_PUBKEY, cn_sig_algo, (char *) user_public_key, md, &len);
 #else
-      ASN1_digest(i2d_PUBKEY, sig_algo, (char *) user_public_key, md, &len);
+      ASN1_digest(i2d_PUBKEY, cn_sig_algo, (char *) user_public_key, md, &len);
 #endif
       EVP_PKEY_free(user_public_key);
 
@@ -1041,8 +1042,7 @@ proxy_sign_ext(
     unsigned int                        len;
     EVP_MD*                             sig_algo;
 
-    sig_algo = EVP_get_digestbyobj(req->sig_alg->algorithm);
-    if (sig_algo == NULL) sig_algo = EVP_sha1();
+    sig_algo = EVP_sha1();
 
     if (!selfsigned)
       user_cert_info = user_cert->cert_info;

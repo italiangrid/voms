@@ -31,7 +31,9 @@
 
 #include "parsertypes.h"
 #include "namespaces.h"
+#ifndef strndup
 extern char *strndup(const char*, size_t);
+#endif
 %}
 
 %x SINGLE_QUOTED
