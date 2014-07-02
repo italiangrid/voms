@@ -12,19 +12,19 @@ voms_SOURCES = \
 	attribute.cc
 
 nodist_voms_SOURCES = \
-	soapC.c \
+	soapC.cpp \
 	soapH.h \
 	soapStub.h
 
 vomsd.$(OBJEXT) vomsd-rest.$(OBJEXT): soapH.h
 voms-vomsd.$(OBJEXT) voms-vomsd-rest.$(OBJEXT): soapH.h
-soapH.h soapStub.h: soapC.c
+soapH.h soapStub.h: soapC.cpp
 
-soapC.c: VOMSAC.h
-	$(SOAPCPP2) -c VOMSAC.h
+soapC.cpp: VOMSAC.h
+	$(SOAPCPP2) VOMSAC.h
 
 VOMSAC.h: VOMSAC.wsdl
-	$(WSDL2H) $(WSDL2H_FLAGS) -c VOMSAC.wsdl
+	$(WSDL2H) $(WSDL2H_FLAGS) -s VOMSAC.wsdl
 
 EXTRA_DIST= VOMSAC.wsdl
 CLEANFILES= soap* VOMSAC.h vomsSOAP*
