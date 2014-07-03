@@ -2356,7 +2356,9 @@ static yyconst flex_int16_t yy_rule_linenum[17] =
 
 #include "parsertypes.h"
 #include "signing_policy.h"
+#ifndef strndup
 extern char *strndup(const char*, size_t);
+#endif
 
 
 #line 2363 "lex.signing.c"
