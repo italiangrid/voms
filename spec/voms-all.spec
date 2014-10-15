@@ -287,8 +287,8 @@ fi
 %{_mandir}/man8/voms.8*
 
 %changelog
-* Mon May 12 2014 Andrea Ceccanti <andrea.ceccanti at cnaf.infn.it> - 2.0.12-0
-- ...
+* Mon May 12 2014 Andrea Ceccanti <andrea.ceccanti at cnaf.infn.it> - 2.0.12-1
+- New packaging of the clients. https://issues.infn.it/jira/browse/VOMS-495
 
 * Mon Aug 21 2013 Andrea Ceccanti <andrea.ceccanti at cnaf.infn.it> - 2.0.11-1
 - Fix for https://issues.infn.it/browse/VOMS-379
