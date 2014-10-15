@@ -1,6 +1,15 @@
 ---
 layout: default
 title: VOMS downloads
+
+versions:
+  clients: 3.0.5
+  core: 2.0.12
+  admin-server: 3.3.0
+  admin-client: 2.0.19
+  api-c: 2.0.12
+  api-java: 3.0.4
+
 ---
 
 # VOMS releases
@@ -33,20 +42,14 @@ To install the repository files, run the following commands (as root):
 
 ### Current releases
 
-
-|  Component   |  Version   | Repo availability   |
-| :----------: | :--------: | :-----------------: |
-| VOMS clients | [3.0.4]({{site.baseurl}}/release-notes/voms-clients/3.0.4) | <span class="label label-info">voms pt</span> <span class="label">emi</span> |
-| VOMS core service | [2.0.11][rn-voms-core] | <span class="label label-info">voms pt</span> <span class="label">emi</span> |
-| VOMS admin service | [3.2.0]({{site.baseurl}}/release-notes/voms-admin-server/3.2.0) | <span class="label label-info">voms pt</span> <span class="label">emi</span>|
-| VOMS admin client | [2.0.19]({{site.baseurl}}/release-notes/voms-admin-client/2.0.19) | <span class="label label-info">voms pt</span> <span class="label">emi</span>|
-| VOMS C/C++ APIs | [2.0.11][rn-voms-capi] | <span class="label label-info">voms pt</span> <span class="label">emi</span> |
-| VOMS Java APIs | [3.0.2]({{site.baseurl}}/release-notes/voms-api-java/3.0.2) | <span class="label label-info">voms pt</span> <span class="label label-success">maven central</span> <span class="label">emi</span> |
-
-
-### Previous releases
-
-Information about previous releases can be found on the [EMI website](http://www.eu-emi.eu).
+| Component          | Version                                           |
+| ------------------ | ------------------------------------------------- |
+| VOMS clients       | [{{page.versions.clients}}][rn-clients]           |
+| VOMS core service  | [{{page.versions.core}}][rn-core]                 |
+| VOMS admin service | [{{page.versions.admin-server}}][rn-admin-server] |
+| VOMS admin client  | [{{page.versions.admin-client}}][rn-admin-client] |
+| VOMS C/C++ APIs    | [{{page.versions.api-c}}][rn-api-c]               |
+| VOMS Java APIs     | [{{page.versions.api-java:}}][rn-api-java]        |
 
 ---
 
@@ -55,7 +58,6 @@ Information about previous releases can be found on the [EMI website](http://www
 Development versions are built regularly on our [continuos integration infrastructure](http://radiohead.cnaf.infn.it:9999/view/VOMS/). 
 
 Artifacts produced from the development branch can be found on our development yum repos for [SL5 x86/64][repo_develop_sl5] and [SL6 x86/64][repo_develop_sl6].
-
 
 ---
 
@@ -73,7 +75,11 @@ The VOMS source is available on [Github](https://github.com) in the following re
 - [VOMS oracle plugin](https://github.com/italiangrid/voms-oracle-plugin)
 
 [voms-emi3]: http://www.eu-emi.eu/releases/emi-3-montebianco/products/-/asset_publisher/5dKm/content/voms-2
-[rn-voms-core]: {{site.baseurl}}/release-notes/voms-server/2.0.11
-[rn-voms-capi]: {{site.baseurl}}/release-notes/voms-api-c/2.0.11
+[rn-core]: {{site.baseurl}}/release-notes/voms-server/{{page.versions.core}}
+[rn-clients]: {{site.baseurl}}/release-notes/voms-clients/{{page.versions.clients}}
+[rn-admin-server]: {{site.baseurl}}/release-notes/voms-admin-server/{{page.versions.admin-server}}
+[rn-admin-client]: {{site.baseurl}}/release-notes/voms-admin-client/{{page.versions.admin-client}}
+[rn-api-c]: {{site.baseurl}}/release-notes/voms-api-c/{{page.versions.api-c}}
+[rn-api-java]: {{site.baseurl}}/release-notes/voms-api-java/{{page.versions.api-java}}
 [repo_develop_sl5]: http://italiangrid.github.io/voms/repo/voms_develop_sl5.repo
 [repo_develop_sl6]: http://italiangrid.github.io/voms/repo/voms_develop_sl6.repo

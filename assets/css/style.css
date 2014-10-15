@@ -1,218 +1,218 @@
 html,body { 
-	height: 100%; 
+  height: 100%; 
 }
 
 code{
-	color: rgb(31, 26, 168);
+  color: rgb(31, 26, 168);
 }
 
 .vo-highlight {
-	color: rgb(25, 100, 11);
+  color: rgb(25, 100, 11);
 }
+
 #wrap, #home-wrap { 
-	
-	min-height: 100%; 
-	height: auto !important;
-	height: 100%;
-	/* Keep the margin below aligned with the height value
-	   of #push and #footer (and also consider eventually 
-	   border sizes in the footer element)
-	*/
-	margin: 0 auto -60px;
+
+  min-height: 100%; 
+  height: auto !important;
+  height: 100%;
+  /* Keep the margin below aligned with the height value
+  of #push and #footer (and also consider eventually 
+  border sizes in the footer element)
+   */
+  margin: 0 auto -60px;
 }
 
 /* set a max-width for horizontal fluid layout 
 and make it centered */
-.container {
-  margin-right: auto;
-  margin-left: auto;
-  max-width: 940px;
-}
+  .container {
+    margin-right: auto;
+    margin-left: auto;
+    max-width: 940px;
+  }
 
-#push, #footer {
-	height: 60px;
-}
+  #push, #footer {
+    height: 60px;
+  }
 
-#vomscontent {
-	margin-top: 25px;
-	margin-bottom: 60px;
-}
+  #vomscontent {
+    margin-top: 25px;
+    margin-bottom: 60px;
+  }
 
-#vomscontent p {
-	line-height: 25px;
-}
+  #vomscontent p {
+    line-height: 25px;
+  }
 
-#vomscontent li{
-	line-height: 25px;
-}
+  #vomscontent li{
+    line-height: 25px;
+  }
 
-.alert{
-	line-height: 25px;
-}
+  .alert{
+    line-height: 25px;
+  }
 
-.alert h4{
-	margin-bottom: 1em;
-}
+  .alert h4{
+    margin-bottom: 1em;
+  }
 
-#footer{
-	/* border-top: 5px solid #e4c90f;*/
-	background-color: #3d3f42;
-	/* margin-top: 20px; */
-}
+  #footer{
+    /* border-top: 5px solid #e4c90f;*/
+    background-color: #3d3f42;
+    /* margin-top: 20px; */
+  }
 
-.highlight pre code {
-	font-size: 110%;
-}
+  .highlight pre code {
+    font-size: 110%;
+  }
 
-@media (max-width: 1024px) {
-        #footer {
-          margin-left: -20px;
-          margin-right: -20px;
-          padding-left: 20px;
-          padding-right: 20px;
-		}		
-}
-
-
-#wrap > .container {
-	padding-top: 41px;
-}
-
-.container .credit {
-	margin: 20px 0;
-}
-
-/** This is required to make anchors not disappear
- under fixed navbar **/
-a[name] {
-  padding-top: 66px;
-  margin-top: -66px;
-  display: inline-block; /* required for webkit browsers */
-}
+  @media (max-width: 1024px) {
+    #footer {
+      margin-left: -20px;
+      margin-right: -20px;
+      padding-left: 20px;
+      padding-right: 20px;
+    }		
+  }
 
 
-h1, h2, h3, h4, h5 {
-	color: #3d3f42;
-}
+  #wrap > .container {
+    padding-top: 41px;
+  }
 
-/** headings, paragraphs, and code got to look like 
-on github wiki */
+  .container .credit {
+    margin: 20px 0;
+  }
 
-h1 {
-	color: rgb(51, 51, 51);
-	font-size: 36px;
-	line-height: normal;
-}
-
-h2 {
-	color: rgb(51, 51, 51);
-	border-bottom-color: rgb(238, 238, 238);
-	border-bottom-style: solid;
-	border-bottom-width: 1px;
-	margin-bottom: 15px;
-	margin-top: 25px;
-}
-
-.highlight pre code {
-	font-size: 13px;
-	font-family: Consolas, "Liberation Mono", Courier, monospace;
-	line-height: 19px;
-}
-
-.navbar .brand{
-	font-size:24px;
-	font-weight: bold;
-}
-
-/** for the home page **/
-.news-row {
-	margin-bottom: 1em;
-}
-
-.news-row h3 {
-	margin-top: 0;
-	line-height: 24px;
-}
-hr.soften {
-	margin: 40px 0;
-}
-
-.marketing {
-	color: #5a5a5a;
-}
-
-.marketing h1 {
-	color: #5a5a5a;
-	margin: 15px 0;
-	font-size: 60px;
-	font-weight: 500;
-	line-height: 1;
-	letter-spacing: -1px;
-	height: auto;
-}
-
-.marketing h2 {
-	border-bottom: none;
-	color: #5a5a5a;
-	font-weight: 200;
-	margin-top: 0px;
-	margin-bottom: 10px;
-}
-
-.marketing h3 {
-	font-weight: 200;
-}
-
-span.news-title {
-	font-size: 24px;
-	font-weight: 200;
-	margin-right: 10px;
-}
-
-.marketing h4 {
-	font-weight: 200;
-}
-
-.marketing p {
-	line-height: 24px;
-}
+  /** This is required to make anchors not disappear
+  under fixed navbar **/
+  a[name] {
+    padding-top: 66px;
+    margin-top: -66px;
+    display: inline-block; /* required for webkit browsers */
+  }
 
 
-.marketing ul li h4 a {
-	color: #5a5a5a;
-}
+  h1, h2, h3, h4, h5 {
+    color: #3d3f42;
+  }
 
-.marketing ul li h4 a:hover {
-	color: #ad141e;
-	text-decoration:none;
-}
+  /** headings, paragraphs, and code got to look like 
+  on github wiki */
 
-.marketing h3 a {
-	color: #5a5a5a;
-}
+  h1 {
+    color: rgb(51, 51, 51);
+    font-size: 36px;
+    line-height: normal;
+  }
 
-.marketing h3 a:hover {
-	color: #ad141e;
-	text-decoration:none;
-}
+  h2 {
+    color: rgb(51, 51, 51);
+    border-bottom-color: rgb(238, 238, 238);
+    border-bottom-style: solid;
+    border-bottom-width: 1px;
+    margin-bottom: 15px;
+    margin-top: 25px;
+  }
 
-.marketing h2 a {
-	color: #5a5a5a;
-}
+  .highlight pre code {
+    font-size: 13px;
+    font-family: Consolas, "Liberation Mono", Courier, monospace;
+    line-height: 19px;
+  }
 
-.marketing h2 a:hover {
-	color: #ad141e;
-	text-decoration:none;
-}
+  .navbar .brand{
+    font-size:24px;
+    font-weight: bold;
+  }
 
-/* Hero unit */
-.hero-unit .container h1{
-	margin-bottom: 10px;
-	
-}
+  /** for the home page **/
+  .news-row {
+    margin-bottom: 1em;
+  }
+
+  .news-row h3 {
+    margin-top: 0;
+    line-height: 24px;
+  }
+  hr.soften {
+    margin: 40px 0;
+  }
+
+  .marketing {
+    color: #5a5a5a;
+  }
+
+  .marketing h1 {
+    color: #5a5a5a;
+    margin: 15px 0;
+    font-size: 60px;
+    font-weight: 500;
+    line-height: 1;
+    letter-spacing: -1px;
+    height: auto;
+  }
+
+  .marketing h2 {
+    border-bottom: none;
+    color: #5a5a5a;
+    font-weight: 200;
+    margin-top: 0px;
+    margin-bottom: 10px;
+  }
+
+  .marketing h3 {
+    font-weight: 200;
+  }
+
+  span.news-title {
+    font-size: 24px;
+    font-weight: 200;
+    margin-right: 10px;
+  }
+
+  .marketing h4 {
+    font-weight: 200;
+  }
+
+  .marketing p {
+    line-height: 24px;
+  }
 
 
-#forkongithub a{
+  .marketing ul li h4 a {
+    color: #5a5a5a;
+  }
+
+  .marketing ul li h4 a:hover {
+    color: #ad141e;
+    text-decoration:none;
+  }
+
+  .marketing h3 a {
+    color: #5a5a5a;
+  }
+
+  .marketing h3 a:hover {
+    color: #ad141e;
+    text-decoration:none;
+  }
+
+  .marketing h2 a {
+    color: #5a5a5a;
+  }
+
+  .marketing h2 a:hover {
+    color: #ad141e;
+    text-decoration:none;
+  }
+
+  /* Hero unit */
+  .hero-unit .container h1{
+    margin-bottom: 10px;
+
+  }
+
+  #forkongithub a{
     background:#000;
     color:#fff;
     text-decoration:none;
@@ -223,15 +223,15 @@ span.news-title {
     font-size:1rem;
     line-height:2rem;
     position:relative;
-    transition:0.5s;} 
+  transition:0.5s;} 
 
-#forkongithub a:hover{background:#060;color:#fff;} 
-#forkongithub a::before, #forkongithub a::after{content:"";width:100%;display:block;position:absolute;top:1px;left:0;height:1px;background:#fff;}
+  #forkongithub a:hover{background:#060;color:#fff;} 
+  #forkongithub a::before, #forkongithub a::after{content:"";width:100%;display:block;position:absolute;top:1px;left:0;height:1px;background:#fff;}
 
-#forkongithub a::after{bottom:1px;top:auto;}
+  #forkongithub a::after{bottom:1px;top:auto;}
 
-@media screen and (min-width:1024px){
+  @media screen and (min-width:1024px){
     #forkongithub{position:absolute;display:block;top:0;right:0;width:200px;overflow:hidden;height:200px;} 
     #forkongithub a{width:200px;position:absolute;top:60px;right:-60px;transform:rotate(45deg);-webkit-transform:rotate(45deg);
     box-shadow:4px 4px 10px rgba(0,0,0,0.8);}
-}
+  }
