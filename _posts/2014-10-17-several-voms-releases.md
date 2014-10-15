@@ -21,7 +21,7 @@ The highlights of this release are:
   some segfaults have been resolved and the server now correctly throttles
   incoming requests;
 
-- [VOMS-Admin 3.3.0][rn-admin-server] provides bugfixes and improvements in the integration with
+- [VOMS-Admin server 3.3.0][rn-admin-server] provides bugfixes and improvements in the integration with
   the CERN Organizational Database;
 
 - [VOMS API Java 3.0.4][rn-api-java] providing fixes for several issues.
