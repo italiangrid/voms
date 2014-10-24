@@ -48,7 +48,7 @@ In particular:
 
 Upgrading to this version requires an upgrade of the database and a reconfiguration depending on the version of VOMS admin which is being upgraded.
 
-Follow the instructions in the VOMS [System Administrator Guide]({{site.baseurl}}/documentation/sysadmin-guide/3.0.0).
+Follow the instructions in the VOMS [System Administrator Guide]({{site.baseurl}}/documentation/sysadmin-guide/3.0.1).
 
 | Upgrade from   | Actions required                                                                                            |
 | :------------: | :----------------:                                                                                          |

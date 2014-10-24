@@ -18,7 +18,3 @@ new Java clients and some bug fixes.
 ### Bug fixes
 
 {% include list-rfcs.liquid %}
-
-### Known issues
-
-None at the moment.
