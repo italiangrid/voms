@@ -40,6 +40,6 @@ authors:
     github: enricovianello
 
 versions:
-    sysadmin_guide : 3.0.0
-    voms_admin_guide : 3.2.0
+    sysadmin_guide : 3.0.1
+    voms_admin_guide : 3.3.0
     voms_clients_guide: 3.0.3

@@ -17,14 +17,15 @@ The highlights of this release are:
   Starting with this release, the clients are also available on [Maven
   Central][clients-central];
 
+- [VOMS API Java 3.0.4][rn-api-java] providing fixes for several issues in support
+  for the clients release;
+
 - [VOMS server 2.0.12][rn-core] which provides several bugfixes. In particular,
   some segfaults have been resolved and the server now correctly throttles
   incoming requests;
 
 - [VOMS-Admin server 3.3.0][rn-admin-server] provides bugfixes and improvements in the integration with
   the CERN Organizational Database;
-
-- [VOMS API Java 3.0.4][rn-api-java] providing fixes for several issues.
 
 As usual packages can be obtained from our repositories and will soon be pushed to the
 EMI-3 and UMD repositories. For instructions, refer to the [download section][downloads].

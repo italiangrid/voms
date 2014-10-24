@@ -13,8 +13,8 @@ rfcs:
 # VOMS Clients v. 3.0.5
 
 This release provides bug fixes for the VOMS Java clients and introduces new
-packaging of the clients that makes them installable together with the old
-native clients (v. >= 2.0.12).
+packaging of the clients that makes them installable together with native
+clients (version  >= 2.0.12).
 
 ### Bug fixes
 

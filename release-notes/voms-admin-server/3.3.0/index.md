@@ -3,6 +3,8 @@ layout: default
 title: VOMS Admin server v. 3.3.0
 
 rfcs:
+    - id: VOMS-537
+      title: Keep service host and bind address unrelated for VOMS Admin server
     - id: VOMS-531
       title: Handle null institute in OrgDB gracefully
     - id: VOMS-525
@@ -34,7 +36,9 @@ In particular:
 
 - Improvements with the integration with the CERN Organizational database
 - The container work directory is no more stored in /var/tmp
-- VOMS Admin binds on all interfaces by default
+- VOMS Admin binds on all interfaces by default, however  a `bind_address`
+  option has been added to voms-admin-server.properties to bind to specific
+  interfaces
 
 ### Bug fixes
 
