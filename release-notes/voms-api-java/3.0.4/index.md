@@ -35,7 +35,3 @@ For an update install:
 ```bash
 yum update
 ```
-
-### Known issues
-
-None at the moment.

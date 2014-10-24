@@ -55,9 +55,5 @@ Follow the instructions in the VOMS [System Administrator Guide]({{site.baseurl}
 | v. 3.1.0       | <span class="label label-important">db upgrade</span>                                                       |
 | v. 2.7.0       | <span class="label label-important">db upgrade</span> <span class="label label-info">reconfiguration</span> |
 
-### Known issues
-
-None at the moment
-
 [voms-website]: http://italiangrid.github.io/voms
 [voms-admin-guide]: {{site.baseurl}}/documentation/voms-admin-guide/3.3.0

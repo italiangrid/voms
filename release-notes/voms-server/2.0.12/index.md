@@ -22,7 +22,7 @@ This release fixes several problems:
 
 * gSoap is now taken from the OS (before it was embedded in the VOMS source code and
 this could lead to issues)
-* a routine that coused segfaults when DNS resolution resulted in errors has been removed
+* a routine that caused segmentation faults when DNS resolution resulted in errors has been removed
 * VOMS does not disable core file dumping anymore
 * More stringent validation have been implemented on incoming requests
 * VOMS now correctly limits the number of incoming requests
@@ -34,7 +34,3 @@ this could lead to issues)
 ### Installation and configuration
 
 For clean and update installation instructions, follow the instructions in the [VOMS System Administrator guide]({{site.baseurl}}/documentation/sysadmin-guide/3.0.0).
-
-### Known issues
-
-None at the moment.

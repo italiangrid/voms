@@ -24,6 +24,3 @@ clients (version  >= 2.0.12).
 
 For clean and update installation instructions, follow the instructions in the [VOMS clients guide]({{site.baseurl}}/documentation/voms-clients-guide/3.0.3).
 
-### Known issues
-
-None at the moment.
