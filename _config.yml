@@ -1,6 +1,7 @@
-exclude: [README.md]
+exclude: [README.md,"run-jekyll.sh"]
 
 markdown: redcarpet
+
 redcarpet:
   extensions: [ "tables" ]
 
@@ -17,6 +18,11 @@ authors:
     gravatar: f371f6284e5f3b10c555a24fd728a1ef    
     email: andrea.ceccanti@cnaf.infn.it
     github: andreaceccanti
+  francesco:
+    display_name: Francesco Giacomini
+    gravatar:
+    email: francesco.giacomini@cnaf.infn.it
+    github: giacomini
   valerio:
     display_name: Valerio Venturi
     gravatar: 25170d7bd06dd4d753053e12888d1bb0    
@@ -34,6 +40,6 @@ authors:
     github: enricovianello
 
 versions:
-    sysadmin_guide : 3.0.0
-    voms_admin_guide : 3.2.0
+    sysadmin_guide : 3.0.1
+    voms_admin_guide : 3.3.0
     voms_clients_guide: 3.0.3

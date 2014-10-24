@@ -1,4 +1,8 @@
-voms.github.io
-==============
+# voms.github.io
 
-Temporary repository for VOMS website
+VOMS website code.
+
+To run it locally use:
+  
+  sh run-jekyll.sh
+
