@@ -5,6 +5,8 @@ title: VOMS Admin server v. 3.3.0
 rfcs:
     - id: VOMS-537
       title: Keep service host and bind address unrelated for VOMS Admin server
+    - id: VOMS-536
+      title: Disable SSLv3 in VOMS Admin
     - id: VOMS-531
       title: Handle null institute in OrgDB gracefully
     - id: VOMS-525
@@ -39,6 +41,7 @@ In particular:
 - VOMS Admin binds on all interfaces by default, however  a `bind_address`
   option has been added to voms-admin-server.properties to bind to specific
   interfaces
+- SSLv3 support is now disabled ([CVE-2014-3566][cve-2014-3566])
 
 ### Bug fixes
 
@@ -57,3 +60,4 @@ Follow the instructions in the VOMS [System Administrator Guide]({{site.baseurl}
 
 [voms-website]: http://italiangrid.github.io/voms
 [voms-admin-guide]: {{site.baseurl}}/documentation/voms-admin-guide/3.3.0
+[cve-2014-3566]: https://access.redhat.com/security/cve/CVE-2014-3566
