@@ -3,6 +3,8 @@ layout: default
 title: VOMS Admin server v. 3.3.0
 
 rfcs:
+    - id: VOMS-541
+      title: VOMS admin vo.d directory should live under /var/lib
     - id: VOMS-537
       title: Keep service host and bind address unrelated for VOMS Admin server
     - id: VOMS-536
@@ -10,7 +12,7 @@ rfcs:
     - id: VOMS-531
       title: Handle null institute in OrgDB gracefully
     - id: VOMS-525
-      title: voms-container should have workdir under /usr/share/voms-admin/work
+      title: voms-container should have workdir under /var/lib
     - id: VOMS-488
       title: Allow users to change their email address when OrgDB integration is enabled
     - id: VOMS-486
@@ -49,14 +51,34 @@ In particular:
 
 ### Installation and configuration
 
-Upgrading to this version requires an upgrade of the database and a reconfiguration depending on the version of VOMS admin which is being upgraded.
+#### Clean install
 
-Follow the instructions in the VOMS [System Administrator Guide]({{site.baseurl}}/documentation/sysadmin-guide/3.0.1).
+Follow the instructions in the VOMS [System Administrator
+Guide]({{site.baseurl}}/documentation/sysadmin-guide/3.0.1).
+
+#### Upgrade from v. 3.2.0
+
+The upgrade requires a service restart.
+After the packages have been updated, run the following commands:
+
+```bash
+service voms-admin stop
+service voms-admin undeploy
+service voms-admin start
+```
+
+#### Upgrade from earlier VOMS Admin versions
+
+Upgrading to this version requires an upgrade of the database and a
+reconfiguration depending on the version of VOMS admin which is being upgraded.
+Follow the instructions in the VOMS [System Administrator
+Guide]({{site.baseurl}}/documentation/sysadmin-guide/3.0.1).
 
 | Upgrade from   | Actions required                                                                                            |
 | :------------: | :----------------:                                                                                          |
 | v. 3.1.0       | <span class="label label-important">db upgrade</span>                                                       |
 | v. 2.7.0       | <span class="label label-important">db upgrade</span> <span class="label label-info">reconfiguration</span> |
+
 
 [voms-website]: http://italiangrid.github.io/voms
 [voms-admin-guide]: {{site.baseurl}}/documentation/voms-admin-guide/3.3.0
