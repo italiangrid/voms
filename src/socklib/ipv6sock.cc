@@ -33,101 +33,38 @@
 #include <netdb.h>
 #include <sys/socket.h>
 #include <arpa/inet.h>
-#include <stdlib.h>
-#include <string.h>
-
-#include <strings.h>
+#include <cstdlib>
+#include <cstring>
 
 extern "C" {
 #include "log.h"
 }
 
-static char *getid(struct sockaddr *client, char **symbolic, char **port)
-{
-  char ports[100];
-
-  char      *buffer = NULL;
-  socklen_t  bufsize = 50;
-  int        result = 0;
-
-  buffer = (char *)malloc(50);
-  if (!buffer)
-    return NULL;
-
-  while ((result = 
-          getnameinfo(client, sizeof(struct sockaddr_storage), buffer, 
-                      bufsize, ports, 99, 0)) == EAI_OVERFLOW) {
-    char *newbuf = (char*)realloc(buffer, bufsize + 50);
-
-    if (newbuf) {
-      bufsize += 50;
-      buffer = newbuf;
-    }
-    else
-      break;
-  }
-  if (result == 0) {
-    *symbolic = buffer;
-    *port = ports;
-  }
-
-  bufsize = 50;
-  buffer = (char *)malloc(50);
-  if (!buffer) {
-    free(*symbolic);
-    return NULL;
-  }
-
-  while ((result = 
-          getnameinfo(client, sizeof(struct sockaddr_storage), buffer, bufsize, NULL, 0, NI_NUMERICHOST)) == EAI_OVERFLOW) {
-    char *newbuf = (char*)realloc(buffer, bufsize + 70);
-
-    if (newbuf) {
-      bufsize += 70;
-      buffer = newbuf;
-    }
-    else
-      break;
-  }
-
-  if (result != 0) {
-    free(*symbolic);
-    return NULL;
-  }
-  else {
-    if (!strcmp(buffer, *symbolic)) {
-      free(*symbolic);
-      *symbolic = NULL;
-    }
-
-    if (strncasecmp(buffer, "::ffff:", 7) == 0) {
-      memmove(buffer, buffer + 7, strlen(buffer) -7 + 1);
-    }
-    return buffer;
-  }
-
-  /* Control should never get here */
-  return NULL;
-}
-  
 static void logconnection(struct sockaddr *client, void *logh)
 {
-  char *port = NULL;
-  char *ip = NULL;
-  char *dns = NULL;
 
-  ip = getid(client, &dns, &port);
+  char hostname_buf[NI_MAXHOST];
+  char port_no_buf[NI_MAXSERV];
 
-  if (ip) {
-    if (dns)
-      LOGM(VARP, logh, LEV_INFO, T_PRE, 
-           "Received connection from: %s (%s):%s\n", dns, ip, port);
-    else
-      LOGM(VARP, logh, LEV_INFO, T_PRE, "Received connection from: %s:%s\n", 
-           ip, port);
+  int nameinfo_status = getnameinfo(
+      client,
+      sizeof(sockaddr_storage),
+      hostname_buf, 
+      NI_MAXHOST,
+      port_no_buf, 
+      NI_MAXSERV,
+      NI_NUMERICHOST | NI_NUMERICSERV);
+
+  if (nameinfo_status){
+    LOGM(VARP, logh, LEV_ERROR, T_PRE,
+        "Error resolving name information for current client, no logging.");
+    return;
   }
-  free(ip);
-  free(dns);
+
+  LOGM(VARP, logh, LEV_INFO, T_PRE, 
+      "Received connection from: %s:%s\n", 
+      hostname_buf, 
+      port_no_buf);
 }
 
 int bind_and_listen(char* port, int backlog, void *logh)
@@ -143,7 +80,10 @@ int bind_and_listen(char* port, int backlog, void *logh)
   hints.ai_family    = AF_UNSPEC;
   hints.ai_socktype  = SOCK_STREAM;
 
-  getaddrinfo(NULL, port, &hints, &address_list);
+  if (getaddrinfo(NULL, port, &hints, &address_list)){
+    LOGM(VARP, logh, LEV_ERROR, T_PRE, "getaddrinfo() failed for port %s!", port);
+    return -1;
+  }
 
   paddress = address_list;
 
@@ -210,7 +150,9 @@ int sock_connect(const char *host, char *port)
   hints.ai_family = PF_UNSPEC;
   hints.ai_socktype = SOCK_STREAM;
 
-  getaddrinfo(host, port, &hints, &address_list);
+  if (getaddrinfo(host, port, &hints, &address_list)) {
+    return -1;
+  }
 
   paddress = address_list;
 

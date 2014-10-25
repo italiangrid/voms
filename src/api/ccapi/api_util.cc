@@ -667,21 +667,26 @@ X509 *vomsdata::check_from_file(AC *ac, std::ifstream &file, const std::string &
 
   X509 *cert = X509_dup(sk_X509_value(certstack, 0));
 
-  bool found = false;
+  if ( ! check_sig_ac(cert,ac) ){
 
-  if (check_sig_ac(cert, ac))
-    found = true;
-  else
-    seterror(VERR_SIGN, "Unable to verify signature!");
+    char * cert_subject = X509_NAME_oneline(X509_get_subject_name(cert), NULL, 0);
+    std::string msg("AC signature check failed for certificate '");
 
-  if (found) {
-    if (!check_cert(certstack)) {
-      cert = NULL;
-      seterror(VERR_SIGN, "Unable to verify certificate chain.");
+    msg += cert_subject;
+    msg += std::string("' for vo ");
+    msg += voname;
+
+    seterror(VERR_SIGN, msg);
+    OPENSSL_free(cert_subject);
+
+  } else {
+
+    if ( ! check_cert(certstack) ) {
+      // check_cert sets the error message
+      cert = 0;
     }
+
   }
-  else
-    seterror(VERR_SIGN, std::string("Cannot find certificate of AC issuer for vo ") + voname);
 
   AC_CERTS_free(certs);
   return cert;
@@ -716,14 +721,16 @@ vomsdata::check_cert(STACK_OF(X509) *stack)
   csc = X509_STORE_CTX_new();
   ctx = X509_STORE_new();
   error = VERR_MEM;
+
   if (ctx && csc) {
     proxy_verify_desc *pvd = setup_initializers(strdup((char*)ca_cert_dir.c_str()));
 
     X509_STORE_set_verify_cb_func(ctx,proxy_verify_callback);
-    
+
 #ifdef SIGPIPE
     void (*oldsignal)(int) = signal(SIGPIPE,SIG_IGN);
 #endif
+
     CRYPTO_malloc_init();
     if ((lookup = X509_STORE_add_lookup(ctx, X509_LOOKUP_file()))) {
       X509_LOOKUP_load_file(lookup, NULL, X509_FILETYPE_DEFAULT);
@@ -736,16 +743,51 @@ vomsdata::check_cert(STACK_OF(X509) *stack)
 
         ERR_clear_error();
         error = VERR_VERIFY;
-        X509_STORE_CTX_init(csc, ctx, sk_X509_value(stack, 0), NULL);
-        X509_STORE_CTX_set_ex_data(csc, PVD_STORE_EX_DATA_IDX, pvd);
-        index = X509_verify_cert(csc);
+        if (X509_STORE_CTX_init(csc, ctx, sk_X509_value(stack, 0), NULL)==0) {
+          error = VERR_MEM;
+        } else	{
+
+          X509_STORE_CTX_set_ex_data(csc, PVD_STORE_EX_DATA_IDX, pvd);
+          /* X509_STORE_CTX_get0_param() only returns NULL if
+           * X509_STORE_CTX_init() has failed  */
+
+          if (verificationtime){
+
+            X509_VERIFY_PARAM_set_time(X509_STORE_CTX_get0_param(csc),
+                verificationtime);
+          }
+
+          index = X509_verify_cert(csc);
+        }
       }
     }
+
 #ifdef SIGPIPE
     signal(SIGPIPE, oldsignal);
 #endif
+
     destroy_initializers(pvd);
   }
+  
+  if (!index){
+    // Certificate validation failed, fetch underlying error
+    std::string vfy_error("Certificate verification failed ");
+
+    X509 *invalid_cert = X509_STORE_CTX_get_current_cert(csc);
+    if (invalid_cert){
+
+      vfy_error += "for certificate '";
+      char *cert_subject = X509_NAME_oneline(X509_get_subject_name(invalid_cert), NULL, 0);
+      vfy_error += cert_subject; 
+      vfy_error += "': ";
+      OPENSSL_free(cert_subject);
+    } 
+
+    vfy_error += X509_verify_cert_error_string(X509_STORE_CTX_get_error(csc));
+    vfy_error += ".";
+    seterror(VERR_VERIFY, vfy_error); 
+  }
+
   X509_STORE_free(ctx);
 
   if (csc)

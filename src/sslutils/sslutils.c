@@ -885,34 +885,36 @@ proxy_sign(
 )
 {
     char *                              newcn;
-    EVP_PKEY *                          user_public_key;
     X509_NAME *                         subject_name = NULL;
     X509_NAME *                         issuer_name = NULL;
     int                                 rc = 0;
 
     unsigned char                       md[SHA_DIGEST_LENGTH];
     unsigned int                        len;
-    EVP_MD* sig_algo; 
-    
+    EVP_MD*                             sig_algo;
+
     sig_algo = EVP_get_digestbyobj(req->sig_alg->algorithm);
     if (sig_algo == NULL) sig_algo = EVP_sha1();
 
-
     if(proxyver>=3) {
-      long sub_hash;
+      unsigned sub_hash;
+      EVP_MD* cn_sig_algo;
+      EVP_PKEY* req_public_key;
 
-      user_public_key = X509_get_pubkey(user_cert);
+      cn_sig_algo = EVP_sha1();
+      req_public_key = X509_REQ_get_pubkey(req);
 
 #ifdef TYPEDEF_I2D_OF
-      ASN1_digest((i2d_of_void*)i2d_PUBKEY, sig_algo, (char *) user_public_key, md, &len);
+      ASN1_digest((i2d_of_void*)i2d_PUBKEY, cn_sig_algo, (char *) req_public_key, md, &len);
 #else
-      ASN1_digest(i2d_PUBKEY, sig_algo, (char *) user_public_key, md, &len);
+      ASN1_digest(i2d_PUBKEY, cn_sig_algo, (char *) req_public_key, md, &len);
 #endif
-      EVP_PKEY_free(user_public_key);
+      EVP_PKEY_free(req_public_key);
 
-      sub_hash = md[0] + (md[1] + (md[2] + (md[3] >> 1) * 256) * 256) * 256;
+      sub_hash = md[0] | md[1] << 8 | md[2] << 16 | md[3] << 24;
  
-      newcn = snprintf_wrap("%ld", sub_hash);
+      newcn = snprintf_wrap("%u", sub_hash);
+      newserial = snprintf_wrap("%x", sub_hash);
     }
     else {
       if(limited_proxy)
@@ -927,8 +929,10 @@ proxy_sign(
                               &subject_name,
                               newcn, -1)) {
         PRXYerr(PRXYERR_F_PROXY_SIGN,PRXYERR_R_PROCESS_SIGN);
-        if (proxyver >= 3)
+        if (proxyver >= 3) {
           free(newcn);
+	  free(newserial);
+	}
         return 1;
       }
     }
@@ -963,8 +967,10 @@ proxy_sign(
     if (issuer_name)
       X509_NAME_free(issuer_name);
 
-    if (proxyver >= 3)
+    if (proxyver >= 3) {
       free(newcn);
+      free(newserial);
+    }
 
     return rc;
 }
@@ -1041,8 +1047,7 @@ proxy_sign_ext(
     unsigned int                        len;
     EVP_MD*                             sig_algo;
 
-    sig_algo = EVP_get_digestbyobj(req->sig_alg->algorithm);
-    if (sig_algo == NULL) sig_algo = EVP_sha1();
+    sig_algo = EVP_sha1();
 
     if (!selfsigned)
       user_cert_info = user_cert->cert_info;

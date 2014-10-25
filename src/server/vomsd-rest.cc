@@ -117,7 +117,7 @@ makeACREST(struct soap *soap, const std::string& command, const std::string& ord
   if (unknown)
     vr.setError(WARN_UNKNOWN_COMMAND, "Unknown parameters in the request were ignored!");
 
-  (void)makeACSSL(vr, soap->ssl, command, orderstring, targets, requested, selfpointer);
+  (void)makeACSSL(vr, (SSL*)soap->ssl, command, orderstring, targets, requested, selfpointer);
 
   int value;
   std::string output = vr.makeRESTAnswer(value);
@@ -135,7 +135,7 @@ int http_get(soap *soap)
   char *path = strdup(soap->path);
   int unknown = 0;
 
-  LOGM(VARP, logh, LEV_DEBUG, T_PRE, "REST Request: %s", soap->path);
+  LOGM(VARP, logh, LEV_DEBUG, T_PRE, "HTTP request: %s", soap->path);
 
   if (!path)
     return SOAP_GET_METHOD;

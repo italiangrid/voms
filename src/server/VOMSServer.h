@@ -37,6 +37,24 @@
 #include <openssl/evp.h>
 
 #include "data.h"
+#include <stdexcept>
+
+
+struct voms_init_error: public std::runtime_error {
+  voms_init_error(std::string const& m): 
+    runtime_error(m){}
+  virtual const char* what() throw() {
+    return std::runtime_error::what();
+  }
+};
+
+struct voms_execution_error: public std::runtime_error {
+  voms_execution_error(std::string const& m): 
+    runtime_error(m){}
+  virtual const char* what() throw() {
+    return std::runtime_error::what();
+  }
+};
 
 class vomsresult {
 private:
@@ -82,16 +100,6 @@ public:
   }
 
   std::string makeRESTAnswer(int& code);
-};
-
-class VOMSInitException {
-
- public:
-  VOMSInitException(const std::string &er = "") : error(er) {}
-  virtual ~VOMSInitException() throw () {}
-  const std::string error; //: The error message
-  virtual const char* what( void ) const throw () { return error.c_str(); }
-
 };
 
 class VOMSServer {

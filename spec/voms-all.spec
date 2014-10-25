@@ -1,5 +1,5 @@
 Name: voms
-Version: 2.0.11
+Version: 2.0.12
 Release: 1%{?dist}
 Summary: The Virtual Organisation Membership Service C++ APIs
 
@@ -66,7 +66,12 @@ Documentation for the Virtual Organization Membership Service.
 %package clients
 Summary:	Virtual Organization Membership Service Clients
 Group:		Applications/Internet
+
 Requires:	%{name}%{?_isa} = %{version}-%{release}
+Conflicts: voms-clients3 <= 3.0.4
+
+Requires(post):         %{_sbindir}/update-alternatives
+Requires(postun):       %{_sbindir}/update-alternatives
 
 %description clients
 The Virtual Organization Membership Service (VOMS) is an attribute authority
@@ -140,6 +145,17 @@ cp -pr  doc/apidoc/api/VOMS_CC_API/html \
 	$RPM_BUILD_ROOT%{_docdir}/%{name}-%{version}/VOMS_CC_API
 rm -f $RPM_BUILD_ROOT%{_docdir}/%{name}-%{version}/VOMS_CC_API/html/installdox
 
+for b in voms-proxy-init voms-proxy-info voms-proxy-destroy; do
+  ## Rename client binaries 
+  mv $RPM_BUILD_ROOT%{_bindir}/${b} $RPM_BUILD_ROOT%{_bindir}/${b}2
+
+  ## and man pages
+  mv $RPM_BUILD_ROOT%{_mandir}/man1/${b}.1 $RPM_BUILD_ROOT%{_mandir}/man1/${b}2.1
+
+  # Needed by alternatives. See http://fedoraproject.org/wiki/Packaging:Alternatives
+  touch $RPM_BUILD_ROOT/%{_bindir}/${b}
+done
+
 %clean
 
 rm -rf $RPM_BUILD_ROOT
@@ -178,6 +194,37 @@ if [ $1 -ge 1 ]; then
     /sbin/service %{name} condrestart >/dev/null 2>&1 || :
 fi
 
+%pre clients
+
+if [ $1 -eq 2 ]; then 
+  for c in voms-proxy-init voms-proxy-info voms-proxy-destroy; do
+    if [[ -x %{_bindir}/$c && ! -L %{_bindir}/$c ]]; then
+      rm -f %{_bindir}/$c
+    fi
+  done
+fi
+
+%post clients
+
+%{_sbindir}/update-alternatives --install %{_bindir}/voms-proxy-init \
+    voms-proxy-init %{_bindir}/voms-proxy-init2 50 \
+    --slave %{_mandir}/man1/voms-proxy-init.1.gz voms-proxy-init-man %{_mandir}/man1/voms-proxy-init2.1.gz 
+
+%{_sbindir}/update-alternatives --install %{_bindir}/voms-proxy-info \
+    voms-proxy-info %{_bindir}/voms-proxy-info2 50 \
+    --slave %{_mandir}/man1/voms-proxy-info.1.gz voms-proxy-info-man %{_mandir}/man1/voms-proxy-info2.1.gz
+
+%{_sbindir}/update-alternatives --install %{_bindir}/voms-proxy-destroy \
+    voms-proxy-destroy %{_bindir}/voms-proxy-destroy2 50 \
+    --slave %{_mandir}/man1/voms-proxy-destroy.1.gz voms-proxy-destroy-man %{_mandir}/man1/voms-proxy-destroy2.1.gz
+
+%postun clients
+
+if [ $1 -eq 0 ] ; then
+  %{_sbindir}/update-alternatives  --remove voms-proxy-init %{_bindir}/voms-proxy-init2
+  %{_sbindir}/update-alternatives  --remove voms-proxy-info %{_bindir}/voms-proxy-info2
+  %{_sbindir}/update-alternatives  --remove voms-proxy-destroy %{_bindir}/voms-proxy-destroy2
+fi
 
 %files
 %defattr(-,root,root,-)
@@ -205,16 +252,22 @@ fi
 
 %files clients
 %defattr(-,root,root,-)
-%{_bindir}/voms-proxy-destroy
-%{_bindir}/voms-proxy-info
-%{_bindir}/voms-proxy-init
+
+%ghost %{_bindir}/voms-proxy-destroy
+%ghost %{_bindir}/voms-proxy-info
+%ghost %{_bindir}/voms-proxy-init
+
+%{_bindir}/voms-proxy-destroy2
+%{_bindir}/voms-proxy-info2
+%{_bindir}/voms-proxy-init2
 %{_bindir}/voms-proxy-fake
 %{_bindir}/voms-proxy-list
-%{_mandir}/man1/voms-proxy-destroy.1*
-%{_mandir}/man1/voms-proxy-info.1*
-%{_mandir}/man1/voms-proxy-init.1*
-%{_mandir}/man1/voms-proxy-fake.1*
-%{_mandir}/man1/voms-proxy-list.1*
+
+%{_mandir}/man1/voms-proxy-destroy2.1.gz
+%{_mandir}/man1/voms-proxy-info2.1.gz
+%{_mandir}/man1/voms-proxy-init2.1.gz
+%{_mandir}/man1/voms-proxy-fake.1.gz
+%{_mandir}/man1/voms-proxy-list.1.gz
 
 %files server
 %defattr(-,root,root,-)
@@ -234,6 +287,9 @@ fi
 %{_mandir}/man8/voms.8*
 
 %changelog
+* Mon May 12 2014 Andrea Ceccanti <andrea.ceccanti at cnaf.infn.it> - 2.0.12-1
+- New packaging of the clients. https://issues.infn.it/jira/browse/VOMS-495
+
 * Mon Aug 21 2013 Andrea Ceccanti <andrea.ceccanti at cnaf.infn.it> - 2.0.11-1
 - Fix for https://issues.infn.it/browse/VOMS-379
 

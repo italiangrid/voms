@@ -1142,6 +1142,12 @@ bool Client::pcdInit()
   if (!determine_filenames(&cacertfile, &certdir, &outfile, &certfile, &keyfile, noregen ? 1 : 0))
     goto err;
 
+  if (!certfile){
+    Print(ERROR) << "ERROR: Coudln't find valid credentials to generate a proxy." << std::endl;
+    goto err;
+  }
+
+
   if (certfile == keyfile) 
     keyfile = strdup(certfile);
 

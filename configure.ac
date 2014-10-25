@@ -1,4 +1,4 @@
-AC_INIT([VOMS], [2.0.11])
+AC_INIT([VOMS], [2.0.12])
 AC_PREREQ(2.57)
 AC_CONFIG_AUX_DIR([./aux])
 AM_INIT_AUTOMAKE
@@ -21,6 +21,7 @@ AC_SUBST(WORKDIR)
 AC_PROG_CXX
 AC_PROG_AWK
 AC_PROG_CC
+AM_PROG_CC_C_O
 AC_PROG_CPP
 AC_PROG_INSTALL
 AC_PROG_LN_S
@@ -30,23 +31,34 @@ AC_PROG_YACC
 AC_PROG_LEX
 AC_COMPILER
 
-# Checks for libraries.
-AC_OPENSSL
+PKG_CHECK_MODULES([OPENSSL], [openssl])
 
-# check for dependencies based on project/*m4
-AC_EXPAT([], have_expat=yes, have_expat=no)        # taken from org.glite
+PKG_CHECK_MODULES([GSOAP],[gsoap >= 2.7])
+PKG_CHECK_MODULES([GSOAP_PP],[gsoap++ >= 2.7])
+PKG_CHECK_MODULES([GSOAP_SSL],[gsoapssl >= 2.7])
+PKG_CHECK_MODULES([GSOAP_SSL_PP],[gsoapssl++ >= 2.7])
 
+AC_CHECK_HEADER([expat.h], 
+    [], 
+    [AC_MSG_ERROR("Could not find expat.h. Please install the expat development package.")],
+    [])
+
+AC_CHECK_LIB([expat],
+    [XML_ParserCreate],
+    [EXPAT_LIBS=-lexpat],
+    [AC_MSG_ERROR("Error checking libexpat. Please install the expat development package.")]
+    )
+
+AC_SUBST(EXPAT_LIBS)
+
+AC_WSDL2H
 AC_ENABLE_DOCS
-
 
 # Checks for header files.
 AC_HEADER_DIRENT
 AC_HEADER_STDC
 AC_HEADER_SYS_WAIT
-AC_CHECK_HEADERS([fcntl.h libintl.h limits.h memory.h netdb.h netinet/in.h stdlib.h string.h strings.h sys/socket.h sys/time.h syslog.h termios.h unistd.h malloc.h openssl/e_os.h openssl/e_os2.h wchar.h])
-AC_LANG_PUSH(C++)
-AC_CHECK_HEADERS(strstream strstream.h)
-AC_LANG_POP(C++)
+AC_CHECK_HEADERS([fcntl.h libintl.h limits.h memory.h netdb.h netinet/in.h stdlib.h string.h strings.h sys/socket.h sys/time.h syslog.h termios.h unistd.h malloc.h wchar.h])
 
 # Checks for typedefs, structures, and compiler characteristics.
 AC_HEADER_STDBOOL
@@ -113,6 +125,7 @@ INSTALL_API_LIBS="libvomsapi.la"
 else
 INSTALL_API_LIBS=""
 fi
+
 
 AC_SUBST(INSTALL_API_LIBS)
 

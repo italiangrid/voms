@@ -54,6 +54,8 @@ void *logh = NULL;
 #include "myproxycertinfo.h"
 }
 
+#include <sstream>
+
 #include "Server.h"
 
 #include "options.h"
@@ -83,6 +85,11 @@ extern int http_get(soap *soap);
 #include "validate.h"
 
 #include "VOMSServer.h"
+
+static bool file_is_readable(const char* filename){
+  std::ifstream f(filename);
+  return f.good();
+}
 
 std::string vomsresult::makeRESTAnswer(int& code)
 {
@@ -175,9 +182,8 @@ static signed long int get_userid(sqliface::interface *db, X509 *cert, const std
 static std::string addtoorder(std::string previous, char *group, char *role);
 static bool determine_group_and_role(std::string command, char *comm, char **group, char **role);
 static BIGNUM *get_serial();
-static void sigchld_handler(UNUSED(int sig));
-static void sighup_handler(UNUSED(int sig));
-static void sigterm_handler(UNUSED(int sig));
+static void sighup_handler(int signo);
+static void sigterm_handler(int signo);
 static bool compare(const std::string &lhs, const std::string &rhs);
 static void orderattribs(std::vector<std::string> &v);
 static std::string parse_order(const std::string &message, ordermap &ordering);
@@ -185,31 +191,42 @@ static void parse_targets(const std::string &message, std::vector<std::string> &
 static bool not_in(std::string fqan, std::vector<std::string> fqans);
 static void AdjustURI(std::string &uri, int port);
 
+static int active_requests = 0;
+
 static void
-sigchld_handler(UNUSED(int sig))
+sigchld_handler(int signo)
 {
+
   int save_errno = errno;
   pid_t pid;
   int status;
+  
+  do{
 
-  while ((pid = waitpid(-1, &status, WNOHANG)) > 0 ||
-         (pid < 0 && errno == EINTR))
-    ;
+    pid = waitpid(-1,&status, WNOHANG);
 
-  signal(SIGCHLD, sigchld_handler);
+    if (pid > 0)  
+    {
+      active_requests--;
+      if ( active_requests < 0 )
+        active_requests = 0;
+    }
+
+  } while ((pid > 0) || (pid < 0 && errno == EINTR));
+
   errno = save_errno;
 }
 
 static void
-sighup_handler(UNUSED(int sig))
+sighup_handler(int signo)
 {
   reload = 1;
 }
 
 static void
-sigterm_handler(UNUSED(int sig))
+sigterm_handler(int signo)
 {
-  exit(0);
+  exit(1);
 }
 
 static bool compare(const std::string &lhs, const std::string &rhs)
@@ -355,6 +372,7 @@ VOMSServer::VOMSServer(int argc, char *argv[]) : sock(0,NULL,50,false),
 
   signal(SIGCHLD, sigchld_handler);
   signal(SIGTERM, sigterm_handler);
+
   ac = argc;
   av = argv;
 
@@ -429,7 +447,7 @@ VOMSServer::VOMSServer(int argc, char *argv[]) : sock(0,NULL,50,false),
             "[-max_reqs max_concurrent_request_number]\n");
 
   if (!getopts(argc, argv, opts))
-    throw VOMSInitException("unable to read options");
+    throw voms_init_error("unable to read options");
 
   maingroup = snprintf_wrap("/%s", voname.c_str());
 
@@ -442,7 +460,7 @@ VOMSServer::VOMSServer(int argc, char *argv[]) : sock(0,NULL,50,false),
   if (progversion) {
     std::cout << SUBPACKAGE << "\nVersion: " << VERSION << std::endl;
     std::cout << "Compiled: " << __DATE__ << " " << __TIME__ << std::endl;
-    exit(0);
+    return;
   }
 
   /* Test if logging can start. */
@@ -459,7 +477,7 @@ VOMSServer::VOMSServer(int argc, char *argv[]) : sock(0,NULL,50,false),
       
     if (newfd == -1) {
       fprintf(stderr, "logging could not start!  Logfile %s could not be opened, and syslogging is disabled.", logfile.c_str());
-      exit(1);
+      throw voms_execution_error("Logging system startup error.");
     }
     if (dounlink)
       unlink(logfile.c_str());
@@ -497,7 +515,7 @@ VOMSServer::VOMSServer(int argc, char *argv[]) : sock(0,NULL,50,false),
       (void)LogOption(logh, "DATEFORMAT", logdf.c_str());
   }
   else
-    throw VOMSInitException("logging startup failure");
+    throw voms_init_error("logging startup failure");
 
   LOGM(VARP, logh, LEV_INFO, T_PRE, "Package: %s", SUBPACKAGE);
   LOGM(VARP, logh, LEV_INFO, T_PRE, "Version: %s", VERSION);
@@ -517,35 +535,37 @@ VOMSServer::VOMSServer(int argc, char *argv[]) : sock(0,NULL,50,false),
         LOG(logh, LEV_ERROR, T_PRE, message);
         std::cout << dlerror() << std::endl;
       }
-      exit(1);
+      throw voms_init_error("Cannot load database library");
     }
 
     getlibversion = (gv)dlsym(library, "getDBInterfaceVersion");
     if (!getlibversion || getlibversion() != 3) {
-      LOGM(VARP, logh, LEV_ERROR, T_PRE, "Old version of interface library found. Expecting >= 3, Found: %d", 
-           (getlibversion ? getlibversion() : 1));
-      std::cout << "Old version of interface library found. Expecting >= 3, Found: " << 
-        (getlibversion ? getlibversion() : 1);
-      exit(1);
+
+      std::string error_msg("Old version of interface library found. Expecting >= 3, found: ");
+      error_msg += (getlibversion ? getlibversion() : 1);
+
+      LOGM(VARP, logh, LEV_ERROR, T_PRE, error_msg.c_str());
+      throw voms_init_error(error_msg);
     }
 
     NewDB = (cdb)dlsym(library, "CreateDB");
     if (!NewDB) {
-      LOG(logh, LEV_ERROR, T_PRE, ((std::string)("Cannot find initialization symbol in: " + sqllib)).c_str());
-      std::cout << "Cannot find initialization symbol in: "<< sqllib << dlerror() << std::endl;
-      exit(1);
+      std::string error_msg("Cannot find initialization symbol in: ");
+      error_msg += sqllib;
+
+      LOG(logh, LEV_ERROR, T_PRE, error_msg.c_str());
+      throw voms_init_error(error_msg);
     }
 
   }
   else {
-    std::cout << "Cannot load library! "<< std::endl;
-    LOG(logh, LEV_ERROR, T_PRE, "Cannot load library!" );
-    exit(1);
+    LOG(logh, LEV_ERROR, T_PRE, "Empty SQL library. Cannot start." );
+    throw voms_init_error("Empty SQL library. Cannot start.");
   }
 
   if (!getpasswd(passfile, logh))  {
     LOG(logh, LEV_ERROR, T_PRE, "can't read password file!\n");
-    throw VOMSInitException("can't read password file!");
+    throw voms_init_error("can't read password file!");
   }
 
   if(contactstring.empty())
@@ -555,8 +575,7 @@ VOMSServer::VOMSServer(int argc, char *argv[]) : sock(0,NULL,50,false),
 
   if (!db) {
     LOG(logh, LEV_ERROR, T_PRE, "Cannot initialize DB library.");
-    std::cout << "Cannot initialize DB library.";
-    exit(1);
+    throw voms_init_error("Cannot initialize DB library.");
   }
 
   db->setOption(OPTION_SET_PORT, &mysql_port);
@@ -566,11 +585,12 @@ VOMSServer::VOMSServer(int argc, char *argv[]) : sock(0,NULL,50,false),
 
   if (!db->connect(dbname.c_str(), contactstring.c_str(), 
                    username.c_str(), passwd())) {
-    LOGM(VARP, logh, LEV_ERROR, T_PRE, "Unable to connect to database: %s", 
-         db->errorMessage());
-    std::cout << "Unable to connect to database: " <<
-      db->errorMessage() << std::endl;
-    exit(1);
+
+    std::string error_msg("Unable to connect to database: ");
+    error_msg += db->errorMessage();
+
+    LOGM(VARP, logh, LEV_ERROR, T_PRE, error_msg.c_str());
+    throw voms_init_error(error_msg);
   }
 
   int v = 0;
@@ -582,15 +602,13 @@ VOMSServer::VOMSServer(int argc, char *argv[]) : sock(0,NULL,50,false),
   if (result) {
     if (v < 2) {
       LOGM(VARP, logh, LEV_ERROR, T_PRE, "Detected DB Version: %d. Required DB version >= 2", v);
-      std::cerr << "Detected DB Version: " << v << ". Required DB version >= 2";
-
-      throw VOMSInitException("wrong database version");
+      throw voms_init_error("Wrong database version");
     }
   }
   else {
 
     LOGM(VARP, logh, LEV_ERROR, T_PRE, "Error connecting to the database : %s", errormessage.c_str());
-    throw VOMSInitException((std::string("Error connecting to the database : ") + errormessage));
+    throw voms_init_error((std::string("Error connecting to the database : ") + errormessage));
   }
 
   /* Check the value of max_active_requests passed in from voms configuration */
@@ -645,11 +663,11 @@ static char *hostkey   = (char*)"/etc/grid-security/hostkey.pem";
 extern proxy_verify_desc *setup_initializers(char*);
 
 
+
 void VOMSServer::Run()
 {
   pid_t pid = 0;
   struct soap *sop = NULL;
-  int active_requests = 0;
   int wait_status = 0;
 
   if (!x509_user_cert.empty())
@@ -661,9 +679,22 @@ void VOMSServer::Run()
   if (!x509_cert_dir.empty())
     cacertdir = (char *)x509_cert_dir.c_str();
 
+  // Check AA certificate and private key can be opened
+  // or refuse to start up
+ 
+  if (!file_is_readable(hostcert)) {
+    LOGM(VARP, logh, LEV_ERROR, T_PRE, "Error opening VOMS certificate file: %s", hostcert); 
+    throw voms_init_error(std::string("Cannot open file: ")+hostcert);
+  }
+
+  if (!file_is_readable(hostkey)) {
+    LOGM(VARP, logh, LEV_ERROR, T_PRE, "Error opening VOMS private key file: %s", hostkey); 
+    throw voms_init_error(std::string("Cannot open file: ")+hostkey);
+  }
+
   if (!debug) {
     if (daemon(0,0))
-      exit(0);
+      return;
   }
 
   fd_set rset;
@@ -680,8 +711,9 @@ void VOMSServer::Run()
     LOGM(VARP, logh, LEV_DEBUG, T_PRE, "Opened Socket: %d", sock.sck); 
     if (sock.sck == -1) {
       LOG(logh, LEV_ERROR, T_PRE, "Unable to bind socket");
-      exit(1);
+      throw voms_execution_error("Unable to bind socket");
     }
+
     sock.SetTimeout(socktimeout);
     FD_SET(sock.sck, &rset);
 
@@ -706,63 +738,73 @@ void VOMSServer::Run()
       if (FD_ISSET(sock.sck, &rset)) {
 
         if (!sock.Listen()){
-          LOGM(VARP, logh, LEV_ERROR, T_PRE, "Cannot listen on port %d", daemon_port);
-          exit(1);
+
+          std::ostringstream error_msg;
+          error_msg << "Cannot listen on port " << daemon_port;
+
+          LOGM(VARP, logh, LEV_ERROR, T_PRE, error_msg.str().c_str());
+          throw voms_execution_error(error_msg.str());
         } 
 
         (void)SetCurLogType(logh, T_REQUEST);
-
-        active_requests++;
 
         // Wait for children termination before accepting
         // new requests if we exceeded the number of active
         // requests
         if (active_requests > max_active_requests){
 
-          for (; active_requests > max_active_requests; --active_requests){
-            LOGM( VARP, 
-                logh, 
-                LEV_INFO, 
-                T_PRE, 
-                "Reached number of maximum active requests: %d. Waiting for some children process to finish.", 
-                max_active_requests);
+          LOGM( VARP, 
+              logh, 
+              LEV_INFO, 
+              T_PRE, 
+              "Reached number of maximum active requests: %d. Waiting for some children process to finish.", 
+              max_active_requests);
 
-            wait(&wait_status);
-          }
+          wait(&wait_status);
+          active_requests--;
+
         }
 
         pid = fork();
 
         if (pid) {
+          // Parent process
+          active_requests++;
+          LOGM(VARP, logh, LEV_INFO, T_PRE, "Started child executor with pid = %d. Active requests = %d", 
+            pid, active_requests);
 
-          LOGM(VARP, logh, LEV_INFO, T_PRE, "Started child executor with pid = %d", pid);
-          sock.CloseListened();
+          sock.Close();
+
+          // Reset socket descriptors
+          FD_ZERO(&rset);
+          FD_SET(sock.sck, &rset);
         }
 
         if (!pid) {
           //Children process
+
           if (!sock.AcceptGSIAuthentication()){
-            // Print out handshake errors to logs
+
             LOGM(VARP, logh, LEV_INFO, T_PRE, "Failed to authenticate peer.");
-            LOGM(VARP, logh, LEV_INFO, T_PRE, "OpenSSL error: %s", sock.error.c_str());
+            LOGM(VARP, logh, LEV_INFO, T_PRE, "Error: %s", sock.error.c_str());
+
             sock.CleanSocket();
             sock.Close();
-            exit(1);
+            return;
           }
 
           LOGM(VARP, logh, LEV_INFO, T_PRE, "SSL handshake completed succesfully.");
-          LOGM(VARP, logh, LEV_INFO, T_PRE, "Self    : %s", sock.own_subject.c_str());
-          LOGM(VARP, logh, LEV_INFO, T_PRE, "Self CA : %s", sock.own_ca.c_str());
 
           std::string user    = sock.peer_subject;
           std::string userca  = sock.peer_ca;
           subject = sock.own_subject;
           ca = sock.own_ca;
 
-          LOGM(VARP, logh, LEV_INFO, T_PRE, "At: %s Received Contact :", timestamp());
-          LOGM(VARP, logh, LEV_INFO, T_PRE, " user: %s", user.c_str());
-          LOGM(VARP, logh, LEV_INFO, T_PRE, " ca  : %s", userca.c_str());
-          LOGM(VARP, logh, LEV_INFO, T_PRE, " serial: %s", sock.peer_serial.c_str());
+          LOGM(VARP, logh, LEV_INFO, T_PRE, "Received request from: %s, %s (serial: %s)", 
+            user.c_str(), 
+            userca.c_str(), 
+            sock.peer_serial.c_str());
+
           std::string peek;
 
           (void)sock.Peek(3, peek);
@@ -780,37 +822,39 @@ void VOMSServer::Run()
 
           // This is where all the handling logic happens now, when
           // a REST request is received.
-
-          LOG(logh, LEV_DEBUG, T_PRE, "Starting Execution.");
           if (peek == "GET") {
 
-            LOG(logh, LEV_DEBUG, T_PRE, "Received REST request.");
+            LOG(logh, LEV_DEBUG, T_PRE, "Received HTTP request...");
             sop->socket = sock.newsock;
             sop->ssl = sock.ssl;
+
+            // GSOAP will handle this
             sop->fparse(sop);
 
             sock.Close();
-            exit(0);
+          } else {
+
+            // Old legacy interface (pre voms 2.0)
+            LOG(logh, LEV_DEBUG, T_PRE, "Received VOMS legacy protocol request...");
+            Execute(sock.own_key, sock.own_cert, sock.peer_cert);
+            sock.Close();
           }
 
-          // Old legacy interface (pre voms 2.0)
-          Execute(sock.own_key, sock.own_cert, sock.peer_cert);
-          sock.Close();
-          exit(0);
-
+          return;
         } // Children execution frame   
-      } // if (FD_ISSET(sock.sck, &rset))
-
-      FD_ZERO(&rset);
-      FD_SET(sock.sck, &rset);
-
+      } 
     } // Outer foor loop
-  }catch (...) {}
-
+  }catch (voms_execution_error &e){
+    LOGM(VARP, logh, LEV_ERROR, T_PRE, e.what());
+  }
+  catch (...) 
+  {
+    LOGM(VARP, logh, LEV_WARN, T_PRE, "Exception caught in main server loop (and swallowed).");
+  }
 }
 
 bool VOMSServer::makeAC(vomsresult& vr, EVP_PKEY *key, X509 *issuer, 
-			X509 *holder, const std::string &message)
+      X509 *holder, const std::string &message)
 {
   LOGM(VARP, logh, LEV_DEBUG, T_PRE, "Received Request: %s", message.c_str());
 
@@ -828,14 +872,23 @@ bool VOMSServer::makeAC(vomsresult& vr, EVP_PKEY *key, X509 *issuer,
 
   int requested = r.lifetime;
 
+  if (requested < 0){
+    requested = validity;
+  }
+
   std::vector<std::string> targs;
 
   ordering.clear();
 
   parse_targets(r.targets, targs);
 
-  std::string tmp="";
-  std::string command=comm[0];
+  std::string tmp;
+  
+  if (comm.empty()){
+    throw voms_execution_error("Invalid VOMS request received: no command found!");
+  }
+  
+  std::string command(comm[0]);
   bool result = true;
   bool result2 = true;
 
@@ -844,13 +897,19 @@ bool VOMSServer::makeAC(vomsresult& vr, EVP_PKEY *key, X509 *issuer,
   /* Shorten validity if needed */
 
   if (requested != 0) {
-    if (requested == -1)
+    if (requested == -1){
+
       requested = validity;
-    else if (validity < requested) {
-      vr.setError(WARN_SHORT_VALIDITY,
-                  uri + ": The validity of this VOMS AC in your proxy is shortened to " +
-                  stringify(validity, tmp) + " seconds!");
+
+    } else if (validity < requested) {
+
       requested = validity;
+      std::ostringstream msg;
+
+      msg << uri << ": The validity of this VOMS AC in your proxy is shortened to "
+        << validity << " seconds!";
+
+      vr.setError(WARN_SHORT_VALIDITY, msg.str());
     }
   }
 
@@ -944,12 +1003,12 @@ bool VOMSServer::makeAC(vomsresult& vr, EVP_PKEY *key, X509 *issuer,
     free(group); // role is automatically freed.
 
     if(!result) {
-      LOGM(VARP, logh, LEV_DEBUG, T_PRE, "While retrieving fqans: %s", newdb->errorMessage());
+      LOGM(VARP, logh, LEV_DEBUG, T_PRE, "Error while retrieving fqans: %s", newdb->errorMessage());
       break;
     }
 
     if (!result2)
-      LOGM(VARP, logh, LEV_DEBUG, T_PRE, "While retrieving attributes: %s", newdb->errorMessage());
+      LOGM(VARP, logh, LEV_DEBUG, T_PRE, "Error while retrieving generic attributes: %s", newdb->errorMessage());
   }
 
   db->releaseSession(newdb);
@@ -964,7 +1023,7 @@ bool VOMSServer::makeAC(vomsresult& vr, EVP_PKEY *key, X509 *issuer,
         command == (std::string("/") + voname))
       msg = voname + ": User unknown to this VO.";
     else
-      msg = voname + ": Unable to satisfy " + command + " Request!";
+      msg = voname + ": Unable to satisfy " + command + " request!";
 
     vr.setError(ERR_NOT_MEMBER, msg);
 
@@ -994,105 +1053,142 @@ bool VOMSServer::makeAC(vomsresult& vr, EVP_PKEY *key, X509 *issuer,
   if (!firstfqan.empty()) {
     std::vector<std::string>::iterator i = fqans.begin();
     if (i != fqans.end()) {
-      LOGM(VARP, logh, LEV_DEBUG, T_PRE,  "fq = %s", firstfqan.c_str());
+      LOGM(VARP, logh, LEV_DEBUG, T_PRE,  "first fqan = %s", firstfqan.c_str());
       if (*i != firstfqan)
         vr.setError(WARN_NO_FIRST_SELECT, "FQAN: " + *i + " is not the first selected!\n");
     }
   }
 
+  // Adjust for long/short format
+  if (!shortfqans && !fqans.empty()) {
+
+    LOGM(VARP, logh, LEV_DEBUG, T_PRE,  "Translating FQANs to long format.");
+    std::vector<std::string> newfqans(fqans);
+    fqans.clear();
+    std::vector<std::string>::iterator i = newfqans.begin();
+    std::vector<std::string>::iterator end = newfqans.end();
+
+    while (i != end) {
+      std::string fqan = *i;
+      if (fqan.find("/Role=") != std::string::npos)
+        fqan += "/Capability=NULL";
+      else
+        fqan += "/Role=NULL/Capability=NULL";
+      LOGM(VARP, logh, LEV_DEBUG, T_PRE, "Translated FQAN: %s", fqan.c_str());
+      fqans.push_back(fqan);
+      ++i;
+    }
+  }
 
   if(!fqans.empty()) {
-    /* check whether the user is allowed to requests those attributes */
-    vomsdata vd("", "");
-    vd.SetVerificationType((verify_type)(VERIFY_SIGN));
-    vd.Retrieve(sock.actual_cert, sock.peer_stack, RECURSE_DEEP);
+    
+    LOGM(VARP, logh, LEV_DEBUG, T_PRE,  "Checking if user comes with valid fqans.");
 
-    /* find the attributes corresponding to the vo */
+    vomsdata vd("", "");
+    vd.SetVerificationType((verify_type)(VERIFY_SIGN | VERIFY_DATE));
+    
+    if (!vd.Retrieve(sock.actual_cert, sock.peer_stack, RECURSE_DEEP)){
+
+      std::string voms_error = vd.ErrorMessage();
+
+      LOGM(VARP, logh, LEV_DEBUG, T_PRE,  
+        "No valid VOMS attributes found in client cert chain. VOMS retrieve error: %s",
+        voms_error.c_str());
+    }
+
     std::vector<std::string> existing;
     std::vector<voms>::iterator end = (vd.data).end();
-    for(std::vector<voms>::iterator index = (vd.data).begin(); index != end; ++index) {
-      if(index->voname == voname)
-        existing.insert(existing.end(),
-                     index->fqan.begin(),
-                     index->fqan.end());
-    }
-  
-    // Adjust for long/short format
-    if (!shortfqans && !fqans.empty()) {
-      std::vector<std::string> newfqans(fqans);
-      fqans.clear();
-      std::vector<std::string>::iterator i = newfqans.begin();
-      std::vector<std::string>::iterator end = newfqans.end();
 
-      while (i != end) {
-        std::string fqan = *i;
-        LOGM(VARP, logh, LEV_DEBUG, T_PRE, "Initial FQAN: %s", fqan.c_str());
-        if (fqan.find("/Role=") != std::string::npos)
-          fqan += "/Capability=NULL";
-        else
-          fqan += "/Role=NULL/Capability=NULL";
-        LOGM(VARP, logh, LEV_DEBUG, T_PRE, "Processed FQAN: %s", fqan.c_str());
-        fqans.push_back(fqan);
-        ++i;
+    for (std::vector<voms>::iterator index = (vd.data).begin(); index != end; ++index) 
+    {
+      if (index->voname == voname)
+      {
+        std::vector<std::string>::iterator fqan_it = index->fqan.begin();
+
+        for ( ; fqan_it != index->fqan.end(); ++fqan_it)
+        {
+          LOGM(VARP, logh, LEV_DEBUG, T_PRE,  "Found fqan in user credential: %s", fqan_it->c_str());
+          existing.push_back(*fqan_it);
+        }
       }
     }
+
 
     /* if attributes were found, only release an intersection beetween the requested and the owned */
     std::vector<std::string>::iterator fend = fqans.end();
     bool subset = false;
 
     if (!existing.empty())
+    {
+      LOGM(VARP, logh, LEV_DEBUG, T_PRE,  "User comes with valid fqans for this VO. Computing fqans intersection.");
       if (fqans.erase(remove_if(fqans.begin(),
                                 fqans.end(),
                                 bind2nd(std::ptr_fun(not_in), existing)),
                       fqans.end()) != fend)
+      {
+        LOGM(VARP, logh, LEV_DEBUG, T_PRE,  "Only a subset of the requested attributes will be returned.");
         subset = true;
+      }
+    }
 
-    if (subset) {
-      // remove attributes for qualifier which had been removed
+    if (subset) 
+    {
+      
+      LOGM(VARP, logh, LEV_DEBUG, T_PRE,  "Dropping generic attributes for fqans which cannot be issued for current request.");
       attribs.erase(remove_if(attribs.begin(), attribs.end(),
                               bind2nd(std::ptr_fun(checkinside), fqans)),
                     attribs.end());
     }
 
-
-    // no attributes can be send
-    if (fqans.empty()) {
+    if (fqans.empty()) 
+    {
       LOG(logh, LEV_ERROR, T_PRE, "Error in executing request!");
-      vr.setError(ERR_ATTR_EMPTY, voname + " : your certificate already contains attributes, only a subset of them can be issued.");
+      vr.setError(ERR_ATTR_EMPTY, voname + " : no valid VOMS attributes found for your request.");
       return false;
     }
 
-    // some attributes can't be send
-    if(subset) {
-      LOG(logh, LEV_ERROR, T_PRE, "Error in executing request!");
-      vr.setError(WARN_ATTR_SUBSET, voname + " : your certificate already contains attributes, only a subset of them can be issued.");
+    if(subset) 
+    {
+      LOG(logh, LEV_WARN, T_PRE, "Only a subset of the requested attributes will be issued.");
+      vr.setError(WARN_ATTR_SUBSET, voname + 
+      " : your certificate already contains attributes, only a subset of them can be issued.");
     }
   }
 
-  if (!fqans.empty()) {
-    // test logging retrieved attributes
+  if (fqans.empty()) {
+
+    vr.setError(ERR_NOT_MEMBER, std::string("You are not a member of the ") + voname + " VO!");
+    return false;
+
+  } else {
+
     std::vector<std::string>::const_iterator end = fqans.end();
 
     for (std::vector<std::string>::const_iterator i = fqans.begin(); i != end; ++i)
-      LOGM(VARP, logh, LEV_INFO, T_PRE, "Request Result: %s",  (*i).c_str());
+      LOGM(VARP, logh, LEV_INFO, T_PRE, "Issued FQAN: %s",  (*i).c_str());
 
     if (LogLevelMin(logh, LEV_DEBUG)) {
       if(result && !attribs.empty()) {
         std::vector<gattrib>::const_iterator end = attribs.end();
         for(std::vector<gattrib>::const_iterator i = attribs.begin(); i != end; ++i)
-          LOGM(VARP, logh, LEV_DEBUG, T_PRE,  "User got attributes: %s", i->str().c_str());
+          LOGM(VARP, logh, LEV_DEBUG, T_PRE,  "Generic attributes found: %s", i->str().c_str());
       }
       else
-        LOGM(VARP, logh, LEV_DEBUG, T_PRE,  "User got no attributes or something went wrong searching for them.");
+        LOGM(VARP, logh, LEV_DEBUG, T_PRE,  "No generic attributes found for user.");
     }
-
-    ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
     std::string codedac;
     std::string data;
 
-    if (comm[0] != "N") {
+    if (comm[0] == "N") {
+
+      std::vector<std::string>::const_iterator end = fqans.end();
+      for (std::vector<std::string>::const_iterator i = fqans.begin(); i != end; ++i)
+        data += (*i).c_str() + std::string("\n");
+
+    } else {
+
+      // This is the real AC encoding
       int res = 1;
       BIGNUM * serial = get_serial();
 
@@ -1102,7 +1198,6 @@ bool VOMSServer::makeAC(vomsresult& vr, EVP_PKEY *key, X509 *issuer,
         /* Make AC */
         AC *a = AC_new();
 
-        LOGM(VARP, logh, LEV_DEBUG, T_PRE, "length = %d", i2d_AC(a, NULL));
         if (a) {
           std::vector<std::string> attributes_compact;
 
@@ -1121,8 +1216,6 @@ bool VOMSServer::makeAC(vomsresult& vr, EVP_PKEY *key, X509 *issuer,
 
           unsigned char *tmp = (unsigned char *)OPENSSL_malloc(len);
           unsigned char *ttmp = tmp;
-
-          LOGM(VARP, logh, LEV_DEBUG, T_PRE, "length = %d", len);
 
           if (tmp) {
             i2d_AC(a, &tmp);
@@ -1143,13 +1236,6 @@ bool VOMSServer::makeAC(vomsresult& vr, EVP_PKEY *key, X509 *issuer,
         return false;
       }
     }
-    else {
-      /* comm[0] == "N" */
-
-      std::vector<std::string>::const_iterator end = fqans.end();
-      for (std::vector<std::string>::const_iterator i = fqans.begin(); i != end; ++i)
-        data += (*i).c_str() + std::string("\n");
-    }
 
     (void)SetCurLogType(logh, T_RESULT);
 
@@ -1157,10 +1243,7 @@ bool VOMSServer::makeAC(vomsresult& vr, EVP_PKEY *key, X509 *issuer,
     vr.setData(data);
     return true;
   }
-  else {
-    vr.setError(ERR_NOT_MEMBER, std::string("You are not a member of the ") + voname + " VO!");
-    return false;
-  }
+
 }
 
 void
@@ -1247,7 +1330,7 @@ void VOMSServer::UpdateOpts(void)
 
   if (!getopts(ac, av, opts)) {
     LOG(logh, LEV_ERROR, T_PRE, "Unable to read options!");
-    throw VOMSInitException("unable to read options");
+    throw voms_init_error("unable to read options");
   }
 
   if (nlogfile.size() != 0) {
@@ -1294,7 +1377,7 @@ void VOMSServer::UpdateOpts(void)
   AdjustURI(uri, daemon_port);
 
   if (!getpasswd(passfile, logh)){
-    throw VOMSInitException("can't read password file!");
+    throw voms_init_error("can't read password file!");
   }
 
   if (!x509_cert_dir.empty()) {
