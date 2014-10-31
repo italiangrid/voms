@@ -1,6 +1,6 @@
 Name: voms
 Version: 2.0.12
-Release: 1%{?dist}
+Release: 2%{?dist}
 Summary: The Virtual Organisation Membership Service C++ APIs
 
 Group:          System Environment/Libraries
@@ -12,6 +12,7 @@ BuildRequires: libtool
 BuildRequires: expat-devel
 BuildRequires: pkgconfig
 BuildRequires: openssl-devel%{?_isa}
+BuildRequires: gsoap-devel
 BuildRequires: libxslt
 BuildRequires: docbook-style-xsl
 BuildRequires: doxygen
@@ -88,6 +89,7 @@ services.
 Summary:	Virtual Organization Membership Service Server
 Group:		Applications/Internet
 Requires:	%{name}%{?_isa} = %{version}-%{release}
+Requires:	gsoap
 
 Requires(pre):		shadow-utils
 Requires(post):		chkconfig
@@ -287,6 +289,9 @@ fi
 %{_mandir}/man8/voms.8*
 
 %changelog
+* Mon May 12 2014 Andrea Ceccanti <andrea.ceccanti at cnaf.infn.it> - 2.0.12-2
+- Added missing dependency on gsoap.
+
 * Mon May 12 2014 Andrea Ceccanti <andrea.ceccanti at cnaf.infn.it> - 2.0.12-1
 - New packaging of the clients. https://issues.infn.it/jira/browse/VOMS-495
 
