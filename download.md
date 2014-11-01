@@ -4,10 +4,10 @@ title: VOMS downloads
 
 versions:
   clients: 3.0.5
-  core: 2.0.12
-  admin-server: 3.3.0
+  core: 2.0.12-2
+  admin-server: 3.3.1
   admin-client: 2.0.19
-  api-c: 2.0.12
+  api-c: 2.0.12-2
   api-java: 3.0.4
 
 ---
