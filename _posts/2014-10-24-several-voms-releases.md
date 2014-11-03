@@ -28,7 +28,7 @@ The highlights of this release are:
   the CERN Organizational Database;
 
 As usual packages can be obtained from our repositories and will soon be pushed to the
-EMI-3 and UMD repositories. For instructions, refer to the [download section][downloads].
+EMI-3 and UMD repositories. For instructions, refer to the [releases section][releases].
 
 This release is dedicated to the memory of our friend Valerio Venturi.
 
@@ -38,4 +38,4 @@ This release is dedicated to the memory of our friend Valerio Venturi.
 [rn-clients-2x]: {{site.baseurl}}/release-notes/voms-clients/2.0.12
 [rn-api-java]: {{site.baseurl}}/release-notes/voms-api-java/3.0.4
 [clients-central]: http://search.maven.org/#search%7Cga%7C1%7Ca%3A%22voms-clients%22
-[downloads]: {{site.baseurl}}/download.html
+[releases]: {{site.baseurl}}/releases.html

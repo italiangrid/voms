@@ -10,7 +10,7 @@ The VOMS Product Team is pleased to announce the release of VOMS clients v. 3.0.
 This release provides an important bug fix, as highlighted in the release notes
 for the [clients][rel-notes-clients] and the [APIs][rel-notes-apis]. Packages
 can be obtained from our repositories and will soon be available on the EMI-3
-repository. Follow the instructions in the [download section][downloads].
+repository. Follow the instructions in the [releases section][releases].
 
 The new packages provide fixes for the problems described in
 [this ticket][dcache-incident]. 
@@ -31,5 +31,5 @@ were updated to explicitly depend on that version.
 [rel-notes-clients]: {{site.baseurl}}/release-notes/voms-clients/3.0.4
 [rel-notes-apis]: {{site.baseurl}}/release-notes/voms-api-java/3.0.2
 [dcache-incident]: https://ggus.eu/ws/ticket_info.php?ticket=97555
-[downloads]: {{site.baseurl}}/download.html
+[releases]: {{site.baseurl}}/releases.html
 [voms-api-java]: https://github.com/italiangrid/voms-api-java

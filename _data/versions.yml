@@ -1,0 +1,46 @@
+docs:
+  sysadmin-guide:
+      name: System Administrator Guide
+      current: 3.0.2
+      previous: [3.0.1,3.0.0]
+
+  voms-admin-guide:
+      name: VOMS Admin service user guide
+      current: 3.3.0
+      previous: [3.2.0]
+
+  voms-clients-guide:
+      name: VOMS Clients user guide
+      current: 3.0.3
+      previous: [3.0.2]
+
+components:
+  voms-clients:
+      name: VOMS clients
+      current: 3.0.5
+      previous: [3.0.4,3.0.3,3.0.2,2.0.12-2,2.0.12]
+
+  voms-server:
+      name: VOMS server
+      current: 2.0.12-2
+      previous: [2.0.12,2.0.11]
+
+  voms-admin-server:
+      name: VOMS Admin server
+      current: 3.3.1
+      previous: [3.3.0,3.2.0]
+
+  voms-admin-client:
+      name: VOMS Admin client
+      current: 2.0.19
+      previous: []
+
+  voms-api-java:
+      name: VOMS API Java
+      current: 3.0.4
+      previous: [3.0.2,3.0.1]
+
+  voms-api-c:
+      name: VOMS API C/C++
+      current: 2.0.12-2
+      previous: [2.0.12,2.0.11]

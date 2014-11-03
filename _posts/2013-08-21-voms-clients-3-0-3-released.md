@@ -10,7 +10,7 @@ The VOMS Product Team is pleased to announce the release of VOMS clients v. 3.0.
 This release provide several bug fixes, as highlighted in the release notes
 for the [clients][rel-notes-clients] and the [APIs][rel-notes-apis]. Packages
 can be obtained from our repositories and will soon be available on the EMI-3
-repository. Follow the instructions in the [download section][downloads].
+repository. Follow the instructions in the [releases section][releases].
 
 As you may already know by now, version 3 of the clients are a full rewrite
 based on the [VOMS Java APIs 3.x][voms-java-api] which are in turn based on
@@ -59,4 +59,4 @@ requested by the clients in the clients startup script to a more sensible value 
 [myproxy-fix]: https://github.com/italiangrid/voms-api-java/commit/861da185133f6548412df0c8e8720ad8861d8ff0
 [myproxy-tests]: https://github.com/italiangrid/voms-testsuite/blob/master/basic-tests/myproxy-tests.txt
 [jenkins]: http://radiohead.cnaf.infn.it:9999/view/VOMS
-[downloads]: {{site.baseurl}}/download.html
+[releases]: {{site.baseurl}}/releases.html

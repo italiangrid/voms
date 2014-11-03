@@ -1,0 +1,26 @@
+<table>
+  <thead>
+    <tr>
+      <th>Guide</th>
+      <th>Current version</th>
+      <th>Older versions</th>
+    </tr>
+  </thead>
+  <tbody>
+{% for d in site.data.versions.docs %}
+  <tr>
+  <td> {{d[1].name }} </td>
+  <td> <a href="{{ site.base_url }}/documentation/{{d[0]}}/{{d[1].current}}">{{ d[1].current}}</a> </td>
+  <td>
+    {% if d[1].previous != empty %}
+      <ul class="unstyled">
+      {% for v in d[1].previous %}
+        <li><a href="{{ site.base_url }}/documentation/{{ d[0] }}/{{ v }}">{{ v }}</a></li>
+      {% endfor %}
+      </ul>
+    {% endif %}
+  </td>
+  </tr>
+{% endfor %}
+  </tbody>
+</table>
