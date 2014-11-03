@@ -2,23 +2,22 @@
   <thead>
     <tr>
       <th>Component</th>
-      <th>Current version</th>
-      <th>Older versions</th>
+      <th>Releases</th>
     </tr>
   </thead>
   <tbody>
 {% for c in site.data.versions.components %}
   <tr>
   <td> {{c[1].name }} </td>
-  <td> <a href="{{ site.baseurl }}/release-notes/{{c[0]}}/{{c[1].current}}">{{ c[1].current}}</a> </td>
-  <td>
-    {% if c[1].previous != empty %}
+  <td> 
       <ul class="unstyled">
+        <li><a href="{{ site.baseurl }}/release-notes/{{c[0]}}/{{c[1].current}}">{{ c[1].current}}</a> </li>
+    {% if c[1].previous != empty %}
       {% for v in c[1].previous %}
         <li><a href="{{ site.baseurl }}/release-notes/{{ c[0] }}/{{ v }}">{{ v }}</a></li>
       {% endfor %}
-      </ul>
     {% endif %}
+     </ul>
   </td>
   </tr>
 {% endfor %}

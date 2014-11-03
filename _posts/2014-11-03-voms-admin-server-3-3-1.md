@@ -23,6 +23,9 @@ In particular:
 As usual packages can be obtained from our repositories and will soon be pushed to the
 EMI-3 and UMD repositories. For instructions, refer to the [releases section][releases].
 
+Besides the release, we have restructured the web site a bit in order to
+provide more consistent access to release notes and documentation.
+
 [rn-core]: {{site.baseurl}}/release-notes/voms-server/2.0.12-2
 [rn-admin-server]: {{site.baseurl}}/release-notes/voms-admin-server/3.3.1
 [releases]: {{site.baseurl}}/releases.html

@@ -2,23 +2,22 @@
   <thead>
     <tr>
       <th>Guide</th>
-      <th>Current version</th>
-      <th>Older versions</th>
+      <th>Versions</th>
     </tr>
   </thead>
   <tbody>
 {% for d in site.data.versions.docs %}
   <tr>
   <td> {{d[1].name }} </td>
-  <td> <a href="{{ site.baseurl }}/documentation/{{d[0]}}/{{d[1].current}}">{{ d[1].current}}</a> </td>
-  <td>
-    {% if d[1].previous != empty %}
-      <ul class="unstyled">
-      {% for v in d[1].previous %}
-        <li><a href="{{ site.baseurl }}/documentation/{{ d[0] }}/{{ v }}">{{ v }}</a></li>
-      {% endfor %}
-      </ul>
+  <td> 
+    <ul class="unstyled">
+      <li><a href="{{ site.baseurl }}/documentation/{{d[0]}}/{{d[1].current}}">{{ d[1].current}}</a>
+      {% if d[1].previous != empty %}
+        {% for v in d[1].previous %}
+          <li><a href="{{ site.baseurl }}/documentation/{{ d[0] }}/{{ v }}">{{ v }}</a></li>
+        {% endfor %}
     {% endif %}
+    </ul>
   </td>
   </tr>
 {% endfor %}
