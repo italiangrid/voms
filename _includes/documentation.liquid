@@ -2,19 +2,24 @@
   <thead>
     <tr>
       <th>Guide</th>
-      <th>Versions</th>
+      <th>Versions
+          <button type="button" class="btn btn-mini pull-right"
+            data-toggle="collapse" data-target=".collapse">
+            Show older versions
+          </button>
+      </th>
     </tr>
   </thead>
   <tbody>
 {% for d in site.data.versions.docs %}
   <tr>
   <td> {{d[1].name }} </td>
-  <td> 
+  <td>
     <ul class="unstyled">
       <li><a href="{{ site.baseurl }}/documentation/{{d[0]}}/{{d[1].current}}">{{ d[1].current}}</a>
       {% if d[1].previous != empty %}
         {% for v in d[1].previous %}
-          <li><a href="{{ site.baseurl }}/documentation/{{ d[0] }}/{{ v }}">{{ v }}</a></li>
+          <li class="collapse"><a href="{{ site.baseurl }}/documentation/{{ d[0] }}/{{ v }}">{{ v }}</a></li>
         {% endfor %}
     {% endif %}
     </ul>
