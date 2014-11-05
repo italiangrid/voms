@@ -7,7 +7,7 @@ title: VOMS Known issues page
 
 ### Latest VOMS release (available in VOMS and EMI-3 repos)
 
-No known issues.
+See [VOMS Open issues on our tracker](https://issues.infn.it/jira/issues/?filter=12510).
 
 ### EMI 2 and EMI 1 packages 
 

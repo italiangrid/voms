@@ -38,8 +38,27 @@
 	</script>
     <script type="text/javascript">
         $(document).ready(function(){
+
             $('table').addClass('table');
             $('table').addClass('table-bordered');
+
+            $("#doc-button").click(
+              function() {
+                if ($(this).text() == 'Show older versions'){
+                  $(this).text('Hide older versions');
+                } else {
+                  $(this).text('Show older versions');
+                }
+            });
+
+            $("#release-button").click(
+              function() {
+                if ($(this).text() == 'Show older releases'){
+                  $(this).text('Hide older releases');
+                } else {
+                  $(this).text('Show older releases');
+                }
+            });
         });
     </script>
   </body>

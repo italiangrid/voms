@@ -80,7 +80,7 @@ Also archive the configuration files for VOMS and VOMS-Admin, which live in the 
 
 Follow the [general EMI 3 installation instructions](https://twiki.cern.ch/twiki/bin/view/EMI/GenericInstallationConfigurationEMI3) for installing the EMI-3 repositories.
 
-If installing from the VOMS PT repository, also follow the instructions given [here]({{site.baseurl}}/download.html).
+If installing from the VOMS PT repository, also follow the instructions given [here]({{site.baseurl}}/releases.html).
 
 ### Upgrading from EMI 3 to the latest VOMS release <a name="Upgrading from EMI 3">&nbsp;</a>
 

@@ -16,7 +16,9 @@ This release provides a small fix on the VOMS API package config file.
 
 ### Installation and configuration
 
-For clean and update installation instructions, follow the instructions in the [VOMS System Administrator guide]({{site.baseurl}}/documentation/sysadmin-guide).
+For clean and update installation instructions, follow the instructions in the
+[VOMS System Administrator
+guide]({{site.baseurl}}/documentation/sysadmin-guide).
 
 ### Known issues
 

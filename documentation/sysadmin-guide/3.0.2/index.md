@@ -1,7 +1,9 @@
 ---
 layout: default
 title: VOMS System Administrator Guide
-version: 3.0.1
+version: 3.0.2
+redirect_from:
+  - /documentation/sysadmin-guide/
 ---
 
 # VOMS System Administrator guide
@@ -704,6 +706,5 @@ mysql -uroot -p<PASSWORD> < voms_database_dump.sql
 ## Troubleshooting <a name="Troubleshooting">&nbsp;</a>
 
 See the [known issues page]({{ site.baseurl }}/documentation/known-issues)
-
 
 [voms-conf-ref]: {{site.baseurl}}/documentation/sysadmin-guide/{{page.version}}/configuration.html
