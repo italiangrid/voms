@@ -17,8 +17,8 @@ docs:
 components:
   voms-clients:
       name: VOMS clients
-      current: 3.0.5
-      previous: [3.0.4,3.0.3,3.0.2,2.0.12-2,2.0.12]
+      current: 3.0.6
+      previous: [3.0.5,3.0.4,3.0.3,3.0.2,2.0.12-2,2.0.12]
 
   voms-server:
       name: VOMS server
@@ -37,8 +37,8 @@ components:
 
   voms-api-java:
       name: VOMS API Java
-      current: 3.0.4
-      previous: [3.0.2,3.0.1]
+      current: 3.0.5
+      previous: [3.0.4,3.0.2,3.0.1]
 
   voms-api-c:
       name: VOMS API C/C++
