@@ -1,7 +1,9 @@
 ---
 layout: default
 title: VOMS System Administrator Guide
-version: 3.0.2
+version: 3.0.3
+redirect_from:
+  - /documentation/sysadmin-guide/
 ---
 
 # VOMS System Administrator guide
@@ -93,7 +95,7 @@ yum update
 to get the latest versions of the VOMS packages.
 
 If the release notes indicate that a reconfiguration of the services is required, run `voms-configure` with the same parameters
-that you used the first time you configured the VO. See the [Configuration section](#conf) for more information on how
+that you used the first time you configured the VO. See the [Configuration section](#Configuration) for more information on how
 to install and reconfigure the VOMS services.
 
 If the release notes indicate that restarting the VOMS services is required, run
