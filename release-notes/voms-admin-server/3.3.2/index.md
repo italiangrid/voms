@@ -18,14 +18,14 @@ rfcs:
 
 # VOMS Admin server v. 3.3.2
 
-This releases provides minor fixes to the CERN OrgDB integration code and a new
+This release provides minor fixes to the CERN OrgDB integration code and a new
 flag that allows to skip checks on certificate issuer when doing user
 authentication.
 
 #### How to turn off certificate issuer checks
 
 By default, VOMS Admin authenticates users considering certificate subject
-*and* issuer. This means that the following certificate:
+**and** issuer. This means that the following certificate:
 
 ```
 subject= /C=IT/O=IGI/CN=test0
@@ -93,4 +93,3 @@ Follow the instructions in the VOMS [System Administrator Guide][sysadmin-guide]
 [voms-website]: http://italiangrid.github.io/voms
 [sysadmin-guide]:{{site.baseurl}}/documentation/sysadmin-guide/3.0.3
 [voms-admin-guide]: {{site.baseurl}}/documentation/voms-admin-guide/3.3.0
-[cve-2014-3566]: https://access.redhat.com/security/cve/CVE-2014-3566
