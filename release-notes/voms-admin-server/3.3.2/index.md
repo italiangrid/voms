@@ -40,10 +40,10 @@ issuer= /C=IT/O=IGI/CN=Test CA 2
 ```
 
 It is now possible to authenticate user skipping the checks on the certificate
-issuer, by setting the `voms.skip_ca_check` option in a VO `service.properties`
-file.
+issuer, by setting the `voms.skip_ca_check=True` in the
+`/etc/voms-admin/<VO>/service.properties` file for a given VO.
 
-By setting the above option, the two example certificates would be considered
+By setting the above property, the two example certificates would be considered
 the same user.
 
 ### Bug fixes and improvements
