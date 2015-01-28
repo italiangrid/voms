@@ -39,7 +39,7 @@ subject= /C=IT/O=IGI/CN=test0
 issuer= /C=IT/O=IGI/CN=Test CA 2
 ```
 
-It is now possible to authenticate user skipping the checks on the certificate
+It is now possible to authenticate users skipping the checks on the certificate
 issuer, by setting the `voms.skip_ca_check=True` in the
 `/etc/voms-admin/<VO>/service.properties` file for a given VO.
 
