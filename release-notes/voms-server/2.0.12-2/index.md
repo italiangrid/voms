@@ -20,4 +20,4 @@ previously missing.
 
 For clean and update installation instructions, follow the instructions in the
 [VOMS System Administrator
-guide]({{site.baseurl}}/documentation/sysadmin-guide/3.0.2).
+guide]({{site.baseurl}}/documentation/sysadmin-guide/3.0.4).

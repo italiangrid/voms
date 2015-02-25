@@ -24,7 +24,11 @@ The VOMS server configuration for a VO can be found in `/etc/voms/VO_NAME` and i
 ### /etc/voms/<span class="vo-highlight">vo</span>/voms.conf
 
 The server configuration file is a text file containing a series of command line options that is parsed by the VOMS
-daemon at startup time. Check the VOMS man page for more information.
+daemon at startup time. Check the VOMS man page for more information, using the following command:
+
+```bash
+man voms
+```
 
 An example VOMS configuration file:
 
@@ -47,6 +51,14 @@ An example VOMS configuration file:
 --socktimeout=60
 --max-reqs=50
 ```
+
+Special configuration flags:
+
+| Flag            | Description                                                                        | Default  |
+| :--             | :--                                                                                | :--      |
+| `--skipcacheck` | Configures VOMS to only consider a certificate subject when checking VO membership | disabled |
+| `--shortfqans`  | Configures VOMS to use the short fqans syntax                                      | disabled |
+| `--syslog`      | Configures VOMS to log to syslog                                                   | disabled |
 
 ### /etc/voms/<span class="vo-highlight">vo</span>/voms.pass
 

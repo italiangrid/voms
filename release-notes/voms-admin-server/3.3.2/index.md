@@ -46,6 +46,26 @@ issuer, by setting the `voms.skip_ca_check=True` in the
 By setting the above property, the two example certificates would be considered
 the same user.
 
+In order to have consisten behaviour among voms and voms-admin service, you 
+should set the `skip ca check` option for both services.
+
+This can be done in two ways:
+
+- reconfiguring the affected VOs with `voms-configure` and specifying the
+  `--skip-ca-check` and `--admin-skip-ca-check` option when running the
+  command, as in the following example:
+  ```
+  voms-configure install --vo <my.vo> --skip-ca-check --admin-skip-ca-check ...
+  ```
+  Running the above command will modify the voms-admin and voms configuration for
+  the affected VO
+
+- by setting, for a given VO
+
+  - the `voms.skip_ca_check=True` in the `/etc/voms-admin/<VO>/service.properties` file
+  - the `--skipcacheck` flag in the `/etc/voms/<VO>/voms.conf` file
+
+In both cases, services need to be restarted for the change to take effect.
 ### Bug fixes and improvements
 
 {% include list-rfcs.liquid %}
