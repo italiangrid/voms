@@ -1620,6 +1620,7 @@ int proxy_check_proxy_name(
     X509 *                              cert)
 {
     int                                 ret = 0;
+    int                                 entries;
     X509_NAME *                         subject;
     X509_NAME *                         issuer_name = NULL;
     X509_NAME_ENTRY *                   last_cn = NULL;
@@ -1670,7 +1671,10 @@ int proxy_check_proxy_name(
     }
 
     subject = X509_get_subject_name(cert);
-    last_cn = X509_NAME_get_entry(subject, X509_NAME_entry_count(subject)-1);
+    entries = X509_NAME_entry_count(subject);
+    if (entries == 0)
+	return 0;
+    last_cn = X509_NAME_get_entry(subject, entries-1);
 
     /* If the last part of the subject name is a CN */
     if (!OBJ_cmp(last_cn->object,OBJ_nid2obj(NID_commonName)))
