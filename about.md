@@ -19,3 +19,5 @@ Here are the main VOMS developers:
 {% assign author=site.authors.enrico %}
 {% include author.html %}
 
+{% assign author=site.authors.gianni %}
+{% include author.html %}
