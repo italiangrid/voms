@@ -37,8 +37,6 @@ features:
   title: Group-Manager role to grant group membership request rights
 ---
 
-# VOMS Admin server v. 3.3.3
-
 # VOMS Admin server v. 3.4.0
 
 This release
