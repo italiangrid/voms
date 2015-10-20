@@ -14,7 +14,7 @@ This file contains variables needed by startup scripts to properly execute the V
 | `TNS_ADMIN` | Default oracle tnsnames.ora location | `/etc/voms` |
 
 
-## VOMS server configuration 
+## VOMS server configuration
 
 The VOMS server configuration for a VO can be found in `/etc/voms/VO_NAME` and is composed of two files:
 
@@ -121,7 +121,7 @@ information about certificate-related issues, change the level for the `CANLList
 from `INFO` to `DEBUG` as follows:
 
 ```xml
-<configuration>    
+<configuration>
 	...
 	<logger name="org.italiangrid.utils.https.impl.canl.CANLListener" level="DEBUG" additivity="false">
 	       <appender-ref ref="AUTHN" />
@@ -144,7 +144,6 @@ The following files control the configuration of a given VO:
 - `vo-aup.txt` : the text of the default VO AUP 
 - `vomses`: this file contains the vomses configuration displayed by the VOMS Admin webapp configuration page
 - `lsc` : this file contains the lsc configuration displayed by the VOMS Admin webapp configuration page
-
 
 All the options described below can be set using the `voms-configure` script.
 
@@ -226,9 +225,9 @@ Look at the [Hibernate documentation][hibernate-doc] for more detailed informati
 |`hibernate.connection.username` | The username used to authenticate to the database | N/A |
 |`hibernate.connection.password` | The password used to authenticate to the database | N/A |
 
-#### Connection pool settings
+#### Database connection pool settings
 
-Look at the [c3p0 documentation][c3p0-doc] to know about connection pool tuning. 
+Look at the [c3p0 documentation][c3p0-doc] to know about connection pool tuning.
 
 | Property | Description | Default value |
 |:---------|:------------|:--------------|
@@ -251,13 +250,11 @@ An example configuration file is listed below:
 
 ```xml
 <configuration>
-    
-    <!-- 
+    <!--
         This logger controls the MAIN voms admin log messages. Set the level to DEBUG 
         for maximum detail.  
      -->
     <logger name="org.glite.security.voms.admin" level="INFO" />
-    
     <!--
          This logger controls the main validation service VOMS Admin log messages.
          Set the level to DEBUG for maximum detail.
@@ -308,6 +305,81 @@ An example configuration file is listed below:
     
 </configuration>
 ```
+
+### CERN OrgDB plugin configuration
+
+<div class="alert alert-error">
+These instructions are only valid for the CERN VOMS deployment.
+</div>
+
+The VOMS OrgDB plugin provides integration with the CERN organizational
+database (OrgDB). 
+
+When the OrgDB integration is active:
+
+- registration requests are validated so that only applicants present in the
+  OrgDB can apply for VO membership.
+- VO membership expiration time is linked to OrgDB membership expiration.
+
+A periodic background task keeps the information in VOMS in sync with the information
+in the OrgDB.
+
+#### Enabling the OrgDB plugin
+
+The plugin configuration is currently **not** supported by `voms-configure`.
+
+Assuming the VO for which the OrgDB plugin must be enabled is already
+configured, you will need to do the following changes to the configuration:
+
+- Edit the `/etc/voms-admin/<vo-name>/service.properties` file for the VO to
+  enable the plugin.
+- Create the file `/etc/voms-admin/<vo-name>/orgdb.properties` where the OrgDB
+  database connection properties will be configured.
+
+#### Changes to the service.properties file
+
+Add the following lines at the bottom of the `service.properties` file:
+
+	## External validation plugin options
+	voms.external-validators = orgdb
+	voms.ext.orgdb.configClass = org.glite.security.voms.admin.integration.orgdb.OrgDBConfigurator
+	voms.ext.orgdb.experimentName = ATLAS
+	voms.ext.orgdb.membership_check.period = 30
+
+
+| Property | Description |
+|:----------|:------------|
+|`voms.ext.orgdb.experimentName`| The name of the experiment in the OrgDB database that must be linked to the configured VO |
+|`voms.ext.orgdb.membership_check.period` | How frequently (in seconds) should the OrgDB synchronization task run. `43200` (12 hours) is a reasonable value |
+
+#### The orgdb.properties configuration file
+
+The orgdb.properties defines the configuration used to connect to the OrgDB Oracle database:
+
+	hibernate.connection.driver_class= oracle.jdbc.driver.OracleDriver
+	hibernate.connection.url= jdbc:oracle:oci:<the orgdb TNS alias here>
+	hibernate.dialect= org.hibernate.dialect.Oracle10gDialect
+
+	hibernate.connection.username= orgdb_username
+	hibernate.connection.password= orgdb_password
+
+	hibernate.c3p0.acquire_increment=1
+	hibernate.c3p0.idle_test_period=100
+	hibernate.c3p0.min_size=5
+	hibernate.c3p0.max_size=100
+	hibernate.c3p0.max_statements=0
+	hibernate.c3p0.timeout=100
+
+### Troubleshooting
+
+Check the voms-admin log for your VO in `/var/log/voms-admin-server`. In case of successful configuration you will see something like:
+
+	2012-11-27 08:06:08.582Z - INFO [OrgDBConfigurator] - Connection to the OrgDB database is active.
+	2012-11-27 08:06:08.583Z - INFO [OrgDBConfigurator] - Setting OrgDB experiment name: ATLAS
+	2012-11-27 08:06:08.595Z - INFO [DefaultMembershipCheckBehaviour] - Expired users will be suspended after a grace period of 7 days.
+	2012-11-27 08:06:08.601Z - INFO [OrgDBConfigurator] - OrgDB request validator registered SUCCESSFULLY.
+	2012-11-27 08:06:08.604Z - INFO [VOMSExecutorService] - Scheduling task OrgDBMembershipSynchronizationTask with period: 30 seconds
+	2012-11-27 08:06:08.604Z - INFO [PluginManager] - 'orgdb' plugin configured SUCCESSFULLY.
 
 
 [c3p0-doc]: http://www.mchange.com/projects/c3p0/index.html#hibernate-specific
