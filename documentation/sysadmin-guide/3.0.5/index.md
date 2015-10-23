@@ -1,14 +1,14 @@
 ---
 layout: default
-title: VOMS System Administrator Guide
 version: 3.0.5
+title: VOMS System Administrator Guide}
 redirect_from:
   - /documentation/sysadmin-guide/
 ---
 
 # VOMS System Administrator guide
 
-Version : {{page.version}}
+{% include sysadmin-guide-version.liquid %}
 
 #### Table of contents
 
@@ -30,6 +30,8 @@ their roles and other attributes in order to issue trusted attribute
 certificates and SAML assertions used in the Grid environment for authorization
 purposes.
 
+This guide is targeted at VOMS service administrators, i.e. people installing
+and running the VOMS server.
 ## Prerequisites and recommendations <a name="Prereq">&nbsp;</a>
 
 ### Hardware

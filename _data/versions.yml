@@ -14,6 +14,7 @@ docs:
       current: 3.0.3
       previous: [3.0.2]
 
+
 components:
   voms-clients:
       name: VOMS clients
@@ -32,8 +33,8 @@ components:
 
   voms-admin-client:
       name: VOMS Admin client
-      current: 2.0.20
-      previous: [2.0.19]
+      current: 2.0.19
+      previous: []
 
   voms-api-java:
       name: VOMS API Java

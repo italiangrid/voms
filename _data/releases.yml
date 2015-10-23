@@ -1,0 +1,22 @@
+voms-clients:
+  name: VOMS clients
+
+  releases:
+    3.0.6:
+      date: some date
+
+    3.0.5:
+      date: some date
+
+voms-server:
+  name: VOMS server
+
+  releases:
+    2.0.12-2:
+      date: some date
+
+    2.0.12:
+      date: some date
+
+    2.0.11:
+      date: some date

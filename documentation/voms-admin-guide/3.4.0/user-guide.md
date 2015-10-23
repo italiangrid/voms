@@ -2,13 +2,11 @@
 layout: default
 title: VOMS Admin user guide
 version: 3.4.0
-admin_server_version: 3.4.0
-admin_client_version: 2.0.19
 ---
 
 # VOMS Admin user guide documentation
 
-- Covering VOMS Admin server  {{ page.admin_server_version}}, VOMS Admin client  {{ page.admin_client_version}}
+{% include voms-admin-guide-version.liquid %}
 
 #### Table of contents
 
