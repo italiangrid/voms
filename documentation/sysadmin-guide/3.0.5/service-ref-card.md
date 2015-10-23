@@ -1,9 +1,12 @@
 ---
 layout: default
 title: VOMS Service Reference Card
+version: 3.0.5
 ---
 
 # VOMS Service Reference Card
+
+{% include sysadmin-guide-version.liquid %}
 
 #### Table of contents
 * [Functional Description](#funcdesc)

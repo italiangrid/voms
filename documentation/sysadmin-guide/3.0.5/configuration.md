@@ -1,11 +1,28 @@
 ---
 layout: default
+version: 3.0.5
 title: VOMS services configuration reference
 ---
 
 # VOMS services configuration reference
 
-### /etc/sysconfig/voms
+{% include sysadmin-guide-version.liquid %}
+
+#### Table of contents
+
+- [VOMS server configuration](#voms_server_configuration)
+  - [/etc/sysconfig/voms](#etc_sysconfig_voms)
+  - [VOMS Server VO configuration](#voms_vo_conf)
+- [VOMS Admin configuration] (#voms_admin_configuration)
+  - [/etc/sysconfig/voms-admin](#etc_sysconfig_voms_admin)
+  - [Container configuration](#container_conf)
+  - [VOMS Admin VO configuration](#voms_admin_vo_conf)
+  - [CERN OrgDB plugin configuration](#cern_orgb)
+- [Troubleshooting](#troubleshooting)
+
+## VOMS server configuration <a name="voms_server_configuration"></a>
+
+### /etc/sysconfig/voms <a name="etc_sysconfig_voms"></a>
 This file contains variables needed by startup scripts to properly execute the VOMS service
 
 | Property | Description | Default value |
@@ -13,15 +30,14 @@ This file contains variables needed by startup scripts to properly execute the V
 | `VOMS_USER` | The user under which the VOMS process will run | `voms` |
 | `TNS_ADMIN` | Default oracle tnsnames.ora location | `/etc/voms` |
 
-
-## VOMS server configuration
+### VOMS server VO configuration <a name="voms_vo_conf"></a>
 
 The VOMS server configuration for a VO can be found in `/etc/voms/VO_NAME` and is composed of two files:
 
 - `voms.conf` containing the server configuration
 - `voms.pass` containing the password used to access the database
 
-### /etc/voms/<span class="vo-highlight">vo</span>/voms.conf
+### /etc/voms/<span class="vo-highlight">vo</span>/voms.conf  <a name="voms_conf"></a>
 
 The server configuration file is a text file containing a series of command line options that is parsed by the VOMS
 daemon at startup time. Check the VOMS man page for more information, using the following command:
@@ -60,13 +76,14 @@ Special configuration flags:
 | `--shortfqans`  | Configures VOMS to use the short fqans syntax                                      | disabled |
 | `--syslog`      | Configures VOMS to log to syslog                                                   | disabled |
 
-### /etc/voms/<span class="vo-highlight">vo</span>/voms.pass
+### /etc/voms/<span class="vo-highlight">vo</span>/voms.pass <a name="voms_pass"></a>
 
 This is a text containing only the password used by the VOMS server to connect to the database.
 
-# VOMS Admin configuration 
+# VOMS Admin configuration <a name="voms_admin_configuration"></a>
 
-### /etc/sysconfig/voms-admin
+
+### /etc/sysconfig/voms-admin  <a name="etc_sysconfig_voms_admin"></a>
 
 This file contains variables needed by startup scripts to properly execute the VOMS Admin services
 
@@ -79,7 +96,8 @@ This file contains variables needed by startup scripts to properly execute the V
 | `TNS_ADMIN` | Default oracle tnsnames.ora location | `/etc/voms` |
 
 
-## Container configuration
+## Container configuration <a name="container_conf"></a>
+
 
 VOMS Admin container configuration can be found in the `/etc/voms-admin` directory.
 The container configuration consists of two files:
@@ -87,7 +105,8 @@ The container configuration consists of two files:
 - `voms-admin-server.properties`
 - `voms-admin-server.logback`
 
-### /etc/voms-admin/voms-admin-server.properties
+### /etc/voms-admin/voms-admin-server.properties <a name="admin_server_props"></a>
+
 
 This is a standard Java properties file.
 
@@ -107,7 +126,8 @@ This is a standard Java properties file.
 | `tls_exclude_cipher_suites`    | The list of disabled SSL/TLS cipher suites                                          | This option is commented out by default.  |
 | `tls_include_cipher_suites`    | The list of enabled SSL/TLS cipher suites                                           | This option is commented out by default.  |
 
-### /etc/voms-admin/voms-admin-server.logback
+### /etc/voms-admin/voms-admin-server.logback <a name="admin_server_logback"></a>
+
 
 This is logback configuration file, which controls the logging to the following files:
 
@@ -132,7 +152,8 @@ from `INFO` to `DEBUG` as follows:
 </configuration>
 ```
 
-## VO configuration
+## VO configuration <a name="vo_configuration"></a>
+
 
 VOMS Admin configuration files can be found in `/etc/voms-admin/VO_NAME` for a given VO.
 
@@ -147,7 +168,8 @@ The following files control the configuration of a given VO:
 
 All the options described below can be set using the `voms-configure` script.
 
-### /etc/voms-admin/<span class="vo-highlight">vo</span>/service.properties
+### /etc/voms-admin/<span class="vo-highlight">vo</span>/service.properties <a name="service_props"></a>
+
 
 This is a Java properties file.
 
@@ -185,13 +207,13 @@ This is a Java properties file.
 
 #### Registration service options
 
-| Property | Description | Default value |
-|:---------|:------------|:--------------|
-| `voms.request.vo_membership.enable_attribute_requests` | Enables the attribute request at registration time. Setting this option to true will allow users to request membership in groups also during their first registration at the VO. The VO manager will be given the chance to approve every membership request. | True |
-| `voms.request.vo_membership.require_group_manager_selection` | Require group manager selection at registration time, when GM are enabled. | True |
-| `voms.request.vo_membership.lifetime` | Time (in seconds) that unconfirmed membership requests are kept inside the voms database. | 604800 |
-| `voms.request.vo_membership.warn_when_expired` | Should voms-admin send a warning email to the user when his/her unconfirmed request is removed from the database? | True |
-| `voms.mkgridmap.translate_dn_email_format` | Should voms-admin generate gridmapfiles that encode the email part of the DN using the "emailAddress" format in addition to the "Email=" format used by default? | False |
+| Property                                                     | Description                                                                                                                                                                                                                                                   | Default value   |
+| :---------                                                   | :------------                                                                                                                                                                                                                                                 | :-------------- |
+| `voms.request.vo_membership.enable_attribute_requests`       | Enables the attribute request at registration time. Setting this option to true will allow users to request membership in groups also during their first registration at the VO. The VO manager will be given the chance to approve every membership request. | True            |
+| `voms.request.vo_membership.require_group_manager_selection` | Require group manager selection at registration time, when GM are enabled.                                                                                                                                                                                    | True            |
+| `voms.request.vo_membership.lifetime`                        | Time (in seconds) that unconfirmed membership requests are kept inside the voms database.                                                                                                                                                                     | 604800          |
+| `voms.request.vo_membership.warn_when_expired`               | Should voms-admin send a warning email to the user when his/her unconfirmed request is removed from the database?                                                                                                                                             | True            |
+| `voms.request.group_manager_role`                            | Sets a custom name for the group manager role.                                                                                                                                                                                                                | Group-Manager   |
 
 #### AUP options
 
@@ -212,8 +234,10 @@ This is a Java properties file.
 | Property | Description | Default value |
 |:---------|:------------|:--------------|
 | `voms.csrf.log_only` | CSRF guard. When true, dubious requests are not blocked but logged. | False |
+| `voms.mkgridmap.translate_dn_email_format` | Should voms-admin generate gridmapfiles that encode the email part of the DN using the "emailAddress" format in addition to the "Email=" format used by default? | False |
 
-### /etc/voms-admin/<span class="vo-highlight">vo</span>/database.properties
+### /etc/voms-admin/<span class="vo-highlight">vo</span>/database.properties <a name="database_props"></a>
+
 
 Look at the [Hibernate documentation][hibernate-doc] for more detailed information about these properties.
 
@@ -238,7 +262,8 @@ Look at the [c3p0 documentation][c3p0-doc] to know about connection pool tuning.
 |`hibernate.c3p0.max_statements` | Number of cached prepared statements (across all connections). See [c3p0 doc](http://www.mchange.com/projects/c3p0/index.html#maxStatements). | 50 |
 |`hibernate.c3p0.timeout` | Seconds a Connection can remain pooled but unused before being discarded. Zero means idle connections never expire. | 60 |
 
-### /etc/voms-admin/<span class="vo-highlight">vo</span>/logback.xml
+### /etc/voms-admin/<span class="vo-highlight">vo</span>/logback.xml <a name="vo_logback"></a>
+
 
 This is logback configuration file. For more information about logback configuration syntax, check the [logback documentation][logback-doc].
 
@@ -306,7 +331,8 @@ An example configuration file is listed below:
 </configuration>
 ```
 
-### CERN OrgDB plugin configuration
+### CERN OrgDB plugin configuration <a name="cern_orgdb"></a>
+
 
 <div class="alert alert-error">
 These instructions are only valid for the CERN VOMS deployment.
@@ -324,7 +350,8 @@ When the OrgDB integration is active:
 A periodic background task keeps the information in VOMS in sync with the information
 in the OrgDB.
 
-#### Enabling the OrgDB plugin
+#### Enabling the OrgDB plugin <a name="cern_orgdb_enable"></a>
+
 
 The plugin configuration is currently **not** supported by `voms-configure`.
 
@@ -370,7 +397,7 @@ The orgdb.properties defines the configuration used to connect to the OrgDB Orac
 	hibernate.c3p0.max_statements=0
 	hibernate.c3p0.timeout=100
 
-### Troubleshooting
+### Troubleshooting <a name="troubleshooting"></a>
 
 Check the voms-admin log for your VO in `/var/log/voms-admin-server`. In case of successful configuration you will see something like:
 

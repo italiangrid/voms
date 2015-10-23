@@ -21,6 +21,12 @@ redirect_from:
 * [Service migration](#Migration)
 * [Troubleshooting](#Troubleshooting)
 
+#### Other guides
+{% assign ref = site.data.docs.sysadmin-guide.versions[page.version] %}
+
+- [VOMS Services configuration reference](configuration.html)
+- [VOMS Admin guides]({{site.baseurl}}/documentation/voms-admin-guide/{{ref.admin_server_version}}/index.html)
+
 ## Introduction <a name="Intro">&nbsp;</a>
 
 The Virtual Organization Membership Service (VOMS) is an attribute authority
