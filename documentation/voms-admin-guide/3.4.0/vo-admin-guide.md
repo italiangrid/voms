@@ -6,6 +6,7 @@ version: 3.4.0
 
 # VOMS Admin VO administrator guide
 {% include voms-admin-guide-version.liquid %}
+
 #### Table of contents
 
 - [Introduction](#intro)
@@ -40,6 +41,10 @@ version: 3.4.0
   - [ACL inheritance](#acl-inheritance)
   - [Managing ACLs](#managing-acls)
 - [The configuration info page](#configuration-info-page)
+
+#### Other VOMS Admin guides
+
+- [VOMS Admin user guide](user-guide.html)
 
 ## Introduction <a name="intro"></a>
 

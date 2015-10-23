@@ -25,6 +25,8 @@ rfcs:
 - id: VOMS-524
   title: Include Orgdb configuration documentation in VOMS administrator guide
 features:
+- id: VOMS-675
+  title: Provide a VO member targeted VOMS Admin guide
 - id: VOMS-655
   title: Group-Manager role to grant group membership request rights
 - id: VOMS-654
@@ -113,25 +115,23 @@ and role assignment requests that are specific for a VO group.
 
 ### Installation and configuration
 
+#### Upgrade from VOMS Admin Server >= 3.2.0
+
+A [reconfiguration][reconf] and a [database upgrade][db-upgrade] are required
+to upgrade to VOMS Admin Server 3.4.0.
+
+#### Upgrade from earlier VOMS Admin Server versions
+
+First upgrade to VOMS Admin version [3.2.0][voms-admin-320-rn] and then to 3.4.0.
+
 #### Clean install
 
 Follow the instructions in the VOMS [System Administrator Guide][sysadmin-guide].
-
-#### Upgrade from v. >= 3.2.0
-
-A database upgrade and a reconfiguration is required. Follow the instructions
-in the System Administrator Guide [database upgrade
-section][sysadmin-guide-db-upgrade].
-
-#### Upgrade from earlier VOMS Admin versions
-
-First upgrade to VOMS Admin version 3.2.0 and then to this version.
-
-For instructions on how to upgrade to VOMS Admin version 3.2.0, see
-[here][voms-admin-320-rn].
 
 [voms-website]: http://italiangrid.github.io/voms
 [sysadmin-guide]:{{site.baseurl}}/documentation/sysadmin-guide/3.0.5
 [sysadmin-guide-db-upgrade]:{{site.baseurl}}/documentation/sysadmin-guide/3.0.5/#db-upgrade
 [voms-admin-guide]: {{site.baseurl}}/documentation/voms-admin-guide/3.4.0
 [voms-admin-320-rn]: {{site.baseurl}}/release-notes/voms-admin-server/3.2.0
+[reconf]: {{site.baseurl}}/documentation/sysadmin-guide/3.0.5/#reconf
+[db-upgrade]: {{site.baseurl}}/documentation/sysadmin-guide/3.0.5/#db-upgrade

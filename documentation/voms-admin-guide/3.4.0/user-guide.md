@@ -4,7 +4,7 @@ title: VOMS Admin user guide
 version: 3.4.0
 ---
 
-# VOMS Admin user guide documentation
+# VOMS Admin user guide
 
 {% include voms-admin-guide-version.liquid %}
 
@@ -18,6 +18,10 @@ version: 3.4.0
 - [Requesting group membership and role assignment](#user-requests)
 - [Requesting membership removal](#membership-removal-request)
 - [Membership expiration](#membership-expiration)
+
+#### Other VOMS Admin guides
+
+- [VOMS Admin VO administrator guide](vo-admin-guide.html)
 
 ## Introduction <a name="intro"></a>
 
