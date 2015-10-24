@@ -17,7 +17,7 @@ title: VOMS services configuration reference
   - [/etc/sysconfig/voms-admin](#etc_sysconfig_voms_admin)
   - [Container configuration](#container_conf)
   - [VOMS Admin VO configuration](#voms_admin_vo_conf)
-  - [CERN OrgDB plugin configuration](#cern_orgb)
+  - [CERN OrgDB plugin configuration](#cern_orgdb)
 - [Troubleshooting](#troubleshooting)
 
 ## VOMS server configuration <a name="voms_server_configuration"></a>
