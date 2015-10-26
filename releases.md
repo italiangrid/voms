@@ -19,7 +19,7 @@ You can find [general EMI 3 installation instructions](https://twiki.cern.ch/twi
     wget http://emisoft.web.cern.ch/emisoft/dist/EMI/3/sl5/x86_64/base/emi-release-3.0.0-2.el5.noarch.rpm
     yum localinstall -y emi-release-3.0.0-2.el5.noarch.rpm
 
-Follow the [system administrator guide]({{site.baseurl}}/documentation/sysadmin-guide}}) for detailed installation instructions.
+Follow the [system administrator guide]({{site.baseurl}}/documentation/sysadmin-guide) for detailed installation instructions.
 
 #### VOMS
 

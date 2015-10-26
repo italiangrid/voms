@@ -1,0 +1,42 @@
+<table>
+  <thead>
+    <tr>
+      <th>Guide</th>
+      <th>Versions
+          <button id='doc-button' type="button" class="btn btn-mini pull-right"
+            data-toggle="collapse" data-target=".collapse">Show older versions</button>
+      </th>
+    </tr>
+  </thead>
+  <tbody>
+{% for d in site.data.docs %}
+  {% assign current_version = d[1].current_version %}
+  {% assign versions = d[1].versions %}
+  <tr>
+  <td> {{d[1].name }} </td>
+  <td>
+    <ul class="unstyled">
+      {% for v in versions %}
+        <li
+        {% if v[0] != current_version %}
+          class="collapse"
+        {% endif %}>
+          <a href="{{ site.baseurl }}/documentation/{{ d[0] }}/{{ v[0] }}"><strong>{{ v[0] }}</strong></a>
+          covering:
+          <ul>
+          {% for k in d[1].ref_keys %}
+            {% assign idx = k[0] %}
+            {% assign comp_ver = v[1] %}
+            <li>
+            {{ k[1] }}
+            <strong>{{ comp_ver[idx] }}</strong>
+            </li>
+          {% endfor %}
+          </ul>
+      {% endfor %}
+    </ul>
+  </td>
+  </tr>
+{% endfor %}
+  </tbody>
+</table>

@@ -1,12 +1,14 @@
 ---
 layout: default
-title: VOMS System Administrator Guide
-version: 3.0.4
+version: 3.0.5
+title: VOMS System Administrator Guide}
+redirect_from:
+  - /documentation/sysadmin-guide/
 ---
 
 # VOMS System Administrator guide
 
-Version : {{page.version}}
+{% include sysadmin-guide-version.liquid %}
 
 #### Table of contents
 
@@ -19,6 +21,12 @@ Version : {{page.version}}
 * [Service migration](#Migration)
 * [Troubleshooting](#Troubleshooting)
 
+#### Other guides
+{% assign ref = site.data.docs.sysadmin-guide.versions[page.version] %}
+
+- [VOMS Services configuration reference](configuration.html)
+- [VOMS Admin guides]({{site.baseurl}}/documentation/voms-admin-guide/{{ref.admin_server_version}}/index.html)
+
 ## Introduction <a name="Intro">&nbsp;</a>
 
 The Virtual Organization Membership Service (VOMS) is an attribute authority
@@ -28,6 +36,8 @@ their roles and other attributes in order to issue trusted attribute
 certificates and SAML assertions used in the Grid environment for authorization
 purposes.
 
+This guide is targeted at VOMS service administrators, i.e. people installing
+and running the VOMS server.
 ## Prerequisites and recommendations <a name="Prereq">&nbsp;</a>
 
 ### Hardware
@@ -195,13 +205,16 @@ For example, for 15 VOs, the memory should be configured as follows:
 VOMS_JAVA_OPTS="-Xms375m -Xmx750m -XX:MaxPermSize=1125m"
 ```
 
-### <span class="label label-info">reconfiguration</span> Reconfiguring the VOs
+### <span class="label label-info">reconfiguration</span> Reconfiguring the VOs <a name="reconf"></a>
 
-The upgrade from EMI 2 VOMS to EMI 3 VOMS (and, in particular, VOMS Admin v. 3.x) requires a reconfiguration of the deployed VOs. 
-The VOs can be reconfigured using the `voms-configure` configuration tool (YAIM is no longer supported).
+Sometimes a VOMS Admin upgrade requires a reconfiguration.
+The VOs can be reconfigured using the `voms-configure` configuration tool (YAIM
+is no longer supported).
 
-This tool is the evolution of the `voms-admin-configure` script, and provides access to all the VOMS
-and VOMS-Admin service configuration parameters. For more detailed information about the `voms-configure` tool, see the [configuration section](#Configuration).
+This tool is the evolution of the `voms-admin-configure` script, and provides
+access to all the VOMS and VOMS-Admin service configuration parameters. For
+more detailed information about the `voms-configure` tool, see the
+[configuration section](#Configuration).
 
 The following command shows a basic reconfiguration of the VO:
 
@@ -223,31 +236,33 @@ The above command will migrate the configuration to the latest supported version
 	<i class="icon-eye-open"></i> Save the command you use to configure your VOs in a script for future reference. 
 </div>
 
-Once the configuration is over, you will need to upgrade the database as explained in the [database upgrade section](#db-upgrade), i.e.
-running:
+Once the configuration is over, you will need to upgrade the database as
+explained in the [database upgrade section](#db-upgrade), i.e. running:
 
 ```bash
 voms-configure upgrade --vo <vo_name>
 ```
 
-for each configured VO and then restart the services with the following commands:
+for each configured VO and then restart the services with the following
+commands:
 
 ```bash
 service voms start
 service voms-admin start
 ```
 
-
-
 ### Reconfiguring the information system
 
-Configuration files for voms information providers are now provided by voms. To configure the information providers for voms follow the instructions [here](#bdii).
+Configuration files for voms information providers are now provided by voms. To
+configure the information providers for VOMS follow the instructions
+[here](#bdii).
 
 To configure EMIR follow the instructions [here](#emir).
 
 ## Clean installation instructions<a name="Installation">&nbsp;</a>
 
-These are the full instructions for a clean installation. If you are upgrading, see the [upgrade instructions section](#Upgrade).
+These are the full instructions for a clean installation. If you are upgrading,
+see the [upgrade instructions section](#Upgrade).
 
 ### Repositories
 

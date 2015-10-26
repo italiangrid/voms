@@ -6,7 +6,7 @@ version: 3.0.2
 
 # VOMS Clients guide
 
-Version: {{page.version}}
+{% include voms-clients-guide-version.liquid %}
 
 #### Table of contents
 * [Installing the clients](#install)

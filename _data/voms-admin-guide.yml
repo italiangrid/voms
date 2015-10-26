@@ -1,0 +1,14 @@
+3.4.0:
+  sysadmin_guide_version: 3.0.5
+  admin_server_version: 3.4.0
+  admin_client_version: 2.0.19
+
+3.3.0:
+  sysadmin_guide_version: 3.0.4
+  admin_server_version: 3.3.0
+  admin_client_version: 2.0.19
+
+3.2.0:
+  sysadmin_guide_version: 3.0.3
+  admin_server_version: 3.2.0
+  admin_client_version: 2.0.19

@@ -5,7 +5,7 @@ title: VOMS Documentation
 
 # Documentation
 
-{% include documentation.liquid %}
+{% include docs.liquid %}
 
 # Known issues
 
