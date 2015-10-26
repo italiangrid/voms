@@ -117,8 +117,8 @@ and role assignment requests that are specific for a VO group.
 
 #### Upgrade from VOMS Admin Server >= 3.2.0
 
-A [reconfiguration][reconf] and a [database upgrade][db-upgrade] are required
-to upgrade to VOMS Admin Server 3.4.0.
+A [database upgrade][db-upgrade] and a [reconfiguration][reconf] (in this order) are
+required to upgrade to VOMS Admin server 3.4.0.
 
 #### Upgrade from earlier VOMS Admin Server versions
 
