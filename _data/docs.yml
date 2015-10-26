@@ -11,10 +11,21 @@ sysadmin-guide:
       voms_core_version: 2.0.12-2
       admin_server_version: 3.4.0
       admin_client_version: 2.0.19
-
     3.0.4:
       voms_core_version: 2.0.12-2
-      admin_server_version: 3.3.0
+      admin_server_version: 3.3.3
+      admin_client_version: 2.0.19
+    3.0.3:
+      voms_core_version: 2.0.12-2
+      admin_server_version: 3.3.2
+      admin_client_version: 2.0.19
+    3.0.2:
+      voms_core_version: 2.0.12-2
+      admin_server_version: 3.3.1
+      admin_client_version: 2.0.19
+    3.0.1:
+      voms_core_version: 2.0.12-2
+      admin_server_version: 3.2.0
       admin_client_version: 2.0.19
 
 voms-admin-guide:
@@ -47,7 +58,7 @@ voms-clients-guide:
     voms_clients_version: VOMS clients
   versions:
     3.0.3:
-      voms_clients_version: 3.0.5
+      voms_clients_version: 3.0.6
 
     3.0.2:
-      voms_clients_version: 3.0.4
+      voms_clients_version: 3.0.5
