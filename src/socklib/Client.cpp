@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * Authors: Vincenzo Ciaschini - Vincenzo.Ciaschini@cnaf.infn.it 
+ * Authors: Vincenzo Ciaschini - Vincenzo.Ciaschini@cnaf.infn.it
  *
  * Copyright (c) Members of the EGEE Collaboration. 2004-2010.
  * See http://www.eu-egee.org/partners/ for details on the copyright holders.
@@ -80,7 +80,7 @@ GSISocketClient::GSISocketClient(const std::string &h, int p) :
 
 /**
  * Destructor.
- */  
+ */
 GSISocketClient::~GSISocketClient()
 {
   Close();
@@ -102,7 +102,7 @@ void GSISocketClient::SetErrorOpenSSL(const std::string &message)
 
   error += OpenSSLError(true);
 }
-  
+
 std::string GSISocketClient::GetError()
 {
   return error;
@@ -115,7 +115,7 @@ std::string GSISocketClient::GetError()
  * @param sock the socket descriptot
  * @return true on success, false otherwise.
  */
-bool 
+bool
 GSISocketClient::post_connection_check(SSL *ssl)
 {
   bool ret = true;
@@ -155,7 +155,7 @@ extern "C" {
 }
 
 
-proxy_verify_desc *setup_initializers(char *cadir) 
+proxy_verify_desc *setup_initializers(char *cadir)
 {
   proxy_verify_ctx_desc *pvxd = NULL;
   proxy_verify_desc *pvd = NULL;
@@ -180,7 +180,7 @@ proxy_verify_desc *setup_initializers(char *cadir)
 
 }
 
-void destroy_initializers(void *data) 
+void destroy_initializers(void *data)
 {
   proxy_verify_desc *pvd = (proxy_verify_desc *)data;
 
@@ -214,7 +214,7 @@ int proxy_verify_callback_client(int ok, X509_STORE_CTX *ctx)
 
 void setup_SSL_proxy_handler(SSL *ssl, char *cadir)
 {
-  SSL_set_ex_data(ssl, PVD_SSL_EX_DATA_IDX, 
+  SSL_set_ex_data(ssl, PVD_SSL_EX_DATA_IDX,
                   setup_initializers(cadir));
 }
 
@@ -233,7 +233,7 @@ void destroy_SSL_proxy_handler(SSL *ssl)
  * Open the connection.
  * @return true for successful opening, false otherwise.
  */
-bool 
+bool
 GSISocketClient::Open()
 {
 #if OPENSSL_VERSION_NUMBER >= 0x10000000L
@@ -254,20 +254,20 @@ GSISocketClient::Open()
     goto err;
   }
 
-  SSL_CTX_set_options(ctx, SSL_OP_DONT_INSERT_EMPTY_FRAGMENTS | SSL_OP_NO_TLSv1 | SSL_OP_NO_SSLv2);
+  SSL_CTX_set_options(ctx, SSL_OP_DONT_INSERT_EMPTY_FRAGMENTS | SSL_OP_NO_SSLv3 | SSL_OP_NO_SSLv2);
   SSL_CTX_set_verify(ctx, SSL_VERIFY_PEER | SSL_VERIFY_FAIL_IF_NO_PEER_CERT, proxy_verify_callback);
   SSL_CTX_set_verify_depth(ctx, 100);
   SSL_CTX_load_verify_locations(ctx, NULL, cacertdir);
   SSL_CTX_use_certificate(ctx, ucert);
   SSL_CTX_use_PrivateKey(ctx, upkey);
-  SSL_CTX_set_cipher_list(ctx, "ALL:!LOW:!EXP:!MD5:!MD2");    
+  SSL_CTX_set_cipher_list(ctx, "ALL:!LOW:!EXP:!MD5:!MD2");
   SSL_CTX_set_purpose(ctx, X509_PURPOSE_ANY);
   SSL_CTX_set_mode(ctx, SSL_MODE_AUTO_RETRY);
 
   if (cert_chain){
     int num_certs = sk_X509_num(cert_chain);
     for (int i=0; i< num_certs;i++){
-      
+
       // Dup certificate
       X509* cert = X509_dup(sk_X509_value(cert_chain,i));
 
@@ -279,12 +279,12 @@ GSISocketClient::Open()
         } else {
           SetErrorOpenSSL("Cannot add certificate to the SSL context's certificate store");
           goto err;
-          
-        }    
+
+        }
       }
     }
   }
-  
+
   snprintf(portstring, 35, "%ld", (long int)port);
   fd = sock_connect(host.c_str(), portstring);
 
@@ -327,7 +327,7 @@ GSISocketClient::Open()
 
   return false;
 }
-  
+
 
 /**
  * Close the connection.
@@ -356,8 +356,8 @@ GSISocketClient::Close()
  * Send a string value.
  * @param s the string value to send.
  * @return true on success, false otherwise.
- */ 
-bool 
+ */
+bool
 GSISocketClient::Send(const std::string &s)
 {
   std::string error;
@@ -376,7 +376,7 @@ GSISocketClient::Send(const std::string &s)
  * @param s the string to fill.
  * @return true on success, false otherwise.
  */
-bool 
+bool
 GSISocketClient::Receive(std::string& s)
 {
   std::string output;
