@@ -245,7 +245,7 @@ GSISocketClient::Open()
   char portstring[36];
   std::string error;
 
-  meth = SSLv3_method();
+  meth = SSLv23_method();
 
   ctx = SSL_CTX_new(meth);
 
