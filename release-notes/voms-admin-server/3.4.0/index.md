@@ -10,6 +10,8 @@ rfcs:
   title: Suspended users end up in Gridmap files
 - id: VOMS-645
   title: Force users to include a textual motivation for group and role requests
+- id: VOMS-641
+  title: VO members whose AUP has expired but are not notified
 - id: VOMS-640
   title: VOMS Admin sessions expire in two minutes
 - id: VOMS-636
