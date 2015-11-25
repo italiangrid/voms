@@ -352,7 +352,6 @@ in the OrgDB.
 
 #### Enabling the OrgDB plugin <a name="cern_orgdb_enable"></a>
 
-
 The plugin configuration is currently **not** supported by `voms-configure`.
 
 Assuming the VO for which the OrgDB plugin must be enabled is already
@@ -408,6 +407,27 @@ Check the voms-admin log for your VO in `/var/log/voms-admin-server`. In case of
 	2012-11-27 08:06:08.604Z - INFO [VOMSExecutorService] - Scheduling task OrgDBMembershipSynchronizationTask with period: 30 seconds
 	2012-11-27 08:06:08.604Z - INFO [PluginManager] - 'orgdb' plugin configured SUCCESSFULLY.
 
+#### Oracle timezone error <a name="oracle-timezone-known-issue"></a>
+
+A bug in the Oracle jdbc driver may lead to problems in starting VOMS admin
+when the OrgDB is enabled. If you see an exception similar to:
+
+```
+Acquisition Attempt Failed!!! Clearing pending acquires. While trying to
+acquire a needed new resource, we failed to succeed more than the maximum
+number of allowed acquisition attempts (5). Last acquisition attempt exception:
+
+java.sql.SQLException: ORA-00604: error occurred at recursive SQL level 1
+
+ORA-01882: timezone region not found
+```
+
+then you should add the `-Doracle.jdbc.timezoneAsRegion=false` to the `VOMS_JAVA_OPTS` 
+variable in `/etc/sysconfig/voms-admin`:
+
+```bash
+VOMS_JAVA_OPTS="-Doracle.jdbc.timezoneAsRegion=false ..."
+```
 
 [c3p0-doc]: http://www.mchange.com/projects/c3p0/index.html#hibernate-specific
 [hibernate-doc]: http://docs.jboss.org/hibernate/orm/3.3/reference/en/html/session-configuration.html#configuration-hibernatejdbc
