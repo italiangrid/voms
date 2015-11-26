@@ -10,8 +10,9 @@ version: 3.4.0
 #### Table of contents
 
 - [Introduction](#intro)
+- [CERN HR DB membership validation](#cern-hr-db) <span class="label label-important">new</span>
 - [Managing user requests](#managing-user-requests)
-  - [The Group-Manager role](#group-manager-role) <span class="label label-important">new</span> 
+  - [The Group-Manager role](#group-manager-role) <span class="label label-important">new</span>
   - [Group managers](#group-managers)
 - [Managing groups](#managing-groups)
   - [The Group Information page](#group-info-page)
@@ -29,7 +30,7 @@ version: 3.4.0
   - [Assign the VO member to groups and roles](#vo-member-groups-roles)
   - [Manage the VO member certificates](#manage-certificates)
   - [Show information about AUP signatures](#aup-show)
-  - [Change the HR id for a VO member](#change-hr-id)
+  - [Change the HR id for a VO member](#change-hr-id) <span class="label label-important">new</span>
 - [Acceptable Usage Policies management](#manage-aup)
   - [The AUP management page](#aup-management-page)
   - [Change the AUP acceptance period](#aup-change-reacc-period)
@@ -58,6 +59,63 @@ classes), approve user requests and perform other administrative tasks.
 
 This guide is targeted at **VO administrators**. It introduces the main
 VOMS administration concepts and functions.
+
+## CERN HR db membership validation <a name="cern-hr-db"></a>
+
+This section explains how VOMS Admin integrates with the CERN Human Resource
+(HR) database. This integration is enabled on the four main LHC experiment VOs
+hosted at CERN (alice,atlas,cms,lhcb) in order to link experiment membership
+information in the CERN HR db with the membership information in VOMS.
+
+As a result of this integration:
+
+- VO registration requests (aka membership requests) are validated against the
+  HR db, so that only users that have a valid participation record for the
+  experiment in the HR db are allowed to submit a registration request;
+
+- membership information in VOMS is synchronized with membership information in
+  the HR database, so that details such as name, institution and email are kept
+  in sync;
+
+- membership validity in VOMS is linked to the member experiment participation
+  record in the CERN HR db, so that when a participation record expires in the
+  HR db, the linked VOMS membership is expired as well (which leads to member
+  suspension and thus inability to obtain credentials from the VOMS server).
+
+VOMS keeps track of the relation between the VO membership and the HR db
+experiment participation record by storing the HR db record id for each VO
+member in its database.
+
+The HR db record ID is obtained at VO registration time. The WLCG registration
+process is described in detail [here](user-guide.html#registration).
+
+In order to register, the user has to provide the email linked to his/her CERN
+HR membership record. This email address is used by VOMS Admin to search for a
+valid experiment participation record in the HR db. If a record is found, VOMS
+Admin will ask the user for confirmation that the record actually describes
+his/her experiment membership. The email address linked to the HR record will
+then by used to validate the registration request as usual.
+
+VOMS membership information is then periodically (typically every 12 hours,
+but depends on the service configuration) validated against the HR database.
+This synchronization process keeps VOMS user name, surname, institution, email
+address and membership expiration date in sync with the content of the HR db
+experiment participation record. When a participation record is expired the
+corresponding VOMS membership is expired. Also if an expired participation record
+in the HR db is restored, the VOMS synchronization process will notice it and
+will restore the linked VOMS membership.
+
+VO administrators can change the HR db linked to a VOMS membership by following
+the instructions given [here](#change-hr-id).
+
+Note that is possible to have multiple VOMS users linked to the same HR record
+id. This is useful, for instance, to have different VO groups, roles and
+generic attributes linked to different user certificates.
+
+On the other hand, is also possible to have multiple certificates linked to the
+same HR record id, by registering multiple user certificates to the same VO
+membership. In this case, VOMS will return the same group, roles and generic attributes
+for all the registered certificates for the user.
 
 ## Managing user requests <a name="managing-user-requests"></a>
 
@@ -355,10 +413,12 @@ linked to a VOMS membership.
 
 The HR id entered will be validated by VOMS to check if a valid membership for
 the experiment linked to such id and the currently managed VO is found in the
-HR database. 
+HR database.
+
 If the check succeeds, the membership information will be synchronized with the
 content of the HR membership record at the next run of the VOMS HR database
-synchronization task.
+synchronization task (typically run every 12 hours, but depends on service
+configuration).
 
 ## Acceptable usage policy (AUP) management <a name="manage-aup"></a>
 
