@@ -290,7 +290,7 @@ static std::string parse_order(const std::string &message, ordermap &ordering)
       first = fqan;
 
     LOGM(VARP, logh, LEV_DEBUG, T_PRE, "Order: %s",fqan.c_str());
-    ordering.insert(std::make_pair<std::string, int>(fqan,order));
+    ordering.insert(std::pair<std::string, int>(fqan,order));
     order++;
     position = end_token;
 
