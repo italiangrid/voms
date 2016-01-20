@@ -1696,7 +1696,7 @@ int proxy_check_proxy_name(
 	     * We now check equality between this subject and
 	     * the issuer plus an additional CN=proxy.
 	     *
-             * /
+	     */
 
 	    /* We dup the issuer name */
             issuer_name = X509_NAME_dup(X509_get_issuer_name(cert));
