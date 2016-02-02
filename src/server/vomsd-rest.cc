@@ -273,7 +273,7 @@ static char *canonicalize_string(char *original)
 
         if (second != '\0') {
           if (isxdigit(first) && isxdigit(second)) {
-            *currentout++ = (hex2num(first) << 4) + hex2num(second);
+            *currentout++ = (hex2num(first) << 4) | hex2num(second);
             currentin += 3;
           }
           else
