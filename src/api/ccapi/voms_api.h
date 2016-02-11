@@ -309,6 +309,7 @@ struct vomsdata {
                                     \param port the port on which the VOMS server is listening
                                     \param servsubject the subject of the server's certificate
                                     \param command the command sent to the server
+                                    \param timeout Timeout for server connections in seconds
                                     \return failure (F) or success (T)
                                      */
 
@@ -338,6 +339,7 @@ struct vomsdata {
                          \param command the command sent to the server
                          \param raw OUTPUT PARAMETER the answer from the server
                          \param version OUTPUT PARAMETER the version of the answer
+                         \param timeout Timeout for server connections in seconds
                          \return failure (F) or success (T) */
 
   void SetVerificationType(verify_type how); /*!< Sets the type of verification done on the data.
@@ -436,7 +438,7 @@ public:
                                Note: Does NOT verify that the proxy is valid.  Such verification must be obtained through other means. */
 
   bool Retrieve(AC *ac);/*!< Gets VOMS information from the AC
-             \param ext The extension to parse.
+             \param ac The extension to parse.
              \return failure (F) or success (T) */
 
   ~vomsdata();
