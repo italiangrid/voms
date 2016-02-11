@@ -1,26 +1,27 @@
 ---
 layout: post
-title: VOMS Admin server v. 3.4.1
+title: Several VOMS releases
 author: andrea
-summary: A fix for subject-based authentication in VOMS Admin server
+summary: An update for several VOMS components
 ---
 
-This release provides an update for VOMS Admin server.
+Today we release updates for VOMS, VOMS Admin server and VOMS API
+Java components. For detailed release notes see:
 
-With default settings, VOMS Admin authenticates clients by looking
-at the client certificate (subject,issuer) couple.
-
-A configuration flag was introduced in VOMS Admin 3.3.2 to authenticate only on
-subject, but the fix worked only for VO administrators.
-
-[VOMS Admin server 3.4.1][rn-admin] provides a fix for the above problem.
+- [VOMS Admin 3.4.1 release notes][rn-admin]
+- [VOMS API Java 3.0.6 release notes][rn-api-java]
+- [VOMS server 2.0.13][rn-core]
 
 As usual packages can be obtained from our repositories and will soon be pushed
 to the EMI-3 and UMD repositories. For instructions, refer to  the [releases
 section][releases].
 
 [rn-admin]: {{site.baseurl}}/release-notes/voms-admin-server/3.4.1
+[rn-core]: {{site.baseurl}}/release-notes/voms-server/2.0.13
+[rn-api-java]: {{site.baseurl}}/release-notes/voms-api-java/3.0.6
+
 [voms-admin-guide]: {{site.baseurl}}/documentation/voms-admin-guide/3.4.0
 [voms-admin-user-guide]: {{site.baseurl}}/documentation/voms-admin-guide/3.4.0/user-guide.html
 [voms-admin-vo-admin-guide]: {{site.baseurl}}/documentation/voms-admin-guide/3.4.0/vo-admin-guide.html
+
 [releases]: {{site.baseurl}}/releases.html

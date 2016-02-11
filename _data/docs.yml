@@ -8,9 +8,8 @@ sysadmin-guide:
 
   versions:
     3.0.6:
-      voms_core_version: 2.0.12-2
+      voms_core_version: 2.0.13
       admin_server_version: 3.4.1
-
       admin_client_version: 2.0.19
     3.0.5:
       voms_core_version: 2.0.12-2

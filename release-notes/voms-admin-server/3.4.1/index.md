@@ -4,16 +4,41 @@ title: VOMS Admin server v. 3.4.1
 rfcs:
   - id: VOMS-678
     title: VOMS Admin skip-ca check does not work as expected for unprivileged VOMS Admin users
+  - id: VOMS-705
+    title: Extend membership expiration time at each sync for VO members with valid, open-ended experiment participation
+  - id: VOMS-706
+    title: Add the ability to disable membership expiration notifications
+  - id: VOMS-707
+    title: Trim whitespace and remove newlines from subject in certificate requests
 ---
 
 # VOMS Admin server v. 3.4.1
 
-With default settings, VOMS Admin authenticates clients by looking at the
-client certificate (subject,issuer) couple.
+#### Authenticate users by certificate subject
 
-A configuration flag was introduced in VOMS Admin [3.3.2][voms-admin-332-rn] to
-authenticate only on subject, but the fix worked only for VO administrators.
-This release fixes such problem.
+Now users are correctly authenticated by certificate subject. With default
+settings, VOMS Admin authenticates clients by looking at the client certificate
+(subject,issuer) couple. A configuration flag was introduced in VOMS Admin
+3.3.2 to authenticate only by certificate subject, but the fix worked only for
+VO administrators. This  problem is now fixed. 
+
+For instruction on how to enable this feature, see the VOMS Admin
+[3.3.2][voms-admin-332-rn] release notes.
+
+#### Disable membership expiration notifications
+
+Is now possible to disable membership expiration notifications. This kind of
+notification do not make sense in deployments, like at CERN, where a VO administrator
+cannot extend the lifetime of VO members.
+
+To disable membership expiration notifications either:
+
+- reconfigure the affected VO with `voms-configure` specifying the `--disable-membership-expiration-warnings` option
+- set the `voms.membership.disable_expiration_warning` in `/etc/voms-admin/<VO>/service.properties`
+
+A restart of the service is required.
+
+Other improvements and fixes are listed below.
 
 ### Bug fixes
 
