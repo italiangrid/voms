@@ -1,6 +1,6 @@
 ---
 layout: default
-version: 3.0.5
+version: 3.0.6
 title: VOMS System Administrator Guide}
 redirect_from:
   - /documentation/sysadmin-guide/

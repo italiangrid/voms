@@ -1,6 +1,6 @@
 ---
 layout: default
-version: 3.0.5
+version: 3.0.6
 title: VOMS services configuration reference
 ---
 
@@ -406,7 +406,6 @@ Check the voms-admin log for your VO in `/var/log/voms-admin-server`. In case of
 	2012-11-27 08:06:08.601Z - INFO [OrgDBConfigurator] - OrgDB request validator registered SUCCESSFULLY.
 	2012-11-27 08:06:08.604Z - INFO [VOMSExecutorService] - Scheduling task OrgDBMembershipSynchronizationTask with period: 30 seconds
 	2012-11-27 08:06:08.604Z - INFO [PluginManager] - 'orgdb' plugin configured SUCCESSFULLY.
-
 
 #### Oracle timezone error <a name="oracle-timezone-known-issue"></a>
 
