@@ -1,6 +1,6 @@
 ---
 layout: post
-title: Several VOMS releases
+title: VOMS Admin 3.4.1, VOMS Server 2.0.13, VOMS API Java 3.0.6
 author: andrea
 summary: An update for several VOMS components
 ---
