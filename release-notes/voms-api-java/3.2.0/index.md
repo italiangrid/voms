@@ -16,7 +16,7 @@ functionality is equivalent to [VOMS API Java 3.0.6][rn-api-java-3-0-6].
 <dependency>
   <groupId>org.italiangrid</groupId>
   <artifactId>voms-api-java</artifactId>
-  <version>3.1.0</version>
+  <version>3.2.0</version>
 </dependency>
 ```
 
