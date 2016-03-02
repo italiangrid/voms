@@ -173,7 +173,8 @@ All the options described below can be set using the `voms-configure` script.
 
 This is a Java properties file.
 
-#### Base service options
+#### Base service options <a name="va_service_props"></a>
+
 
 | Property | Description | Default value |
 |:---------|:------------|:--------------|
@@ -182,7 +183,8 @@ This is a Java properties file.
 | `voms.readonly` | Is this a read-only VOMS instance | False |
 | `voms.skip_ca_check` | Skip checks on certificate issuer (i.e. authenticate users considering only the certificate subject) | False |
 
-#### Notification settings
+#### Notification settings <a name="va_notification_props"></a>
+
 
 | Property | Description | Default value |
 |:---------|:------------|:--------------|
@@ -193,7 +195,8 @@ This is a Java properties file.
 | `voms.notification.password` | The password used to authenticate to the SMTP server | N/A |
 | `voms.notification.use_tls` | Whether TLS should be used when contacting the SMTP server | False |
 
-#### Membership validation settings
+#### Membership validation settings  <a name="va_membership_validation_props"></a>
+
 
 | Property | Description | Default value |
 |:---------|:------------|:--------------|
@@ -205,7 +208,8 @@ This is a Java properties file.
 | `voms.preserve_expired_members` | When this option value is true, expired users are NOT suspended. | False |
 | `voms.disable_membership_end_time` | This flag disables the membership end time checks completely. Turn this setting to true in case you want that user membership lifetime is linked only to the AUP acceptance period. | False |
 
-#### Registration service options
+#### Registration service options <a name="va_registration_props"></a>
+
 
 | Property                                                     | Description                                                                                                                                                                                                                                                   | Default value   |
 | :---------                                                   | :------------                                                                                                                                                                                                                                                 | :-------------- |
@@ -215,7 +219,8 @@ This is a Java properties file.
 | `voms.request.vo_membership.warn_when_expired`               | Should voms-admin send a warning email to the user when his/her unconfirmed request is removed from the database?                                                                                                                                             | True            |
 | `voms.request.group_manager_role`                            | Sets a custom name for the group manager role.                                                                                                                                                                                                                | Group-Manager   |
 
-#### AUP options
+#### AUP options <a name="va_aup_props"></a>
+
 
 | Property | Description | Default value |
 |:---------|:------------|:--------------|
@@ -223,7 +228,8 @@ This is a Java properties file.
 | `voms.aup.sign_aup_task_lifetime` | The lifetime of Sign AUP task assigned to users. This is a grace period, in days, given to users to sign the AUP after the signature expiration. | 15 |
 | `voms.aup.sign_aup_task_reminders` | Comma separated list of values that represent the days before the AUP grace period expiration when reminders should be sent to users that have a pending Sign AUP request | 7,3,1  |
 
-#### SAML Attribute authority options
+#### SAML Attribute authority options  <a name="va_saml_props"></a>
+
 
 | Property | Description | Default value |
 |:---------|:------------|:--------------|
@@ -231,7 +237,8 @@ This is a Java properties file.
 | `voms.saml.max_assertion_lifetime` | The lifetime of issued SAML assertion (in seconds) | 86400 |
 | `voms.aa.compulsory_group_membership` | Set this to false to have a standard SAML AA behaviour. | True |
 
-#### Other options
+#### Other options <a name="va_other_props"></a>
+
 | Property | Description | Default value |
 |:---------|:------------|:--------------|
 | `voms.csrf.log_only` | CSRF guard. When true, dubious requests are not blocked but logged. | False |
