@@ -62,13 +62,22 @@ VOMS Admin server now requires Java 8.
 It is now possible to configure VOMS Admin to send multiple reminders to remind
 users of AUP signature requests.
 
-The `voms.aup.sign_aup_task_lifetime` option in the `/etc/<vo>/service.properties` configuration
-file now accepts a comma separated list of values as in:
+The `voms.aup.sign_aup_task_reminders` option in the `/etc/<vo>/service.properties` configuration
+file accepts a comma separated list of values as in:
 
-    voms.aup.sign_aup_task_lifetime = 14,7,1
+    voms.aup.sign_aup_task_reminders = 14,7,1
 
 With the settings above, VOMS Admin would send three reminders to a user that is requested
-to sign the AUP: 14,7 and 1 day before the grace period expiration.
+to sign the AUP: 14,7 and 1 day before the grace period expiration. These reminders are
+sent **in addition** to the email notification that is sent by VOMS Admin when the AUP
+signature expires.
+
+The grace period duration is configured as before with the `voms.aup.sign_aup_task_lifetime` option.
+For example:
+
+    voms.aup.sign_aup_task_lifetime = 30
+
+configures a grace period of 30 days.
 
 #### Improved user requests handling
 

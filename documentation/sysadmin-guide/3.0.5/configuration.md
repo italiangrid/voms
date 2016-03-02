@@ -1,6 +1,6 @@
 ---
 layout: default
-version: 3.0.5
+version: 3.0.7
 title: VOMS services configuration reference
 ---
 
@@ -220,7 +220,8 @@ This is a Java properties file.
 | Property | Description | Default value |
 |:---------|:------------|:--------------|
 | `voms.aup.initial_url` | The URL of the AUP configured by default | `file:/etc/voms-admin/<VO_NAME>/vo-aup.txt` |
-| `voms.aup.sign_aup_task_lifetime` | A comma separated list containing the days at which reminder emails are sent to the user before they get suspended. | 15 |
+| `voms.aup.sign_aup_task_lifetime` | The lifetime of Sign AUP task assigned to users. This is a grace period, in days, given to users to sign the AUP after the signature expiration. | 15 |
+| `voms.aup.sign_aup_task_reminders` | Comma separated list of values that represent the days before the AUP grace period expiration when reminders should be sent to users that have a pending Sign AUP request | 7,3,1  |
 
 #### SAML Attribute authority options
 
@@ -406,7 +407,6 @@ Check the voms-admin log for your VO in `/var/log/voms-admin-server`. In case of
 	2012-11-27 08:06:08.601Z - INFO [OrgDBConfigurator] - OrgDB request validator registered SUCCESSFULLY.
 	2012-11-27 08:06:08.604Z - INFO [VOMSExecutorService] - Scheduling task OrgDBMembershipSynchronizationTask with period: 30 seconds
 	2012-11-27 08:06:08.604Z - INFO [PluginManager] - 'orgdb' plugin configured SUCCESSFULLY.
-
 
 #### Oracle timezone error <a name="oracle-timezone-known-issue"></a>
 
