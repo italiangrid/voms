@@ -203,6 +203,7 @@ This is a Java properties file.
 | `voms.task.membership_check.period ` | How often (in seconds) the membership background thread should run | 600 |
 | `voms.membership.default_lifetime` | Default VO membership lifetime duration (in months). This setting is used to compute the default membership expiration date for newly created users | 12 |
 | `voms.membership.expiration_warning_period` | Warning period duration (in days). VOMS Admin will notify of users about to expire in the next number of days expressed by this option | 30 |
+| `voms.membership.disable_expiration_warning` | Disables periodic membership expiration warning notifications | False |
 | `voms.membership.expiration_grace_period` | Membership expiration grace period (in days). During the grace period the user will be maintained active even if its membership has expired. Note that this option has no effect if the `voms.preserve_expired_members` is set to True | 7 |
 | `voms.membership.notification_resend_period` | Time (in days) that should pass between consecutive warning expiration messages sent to VO administrators to inform about expired and expiring VO members.| 1 |
 | `voms.preserve_expired_members` | When this option value is true, expired users are NOT suspended. | False |
