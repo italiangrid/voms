@@ -18,11 +18,11 @@
 sslutils.c
 
 Description:
-        Routines used internally to implement delegation and proxy 
+        Routines used internally to implement delegation and proxy
         certificates for use with Globus The same file is also used
         for the non-exportable sslk5 which allows Kerberos V5 to
         accept SSLv3 with certificates as proof of identiy and
-        issue a TGT. 
+        issue a TGT.
 
 **********************************************************************/
 
@@ -38,6 +38,7 @@ Description:
 #include "parsertypes.h"
 #include "doio.h"
 #include "data.h"
+#include "voms_cert_type.h"
 
 #ifdef HAVE_UNISTD_H
 #include <unistd.h>
@@ -91,7 +92,7 @@ Description:
 
 #ifndef X509_V_ERR_INVALID_PURPOSE
 #define X509_V_ERR_INVALID_PURPOSE X509_V_ERR_CERT_CHAIN_TOO_LONG
-#endif 
+#endif
 
 #ifdef USE_PKCS11
 #include "scutils.h"
@@ -115,7 +116,7 @@ extern int restriction_evaluate(STACK_OF(X509) *chain, struct policy **namespace
                                 struct policy **signings);
 extern void voms_free_policies(struct policy **policies);
 extern int read_pathrestriction(STACK_OF(X509) *chain, char *path,
-                                struct policy ***namespaces, 
+                                struct policy ***namespaces,
                                 struct policy ***signings);
 
 static int check_critical_extensions(X509 *cert, int itsaproxy);
@@ -123,6 +124,7 @@ static int check_critical_extensions(X509 *cert, int itsaproxy);
 /**********************************************************************
                                Type definitions
 **********************************************************************/
+
 
 /**********************************************************************
                           Module specific prototypes
@@ -135,16 +137,17 @@ static ERR_STRING_DATA prxyerr_str_functs[]=
 {
     {ERR_PACK(0,PRXYERR_F_PROXY_GENREQ ,0),"proxy_genreq"},
     {ERR_PACK(0,PRXYERR_F_PROXY_SIGN ,0),"proxy_sign"},
-    {ERR_PACK(0,PRXYERR_F_VERIFY_CB ,0),"verify_callback"},
+    {ERR_PACK(0,PRXYERR_F_VERIFY_CB ,0),"proxy_verify_callback"},
     {ERR_PACK(0,PRXYERR_F_PROXY_TMP ,0),"proxy_marshal_tmp"},
     {ERR_PACK(0,PRXYERR_F_INIT_CRED ,0),"proxy_init_cred"},
     {ERR_PACK(0,PRXYERR_F_LOCAL_CREATE, 0),"proxy_local_create"},
     {ERR_PACK(0,PRXYERR_F_CB_NO_PW, 0),"proxy_pw_cb"},
     {ERR_PACK(0,PRXYERR_F_GET_CA_SIGN_PATH, 0),"get_ca_signing_policy_path"},
     {ERR_PACK(0,PRXYERR_F_PROXY_SIGN_EXT ,0),"proxy_sign_ext"},
-    {ERR_PACK(0,PRXYERR_F_PROXY_CHECK_SUBJECT_NAME,0),
-     "proxy_check_subject_name"},
+    {ERR_PACK(0,PRXYERR_F_PROXY_VERIFY_NAME,0),
+     "proxy_verify_name"},
     {ERR_PACK(0,PRXYERR_F_PROXY_CONSTRUCT_NAME ,0),"proxy_construct_name"},
+    {ERR_PACK(0,PRXYERR_F_VOMS_GET_CERT_TYPE,0),"voms_get_cert_type"},
     {0,NULL},
 };
 
@@ -159,7 +162,7 @@ static ERR_STRING_DATA prxyerr_str_reasons[]=
     {PRXYERR_R_PROCESS_PROXY, "processing user proxy cert"},
     {PRXYERR_R_PROXY_NAME_BAD, "proxy name does not match"},
     {PRXYERR_R_PROCESS_SIGNC, "while signing proxy cert"},
-    {PRXYERR_R_BAD_PROXY_ISSUER, "proxy can only be signed by user"},
+    {PRXYERR_R_BAD_PROXY_ISSUER, "invalid proxy issuer certificate"},
     {PRXYERR_R_SIGN_NOT_CA ,"user cert not signed by CA"},
     {PRXYERR_R_PROBLEM_PROXY_FILE ,"problems creating proxy file"},
     {PRXYERR_R_PROCESS_KEY, "processing key"},
@@ -176,7 +179,7 @@ static ERR_STRING_DATA prxyerr_str_reasons[]=
     {PRXYERR_R_PROBLEM_SERVER_NOCERT_FILE, "system certificate not found"},
     {PRXYERR_R_PROBLEM_USER_NOCERT_FILE, "user certificate not found"},
     {PRXYERR_R_INVALID_CERT, "no certificate in file"},
-    {PRXYERR_R_REMOTE_CRED_EXPIRED, "remote certificate has expired"},
+    {PRXYERR_R_REMOTE_CRED_EXPIRED, "peer certificate has expired"},
     {PRXYERR_R_USER_CERT_EXPIRED, "user certificate has expired"},
     {PRXYERR_R_SERVER_CERT_EXPIRED, "system certificate has expired"},
     {PRXYERR_R_PROXY_EXPIRED, "proxy expired: run grid-proxy-init or wgpi first"},
@@ -184,21 +187,21 @@ static ERR_STRING_DATA prxyerr_str_reasons[]=
     {PRXYERR_R_CRL_SIGNATURE_FAILURE, "invalid signature on a CRL"},
     {PRXYERR_R_CRL_NEXT_UPDATE_FIELD, "invalid nextupdate field in CRL"},
     {PRXYERR_R_CRL_HAS_EXPIRED, "outdated CRL found, revoking all certs till you get new CRL"},
-    {PRXYERR_R_CERT_REVOKED, "certificate revoked per CRL"},
+    {PRXYERR_R_CERT_REVOKED, "certificate revoked by CRL"},
     {PRXYERR_R_NO_HOME, "can't determine HOME directory"},
     {PRXYERR_R_KEY_CERT_MISMATCH, "user key and certificate don't match"},
     {PRXYERR_R_WRONG_PASSPHRASE, "wrong pass phrase"},
     {PRXYERR_R_CA_POLICY_VIOLATION, "remote certificate CA signature not allowed by policy"},
-    {PRXYERR_R_CA_POLICY_ERR,"no matching CA found in file for remote certificate"}, 
-    {PRXYERR_R_CA_NOFILE,"could not find CA policy file"}, 
-    {PRXYERR_R_CA_NOPATH,"could not determine path to CA policy file"}, 
+    {PRXYERR_R_CA_POLICY_ERR,"no matching CA found in file for remote certificate"},
+    {PRXYERR_R_CA_NOFILE,"could not find CA policy file"},
+    {PRXYERR_R_CA_NOPATH,"could not determine path to CA policy file"},
     {PRXYERR_R_CA_POLICY_RETRIEVE, "CA policy retrieve problems"},
     {PRXYERR_R_CA_POLICY_PARSE, "CA policy parse problems"},
     {PRXYERR_R_CA_UNKNOWN,"remote certificate signed by unknown CA"},
     {PRXYERR_R_PROBLEM_CLIENT_CA, "problems getting client_CA list"},
     {PRXYERR_R_CB_NO_PW, "no proxy credentials: run grid-proxy-init or wgpi first"},
-    {PRXYERR_R_CB_CALLED_WITH_ERROR,"certificate failed verify:"},
-    {PRXYERR_R_CB_ERROR_MSG, "certificate:"},
+    {PRXYERR_R_CB_CALLED_WITH_ERROR,"certificate validation error"},
+    {PRXYERR_R_CB_ERROR_MSG, "certificate validation error"},
     {PRXYERR_R_CLASS_ADD_OID,"can't find CLASS_ADD OID"},
     {PRXYERR_R_CLASS_ADD_EXT,"problem adding CLASS_ADD Extension"},
     {PRXYERR_R_DELEGATE_VERIFY,"problem verifiying the delegate extension"},
@@ -207,11 +210,16 @@ static ERR_STRING_DATA prxyerr_str_reasons[]=
     {PRXYERR_R_DELEGATE_COPY,"problem copying delegate extension to proxy"},
     {PRXYERR_R_BUFFER_TOO_SMALL,"buffer too small"},
     {PRXYERR_R_CERT_NOT_YET_VALID,"remote certificate not yet valid"},
-    {PRXYERR_R_LOCAL_CA_UNKNOWN,"cannot find CA certificate for local credential"},
-    {PRXYERR_R_OUT_OF_MEMORY,"out of memory"},
+    {PRXYERR_R_LOCAL_CA_UNKNOWN,"cannot find a locally trusted CA certificate that matches the issuer of the peer credential"},
+    {PRXYERR_R_OUT_OF_MEMORY,"out of memory error"},
     {PRXYERR_R_BAD_ARGUMENT,"bad argument"},
     {PRXYERR_R_BAD_MAGIC,"bad magic number"},
     {PRXYERR_R_UNKNOWN_CRIT_EXT,"unable to handle critical extension"},
+    {PRXYERR_R_NON_COMPLIANT_PROXY,"non compliant proxy"},
+    {PRXYERR_R_ERROR_GETTING_NAME_ENTRY_OF_SUBJECT, "error getting name entry from certificate subject name"},
+    {PRXYERR_R_ERROR_COPYING_SUBJECT, "error copying subject"},
+    {PRXYERR_R_ERROR_GETTING_CN_ENTRY, "error getting CommonName entry from certificate subject name"},
+    {PRXYERR_R_ERROR_BUILDING_SUBJECT, "error building certificate subject for proxy name integrity checks"},
     {0,NULL}
 };
 
@@ -228,19 +236,19 @@ int my_txt2nid(char *name)
 Function: X509_NAME_cmp_no_set
 
 Description:
-        To circumvent a bug with adding X509_NAME_ENTRIES 
+        To circumvent a bug with adding X509_NAME_ENTRIES
         with the wrong "set", we will compare names without
-        the set. 
+        the set.
         This is a temporary fix which will be removed when we
-        fix the creation of the names using the correct sets. 
+        fix the creation of the names using the correct sets.
         This is only being done this way for some compatability
-        while installing the these fixes. 
-        This fix is needed in all previous versions of Globus. 
+        while installing the these fixes.
+        This fix is needed in all previous versions of Globus.
 
 Parameters:
         same as X509_NAME_cmp
 Returns :
-        same as X509_NAME_cmp 
+        same as X509_NAME_cmp
 ********************************************************************/
 static int
 X509_NAME_cmp_no_set(
@@ -258,7 +266,7 @@ X509_NAME_cmp_no_set(
         return(sk_X509_NAME_ENTRY_num(a->entries) -
                sk_X509_NAME_ENTRY_num(b->entries));
     }
-    
+
     for (i=sk_X509_NAME_ENTRY_num(a->entries)-1; i>=0; i--)
     {
         na = sk_X509_NAME_ENTRY_value(a->entries,i);
@@ -269,7 +277,7 @@ X509_NAME_cmp_no_set(
         {
             return(j);
         }
-        
+
         j = memcmp(na->value->data,
                    nb->value->data,
                    na->value->length);
@@ -302,7 +310,7 @@ Function: getuid, getpid
 
 Descriptions:
         For Windows95, WIN32, we don't have these, so we will default
-    to using uid 0 and pid 0 Need to look at this better for NT. 
+    to using uid 0 and pid 0 Need to look at this better for NT.
 ******************************************************************/
 static unsigned long
 getuid()
@@ -325,7 +333,7 @@ getpid()
 Function: ERR_add_error_data()
 
 Description:
-    Dummy routine only defined if running with SSLeay-0.8.x 
+    Dummy routine only defined if running with SSLeay-0.8.x
     this feature was introduced with SSLeay-0.9.0
 
 Parameters:
@@ -343,7 +351,7 @@ ERR_add_error_data( VAR_PLIST( int, num ))
 Function: ERR_get_error_line_data()
 
 Description:
-    Dummy routine only defined if running with SSLeay-0.8.x 
+    Dummy routine only defined if running with SSLeay-0.8.x
     this feature was introduced with SSLeay-0.9.0. We will
     simulate it for 0.8.1
 
@@ -362,12 +370,12 @@ ERR_get_error_line_data(
     {
         *data = "";
     }
-    
+
     if (flags)
     {
         *flags = 0;
     }
-    
+
     return (ERR_get_error_line(file, line));
 }
 
@@ -379,24 +387,39 @@ Function: ERR_set_continue_needed()
 Description:
         Sets state information which error display routines can use to
         determine if the error just added is enough information to describe
-        the error or if further error information need displayed. 
+        the error or if further error information need displayed.
         (By default gss_display_status will only show one user level error)
-        
+
         note: This function must be called after (or instead of) the ssl add error
         data functions.
-        
+
 Parameters:
 
 Returns:
 **********************************************************************/
-    
+
 void PRIVATE
 ERR_set_continue_needed(void)
 {
     ERR_STATE *es;
     es = ERR_get_state();
-    es->err_data_flags[es->top] = 
+    es->err_data_flags[es->top] =
         es->err_data_flags[es->top] | ERR_DISPLAY_CONTINUE_NEEDED;
+}
+
+
+int
+ERR_load_proxy_error_strings(){
+
+  static int do_init = 1;
+
+  if (do_init) {
+
+    do_init = 0;
+
+    ERR_load_strings(ERR_USER_LIB_PRXYERR_NUMBER,prxyerr_str_functs);
+    ERR_load_strings(ERR_USER_LIB_PRXYERR_NUMBER,prxyerr_str_reasons);
+  }
 }
 
 /**********************************************************************
@@ -406,7 +429,7 @@ Description:
     Sets up the error tables used by SSL and adds ours
     using the ERR_LIB_USER
     Only the first call does anything.
-        Will also add any builtin objects for SSLeay. 
+        Will also add any builtin objects for SSLeay.
 
 Parameters:
     i should be zero the first time one of the ERR_load functions
@@ -431,19 +454,19 @@ ERR_load_prxyerr_strings(
     char *                              egd_path;
 #endif
     char                                buffer[200];
-        
+
     if (init)
     {
         init = 0;
-        
+
 #ifndef RAND_DO_NOT_USE_CLOCK
-        clock(); 
+        clock();
 #endif
         if (i == 0)
         {
             SSL_load_error_strings();
         }
-        
+
         OBJ_create("1.3.6.1.4.1.3536.1.1.1.1","CLASSADD","ClassAdd");
         OBJ_create("1.3.6.1.4.1.3536.1.1.1.2","DELEGATE","Delegate");
         OBJ_create("1.3.6.1.4.1.3536.1.1.1.3","RESTRICTEDRIGHTS",
@@ -456,20 +479,20 @@ ERR_load_prxyerr_strings(
         /*
          * We need to get a lot of randomness for good security
          * OpenSSL will use /dev/urandom (if available),
-         * uid, time, and gid. 
+         * uid, time, and gid.
          *
          * If user has RANDFILE set, or $HOME/.rnd
          * load it for extra random seed.
          * This may also not be enough, so we will also add in
-         * the time it takes to run this routine, which includes 
-         * reading the randfile.    
+         * the time it takes to run this routine, which includes
+         * reading the randfile.
          * Later we will also add in some keys and some stats
          * if we have them.
          * look for RAND_add in this source file.
          *
          * Other methods we could use:
          *  * Librand from  Don Mitchell and Matt Blaze
-         *  * Doing a netstat -in 
+         *  * Doing a netstat -in
          *  * some form of pstat
          * But /dev/random and/or egd should be enough.
          */
@@ -484,7 +507,7 @@ ERR_load_prxyerr_strings(
 #if SSLEAY_VERSION_NUMBER >=  0x0090581fL
         /*
          * Try to use the Entropy Garthering Deamon
-         * See the OpenSSL crypto/rand/rand_egd.c 
+         * See the OpenSSL crypto/rand/rand_egd.c
          */
         egd_path = getenv("EGD_PATH");
         if (egd_path == NULL)
@@ -493,7 +516,7 @@ ERR_load_prxyerr_strings(
         }
         RAND_egd(egd_path);
 #endif
-                
+
         /* if still not enough entropy*/
         if (RAND_status() == 0)
         {
@@ -536,8 +559,8 @@ static int checkstat(const char* filename)
     }
 
     /*
-     * use any stat output as random data, as it will 
-     * have file sizes, and last use times in it. 
+     * use any stat output as random data, as it will
+     * have file sizes, and last use times in it.
      */
     RAND_add((void*)&stx,sizeof(stx),2);
 
@@ -551,7 +574,7 @@ static int checkstat(const char* filename)
     {
         return 3;
     }
-    
+
 #endif /* !WIN32 && !TARGET_ARCH_CYGWIN */
 
     if (stx.st_size == 0)
@@ -566,10 +589,10 @@ static int checkstat(const char* filename)
 Function: proxy_load_user_proxy()
 
 Description:
-        Given the user_proxy file, skip the first cert, 
-        and add any additional certs to the cert_chain. 
+        Given the user_proxy file, skip the first cert,
+        and add any additional certs to the cert_chain.
         These must be additional proxies, or the user's cert
-        which signed the proxy. 
+        which signed the proxy.
         This is based on the X509_load_cert_file routine.
 
 Parameters:
@@ -623,7 +646,7 @@ proxy_load_user_proxy(
 
           x = NULL;
         }
-        
+
         count++;
 
         if (x)
@@ -633,13 +656,13 @@ proxy_load_user_proxy(
         }
     }
     ret = count;
-        
+
 err:
     if (x != NULL)
     {
         X509_free(x);
     }
-    
+
     if (in != NULL)
     {
         BIO_free(in);
@@ -652,7 +675,7 @@ err:
 Function: proxy_genreq()
 
 Description:
-        generate certificate request for a proxy certificate. 
+        generate certificate request for a proxy certificate.
         This is based on using the current user certificate.
         If the current user cert is NULL, we are asking fke the server
     to fill this in, and give us a new cert. Used with k5cert.
@@ -675,7 +698,7 @@ proxy_genreq(
     RSA *                               rsa = NULL;
     EVP_PKEY *                          pkey = NULL;
     EVP_PKEY *                          upkey = NULL;
-    X509_NAME *                         name = NULL; 
+    X509_NAME *                         name = NULL;
     X509_REQ *                          req = NULL;
     X509_NAME_ENTRY *                   ne = NULL;
     int                                 rbits;
@@ -685,19 +708,19 @@ proxy_genreq(
         rbits = bits;
     }
     else if (ucert)
-    { 
+    {
         if ((upkey = X509_get_pubkey(ucert)) == NULL)
         {
             PRXYerr(PRXYERR_F_PROXY_GENREQ,PRXYERR_R_PROCESS_PROXY_KEY);
             goto err;
         }
-        
+
         if (upkey->type != EVP_PKEY_RSA)
         {
             PRXYerr(PRXYERR_F_PROXY_GENREQ,PRXYERR_R_PROCESS_PROXY_KEY);
             goto err;
         }
-        
+
         rbits = 8 * EVP_PKEY_size(upkey);
         EVP_PKEY_free(upkey);
     }
@@ -725,13 +748,13 @@ proxy_genreq(
         PRXYerr(PRXYERR_F_PROXY_GENREQ,PRXYERR_R_PROCESS_PROXY_KEY);
         goto err;
     }
-    
+
     if (!EVP_PKEY_assign_RSA(pkey,rsa))
     {
         PRXYerr(PRXYERR_F_PROXY_GENREQ,PRXYERR_R_PROCESS_PROXY_KEY);
         goto err;
     }
-    
+
     if ((req = X509_REQ_new()) == NULL)
     {
         PRXYerr(PRXYERR_F_PROXY_GENREQ,PRXYERR_R_PROCESS_REQ);
@@ -751,8 +774,8 @@ proxy_genreq(
       else {
         name = X509_NAME_new();
       }
-                
-        
+
+
       if ((ne = X509_NAME_ENTRY_create_by_NID(NULL,NID_commonName,
                                               V_ASN1_APP_CHOOSE,
                                               (unsigned char *)"proxy",
@@ -781,9 +804,9 @@ proxy_genreq(
     EVP_MD* md = EVP_get_digestbyobj(req->sig_alg->algorithm);
 
     if ( ucert ){
-     
-     md = EVP_get_digestbyobj(ucert->sig_alg->algorithm); 
-    
+
+     md = EVP_get_digestbyobj(ucert->sig_alg->algorithm);
+
     }
 
     if (md == NULL) md = EVP_sha1();
@@ -793,7 +816,7 @@ proxy_genreq(
         PRXYerr(PRXYERR_F_PROXY_GENREQ,PRXYERR_R_PROCESS_SIGN);
         goto err;
     }
-        
+
     if (ne)
     {
         X509_NAME_ENTRY_free(ne);
@@ -833,7 +856,7 @@ err:
 
 
 /**
- * Sign a certificate request  
+ * Sign a certificate request
  *
  * This function is a wrapper function for proxy_sign_ext. The subject
  * name of the resulting certificate is generated by adding either
@@ -850,7 +873,7 @@ err:
  *        The certificate request
  * @param new_cert
  *        This parameter will contain the signed certficate upon
- *        success. 
+ *        success.
  * @param seconds
  *        The number of seconds the new cert is going to be
  *        valid. The validity should not exceed that of the issuing
@@ -912,7 +935,7 @@ proxy_sign(
       EVP_PKEY_free(req_public_key);
 
       sub_hash = md[0] | md[1] << 8 | md[2] << 16 | md[3] << 24;
- 
+
       newcn = snprintf_wrap("%u", sub_hash);
       newserial = snprintf_wrap("%x", sub_hash);
     }
@@ -922,7 +945,7 @@ proxy_sign(
       else
         newcn = "proxy";
     }
-    
+
     if (newdn == NULL) {
       if(proxy_construct_name(
                               user_cert,
@@ -946,7 +969,7 @@ proxy_sign(
 
     if(proxy_sign_ext(user_cert,
                       user_private_key,
-                      sig_algo, 
+                      sig_algo,
                       req,
                       new_cert,
                       subject_name,
@@ -976,7 +999,7 @@ proxy_sign(
 }
 
 /**
- * Sign a certificate request  
+ * Sign a certificate request
  *
  * This function signs the given certificate request. Before signing
  * the certificate the certificate's subject and issuer names may be
@@ -994,7 +1017,7 @@ proxy_sign(
  *        The certificate request
  * @param new_cert
  *        This parameter will contain the signed certficate upon
- *        success. 
+ *        success.
  * @param subject_name
  *        The subject name to be used for the new certificate. If no
  *        subject name is provided the subject name in the certificate
@@ -1019,7 +1042,7 @@ proxy_sign(
  *        will also place a more detailed error on an error stack.
  */
 
-int PRIVATE 
+int PRIVATE
 proxy_sign_ext(
     X509 *                    user_cert,
     EVP_PKEY *                user_private_key,
@@ -1027,7 +1050,7 @@ proxy_sign_ext(
     X509_REQ *                req,
     X509 **                   new_cert,
     X509_NAME *               subject_name,
-    X509_NAME *               issuer_name,    
+    X509_NAME *               issuer_name,
     int                       seconds,
     STACK_OF(X509_EXTENSION) *extensions,
     int                       proxyver,
@@ -1053,7 +1076,7 @@ proxy_sign_ext(
       user_cert_info = user_cert->cert_info;
 
     *new_cert = NULL;
-    
+
     if ((req->req_info == NULL) ||
         (req->req_info->pubkey == NULL) ||
         (req->req_info->pubkey->public_key == NULL) ||
@@ -1062,7 +1085,7 @@ proxy_sign_ext(
         PRXYerr(PRXYERR_F_PROXY_SIGN,PRXYERR_R_MALFORM_REQ);
         goto err;
     }
-    
+
     if ((new_public_key=X509_REQ_get_pubkey(req)) == NULL) {
       PRXYerr(PRXYERR_F_PROXY_SIGN_EXT,PRXYERR_R_MALFORM_REQ);
       goto err;
@@ -1119,7 +1142,7 @@ proxy_sign_ext(
     }
     else if (proxyver > 2) {
       ASN1_INTEGER_free(X509_get_serialNumber(*new_cert));
-          
+
       new_public_key = X509_REQ_get_pubkey(req);
 #ifdef TYPEDEF_I2D_OF
       ASN1_digest((i2d_of_void*)i2d_PUBKEY, sig_algo, (char *) new_public_key, md, &len);
@@ -1138,7 +1161,7 @@ proxy_sign_ext(
         goto err;
       }
       memcpy((*new_cert)->cert_info->serialNumber->data, md, SHA_DIGEST_LENGTH);
-    } 
+    }
     else if (selfsigned) {
       ASN1_INTEGER *copy = ASN1_INTEGER_new();
       if (copy) {
@@ -1180,18 +1203,18 @@ proxy_sign_ext(
         {
             PRXYerr(PRXYERR_F_PROXY_SIGN_EXT,PRXYERR_R_PROCESS_PROXY);
             goto err;
-        } 
+        }
     }
 
     /* Allow for a five minute clock skew here. */
- 
+
     X509_gmtime_adj(X509_get_notBefore(*new_cert),-5*60 -pastproxy);
 
     /* DEE? should accept an seconds parameter, and set to min of
      * hours or the ucert notAfter
-     * for now use seconds if not zero. 
+     * for now use seconds if not zero.
      */
-    
+
     if (selfsigned) {
       X509_gmtime_adj(X509_get_notAfter(*new_cert),(long) seconds - pastproxy);
     }
@@ -1236,15 +1259,15 @@ proxy_sign_ext(
     ASN1_INTEGER_set(new_cert_info->version,2); /* version 3 certificate */
 
     /* Free the current entries if any, there should not
-     * be any I belive 
+     * be any I belive
      */
-    
+
     if (new_cert_info->extensions != NULL)
     {
         sk_X509_EXTENSION_pop_free(new_cert_info->extensions,
                                    X509_EXTENSION_free);
     }
-        
+
     /* Add extensions provided by the client */
 
     if (extensions)
@@ -1268,7 +1291,7 @@ proxy_sign_ext(
                 PRXYerr(PRXYERR_F_PROXY_SIGN_EXT,PRXYERR_R_DELEGATE_COPY);
                 goto err;
             }
-            
+
             if (!sk_X509_EXTENSION_push(new_cert_info->extensions,
                                         extension))
             {
@@ -1282,12 +1305,12 @@ proxy_sign_ext(
 
 #ifndef NO_DSA
     /* DEE? not sure what this is doing, I think
-     * it is adding from the key to be used to sign to the 
+     * it is adding from the key to be used to sign to the
      * new certificate any info DSA may need
      */
-    
+
     tmp_public_key = X509_get_pubkey(*new_cert);
-    
+
     if (EVP_PKEY_missing_parameters(tmp_public_key) &&
         !EVP_PKEY_missing_parameters(user_private_key))
     {
@@ -1307,7 +1330,7 @@ proxy_sign_ext(
 
 err:
     /* free new_cert upon error */
-    
+
     if (*new_cert)
     {
         X509_free(*new_cert);
@@ -1353,7 +1376,7 @@ proxy_construct_name(
 {
     X509_NAME_ENTRY *                   name_entry = NULL;
     *name = NULL;
-    
+
     if ((*name = X509_NAME_dup(X509_get_subject_name(cert))) == NULL)
     {
         PRXYerr(PRXYERR_F_PROXY_CONSTRUCT_NAME,PRXYERR_R_PROCESS_PROXY);
@@ -1382,7 +1405,7 @@ proxy_construct_name(
         }
         X509_NAME_ENTRY_free(name_entry);
     }
-    
+
     return 0;
 
 err:
@@ -1397,9 +1420,9 @@ err:
     }
 
     return 1;
-    
+
 }
-    
+
 
 
 /**********************************************************************
@@ -1449,7 +1472,7 @@ proxy_marshal_bp(
     if (cert_chain)
     {
         /*
-         * add additional certs, but not our cert, or the 
+         * add additional certs, but not our cert, or the
          * proxy cert, or any self signed certs
          */
         int i;
@@ -1458,10 +1481,10 @@ proxy_marshal_bp(
         {
             cert = sk_X509_value(cert_chain,i);
             if (!(!X509_NAME_cmp_no_set(X509_get_subject_name(cert),
-                                        X509_get_subject_name(ncert)) 
+                                        X509_get_subject_name(ncert))
                   || (ucert &&
                       !X509_NAME_cmp_no_set(X509_get_subject_name(cert),
-                                            X509_get_subject_name(ucert)))  
+                                            X509_get_subject_name(ucert)))
                   || !X509_NAME_cmp_no_set(X509_get_subject_name(cert),
                                            X509_get_issuer_name(cert))))
             {
@@ -1472,7 +1495,7 @@ proxy_marshal_bp(
             }
         }
     }
-        
+
     return 0;
 }
 
@@ -1482,7 +1505,7 @@ Function: proxy_verify_init()
 Description:
 
 Parameters:
-   
+
 Returns:
 **********************************************************************/
 
@@ -1509,7 +1532,7 @@ Function: proxy_verify_ctx_init()
 Description:
 
 Parameters:
-   
+
 Returns:
 **********************************************************************/
 
@@ -1529,7 +1552,7 @@ Function: proxy_verify_release()
 Description:
 
 Parameters:
-   
+
 Returns:
 **********************************************************************/
 
@@ -1547,7 +1570,7 @@ Function: proxy_verify_ctx_release()
 Description:
 
 Parameters:
-   
+
 Returns:
 **********************************************************************/
 
@@ -1561,31 +1584,35 @@ proxy_verify_ctx_release(
         pvxd->certdir = NULL;
     }
 }
-
 #if SSLEAY_VERSION_NUMBER >=  0x0090600fL
 /**********************************************************************
 Function: proxy_app_verify_callback()
 
 Description:
         SSL callback which lets us do the x509_verify_cert
-        ourself. We use this to set the ctx->check_issued routine        
-        so we can override some of the tests if needed. 
+        ourself. We use this to set the ctx->check_issued routine
+        so we can override some of the tests if needed.
 
 Parameters:
-   
+
 Returns:
-        Same as X509_verify_cert 
+        Same as X509_verify_cert
 **********************************************************************/
 
 int
 proxy_app_verify_callback(X509_STORE_CTX *ctx, UNUSED(void *empty))
 {
-    /*
-     * OpenSSL-0.9.6 has a  check_issued routine which
-     * we want to override so we  can replace some of the checks.
-     */
 
+#if OPENSSL_VERSION_NUMBER < 0x10100000L
     ctx->check_issued = proxy_check_issued;
+#else
+    X509_STORE_set_check_issued(X509_STORE_CTX_get0_store(ctx), proxy_check_issued);
+#endif
+
+#if defined(X509_V_FLAG_ALLOW_PROXY_CERTS)
+    X509_STORE_CTX_set_flags(ctx, X509_V_FLAG_ALLOW_PROXY_CERTS);
+#endif
+
     return X509_verify_cert(ctx);
 }
 #endif
@@ -1595,18 +1622,17 @@ proxy_app_verify_callback(X509_STORE_CTX *ctx, UNUSED(void *empty))
  */
 
 #ifndef BUILD_FOR_K5CERT_ONLY
+
+
+
 /**********************************************************************
-Function: proxy_check_proxy_name()
+Function: proxy_verify_name
 
 Description:
-    Check if the subject name is a proxy, and the issuer name
-        is the same as the subject name, but without the proxy
-    entry. 
-        i.e. inforce the proxy signing requirement of 
-        only a user or a user's proxy can sign a proxy. 
-        Also pass back Rif this is a limited proxy. 
 
-Parameters:
+Checks if the subject name is a proxy, and the issuer name
+is the same as the subject name, but without the proxy
+entry.
 
 Returns:
         -1  if there was an error
@@ -1615,137 +1641,35 @@ Returns:
          2  if a limited proxy
 
 *********************************************************************/
+int proxy_verify_name(X509* cert){
 
-int proxy_check_proxy_name(
-    X509 *                              cert)
-{
-    int                                 ret = 0;
-    X509_NAME *                         subject;
-    X509_NAME *                         issuer_name = NULL;
-    X509_NAME_ENTRY *                   last_cn = NULL;
-    ASN1_STRING *                       data;
-    int nidv3, nidv4 = 0;
-    int indexv3 = -1, indexv4 = -1;
-    unsigned char found_proxy = 0,
-		found_limited_proxy = 0;
+  voms_cert_type_t cert_type;
 
-    nidv3 = my_txt2nid(PROXYCERTINFO_V3);
-    nidv4 = my_txt2nid(PROXYCERTINFO_V4);
+  if (voms_get_cert_type(cert, &cert_type))
+  {
+    // TODO: there was an error, proper error message
+    return -1;
+  }
 
-    if (nidv3 == 0 || nidv4 == 0)
-      ERR_clear_error();
+  if (!VOMS_IS_PROXY(cert_type))
+  {
+    return 0;
+  }
 
-    indexv3 = X509_get_ext_by_NID(cert, nidv3, -1);
-    indexv4 = X509_get_ext_by_NID(cert, nidv4, -1);
+  // If we reach this point, name checks on the proxy have
+  // succeeded, and this is actually a proxy, inform OpenSSL
+  // (is this still needed?)
+  cert->ex_flags |= EXFLAG_PROXY;
+  cert->ex_pcpathlen = -1;
 
-    if (indexv3 != -1 || indexv4 != -1) {
+  if (VOMS_IS_LIMITED_PROXY(cert_type))
+  {
+    cert->ex_pcpathlen = 0;
+    return 2;
 
-      /* Its a proxy! */
-      X509_EXTENSION *ext = X509_get_ext(cert, (indexv3 == -1 ? indexv4 : indexv3));
+  }
 
-      if (ext) {
-        myPROXYCERTINFO *certinfo = NULL;
-
-        certinfo = (myPROXYCERTINFO *)X509V3_EXT_d2i(ext);
-
-        if (certinfo) {
-          myPROXYPOLICY *policy = myPROXYCERTINFO_get_proxypolicy(certinfo);
-
-          if (policy) {
-/*             ASN1_OBJECT *policylang; */
-/*             policylang = myPROXYPOLICY_get_policy_language(policy); */
-
-            /* TO DO:  discover exact type of proxy. */
-
-          }
-          myPROXYCERTINFO_free(certinfo);
-        }
-#if OPENSSL_VERSION_NUMBER >= 0x00908010
-#ifdef EXFLAG_PROXY
-        cert->ex_flags |= EXFLAG_PROXY;
-#endif
-#endif
-        return 1;
-      }
-    }
-
-    subject = X509_get_subject_name(cert);
-    last_cn = X509_NAME_get_entry(subject, X509_NAME_entry_count(subject)-1);
-
-    /* If the last part of the subject name is a CN */
-    if (!OBJ_cmp(last_cn->object,OBJ_nid2obj(NID_commonName)))
-    {
-        data = X509_NAME_ENTRY_get_data(last_cn);
-
-	if (data->length == 5 && !strncmp(data->data, "proxy",5))
-	{
-		found_proxy = 1;
-		ret = 1;
-	}
-
-	if (data->length == 13 && !strncmp(data->data, "limited proxy",13))
-	{
-		found_limited_proxy = 1;
-		ret = 2;
-	}
-
-	if (found_proxy || found_limited_proxy)
-	{
-
-      	    /* 
-	     * We now check equality between this subject and
-	     * the issuer plus an additional CN=proxy.
-	     *
-	     */
-
-	    /* We dup the issuer name */
-            issuer_name = X509_NAME_dup(X509_get_issuer_name(cert));
-
-	    /* Create additional CN object */
-	    unsigned char *last_cn_entry;
-            
-            if (found_proxy) last_cn_entry = "proxy";
-            if (found_limited_proxy) last_cn_entry = "limited proxy";
-
-	    last_cn = X509_NAME_ENTRY_create_by_NID(NULL,
-                                                NID_commonName,
-                                                V_ASN1_APP_CHOOSE,
-                                                last_cn_entry,
-                                                -1);
-            /* Add last CN to issuer name */
-            X509_NAME_add_entry(issuer_name,
-                                last_cn,
-                                X509_NAME_entry_count(issuer_name),
-				0);
-            
-            /* Check equality between subject and the just built issuer */
-
-            if (X509_NAME_cmp_no_set(issuer_name, subject))
-            {
-                /* Reject certificate */
-                ret=-1;
-            }
-
-
-            /* Cleanup */
-            X509_NAME_ENTRY_free(last_cn);
-            X509_NAME_free(issuer_name);
-            last_cn = NULL;
-        }
-    }
-
-#if OPENSSL_VERSION_NUMBER >= 0x00908010
-#ifdef EXFLAG_PROXY
-    if (ret > 0) {
-      cert->ex_flags |= EXFLAG_PROXY;
-      if (ret == 1)
-        cert->ex_pcpathlen = -1; /* unlimited */
-      else if (ret == 2)
-        cert->ex_pcpathlen = 0; /* Only at top level if limited */
-    }
-#endif
-#endif
-    return ret;
+  return 1;
 }
 
 #if SSLEAY_VERSION_NUMBER >=  0x0090600fL
@@ -1754,7 +1678,7 @@ int proxy_check_proxy_name(
 
 Description:
         Replace the OpenSSL check_issued in x509_vfy.c with our own,
-        so we can override the key usage checks if its a proxy. 
+        so we can override the key usage checks if its a proxy.
         We are only looking for X509_V_ERR_KEYUSAGE_NO_CERTSIGN
 
 Parameters:r
@@ -1773,7 +1697,7 @@ proxy_check_issued(
 {
     int                                 ret;
     int                                 ret_code = 1;
-        
+
     ret = X509_check_issued(issuer, x);
     if (ret != X509_V_OK)
     {
@@ -1781,12 +1705,12 @@ proxy_check_issued(
         switch (ret)
         {
         case X509_V_ERR_AKID_SKID_MISMATCH:
-            /* 
+            /*
              * If the proxy was created with a previous version of Globus
              * where the extensions where copied from the user certificate
              * This error could arise, as the akid will be the wrong key
              * So if its a proxy, we will ignore this error.
-             * We should remove this in 12/2001 
+             * We should remove this in 12/2001
              * At which time we may want to add the akid extension to the proxy.
              */
 
@@ -1795,9 +1719,9 @@ proxy_check_issued(
              * If this is a proxy certificate then the issuer
              * does not need to have the key_usage set.
              * So check if its a proxy, and ignore
-             * the error if so. 
+             * the error if so.
              */
-            if (proxy_check_proxy_name(x) >= 1)
+            if (proxy_verify_name(x) >= 1)
             {
                 ret_code = 1;
             }
@@ -1815,25 +1739,25 @@ Function: proxy_verify_callback()
 
 Description:
         verify callback for SSL. Used to check that proxy
-        certificates are only signed by the correct user, 
+        certificates are only signed by the correct user,
         and used for debuging.
-        
+
         Also on the server side, the s3_srvr.c code does not appear
-        to save the peer cert_chain, like the client side does. 
-        We need these for additional proxies, so we need to 
-        copy the X509 to our own stack. 
+        to save the peer cert_chain, like the client side does.
+        We need these for additional proxies, so we need to
+        copy the X509 to our own stack.
 
 Parameters:
         ok  1 then we are given one last chance to check
                 this certificate.
                 0 then this certificate has failed, and ctx->error has the
-                reason. We may want to override the failure. 
-        ctx the X509_STORE_CTX which has as a user arg, our 
-                proxy verify desc. 
-   
+                reason. We may want to override the failure.
+        ctx the X509_STORE_CTX which has as a user arg, our
+                proxy verify desc.
+
 Returns:
         1 - Passed the tests
-        0 - failed.  The x509_vfy.c will return a failed to caller. 
+        0 - failed.  The x509_vfy.c will return a failed to caller.
 **********************************************************************/
 
 int
@@ -1862,11 +1786,11 @@ proxy_verify_callback(
     /*
      * If we are being called recursivly to check delegate
      * cert chains, or being called by the grid-proxy-init,
-     * a pointer to a proxy_verify_desc will be 
+     * a pointer to a proxy_verify_desc will be
      * pased in the store.  If we are being called by SSL,
      * by a roundabout process, the app_data of the ctx points at
      * the SSL. We have saved a pointer to the  context handle
-     * in the SSL, and its magic number should be PVD_MAGIC_NUMBER 
+     * in the SSL, and its magic number should be PVD_MAGIC_NUMBER
      */
     if (!(pvd = (proxy_verify_desc *)
          X509_STORE_CTX_get_ex_data(ctx,
@@ -1879,8 +1803,8 @@ proxy_verify_callback(
     }
 
     /*
-     * For now we hardcode the ex_data. We could look at all 
-     * ex_data to find ours. 
+     * For now we hardcode the ex_data. We could look at all
+     * ex_data to find ours.
      * Double check that we are indeed pointing at the context
      * handle. If not, we have an internal error, SSL may have changed
      * how the callback and app_data are handled
@@ -1895,9 +1819,9 @@ proxy_verify_callback(
 
     /*
      * We now check for some error conditions which
-     * can be disregarded. 
+     * can be disregarded.
      */
-        
+
     if (!ok)
     {
         switch (ctx->error)
@@ -1919,10 +1843,10 @@ proxy_verify_callback(
 #if OPENSSL_VERSION_NUMBER >= 0x10000000L
         case X509_V_ERR_UNABLE_TO_VERIFY_LEAF_SIGNATURE:
           /*
-           * OpenSSL 1.0 causes the cert to be added twice to 
+           * OpenSSL 1.0 causes the cert to be added twice to
            * the store.
            */
-          if (proxy_check_proxy_name(ctx->cert) && 
+          if (proxy_verify_name(ctx->cert) > 0 &&
               !X509_cmp(ctx->cert, ctx->current_cert))
             ok = 1;
           break;
@@ -1933,7 +1857,7 @@ proxy_verify_callback(
           /*
            * This may happen since proxy issuers are not CAs
            */
-          if (proxy_check_proxy_name(ctx->cert) >= 1) {
+          if (proxy_verify_name(ctx->cert) > 0) {
             if (proxy_check_issued(ctx, ctx->cert, ctx->current_cert)) {
               ok = 1;
             }
@@ -1941,7 +1865,7 @@ proxy_verify_callback(
           break;
 
         case X509_V_ERR_UNHANDLED_CRITICAL_EXTENSION:
-          if (proxy_check_proxy_name(ctx->cert) >= 1) {
+          if (proxy_verify_name(ctx->cert) > 0) {
             if (check_critical_extensions(ctx->cert, 1))
               /* Allows proxy specific extensions on proxies. */
               ok = 1;
@@ -1950,7 +1874,7 @@ proxy_verify_callback(
 
         case X509_V_ERR_UNABLE_TO_GET_ISSUER_CERT_LOCALLY:
         case X509_V_ERR_CERT_UNTRUSTED:
-          if (proxy_check_proxy_name(ctx->current_cert) > 0) {
+          if (proxy_verify_name(ctx->current_cert) > 0) {
             /* Server side, needed to fully recognize a proxy. */
             ok = 1;
           }
@@ -1965,7 +1889,7 @@ proxy_verify_callback(
 
         default:
             break;
-        }                       
+        }
         /* if already failed, skip the rest, but add error messages */
         if (!ok)
         {
@@ -1976,12 +1900,12 @@ proxy_verify_callback(
             }
             else if (ctx->error==X509_V_ERR_UNABLE_TO_GET_ISSUER_CERT_LOCALLY)
             {
-                PRXYerr(PRXYERR_F_VERIFY_CB,PRXYERR_R_LOCAL_CA_UNKNOWN); 
+                PRXYerr(PRXYERR_F_VERIFY_CB,PRXYERR_R_LOCAL_CA_UNKNOWN);
                 ERR_set_continue_needed();
             }
             else if (ctx->error==X509_V_ERR_CERT_HAS_EXPIRED)
             {
-                PRXYerr(PRXYERR_F_VERIFY_CB, PRXYERR_R_REMOTE_CRED_EXPIRED); 
+                PRXYerr(PRXYERR_F_VERIFY_CB, PRXYERR_R_REMOTE_CRED_EXPIRED);
                 ERR_set_continue_needed();
             }
 
@@ -1991,27 +1915,27 @@ proxy_verify_callback(
         return(ok);
     }
 
-    /* Note: OpenSSL will try to verify the client's chain on the client side 
-       before sending it abroad.  However, to properly verify proxy conditions, 
+    /* Note: OpenSSL will try to verify the client's chain on the client side
+       before sending it abroad.  However, to properly verify proxy conditions,
        we need access to pvd, which is not passed.  For this reason, in this
        scenario we assume that if the checks above passed, everything is ok. If
-       it is not, it will be discovered during server-side validation of the cert. 
+       it is not, it will be discovered during server-side validation of the cert.
     */
     if (!pvd)
       return ok;
 
-    /* 
-     * All of the OpenSSL tests have passed and we now get to 
-     * look at the certificate to verify the proxy rules, 
+    /*
+     * All of the OpenSSL tests have passed and we now get to
+     * look at the certificate to verify the proxy rules,
      * and ca-signing-policy rules. We will also do a CRL check
      */
 
     /*
      * Test if the name ends in CN=proxy and if the issuer
-     * name matches the subject without the final proxy. 
+     * name matches the subject without the final proxy.
      */
-        
-    ret = proxy_check_proxy_name(ctx->current_cert);
+
+    ret = proxy_verify_name(ctx->current_cert);
     if (ret < 0)
     {
         PRXYerr(PRXYERR_F_VERIFY_CB,PRXYERR_R_BAD_PROXY_ISSUER);
@@ -2024,19 +1948,19 @@ proxy_verify_callback(
         if (ret == 2)
         {
             /*
-             * If its a limited proxy, it means it use has been limited 
-             * during delegation. It can not sign other certs i.e.  
-             * it must be the top cert in the chain. 
-             * Depending on who we are, 
-             * We may want to accept this for authentication. 
-             * 
+             * If its a limited proxy, it means it use has been limited
+             * during delegation. It can not sign other certs i.e.
+             * it must be the top cert in the chain.
+             * Depending on who we are,
+             * We may want to accept this for authentication.
+             *
              *   Globus gatekeeper -- don't accept
              *   sslk5d accept, but should check if from local site.
-             *   globus user-to-user Yes, thats the purpose 
-             *    of this cert. 
+             *   globus user-to-user Yes, thats the purpose
+             *    of this cert.
              *
              * We will set the limited_proxy flag, to show we found
-             * one. A Caller can then reject. 
+             * one. A Caller can then reject.
              */
 
           pvd->limited_proxy = 1; /* its a limited proxy */
@@ -2058,29 +1982,29 @@ proxy_verify_callback(
 
     if (!itsaproxy)
     {
-                        
+
 #ifdef X509_V_ERR_CERT_REVOKED
         int n = 0;
-        /* 
-         * SSLeay 0.9.0 handles CRLs but does not check them. 
+        /*
+         * SSLeay 0.9.0 handles CRLs but does not check them.
          * We will check the crl for this cert, if there
-         * is a CRL in the store. 
-         * If we find the crl is not valid, we will fail, 
-         * as once the sysadmin indicates that CRLs are to 
-         * be checked, he best keep it upto date. 
-         * 
+         * is a CRL in the store.
+         * If we find the crl is not valid, we will fail,
+         * as once the sysadmin indicates that CRLs are to
+         * be checked, he best keep it upto date.
+         *
          * When future versions of SSLeay support this better,
-         * we can remove these tests. 
+         * we can remove these tests.
          * we come through this code for each certificate,
          * starting with the CA's We will check for a CRL
          * each time, but only check the signature if the
          * subject name matches, and check for revoked
          * if the issuer name matches.
-         * this allows the CA to revoke its own cert as well. 
+         * this allows the CA to revoke its own cert as well.
          */
-        
+
         if (X509_STORE_get_by_subject(ctx,
-                                      X509_LU_CRL, 
+                                      X509_LU_CRL,
                                       X509_get_subject_name(ctx->current_issuer),
                                       &obj))
         {
@@ -2104,11 +2028,11 @@ proxy_verify_callback(
             if (i == 0)
             {
                 PRXYerr(PRXYERR_F_VERIFY_CB,PRXYERR_R_CRL_NEXT_UPDATE_FIELD);
-                ERR_set_continue_needed();                
+                ERR_set_continue_needed();
                 ctx->error = X509_V_ERR_ERROR_IN_CRL_NEXT_UPDATE_FIELD;
                 goto fail_verify;
             }
-           
+
 
             if (i < 0)
             {
@@ -2138,7 +2062,7 @@ proxy_verify_callback(
                     sprintf(buf,"%ld (0x%lX)",serial,serial);
                     s = X509_NAME_oneline(X509_get_subject_name(
                                               ctx->current_cert),NULL,0);
-                    
+
                     ERR_add_error_data(4,"Serial number = ",buf,
                                        " Subject=",s);
 
@@ -2169,7 +2093,7 @@ proxy_verify_callback(
                 read_pathrestriction(ctx->chain, cert_dir, &namespaces, &signings);
 
                 result = restriction_evaluate(ctx->chain, namespaces, signings);
-                
+
                 voms_free_policies(namespaces);
                 voms_free_policies(signings);
 
@@ -2177,15 +2101,15 @@ proxy_verify_callback(
                 {
                     PRXYerr(PRXYERR_F_VERIFY_CB, PRXYERR_R_CA_POLICY_VIOLATION);
 
-                    ctx->error = X509_V_ERR_INVALID_PURPOSE; 
-                                
+                    ctx->error = X509_V_ERR_INVALID_PURPOSE;
+
                     if (error_string != NULL)
                     {
                         /*
                          * Seperate error message returned from policy check
                          * from above error message with colon
                          */
-                        
+
                         ERR_add_error_data(2, ": ", error_string);
                         free(error_string);
                     }
@@ -2214,10 +2138,10 @@ proxy_verify_callback(
     {
         pvd->pvxd->goodtill = goodtill;
     }
-        
-    /* We need to make up a cert_chain if we are the server. 
-     * The ssl code does not save this as I would expect. 
-     * This is used to create a new proxy by delegation. 
+
+    /* We need to make up a cert_chain if we are the server.
+     * The ssl code does not save this as I would expect.
+     * This is used to create a new proxy by delegation.
      */
 
     pvd->cert_depth++;
@@ -2235,12 +2159,12 @@ proxy_verify_callback(
 
     /*
      * We ignored any path length restrictions above because
-     * OpenSSL was counting proxies against the limit. 
-     * If we are on the last cert in the chain, we 
-     * know how many are proxies, so we can do the 
-     * path length check now. 
+     * OpenSSL was counting proxies against the limit.
+     * If we are on the last cert in the chain, we
+     * know how many are proxies, so we can do the
+     * path length check now.
      * See x509_vfy.c check_chain_purpose
-     * all we do is substract off the proxy_dpeth 
+     * all we do is substract off the proxy_dpeth
      */
 
     if(ctx->current_cert == ctx->cert)
@@ -2250,7 +2174,7 @@ proxy_verify_callback(
             cert = sk_X509_value(ctx->chain,i);
             if (((i - pvd->proxy_depth) > 1) && (cert->ex_pathlen != -1)
                 && ((i - pvd->proxy_depth) > (cert->ex_pathlen + 1))
-                && (cert->ex_flags & EXFLAG_BCONS)) 
+                && (cert->ex_flags & EXFLAG_BCONS))
             {
                 ctx->current_cert = cert; /* point at failing cert */
                 ctx->error = X509_V_ERR_PATH_LENGTH_EXCEEDED;
@@ -2262,66 +2186,65 @@ proxy_verify_callback(
     EVP_PKEY_free(key);
 
     if (objset)
+    {
       X509_OBJECT_free_contents(&obj);
+    }
 
     return(ok);
 
 fail_verify:
 
     if (key)
+    {
       EVP_PKEY_free(key);
+    }
 
     if (objset)
+    {
       X509_OBJECT_free_contents(&obj);
+    }
 
     if (ctx->current_cert)
     {
         char *subject_s = NULL;
         char *issuer_s = NULL;
-                
+
         subject_s = X509_NAME_oneline(
             X509_get_subject_name(ctx->current_cert),NULL,0);
         issuer_s = X509_NAME_oneline(
             X509_get_issuer_name(ctx->current_cert),NULL,0);
-        
+
+        char *openssl_error_str = X509_verify_cert_error_string(ctx->error);
+
         switch (ctx->error)
         {
             case X509_V_OK:
             case X509_V_ERR_INVALID_PURPOSE:
             case X509_V_ERR_APPLICATION_VERIFICATION:
-                 PRXYerr(PRXYERR_F_VERIFY_CB,PRXYERR_R_CB_ERROR_MSG);
-                 ERR_add_error_data(6, 
-                    "\n        File=", 
+                 
+              ERR_add_error_data(9,
+                    ": ",
+                    openssl_error_str ? openssl_error_str : "",
+                    " [file=",
                     ca_policy_file_path ? ca_policy_file_path : "UNKNOWN",
-                    "\n        subject=",
+                    ",subject=",
                     subject_s ? subject_s : "UNKNOWN",
-                    "\n        issuer =",
-                    issuer_s ? issuer_s : "UNKNOWN");
+                    ",issuer =",
+                    issuer_s ? issuer_s : "UNKNOWN",
+                    "]");
             break;
-            case X509_V_ERR_CERT_NOT_YET_VALID:
-            case X509_V_ERR_UNABLE_TO_GET_ISSUER_CERT_LOCALLY:
-            case X509_V_ERR_CERT_HAS_EXPIRED:
-                 PRXYerr(PRXYERR_F_VERIFY_CB,PRXYERR_R_CB_ERROR_MSG);
-                 ERR_add_error_data(4, 
-                    "\n        subject=",
-                    subject_s ? subject_s : "UNKNOWN",
-                    "\n        issuer =",
-                    issuer_s ? issuer_s : "UNKNOWN");
-            break;
-            case X509_V_ERR_SELF_SIGNED_CERT_IN_CHAIN:
-                 PRXYerr(PRXYERR_F_VERIFY_CB,PRXYERR_R_CA_UNKNOWN);
-                    ERR_add_error_data(2, "\n        issuer =",
-                    issuer_s ? issuer_s : "UNKNOWN");
-            break;
-
             default:
                 PRXYerr(PRXYERR_F_VERIFY_CB,PRXYERR_R_CB_CALLED_WITH_ERROR);
-                ERR_add_error_data(6,"\n        error =",
-                    X509_verify_cert_error_string(ctx->error),
-                    "\n        subject=",
+                char *openssl_error_str = X509_verify_cert_error_string(ctx->error);
+
+                ERR_add_error_data(7,
+                    ": ",
+                    openssl_error_str ? openssl_error_str : "",
+                    " [subject=",
                     subject_s ? subject_s : "UNKNOWN",
-                    "\n        issuer =",
-                    issuer_s ? issuer_s : "UNKNOWN");
+                    ",issuer=",
+                    issuer_s ? issuer_s : "UNKNOWN",
+                    "]");
         }
 
         free(subject_s);
@@ -2412,11 +2335,11 @@ proxy_verify_cert_chain(
         {
             goto err;
         }
-    } 
+    }
     retval = 1;
 
 err:
-    if (cscinitialized) 
+    if (cscinitialized)
       X509_STORE_CTX_cleanup(&csc);
     if (cert_store)
       X509_STORE_free(cert_store);
@@ -2429,35 +2352,35 @@ err:
 Function: proxy_get_filenames()
 
 Description:
-    Gets the filenames for the various files used 
+    Gets the filenames for the various files used
     to store the cert, key, cert_dir and proxy.
-    
-    
+
+
     Environment variables to use:
         X509_CERT_DIR   Directory of trusted certificates
                         File names are hash values, see the SSLeay
-                        c_hash script. 
+                        c_hash script.
         X509_CERT_FILE  File of trusted certifiates
         X509_USER_PROXY File with a proxy certificate, key, and
                         additional certificates to makeup a chain
-                        of certificates used to sign the proxy. 
+                        of certificates used to sign the proxy.
         X509_USER_CERT  User long term certificate.
-        X509_USER_KEY   private key for the long term certificate. 
+        X509_USER_KEY   private key for the long term certificate.
 
-    All of these are assumed to be in PEM form. If there is a 
-    X509_USER_PROXY, it will be searched first for the cert and key. 
+    All of these are assumed to be in PEM form. If there is a
+    X509_USER_PROXY, it will be searched first for the cert and key.
     If not defined, but a file /tmp/x509up_u<uid> is
     present, it will be used, otherwise the X509_USER_CERT
     and X509_USER_KEY will be used to find the certificate
     and key. If X509_USER_KEY is not defined, it will be assumed
     that the key is is the same file as the certificate.
- 
-    If windows, look in the registry HKEY_CURRENT_USER for the 
+
+    If windows, look in the registry HKEY_CURRENT_USER for the
     GSI_REGISTRY_DIR, then look for the x509_user_cert, etc.
 
     Then try $HOME/.globus/usercert.pem
-    and $HOME/.globus/userkey.pem 
-        Unless it is being run as root, then look for 
+    and $HOME/.globus/userkey.pem
+        Unless it is being run as root, then look for
         /etc/grid-security/hostcert.pem and /etc/grid-security/hostkey.pem
 
     X509_CERT_DIR and X509_CERT_FILE can point to world readable
@@ -2482,15 +2405,15 @@ Description:
     Indirectly by gss_acquire_creds. For grid-proxy-init and wgpi, the proxy_in
     is 0, for acquire_creds its 1. This is used to signal how the proxy file is
     to be used, 1 for input 0 for output.
-        
+
     The logic for output is to use the provided input parameter, registry,
     environment, or default name for the proxy. Wgpi calls this multiple times
     as the options window is updated. The file will be created if needed.
-        
+
     The logic for input is to use the provided input parameter, registry,
     environment variable. But only use the default file if it exists, is owned
     by the user, and has something in it. But not when run as root.
-        
+
     Then on input if there is a proxy, the user_cert and user_key are set to
     use the proxy.
 
@@ -2503,7 +2426,7 @@ Description:
     under Windows 95.
 
     This will allow the cert to have the same form, with the same label as well
-    in the future.  
+    in the future.
 
 
 
@@ -2548,7 +2471,7 @@ proxy_get_filenames(
 #ifdef WIN32
     RegOpenKey(HKEY_CURRENT_USER,GSI_REGISTRY_DIR,&hkDir);
 #endif
-    
+
     /* setup some default values */
     if (p_cert_dir)
     {
@@ -2575,7 +2498,7 @@ proxy_get_filenames(
     {
         cert_file = *p_cert_file;
     }
-    
+
     if (!cert_file)
     {
         cert_file = (char *)getenv(X509_CERT_FILE);
@@ -2591,7 +2514,7 @@ proxy_get_filenames(
         }
     }
 #endif
-        
+
     if (cert_dir == NULL)
     {
 
@@ -2607,7 +2530,7 @@ proxy_get_filenames(
         }
 #endif /* WIN32 */
 
-        if (home) 
+        if (home)
         {
             default_cert_dir = snprintf_wrap("%s%s%s",
                     home, FILE_SEPERATOR, X509_DEFAULT_CERT_DIR);
@@ -2624,9 +2547,9 @@ proxy_get_filenames(
                 cert_dir = default_cert_dir;
             }
         }
-                
 
-        /* 
+
+        /*
          * Now check for host based default directory
          */
         if (!cert_dir)
@@ -2652,7 +2575,7 @@ proxy_get_filenames(
             globus_location = getenv("GLOBUS_DEPLOY_PATH");
 
             if (!globus_location)
-            {               
+            {
                 globus_location = getenv("GLOBUS_LOCATION");
             }
 
@@ -2699,7 +2622,7 @@ proxy_get_filenames(
     {
         if (checkstat(cert_dir)  == 1)
         {
-            PRXYerr(PRXYERR_F_INIT_CRED,PRXYERR_R_PROCESS_CERTS); 
+            PRXYerr(PRXYERR_F_INIT_CRED,PRXYERR_R_PROCESS_CERTS);
             ERR_add_error_data(2,"x509_cert_dir=",cert_dir);
             goto err;
         }
@@ -2709,15 +2632,15 @@ proxy_get_filenames(
     {
         if (checkstat(cert_file)  == 1)
         {
-            PRXYerr(PRXYERR_F_INIT_CRED,PRXYERR_R_PROCESS_CERTS); 
+            PRXYerr(PRXYERR_F_INIT_CRED,PRXYERR_R_PROCESS_CERTS);
             ERR_add_error_data(2,"x509_cert_file=",cert_file);
             goto err;
         }
     }
     /* if X509_USER_PROXY is defined, use it for cert and key,
-     * and for additional certs. 
-     * if not, and the default user_proxy file is present, 
-     * use it. 
+     * and for additional certs.
+     * if not, and the default user_proxy file is present,
+     * use it.
      * If not, get the X509_USER_CERT and X509_USER_KEY
      * if not, use ~/.globus/usercert.pem ~/.globus/userkey.pem
      */
@@ -2725,7 +2648,7 @@ proxy_get_filenames(
     {
         user_proxy = *p_user_proxy;
     }
-    
+
     if (!user_proxy)
     {
         user_proxy = (char *)getenv(X509_USER_PROXY);
@@ -2757,7 +2680,7 @@ proxy_get_filenames(
 
 #ifndef WIN32
         if ((!proxy_in || getuid() != 0)
-            && checkstat(default_user_proxy) == 0) 
+            && checkstat(default_user_proxy) == 0)
 #endif
         {
             user_proxy = default_user_proxy;
@@ -2844,7 +2767,7 @@ proxy_get_filenames(
                     user_key = X509_DEFAULT_HOST_KEY;
                 }
             }
-            else 
+            else
 #endif
             {
                 if (!home)
@@ -2860,7 +2783,7 @@ proxy_get_filenames(
                     home = "c:\\";
 #endif
                 }
-                
+
                 default_user_cert = snprintf_wrap("%s%s%s",
                         home, FILE_SEPERATOR, X509_DEFAULT_USER_CERT);
 
@@ -2868,11 +2791,11 @@ proxy_get_filenames(
                 {
                     PRXYerr(PRXYERR_F_INIT_CRED, PRXYERR_R_OUT_OF_MEMORY);
                     goto err;
-                } 
+                }
 
                 default_user_key = snprintf_wrap("%s%s%s",
                         home,FILE_SEPERATOR, X509_DEFAULT_USER_KEY);
-                                                
+
                 if (!default_user_key)
                 {
                     PRXYerr(PRXYERR_F_INIT_CRED, PRXYERR_R_OUT_OF_MEMORY);
@@ -2893,7 +2816,7 @@ proxy_get_filenames(
 
                     free(default_user_cert);
                     free(default_user_key);
-                    
+
 
                     certname = getenv("X509_USER_CRED");
 
@@ -2904,7 +2827,7 @@ proxy_get_filenames(
                       if (!default_user_cert) {
                         PRXYerr(PRXYERR_F_INIT_CRED, PRXYERR_R_OUT_OF_MEMORY);
                         goto err;
-                      } 
+                      }
 
                       if (checkstat(default_user_cert) != 0) {
                         free(default_user_cert);
@@ -2915,7 +2838,7 @@ proxy_get_filenames(
                       if (!default_user_cert) {
                         PRXYerr(PRXYERR_F_INIT_CRED, PRXYERR_R_OUT_OF_MEMORY);
                         goto err;
-                      } 
+                      }
 
                     }
                     else
@@ -2927,7 +2850,7 @@ proxy_get_filenames(
                       PRXYerr(PRXYERR_F_INIT_CRED, PRXYERR_R_OUT_OF_MEMORY);
                       goto err;
                     }
-                                                
+
                     user_cert = default_user_cert;
                     user_key = default_user_key;
                   }
@@ -2935,7 +2858,7 @@ proxy_get_filenames(
             }
         }
     }
- 
+
     status = 0;
 err:
     if (!status) {
@@ -2976,15 +2899,15 @@ err:
 Function: proxy_load_user_cert()
 
 Description:
-    loads the users cert. May need a pw callback for Smartcard PIN. 
-    May use a smartcard too.   
+    loads the users cert. May need a pw callback for Smartcard PIN.
+    May use a smartcard too.
 
 Parameters:
 
 Returns:
 **********************************************************************/
 
-static int cert_load_pkcs12(BIO *bio, int (*pw_cb)(), X509 **cert, EVP_PKEY **key, STACK_OF(X509) **chain) 
+static int cert_load_pkcs12(BIO *bio, int (*pw_cb)(), X509 **cert, EVP_PKEY **key, STACK_OF(X509) **chain)
 {
   PKCS12 *p12 = NULL;
   char *password = NULL;
@@ -3001,7 +2924,7 @@ static int cert_load_pkcs12(BIO *bio, int (*pw_cb)(), X509 **cert, EVP_PKEY **ke
 
     if (pw_cb)
       sz = pw_cb(buffer, 1024, 0);
-    else 
+    else
       if (EVP_read_pw_string(buffer, 1024, EVP_get_pw_prompt(), 0) != -1)
         sz = strlen(buffer);
 
@@ -3040,8 +2963,8 @@ int PRIVATE proxy_load_user_cert_and_key_pkcs12(const char *user_cert,
     if (ERR_peek_error() == ERR_PACK(ERR_LIB_PEM,PEM_F_PEM_READ_BIO,PEM_R_NO_START_LINE)) {
       ERR_clear_error();
       PRXYerr(PRXYERR_F_INIT_CRED,PRXYERR_R_INVALID_CERT);
-    } 
-    else { 
+    }
+    else {
       PRXYerr(PRXYERR_F_INIT_CRED,PRXYERR_R_PROCESS_CERT);
     }
     ERR_add_error_data(2, "\n        File=", user_cert);
@@ -3066,9 +2989,9 @@ proxy_load_user_cert(
     {
       PRXYerr(PRXYERR_F_INIT_CRED,PRXYERR_R_PROBLEM_USER_NOCERT_FILE);
       status = PRXYERR_R_PROBLEM_USER_NOCERT_FILE;
-        
+
       ERR_add_error_data(1, "\n        No certificate file found");
-      goto err;   
+      goto err;
     }
 
     if (!strncmp(user_cert,"SC:",3))
@@ -3128,7 +3051,7 @@ proxy_load_user_cert(
         /*
          * DEE? need to add a random number routine here, to use
          * the random number generator on the card
-         */ 
+         */
 
 #endif /* USE_PKCS11 */
     }
@@ -3137,7 +3060,7 @@ proxy_load_user_cert(
       if((fp = fopen(user_cert,"rb")) == NULL) {
         PRXYerr(PRXYERR_F_INIT_CRED,PRXYERR_R_PROBLEM_USER_NOCERT_FILE);
         status = PRXYERR_R_PROBLEM_USER_NOCERT_FILE;
-                    
+
         ERR_add_error_data(2, "\n        Cert File=", user_cert);
         goto err;
       }
@@ -3149,8 +3072,8 @@ proxy_load_user_cert(
           ERR_clear_error();
           PRXYerr(PRXYERR_F_INIT_CRED,PRXYERR_R_INVALID_CERT);
           status = PRXYERR_R_INVALID_CERT;
-        } 
-        else { 
+        }
+        else {
           PRXYerr(PRXYERR_F_INIT_CRED,PRXYERR_R_PROCESS_CERT);
           status = PRXYERR_R_PROCESS_CERT;
         }
@@ -3173,8 +3096,8 @@ Function: proxy_load_user_key()
 
 Description:
     loads the users key. Assumes the cert has been loaded,
-    and checks they match. 
-    May use a smartcard too.   
+    and checks they match.
+    May use a smartcard too.
 
 Parameters:
 
@@ -3211,12 +3134,12 @@ proxy_load_user_key(
     {
       PRXYerr(PRXYERR_F_INIT_CRED,PRXYERR_R_PROBLEM_USER_NOKEY_FILE);
       status = PRXYERR_R_PROBLEM_USER_NOKEY_FILE;
-      
+
       ERR_add_error_data(1,"\n        No key file found");
-      goto err;   
+      goto err;
     }
 
-            
+
     if (!strncmp(user_key,"SC:",3))
     {
 #ifdef USE_PKCS11
@@ -3266,11 +3189,11 @@ proxy_load_user_key(
             "\n       Smartcard support not compiled with this program");
         status = PRXYERR_R_PROCESS_KEY;
         goto err;
-        
+
         /*
          * DEE? could add a random number routine here, to use
          * the random number generator on the card
-         */ 
+         */
 
 #endif /* USE_PKCS11 */
     }
@@ -3281,7 +3204,7 @@ proxy_load_user_key(
       if ((fp = fopen(user_key,"rb")) == NULL) {
         PRXYerr(PRXYERR_F_INIT_CRED,PRXYERR_R_PROBLEM_USER_NOKEY_FILE);
         status = PRXYERR_R_PROBLEM_USER_NOKEY_FILE;
-        
+
         ERR_add_error_data(2, "\n        File=",user_key);
         goto err;
       }
@@ -3322,7 +3245,7 @@ proxy_load_user_key(
                                 PEM_R_PROBLEMS_GETTING_PASSWORD))
 #endif
             {
-              ERR_clear_error(); 
+              ERR_clear_error();
             }
 #ifdef EVP_F_EVP_DECRYPTFINAL_EX
           else if (error == ERR_PACK(ERR_LIB_EVP,
@@ -3345,13 +3268,13 @@ proxy_load_user_key(
           }
         goto err;
       }
-      fclose(fp);  
+      fclose(fp);
     }
 
-    /* 
+    /*
      * check that the private key matches the certificate
      * Dont want a mixup of keys and certs
-     * Will only check rsa type for now. 
+     * Will only check rsa type for now.
      */
     if (ucert)
     {
@@ -3359,7 +3282,7 @@ proxy_load_user_key(
         ucertpkey =  X509_PUBKEY_get(key);
         int mismatch = 0;
 
-        if (ucertpkey!= NULL  && ucertpkey->type == 
+        if (ucertpkey!= NULL  && ucertpkey->type ==
             (*private_key)->type)
         {
             if (ucertpkey->type == EVP_PKEY_RSA)
@@ -3380,7 +3303,7 @@ proxy_load_user_key(
                                  BN_num_bytes(ucertpkey->pkey.rsa->q));
                     }
                 }
-                if ((ucertpkey->pkey.rsa != NULL) && 
+                if ((ucertpkey->pkey.rsa != NULL) &&
                     (ucertpkey->pkey.rsa->n != NULL) &&
                     ((*private_key)->pkey.rsa != NULL) )
                 {
@@ -3407,7 +3330,7 @@ proxy_load_user_key(
         {
             mismatch=1;
         }
-        
+
         EVP_PKEY_free(ucertpkey);
 
         if (mismatch)
@@ -3430,15 +3353,15 @@ err:
 Function: ASN1_UTCTIME_mktime()
 
 Description:
- SSLeay only has compare functions to the current 
+ SSLeay only has compare functions to the current
  So we define a convert to time_t from which we can do differences
  Much of this it taken from the X509_cmp_current_time()
- routine. 
+ routine.
 
 Parameters:
 
 Returns:
-        time_t 
+        time_t
 **********************************************************************/
 
 time_t PRIVATE ASN1_TIME_mktime(ASN1_TIME *ctm)
@@ -3563,11 +3486,11 @@ ASN1_UTCTIME_mktime(
 Function: proxy_extension_class_add_create()
 
 Description:
-            create a X509_EXTENSION for the class_add info. 
-        
+            create a X509_EXTENSION for the class_add info.
+
 Parameters:
                 A buffer and length. The date is added as
-                ANS1_OCTET_STRING to an extension with the 
+                ANS1_OCTET_STRING to an extension with the
                 class_add  OID.
 
 Returns:
@@ -3600,7 +3523,7 @@ proxy_extension_class_add_create(
     class_add_oct->data = buffer;
     class_add_oct->length = length;
 
-    if (!(ex = X509_EXTENSION_create_by_OBJ(NULL, class_add_obj, 
+    if (!(ex = X509_EXTENSION_create_by_OBJ(NULL, class_add_obj,
                                             crit, class_add_oct)))
     {
         PRXYerr(PRXYERR_F_PROXY_SIGN,PRXYERR_R_CLASS_ADD_EXT);
@@ -3615,7 +3538,7 @@ err:
     {
         ASN1_OCTET_STRING_free(class_add_oct);
     }
-    
+
     if (class_add_obj)
     {
         ASN1_OBJECT_free(class_add_obj);
@@ -3633,7 +3556,7 @@ int PRIVATE determine_filenames(char **cacert, char **certdir, char **outfile,
   if (noregen) {
     int modify = 0;
 
-    if (*certfile == NULL && *keyfile == NULL) 
+    if (*certfile == NULL && *keyfile == NULL)
       modify = 1;
 
     if (proxy_get_filenames(0, NULL, NULL, &oldoutfile, certfile, keyfile))
@@ -3695,12 +3618,12 @@ int load_credentials(const char *certname, const char *keyname,
       if (proxy_load_user_proxy(chain, certname) < 0)
         goto err;
       *stack = chain;
-    } 
+    }
   }
   else {
     if (!proxy_load_user_cert_and_key_pkcs12(certname, cert, stack, key, callback))
       goto err;
-  }    
+  }
 
   return 1;
 
@@ -3718,7 +3641,7 @@ err:
   return 0;
 }
 
-int PRIVATE load_certificate_from_file(FILE *file, X509 **cert, 
+int PRIVATE load_certificate_from_file(FILE *file, X509 **cert,
                                        STACK_OF(X509) **stack)
 {
   BIO *in = NULL;
@@ -3890,7 +3813,7 @@ static X509_NAME *make_DN(const char *dnstring)
           *currentname++ = *dnstring++;
       }
       /* now, if *dnstring == '\0' then error; */
-   
+
       if (*dnstring == '\0')
         goto err;
       /* else, we got a type, now look for a value. */

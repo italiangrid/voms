@@ -785,8 +785,16 @@ void VOMSServer::Run()
 
           if (!sock.AcceptGSIAuthentication()){
 
-            LOGM(VARP, logh, LEV_INFO, T_PRE, "Failed to authenticate peer.");
-            LOGM(VARP, logh, LEV_INFO, T_PRE, "Error: %s", sock.error.c_str());
+            LOGM(VARP, logh, LEV_INFO, T_PRE, "Peer authentication error");
+
+            for (std::vector<std::string>::const_iterator err_it = sock.GetOpenSSLErrors().begin();
+                err_it != sock.GetOpenSSLErrors().end();
+                ++err_it){
+
+              std::string err_string = *err_it;
+              LOGM(VARP, logh, LEV_INFO, T_PRE, err_string.c_str());
+
+            }
 
             sock.CleanSocket();
             sock.Close();

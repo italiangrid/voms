@@ -178,7 +178,7 @@ GSISocketServer::GSISocketServer(int p, void *l, int b, bool m) :
   ssl(NULL), ctx(NULL), conn(NULL), pvd(NULL), cacertdir(NULL),
   upkey(NULL), ucert(NULL), error(""),
   port(p), opened(false), sck(-1), backlog(b), newsock(-1), timeout(30),
-  newopened(false), mustclose(m), logh(l)
+  newopened(false), mustclose(m), logh(l), openssl_errors()
 {
   if (OBJ_txt2nid("UID") == NID_undef)
     OBJ_create("0.9.2342.19200300.100.1.1","USERID","userId");
@@ -259,6 +259,8 @@ GSISocketServer::Close()
   own_cert = peer_cert = NULL;
 
   opened=false;
+  error.clear();
+  openssl_errors.clear();
 }
 
 void GSISocketServer::CloseListener(void)
@@ -644,11 +646,52 @@ void GSISocketServer::SetError(const std::string &g)
 
 void GSISocketServer::SetErrorOpenSSL(const std::string &preamble)
 {
-  error = preamble;
+  openssl_errors.clear();
+
+  bool first = true;
 
   while( ERR_peek_error() ){
-    long error_code = ERR_get_error();
-    const char * error_message = ERR_error_string(error_code, NULL);
-    error += error_message;
+
+    char error_msg_buf[512];
+
+    const char *filename;
+    int lineno;
+    const char* data;
+    int flags;
+
+    long error_code = ERR_get_error_line_data(&filename, &lineno, &data, &flags);
+
+    const char *lib = ERR_lib_error_string(error_code);
+    const char *func = ERR_func_error_string(error_code);
+    const char *error_reason = ERR_reason_error_string(error_code);
+
+    if (lib == NULL) {
+
+      int lib_no = ERR_GET_LIB(error_code);
+
+      if (lib_no == ERR_USER_LIB_PRXYERR_NUMBER){
+        lib = "VOMS proxy routines";
+      }
+    }
+
+    if (!first){
+      error.append(",");
+    }
+
+    sprintf(error_msg_buf,
+        "%s %s [err:%lu,lib:%s,func:%s(file: %s+%d)]",
+        (error_reason) ? error_reason : "",
+        (data) ? data : "",
+        error_code,lib,func,filename,lineno);
+
+    openssl_errors.push_back(error_msg_buf);
+
+    first = false;
   }
+}
+
+const std::vector<std::string>&
+GSISocketServer::GetOpenSSLErrors(){
+
+  return openssl_errors;
 }
