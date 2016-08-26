@@ -435,7 +435,7 @@ GSISocketServer::AcceptGSIAuthentication()
     if (accept_timed_out){
       SetError("SSL Handshake failed due to server timeout!");
     }else{
-      SetErrorOpenSSL("SSL Handshake error:");
+      SetErrorOpenSSL("SSL Handshake error");
     }
 
     goto err;
@@ -604,7 +604,7 @@ bool GSISocketServer::Peek(int bufsize, std::string& s)
     if (timeout != -1 && (curtime - starttime >= timeout))
       SetError("Connection stuck during read: timeout reached.");
     else
-      SetErrorOpenSSL("Error during SSL read:");
+      SetErrorOpenSSL("Error during SSL read");
     OPENSSL_free(buffer);
     ERR_clear_error();
     return false;
@@ -642,13 +642,13 @@ GSISocketServer::Receive(std::string& s)
 void GSISocketServer::SetError(const std::string &g)
 {
   error = g;
+  openssl_errors.clear();
 }
 
-void GSISocketServer::SetErrorOpenSSL(const std::string &preamble)
+void GSISocketServer::SetErrorOpenSSL(const std::string &err)
 {
+  error = err;
   openssl_errors.clear();
-
-  bool first = true;
 
   while( ERR_peek_error() ){
 
@@ -674,10 +674,6 @@ void GSISocketServer::SetErrorOpenSSL(const std::string &preamble)
       }
     }
 
-    if (!first){
-      error.append(",");
-    }
-
     sprintf(error_msg_buf,
         "%s %s [err:%lu,lib:%s,func:%s(file: %s+%d)]",
         (error_reason) ? error_reason : "",
@@ -685,8 +681,6 @@ void GSISocketServer::SetErrorOpenSSL(const std::string &preamble)
         error_code,lib,func,filename,lineno);
 
     openssl_errors.push_back(error_msg_buf);
-
-    first = false;
   }
 }
 

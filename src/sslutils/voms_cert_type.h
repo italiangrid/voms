@@ -8,7 +8,7 @@ extern "C" {
 #include "openssl/x509.h"
 
 /**
- * This is shamelessly inspired by Globus toolkit way of detecting the certificate type 
+ * This is shamelessly inspired by the Globus toolkit cert utils library 
  * 
  * https://github.com/globus/globus-toolkit/blob/globus_6_branch/gsi/cert_utils/source/library/globus_gsi_cert_utils_constants.h
  **/

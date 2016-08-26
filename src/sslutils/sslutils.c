@@ -1647,7 +1647,6 @@ int proxy_verify_name(X509* cert){
 
   if (voms_get_cert_type(cert, &cert_type))
   {
-    // TODO: there was an error, proper error message
     return -1;
   }
 

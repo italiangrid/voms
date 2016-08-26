@@ -106,12 +106,6 @@ get_proxy_type(ASN1_OBJECT *policy_lang){
   }
 }
 
-static void 
-voms_build_validation_error(X509* cert,int code, const char* message){
-  PRXYerr(PRXYERR_F_VOMS_GET_CERT_TYPE,code);
-  ERR_add_error_data(1, message);
-}
-
 voms_result_t 
 voms_get_cert_type(X509* cert, voms_cert_type_t* cert_type){
 
