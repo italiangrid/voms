@@ -1174,11 +1174,11 @@ bool VOMSServer::makeAC(vomsresult& vr, EVP_PKEY *key, X509 *issuer,
     for (std::vector<std::string>::const_iterator i = fqans.begin(); i != end; ++i)
       LOGM(VARP, logh, LEV_INFO, T_PRE, "Issued FQAN: %s",  (*i).c_str());
 
-    if (LogLevelMin(logh, LEV_DEBUG)) {
+    if (LogLevelMin(logh, LEV_INFO)) {
       if(result && !attribs.empty()) {
         std::vector<gattrib>::const_iterator end = attribs.end();
         for(std::vector<gattrib>::const_iterator i = attribs.begin(); i != end; ++i)
-          LOGM(VARP, logh, LEV_DEBUG, T_PRE,  "Generic attributes found: %s", i->str().c_str());
+          LOGM(VARP, logh, LEV_INFO, T_PRE,  "Issued generic attribute: %s", i->str().c_str());
       }
       else
         LOGM(VARP, logh, LEV_DEBUG, T_PRE,  "No generic attributes found for user.");
