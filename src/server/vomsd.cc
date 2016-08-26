@@ -178,7 +178,7 @@ gv  getlibversion;
 bool dummyb = false;
 
 static bool checkinside(gattrib g, std::vector<std::string> list);
-static signed long int get_userid(sqliface::interface *db, X509 *cert, const std::string& voname, vomsresult &vr);
+static long long get_userid(sqliface::interface *db, X509 *cert, const std::string& voname, vomsresult &vr);
 static std::string addtoorder(std::string previous, char *group, char *role);
 static bool determine_group_and_role(std::string command, char *comm, char **group, char **role);
 static BIGNUM *get_serial();
@@ -923,7 +923,6 @@ bool VOMSServer::makeAC(vomsresult& vr, EVP_PKEY *key, X509 *issuer,
 
   std::vector<std::string> fqans;
   std::vector<gattrib> attribs;
-  signed long int uid = -1;
 
   sqliface::interface *newdb = db->getSession();
 
@@ -934,6 +933,7 @@ bool VOMSServer::makeAC(vomsresult& vr, EVP_PKEY *key, X509 *issuer,
   }
 
   /* Determine user ID in the DB */
+  long long uid = -1;
 
   if ((uid = get_userid(newdb, holder, voname, vr)) == -1) {
     db->releaseSession(newdb);
@@ -948,7 +948,6 @@ bool VOMSServer::makeAC(vomsresult& vr, EVP_PKEY *key, X509 *issuer,
     setuporder = true;
 
   int k = 0;
-
 
   /* Parse and execute requests */
 
@@ -1517,9 +1516,9 @@ static bool checkinside(gattrib g, std::vector<std::string> list)
   return !g.qualifier.empty() && not_in(g.qualifier, list);
 }
 
-static signed long int get_userid(sqliface::interface *db, X509 *cert, const std::string& voname, vomsresult &vr)
+static long long get_userid(sqliface::interface *db, X509 *cert, const std::string& voname, vomsresult &vr)
 {
-  signed long int uid = -1;
+  long long uid = -1;
 
   if (!db->operation(OPERATION_GET_USER, &uid, cert)) {
     std::string message = db->errorMessage() ? db->errorMessage() : "unknown";
