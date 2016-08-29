@@ -226,7 +226,7 @@ voms_get_cert_type(X509* cert, voms_cert_type_t* cert_type){
 
     *cert_type = VOMS_CERT_TYPE_GSI_3 | get_proxy_type(policy_lang);
 
-    if (X509_get_ext_by_NID(cert,PROXYCERTINFO_OLD_OID,index) != -1)
+    if (X509_get_ext_by_NID(cert,OBJ_txt2nid(PROXYCERTINFO_OLD_OID),index) != -1)
     {
 
       result = voms_validation_error_with_detail(
