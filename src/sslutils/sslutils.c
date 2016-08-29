@@ -1852,15 +1852,19 @@ proxy_verify_callback(
 #endif
 
         case X509_V_ERR_INVALID_CA:
-        case X509_V_ERR_UNABLE_TO_GET_ISSUER_CERT:
           /*
-           * This may happen since proxy issuers are not CAs
+           * This may happen since proxy issuers are not recognized as CAs
+           * by OpenSSL, we just
            */
-          if (proxy_verify_name(ctx->cert) > 0) {
-            if (proxy_check_issued(ctx, ctx->cert, ctx->current_cert)) {
-              ok = 1;
-            }
+          X509* prev_cert = sk_X509_value(
+              X509_STORE_CTX_get0_chain(ctx),
+              X509_STORE_CTX_get_error_depth(ctx) -1);
+
+          if (proxy_verify_name(prev_cert) > 0 && 
+              proxy_check_issued(ctx, ctx->current_cert, prev_cert)){
+            ok = 1;
           }
+
           break;
 
         case X509_V_ERR_UNHANDLED_CRITICAL_EXTENSION:
