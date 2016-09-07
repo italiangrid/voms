@@ -1,5 +1,6 @@
 #include "sslutils.h"
 #include "openssl/x509_vfy.h"
+#include "openssl/x509v3.h"
 
 #include <iostream>
 #include <cstdlib>
@@ -146,6 +147,7 @@ int main(int argc, char* argv[]){
   FILE *cert_fp = NULL;
 
   STACK_OF(X509) *cert_chain = sk_X509_new_null();
+  X509* cert = NULL;
 
   X509_STORE *store = NULL;
   X509_STORE_CTX *ctx = NULL;
@@ -175,6 +177,8 @@ int main(int argc, char* argv[]){
     internal_error("Error loading proxy chain");
   }
 
+  cert = sk_X509_delete(cert_chain,0);
+
   if (!(store = X509_STORE_new())){
     internal_error("Error creating X.509 store");
   }
@@ -191,11 +195,6 @@ int main(int argc, char* argv[]){
     internal_error("Error setting ca dir lookup for X509 store");
   }
 
-  // This loop loads up the chain in the store
-  for (int i=1; i < sk_X509_num(cert_chain); i++){
-    X509_STORE_add_cert(store,sk_X509_value(cert_chain,i));
-  }
-
   if (!(pvd = setup_initializers(ca_dir))){
     internal_error("Error setting up proxy verification data");
   }
@@ -204,13 +203,27 @@ int main(int argc, char* argv[]){
     internal_error("Error creating X509_STORE_CTX object");
   }
 
-  if (X509_STORE_CTX_init(ctx, store, sk_X509_value(cert_chain,0), NULL) != 1) {
+  if (X509_STORE_CTX_init(ctx, store, cert, cert_chain) != 1) {
     internal_error("Error initializing verification context");
   }
 
   if (!X509_STORE_CTX_set_ex_data(ctx, PVD_STORE_EX_DATA_IDX, pvd)) {
     internal_error("Error setting pvd in verification context");
   }
+
+#if 0
+  X509_VERIFY_PARAM *param = NULL;
+
+  if (!(param = X509_VERIFY_PARAM_new())){
+    internal_error("Error allocating X509_VERIFY_PARAM struct");
+  }
+
+  if (!(X509_VERIFY_PARAM_set_purpose(param, X509_PURPOSE_ANY))) {
+    internal_error("Error setting purpose on X509_VERIFY_PARAM struct");
+  }
+
+  X509_STORE_CTX_set0_param(ctx, param);
+#endif
 
   X509_STORE_CTX_set_flags(ctx, X509_V_FLAG_ALLOW_PROXY_CERTS);
 

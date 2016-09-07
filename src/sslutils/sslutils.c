@@ -1671,67 +1671,35 @@ int proxy_verify_name(X509* cert){
   return 1;
 }
 
-#if SSLEAY_VERSION_NUMBER >=  0x0090600fL
-/**********************************************************************
- Function: proxy_check_issued()
-
-Description:
-        Replace the OpenSSL check_issued in x509_vfy.c with our own,
-        so we can override the key usage checks if its a proxy.
-        We are only looking for X509_V_ERR_KEYUSAGE_NO_CERTSIGN
-
-Parameters:r
-        See OpenSSL check_issued
-
-Returns:
-        See OpenSSL check_issued
-
-**********************************************************************/
 
 int PRIVATE
-proxy_check_issued(
-    UNUSED(X509_STORE_CTX *                    ctx),
-    X509 *                              x,
-    X509 *                              issuer)
+proxy_check_issued(UNUSED(X509_STORE_CTX *  ctx),
+      X509 *                              x,
+      X509 *                              issuer)
 {
-    int                                 ret;
-    int                                 ret_code = 1;
+  int return_value;
+  int return_code = 1;
 
-    ret = X509_check_issued(issuer, x);
-    if (ret != X509_V_OK)
+  return_value = X509_check_issued(issuer, x);
+  if (return_value != X509_V_OK)
+  {
+    return_code = 0;
+    switch (return_value)
     {
-        ret_code = 0;
-        switch (ret)
-        {
-        case X509_V_ERR_AKID_SKID_MISMATCH:
-            /*
-             * If the proxy was created with a previous version of Globus
-             * where the extensions where copied from the user certificate
-             * This error could arise, as the akid will be the wrong key
-             * So if its a proxy, we will ignore this error.
-             * We should remove this in 12/2001
-             * At which time we may want to add the akid extension to the proxy.
-             */
+      case X509_V_ERR_KEYUSAGE_NO_CERTSIGN:
 
-        case X509_V_ERR_KEYUSAGE_NO_CERTSIGN:
-            /*
-             * If this is a proxy certificate then the issuer
-             * does not need to have the key_usage set.
-             * So check if its a proxy, and ignore
-             * the error if so.
-             */
-            if (proxy_verify_name(x) >= 1)
-            {
-                ret_code = 1;
-            }
-            break;
-        default:
-            break;
+        if (proxy_verify_name(x) >= 1)
+        {
+          return_code = 1;
         }
+        break;
+
+      default:
+        break;
     }
-    return ret_code;
+  }
+  return return_code;
 }
-#endif
 
 /**********************************************************************
 Function: proxy_verify_callback()
@@ -1766,11 +1734,14 @@ proxy_verify_callback(
 {
     X509_OBJECT                         obj;
     X509 *                              cert = NULL;
+    X509 *                              prev_cert = NULL;
+
 #ifdef X509_V_ERR_CERT_REVOKED
     X509_CRL *                          crl;
     X509_CRL_INFO *                     crl_info;
     X509_REVOKED *                      revoked;
 #endif
+
     SSL *                               ssl = NULL;
     proxy_verify_desc *                 pvd;
     int                                 itsaproxy = 0;
@@ -1782,15 +1753,7 @@ proxy_verify_callback(
     EVP_PKEY *key = NULL;
     int       objset = 0;
 
-    /*
-     * If we are being called recursivly to check delegate
-     * cert chains, or being called by the grid-proxy-init,
-     * a pointer to a proxy_verify_desc will be
-     * pased in the store.  If we are being called by SSL,
-     * by a roundabout process, the app_data of the ctx points at
-     * the SSL. We have saved a pointer to the  context handle
-     * in the SSL, and its magic number should be PVD_MAGIC_NUMBER
-     */
+    /* fetch proxy specific information */
     if (!(pvd = (proxy_verify_desc *)
          X509_STORE_CTX_get_ex_data(ctx,
                                     PVD_STORE_EX_DATA_IDX)))
@@ -1801,14 +1764,6 @@ proxy_verify_callback(
                                                      PVD_SSL_EX_DATA_IDX);
     }
 
-    /*
-     * For now we hardcode the ex_data. We could look at all
-     * ex_data to find ours.
-     * Double check that we are indeed pointing at the context
-     * handle. If not, we have an internal error, SSL may have changed
-     * how the callback and app_data are handled
-     */
-
     if (pvd) {
       if(pvd->magicnum != PVD_MAGIC_NUMBER) {
           PRXYerr(PRXYERR_F_VERIFY_CB, PRXYERR_R_BAD_MAGIC);
@@ -1816,16 +1771,11 @@ proxy_verify_callback(
       }
     }
 
-    /*
-     * We now check for some error conditions which
-     * can be disregarded.
-     */
-
     if (!ok)
     {
-        switch (ctx->error)
+        switch (X509_STORE_CTX_get_error(ctx))
         {
-#if SSLEAY_VERSION_NUMBER >=  0x0090581fL
+
         case X509_V_ERR_PATH_LENGTH_EXCEEDED:
             /*
              * Since OpenSSL does not know about proxies,
@@ -1837,27 +1787,12 @@ proxy_verify_callback(
             ok = 1;
             break;
 
-#endif
-
-#if OPENSSL_VERSION_NUMBER >= 0x10000000L
-        case X509_V_ERR_UNABLE_TO_VERIFY_LEAF_SIGNATURE:
-          /*
-           * OpenSSL 1.0 causes the cert to be added twice to
-           * the store.
-           */
-          if (proxy_verify_name(ctx->cert) > 0 &&
-              !X509_cmp(ctx->cert, ctx->current_cert))
-            ok = 1;
-          break;
-#endif
-
         case X509_V_ERR_INVALID_CA:
           /*
            * This may happen since proxy issuers are not recognized as CAs
-           * by OpenSSL, we just
+           * by OpenSSL
            */
-          X509* prev_cert = sk_X509_value(
-              X509_STORE_CTX_get0_chain(ctx),
+          prev_cert = sk_X509_value(X509_STORE_CTX_get_chain(ctx),
               X509_STORE_CTX_get_error_depth(ctx) -1);
 
           if (proxy_verify_name(prev_cert) > 0 && 
@@ -1875,24 +1810,10 @@ proxy_verify_callback(
           }
           break;
 
-        case X509_V_ERR_UNABLE_TO_GET_ISSUER_CERT_LOCALLY:
-        case X509_V_ERR_CERT_UNTRUSTED:
-          if (proxy_verify_name(ctx->current_cert) > 0) {
-            /* Server side, needed to fully recognize a proxy. */
-            ok = 1;
-          }
-          break;
-
-#ifdef X509_V_ERR_PROXY_CERTIFICATES_NOT_ALLOWED
-        case X509_V_ERR_PROXY_CERTIFICATES_NOT_ALLOWED:
-          /* Proxies ARE allowed */
-          ok = 1;
-          break;
-#endif
-
         default:
             break;
         }
+
         /* if already failed, skip the rest, but add error messages */
         if (!ok)
         {
@@ -1914,16 +1835,11 @@ proxy_verify_callback(
 
             goto fail_verify;
         }
-        ctx->error = 0;
+
+        X509_STORE_CTX_set_error(ctx,0);
         return(ok);
     }
 
-    /* Note: OpenSSL will try to verify the client's chain on the client side
-       before sending it abroad.  However, to properly verify proxy conditions,
-       we need access to pvd, which is not passed.  For this reason, in this
-       scenario we assume that if the checks above passed, everything is ok. If
-       it is not, it will be discovered during server-side validation of the cert.
-    */
     if (!pvd)
       return ok;
 
@@ -1933,11 +1849,6 @@ proxy_verify_callback(
      * and ca-signing-policy rules. We will also do a CRL check
      */
 
-    /*
-     * Test if the name ends in CN=proxy and if the issuer
-     * name matches the subject without the final proxy.
-     */
-
     ret = proxy_verify_name(ctx->current_cert);
     if (ret < 0)
     {
@@ -1945,33 +1856,14 @@ proxy_verify_callback(
         ERR_set_continue_needed();
         ctx->error = X509_V_ERR_CERT_SIGNATURE_FAILURE;
         goto fail_verify;
-    }
-    if (ret > 0)
+    } else if (ret > 0)
     {  /* Its a proxy */
         if (ret == 2)
         {
-            /*
-             * If its a limited proxy, it means it use has been limited
-             * during delegation. It can not sign other certs i.e.
-             * it must be the top cert in the chain.
-             * Depending on who we are,
-             * We may want to accept this for authentication.
-             *
-             *   Globus gatekeeper -- don't accept
-             *   sslk5d accept, but should check if from local site.
-             *   globus user-to-user Yes, thats the purpose
-             *    of this cert.
-             *
-             * We will set the limited_proxy flag, to show we found
-             * one. A Caller can then reject.
-             */
 
           pvd->limited_proxy = 1; /* its a limited proxy */
 
           if (ctx->error_depth && !pvd->multiple_limited_proxy_ok) {
-            /* tried to sign a cert with a limited proxy */
-            /* i.e. there is still another cert on the chain */
-            /* indicating we are trying to sign it! */
             PRXYerr(PRXYERR_F_VERIFY_CB,PRXYERR_R_LPROXY_MISSED_USED);
             ERR_set_continue_needed();
             ctx->error = X509_V_ERR_CERT_SIGNATURE_FAILURE;
@@ -1986,26 +1878,8 @@ proxy_verify_callback(
     if (!itsaproxy)
     {
 
-#ifdef X509_V_ERR_CERT_REVOKED
+        /** CRL checks **/
         int n = 0;
-        /*
-         * SSLeay 0.9.0 handles CRLs but does not check them.
-         * We will check the crl for this cert, if there
-         * is a CRL in the store.
-         * If we find the crl is not valid, we will fail,
-         * as once the sysadmin indicates that CRLs are to
-         * be checked, he best keep it upto date.
-         *
-         * When future versions of SSLeay support this better,
-         * we can remove these tests.
-         * we come through this code for each certificate,
-         * starting with the CA's We will check for a CRL
-         * each time, but only check the signature if the
-         * subject name matches, and check for revoked
-         * if the issuer name matches.
-         * this allows the CA to revoke its own cert as well.
-         */
-
         if (X509_STORE_get_by_subject(ctx,
                                       X509_LU_CRL,
                                       X509_get_subject_name(ctx->current_issuer),
@@ -2077,9 +1951,6 @@ proxy_verify_callback(
                 }
             }
         }
-#endif /* X509_V_ERR_CERT_REVOKED */
-
-        /* Do not need to check self signed certs against ca_policy_file */
 
         if (X509_NAME_cmp(X509_get_subject_name(ctx->current_cert),
                           X509_get_issuer_name(ctx->current_cert)))
@@ -2127,7 +1998,7 @@ proxy_verify_callback(
                     }
                 }
             }
-        } /* end of do not check self signed certs */
+        } 
     }
 
     /*
