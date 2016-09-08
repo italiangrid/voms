@@ -211,20 +211,6 @@ int main(int argc, char* argv[]){
     internal_error("Error setting pvd in verification context");
   }
 
-#if 0
-  X509_VERIFY_PARAM *param = NULL;
-
-  if (!(param = X509_VERIFY_PARAM_new())){
-    internal_error("Error allocating X509_VERIFY_PARAM struct");
-  }
-
-  if (!(X509_VERIFY_PARAM_set_purpose(param, X509_PURPOSE_ANY))) {
-    internal_error("Error setting purpose on X509_VERIFY_PARAM struct");
-  }
-
-  X509_STORE_CTX_set0_param(ctx, param);
-#endif
-
   X509_STORE_CTX_set_flags(ctx, X509_V_FLAG_ALLOW_PROXY_CERTS);
 
   if (verify_cert(ctx) != 1){
