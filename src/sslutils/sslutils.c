@@ -1736,14 +1736,13 @@ proxy_verify_callback(
     X509 *                              cert = NULL;
     X509 *                              prev_cert = NULL;
 
-#ifdef X509_V_ERR_CERT_REVOKED
     X509_CRL *                          crl;
     X509_CRL_INFO *                     crl_info;
     X509_REVOKED *                      revoked;
-#endif
 
     SSL *                               ssl = NULL;
     proxy_verify_desc *                 pvd;
+
     int                                 itsaproxy = 0;
     int                                 i;
     int                                 ret;
