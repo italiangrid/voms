@@ -38,6 +38,7 @@
 
 #include "credentials.h"
 #include "sslutils.h"
+#include "voms_cert_type.h"
 
 int
 globus(int version)
@@ -68,15 +69,32 @@ get_real_cert(X509 *base, STACK_OF(X509) *stk)
   X509 *cert = NULL;
   int i;
 
-  if (!proxy_check_proxy_name(base))
+  voms_cert_type_t cert_type;
+
+
+  if (voms_get_cert_type(base, &cert_type)){
+    // FIXME: This is just for backward compatibility, where error in the
+    // proxy_check_proxy_name call weren't handled
+    return base;
+  }
+
+  if (!VOMS_IS_PROXY(cert_type)){
     return base;
 
+  }
   int num_certs = sk_X509_num(stk);
 
   /* Determine id data */
   for (i = 0; i < num_certs; i++) {
     cert = sk_X509_value(stk, i);
-    if (!proxy_check_proxy_name(cert)) {
+
+    if (voms_get_cert_type(cert, &cert_type)){
+    // FIXME: This is just for backward compatibility, where error in the
+    // proxy_check_proxy_name call weren't handled
+      return cert;
+    }
+
+    if (!VOMS_IS_PROXY(cert_type)){
       return cert;
     }
   }

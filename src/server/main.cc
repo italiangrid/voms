@@ -29,6 +29,7 @@
 
 #include "VOMSServer.h"
 #include "dbwrap.h"
+#include "sslutils.h"
 #include <cstdlib>
 
 extern "C" {
@@ -37,8 +38,9 @@ extern "C" {
 
 int main(int argc, char *argv[])
 {
-  OpenSSL_add_ssl_algorithms();
 
+  ERR_load_proxy_error_strings();
+  OpenSSL_add_ssl_algorithms();
   SSL_library_init();
 
   try

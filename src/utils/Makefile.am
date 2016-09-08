@@ -2,7 +2,9 @@ if BUILD_CLIENTS
 bin_PROGRAMS = \
 	voms-proxy-info \
 	voms-proxy-destroy \
-	voms-proxy-fake
+	voms-proxy-fake \
+	voms-verify
+
 
 voms_proxy_info_SOURCES = \
 	voms_proxy_info.cc
@@ -23,6 +25,15 @@ voms_proxy_destroy_LDADD = \
 	$(top_builddir)/src/replib/librep.la \
 	$(OPENSSL_LIBS) \
 	$(EXPAT_LIBS) 
+
+voms_verify_SOURCES = \
+	voms_verify.cc
+
+voms_verify_LDADD = \
+	$(top_builddir)/src/api/ccapi/libvomsapi.la  \
+	$(top_builddir)/src/sslutils/libssl_utils_nog.la \
+	$(top_builddir)/src/replib/librep.la \
+	$(OPENSSL_LIBS) 
 
 voms_proxy_fake_SOURCES = \
 	vomsfake.h \

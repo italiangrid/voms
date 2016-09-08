@@ -178,7 +178,7 @@ GSISocketServer::GSISocketServer(int p, void *l, int b, bool m) :
   ssl(NULL), ctx(NULL), conn(NULL), pvd(NULL), cacertdir(NULL),
   upkey(NULL), ucert(NULL), error(""),
   port(p), opened(false), sck(-1), backlog(b), newsock(-1), timeout(30),
-  newopened(false), mustclose(m), logh(l)
+  newopened(false), mustclose(m), logh(l), openssl_errors()
 {
   if (OBJ_txt2nid("UID") == NID_undef)
     OBJ_create("0.9.2342.19200300.100.1.1","USERID","userId");
@@ -259,6 +259,8 @@ GSISocketServer::Close()
   own_cert = peer_cert = NULL;
 
   opened=false;
+  error.clear();
+  openssl_errors.clear();
 }
 
 void GSISocketServer::CloseListener(void)
@@ -433,7 +435,7 @@ GSISocketServer::AcceptGSIAuthentication()
     if (accept_timed_out){
       SetError("SSL Handshake failed due to server timeout!");
     }else{
-      SetErrorOpenSSL("SSL Handshake error:");
+      SetErrorOpenSSL("SSL Handshake error");
     }
 
     goto err;
@@ -602,7 +604,7 @@ bool GSISocketServer::Peek(int bufsize, std::string& s)
     if (timeout != -1 && (curtime - starttime >= timeout))
       SetError("Connection stuck during read: timeout reached.");
     else
-      SetErrorOpenSSL("Error during SSL read:");
+      SetErrorOpenSSL("Error during SSL read");
     OPENSSL_free(buffer);
     ERR_clear_error();
     return false;
@@ -640,15 +642,50 @@ GSISocketServer::Receive(std::string& s)
 void GSISocketServer::SetError(const std::string &g)
 {
   error = g;
+  openssl_errors.clear();
 }
 
-void GSISocketServer::SetErrorOpenSSL(const std::string &preamble)
+void GSISocketServer::SetErrorOpenSSL(const std::string &err)
 {
-  error = preamble;
+  error = err;
+  openssl_errors.clear();
 
   while( ERR_peek_error() ){
-    long error_code = ERR_get_error();
-    const char * error_message = ERR_error_string(error_code, NULL);
-    error += error_message;
+
+    char error_msg_buf[512];
+
+    const char *filename;
+    int lineno;
+    const char* data;
+    int flags;
+
+    long error_code = ERR_get_error_line_data(&filename, &lineno, &data, &flags);
+
+    const char *lib = ERR_lib_error_string(error_code);
+    const char *func = ERR_func_error_string(error_code);
+    const char *error_reason = ERR_reason_error_string(error_code);
+
+    if (lib == NULL) {
+
+      int lib_no = ERR_GET_LIB(error_code);
+
+      if (lib_no == ERR_USER_LIB_PRXYERR_NUMBER){
+        lib = "VOMS proxy routines";
+      }
+    }
+
+    sprintf(error_msg_buf,
+        "%s %s [err:%lu,lib:%s,func:%s(file: %s+%d)]",
+        (error_reason) ? error_reason : "",
+        (data) ? data : "",
+        error_code,lib,func,filename,lineno);
+
+    openssl_errors.push_back(error_msg_buf);
   }
+}
+
+const std::vector<std::string>&
+GSISocketServer::GetOpenSSLErrors(){
+
+  return openssl_errors;
 }
