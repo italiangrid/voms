@@ -49,12 +49,12 @@ voms-admin-guide:
 
   versions:
     3.5.0:
-      sysadmin_guide_version: 3.5.0
+      sysadmin_guide_version: 3.0.8
       admin_server_version: 3.5.0
       admin_client_version: 2.0.19
 
     3.4.2:
-      sysadmin_guide_version: 3.0.6
+      sysadmin_guide_version: 3.0.7
       admin_server_version: 3.4.2
       admin_client_version: 2.0.19
 
