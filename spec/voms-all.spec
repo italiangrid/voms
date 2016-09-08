@@ -264,6 +264,7 @@ fi
 %{_bindir}/voms-proxy-init2
 %{_bindir}/voms-proxy-fake
 %{_bindir}/voms-proxy-list
+%{_bindir}/voms-verify
 
 %{_mandir}/man1/voms-proxy-destroy2.1.gz
 %{_mandir}/man1/voms-proxy-info2.1.gz
