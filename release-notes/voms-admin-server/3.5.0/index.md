@@ -61,14 +61,14 @@ The list of full bug fixes and new features is listed below.
 
 ### Installation and configuration
 
-#### Upgrade from VOMS Admin Server >= 3.2.0
+#### Upgrade from VOMS Admin Server >= 3.3.2
 
 A [database upgrade][db-upgrade] and a [reconfiguration][reconf] (in this order) are
 required to upgrade to VOMS Admin server 3.5.0.
 
 #### Upgrade from earlier VOMS Admin Server versions
 
-First upgrade to VOMS Admin version [3.2.0][voms-admin-320-rn] and then to 3.5.0.
+First upgrade to VOMS Admin version [3.3.2][voms-admin-332-rn] and then to 3.5.0.
 
 #### Clean install
 
@@ -79,5 +79,4 @@ Follow the instructions in the VOMS [System Administrator Guide][sysadmin-guide]
 [voms-admin-guide]: {{site.baseurl}}/documentation/voms-admin-guide/3.5.0
 [reconf]: {{site.baseurl}}/documentation/sysadmin-guide/3.0.8/#reconf
 [db-upgrade]: {{site.baseurl}}/documentation/sysadmin-guide/3.0.8/#db-upgrade
-[voms-admin-320-rn]: {{site.baseurl}}/release-notes/voms-admin-server/3.2.0
 [voms-admin-332-rn]: {{site.baseurl}}/release-notes/voms-admin-server/3.3.2
