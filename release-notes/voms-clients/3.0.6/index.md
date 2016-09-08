@@ -2,8 +2,8 @@
 layout: default
 title: VOMS Clients v. 3.0.6
 rfcs:
-    - id: VOMS-566
-      title: VOMS clients and Java APIs should provide a flag to disable host name verification
+- id: VOMS-566
+  title: VOMS clients and Java APIs should provide a flag to disable host name verification
 ---
 
 # VOMS Clients v. 3.0.6

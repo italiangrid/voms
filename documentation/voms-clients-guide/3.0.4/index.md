@@ -1,7 +1,9 @@
 ---
 layout: default
 title: VOMS Client Guide
-version: 3.0.3
+version: 3.0.4
+redirect_from:
+  - /documentation/voms-clients-guide/
 ---
 
 # VOMS Clients guide
