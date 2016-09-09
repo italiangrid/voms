@@ -30,7 +30,7 @@ section][releases].
 [rn-admin]: {{site.baseurl}}/release-notes/voms-admin-server/3.5.0
 [rn-clients]: {{site.baseurl}}/release-notes/voms-clients/3.0.7
 [rn-api-c]: {{site.baseurl}}/release-notes/voms-api-c/2.0.14
-[rn-core]: {{site.baseurl}}/release-notes/voms/2.0.14
+[rn-core]: {{site.baseurl}}/release-notes/voms-server/2.0.14
 [rn-mysql-plugin]: {{site.baseurl}}/release-notes/voms-mysql-plugin/3.1.7
 
 [releases]: {{site.baseurl}}/releases.html
