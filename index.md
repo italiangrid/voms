@@ -2,23 +2,27 @@
 layout: home
 title: VOMS home
 ---
-<!--
 <div class="row-fluid marketing">
-	<h2>News</h2>
+	<h2>Latest News</h2>
+
+	{% for post in site.posts limit:1 %}
+	<div class="row-fluid marketing news-row">
+		    <div class="span2 news-date">
+			    <p class="text-left">{{ post.date | date_to_long_string }}</p>
+		    </div>
+		    <div class="span10">
+		    <h3>{{post.title}}</h3>
+		    <p>{{post.summary}}</p>
+		    
+	            <a href="{{ site.baseurl }}{{post.url}}">Read more</a>
+				
+		</div>
+	</div>
+	{% endfor %}
 </div>
-{% for post in site.posts limit:2 %}
-<div class="row-fluid marketing news-row">
-	    <div class="span2 news-date">
-		    <p class="text-left">{{ post.date | date_to_long_string }}</p>
-	    </div>
-	    <div class="span10">
-            <h3>{{post.title}}</h3>
-            <p>{{post.summary}} <a href="{{post.url}}">more</a></p>
-			
-        </div>
-</div>
-{% endfor %}
--->
+
+<hr class="soften">
+
 <div class="row-fluid marketing">
 	<div class="span6">
 		<h2 class="">Organization management</h2>
@@ -61,6 +65,3 @@ title: VOMS home
 </div>
 
 <hr class="soften">
-
-</div>
-

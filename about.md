@@ -5,13 +5,9 @@ title: About us
 
 # About us
 
-Here are the main VOMS developers:
+VOMS is maintained by the following people:
 
-{% assign author=site.authors.andrea %}
-{% include author.html %}
-
-{% assign author=site.authors.francesco %}
-{% include author.html %}
-
-{% assign author=site.authors.enrico %}
-{% include author.html %}
+- [@andreaceccanti](https://github.com/andreaceccanti)
+- [@giacomini](https://github.com/giacomini)
+- [@enricovianello](https://github.com/enricovianello)
+- [@marcocaberletti](https://github.com/marcocaberletti)

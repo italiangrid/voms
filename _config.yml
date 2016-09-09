@@ -4,7 +4,6 @@ gems:
 exclude: [README.md,"run-jekyll.sh"]
 
 future: yes
-markdown: redcarpet
 
 redcarpet:
   extensions: [ "tables" ]
