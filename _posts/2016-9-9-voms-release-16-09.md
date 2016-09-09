@@ -1,8 +1,8 @@
 ---
 layout: post
-title: VOMS Admin 3.5.0, VOMS 2.0.14, VOMS clients 3.0.7 and more 
+title: VOMS clients 3.0.7, VOMS Admin 3.5.0, VOMS 2.0.14 and more 
 author: andrea
-summary: New packages for VOMS Admin, VOMS server, C/C++ APIs, VOMS clients and VOMS MySQL plugin
+summary: New packages for VOMS clients, VOMS Admin, VOMS server, VOMS C/C++ APIs and VOMS MySQL plugin
 ---
 
 Today we announce a new release for several VOMS components fixing outstanding
@@ -10,15 +10,15 @@ bugs and providing new features.
 
 The updated components are:
 
-- [VOMS Admin 3.5.0][rn-admin]: which fixes problems found in former releases
-  and introduces new features. More details in the [release notes][rn-admin]
 - [VOMS clients 3.0.7][rn-clients]: starting from this release voms-proxy-init
   generates RFC proxies by default
+- [VOMS Admin 3.5.0][rn-admin]: which fixes problems found in former releases
+  and introduces new features. More details in the [release notes][rn-admin]
+- [VOMS server 2.0.14][rn-core]: which provides improved certificate validation
+  error reporting 
 - [VOMS C/C++ APIs 2.0.14][rn-api-c]: which provide improved certificate
   chain type detection and validation, mainly targeted at support for RFC proxy
   certificate chains
-- [VOMS server 2.0.14][rn-core]: which provides improved certificate validation
-  error reporting 
 - [VOMS MySQL plugin 3.1.7][rn-mysql-plugin]: which fixes a problem with data
   types used in some queries which caused improper logging of user IDs in VOMS
   server logs
