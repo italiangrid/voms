@@ -1,6 +1,6 @@
 ---
 layout: post
-title: Updates for several VOMS components 
+title: VOMS Admin 3.5.0, VOMS 2.0.14, VOMS clients 3.0.7 and more 
 author: andrea
 summary: New packages for VOMS server, C/C++ APIs, VOMS Admin, VOMS clients and VOMS MySQL plugin
 ---
@@ -10,7 +10,7 @@ bugs and providing new features.
 
 The updated components are:
 
-- [VOMS Admin 3.5.0][rn-admin]: which fixes problems found in the former releases
+- [VOMS Admin 3.5.0][rn-admin]: which fixes problems found in former releases
   and introduces new features. More details in the [release notes][rn-admin]
 - [VOMS clients 3.0.7][rn-clients]: starting from this release voms-proxy-init
   generates RFC proxies by default
