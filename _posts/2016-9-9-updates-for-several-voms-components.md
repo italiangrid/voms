@@ -2,7 +2,7 @@
 layout: post
 title: VOMS Admin 3.5.0, VOMS 2.0.14, VOMS clients 3.0.7 and more 
 author: andrea
-summary: New packages for VOMS server, C/C++ APIs, VOMS Admin, VOMS clients and VOMS MySQL plugin
+summary: New packages for VOMS Admin, VOMS server, C/C++ APIs, VOMS clients and VOMS MySQL plugin
 ---
 
 Today we announce a new release for several VOMS components fixing outstanding
