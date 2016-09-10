@@ -1015,7 +1015,7 @@ int Client::Verify()
     if (!dontverifyac) {
       if (!v->Retrieve(cert, chain, RECURSE_CHAIN)) {
         if (v->error != VERR_NOEXT) {
-          Print(ERROR) << "Error: verify failed." << std::endl
+          Print(ERROR) << "Error: verification failed." << std::endl
                        << v->ErrorMessage() << std::endl;
           goto err;
         }
@@ -1030,7 +1030,7 @@ int Client::Verify()
     return 0;
   }
   else {
-    Print(ERROR) << "Error: Certificate verify failed." << std::endl;
+    Print(ERROR) << "Error: Certificate verification failed." << std::endl;
     Error();
     goto err;
   }

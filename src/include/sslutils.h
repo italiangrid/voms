@@ -217,8 +217,9 @@ ERR_set_continue_needed(void);
 #define PRXYERR_F_CB_NO_PW                     PRXYERR_F_BASE + 7
 #define PRXYERR_F_GET_CA_SIGN_PATH             PRXYERR_F_BASE + 8
 #define PRXYERR_F_PROXY_SIGN_EXT               PRXYERR_F_BASE + 9
-#define PRXYERR_F_PROXY_CHECK_SUBJECT_NAME     PRXYERR_F_BASE + 10
+#define PRXYERR_F_PROXY_VERIFY_NAME            PRXYERR_F_BASE + 10
 #define PRXYERR_F_PROXY_CONSTRUCT_NAME         PRXYERR_F_BASE + 11
+#define PRXYERR_F_VOMS_GET_CERT_TYPE           PRXYERR_F_BASE + 12
 
 /* 
  * defines for reasons 
@@ -293,6 +294,15 @@ ERR_set_continue_needed(void);
 #define PRXYERR_R_BAD_ARGUMENT                 PRXYERR_R_BASE + 61
 #define PRXYERR_R_BAD_MAGIC                    PRXYERR_R_BASE + 62
 #define PRXYERR_R_UNKNOWN_CRIT_EXT             PRXYERR_R_BASE + 63
+
+#define PRXYERR_R_NON_COMPLIANT_PROXY                   PRXYERR_R_BASE + 64
+#define PRXYERR_R_ERROR_GETTING_NAME_ENTRY_OF_SUBJECT   PRXYERR_R_BASE + 65
+#define PRXYERR_R_ERROR_COPYING_SUBJECT                 PRXYERR_R_BASE + 66
+#define PRXYERR_R_ERROR_GETTING_CN_ENTRY                PRXYERR_R_BASE + 67
+#define PRXYERR_R_ERROR_BUILDING_SUBJECT                 PRXYERR_R_BASE + 68
+
+
+
 /* NOTE: Don't go over 1500 here or will conflict with errors in scutils.h */
 
 
@@ -336,6 +346,9 @@ struct proxy_verify_desc_struct {
 
 int
 ERR_load_prxyerr_strings(int i);
+
+int
+ERR_load_proxy_error_strings();
 
 int proxy_load_user_cert_and_key_pkcs12(const char *user_cert,
                                         X509 **cert,
