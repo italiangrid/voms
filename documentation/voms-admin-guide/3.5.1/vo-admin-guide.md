@@ -1,7 +1,7 @@
 ---
 layout: default
 title: VOMS Admin administrator's guide
-version: 3.4.2
+version: 3.5.0
 ---
 
 # VOMS Admin VO administrator guide
@@ -85,11 +85,9 @@ corner of the request table:
 
 ### The Group-Manager role <a name="group-manager-role"></a>
 
-Starting with version 3.4.0, VOMS Admin provides support for a VOMS role called
-'Group-Manager', which, when assigned to a VO member in the context a group,
-grants privileges to manage group and role requests for such group. The
-'Group-Manager' role is inactive by default, but its inherent privileges are
-activated automitcally simply by creating a role with its name in VOMS Admin.
+Starting with version 3.4.0, VOMS Admin provides support for the
+'Group-Manager' VOMS role, which, when assigned to a VO member in the context a
+group, grants privileges to manage group and role requests for such group.
 
 To enable the 'Group-Manager' role:
 
@@ -103,8 +101,7 @@ To enable the 'Group-Manager' role:
   managers in the context of the managed group **and** in the root group context
 
 Note that the Group-Manager role **does not** grant privileges to approve VO
-registration requests or to add VO members to a specific group, but only to
-approve/reject group and role membership request for the managed group.
+registration requests.
 
 ### Group managers <a name="group-managers"></a>
 
