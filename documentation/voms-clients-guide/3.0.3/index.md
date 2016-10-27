@@ -95,7 +95,7 @@ For more details on how to configure vomses files on the system, see the `vomses
 While user credentials may be put anywhere, and then their location passed to 
 `voms-proxy-init` via the appropriate options, there are obviously default values.
 
-User credentials should be put in the `$HOME/.globus`.
+User credentials should be put in the `$HOME/.globus` directory.
 
 Certificates encoded in PKCS12 and PEM formats are correctly handled by the VOMS clients.
 
