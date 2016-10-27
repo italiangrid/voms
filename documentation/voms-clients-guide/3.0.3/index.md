@@ -105,7 +105,7 @@ The default path for looking up PKCS12 credentials is:
 $HOME/.globus/usercred.p12
 ```
 
-Permissions on `usercred.p12` must be 600.
+Permissions on `$HOME/.globus/usercred.p12` must be 600.
 
 For PEM credentials the following paths are used:
 
