@@ -102,7 +102,7 @@ Certificates encoded in PKCS12 and PEM formats are correctly handled by the VOMS
 The default path for looking up PKCS12 credentials is:
 
 ```
-usercred.p12
+$HOME/.globus/usercred.p12
 ```
 
 Permissions on `usercred.p12` must be 600.
@@ -110,14 +110,14 @@ Permissions on `usercred.p12` must be 600.
 For PEM credentials the following paths are used:
 
 ```
-usercert.pem (certificate)
-userkey.pem (private key)
+$HOME/.globus/usercert.pem (certificate)
+$HOME/.globus/userkey.pem (private key)
 ```
 
 Permissions on the pem files must be:
 
-- 644 for `usercert.pem`
-- 400 for `userkey.pem`
+- 644 for `$HOME/.globus/usercert.pem`
+- 400 for `$HOME/.globus/userkey.pem`
 
 In case both the PEM and PKCS12 formats are present, PEM takes precedence. 
 
