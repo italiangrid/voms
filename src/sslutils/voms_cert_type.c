@@ -9,6 +9,7 @@
 
 #include <ctype.h>
 #include <stdio.h>
+#include <string.h>
 
 #define LIMITED_PROXY_OID               "1.3.6.1.4.1.3536.1.1.1.9"
 #define PROXYCERTINFO_OLD_OID           "1.3.6.1.4.1.3536.1.222"
@@ -86,7 +87,7 @@ get_proxy_type(ASN1_OBJECT *policy_lang){
 
   }
 
-  if (policy_nid = NID_Independent)
+  if (policy_nid == NID_Independent)
   {
 
     return VOMS_CERT_TYPE_INDEPENDENT_PROXY;

@@ -32,6 +32,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <unistd.h>
+#include <assert.h>
 
 #include <openssl/x509.h>
 #include <openssl/x509v3.h>
@@ -40,7 +41,7 @@
 #include <openssl/bio.h>
 
 #include "vomsproxy.h"
-#include "myproxycertinfo.h"
+#include "proxycertinfo.h"
 #include "sslutils.h"
 #include "doio.h"
 
@@ -54,6 +55,19 @@ static char *getBitName(char**string);
 static int getBitValue(char *bitname);
 static int convertMethod(char *bits, int *warning, void **additional);
 static X509_EXTENSION *get_BasicConstraints(int ca);
+
+AC_SEQ* create_ac_seq(AC** aclist) {
+
+  if (!aclist) return NULL;
+
+  AC_SEQ* seq = AC_SEQ_new();
+
+  while(*aclist) {
+    sk_AC_push(seq->acs, *aclist++);
+  }
+
+  return seq;
+}
 
 struct VOMSProxyArguments *VOMS_MakeProxyArguments()
 {
@@ -132,7 +146,7 @@ struct VOMSProxy *VOMS_MakeProxy(struct VOMSProxyArguments *args, int *warning, 
   X509_REQ * req = NULL;
   STACK_OF(X509_EXTENSION) * extensions = NULL;
   int ku_flags = 0;
-  char *policy = NULL;
+  char* policy = NULL;
 
   X509_EXTENSION *ex1 = NULL, *ex2 = NULL, *ex3 = NULL, 
     *ex4 = NULL, *ex5 = NULL, *ex6 = NULL, *ex7 = NULL, 
@@ -143,31 +157,27 @@ struct VOMSProxy *VOMS_MakeProxy(struct VOMSProxyArguments *args, int *warning, 
   
   struct VOMSProxy *proxy = NULL;
 
-  static int init = 0;
-
   int (*cback)();
 
-  if (!init) {
-    InitProxyCertInfoExtension(1);
-    init = 1;
-  }
+  InitProxyCertInfoExtension(1);
 
   setWarning(warning, PROXY_NO_ERROR);
 
-  if (args->callback)
+  if (args->callback) {
     cback = args->callback;
-  else
+  } else {
     cback = kpcallback;
-
+  }
   
   if (args->proxyrequest == NULL) {
     if (proxy_genreq(args->cert, &req, &npkey, args->bits, 
                      args->newsubject ? args->newsubject : NULL, 
-                     (int (*)())cback))
+                     (int (*)())cback)) {
       goto err;
-  }
-  else
+    }
+  } else {
     req = args->proxyrequest;
+  }
 
   /* initialize extensions stack */
 
@@ -188,8 +198,7 @@ struct VOMSProxy *VOMS_MakeProxy(struct VOMSProxyArguments *args, int *warning, 
           PRXYerr(PRXYERR_F_PROXY_SIGN, PRXYERR_R_CLASS_ADD_EXT);
           goto err;
         }
-      }
-      else {
+      } else {
         PRXYerr(PRXYERR_F_PROXY_SIGN, PRXYERR_R_CLASS_ADD_EXT);
         goto err;
       }
@@ -205,8 +214,9 @@ struct VOMSProxy *VOMS_MakeProxy(struct VOMSProxyArguments *args, int *warning, 
       goto err;
     }
 
-    if (!SET_EXT(ex1))
+    if (!SET_EXT(ex1)) {
       goto err;
+    }
   }
 
   /* include extension */
@@ -224,10 +234,10 @@ struct VOMSProxy *VOMS_MakeProxy(struct VOMSProxyArguments *args, int *warning, 
       }
       
       free(filedata);
-      if (!SET_EXT(ex3))
+      if (!SET_EXT(ex3)) {
         goto err;
-    }
-    else {
+      }
+    } else {
       setAdditional(additional, args->filename);
       goto err;
     }
@@ -237,13 +247,24 @@ struct VOMSProxy *VOMS_MakeProxy(struct VOMSProxyArguments *args, int *warning, 
 
   if (args->aclist) {
 
-    if ((ex5 = X509V3_EXT_conf_nid(NULL, NULL, OBJ_txt2nid("acseq"), (char *)args->aclist)) == NULL) {
+    AC_SEQ* acseq = create_ac_seq(args->aclist);
+
+    if (!acseq){
+      // FIXME: set this error to out of memory
+      PRXYerr(PRXYERR_F_PROXY_SIGN, PRXYERR_R_CLASS_ADD_EXT);
+      goto err;
+    }
+
+    ex5 = X509V3_EXT_i2d(OBJ_txt2nid("acseq"),0, acseq);
+
+    if ( ex5 == NULL) {
       PRXYerr(PRXYERR_F_PROXY_SIGN, PRXYERR_R_CLASS_ADD_EXT);
       goto err;
     }
     
-    if (!SET_EXT(ex5))
+    if (!SET_EXT(ex5)) {
       goto err;
+    }
   }
 
   /* keyUsage extension */
@@ -254,12 +275,10 @@ struct VOMSProxy *VOMS_MakeProxy(struct VOMSProxyArguments *args, int *warning, 
       PRXYerr(PRXYERR_F_PROXY_SIGN, PRXYERR_R_CLASS_ADD_EXT);
       goto err;
     }
-  }
-  else if (args->selfsigned) {
+  } else if (args->selfsigned) {
     ku_flags = X509v3_KU_DIGITAL_SIGNATURE | X509v3_KU_KEY_CERT_SIGN |
       X509v3_KU_CRL_SIGN;
-  }
-  else {
+  } else {
     ku_flags = get_KeyUsageFlags(args->cert);
 
     if (ku_flags != 0) {
@@ -276,8 +295,9 @@ struct VOMSProxy *VOMS_MakeProxy(struct VOMSProxyArguments *args, int *warning, 
 
     X509_EXTENSION_set_critical(ex8, 1);
 
-    if (!SET_EXT(ex8))
+    if (!SET_EXT(ex8)) {
       goto err;
+    }
   }
 
   /* netscapeCert extension */
@@ -288,8 +308,9 @@ struct VOMSProxy *VOMS_MakeProxy(struct VOMSProxyArguments *args, int *warning, 
       goto err;
     }
 
-    if (!SET_EXT(ex9))
+    if (!SET_EXT(ex9)) {
       goto err;
+    }
   }
 
   /* extended key usage */
@@ -302,8 +323,9 @@ struct VOMSProxy *VOMS_MakeProxy(struct VOMSProxyArguments *args, int *warning, 
       goto err;
     }
 
-    if (!SET_EXT(ex10))
+    if (!SET_EXT(ex10)) {
       goto err;
+    }
   }
 
   /* Basic Constraints */
@@ -315,8 +337,9 @@ struct VOMSProxy *VOMS_MakeProxy(struct VOMSProxyArguments *args, int *warning, 
 
   X509_EXTENSION_set_critical(ex12, 1);
 
-  if (!SET_EXT(ex12))
+  if (!SET_EXT(ex12)) {
     goto err;
+  }
  
   /* vo extension */
   
@@ -326,8 +349,9 @@ struct VOMSProxy *VOMS_MakeProxy(struct VOMSProxyArguments *args, int *warning, 
       goto err;
     }
     
-    if (!SET_EXT(ex4))
+    if (!SET_EXT(ex4)) {
       goto err;
+    }
   }
   
   /* authority key identifier and subject key identifier extension */
@@ -346,8 +370,9 @@ struct VOMSProxy *VOMS_MakeProxy(struct VOMSProxyArguments *args, int *warning, 
         goto err;
       }
           
-      if (!SET_EXT(ex13))
+      if (!SET_EXT(ex13)) {
         goto err;
+      }
 
       tmpcert = X509_new();
       if (tmpcert) {
@@ -358,11 +383,10 @@ struct VOMSProxy *VOMS_MakeProxy(struct VOMSProxyArguments *args, int *warning, 
         ex11 = X509V3_EXT_conf_nid(NULL, &ctx, NID_authority_key_identifier, "keyid");
         X509_free(tmpcert);
         EVP_PKEY_free(key);
-      }
-      else
+      } else {
         ex11 = NULL;
-    }
-    else {
+      }
+    } else {
       ex11 = X509V3_EXT_conf_nid(NULL, &ctx, NID_authority_key_identifier, "keyid");
     }
 
@@ -371,8 +395,9 @@ struct VOMSProxy *VOMS_MakeProxy(struct VOMSProxyArguments *args, int *warning, 
       goto err;
     }
           
-    if (!SET_EXT(ex11))
+    if (!SET_EXT(ex11)) {
       goto err;
+    }
   }
 
   /* class_add extension */
@@ -394,9 +419,10 @@ struct VOMSProxy *VOMS_MakeProxy(struct VOMSProxyArguments *args, int *warning, 
   /* PCI extension */
   
   if (args->proxyversion>=3) {
-    myPROXYPOLICY *                     proxypolicy;
-    myPROXYCERTINFO *                   proxycertinfo = NULL;
-    ASN1_OBJECT *                       policy_language;
+    PROXY_POLICY*                       proxypolicy;
+    PROXY_CERT_INFO_EXTENSION*                     proxycertinfo = NULL;
+    ASN1_OBJECT*                       policy_language;
+    /* char* policy = NULL; */
 
     /* getting contents of policy file */
 
@@ -418,65 +444,65 @@ struct VOMSProxy *VOMS_MakeProxy(struct VOMSProxyArguments *args, int *warning, 
       if (!args->policyfile) {
         policylang = IMPERSONATION_PROXY_OID;
         setWarning(warning, PROXY_WARNING_GSI_ASSUMED);
-      }
-      else {
+      } else {
         policylang = GLOBUS_GSI_PROXY_GENERIC_POLICY_OID;
         setWarning(warning, PROXY_WARNING_GENERIC_LANGUAGE_ASSUMED);
       }
-    }
     
     /* predefined policy language can be specified with simple name string */
     
-    else if (strcmp(policylang, IMPERSONATION_PROXY_SN) == 0)
+    } else if (strcmp(policylang, IMPERSONATION_PROXY_SN) == 0) {
       policylang = IMPERSONATION_PROXY_OID;
-    else if (strcmp(policylang, INDEPENDENT_PROXY_SN) == 0)
+    } else if (strcmp(policylang, INDEPENDENT_PROXY_SN) == 0) {
       policylang = INDEPENDENT_PROXY_OID;
-    
-    /* does limited prevail on others? don't know what does grid-proxy_init since if pl is given with
-       limited options it crash */
-    if (args->limited)
-      policylang = LIMITED_PROXY_OID;
+    }
 
-    OBJ_create(policylang, policylang, policylang);
-    
-    if (!(policy_language = OBJ_nid2obj(OBJ_sn2nid(policylang)))) {
+    /* does limited prevail on others? don't know what does grid-proxy_init
+       since if pl is given with limited options it crash */
+    if (args->limited) {
+      policylang = LIMITED_PROXY_OID;
+    }
+
+    if (OBJ_txt2nid(policylang) == 0) {
+      OBJ_create(policylang, policylang, policylang);
+    }
+
+    if (!(policy_language = OBJ_txt2obj(policylang, 1))) {
       PRXYerr(PRXYERR_F_PROXY_SIGN, PRXYERR_R_CLASS_ADD_OID);
       goto err;
     }
     
-    int nativeopenssl = proxynative();
-
-    if (args->proxyversion == 3 || (args->proxyversion == 4 && !nativeopenssl)) {
+    if (args->proxyversion == 3) {
       /* proxypolicy */
     
-      proxypolicy = myPROXYPOLICY_new();
+      proxypolicy = PROXY_POLICY_new();
 
       if (policy) {
-        myPROXYPOLICY_set_policy(proxypolicy, (unsigned char*)policy, policysize);
+        PROXY_POLICY_set_policy(proxypolicy, (unsigned char*)policy, policysize);
         free(policy);
         policy = NULL;
-      }
-      else if (args->policytext)
-        myPROXYPOLICY_set_policy(proxypolicy, 
+      } else if (args->policytext) {
+        PROXY_POLICY_set_policy(proxypolicy, 
                                  (unsigned char*)args->policytext, 
                                  strlen(args->policytext));
+      }
 
-      myPROXYPOLICY_set_policy_language(proxypolicy, policy_language);
+      PROXY_POLICY_set_policy_language(proxypolicy, policy_language);
 
       /* proxycertinfo */
     
-      proxycertinfo = myPROXYCERTINFO_new();
-      myPROXYCERTINFO_set_version(proxycertinfo, args->proxyversion);
-      myPROXYCERTINFO_set_proxypolicy(proxycertinfo, proxypolicy);
+      proxycertinfo = PROXY_CERT_INFO_EXTENSION_new();
+#warning is the call to PROXYCERTINFO_set_version needed/useful?
+      /* PROXYCERTINFO_set_version(proxycertinfo, args->proxyversion); */
+      PROXY_CERT_INFO_EXTENSION_set_policy(proxycertinfo, proxypolicy);
 
-      myPROXYPOLICY_free(proxypolicy);
+      PROXY_POLICY_free(proxypolicy);
 
       if (args->pathlength>=0)
-        myPROXYCERTINFO_set_path_length(proxycertinfo, args->pathlength);
+        PROXY_CERT_INFO_EXTENSION_set_path_length(proxycertinfo, args->pathlength);
 
       value = (char *)proxycertinfo;
-    }
-    else {
+    } else {
       if (args->pathlength != -1) {
         char *buffer = snprintf_wrap("%d", args->pathlength);
 
@@ -484,54 +510,67 @@ struct VOMSProxy *VOMS_MakeProxy(struct VOMSProxyArguments *args, int *warning, 
           value = snprintf_wrap("language:%s,pathlen:%s,policy:text:%s", policylang, buffer, policy);
           free(policy);
           policy = NULL;
-        }
-        else if (args->policytext)
+        } else if (args->policytext) {
           value = snprintf_wrap("language:%s,pathlen:%s,policy:text:%s", policylang, buffer, args->policytext);
-        else
+        } else {
           value = snprintf_wrap("language:%s,pathlen:%s", policylang, buffer);
+        }
         free(buffer);
-      }
-      else {
-        if (policy)
+      } else {
+        if (policy) {
           value = snprintf_wrap("language:%s,policy:text:%s", policylang, policy);
-        else if (args->policytext)
+        } else if (args->policytext) {
           value = snprintf_wrap("language:%s,policy:text:%s", policylang, args->policytext);
-        else
+        } else {
           value = snprintf_wrap("language:%s", policylang);
+        }
       }
     }
 
     if (args->proxyversion == 3) {
-      ex7 = X509V3_EXT_conf_nid(NULL, NULL, my_txt2nid(PROXYCERTINFO_V3), (char*)proxycertinfo);
+      /* Convert internal representation to DER */
+      unsigned char* der = NULL;
+      int len;
+      ASN1_OCTET_STRING* oct = NULL;
+      int v3nid = my_txt2nid(PROXYCERTINFO_OLD_OID);
+      X509V3_EXT_METHOD const* method = X509V3_EXT_get_nid(v3nid);
+
+      assert(method != NULL && "X509V3_EXT_get_nid failed");
+      assert(method->it != NULL && "method->it cannot be null");
+
+      len = ASN1_item_i2d((void*)proxycertinfo, &der, ASN1_ITEM_ptr(method->it));
+      oct = ASN1_OCTET_STRING_new();
+      assert(oct != NULL && "ASN1_OCTET_STRING_new failed");
+
+      oct->data = der;
+      oct->length = len;
+      ex7 = X509_EXTENSION_create_by_NID(NULL, v3nid, 1 /*critical*/, oct);
+
+      ASN1_OCTET_STRING_free(oct);
+
       value = NULL;
     } else {
-      if (nativeopenssl) {
-        X509V3_CTX ctx;
-        X509V3_set_ctx(&ctx, NULL, NULL, NULL, NULL, 0L);
-        ctx.db = (void*)&ctx;
-        X509V3_CONF_METHOD method = { NULL, NULL, NULL, NULL };
-        ctx.db_meth = &method;
-        ex7 = X509V3_EXT_conf_nid(NULL, &ctx, my_txt2nid(PROXYCERTINFO_V4), (char*)value);
-        free(value);
-        value = NULL;
-      }
-      else
-        ex7 = X509V3_EXT_conf_nid(NULL, NULL, my_txt2nid(PROXYCERTINFO_V4), (char*)value);
+      assert(args->proxyversion == 4);
+      X509V3_CTX ctx;
+      X509V3_set_ctx(&ctx, NULL, NULL, NULL, NULL, 0L);
+      ctx.db = (void*)&ctx;
+      X509V3_CONF_METHOD method = { NULL, NULL, NULL, NULL };
+      ctx.db_meth = &method;
+      ex7 = X509V3_EXT_conf_nid(NULL, &ctx, my_txt2nid(PROXYCERTINFO_OID), (char*)value);
+      assert(ex7 != NULL && "X509V3_EXT_conf_nid failed");
+
+      free(value);
+      X509_EXTENSION_set_critical(ex7, 1);
+
       value = NULL;
     }
 
-    if (policy) {
-      free(policy);
-      policy = NULL;
-    }
+    free(policy);
+    policy = NULL;
 
     if (ex7 == NULL) {
       PRXYerr(PRXYERR_F_PROXY_SIGN, PRXYERR_R_CLASS_ADD_EXT);
       goto err;
-    }
-
-    if (args->proxyversion >= 3) {
-      X509_EXTENSION_set_critical(ex7, 1);
     }
 
     if (!SET_EXT(ex7))
@@ -554,23 +593,20 @@ struct VOMSProxy *VOMS_MakeProxy(struct VOMSProxyArguments *args, int *warning, 
                    args->selfsigned)) {
       goto err;
     }
-  }
-  else  {
-    if (proxy_sign(NULL,
-                   npkey,
-                   req,
-                   &ncert,
-                   args->hours*60*60 + args->minutes*60,
-                   extensions,
-                   args->limited,
-                   0,
-                   args->newsubject,
-                   args->newsubject,
-                   args->pastproxy,
-                   NULL,
-                   args->selfsigned)) {
-      goto err;
-    }
+  } else if (proxy_sign(NULL,
+                        npkey,
+                        req,
+                        &ncert,
+                        args->hours*60*60 + args->minutes*60,
+                        extensions,
+                        args->limited,
+                        0,
+                        args->newsubject,
+                        args->newsubject,
+                        args->pastproxy,
+                        NULL,
+                        args->selfsigned)) {
+    goto err;
   }
 
   proxy = (struct VOMSProxy*)malloc(sizeof(struct VOMSProxy));
@@ -580,11 +616,13 @@ struct VOMSProxy *VOMS_MakeProxy(struct VOMSProxyArguments *args, int *warning, 
     proxy->key = npkey;
     proxy->chain = sk_X509_new_null();
 
-    if (args->cert)
+    if (args->cert) {
       sk_X509_push(proxy->chain, X509_dup(args->cert));
+    }
 
-    for (i = 0; i < sk_X509_num(args->chain); i++)
+    for (i = 0; i < sk_X509_num(args->chain); i++) {
       sk_X509_push(proxy->chain, X509_dup(sk_X509_value(args->chain, i)));
+    }
   }
 
  err:
@@ -597,8 +635,10 @@ struct VOMSProxy *VOMS_MakeProxy(struct VOMSProxyArguments *args, int *warning, 
   if (extensions) {
     sk_X509_EXTENSION_pop_free(extensions, X509_EXTENSION_free);
   }
-  if (!args->proxyrequest)
+
+  if (!args->proxyrequest) {
     X509_REQ_free(req);
+  }
 
   X509_EXTENSION_free(ex13);
   X509_EXTENSION_free(ex12);

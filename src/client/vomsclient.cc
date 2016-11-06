@@ -39,7 +39,8 @@ extern "C" {
 #include <sys/mman.h>
 #include <fcntl.h>
 #include <errno.h>
-
+#include <string.h>
+  
 #include "listfunc.h"
 #include "credentials.h"
 #include "replace.h"
@@ -66,7 +67,7 @@ extern "C" {
 
 extern "C" 
 {
-#include "myproxycertinfo.h"
+  //#include "myproxycertinfo.h"
 #include "vomsproxy.h"
 }
 
@@ -610,10 +611,12 @@ void Client::CleanAll()
   free(outfile);
   listfree((char **)aclist, (freefn)AC_free);
 
-  if (v)
-    delete v;
+  delete v;
 
   OBJ_cleanup();
+
+#warning if X509V3_EXT_cleanup is called valgrind moves some "still reachable" to "definitely lost"!
+  // X509V3_EXT_cleanup();
 }
 
 Client::~Client() 

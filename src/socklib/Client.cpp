@@ -162,8 +162,6 @@ proxy_verify_desc *setup_initializers(char *cadir)
 
   pvd  = (proxy_verify_desc*)     malloc(sizeof(proxy_verify_desc));
   pvxd = (proxy_verify_ctx_desc *)malloc(sizeof(proxy_verify_ctx_desc));
-  pvd->cert_store = NULL;
-
 
   if (!pvd || !pvxd) {
     free(pvd);
