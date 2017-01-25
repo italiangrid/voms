@@ -298,7 +298,7 @@ std::string XML_Req_Encode(const std::string &command, const std::string &order,
 	
 }
 
-std::string Encode(std::string data, int base64)
+std::string Encode(const std::string &data, int base64)
 {
   int j = 0;
   char *tmp = NULL;

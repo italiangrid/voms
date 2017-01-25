@@ -23,8 +23,8 @@ soapH.h soapStub.h: soapC.cpp
 soapC.cpp: VOMSAC.h
 	$(SOAPCPP2) VOMSAC.h
 
-VOMSAC.h: VOMSAC.wsdl
-	$(WSDL2H) $(WSDL2H_FLAGS) -s VOMSAC.wsdl
+VOMSAC.h: $(top_srcdir)/src/server/VOMSAC.wsdl
+	$(WSDL2H) $(WSDL2H_FLAGS) -s -o $@ $(top_srcdir)/src/server/VOMSAC.wsdl
 
 EXTRA_DIST= VOMSAC.wsdl
 CLEANFILES= soap* VOMSAC.h vomsSOAP*

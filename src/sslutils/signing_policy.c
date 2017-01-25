@@ -1779,17 +1779,6 @@ char **parse_subjects(char *string)
   return list;
 }
 
-#if 0
-int main()
-{
-  signingdebug = 1;
-  void **arg = NULL;
-  void *scanner=NULL;
-  signinglex_init(&scanner);
-  signingset_debug(1, scanner);
-  return signingparse(arg, scanner);
-}
-#endif
 void signingerror(UNUSED(void *policies), UNUSED(void *scanner), UNUSED(char const *msg))
 {
 }

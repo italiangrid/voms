@@ -62,7 +62,7 @@ extern "C" {
 #include "sslutils.h"
 #include "newformat.h"
 #include "listfunc.h"
-#include "myproxycertinfo.h"
+#include "proxycertinfo.h"
 }
 
 extern int AC_Init(void);
@@ -330,8 +330,8 @@ static const char *proxy_type(X509 *cert)
   if (point2 > point1)
       return "limited proxy";
 
-  int nidv3 = OBJ_txt2nid(PROXYCERTINFO_V3);
-  int nidv4 = OBJ_txt2nid(PROXYCERTINFO_V4);
+  int nidv3 = OBJ_txt2nid(PROXYCERTINFO_OLD_OID);
+  int nidv4 = OBJ_txt2nid(PROXYCERTINFO_OID);
 
   int indexv3 = X509_get_ext_by_NID(cert, nidv3, -1);
   int indexv4 = X509_get_ext_by_NID(cert, nidv4, -1);

@@ -46,6 +46,7 @@ extern "C" {
 #include <time.h>
 #include <stdio.h>
 #include <netdb.h>
+#include <assert.h>
 
 #include <openssl/evp.h>
 #include <openssl/buffer.h>
@@ -60,6 +61,7 @@ extern "C" {
 #include "log.h"
 #include "vomsssl.h"
 #include "sslutils.h"
+#include "ssl_compat.h"
 }
 
 #include "ipv6sock.h"
@@ -282,6 +284,72 @@ void GSISocketServer::CloseListened(void)
   newopened = false;
 }
 
+static BIO* make_VOMS_BIO(int sock)
+{
+  int ret;
+
+  int const biom_type = BIO_get_new_index();
+  static char const* const biom_name = "VOMS I/O";
+  BIO_METHOD* voms_biom = BIO_meth_new(biom_type|BIO_TYPE_SOURCE_SINK|BIO_TYPE_DESCRIPTOR, biom_name);
+  assert(voms_biom && "BIO_meth_new failed");
+
+  BIO_METHOD const* sock_biom = BIO_s_socket();
+  assert(sock_biom != NULL && "BIO_s_socket");
+
+  writeb = BIO_meth_get_write(const_cast<BIO_METHOD*>(sock_biom));
+  assert(writeb != NULL && "BIO_meth_get_write failed");
+  ret = BIO_meth_set_write(voms_biom, globusf_write);
+  assert(ret == 1 && "BIO_meth_set_write failed");
+
+  readb = BIO_meth_get_read(const_cast<BIO_METHOD*>(sock_biom));
+  assert(readb != NULL && "BIO_meth_get_read failed");
+  ret = BIO_meth_set_read(voms_biom, globusf_read);
+  assert(ret == 1 && "BIO_meth_set_read failed");
+
+  ret = BIO_meth_set_puts(
+      voms_biom
+    , BIO_meth_get_puts(const_cast<BIO_METHOD*>(sock_biom))
+  );
+  assert(ret == 1 && "BIO_meth_get/set_puts failed");
+
+  ret = BIO_meth_set_gets(
+      voms_biom
+    , BIO_meth_get_gets(const_cast<BIO_METHOD*>(sock_biom))
+  );
+  assert(ret == 1 && "BIO_meth_get/set_gets failed");
+
+  ret = BIO_meth_set_ctrl(
+      voms_biom
+    , BIO_meth_get_ctrl(const_cast<BIO_METHOD*>(sock_biom))
+  );
+  assert(ret == 1 && "BIO_meth_get/set_ctrl failed");
+
+  ret = BIO_meth_set_create(
+      voms_biom
+    , BIO_meth_get_create(const_cast<BIO_METHOD*>(sock_biom))
+  );
+  assert(ret == 1 && "BIO_meth_get/set_create failed");
+
+  ret = BIO_meth_set_destroy(
+      voms_biom
+    , BIO_meth_get_destroy(const_cast<BIO_METHOD*>(sock_biom))
+  );
+  assert(ret == 1 && "BIO_meth_get/set_destroy failed");
+
+  ret = BIO_meth_set_callback_ctrl(
+      voms_biom
+    , BIO_meth_get_callback_ctrl(const_cast<BIO_METHOD*>(sock_biom))
+  );
+  assert(ret == 1 && "BIO_meth_get/set_callback_ctrl failed");
+
+  BIO* voms_bio = BIO_new(voms_biom);
+  assert(voms_bio && "BIO_new failed");
+  BIO_set_fd(voms_bio, sock, BIO_NOCLOSE);
+  (void)BIO_set_nbio(voms_bio, 1);
+
+  return voms_bio;
+}
+
 /**
  * Accept the GSI Authentication.
  * @param sock the socket for communication.
@@ -300,6 +368,7 @@ GSISocketServer::AcceptGSIAuthentication()
   bool accept_timed_out = false;
   int expected = 0;
   BIO *bio = NULL;
+  BIO_METHOD* bio_method = NULL;
   char *cert_file, *user_cert, *user_key, *user_proxy;
   char *serial=NULL;
 
@@ -333,11 +402,11 @@ GSISocketServer::AcceptGSIAuthentication()
      * Certificate was a proxy with a cert. chain.
      * Add the certificates one by one to the chain.
      */
-    X509_STORE_add_cert(ctx->cert_store, ucert);
+    X509_STORE_add_cert(SSL_CTX_get_cert_store(ctx), ucert);
     for (int i = 0; i <sk_X509_num(own_stack); ++i) {
       X509 *cert = (sk_X509_value(own_stack,i));
 
-      if (!X509_STORE_add_cert(ctx->cert_store, cert)) {
+      if (!X509_STORE_add_cert(SSL_CTX_get_cert_store(ctx), cert)) {
         if (ERR_GET_REASON(ERR_peek_error()) == X509_R_CERT_ALREADY_IN_HASH_TABLE) {
           ERR_clear_error();
           continue;
@@ -353,16 +422,10 @@ GSISocketServer::AcceptGSIAuthentication()
   flags = fcntl(newsock, F_GETFL, 0);
   (void)fcntl(newsock, F_SETFL, flags | O_NONBLOCK);
 
-  bio = BIO_new_socket(newsock, BIO_NOCLOSE);
-  (void)BIO_set_nbio(bio, 1);
+  bio = make_VOMS_BIO(newsock);
 
   ssl = SSL_new(ctx);
   setup_SSL_proxy_handler(ssl, cacertdir);
-
-  writeb = bio->method->bwrite;
-  readb  = bio->method->bread;
-  bio->method->bwrite = globusf_write;
-  bio->method->bread  = globusf_read;
 
   SSL_set_bio(ssl, bio, bio);
 
