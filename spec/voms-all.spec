@@ -1,6 +1,6 @@
 Name: voms
 Version: 2.1.0
-Release: 1%{?dist}
+Release: 0%{?dist}
 Summary: The Virtual Organisation Membership Service C++ APIs
 
 Group:          System Environment/Libraries
