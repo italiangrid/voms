@@ -344,6 +344,11 @@ void InitProxyCertInfoExtension(int full)
     return;
   }
 
+  if (OBJ_txt2nid(PROXYCERTINFO_OLD_OID) != NID_undef) {
+    init_done = 1;
+    return;
+  }
+
   char const* pci_v3_sn =  "proxyCertInfo_V3";
   char const* pci_v3_ln =  "Proxy Certificate Information (V3)";
   int const v3nid = OBJ_create(PROXYCERTINFO_OLD_OID, pci_v3_sn, pci_v3_ln);
