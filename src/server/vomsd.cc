@@ -1451,7 +1451,7 @@ static bool determine_group_and_role(std::string command, char *comm, char **gro
     case 'B':
       *role = strchr(string, ':');
       if (*role) {
-        (*role) = '\0';
+        (**role) = '\0';
         (*role)++;
       }
       break;
