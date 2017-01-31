@@ -50,13 +50,13 @@ globus(int version)
       char *tmp;
       
       version = strtol(gver, &tmp, 10);
-      if (!(*tmp))
-        return 22;
+      if (*tmp)
+        return 60;
     }
   }
   
-  if (version >= 42 || version == 0)
-    version = 22;
+  if (version > 60 || version == 0)
+    version = 60;
 
   return version;
 }
