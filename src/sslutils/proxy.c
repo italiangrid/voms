@@ -463,8 +463,9 @@ struct VOMSProxy *VOMS_MakeProxy(struct VOMSProxyArguments *args, int *warning, 
       policylang = LIMITED_PROXY_OID;
     }
 
-    if (OBJ_txt2nid(policylang) == 0) {
-      OBJ_create(policylang, policylang, policylang);
+    if (OBJ_txt2nid(policylang) == NID_undef) {
+      int nid = OBJ_create(policylang, policylang, policylang);
+      assert(nid != NID_undef && "OBJ_create failed");
     }
 
     if (!(policy_language = OBJ_txt2obj(policylang, 1))) {

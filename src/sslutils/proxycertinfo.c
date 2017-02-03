@@ -338,22 +338,19 @@ PROXY_CERT_INFO_EXTENSION_get_policy(PROXY_CERT_INFO_EXTENSION const* pci)
 
 void InitProxyCertInfoExtension(int full)
 {
-  static int init_done = 0;
+  if (OBJ_txt2nid(PROXYCERTINFO_OLD_OID) == NID_undef) {
+    int ret = 0;
+    X509V3_EXT_METHOD* meth = NULL;
 
-  if (init_done) {
-    return;
-  }
+    char const* pci_v3_sn =  "proxyCertInfo_V3";
+    char const* pci_v3_ln =  "Proxy Certificate Information (V3)";
+    int const v3nid = OBJ_create(PROXYCERTINFO_OLD_OID, pci_v3_sn, pci_v3_ln);
+    assert(v3nid != NID_undef && "OBJ_create failed");
 
-  char const* pci_v3_sn =  "proxyCertInfo_V3";
-  char const* pci_v3_ln =  "Proxy Certificate Information (V3)";
-  int const v3nid = OBJ_create(PROXYCERTINFO_OLD_OID, pci_v3_sn, pci_v3_ln);
-  assert(v3nid != 0 && "OBJ_create failed");
-
-  if (X509V3_EXT_get_nid(v3nid) == NULL) {
-    X509V3_EXT_METHOD* meth = PROXYCERTINFO_OLD_x509v3_ext_meth();
+    meth = PROXYCERTINFO_OLD_x509v3_ext_meth();
+    assert(meth != NULL && "PROXYCERTINFO_OLD_x509v3_ext_meth failed");
     meth->ext_nid = v3nid;
-    X509V3_EXT_add(meth);
+    ret = X509V3_EXT_add(meth);
+    assert(ret != 0 && "X509V3_EXT_add failed");
   }
-
-  init_done = 1;
 }

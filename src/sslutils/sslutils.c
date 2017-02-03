@@ -472,12 +472,26 @@ ERR_load_prxyerr_strings(
             SSL_load_error_strings();
         }
 
-        OBJ_create("1.3.6.1.4.1.3536.1.1.1.1","CLASSADD","ClassAdd");
-        OBJ_create("1.3.6.1.4.1.3536.1.1.1.2","DELEGATE","Delegate");
-        OBJ_create("1.3.6.1.4.1.3536.1.1.1.3","RESTRICTEDRIGHTS",
-                   "RestrictedRights");
-        /* the following is already available in OpenSSL... */
-        OBJ_create("0.9.2342.19200300.100.1.1","USERID","userId");
+        if (OBJ_txt2nid("1.3.6.1.4.1.3536.1.1.1.1") == NID_undef) {
+          int nid = OBJ_create("1.3.6.1.4.1.3536.1.1.1.1","CLASSADD","ClassAdd");
+          assert(nid != NID_undef && "OBJ_create failed");
+        }
+
+        if (OBJ_txt2nid("1.3.6.1.4.1.3536.1.1.1.2") == NID_undef) {
+          int nid = OBJ_create("1.3.6.1.4.1.3536.1.1.1.2","DELEGATE","Delegate");
+          assert(nid != NID_undef && "OBJ_create failed");
+        }
+
+        if (OBJ_txt2nid("1.3.6.1.4.1.3536.1.1.1.3") == NID_undef) {
+          int nid = OBJ_create("1.3.6.1.4.1.3536.1.1.1.3","RESTRICTEDRIGHTS",
+                               "RestrictedRights");
+          assert(nid != NID_undef && "OBJ_create failed");
+        }
+
+        if (OBJ_txt2nid("0.9.2342.19200300.100.1.1") == NID_undef) {
+          int nid = OBJ_create("0.9.2342.19200300.100.1.1","USERID","userId");
+          assert(nid != NID_undef && "OBJ_create failed");
+        }
 
         ERR_load_strings(ERR_USER_LIB_PRXYERR_NUMBER,prxyerr_str_functs);
         ERR_load_strings(ERR_USER_LIB_PRXYERR_NUMBER,prxyerr_str_reasons);
