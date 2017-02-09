@@ -106,11 +106,11 @@ static int fix_add_entry_asn1_set_param = 0;
 
 #define V1_ROOT (EXFLAG_V1|EXFLAG_SS)
 #define ku_reject(x, usage) \
-	(((x)->ex_flags & EXFLAG_KUSAGE) && !((x)->ex_kusage & (usage)))
+        (((x)->ex_flags & EXFLAG_KUSAGE) && !((x)->ex_kusage & (usage)))
 #define xku_reject(x, usage) \
-	(((x)->ex_flags & EXFLAG_XKUSAGE) && !((x)->ex_xkusage & (usage)))
+        (((x)->ex_flags & EXFLAG_XKUSAGE) && !((x)->ex_xkusage & (usage)))
 #define ns_reject(x, usage) \
-	(((x)->ex_flags & EXFLAG_NSCERT) && !((x)->ex_nscert & (usage)))
+        (((x)->ex_flags & EXFLAG_NSCERT) && !((x)->ex_nscert & (usage)))
 
 static X509_NAME *make_DN(const char *dnstring);
 
@@ -477,7 +477,10 @@ ERR_load_prxyerr_strings(
         OBJ_create("1.3.6.1.4.1.3536.1.1.1.3","RESTRICTEDRIGHTS",
                    "RestrictedRights");
         /* the following is already available in OpenSSL... */
-        OBJ_create("0.9.2342.19200300.100.1.1","USERID","userId");
+        if (OBJ_txt2nid("0.9.2342.19200300.100.1.1") == NID_undef)
+        {
+            OBJ_create("0.9.2342.19200300.100.1.1","USERID","userId");
+        }
 
         ERR_load_strings(ERR_USER_LIB_PRXYERR_NUMBER,prxyerr_str_functs);
         ERR_load_strings(ERR_USER_LIB_PRXYERR_NUMBER,prxyerr_str_reasons);
@@ -949,8 +952,8 @@ proxy_sign(
         PRXYerr(PRXYERR_F_PROXY_SIGN,PRXYERR_R_PROCESS_SIGN);
         if (proxyver >= 3) {
           free(newcn);
-	  free((void*)newserial);
-	}
+          free((void*)newserial);
+        }
         return 1;
       }
     }
@@ -1334,7 +1337,7 @@ proxy_construct_name(
     if(newcn)
     {
         if ((name_entry = X509_NAME_ENTRY_create_by_NID(NULL,
-							NID_commonName,
+                                                        NID_commonName,
                                                         V_ASN1_APP_CHOOSE,
                                                         (unsigned char *)newcn,
                                                         len)) == NULL)
