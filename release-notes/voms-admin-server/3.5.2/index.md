@@ -18,7 +18,7 @@ checks membership status and could lead to incorrect behaviour.
 
 ### Installation and configuration
 
-#### Upgrade from VOMS Admin Server 3.5.0
+#### Upgrade from VOMS Admin Server >= 3.5.0
 
 A service restart is required for the changes to take effect.
 
