@@ -22,7 +22,7 @@ checks membership status and could lead to incorrect behaviour.
 
 A service restart is required for the changes to take effect.
 
-#### Upgrade from VOMS Admin Server >= 3.3.2
+#### Upgrade from VOMS Admin Server version >= 3.3.2 and &lt; 3.5.0 
 
 A [database upgrade][db-upgrade] is required to upgrade to VOMS Admin server 3.5.2.
 
