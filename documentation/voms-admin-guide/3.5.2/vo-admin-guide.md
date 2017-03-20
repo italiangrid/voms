@@ -1,7 +1,7 @@
 ---
 layout: default
 title: VOMS Admin administrator's guide
-version: 3.5.1
+version: 3.5.2
 ---
 
 # VOMS Admin VO administrator guide
