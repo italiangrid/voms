@@ -60,12 +60,14 @@ voms-admin-guide:
     admin_client_version: VOMS Admin client
 
   versions:
+
     3.6.0:
-      sysadmin_guide_version: 3.0.9
+      sysadmin_guide_version: 3.0.11
       admin_server_version: 3.6.0
       admin_client_version: 2.0.19
+
     3.5.2:
-      sysadmin_guide_version: 3.0.9
+      sysadmin_guide_version: 3.0.10
       admin_server_version: 3.5.2
       admin_client_version: 2.0.19
     3.5.1:

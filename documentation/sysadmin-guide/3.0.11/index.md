@@ -86,20 +86,21 @@ Also archive the configuration files for VOMS and VOMS-Admin, which live in the 
 /etc/voms-admin
 ```
 
-### EMI repository configuration <a name="Repository">&nbsp;</a>
+### UMD repository configuration <a name="Repository">&nbsp;</a>
 
-Follow the [general EMI 3 installation instructions](https://twiki.cern.ch/twiki/bin/view/EMI/GenericInstallationConfigurationEMI3) for installing the EMI-3 repositories.
+Follow the [UMD installation instructions][umd] to install basic UMD
+repositories.
 
-If installing from the VOMS PT repository, also follow the instructions given [here]({{site.baseurl}}/releases.html).
+If you want to install packages from the VOMS repository, follow the
+instructions given [here]({{site.baseurl}}/releases.html).
 
-### Upgrading from EMI 3 to the latest VOMS release <a name="Upgrading from EMI 3">&nbsp;</a>
+### Upgrading to the latest VOMS release <a name="Upgrading">&nbsp;</a>
 
 After having properly configured the repositories as explained in the previous section, just run:
 
 ```bash
 yum update
 ```
-
 to get the latest versions of the VOMS packages.
 
 If the release notes indicate that a reconfiguration of the services is required, run `voms-configure` with the same parameters
@@ -122,13 +123,15 @@ the procedure described below:
 3. Run the upgrade script for each configured vo as follows:
 
    ```bash
-   voms-configure upgrade --vo <vo_name>
+   voms-db-util upgrade --vo <vo_name>
    ```
 
 4. Restart the services
 
+### Upgrading from older releases <a name="Upgrading from older releases">&nbsp;</a>
 
-### Upgrading from EMI 2 <a name="Upgrading from EMI 2">&nbsp;</a>
+These instructions should be followed by people upgrading from VOMS Admin 
+&lt; 3.
 
 Before upgrading, stop the running VOMS services issuing the following commands
 
@@ -209,12 +212,13 @@ VOMS_JAVA_OPTS="-Xms375m -Xmx750m -XX:MaxPermSize=1125m"
 
 Sometimes a VOMS Admin upgrade requires a reconfiguration.
 The VOs can be reconfigured using the `voms-configure` configuration tool (YAIM
-is no longer supported).
+is no longer supported), or your favourite configuration management tool (e.g.,
+puppet).
 
-This tool is the evolution of the `voms-admin-configure` script, and provides
-access to all the VOMS and VOMS-Admin service configuration parameters. For
-more detailed information about the `voms-configure` tool, see the
-[configuration section](#Configuration).
+The `voms-configure` tool is the evolution of the `voms-admin-configure`
+script, and provides access to all the VOMS and VOMS-Admin service
+configuration parameters. For more detailed information about the
+`voms-configure` tool, see the [configuration section](#Configuration).
 
 The following command shows a basic reconfiguration of the VO:
 
@@ -284,7 +288,7 @@ and enable a cron job that periodically refresh CRLs on the filesystem as follow
 ```
 ### Clean installation
 
-Install the `emi-voms-mysql` metapackage, or `emi-voms-oracle` depending on the database backend you are using
+Install the `emi-voms-mysql` metapackage.
 
 ```bash
 yum install emi-voms-mysql
@@ -319,26 +323,7 @@ The following commands change the password for the MySQL root account:
 
 #### Oracle
 
-VOMS uses the Oracle instant-client native libraries to connect to Oracle databases.
-
-These libraries require that the `TNS_ADMIN` and `LD_LIBRARY_PATH` environment libraries
-are set in a compatible way with your oracle-instantclient installation.
-
-VOMS comes with default settings that work out-of-the box with the oracle instantclient packages
-as repackaged by CERN.
-
-To configure the database endpoints, a [tnsnames.ora](http://docs.oracle.com/cd/B28359_01/network.111/b28317/tnsnames.htm) file must be used and placed in the following location:
-```
-/etc/voms
-```
-
-If you want to place the `tnsnames.ora` in a different location, change the value of
-the `TNS_ADMIN` variable in the following files:
-
-```
-/etc/sysconfig/voms
-/etc/sysconfig/voms-admin
-```
+Oracle is no longer supported.
 
 ### Configuring the VOMS Admin container
 
@@ -722,3 +707,4 @@ mysql -uroot -p<PASSWORD> < voms_database_dump.sql
 See the [known issues page]({{ site.baseurl }}/documentation/known-issues)
 
 [voms-conf-ref]: {{site.baseurl}}/documentation/sysadmin-guide/{{page.version}}/configuration.html
+[umd]: http://repository.egi.eu/category/umd_releases/distribution/umd-3/
