@@ -47,7 +47,7 @@ configuration either by:
   command:
 
 ```bash
-for vo in $(find /etc/voms-admin/ -t d); do \
+for vo in $(find /etc/voms-admin/ -type d | sed '1d'); do \
   cp /usr/share/voms-admin/templates/logback.xml $vo; \
 done
 ```
