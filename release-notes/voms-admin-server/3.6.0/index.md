@@ -43,7 +43,7 @@ after** the upgrade of the rpm to version 3.6.0, update your VOs logback
 configuration either by:
 
 - reconfiguring each VO
-- update manually the logback configuration files issuing the following
+- updating manually the logback configuration files with the following
   command:
 
 ```bash
