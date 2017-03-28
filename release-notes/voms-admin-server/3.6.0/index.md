@@ -54,7 +54,7 @@ done
 ##### Java 8
 The VOMS admin RPM explicitly requires Java 8 since version 3.4.0. While former
 versions could run on earlier Java versions, 3.6.0 will not start unless it is
-ran on Java 8.
+run on Java 8.
 
 The output of `java -version` will tell which is the active version on your
 system:
