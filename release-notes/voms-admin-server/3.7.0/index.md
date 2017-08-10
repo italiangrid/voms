@@ -46,7 +46,7 @@ First upgrade to VOMS Admin version [3.3.2][voms-admin-332-rn] and then to 3.7.0
 Follow the instructions in the VOMS [System Administrator Guide][sysadmin-guide].
 
 [voms-website]: http://italiangrid.github.io/voms
-[sysadmin-guide]:{{site.baseurl}}/documentation/sysadmin-guide/3.0.11
+[sysadmin-guide]:{{site.baseurl}}/documentation/sysadmin-guide/3.0.12
 [voms-admin-guide-api]: {{site.baseurl}}/documentation/voms-admin-guide/3.7.0/api.html
 [reconf]: {{site.baseurl}}/documentation/sysadmin-guide/3.0.11/#reconf
 [db-upgrade]: {{site.baseurl}}/documentation/sysadmin-guide/3.0.11/#db-upgrade
