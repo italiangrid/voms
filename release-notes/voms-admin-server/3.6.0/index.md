@@ -37,20 +37,6 @@ The full list of bug fixes and improvements is listed below.
 A [database upgrade][db-upgrade] is required to upgrade to VOMS Admin server
 3.6.0. 
 
-To take advantage of runtime logback configuration reloading, that is now
-working correctly as a result of the fix of [this issue][VOMS-790]**,
-after** the upgrade of the rpm to version 3.6.0, update your VOs logback
-configuration either by:
-
-- reconfiguring each VO
-- updating manually the logback configuration files with the following
-  command:
-
-```bash
-for vo in $(find /etc/voms-admin/ -type d | sed '1d'); do \
-  cp /usr/share/voms-admin/templates/logback.xml $vo; \
-done
-```
 ##### Java 8
 The VOMS admin RPM explicitly requires Java 8 since version 3.4.0. While former
 versions could run on earlier Java versions, 3.6.0 will not start unless it is
@@ -70,6 +56,23 @@ You can configure the active JRE using `update-alternatives`:
 
 ```
 $ update-alternatives --config java
+```
+
+##### Runtime logging configuration reloading
+
+To take advantage of runtime logging  configuration reloading, that is now
+working correctly as a result of the fix of [this issue][VOMS-790]**,
+after** the upgrade of the rpm to version 3.6.0, update your VOs logback
+configuration either by:
+
+- reconfiguring each VO, **or**
+- updating manually the logback configuration files with the following
+  command:
+
+```bash
+for vo in $(find /etc/voms-admin/ -type d | sed '1d'); do \
+  cp /usr/share/voms-admin/templates/logback.xml $vo; \
+done
 ```
 
 #### Upgrade from earlier VOMS Admin Server versions
