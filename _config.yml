@@ -3,6 +3,8 @@ gems:
 
 exclude: [README.md,"run-jekyll.sh"]
 
+encoding: UTF-8
+
 future: yes
 
 redcarpet:

@@ -1,0 +1,249 @@
+swagger: '2.0'
+info:
+  description: A set of APIs to access VOMS user information
+  version: 3.7.0
+  title: VOMS Admin REST APIs
+  contact:
+    email: andrea.ceccanti@cnaf.infn.it
+  license:
+    name: Apache 2.0
+    url: 'http://www.apache.org/licenses/LICENSE-2.0.html'
+host: dev.local.io:8443
+basePath: /voms/voname/apiv2
+schemes:
+  - https
+
+definitions:
+  SignAUPTask:
+    type: object
+    properties:
+      creationDate: 
+        type: string
+        format: date-time
+        description: The task creation date
+        example: "2017-08-04T12:27:06"
+      expirationDate: 
+        type: string
+        format: date-time
+        description: The task expiration date
+        example: "2017-08-19T13:37:28"
+      lastNotificationTime:
+        type: string
+        format: date-time
+        description: The time the user was last notified about this sign AUP task
+        example: "2017-08-04T13:37:28"
+  GenericAttribute:
+    type: object
+    properties:
+      name:
+        type: string
+        description: The GA name
+        example: "nickname"
+      value:
+        type: string
+        description: The GA value
+        example: "jlennon"
+  Certificate:
+    type: object
+    properties:
+      subjectString:
+        type: string
+        description: The X.509 certificate subject, in OpenSSL format
+        example: "/C=IT/O=Example/CN=John Lennon"
+      issuerString:
+        type: string
+        description: The X.509 certificate issuer, in OpenSSL format
+        example: "/C=IT/O=Example/CN=Example CA"  
+      creationTime:
+        type: string
+        format: date-time
+        description: The certificate creation time
+        example: "2016-02-11T10:08:40"
+      suspended:
+        type: boolean
+        description: Certificate suspension status
+        example: false
+      suspensionReason:
+        type: string
+        description: Certificate suspension reason
+        example: User failed to sign the AUP in time
+
+  AupAcceptanceRecord:
+    type: object
+    properties:
+      aupVersion:
+        type: string
+        description: The AUP version signed for this record
+        example: "1.0"
+      daysBeforeExpiration:
+        type: integer
+        format: int64
+        description: The number of days before this acceptance record expires
+        example: 7
+      lastAcceptanceDate:
+        type: string
+        format: date-time
+        description: The time when the AUP was last accepted
+        example: "2017-08-04T12:27:06"
+      valid:
+        type: boolean
+        description: The acceptance record validity
+        example: true
+  SuspendedVoUserList:
+    type: object
+    properties:
+      suspendedUsers:
+        type: array
+        description: An array of suspended VO user objects
+        items:
+          $ref: '#/definitions/VoUser'
+  ExpiredVoUserList:
+    type: object
+    properties:
+      expiredUsers:
+        type: array
+        description: An array of VO user whose membership has expired
+        items:
+          $ref: '#/definitions/VoUser'
+  VoUserList:
+    type: object
+    properties:
+      count:
+        type: integer
+        format: int64
+        description: The total number of users in the VO
+        example: 1
+      pageSize:
+        type: integer
+        format: int64
+        description: The page size for this response
+        example: 10
+      startIndex:
+        type: integer
+        format: int64
+        description: The start index for this response
+        example: 0
+      result:
+        type: array
+        description: An array of VO user objects
+        items:
+          $ref: '#/definitions/VoUser'
+      
+  VoUser:
+    type: object
+    properties:
+      id:
+        type: integer
+        format: int64
+        description: VO user record unique identifier
+        example: 100
+      name:
+        type: string
+        description: VO user given name
+        example: "John"
+      surname:
+        type: string
+        description: VO user family name
+        example: "Lennon"
+      institution:
+        type: string
+        description: VO user institution
+        example: "The Beatles"
+      address:
+        type: string
+        description: VO user address
+        example: "The Dakota, 1 West 72nd Street, NY, USA"
+      phoneNumber:
+        type: string
+        description: VO user phone number
+        example: "+1 9 999 999"
+      suspended:
+        type: boolean
+        description: VO user suspension status
+        example: false
+      suspensionReason:
+        type: string
+        description: VO user suspension reason
+        example: User failed to sign the AUP in time
+      supensionReasonCode:
+        type: string
+        description: VO user suspension reason code
+        example: OTHER
+      creationTime:
+        type: string
+        format: date-time
+        description: VO user membership creation time
+        example: "2016-02-11T10:08:40"
+      endTime:
+        type: string
+        format: date-time
+        description: VO user membership expiration time
+        example: "2018-02-11T10:08:40"
+      emailAddress:
+        type: string
+        description: VO user email address
+        example: "john@lennon.com"
+      aupAcceptanceRecords:
+        type: array
+        items:
+          $ref: '#/definitions/AupAcceptanceRecord'
+      certificates:
+        type: array
+        items:
+          $ref: '#/definitions/Certificate'
+      attributes:
+        type: array
+        items:
+          $ref: '#/definitions/GenericAttribute'
+      fqans:
+        type: array
+        items: 
+          type: string
+        example: [ "/example", "/example/Role=Admin"]
+      pendingSignAUPTask:
+        $ref: '#/definitions/SignAUPTask'
+      
+paths:
+  /users:
+    get:
+      summary: Lists VOMS users 
+      operationId: listVoUsers
+      produces:
+        - application/json
+      parameters:
+        - in: query
+          name: startIndex
+          description: The 0-based index of the first query result
+          type: integer
+        - name: pageSize
+          in: query
+          description: Specifies the desired maximum number of query results per page
+          type: integer
+      responses:
+        200:
+          description: A list of VO users
+          schema:
+            $ref: '#/definitions/VoUserList'
+      description: Returns a list VO users
+  /suspended-users:
+    get:
+      summary: Lists suspended VOMS users
+      operationId: listSuspendedVoUsers
+      produces:
+        - application/json
+      responses:
+        200:
+          description: A list of suspended VO users
+          schema:
+            $ref: '#/definitions/SuspendedVoUserList'
+  /expired-users:
+    get:
+      summary: Lists VOMS users whose membership has expired
+      operationId: listExpiredVoUsers
+      produces:
+        - application/json
+      responses:
+        200:
+          description: A list of VO users whose membership has expired
+          schema:
+            $ref: '#/definitions/ExpiredVoUserList'
