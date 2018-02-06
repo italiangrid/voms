@@ -44,6 +44,8 @@
 # Description:       Virtual Organization Membership Service
 ### END INIT INFO
 
+RUN=yes
+
 etcpath=@ETC_DIR@
 
 # Source an auxiliary profile file if we have one and pick up VOMS_USER and RUN
@@ -57,8 +59,6 @@ fi
 # Default prefix
 @LOCATION_ENV@=@LOCATION_DIR@
 @VAR_LOCATION_ENV@=@VAR_DIR@
-
-RUN=yes
 
 # check whether $@VAR_LOCATION_ENV@/lock/subsys exists
 if ! test -d $@VAR_LOCATION_ENV@/lock/subsys ; then
