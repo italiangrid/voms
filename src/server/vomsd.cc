@@ -178,7 +178,7 @@ gv  getlibversion;
 bool dummyb = false;
 
 static bool checkinside(gattrib g, std::vector<std::string> list);
-static signed long int get_userid(sqliface::interface *db, X509 *cert, const std::string& voname, vomsresult &vr);
+static long long get_userid(sqliface::interface *db, X509 *cert, const std::string& voname, vomsresult &vr);
 static std::string addtoorder(std::string previous, char *group, char *role);
 static bool determine_group_and_role(std::string command, char *comm, char **group, char **role);
 static BIGNUM *get_serial();
@@ -290,7 +290,7 @@ static std::string parse_order(const std::string &message, ordermap &ordering)
       first = fqan;
 
     LOGM(VARP, logh, LEV_DEBUG, T_PRE, "Order: %s",fqan.c_str());
-    ordering.insert(std::make_pair<std::string, int>(fqan,order));
+    ordering.insert(std::make_pair(fqan,order));
     order++;
     position = end_token;
 
@@ -785,8 +785,16 @@ void VOMSServer::Run()
 
           if (!sock.AcceptGSIAuthentication()){
 
-            LOGM(VARP, logh, LEV_INFO, T_PRE, "Failed to authenticate peer.");
-            LOGM(VARP, logh, LEV_INFO, T_PRE, "Error: %s", sock.error.c_str());
+            LOGM(VARP, logh, LEV_INFO, T_PRE, sock.error.c_str());
+
+            for (std::vector<std::string>::const_iterator err_it = sock.GetOpenSSLErrors().begin();
+                err_it != sock.GetOpenSSLErrors().end();
+                ++err_it){
+
+              std::string err_string = *err_it;
+              LOGM(VARP, logh, LEV_INFO, T_PRE, err_string.c_str());
+
+            }
 
             sock.CleanSocket();
             sock.Close();
@@ -915,7 +923,6 @@ bool VOMSServer::makeAC(vomsresult& vr, EVP_PKEY *key, X509 *issuer,
 
   std::vector<std::string> fqans;
   std::vector<gattrib> attribs;
-  signed long int uid = -1;
 
   sqliface::interface *newdb = db->getSession();
 
@@ -926,6 +933,7 @@ bool VOMSServer::makeAC(vomsresult& vr, EVP_PKEY *key, X509 *issuer,
   }
 
   /* Determine user ID in the DB */
+  long long uid = -1;
 
   if ((uid = get_userid(newdb, holder, voname, vr)) == -1) {
     db->releaseSession(newdb);
@@ -940,7 +948,6 @@ bool VOMSServer::makeAC(vomsresult& vr, EVP_PKEY *key, X509 *issuer,
     setuporder = true;
 
   int k = 0;
-
 
   /* Parse and execute requests */
 
@@ -1167,11 +1174,11 @@ bool VOMSServer::makeAC(vomsresult& vr, EVP_PKEY *key, X509 *issuer,
     for (std::vector<std::string>::const_iterator i = fqans.begin(); i != end; ++i)
       LOGM(VARP, logh, LEV_INFO, T_PRE, "Issued FQAN: %s",  (*i).c_str());
 
-    if (LogLevelMin(logh, LEV_DEBUG)) {
+    if (LogLevelMin(logh, LEV_INFO)) {
       if(result && !attribs.empty()) {
         std::vector<gattrib>::const_iterator end = attribs.end();
         for(std::vector<gattrib>::const_iterator i = attribs.begin(); i != end; ++i)
-          LOGM(VARP, logh, LEV_DEBUG, T_PRE,  "Generic attributes found: %s", i->str().c_str());
+          LOGM(VARP, logh, LEV_INFO, T_PRE,  "Issued generic attribute: %s", i->str().c_str());
       }
       else
         LOGM(VARP, logh, LEV_DEBUG, T_PRE,  "No generic attributes found for user.");
@@ -1509,9 +1516,9 @@ static bool checkinside(gattrib g, std::vector<std::string> list)
   return !g.qualifier.empty() && not_in(g.qualifier, list);
 }
 
-static signed long int get_userid(sqliface::interface *db, X509 *cert, const std::string& voname, vomsresult &vr)
+static long long get_userid(sqliface::interface *db, X509 *cert, const std::string& voname, vomsresult &vr)
 {
-  signed long int uid = -1;
+  long long uid = -1;
 
   if (!db->operation(OPERATION_GET_USER, &uid, cert)) {
     std::string message = db->errorMessage() ? db->errorMessage() : "unknown";

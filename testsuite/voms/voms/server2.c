@@ -65,7 +65,7 @@ int main(int argc, char *argv[])
   SSL_library_init();
 
 
-  m_sslCtx = SSL_CTX_new( SSLv3_method() );
+  m_sslCtx = SSL_CTX_new( SSLv23_method() );
   if (!m_sslCtx) {
     ERR_print_errors_fp( stdout );
     printf("error1\n");

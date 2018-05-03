@@ -49,6 +49,7 @@
 #include <openssl/x509.h>
 #include <openssl/ssl.h>
 
+#include <vector>
 #include <string>
 
 #include <sys/types.h>
@@ -108,6 +109,8 @@ class GSISocketServer
   void SetError(const std::string &g);
   void SetErrorOpenSSL(const std::string &message);
 
+  const std::vector<std::string>& GetOpenSSLErrors(); 
+    
 public:
   std::string    own_subject;
   std::string    own_ca;
@@ -127,6 +130,7 @@ public:
   char           *cacertdir;
   EVP_PKEY       *upkey;
   X509           *ucert;
+
   std::string error;
 
 public:
@@ -139,6 +143,10 @@ public:
   bool newopened;
   bool mustclose;
   void *logh;
+
+private:
+  std::vector<std::string> openssl_errors; 
+
 };
 
 #endif

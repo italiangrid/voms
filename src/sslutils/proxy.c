@@ -530,7 +530,7 @@ struct VOMSProxy *VOMS_MakeProxy(struct VOMSProxyArguments *args, int *warning, 
       goto err;
     }
 
-    if (args->proxyversion == 4) {
+    if (args->proxyversion >= 3) {
       X509_EXTENSION_set_critical(ex7, 1);
     }
 

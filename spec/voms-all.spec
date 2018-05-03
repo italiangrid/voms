@@ -1,6 +1,6 @@
 Name: voms
-Version: 2.0.12
-Release: 2%{?dist}
+Version: 2.0.14
+Release: 1%{?dist}
 Summary: The Virtual Organisation Membership Service C++ APIs
 
 Group:          System Environment/Libraries
@@ -264,6 +264,7 @@ fi
 %{_bindir}/voms-proxy-init2
 %{_bindir}/voms-proxy-fake
 %{_bindir}/voms-proxy-list
+%{_bindir}/voms-verify
 
 %{_mandir}/man1/voms-proxy-destroy2.1.gz
 %{_mandir}/man1/voms-proxy-info2.1.gz
@@ -289,6 +290,12 @@ fi
 %{_mandir}/man8/voms.8*
 
 %changelog
+* Tue Aug 23 2016 Andrea Ceccanti <andrea.ceccanti at cnaf.infn.it> - 2.0.14-0
+- Packaging for 2.0.14
+
+* Mon Nov 9 2015 Andrea Ceccanti <andrea.ceccanti at cnaf.infn.it> - 2.0.13-0
+- Packaging for 2.0.13
+
 * Mon May 12 2014 Andrea Ceccanti <andrea.ceccanti at cnaf.infn.it> - 2.0.12-2
 - Added missing dependency on gsoap.
 

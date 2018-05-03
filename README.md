@@ -11,7 +11,7 @@ This repository hosts the VOMS server and C++ APIs.
 
 ## Documentation
 
-See the [VOMS wiki](https://github.com/italiangrid/voms/wiki).
+See the [VOMS website](https://italiangrid.github.io/voms).
 
 # Support
 

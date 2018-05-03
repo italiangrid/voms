@@ -45,7 +45,6 @@ extern "C" {
 #include "data.h"
 
 static int (*pw_cb)() = NULL;
-static char *canonicalize_string(char *original);
 static bool makeACSSL(vomsresult &vr, SSL *ssl, const std::string& command, const std::string &orderstring, const std::string& targets, int requested, VOMSServer *v);
 static int makeACREST(struct soap *soap, const std::string& command, const std::string& orderstring, const std::string& targets, int requested, int unknown);
 int http_get(soap *soap);
@@ -145,9 +144,7 @@ int http_get(soap *soap)
   if (s)
     *s='\0';
 
-  char *prepath=canonicalize_string(path);
-
-  if (strcmp(prepath, "/generate-ac") != 0) {
+  if (strcmp(path, "/generate-ac") != 0) {
     free(path);
     soap_response(soap, 404);
     soap_end_send(soap);
@@ -256,38 +253,3 @@ static bool get_parameter(char **path, char **name, char **value)
 
   return true;
 }
-
-static char *canonicalize_string(char *original)
-{
-  char *currentin  = original;
-  char *currentout = original;
-
-  while (*currentin != '\0') {
-    if (*currentin != '%')
-      *currentout++ = *currentin++;
-    else {
-      char first = *(currentin+1);
-
-      if (first != '\0') {
-        char second = *(currentin+2);
-
-        if (second != '\0') {
-          if (isxdigit(first) && isxdigit(second)) {
-            *currentout++=hex2num(first)<<4 + hex2num(second);
-            currentin += 3;
-          }
-          else
-            *currentout++ = *currentin++;
-        }
-        else
-          *currentout++ = *currentin++;
-      }
-      else
-        *currentout++ = *currentin++;
-    }
-  }
-  *currentout='\0';
-
-  return original;
-}
-
