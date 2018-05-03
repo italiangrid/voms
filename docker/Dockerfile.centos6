@@ -1,0 +1,11 @@
+FROM italiangrid/pkg.base:centos6
+
+USER root
+
+RUN yum -y install expat-devel \
+      pkgconfig openssl-devel \
+      gsoap-devel mysql-devel \
+      libxslt docbook-style-xsl \
+      doxygen bison
+
+USER build
