@@ -13,23 +13,24 @@ pipeline {
             command 'cat'
         }
     }
+  }
 
-    options {
-      timeout(time: 1, unit: 'HOURS')
-      buildDiscarder(logRotator(numToKeepStr: '5'))
-    }
+  options {
+    timeout(time: 1, unit: 'HOURS')
+    buildDiscarder(logRotator(numToKeepStr: '5'))
+  }
 
-    stages {
-      stage ('build') {
-        steps {
-          container('builder') {
-            sh "./autogen.sh"
-            sh "./configure && make"
-          }
+  stages {
+    stage ('build') {
+      steps {
+        container('builder') {
+          sh "./autogen.sh"
+          sh "./configure && make"
         }
       }
+    }
 
-     stage('result'){
+    stage('result'){
       steps {
         script {
           currentBuild.result = 'SUCCESS'
@@ -39,6 +40,7 @@ pipeline {
   }
   
   post {
+
     failure {
       slackSend color: 'danger', message: "${env.JOB_NAME} - #${env.BUILD_NUMBER} Failure (<${env.BUILD_URL}|Open>)"
     }
@@ -50,6 +52,5 @@ pipeline {
         }
       }
     } 
-    }
   }
 }
