@@ -95,26 +95,31 @@ For more details on how to configure vomses files on the system, see the `vomses
 While user credentials may be put anywhere, and then their location passed to 
 `voms-proxy-init` via the appropriate options, there are obviously default values.
 
-User credentials should be put in the `$HOME/.globus`.
+User credentials should be put in the `$HOME/.globus` directory.
 
 Certificates encoded in PKCS12 and PEM formats are correctly handled by the VOMS clients.
 
 The default path for looking up PKCS12 credentials is:
 
 ```
-usercred.p12
+$HOME/.globus/usercred.p12
 ```
+
+Permissions on `$HOME/.globus/usercred.p12` must be 600.
 
 For PEM credentials the following paths are used:
 
 ```
-usercert.pem (certificate)
-userkey.pem (private key)
+$HOME/.globus/usercert.pem (certificate)
+$HOME/.globus/userkey.pem (private key)
 ```
 
-In case both the PEM and PKCS12 formats are present, PEM takes precedence. 
+Permissions on the pem files must be:
 
-The user certiﬁcate must at the most have permission 644, while the private key should be 400.
+- 644 for `$HOME/.globus/usercert.pem`
+- 400 for `$HOME/.globus/userkey.pem`
+
+In case both the PEM and PKCS12 formats are present, PEM takes precedence. 
 
 ## Controlling java options
 
