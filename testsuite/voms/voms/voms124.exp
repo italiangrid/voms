@@ -18,7 +18,7 @@ proc mytest {} {
 
     set correct "Detected Globus version: 2.2
 Unspecified proxy version, settling on Globus version: 2
-Number of bits in key :1024
+Number of bits in key :2048
 Files being used:
  CA certificate file: none
  Trusted certificates directory : $::ETC_DIR/grid-security/certificates

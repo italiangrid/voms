@@ -483,7 +483,7 @@ Client::Client(int argc, char ** argv) :
   /* controls that number of bits for the key is appropiate */
   
   if (bits == -1)
-    bits = 1024;
+    bits = 2048;
 
   if ((bits != 0) && (bits!=512) && (bits!=1024) && (bits!=2048) && (bits!=4096)) {
     Print(ERROR) << "Error: number of bits in key must be one of 512, 1024, 2048, 4096." << std::endl;

@@ -219,7 +219,7 @@ Fake::Fake(int argc, char ** argv) :   confile(conf_file_name),
     "    -pwstdin                       Allows passphrase from stdin\n" \
     "    -limited                       Creates a limited proxy\n" \
     "    -hours H                       Proxy is valid for H hours (default:12)\n" \
-    "    -bits                          Number of bits in key {512|1024|2048|4096} (default:1024)\n" \
+    "    -bits                          Number of bits in key {512|1024|2048|4096} (default:2048)\n" \
     "    -cert     <certfile>           Non-standard location of user certificate\n" \
     "    -key      <keyfile>            Non-standard location of user key\n" \
     "    -certdir  <certdir>            Non-standard location of trusted cert dir\n" \
@@ -1021,7 +1021,7 @@ bool Fake::VerifyOptions()
   /* controls that number of bits for the key is appropiate */
 
   if (bits == -1)
-    bits = 1024;
+    bits = 2048;
 
   if ((bits!=512) && (bits!=1024) && 
       (bits!=2048) && (bits!=4096) && (bits != 0))

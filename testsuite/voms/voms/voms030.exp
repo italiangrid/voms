@@ -20,7 +20,7 @@ proc mytest {} {
         return $::FAILTEST
     } else {
         #match against known (correct) output
-        set correct "1024"
+        set correct "2048"
 
         loadvar out2 $outname
         if [regexp $correct $out2] then {

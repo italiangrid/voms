@@ -21,7 +21,7 @@ proc mytest {} {
         return $::FAILTEST
     }
 
-    set correct "Key: \\(1024 bit\\)"
+    set correct "Key: \\(2048 bit\\)"
 
     loadvar out2 $outname
     if [regexp $correct $out2] then {
