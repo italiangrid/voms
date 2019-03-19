@@ -12,7 +12,7 @@ redcarpet:
 
 baseurl: /voms
 
-issue_base_url: https://issues.infn.it/jira/browse
+issue_base_url: https://issues.infn.it/jira/browse/
 
 voms:
     website: http://italiangrid.github.io/voms
