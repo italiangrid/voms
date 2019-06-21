@@ -3,16 +3,18 @@
 pipeline {
 
   agent {
-    kubernetes {
-      cloud 'Kube mwdevel'
-        label 'build'
-        containerTemplate {
-          name 'builder'
-            image 'voms/voms-build:centos6'
-            ttyEnabled true
-            command 'cat'
-        }
-    }
+      kubernetes {
+          label "voms-${env.JOB_BASE_NAME}-${env.BUILD_NUMBER}"
+          cloud 'Kube mwdevel'
+          defaultContainer 'jnlp'
+          inheritFrom 'ci-template'
+          containerTemplate {
+            name 'runner'
+              image 'voms/voms-build:centos6'
+              ttyEnabled true
+              command 'cat'
+          }
+      }
   }
 
   options {
@@ -20,10 +22,12 @@ pipeline {
     buildDiscarder(logRotator(numToKeepStr: '5'))
   }
 
+  triggers { cron('@daily') }
+
   stages {
     stage ('build') {
       steps {
-        container('builder') {
+        container('runner') {
           sh "./autogen.sh"
           sh "./configure && make"
         }

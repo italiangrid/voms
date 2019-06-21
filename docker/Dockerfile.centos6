@@ -8,4 +8,3 @@ RUN yum -y install expat-devel \
       libxslt docbook-style-xsl \
       doxygen bison
 
-USER build
