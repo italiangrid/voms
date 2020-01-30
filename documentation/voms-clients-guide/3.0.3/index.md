@@ -19,19 +19,20 @@ version: 3.0.3
 
 ## Installing the clients <a name="install">&nbsp;</a>
 
-To install the VOMS clients, configure the EMI 3 repositories as appropriate
-for the distribution where you will install the VOMS clients.
+To install the VOMS clients, configure the [UMD repositories][umd] as appropriate
+for your target distribution.
 
-On Scientific Linux 5 or 6, voms clients are installed with the following command:
+On SL/CENTOS 6, VOMS clients are installed with the following command:
 
 ```
 yum install voms-clients3
 ```
 
-On Debian6 use the following command:
+On CENTOS 7, VOMS clients are available in EPEL 7, and are installed with the
+following command:
 
 ```
-apt-get install voms-clients3
+yum install voms-clients-java
 ```
 
 ## Configuring VOMS trust anchors <a name="voms-trust">&nbsp;</a>
@@ -261,3 +262,5 @@ $ voms-proxy-destroy
 ```
 
 See `voms-proxy-destroy --help` or the man page for a complete list of available options.
+
+[umd]: http://repository.egi.eu/category/umd_releases/distribution/umd-4/
