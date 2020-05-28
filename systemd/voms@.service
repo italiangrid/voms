@@ -1,0 +1,14 @@
+[Unit]
+Description=VOMS service for VO %I
+
+[Service]
+WorkingDirectory=/
+EnvironmentFile=/etc/sysconfig/voms
+User=voms
+Type=forking
+ExecStart=/usr/sbin/voms --conf /etc/voms/%I/voms.conf
+KillMode=process
+SuccessExitStatus=1
+
+[Install]
+WantedBy=multi-user.target
