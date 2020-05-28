@@ -10,7 +10,7 @@ APIDOC_FILES = $(top_srcdir)/AUTHORS $(top_srcdir)/INSTALL $(top_srcdir)/LICENSE
 USERDOC_FILES = $(APIDOC_FILES)
 
 spec=spec/voms-all.spec
-deb_comp="libvomsapi1 voms-dev voms-clients voms-server"
+deb_comp="libvomsapi1 voms-dev voms-server"
 
 rpmbuild_dir=@WORKDIR@/rpmbuild
 debbuild_dir=@WORKDIR@/debbuild
