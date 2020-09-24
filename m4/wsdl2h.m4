@@ -43,8 +43,13 @@ AC_DEFUN([AC_WSDL2H],
 	dnl 
 	dnl @<:@  becomes [
 	dnl @:>@  becomes ]
-	wsdl2h_version=$($WSDL2H -help 2>&1 | grep -o '@<:@0-9@:>@\.@<:@0-9@:>@\.@<:@0-9@:>@*$')
-	
+	dnl
+	dnl Newer versions support -V parameter.
+	wsdl2h_version=$($WSDL2H -V 2>/dev/null)
+	if test -z "$wsdl2h_version"; then
+		wsdl2h_version=$($WSDL2H -help 2>&1 | grep release | grep -o '@<:@0-9@:>@\.@<:@0-9@:>@\.@<:@0-9@:>@*$')
+	fi
+
 	normalized_version=$(printf "%02d%02d%02d" $(echo $wsdl2h_version | tr '.' ' '))
 
 	WSDL2H_FLAGS=""
