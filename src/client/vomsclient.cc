@@ -438,15 +438,9 @@ Client::Client(int argc, char ** argv) :
     exit(1);
   }
   else if (proxyver==0) {
-    if (version<30)
-      proxyver = 2;
-    else if (version < 40)
-      proxyver = 3;
-    else
-      proxyver = 4;
+    proxyver = 4;
 
-    Print(DEBUG) << "Unspecified proxy version, settling on Globus version: " 
-                 << proxyver << std::endl;
+    Print(DEBUG) << "Unspecified proxy version, settling on version 4 (RFC)" << std::endl;
   }
   
   /* PCI extension option */ 

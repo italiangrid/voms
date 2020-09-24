@@ -150,7 +150,7 @@ std::string get_error(int e)
     return "VOMS Server contact data missing from AC.";
     break;
   case AC_ERR_ATTRIB_FQAN:
-    return "VOMS Attributes absent or misformed.";
+    return "VOMS Attributes absent or malformed.";
     break;
   case AC_ERR_EXTS_ABSENT:
     return "Required AC extensions missing (NoRevAvail and AuthorityKeyIdentifier)";
@@ -430,6 +430,8 @@ static int checkAttributes(STACK_OF(AC_ATTR) *atts, voms &v)
   else
     return AC_ERR_ATTRIB_URI;
 
+  std::string top_group = "/" + v.voname;
+
   /* scan the stack of IETFATTRVAL to put attribute in voms struct */
   for (int i=0; i<sk_AC_IETFATTRVAL_num(values); i++) {
     capname = sk_AC_IETFATTRVAL_value(values, i);
@@ -438,6 +440,18 @@ static int checkAttributes(STACK_OF(AC_ATTR) *atts, voms &v)
       return AC_ERR_ATTRIB_FQAN;
 
     std::string str  = std::string((char*)capname->data, capname->length);
+    std::string::size_type top_group_size = top_group.size();
+    std::string::size_type str_size = str.size();
+
+    /* The top level group name must be identical to the VO name.
+       An attribute may end right after the group name, or may continue on
+       (separated by a "/"). */
+    if (str.compare(0, top_group_size, top_group)) {
+      return AC_ERR_ATTRIB_FQAN;
+    }
+    else if (str_size > top_group_size && str[top_group_size] != '/') {
+      return AC_ERR_ATTRIB_FQAN;
+    }
 
     v.fqan.push_back(str);
 
