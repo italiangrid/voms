@@ -1,1 +1,3 @@
 /apidoc
+/AC-RFC.*
+!/AC-RFC.tex
