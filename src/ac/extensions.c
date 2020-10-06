@@ -233,46 +233,24 @@ int initEx(void)
 {
   X509V3_EXT_METHOD *targets;
   X509V3_EXT_METHOD *avail;
-  X509V3_EXT_METHOD *auth;
   X509V3_EXT_METHOD *acseq;
   X509V3_EXT_METHOD *certseq;
   X509V3_EXT_METHOD *attribs;
 
   avail   = (X509V3_EXT_METHOD *)OPENSSL_malloc(sizeof(X509V3_EXT_METHOD));
   targets = (X509V3_EXT_METHOD *)OPENSSL_malloc(sizeof(X509V3_EXT_METHOD));
-  auth    = (X509V3_EXT_METHOD *)OPENSSL_malloc(sizeof(X509V3_EXT_METHOD));
   acseq   = (X509V3_EXT_METHOD *)OPENSSL_malloc(sizeof(X509V3_EXT_METHOD));
   certseq = (X509V3_EXT_METHOD *)OPENSSL_malloc(sizeof(X509V3_EXT_METHOD));
   attribs = (X509V3_EXT_METHOD *)OPENSSL_malloc(sizeof(X509V3_EXT_METHOD));
 
-  if (!avail || !targets || !auth || !acseq || !certseq || !attribs) {
+  if (!avail || !targets || !acseq || !certseq || !attribs) {
     OPENSSL_free(avail);
     OPENSSL_free(targets);
-    OPENSSL_free(auth);
     OPENSSL_free(acseq);
     OPENSSL_free(certseq);
     OPENSSL_free(attribs);
     return 0;
   }
-
-#ifndef VOMS_USE_OPENSSL_EXT_CODE
-  memset(auth, 0, sizeof(*auth));
-
-  auth->ext_nid  = OBJ_txt2nid("authorityKeyIdentifier");
-
-  auth->ext_flags = 0;
-  auth->ext_new  = (X509V3_EXT_NEW) AUTHORITY_KEYID_new;
-  auth->ext_free = (X509V3_EXT_FREE)AUTHORITY_KEYID_free;
-  auth->d2i      = (X509V3_EXT_D2I) d2i_AUTHORITY_KEYID;
-  auth->i2d      = (X509V3_EXT_I2D) i2d_AUTHORITY_KEYID;
-  auth->i2s      = (X509V3_EXT_I2S) authkey_i2s;
-  auth->s2i      = (X509V3_EXT_S2I) authkey_s2i;
-  auth->v2i      = (X509V3_EXT_V2I) NULL;
-  auth->r2i      = (X509V3_EXT_R2I) NULL;
-  auth->i2v      = (X509V3_EXT_I2V) NULL;
-  auth->i2r      = (X509V3_EXT_I2R) NULL;
-
-  X509V3_EXT_add(auth);
 
   memset(avail, 0, sizeof(*avail));
   avail->ext_nid  = OBJ_txt2nid("noRevAvail");
@@ -303,7 +281,6 @@ int initEx(void)
   targets->v2i      = (X509V3_EXT_V2I) NULL;
   targets->r2i      = (X509V3_EXT_R2I) NULL;
   targets->i2r      = (X509V3_EXT_I2R) NULL;
-#endif
 
   X509V3_EXT_add(targets);
 
