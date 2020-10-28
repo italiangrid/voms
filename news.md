@@ -4,7 +4,7 @@ title: News
 ---
 
 # News
-{% for post in site.posts limit:10 %}
+{% for post in site.posts limit:30 %}
 <div class="row-fluid marketing news-row">
 	    <div class="span2">
 		    <p class="text-left">{{ post.date | date_to_long_string }}</p>

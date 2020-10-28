@@ -11,25 +11,19 @@ title: VOMS releases
 
 VOMS packages can be obtained from the UMD repository or from the VOMS product team package repository.
 
-#### UMD 3
+#### UMD repository
 
-You can find UMD 3 repository configuration instructions [here][umd-3].
+You can find UMD repository configuration instructions [here][umd].
 Follow the [system administrator
 guide]({{site.baseurl}}/documentation/sysadmin-guide) for detailed VOMS
 installation instructions.
 
-#### VOMS
+#### VOMS repository
+
+The [VOMS package repository][voms-repo] provides packages for CENTOS 6/7.
 
 Note that the VOMS PT repositories only provide the latest version of the certified VOMS packages.
-You still need to install UMD3 repositories (as detailed above) for installations to work as expected.
-
-To install the repository files, run the following commands (as root):
-
-    # wget http://italiangrid.github.io/voms/repo/voms_sl6.repo -O /etc/yum.repos.d/voms_sl6.repo
-
-### Nightly builds
-
-Development versions are built regularly on our [continuos integration infrastructure][ci]. 
+You still need to install UMD repositories (as detailed above) for installations to work as expected.
 
 ### Source code
 
@@ -42,9 +36,6 @@ The VOMS source is available on [Github](https://github.com) in the following re
 - [VOMS C/C++ APIs](https://github.com/italiangrid/voms)
 - [VOMS Java APIs](https://github.com/italiangrid/voms-api-java)
 - [VOMS mysql plugin](https://github.com/italiangrid/voms-mysql-plugin)
-- [VOMS oracle plugin](https://github.com/italiangrid/voms-oracle-plugin)
 
-
-[ci]:  https://ci.cloud.cnaf.infn.it/view/voms/ 
-[umd-3]: http://repository.egi.eu/category/umd_releases/distribution/umd-3/
-[voms-emi3]: http://www.eu-emi.eu/releases/emi-3-montebianco/products/-/asset_publisher/5dKm/content/voms-2
+[umd]: http://repository.egi.eu/category/umd_releases/distribution/umd-4/
+[voms-repo]: https://italiangrid.github.io/voms-repo/
