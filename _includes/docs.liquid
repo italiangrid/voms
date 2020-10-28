@@ -16,13 +16,10 @@
   <tr>
   <td> {{d[1].name }} </td>
   <td>
-    <ul class="unstyled">
-      {% for v in versions %}
-        <li
-        {% if v[0] != current_version %}
-          class="collapse"
-        {% endif %}>
-          <a href="{{ site.baseurl }}/documentation/{{ d[0] }}/{{ v[0] }}"><strong>{{ v[0] }}</strong></a>
+      <ul class="unstyled">
+        {% for v in versions %}
+          <li {% if v[0] != current_version %}class="collapse"{% endif %}>
+            <a href="{{ site.baseurl }}/documentation/{{ d[0] }}/{{ v[0] }}"><strong>{{ v[0] }}</strong></a>
           covering:
           <ul>
           {% for k in d[1].ref_keys %}
@@ -34,8 +31,9 @@
             </li>
           {% endfor %}
           </ul>
-      {% endfor %}
-    </ul>
+          </li>
+        {% endfor %}
+      </ul>
   </td>
   </tr>
 {% endfor %}

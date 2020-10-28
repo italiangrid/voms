@@ -1,12 +1,16 @@
 sysadmin-guide:
   name: VOMS System Administrator Guide
-  current_version: 3.0.12
+  current_version: 3.0.13
   ref_keys:
     voms_core_version: VOMS
     admin_server_version: VOMS Admin server
     admin_client_version: VOMS Admin client
 
   versions:
+    3.0.13:
+      voms_core_version: 2.0.15
+      admin_server_version: 3.8.0
+      admin_client_version: 2.0.20
     3.0.12:
       voms_core_version: 2.0.14
       admin_server_version: 3.7.0
@@ -58,12 +62,17 @@ sysadmin-guide:
 
 voms-admin-guide:
   name: VOMS Admin Guide
-  current_version: 3.7.0
+  current_version: 3.8.0
   ref_keys:
     admin_server_version: VOMS Admin server
     admin_client_version: VOMS Admin client
 
   versions:
+
+    3.8.0:
+      sysadmin_guide_version: 3.0.13
+      admin_server_version: 3.8.0
+      admin_client_version: 2.0.20
 
     3.7.0:
       sysadmin_guide_version: 3.0.12
@@ -79,10 +88,12 @@ voms-admin-guide:
       sysadmin_guide_version: 3.0.10
       admin_server_version: 3.5.2
       admin_client_version: 2.0.19
+
     3.5.1:
       sysadmin_guide_version: 3.0.9
       admin_server_version: 3.5.1
       admin_client_version: 2.0.19
+
     3.5.0:
       sysadmin_guide_version: 3.0.8
       admin_server_version: 3.5.0
@@ -115,10 +126,16 @@ voms-admin-guide:
 
 voms-clients-guide:
   name: VOMS Clients guide
-  current_version: 3.0.3
+  current_version: 3.0.5
   ref_keys:
     voms_clients_version: VOMS clients
   versions:
+    3.0.5:
+      voms_clients_version: 3.3.2
+
+    3.0.4:
+      voms_clients_version: 3.3.0
+
     3.0.3:
       voms_clients_version: 3.0.6
 
