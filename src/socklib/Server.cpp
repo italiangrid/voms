@@ -321,12 +321,16 @@ GSISocketServer::AcceptGSIAuthentication()
   SSL_CTX_load_verify_locations(ctx, NULL, cacertdir);
   SSL_CTX_use_certificate(ctx, ucert);
   SSL_CTX_use_PrivateKey(ctx,upkey);
-  SSL_CTX_set_cipher_list(ctx, "ALL:!LOW:!EXP:!MD5:!MD2");    
+  SSL_CTX_set_cipher_list(ctx, "ALL:!LOW:!EXP:!MD5:!MD2:!3DES:!RC4:!IDEA");
   SSL_CTX_set_purpose(ctx, X509_PURPOSE_ANY);
   SSL_CTX_set_mode(ctx, SSL_MODE_AUTO_RETRY);
   SSL_CTX_set_verify(ctx, SSL_VERIFY_PEER | SSL_VERIFY_FAIL_IF_NO_PEER_CERT, proxy_verify_callback);
   SSL_CTX_set_verify_depth(ctx, 100);
   SSL_CTX_set_cert_verify_callback(ctx, proxy_app_verify_callback, 0);
+  if (!SSL_CTX_set_options(ctx, SSL_OP_NO_SSLv2 | SSL_OP_NO_SSLv3 | SSL_OP_NO_TLSv1 | SSL_OP_NO_TLSv1_1)) {
+    SetErrorOpenSSL("Cannot set minimum TLS protocol version");
+    goto err;
+  }
 
   if (own_stack) {
     /*

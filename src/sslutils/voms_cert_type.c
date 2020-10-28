@@ -86,7 +86,7 @@ get_proxy_type(ASN1_OBJECT *policy_lang){
 
   }
 
-  if (policy_nid = NID_Independent)
+  if (policy_nid == NID_Independent)
   {
 
     return VOMS_CERT_TYPE_INDEPENDENT_PROXY;
