@@ -1,0 +1,546 @@
+<!doctype html>
+<html>
+  <head>
+    <title>VOMS Admin REST APIs</title>
+    <style type="text/css">
+      body {
+	font-family: Trebuchet MS, sans-serif;
+	font-size: 15px;
+	color: #444;
+	margin-right: 24px;
+}
+
+h1	{
+	font-size: 25px;
+}
+h2	{
+	font-size: 20px;
+}
+h3	{
+	font-size: 16px;
+	font-weight: bold;
+}
+hr	{
+	height: 1px;
+	border: 0;
+	color: #ddd;
+	background-color: #ddd;
+}
+
+.app-desc {
+  clear: both;
+  margin-left: 20px;
+}
+.param-name {
+  width: 100%;
+}
+.license-info {
+  margin-left: 20px;
+}
+
+.license-url {
+  margin-left: 20px;
+}
+
+.model {
+  margin: 0 0 0px 20px;
+}
+
+.method {
+  margin-left: 20px;
+}
+
+.method-notes	{
+	margin: 10px 0 20px 0;
+	font-size: 90%;
+	color: #555;
+}
+
+pre {
+  padding: 10px;
+  margin-bottom: 2px;
+}
+
+.http-method {
+ text-transform: uppercase;
+}
+
+pre.get {
+  background-color: #0f6ab4;
+}
+
+pre.post {
+  background-color: #10a54a;
+}
+
+pre.put {
+  background-color: #c5862b;
+}
+
+pre.delete {
+  background-color: #a41e22;
+}
+
+.huge	{
+	color: #fff;
+}
+
+pre.example {
+  background-color: #f3f3f3;
+  padding: 10px;
+  border: 1px solid #ddd;
+}
+
+code {
+  white-space: pre;
+}
+
+.nickname {
+  font-weight: bold;
+}
+
+.method-path {
+  font-size: 1.5em;
+  background-color: #0f6ab4;
+}
+
+.up {
+  float:right;
+}
+
+.parameter {
+  width: 500px;
+}
+
+.param {
+  width: 500px;
+  padding: 10px 0 0 20px;
+  font-weight: bold;
+}
+
+.param-desc {
+  width: 700px;
+  padding: 0 0 0 20px;
+  color: #777;
+}
+
+.param-type {
+  font-style: italic;
+}
+
+.param-enum-header {
+width: 700px;
+padding: 0 0 0 60px;
+color: #777;
+font-weight: bold;
+}
+
+.param-enum {
+width: 700px;
+padding: 0 0 0 80px;
+color: #777;
+font-style: italic;
+}
+
+.field-label {
+  padding: 0;
+  margin: 0;
+  clear: both;
+}
+
+.field-items	{
+	padding: 0 0 15px 0;
+	margin-bottom: 15px;
+}
+
+.return-type {
+  clear: both;
+  padding-bottom: 10px;
+}
+
+.param-header {
+  font-weight: bold;
+}
+
+.method-tags {
+  text-align: right;
+}
+
+.method-tag {
+  background: none repeat scroll 0% 0% #24A600;
+  border-radius: 3px;
+  padding: 2px 10px;
+  margin: 2px;
+  color: #FFF;
+  display: inline-block;
+  text-decoration: none;
+}
+
+    </style>
+  </head>
+  <body>
+  <h1>VOMS Admin REST APIs</h1>
+    <div class="app-desc">A set of APIs to access VOMS user information</div>
+    <div class="app-desc">More information: <a href=""></a></div>
+    <div class="app-desc">Contact Info: <a href="andrea.ceccanti@cnaf.infn.it">andrea.ceccanti@cnaf.infn.it</a></div>
+    <div class="app-desc">Version: 3.7.0</div>
+    <div class="app-desc">BasePath:/voms/voname/apiv2</div>
+    <div class="license-info">Apache 2.0</div>
+    <div class="license-url">http://www.apache.org/licenses/LICENSE-2.0.html</div>
+  <h2>Access</h2>
+
+  <h2><a name="__Methods">Methods</a></h2>
+  [ Jump to <a href="#__Models">Models</a> ]
+
+  <h3>Table of Contents </h3>
+  <div class="method-summary"></div>
+  <h4><a href="#Default">Default</a></h4>
+  <ul>
+  <li><a href="#listExpiredVoUsers"><code><span class="http-method">get</span> /expired-users</code></a></li>
+  <li><a href="#listSuspendedVoUsers"><code><span class="http-method">get</span> /suspended-users</code></a></li>
+  <li><a href="#listVoUsers"><code><span class="http-method">get</span> /users</code></a></li>
+  </ul>
+
+  <h1><a name="Default">Default</a></h1>
+  <div class="method"><a name="listExpiredVoUsers"/>
+    <div class="method-path">
+    <a class="up" href="#__Methods">Up</a>
+    <pre class="get"><code class="huge"><span class="http-method">get</span> /expired-users</code></pre></div>
+    <div class="method-summary">Lists VOMS users whose membership has expired (<span class="nickname">listExpiredVoUsers</span>)</div>
+    <div class="method-notes"></div>
+
+
+
+
+
+
+
+    <h3 class="field-label">Return type</h3>
+    <div class="return-type">
+      <a href="#ExpiredVoUserList">ExpiredVoUserList</a>
+      
+    </div>
+
+    <!--Todo: process Response Object and its headers, schema, examples -->
+
+    <h3 class="field-label">Example data</h3>
+    <div class="example-data-content-type">Content-Type: application/json</div>
+    <pre class="example"><code>{
+  "expiredUsers" : [ {
+    "address" : "The Dakota, 1 West 72nd Street, NY, USA",
+    "creationTime" : "2016-02-11T10:08:40",
+    "suspensionReason" : "User failed to sign the AUP in time",
+    "fqans" : [ "/example", "/example/Role=Admin" ],
+    "suspended" : false,
+    "institution" : "The Beatles",
+    "aupAcceptanceRecords" : [ {
+      "valid" : true,
+      "daysBeforeExpiration" : 7,
+      "aupVersion" : "1.0",
+      "lastAcceptanceDate" : "2017-08-04T12:27:06"
+    } ],
+    "emailAddress" : "john@lennon.com",
+    "phoneNumber" : "+1 9 999 999",
+    "certificates" : [ {
+      "creationTime" : "2016-02-11T10:08:40",
+      "suspensionReason" : "User failed to sign the AUP in time",
+      "subjectString" : "/C=IT/O=Example/CN=John Lennon",
+      "suspended" : false,
+      "issuerString" : "/C=IT/O=Example/CN=Example CA"
+    } ],
+    "surname" : "Lennon",
+    "name" : "John",
+    "attributes" : [ {
+      "name" : "nickname",
+      "value" : "jlennon"
+    } ],
+    "pendingSignAUPTask" : {
+      "lastNotificationTime" : "2017-08-04T13:37:28",
+      "creationDate" : "2017-08-04T12:27:06",
+      "expirationDate" : "2017-08-19T13:37:28"
+    },
+    "id" : 100,
+    "endTime" : "2018-02-11T10:08:40",
+    "supensionReasonCode" : "OTHER"
+  } ]
+}</code></pre>
+
+    <h3 class="field-label">Produces</h3>
+    This API call produces the following media types according to the <span class="header">Accept</span> request header;
+    the media type will be conveyed by the <span class="heaader">Content-Type</span> response header.
+    <ul>
+      <li><code>application/json</code></li>
+    </ul>
+
+    <h3 class="field-label">Responses</h3>
+    <h4 class="field-label">200</h4>
+    A list of VO users whose membership has expired
+        <a href="#ExpiredVoUserList">ExpiredVoUserList</a>
+  </div> <!-- method -->
+  <hr/>
+  <div class="method"><a name="listSuspendedVoUsers"/>
+    <div class="method-path">
+    <a class="up" href="#__Methods">Up</a>
+    <pre class="get"><code class="huge"><span class="http-method">get</span> /suspended-users</code></pre></div>
+    <div class="method-summary">Lists suspended VOMS users (<span class="nickname">listSuspendedVoUsers</span>)</div>
+    <div class="method-notes"></div>
+
+
+
+
+
+
+
+    <h3 class="field-label">Return type</h3>
+    <div class="return-type">
+      <a href="#SuspendedVoUserList">SuspendedVoUserList</a>
+      
+    </div>
+
+    <!--Todo: process Response Object and its headers, schema, examples -->
+
+    <h3 class="field-label">Example data</h3>
+    <div class="example-data-content-type">Content-Type: application/json</div>
+    <pre class="example"><code>{
+  "suspendedUsers" : [ {
+    "address" : "The Dakota, 1 West 72nd Street, NY, USA",
+    "creationTime" : "2016-02-11T10:08:40",
+    "suspensionReason" : "User failed to sign the AUP in time",
+    "fqans" : [ "/example", "/example/Role=Admin" ],
+    "suspended" : false,
+    "institution" : "The Beatles",
+    "aupAcceptanceRecords" : [ {
+      "valid" : true,
+      "daysBeforeExpiration" : 7,
+      "aupVersion" : "1.0",
+      "lastAcceptanceDate" : "2017-08-04T12:27:06"
+    } ],
+    "emailAddress" : "john@lennon.com",
+    "phoneNumber" : "+1 9 999 999",
+    "certificates" : [ {
+      "creationTime" : "2016-02-11T10:08:40",
+      "suspensionReason" : "User failed to sign the AUP in time",
+      "subjectString" : "/C=IT/O=Example/CN=John Lennon",
+      "suspended" : false,
+      "issuerString" : "/C=IT/O=Example/CN=Example CA"
+    } ],
+    "surname" : "Lennon",
+    "name" : "John",
+    "attributes" : [ {
+      "name" : "nickname",
+      "value" : "jlennon"
+    } ],
+    "pendingSignAUPTask" : {
+      "lastNotificationTime" : "2017-08-04T13:37:28",
+      "creationDate" : "2017-08-04T12:27:06",
+      "expirationDate" : "2017-08-19T13:37:28"
+    },
+    "id" : 100,
+    "endTime" : "2018-02-11T10:08:40",
+    "supensionReasonCode" : "OTHER"
+  } ]
+}</code></pre>
+
+    <h3 class="field-label">Produces</h3>
+    This API call produces the following media types according to the <span class="header">Accept</span> request header;
+    the media type will be conveyed by the <span class="heaader">Content-Type</span> response header.
+    <ul>
+      <li><code>application/json</code></li>
+    </ul>
+
+    <h3 class="field-label">Responses</h3>
+    <h4 class="field-label">200</h4>
+    A list of suspended VO users
+        <a href="#SuspendedVoUserList">SuspendedVoUserList</a>
+  </div> <!-- method -->
+  <hr/>
+  <div class="method"><a name="listVoUsers"/>
+    <div class="method-path">
+    <a class="up" href="#__Methods">Up</a>
+    <pre class="get"><code class="huge"><span class="http-method">get</span> /users</code></pre></div>
+    <div class="method-summary">Lists VOMS users (<span class="nickname">listVoUsers</span>)</div>
+    <div class="method-notes">Returns a list VO users</div>
+
+
+
+
+
+    <h3 class="field-label">Query parameters</h3>
+    <div class="field-items">
+      <div class="param">startIndex (optional)</div>
+
+      <div class="param-desc"><span class="param-type">Query Parameter</span> &mdash; The 0-based index of the first query result </div><div class="param">pageSize (optional)</div>
+
+      <div class="param-desc"><span class="param-type">Query Parameter</span> &mdash; Specifies the desired maximum number of query results per page </div>
+    </div>  <!-- field-items -->
+
+
+    <h3 class="field-label">Return type</h3>
+    <div class="return-type">
+      <a href="#VoUserList">VoUserList</a>
+      
+    </div>
+
+    <!--Todo: process Response Object and its headers, schema, examples -->
+
+    <h3 class="field-label">Example data</h3>
+    <div class="example-data-content-type">Content-Type: application/json</div>
+    <pre class="example"><code>{
+  "result" : [ {
+    "address" : "The Dakota, 1 West 72nd Street, NY, USA",
+    "creationTime" : "2016-02-11T10:08:40",
+    "suspensionReason" : "User failed to sign the AUP in time",
+    "fqans" : [ "/example", "/example/Role=Admin" ],
+    "suspended" : false,
+    "institution" : "The Beatles",
+    "aupAcceptanceRecords" : [ {
+      "valid" : true,
+      "daysBeforeExpiration" : 7,
+      "aupVersion" : "1.0",
+      "lastAcceptanceDate" : "2017-08-04T12:27:06"
+    } ],
+    "emailAddress" : "john@lennon.com",
+    "phoneNumber" : "+1 9 999 999",
+    "certificates" : [ {
+      "creationTime" : "2016-02-11T10:08:40",
+      "suspensionReason" : "User failed to sign the AUP in time",
+      "subjectString" : "/C=IT/O=Example/CN=John Lennon",
+      "suspended" : false,
+      "issuerString" : "/C=IT/O=Example/CN=Example CA"
+    } ],
+    "surname" : "Lennon",
+    "name" : "John",
+    "attributes" : [ {
+      "name" : "nickname",
+      "value" : "jlennon"
+    } ],
+    "pendingSignAUPTask" : {
+      "lastNotificationTime" : "2017-08-04T13:37:28",
+      "creationDate" : "2017-08-04T12:27:06",
+      "expirationDate" : "2017-08-19T13:37:28"
+    },
+    "id" : 100,
+    "endTime" : "2018-02-11T10:08:40",
+    "supensionReasonCode" : "OTHER"
+  } ],
+  "startIndex" : 0,
+  "count" : 1,
+  "pageSize" : 10
+}</code></pre>
+
+    <h3 class="field-label">Produces</h3>
+    This API call produces the following media types according to the <span class="header">Accept</span> request header;
+    the media type will be conveyed by the <span class="heaader">Content-Type</span> response header.
+    <ul>
+      <li><code>application/json</code></li>
+    </ul>
+
+    <h3 class="field-label">Responses</h3>
+    <h4 class="field-label">200</h4>
+    A list of VO users
+        <a href="#VoUserList">VoUserList</a>
+  </div> <!-- method -->
+  <hr/>
+
+  <h2><a name="__Models">Models</a></h2>
+  [ Jump to <a href="#__Methods">Methods</a> ]
+
+  <h3>Table of Contents</h3>
+  <ol>
+    <li><a href="#AupAcceptanceRecord"><code>AupAcceptanceRecord</code> - </a></li>
+    <li><a href="#Certificate"><code>Certificate</code> - </a></li>
+    <li><a href="#ExpiredVoUserList"><code>ExpiredVoUserList</code> - </a></li>
+    <li><a href="#GenericAttribute"><code>GenericAttribute</code> - </a></li>
+    <li><a href="#SignAUPTask"><code>SignAUPTask</code> - </a></li>
+    <li><a href="#SuspendedVoUserList"><code>SuspendedVoUserList</code> - </a></li>
+    <li><a href="#VoUser"><code>VoUser</code> - </a></li>
+    <li><a href="#VoUserList"><code>VoUserList</code> - </a></li>
+  </ol>
+
+  <div class="model">
+    <h3><a name="AupAcceptanceRecord"><code>AupAcceptanceRecord</code> - </a> <a class="up" href="#__Models">Up</a></h3>
+    <div class='model-description'></div>
+    <div class="field-items">
+      <div class="param">aupVersion (optional)</div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span> The AUP version signed for this record </div>
+<div class="param">daysBeforeExpiration (optional)</div><div class="param-desc"><span class="param-type"><a href="#long">Long</a></span> The number of days before this acceptance record expires format: int64</div>
+<div class="param">lastAcceptanceDate (optional)</div><div class="param-desc"><span class="param-type"><a href="#DateTime">Date</a></span> The time when the AUP was last accepted format: date-time</div>
+<div class="param">valid (optional)</div><div class="param-desc"><span class="param-type"><a href="#boolean">Boolean</a></span> The acceptance record validity </div>
+    </div>  <!-- field-items -->
+  </div>
+  <div class="model">
+    <h3><a name="Certificate"><code>Certificate</code> - </a> <a class="up" href="#__Models">Up</a></h3>
+    <div class='model-description'></div>
+    <div class="field-items">
+      <div class="param">subjectString (optional)</div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span> The X.509 certificate subject, in OpenSSL format </div>
+<div class="param">issuerString (optional)</div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span> The X.509 certificate issuer, in OpenSSL format </div>
+<div class="param">creationTime (optional)</div><div class="param-desc"><span class="param-type"><a href="#DateTime">Date</a></span> The certificate creation time format: date-time</div>
+<div class="param">suspended (optional)</div><div class="param-desc"><span class="param-type"><a href="#boolean">Boolean</a></span> Certificate suspension status </div>
+<div class="param">suspensionReason (optional)</div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span> Certificate suspension reason </div>
+    </div>  <!-- field-items -->
+  </div>
+  <div class="model">
+    <h3><a name="ExpiredVoUserList"><code>ExpiredVoUserList</code> - </a> <a class="up" href="#__Models">Up</a></h3>
+    <div class='model-description'></div>
+    <div class="field-items">
+      <div class="param">expiredUsers (optional)</div><div class="param-desc"><span class="param-type"><a href="#VoUser">array[VoUser]</a></span> An array of VO user whose membership has expired </div>
+    </div>  <!-- field-items -->
+  </div>
+  <div class="model">
+    <h3><a name="GenericAttribute"><code>GenericAttribute</code> - </a> <a class="up" href="#__Models">Up</a></h3>
+    <div class='model-description'></div>
+    <div class="field-items">
+      <div class="param">name (optional)</div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span> The GA name </div>
+<div class="param">value (optional)</div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span> The GA value </div>
+    </div>  <!-- field-items -->
+  </div>
+  <div class="model">
+    <h3><a name="SignAUPTask"><code>SignAUPTask</code> - </a> <a class="up" href="#__Models">Up</a></h3>
+    <div class='model-description'></div>
+    <div class="field-items">
+      <div class="param">creationDate (optional)</div><div class="param-desc"><span class="param-type"><a href="#DateTime">Date</a></span> The task creation date format: date-time</div>
+<div class="param">expirationDate (optional)</div><div class="param-desc"><span class="param-type"><a href="#DateTime">Date</a></span> The task expiration date format: date-time</div>
+<div class="param">lastNotificationTime (optional)</div><div class="param-desc"><span class="param-type"><a href="#DateTime">Date</a></span> The time the user was last notified about this sign AUP task format: date-time</div>
+    </div>  <!-- field-items -->
+  </div>
+  <div class="model">
+    <h3><a name="SuspendedVoUserList"><code>SuspendedVoUserList</code> - </a> <a class="up" href="#__Models">Up</a></h3>
+    <div class='model-description'></div>
+    <div class="field-items">
+      <div class="param">suspendedUsers (optional)</div><div class="param-desc"><span class="param-type"><a href="#VoUser">array[VoUser]</a></span> An array of suspended VO user objects </div>
+    </div>  <!-- field-items -->
+  </div>
+  <div class="model">
+    <h3><a name="VoUser"><code>VoUser</code> - </a> <a class="up" href="#__Models">Up</a></h3>
+    <div class='model-description'></div>
+    <div class="field-items">
+      <div class="param">id (optional)</div><div class="param-desc"><span class="param-type"><a href="#long">Long</a></span> VO user record unique identifier format: int64</div>
+<div class="param">name (optional)</div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span> VO user given name </div>
+<div class="param">surname (optional)</div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span> VO user family name </div>
+<div class="param">institution (optional)</div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span> VO user institution </div>
+<div class="param">address (optional)</div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span> VO user address </div>
+<div class="param">phoneNumber (optional)</div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span> VO user phone number </div>
+<div class="param">suspended (optional)</div><div class="param-desc"><span class="param-type"><a href="#boolean">Boolean</a></span> VO user suspension status </div>
+<div class="param">suspensionReason (optional)</div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span> VO user suspension reason </div>
+<div class="param">supensionReasonCode (optional)</div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span> VO user suspension reason code </div>
+<div class="param">creationTime (optional)</div><div class="param-desc"><span class="param-type"><a href="#DateTime">Date</a></span> VO user membership creation time format: date-time</div>
+<div class="param">endTime (optional)</div><div class="param-desc"><span class="param-type"><a href="#DateTime">Date</a></span> VO user membership expiration time format: date-time</div>
+<div class="param">emailAddress (optional)</div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span> VO user email address </div>
+<div class="param">aupAcceptanceRecords (optional)</div><div class="param-desc"><span class="param-type"><a href="#AupAcceptanceRecord">array[AupAcceptanceRecord]</a></span>  </div>
+<div class="param">certificates (optional)</div><div class="param-desc"><span class="param-type"><a href="#Certificate">array[Certificate]</a></span>  </div>
+<div class="param">attributes (optional)</div><div class="param-desc"><span class="param-type"><a href="#GenericAttribute">array[GenericAttribute]</a></span>  </div>
+<div class="param">fqans (optional)</div><div class="param-desc"><span class="param-type"><a href="#string">array[String]</a></span>  </div>
+<div class="param">pendingSignAUPTask (optional)</div><div class="param-desc"><span class="param-type"><a href="#SignAUPTask">SignAUPTask</a></span>  </div>
+    </div>  <!-- field-items -->
+  </div>
+  <div class="model">
+    <h3><a name="VoUserList"><code>VoUserList</code> - </a> <a class="up" href="#__Models">Up</a></h3>
+    <div class='model-description'></div>
+    <div class="field-items">
+      <div class="param">count (optional)</div><div class="param-desc"><span class="param-type"><a href="#long">Long</a></span> The total number of users in the VO format: int64</div>
+<div class="param">pageSize (optional)</div><div class="param-desc"><span class="param-type"><a href="#long">Long</a></span> The page size for this response format: int64</div>
+<div class="param">startIndex (optional)</div><div class="param-desc"><span class="param-type"><a href="#long">Long</a></span> The start index for this response format: int64</div>
+<div class="param">result (optional)</div><div class="param-desc"><span class="param-type"><a href="#VoUser">array[VoUser]</a></span> An array of VO user objects </div>
+    </div>  <!-- field-items -->
+  </div>
+  </body>
+</html>
