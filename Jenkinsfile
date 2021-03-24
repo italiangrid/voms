@@ -1,19 +1,22 @@
 #!/usr/bin/env groovy
 
+@Library('sd')_
+def kubeLabel = getKubeLabel()
+
 pipeline {
 
   agent {
       kubernetes {
-          label "voms-${env.JOB_BASE_NAME}-${env.BUILD_NUMBER}"
-          cloud 'Kube mwdevel'
-          defaultContainer 'jnlp'
-          inheritFrom 'ci-template'
-          containerTemplate {
-            name 'runner'
-              image 'voms/voms-build:centos7'
-              ttyEnabled true
-              command 'cat'
-          }
+        label "${kubeLabel}"
+        cloud 'Kube mwdevel'
+        defaultContainer 'runner'
+        inheritFrom 'ci-template'
+        containerTemplate {
+          name 'runner'
+          image 'italiangrid/voms-build-centos7'
+          ttyEnabled true
+          command 'cat'
+        }
       }
   }
 
