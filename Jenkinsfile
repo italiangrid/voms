@@ -21,7 +21,7 @@ pipeline {
   }
 
   options {
-    timeout(time: 1, unit: 'HOURS')
+    timeout(time: 10, unit: 'MINUTES')
     buildDiscarder(logRotator(numToKeepStr: '5'))
   }
 
@@ -30,10 +30,8 @@ pipeline {
   stages {
     stage ('build') {
       steps {
-        container('runner') {
           sh "./autogen.sh"
           sh "./configure && make"
-        }
       }
     }
 
