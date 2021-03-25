@@ -30,8 +30,14 @@ pipeline {
   stages {
     stage ('build') {
       steps {
-          sh "./autogen.sh"
-          sh "./configure && make"
+        sh '''#!/bin/bash
+        set -ex
+        pwd
+        ls -lR
+        ./autogen.sh 
+        ./configure
+        make
+        '''
       }
     }
 
