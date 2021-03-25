@@ -14,7 +14,7 @@
 # limitations under the License.
 #
 
-name: Maven build
+name: CENTOS 7 build
 
 on:
   push:
@@ -30,4 +30,4 @@ jobs:
     steps:
     - uses: actions/checkout@v2
     - name: Build
-      run: ./autogen.sh && configure && make && make install 
+      run: ./autogen.sh && ./configure && make && make install 
