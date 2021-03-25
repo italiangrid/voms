@@ -13,7 +13,7 @@ pipeline {
         inheritFrom 'ci-template'
         containerTemplate {
           name 'runner'
-          image 'italiangrid/voms-build-centos7'
+          image 'italiangrid/voms-build-centos7:015edee'
           ttyEnabled true
           command 'cat'
         }
