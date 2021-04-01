@@ -609,7 +609,13 @@ X509 *vomsdata::check_from_file(AC *ac, std::ifstream &file, const std::string &
   X509_EXTENSION *ext=sk_X509_EXTENSION_value(exts, pos);
 
   AC_CERTS *certs = (AC_CERTS *)X509V3_EXT_d2i(ext);
-  STACK_OF(X509) *certstack = certs->stackcert;
+  STACK_OF(X509) *certstack = certs != NULL ? certs->stackcert : NULL;
+
+  if (certs == NULL || certstack == NULL) {
+    AC_CERTS_free(certs);
+    seterror(VERR_SIGN, "Malformed AC: the AC does not contain the issuer certificate chain");
+    return NULL;
+  }                  
 
   bool success = false;
   bool final = false;
