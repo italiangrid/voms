@@ -613,7 +613,7 @@ X509 *vomsdata::check_from_file(AC *ac, std::ifstream &file, const std::string &
 
   if (certs == NULL || certstack == NULL) {
     AC_CERTS_free(certs);
-    seterror(VERR_SIGN, "AC does not contain certificate chain");
+    seterror(VERR_SIGN, "Malformed AC: the AC does not contain the issuer certificate chain");
     return NULL;
   }                  
 
