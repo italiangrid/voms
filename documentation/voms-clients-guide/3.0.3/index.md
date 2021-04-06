@@ -19,19 +19,20 @@ version: 3.0.3
 
 ## Installing the clients <a name="install">&nbsp;</a>
 
-To install the VOMS clients, configure the EMI 3 repositories as appropriate
-for the distribution where you will install the VOMS clients.
+To install the VOMS clients, configure the [UMD repositories][umd] as appropriate
+for your target distribution.
 
-On Scientific Linux 5 or 6, voms clients are installed with the following command:
+On SL/CENTOS 6, VOMS clients are installed with the following command:
 
 ```
 yum install voms-clients3
 ```
 
-On Debian6 use the following command:
+On CENTOS 7, VOMS clients are available in EPEL 7, and are installed with the
+following command:
 
 ```
-apt-get install voms-clients3
+yum install voms-clients-java
 ```
 
 ## Configuring VOMS trust anchors <a name="voms-trust">&nbsp;</a>
@@ -95,26 +96,31 @@ For more details on how to configure vomses files on the system, see the `vomses
 While user credentials may be put anywhere, and then their location passed to 
 `voms-proxy-init` via the appropriate options, there are obviously default values.
 
-User credentials should be put in the `$HOME/.globus`.
+User credentials should be put in the `$HOME/.globus` directory.
 
 Certificates encoded in PKCS12 and PEM formats are correctly handled by the VOMS clients.
 
 The default path for looking up PKCS12 credentials is:
 
 ```
-usercred.p12
+$HOME/.globus/usercred.p12
 ```
+
+Permissions on `$HOME/.globus/usercred.p12` must be 600.
 
 For PEM credentials the following paths are used:
 
 ```
-usercert.pem (certificate)
-userkey.pem (private key)
+$HOME/.globus/usercert.pem (certificate)
+$HOME/.globus/userkey.pem (private key)
 ```
 
-In case both the PEM and PKCS12 formats are present, PEM takes precedence. 
+Permissions on the pem files must be:
 
-The user certiﬁcate must at the most have permission 644, while the private key should be 400.
+- 644 for `$HOME/.globus/usercert.pem`
+- 400 for `$HOME/.globus/userkey.pem`
+
+In case both the PEM and PKCS12 formats are present, PEM takes precedence. 
 
 ## Controlling java options
 
@@ -256,3 +262,5 @@ $ voms-proxy-destroy
 ```
 
 See `voms-proxy-destroy --help` or the man page for a complete list of available options.
+
+[umd]: http://repository.egi.eu/category/umd_releases/distribution/umd-4/
