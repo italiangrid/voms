@@ -1,7 +1,9 @@
 ---
 layout: default
-version: 3.0.13
+version: 3.0.14
 title: VOMS System Administrator Guide}
+redirect_from:
+  - /documentation/sysadmin-guide/
 ---
 
 # VOMS System Administrator guide
@@ -48,7 +50,7 @@ and running the VOMS server.
 
 ### Operating system
 
-* Supported OS: Scientific Linux 6, CENTOS 7
+* Supported OS: CENTOS 7
 * NTP Time synchronization: required.
 * IGTF host certificates: required.
 * Networking: for the service ports see the [Service Reference Card]({{site.baseurl}}/documentation/sysadmin-guide/{{page.version}}/service-ref-card.html)
@@ -58,7 +60,7 @@ and running the VOMS server.
 Besides the usual OS packages you will need the EPEL and UMD package
 repositories configured.
 
-All the other dependencies are resolved by the installation of the VOMS metapackages, **emi-voms-mysql**.
+All the other dependencies are resolved by the installation of the VOMS metapackages, **voms-mysql-mp**.
 
 ### Recommended deployment scenarios
 
@@ -75,7 +77,7 @@ See the [clean installation guide](clean-installation.html).
 
 ## Service operation <a name="Operation">&nbsp;</a>
 
-See the [service operation guide](operation.html).
+See the [service operation guide](operations.html).
 
 ## Troubleshooting <a name="Troubleshooting">&nbsp;</a>
 
