@@ -14,12 +14,11 @@ title: VOMS System Administrator Guide - Operations
 The commands used to start and stop VOs in CENTOS 7 changed with the move to systemd.
 
 To enable VOs in VOMS admin, you must use the `voms-vo-ctl` utility. For example,
-the following command
+the following command enables the atlas VO:
 
 ```bash
 voms-vo-ctl deploy atlas
 ```
-
 
 To start and stop all VOs on the machine, use the following commands:
 
