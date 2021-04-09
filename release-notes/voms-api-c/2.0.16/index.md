@@ -8,7 +8,7 @@ rfcs:
   title: Implement support for SNI in the VOMS C/C++ APIs
 ---
 
-# VOMS C/C++ APIs v. 2.0.15
+# VOMS C/C++ APIs v. 2.0.16
 
 ### Bug fixes
 
