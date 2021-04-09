@@ -1,7 +1,9 @@
 ---
 layout: default
 title: VOMS Admin documentation
-version: 3.8.0
+version: 3.8.1
+redirect_from:
+  - /documentation/voms-admin-guide/
 ---
 
 # VOMS Admin documentation
