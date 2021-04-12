@@ -57,4 +57,4 @@ repo.
 [egi-trustanchors]: https://wiki.egi.eu/wiki/EGI_IGTF_Release
 [umd]: https://repository.egi.eu/category/umd_releases/distribution/umd-4/
 [voms-repositories]: https://italiangrid.github.io/voms-repo/
-[voms-releases]: https://tbd
+[voms-releases]: {{site.baseurl}}/releases.html
