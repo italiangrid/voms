@@ -55,19 +55,13 @@ void add_no_rev_avail_ext(AC *ac) {
 
 int add_authority_key_id_ext(AC *ac, X509* issuer_cert) {
 
-  // Copy akid extension from issuer_cert
-  int ext_loc = X509_get_ext_by_NID(issuer_cert, NID_authority_key_identifier, -1);
-
-  if (ext_loc == -1){
-    return 1;
+  X509V3_CTX ctx;
+  X509V3_set_ctx(&ctx, issuer_cert, NULL, NULL, NULL, 0);
+  X509_EXTENSION* ext = X509V3_EXT_conf(NULL, &ctx, "authorityKeyIdentifier", "keyid:always");
+  if (!ext) {
+    return AC_ERR_NO_EXTENSION;
   }
-
-  X509_EXTENSION *akid = X509_get_ext(issuer_cert, ext_loc);
-
-  assert( akid != NULL );
-
-  X509v3_add_ext(&ac->acinfo->exts, akid, -1);
-
+  sk_X509_EXTENSION_push(ac->acinfo->exts, ext);
   return 0;
 }
 

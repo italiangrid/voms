@@ -22,3 +22,4 @@
 /utils/voms-proxy-fake
 /utils/voms-proxy-info
 /utils/voms-verify
+/client/voms-proxy-init
