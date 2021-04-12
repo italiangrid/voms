@@ -93,8 +93,6 @@ extern int AC_Init(void);
 std::map<vomsdata*, vomsspace::internal*> privatedata;
 pthread_mutex_t privatelock = PTHREAD_MUTEX_INITIALIZER;
 
-static bool initialized = false;
-
 void vomsdata::seterror(verror_type err, std::string message)
 {
   error = err;
@@ -104,6 +102,26 @@ void vomsdata::seterror(verror_type err, std::string message)
 std::string vomsdata::ErrorMessage(void)
 {
   return errmessage;
+}
+
+static pthread_once_t initialized = PTHREAD_ONCE_INIT;
+static bool ssl_is_initialized = false;
+
+static void initialize()
+{
+  if (!ssl_is_initialized) {
+     SSL_library_init();
+     SSLeay_add_all_algorithms();
+     ERR_load_crypto_strings();
+     OpenSSL_add_all_ciphers();
+  }
+  AC_Init();
+  InitProxyCertInfoExtension(1);
+}
+
+void vomsdata::DontInitializeSsl()
+{
+  ssl_is_initialized = true;
 }
 
 vomsdata::vomsdata(std::string voms_dir, std::string cert_dir) :  ca_cert_dir(cert_dir),
@@ -118,19 +136,7 @@ vomsdata::vomsdata(std::string voms_dir, std::string cert_dir) :  ca_cert_dir(ce
                                                                   verificationtime(0),
                                                                   vdp(NULL)
 {
-   if (!initialized) {
-     initialized = true;
-#ifdef NOGLOBUS
-     SSL_library_init();
-     SSLeay_add_all_algorithms();
-     ERR_load_crypto_strings();
-     OpenSSL_add_all_ciphers();
-
-     (void)AC_Init();
-     InitProxyCertInfoExtension(1);
-#endif
-     PKCS12_PBE_add();
-   }
+  pthread_once(&initialized, initialize);
 
   if (voms_cert_dir.empty()) {
     char *v;
