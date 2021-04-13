@@ -110,16 +110,19 @@ static bool ssl_is_initialized = false;
 static void initialize()
 {
   if (!ssl_is_initialized) {
-     SSL_library_init();
-     SSLeay_add_all_algorithms();
-     ERR_load_crypto_strings();
-     OpenSSL_add_all_ciphers();
+    // not strictly necessary, since initialize is called only once
+    ssl_is_initialized = true;
+
+    SSL_library_init();
+    SSLeay_add_all_algorithms();
+    ERR_load_crypto_strings();
+    OpenSSL_add_all_ciphers();
   }
   AC_Init();
   InitProxyCertInfoExtension(1);
 }
 
-void vomsdata::DontInitializeSsl()
+void vomsdata::SkipSslInitialization()
 {
   ssl_is_initialized = true;
 }

@@ -212,7 +212,7 @@ struct vomsdata {
   public:
   verror_type error; /*!< Error code */
 
-  static void DontInitializeSsl();
+  static void SkipSslInitialization();
 
   vomsdata(std::string voms_dir = "", 
 	   std::string cert_dir = ""); /*!< \param voms_dir The directory which contains the certificate 
