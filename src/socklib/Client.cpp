@@ -296,6 +296,7 @@ GSISocketClient::Open()
     ssl = SSL_new(ctx);
     setup_SSL_proxy_handler(ssl, cacertdir);
     SSL_set_bio(ssl, conn, conn);
+    SSL_set_tlsext_host_name(ssl, host.c_str());
 
     conn = NULL;
 

@@ -1,0 +1,7 @@
+{
+  "name": "VOMS core development",
+  "dockerComposeFile": "compose/docker-compose.yml",
+  "service": "voms_build",
+  "workspaceFolder": "/home/build/workspace",
+  "shutdownAction": "stopCompose"
+}

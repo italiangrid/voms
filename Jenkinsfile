@@ -1,24 +1,28 @@
 #!/usr/bin/env groovy
 
+@Library('sd')_
+def kubeLabel = getKubeLabel()
+
 pipeline {
 
   agent {
       kubernetes {
-          label "voms-${env.JOB_BASE_NAME}-${env.BUILD_NUMBER}"
-          cloud 'Kube mwdevel'
-          defaultContainer 'jnlp'
-          inheritFrom 'ci-template'
-          containerTemplate {
-            name 'runner'
-              image 'voms/voms-build:centos6'
-              ttyEnabled true
-              command 'cat'
-          }
+
+        label "${kubeLabel}"
+        cloud 'Kube mwdevel'
+        defaultContainer 'runner'
+        inheritFrom 'ci-template'
+        containerTemplate {
+          name 'runner'
+          image 'italiangrid/voms-build-centos7:latest'
+          ttyEnabled true
+          command 'cat'
+        }
       }
   }
 
   options {
-    timeout(time: 1, unit: 'HOURS')
+    timeout(time: 10, unit: 'MINUTES')
     buildDiscarder(logRotator(numToKeepStr: '5'))
   }
 
@@ -27,10 +31,15 @@ pipeline {
   stages {
     stage ('build') {
       steps {
-        container('runner') {
-          sh "./autogen.sh"
-          sh "./configure && make"
-        }
+
+        sh '''#!/bin/bash
+        set -ex
+        pwd
+        ls -lR
+        ./autogen.sh 
+        ./configure
+        make
+        '''
       }
     }
 
