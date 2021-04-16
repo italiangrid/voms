@@ -122,7 +122,7 @@ vomsdata::vomsdata(std::string voms_dir, std::string cert_dir) :  ca_cert_dir(ce
      initialized = true;
 #ifdef NOGLOBUS
      SSL_library_init();
-     SSLeay_add_all_algorithms();
+     OpenSSL_add_all_algorithms();
      ERR_load_crypto_strings();
      OpenSSL_add_all_ciphers();
 

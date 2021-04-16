@@ -51,7 +51,7 @@ extern "C" {
 static int reload = 0;
 
 void *logh = NULL;
-#include "myproxycertinfo.h"
+#include "proxycertinfo.h"
 }
 
 #include <sstream>
@@ -96,11 +96,15 @@ std::string vomsresult::makeRESTAnswer(int& code)
   std::string output = "<?xml version=\"1.0\" encoding=\"UTF-8\"?><voms>";
   code = SOAP_HTML;
 
-  if (ac != "A" && !ac.empty())
-    output += "<ac>"+Encode(ac, true)+"</ac>";
+  if (ac != "A" && !ac.empty()){
+    std::string encoded_ac = Encode(ac,true);
+    output += "<ac>"+encoded_ac+"</ac>";
+  }
 
-  if (!data.empty())
-    output += "<bitstr>"+Encode(data, true)+"</bitstr>";
+  if (!data.empty()){
+    std::string encoded_data = Encode(data,true);
+    output += "<bitstr>"+encoded_data+"</bitstr>";
+  }
 
   std::vector<errorp>::const_iterator end = errs.end();
   for (std::vector<errorp>::const_iterator i = errs.begin(); i != end; ++i) {
@@ -1219,16 +1223,15 @@ bool VOMSServer::makeAC(vomsresult& vr, EVP_PKEY *key, X509 *issuer,
 
         /* Encode AC */
         if (!res) {
-          unsigned int len = i2d_AC(a, NULL);
+          unsigned char *buf = NULL;
 
-          unsigned char *tmp = (unsigned char *)OPENSSL_malloc(len);
-          unsigned char *ttmp = tmp;
+          int len = i2d_AC(a, &buf);
 
-          if (tmp) {
-            i2d_AC(a, &tmp);
-            codedac = std::string((char *)ttmp, len);
+          if (len > 0) {
+            codedac = std::string(reinterpret_cast<char*>(buf), len);
           }
-          free(ttmp);
+
+          OPENSSL_free(buf);
         }
         else
           vr.setError(ERR_NOT_MEMBER, get_error(res));

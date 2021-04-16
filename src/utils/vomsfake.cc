@@ -78,7 +78,7 @@ extern FILE *yyin;
 
 extern "C" {
 
-#include "myproxycertinfo.h"
+#include "proxycertinfo.h"
 extern int writeac(const X509 *issuerc, const STACK_OF(X509) *certstack, const X509 *holder, 
 		   const EVP_PKEY *pkey, BIGNUM *s, char **c, 
 		   const char *t, char **attributes, AC **ac, const char *voname, 
