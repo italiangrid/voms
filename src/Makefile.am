@@ -9,6 +9,7 @@ SUBDIRS = \
 	ac \
 	api \
 	utils \
+	client \
 	server \
 	install \
 	replica
