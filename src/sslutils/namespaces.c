@@ -1671,19 +1671,6 @@ yyreturn:
 /* Line 1675 of yacc.c  */
 #line 110 "namespaces.y"
 
-
-#if 0
-int main()
-{
-  namespacesdebug = 1;
-  struct policy **arg = NULL;
-  void *scanner=NULL;
-  namespaceslex_init(&scanner);
-  namespacesset_debug(1, scanner);
-  return namespacesparse(&arg, scanner);
-}
-#endif
-
 void namespaceserror(UNUSED(void *policies), UNUSED(void *scanner), UNUSED(char const *msg))
 {
 }

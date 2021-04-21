@@ -195,6 +195,17 @@ AC_DEFUN([AC_COMPILER],
       CXXFLAGS="-g -O0"
     fi
 
+    AC_ARG_WITH(profile,
+      [  --with-profile Compiles and links with collection of profile information activated],
+      [ac_with_profile="yes"],
+      [ac_with_profile="no"])
+    
+    if test "x$ac_with_profile" = "xyes" ; then
+      CFLAGS="$CFLAGS -pg"
+      CXXFLAGS="$CXXFLAGS -pg"
+      LDFLAGS="$LDFLAGS -pg"
+    fi
+
     AC_ARG_WITH(warnings,
       [  --with-warnings Compiles with maximum warnings],
       [ac_with_warnings="yes"],

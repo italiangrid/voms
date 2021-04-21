@@ -26,7 +26,17 @@
 
 #include <openssl/asn1.h>
 #include <openssl/objects.h>
+#include <assert.h>
 #include "extensions.h"
+
+static void OBJC(char const* oid, char const* name)
+{
+  assert(oid != NULL && name != NULL);
+  if (OBJ_txt2nid(oid) == NID_undef) {
+    int nid = OBJ_create(oid, name, name);
+    assert(nid != NID_undef && "OBJ_create failed");
+  }
+}
 
 void declareOIDs(void)
 {
@@ -59,19 +69,22 @@ void declareOIDs(void)
 #define certseq               "1.3.6.1.4.1.8005.100.100.10"
 #define email                 idpkcs9 ".1"
 
-#define OBJC(c,n) OBJ_create(c,n,#c)
-
   static int done=0;
-  if (done)
+  if (done) {
     return;
+  }
 
   done=1;
+
   OBJC(idatcap,"idatcap");
-  /*  //// test */
+
   OBJC(attributes,"attributes");
+
+  /*
   OBJC(idcenoRevAvail, "noRevAvail");
-  OBJC(idceauthKeyIdentifier, "authKeyId");
-  OBJC(idceTargets, "idceTargets");
+  OBJC(idceTargets, "targetInformation");
+  */
+
   OBJC(acseq, "acseq");
   OBJC(order, "order");
   OBJC(voms, "voms");

@@ -30,7 +30,10 @@
 #include <string>
 #include <vector>
 
+#ifndef NOGLOBUS
 #define NOGLOBUS
+#endif
+
 extern "C" {
 #ifndef GSSAPI_H_
 /*

@@ -29,7 +29,6 @@
 #include <string.h>
 
 #include <openssl/evp.h>
-#include <openssl/asn1_mac.h>
 #include <openssl/x509.h>
 #include <openssl/x509v3.h>
 #include <openssl/err.h>
@@ -50,8 +49,8 @@
 
 typedef struct ACATTRIBUTE {
   ASN1_OCTET_STRING *name;
-  ASN1_OCTET_STRING *qualifier;
   ASN1_OCTET_STRING *value;
+  ASN1_OCTET_STRING *qualifier;
 } AC_ATTRIBUTE;
 
 typedef struct ACATTHOLDER {
@@ -67,18 +66,6 @@ DECL_STACK(AC_ATTRIBUTE);
 DECL_STACK(AC_ATT_HOLDER);
 DECL_STACK(AC_FULL_ATTRIBUTES);
 
-extern int i2d_AC_ATTRIBUTE(AC_ATTRIBUTE *, unsigned char **);
-extern int i2d_AC_ATT_HOLDER(AC_ATT_HOLDER *, unsigned char **);
-extern int i2d_AC_FULL_ATTRIBUTES(AC_FULL_ATTRIBUTES *, unsigned char **);
-
-extern AC_ATTRIBUTE *d2i_AC_ATTRIBUTE(AC_ATTRIBUTE **, VOMS_MAYBECONST unsigned char **, long);
-extern AC_ATT_HOLDER *d2i_AC_ATT_HOLDER(AC_ATT_HOLDER **, VOMS_MAYBECONST unsigned char **, long);
-extern AC_FULL_ATTRIBUTES *d2i_AC_FULL_ATTRIBUTES(AC_FULL_ATTRIBUTES **, VOMS_MAYBECONST unsigned char **, long);
-
-extern AC_ATTRIBUTE *AC_ATTRIBUTE_new();
-extern AC_ATT_HOLDER *AC_ATT_HOLDER_new();
-extern AC_FULL_ATTRIBUTES *AC_FULL_ATTRIBUTES_new();
-
-extern void AC_ATTRIBUTE_free(AC_ATTRIBUTE *);
-extern void AC_ATT_HOLDER_free(AC_ATT_HOLDER *);
-extern void AC_FULL_ATTRIBUTES_free(AC_FULL_ATTRIBUTES *);
+DECLARE_ASN1_FUNCTIONS(AC_ATTRIBUTE)
+DECLARE_ASN1_FUNCTIONS(AC_ATT_HOLDER)
+DECLARE_ASN1_FUNCTIONS(AC_FULL_ATTRIBUTES)

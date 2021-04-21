@@ -7,6 +7,7 @@ pipeline {
 
   agent {
       kubernetes {
+
         label "${kubeLabel}"
         cloud 'Kube mwdevel'
         defaultContainer 'runner'
@@ -30,6 +31,7 @@ pipeline {
   stages {
     stage ('build') {
       steps {
+
         sh '''#!/bin/bash
         set -ex
         pwd

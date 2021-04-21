@@ -64,26 +64,3 @@ char *normalize(const char *str)
   free(tmp2);
   return tmp;
 }
-
-#if 0
-int main(int argc, char *argv)
-{
-  char *str1="/prova/Email=frge/CN=op";
-  char *str2="/prova/E=boh/emailAddress=mah/E=op/CN=fr";
-  char *str3="/USERID=56/mah";
-
-  char *n1 = normalize(str1);
-  char *n2 = normalize(str2);
-  char *n3 = normalize(str3);
-
-  printf("%s -> %s\n", str1, n1);
-  free(n1);
-  printf("%s -> %s\n", str2, n2);
-  free(n2);
-  printf("%s -> %s\n", str3, n3);
-  free(n3);
-
-  exit(0);
-}
-
-#endif
