@@ -114,7 +114,7 @@ static void initialize()
     ssl_is_initialized = true;
 
     SSL_library_init();
-    SSLeay_add_all_algorithms();
+    OpenSSL_add_all_algorithms();
     ERR_load_crypto_strings();
     OpenSSL_add_all_ciphers();
   }
