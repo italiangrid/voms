@@ -422,11 +422,6 @@ Client::Client(int argc, char ** argv) :
       dontverifyac = true;
   }
 
-  /* set globus version */
-
-  version = globus(version);
-  Print(DEBUG) << "Detected Globus version: " << version/10 << "." << version % 10 << std::endl;
-  
   /* set proxy version */
   if (rfc)
     proxyver = 4;
