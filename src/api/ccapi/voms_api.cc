@@ -109,6 +109,7 @@ static bool ssl_is_initialized = false;
 
 static void initialize()
 {
+#if OPENSSL_VERSION_NUMBER < 0x10100000L
   if (!ssl_is_initialized) {
     // not strictly necessary, since initialize is called only once
     ssl_is_initialized = true;
@@ -118,6 +119,7 @@ static void initialize()
     ERR_load_crypto_strings();
     OpenSSL_add_all_ciphers();
   }
+#endif
   AC_Init();
   InitProxyCertInfoExtension(1);
 }
