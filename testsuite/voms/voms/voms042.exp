@@ -5,7 +5,7 @@ proc mytest {} {
     _activateCert mycert2
 
     _vomsStart voms1
-    set res [log_exec outname {voms-proxy-init --voms voms1 --bits 2048}]
+    set res [log_exec outname {voms-proxy-init --voms voms1 --bits 4096}]
     _vomsStop voms1
 
     if $res then {
@@ -24,7 +24,7 @@ proc mytest {} {
 issuer    : /C=IT/CN=001
 identity  : /C=IT/CN=001
 type      : proxy
-strength  : 2048 bits
+strength  : 4096 bits
 path      : /tmp/x509up_u\[0-9\]*
 timeleft  : \[0-9\]*:\[0-9\]*:\[0-9\]*"
 
