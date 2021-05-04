@@ -34,10 +34,6 @@ AC_COMPILER
 PKG_CHECK_MODULES([OPENSSL], [openssl])
 # AC_OPENSSL
 
-PKG_CHECK_MODULES([GSOAP],[gsoap >= 2.7])
-PKG_CHECK_MODULES([GSOAP_PP],[gsoap++ >= 2.7])
-PKG_CHECK_MODULES([GSOAP_SSL],[gsoapssl >= 2.7])
-PKG_CHECK_MODULES([GSOAP_SSL_PP],[gsoapssl++ >= 2.7])
 
 AC_CHECK_HEADER([expat.h], 
     [], 
@@ -52,7 +48,6 @@ AC_CHECK_LIB([expat],
 
 AC_SUBST(EXPAT_LIBS)
 
-AC_WSDL2H
 AC_ENABLE_DOCS
 
 # Checks for header files.
@@ -101,6 +96,16 @@ AC_VOMS_STRNDUP
 
 AC_BUILD_API_ONLY
 AC_BUILD_PARTS
+
+# Check for gSOAP only when building server which is checked in BUILD_PARTS
+if test "x$build_server" = "xyes" ; then
+PKG_CHECK_MODULES([GSOAP],[gsoap >= 2.7])
+PKG_CHECK_MODULES([GSOAP_PP],[gsoap++ >= 2.7])
+PKG_CHECK_MODULES([GSOAP_SSL],[gsoapssl >= 2.7])
+PKG_CHECK_MODULES([GSOAP_SSL_PP],[gsoapssl++ >= 2.7])
+AC_WSDL2H
+fi
+
 GLITE_DOCBOOK_MAN
 
 AC_LINUX
