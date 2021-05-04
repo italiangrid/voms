@@ -104,7 +104,8 @@ The language in which the policy is expressed. Default is IMPERSONATION_PROXY.</
 Maximum depth of proxy certfificate that can be signed from this.</para>
 
 <para><option>-globus</option> <replaceable>version</replaceable>
-Underlying Globus version.</para>
+This option is obsolete and only present for backwards compatibility
+  with old installations.  Currently, its value is ignored.</para>
 
 <para><option>-proxyver</option>
 Version of the proxy certificate to create. May be 2 or 3.

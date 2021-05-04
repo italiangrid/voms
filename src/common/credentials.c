@@ -40,29 +40,6 @@
 #include "sslutils.h"
 #include "voms_cert_type.h"
 
-int
-globus(int version)
-{
-  if (version == 0) {
-    char *gver = getenv("GLOBUS_VERSION");
-
-    if (gver) {
-      char *tmp;
-      
-      version = strtol(gver, &tmp, 10);
-      if (!(*tmp))
-        return 22;
-    }
-  }
-  
-  if (version >= 42 || version == 0)
-    version = 22;
-
-  return version;
-}
-
-
-
 X509 *
 get_real_cert(X509 *base, STACK_OF(X509) *stk)
 {
