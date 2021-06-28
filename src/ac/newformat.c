@@ -172,7 +172,11 @@ ASN1_SEQUENCE(AC) = {
 
 IMPLEMENT_ASN1_FUNCTIONS(AC)
 
-AC * AC_dup(AC *x) { return (AC*)ASN1_item_dup((&(AC_it)), x); }
+#if OPENSSL_VERSION_NUMBER < 0x30000000L
+AC * AC_dup(AC *x) { return ASN1_item_dup(ASN1_ITEM_rptr(AC), x); }
+#else
+AC * AC_dup(const AC *x) { return ASN1_item_dup(ASN1_ITEM_rptr(AC), x); }
+#endif
 
 ASN1_SEQUENCE(AC_SEQ) = {
   ASN1_SEQUENCE_OF(AC_SEQ, acs, AC)

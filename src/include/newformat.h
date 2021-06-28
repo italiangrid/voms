@@ -162,7 +162,11 @@ DECLARE_ASN1_FUNCTIONS(AC_CERTS)
 
 DECLARE_ASN1_PRINT_FUNCTION(AC)
 
+#if OPENSSL_VERSION_NUMBER < 0x30000000L
 extern AC *AC_dup(AC *ac);
+#else
+extern AC *AC_dup(const AC *ac);
+#endif
 
 extern EVP_PKEY *EVP_PKEY_dup(EVP_PKEY *pkey);
 
