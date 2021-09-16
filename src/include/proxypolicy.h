@@ -72,14 +72,18 @@ extern "C" {
   int PROXY_POLICY_set_policy_language(
       PROXY_POLICY *                       policy
     , ASN1_OBJECT *                       policy_language);
-  
+
   int PROXY_POLICY_set_policy(
       PROXY_POLICY *                       proxypolicy
     , unsigned char *                     policy
     , int                                 length);
 
+#if OPENSSL_VERSION_NUMBER < 0x30000000L
   PROXY_POLICY* PROXY_POLICY_dup(PROXY_POLICY* policy);
-  
+#else
+  PROXY_POLICY* PROXY_POLICY_dup(const PROXY_POLICY* policy);
+#endif
+
 #ifdef __cplusplus
 }
 #endif
