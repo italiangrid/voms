@@ -468,12 +468,13 @@ The options are described in the following table
 | `--dbport PORT` | Uses PORT when connecting to MySQL. | 3306 |
 | `--mysql-command CMD` | Uses CMD ad mysql command. | mysql |
 | `--dbauser USER` | Uses USER when connecting to MySQL. USER must have the rights to create database and grant access to them. | root |
-| `--dbapwd PWD` | Uses PWD when connecting to MySQL. This is the password of the user specified using the --dbauser option.|
-| `--dbapwdfile FILE` | Reads the password to connect to the database from FILE. |
-| `--dbusername USER` | Sets the database username to USER. |
-| `--dbpassword PWD` | Sets the database password to PWD |
+| `--dbapwd PWD` | Uses PWD when connecting to MySQL. This is the password of the user specified using the --dbauser option.| |
+| `--dbapwdfile FILE` | Reads the password to connect to the database from FILE. | |
+| `--dbusername USER` | Sets the database username to USER. | |
+| `--dbpassword PWD` | Sets the database password to PWD | |
 | `--vomshost HOST` | Sets the HOST where VOMS is running. This is the host from which MySQL will receive connections for the database. |
-| `--dbname DBNAME` | Sets the VOMS database name to DBNAME. |
+| `--dbname DBNAME` | Sets the VOMS database name to DBNAME. | |
+| `--dburlparams PROPERTIES` | Sets the database properties. The PROPERTIES value is written as key=value pairs separated by the `&` symbol. We can put here a list of properties like `useSSL=false&serverTimezone=UTC` for example. | |
 
 #### voms-db-util
 
