@@ -943,16 +943,6 @@ bool Fake::VerifyOptions()
       exitError("Error: You must specify an host key!");
   }
 
-  /* set globus version */
-
-  version = globus(version);
-  if (version == 0) {
-    version = 22;
-    Print(DEBUG) << "Unable to discover Globus version: trying for 2.2" << std::endl;
-  }
-  else 
-    Print(DEBUG) << "Detected Globus version: " << version << std::endl;
-
   if (!selfsigned) {
     /* proxyversion is only significant if this is not a selfsigned certificate */
     if (rfc && proxyver != 0) 
@@ -966,16 +956,8 @@ bool Fake::VerifyOptions()
     if (proxyver!=2 && proxyver!=3 && proxyver!=4 && proxyver!=0)
       exitError("Error: proxyver must be 2 or 3 or 4");
     else if (proxyver==0) {
-      Print(DEBUG) << "Unspecified proxy version, settling on version: ";
-
-      if (version<30)
-        proxyver = 2;
-      else if (version<40)
-        proxyver = 3;
-      else
-        proxyver = 4;
-
-      Print(DEBUG) << proxyver << std::endl;
+      Print(DEBUG) << "Unspecified proxy version, settling on version 4 (RFC)" << std::endl;
+      proxyver = 4;
     }
 
     /* PCI extension option */ 
