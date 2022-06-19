@@ -128,7 +128,7 @@ int VOMS_WriteProxy(const char *filename, struct VOMSProxy *proxy)
 }
 
 
-static void kpcallback(int UNUSED(p), int UNUSED(n), void*)
+static void kpcallback(int UNUSED(p), int UNUSED(n), UNUSED(void* v))
 {
 }
 

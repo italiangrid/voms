@@ -128,7 +128,7 @@ static int pwstdin_callback(char * buf, int num, UNUSED(int w))
   return i;
 }
   
-static void kpcallback(int p, int UNUSED(n), void*)
+static void kpcallback(int p, int UNUSED(n), UNUSED(void* v))
 {
   char c='B';
     
