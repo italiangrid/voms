@@ -57,7 +57,7 @@ struct VOMSProxyArguments {
   int             minutes;
   int             limited;
   char           *voID;
-  int (*callback)();
+  void           (*callback)(int, int, void*);
   STACK_OF(X509_EXTENSION) *extensions;
   STACK_OF(X509) *chain;
   int             pastproxy;

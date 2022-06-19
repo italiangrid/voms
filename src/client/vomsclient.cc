@@ -121,11 +121,11 @@ static int pwstdin_callback(char * buf, int num, UNUSED(int w))
   return i;	
 }
   
-static int kpcallback(int p, UNUSED(int n)) 
+static void kpcallback(int p, UNUSED(int n), void*)
 {
   char c='B';
     
-  if (quiet) return 0;
+  if (quiet) return;
     
   if (p == 0) c='.';
   if (p == 1) c='+';
@@ -133,8 +133,6 @@ static int kpcallback(int p, UNUSED(int n))
   if (p == 3) c='\n';
   if (!debug) c = '.';
   fputc(c,stderr);
-
-  return 0;
 }
   
 extern int proxy_verify_cert_chain(X509 * ucert, STACK_OF(X509) * cert_chain, proxy_verify_desc * pvd);
@@ -870,7 +868,7 @@ bool Client::CreateProxy(std::string data, AC ** aclist, int version)
     args->limited       = limit_proxy;
 
     args->voID          = strdup(voID.c_str());
-    args->callback      = (int (*)())kpcallback;
+    args->callback      = kpcallback;
     int warn = 0;
     void *additional = NULL;
 

@@ -128,9 +128,8 @@ int VOMS_WriteProxy(const char *filename, struct VOMSProxy *proxy)
 }
 
 
-static int kpcallback(int UNUSED(p), int UNUSED(n)) 
+static void kpcallback(int UNUSED(p), int UNUSED(n), void*)
 {
-  return 0;
 }
 
 #define SET_EXT(ex)  (!sk_X509_EXTENSION_push(extensions, (ex)) ? \
@@ -157,7 +156,7 @@ struct VOMSProxy *VOMS_MakeProxy(struct VOMSProxyArguments *args, int *warning, 
   
   struct VOMSProxy *proxy = NULL;
 
-  int (*cback)();
+  void (*cback)(int, int, void*);
 
   InitProxyCertInfoExtension(1);
 
@@ -172,7 +171,7 @@ struct VOMSProxy *VOMS_MakeProxy(struct VOMSProxyArguments *args, int *warning, 
   if (args->proxyrequest == NULL) {
     if (proxy_genreq(args->cert, &req, &npkey, args->bits, 
                      args->newsubject ? args->newsubject : NULL, 
-                     (int (*)())cback)) {
+                     cback)) {
       goto err;
     }
   } else {

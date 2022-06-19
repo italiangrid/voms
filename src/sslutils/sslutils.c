@@ -701,7 +701,7 @@ proxy_genreq(
     EVP_PKEY **                         pkeyp,
     int                                 bits,
     const char *                        newdn,
-    int                                 (*callback)())
+    void                                (*callback)(int, int, void*))
 
 {
     RSA *                               rsa = NULL;
@@ -711,6 +711,8 @@ proxy_genreq(
     X509_REQ *                          req = NULL;
     X509_NAME_ENTRY *                   ne = NULL;
     int                                 rbits;
+    BIGNUM *                            rsa_exp = NULL;
+    BN_GENCB *                          cb = NULL;
 
     if (bits)
     {
@@ -744,15 +746,29 @@ proxy_genreq(
         goto err;
     }
 
-    /*
-     * Note: The cast of the callback function is consistent with
-     * the declaration of RSA_generate_key() in OpenSSL.  It may
-     * trigger a warning if you compile with SSLeay.
-     */
-    if ((rsa = RSA_generate_key(rbits,
-                                RSA_F4,
-                                (void (*)(int,int,void *))callback
-                                ,NULL)) == NULL)
+    if ((rsa_exp = BN_new()) == NULL || ! BN_set_word(rsa_exp, RSA_F4))
+    {
+        PRXYerr(PRXYERR_F_PROXY_GENREQ,PRXYERR_R_PROCESS_PROXY_KEY);
+        goto err;
+    }
+
+    if ((cb = BN_GENCB_new()) == NULL)
+    {
+        PRXYerr(PRXYERR_F_PROXY_GENREQ,PRXYERR_R_PROCESS_PROXY_KEY);
+        goto err;
+    }
+    BN_GENCB_set_old(cb, callback, NULL);
+
+    if ((rsa = RSA_new()) == NULL) {
+        PRXYerr(PRXYERR_F_PROXY_GENREQ,PRXYERR_R_PROCESS_PROXY_KEY);
+        goto err;
+    }
+
+    if (RSA_generate_key_ex(rsa, rbits, rsa_exp, cb))
+    {
+      BN_free(rsa_exp);
+    }
+    else
     {
         PRXYerr(PRXYERR_F_PROXY_GENREQ,PRXYERR_R_PROCESS_PROXY_KEY);
         goto err;
@@ -840,6 +856,14 @@ err:
     if (upkey)
       EVP_PKEY_free(upkey);
 
+    if (rsa_exp)
+    {
+      BN_free(rsa_exp);
+    }
+    if (cb)
+    {
+      BN_GENCB_free(cb);
+    }
     if(rsa)
     {
         RSA_free(rsa);
