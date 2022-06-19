@@ -89,7 +89,7 @@ extern int writeac(const X509 *issuerc, const STACK_OF(X509) *certstack, const X
 static int time_to_sec(std::string timestring);
 static long mystrtol(char *number, long int limit);
 static std::string hextostring(const std::string &data);
-static int parse_ga_value(char *ga, char **id, char **value, char **qual);
+static int parse_ga_value(char *ga, char **id, char **value, const char **qual);
 
 extern int AC_Init();
 
@@ -398,7 +398,8 @@ Fake::Fake(int argc, char ** argv) :   confile(conf_file_name),
     int down = 0;
     for (unsigned int i = 0; i < galist.size(); i++) {
       char *temp = strdup(galist[i].c_str());
-      char *id, *value, *qual;
+      char *id, *value;
+      const char *qual;
       if (parse_ga_value(temp, &id, &value, &qual)) {
         std::string realga = std::string(qual) + "::" + id + "=" + value;
         voelem->gas[i] = (char*)strdup((realga.c_str()));
@@ -541,9 +542,9 @@ bool Fake::Run()
 
 }
 
-static int parse_ga_value(char *ga, char **id, char **value, char **qual)
+static int parse_ga_value(char *ga, char **id, char **value, const char **qual)
 {
-  static char *empty="";
+  static const char *empty="";
   char *eqpoint = strchr(ga, '=');
   char *qualpoint = strchr(ga, '(');
   char *qualend = strchr(ga, ')');
