@@ -81,12 +81,8 @@ AC_CHECK_FUNCS([alarm atexit dup2 gethostbyaddr gethostname gethostbyname gethos
 AC_CHECK_DECLS(getopt_data)
 AC_REPLACE_FUNCS(getopt_long getopt_long_only daemon setenv memset)
 
-TEST_USE_BSD
-TEST_USE_POSIX
-
 # NEW_ISSUES
 
-AC_DEFINE(_SVID_SOURCE, 1, [Get SVID extensions])
 AC_VOMS_TIME_T_TIMEZONE
 AM_WITH_DMALLOC
 
