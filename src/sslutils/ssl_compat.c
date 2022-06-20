@@ -342,6 +342,16 @@ int BIO_meth_set_callback_ctrl(BIO_METHOD *biom, long (*callback_ctrl) (BIO *, i
   return 1;
 }
 
+BN_GENCB *BN_GENCB_new(void)
+{
+  return OPENSSL_malloc(sizeof(BN_GENCB));
+}
+
+void BN_GENCB_free(BN_GENCB *cb)
+{
+  OPENSSL_free(cb);
+}
+
 #if OPENSSL_VERSION_NUMBER < 0x10002000L
 
 int X509_get_signature_nid(const X509 *x)

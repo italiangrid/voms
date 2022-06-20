@@ -1,3 +1,6 @@
+#ifndef VOMS_SSL_COMPAT_H
+#define VOMS_SSL_COMPAT_H
+
 #include <openssl/opensslv.h>
 
 #if OPENSSL_VERSION_NUMBER < 0x10100000L
@@ -58,6 +61,8 @@ int (*BIO_meth_get_destroy(BIO_METHOD *biom)) (BIO *);
 int BIO_meth_set_destroy(BIO_METHOD *biom, int (*destroy) (BIO *));
 long (*BIO_meth_get_callback_ctrl(BIO_METHOD *biom))(BIO *, int, bio_info_cb *);
 int BIO_meth_set_callback_ctrl(BIO_METHOD *biom, long (*callback_ctrl) (BIO *, int, bio_info_cb *));
+BN_GENCB *BN_GENCB_new(void);
+void BN_GENCB_free(BN_GENCB *cb);
 
 #if OPENSSL_VERSION_NUMBER < 0x10002000L
 
@@ -69,6 +74,8 @@ void X509_get0_signature(const ASN1_BIT_STRING **psig,
 
 #ifdef __cplusplus
 }
+#endif
+
 #endif
 
 #endif
