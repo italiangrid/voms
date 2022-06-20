@@ -212,8 +212,8 @@ AC_DEFUN([AC_COMPILER],
       [ac_with_warnings="no"])
 
     if test "x$ac_with_warnings" = "xyes" ; then
-      CFLAGS="-g -O0 -Wall -ansi -W $CFLAGS"
-      CXXFLAGS="-g -O0 -Wall -ansi -W $CXXFLAGS"
+      CFLAGS="$CFLAGS -Wall -Wextra"
+      CXXFLAGS="$CXXFLAGS -Wall -Wextra"
     fi
 ])
 
