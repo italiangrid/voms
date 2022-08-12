@@ -262,6 +262,12 @@ This is a Java properties file.
 | `voms.saml.max_assertion_lifetime` | The lifetime of issued SAML assertion (in seconds) | 86400 |
 | `voms.aa.compulsory_group_membership` | Set this to false to have a standard SAML AA behaviour. | True |
 
+#### Caching options <a name="va_caching_props"></a>
+
+| Property | Description | Default value |
+|:---------|:------------|:--------------|
+| `voms.permission_cache.disable` | Should the VOMS permission caching be disabled? | False |
+
 #### Other options <a name="va_other_props"></a>
 
 | Property | Description | Default value |
