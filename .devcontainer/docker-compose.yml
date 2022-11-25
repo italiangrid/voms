@@ -1,0 +1,38 @@
+
+services:
+
+  container-centos9:
+
+    build:
+      context: .devcontainer
+      dockerfile: Dockerfile-centos9
+
+    volumes:
+      - .:/workspace:cached
+
+    cap_add:
+      - SYS_PTRACE
+    security_opt:
+      - seccomp:unconfined
+
+    command: sleep infinity
+ 
+    init: true
+
+  container-centos7:
+
+    build:
+      context: .devcontainer
+      dockerfile: Dockerfile-centos7
+
+    volumes:
+      - .:/workspace:cached
+
+    cap_add:
+      - SYS_PTRACE
+    security_opt:
+      - seccomp:unconfined
+
+    command: sleep infinity
+ 
+    init: true
