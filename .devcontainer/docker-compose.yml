@@ -8,6 +8,7 @@ services:
       dockerfile: Dockerfile-centos9
 
     volumes:
+      - trustanchors:/etc/grid-security/certificates
       - .:/workspace:cached
 
     cap_add:
@@ -26,6 +27,7 @@ services:
       dockerfile: Dockerfile-centos7
 
     volumes:
+      - trustanchors:/etc/grid-security/certificates
       - .:/workspace:cached
 
     cap_add:
