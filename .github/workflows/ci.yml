@@ -17,6 +17,6 @@ jobs:
 
       - name: Build
         run: |
-          ./autogen
+          ./autogen.sh
           ./configure
           make
