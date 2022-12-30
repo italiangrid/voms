@@ -24,6 +24,7 @@
 #include "doio.h"
 
 #include "proxycertinfo.h"
+#include "ssl_compat.h"
 
 typedef PROXY_CERT_INFO_EXTENSION PROXYCERTINFO_OLD;
 
@@ -82,7 +83,7 @@ char* PROXYCERTINFO_OLD_i2s(struct v3_ext_method* method, void* ext)
 			   output, 
 			   ( dooid ? oid : ""), 
 			   ( (pp && pp->policy) ? "\nPolicy Text: " : ""), 
-         ( (pp && pp->policy) ? (char*)ASN1_STRING_data(pp->policy) : ""),
+         ( (pp && pp->policy) ? (const char*)ASN1_STRING_get0_data(pp->policy) : ""),
 			   ( (pp && pp->policy) ? "\n" : ""));
 
   free(output);

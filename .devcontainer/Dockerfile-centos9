@@ -1,0 +1,7 @@
+FROM quay.io/centos/centos:stream9
+
+COPY library-scripts/*.sh /tmp/library-scripts/
+RUN \
+  bash /tmp/library-scripts/add-repos-redhat.sh && \
+  bash /tmp/library-scripts/common-redhat.sh false automatic automatic automatic true false && \
+  bash /tmp/library-scripts/add-deps-redhat.sh

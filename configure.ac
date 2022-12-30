@@ -31,9 +31,7 @@ AC_PROG_YACC
 AC_PROG_LEX
 AC_COMPILER
 
-PKG_CHECK_MODULES([OPENSSL], [openssl])
-# AC_OPENSSL
-
+PKG_CHECK_MODULES([OPENSSL], [openssl], [AC_DEFINE([OPENSSL_API_COMPAT], [10100], [Build against OpenSSL 1.1 API])])
 
 AC_CHECK_HEADER([expat.h], 
     [], 
@@ -81,12 +79,8 @@ AC_CHECK_FUNCS([alarm atexit dup2 gethostbyaddr gethostname gethostbyname gethos
 AC_CHECK_DECLS(getopt_data)
 AC_REPLACE_FUNCS(getopt_long getopt_long_only daemon setenv memset)
 
-TEST_USE_BSD
-TEST_USE_POSIX
-
 # NEW_ISSUES
 
-AC_DEFINE(_SVID_SOURCE, 1, [Get SVID extensions])
 AC_VOMS_TIME_T_TIMEZONE
 AM_WITH_DMALLOC
 

@@ -423,7 +423,7 @@ proxy_genreq(
     EVP_PKEY **                         pkeyp,
     int                                 bits,
     const char *                        newdn,
-    int                                 (*callback)());
+    void                                (*callback)(int, int, void*));
 
 int
 proxy_sign(
