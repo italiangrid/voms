@@ -13,7 +13,9 @@ jobs:
       - uses: actions/checkout@v3
 
       - name: Install packages
-        run: yum install -y make automake libtool gcc-c++ openssl-devel gsoap-devel expat-devel bison
+        run: |
+          yum install epel-release
+          yum install -y make file automake libtool gcc-c++ openssl-devel gsoap-devel gsoap expat-devel bison
 
       - name: Build
         run: |
