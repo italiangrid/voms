@@ -47,8 +47,8 @@ jobs:
 
       - name: Install packages
         run: |
-          apt update
-          apt install make automake libtool pkg-config g++ libssl-dev libgsoap-dev gsoap libexpat-dev
+          sudo apt update
+          sudo apt install make automake libtool pkg-config g++ libssl-dev libgsoap-dev gsoap libexpat-dev
 
       - name: Build
         run: |
