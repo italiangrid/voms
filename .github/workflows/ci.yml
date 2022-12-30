@@ -13,7 +13,7 @@ jobs:
       - uses: actions/checkout@v3
 
       - name: Install packages
-        run: yum install -y make automake libtool gcc-c++ openssl-devel gsoap-devel bison
+        run: yum install -y make automake libtool gcc-c++ openssl-devel gsoap-devel expat-devel bison
 
       - name: Build
         run: |
