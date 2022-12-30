@@ -14,7 +14,7 @@ jobs:
 
       - name: Install packages
         run: |
-          yum install epel-release
+          yum install -y epel-release
           yum install -y make file automake libtool gcc-c++ openssl-devel gsoap-devel gsoap expat-devel bison
 
       - name: Build
