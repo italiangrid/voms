@@ -22,3 +22,20 @@ jobs:
           ./autogen.sh
           ./configure
           make
+
+  centos9:
+    runs-on: ubuntu-latest
+    container: quay.io/centos/centos:stream9
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Install packages
+        run: |
+          yum install -y epel-release
+          yum install -y make file automake libtool gcc-c++ openssl-devel gsoap-devel gsoap expat-devel bison
+
+      - name: Build
+        run: |
+          ./autogen.sh
+          ./configure
+          make
