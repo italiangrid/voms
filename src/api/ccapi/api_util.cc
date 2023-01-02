@@ -23,10 +23,10 @@
  *
  *********************************************************************/
 
+#include "config.h"
 #include "api_util.h"
 
 extern "C" {
-#include "config.h"
 #include "replace.h"
 
 #include <sys/types.h>
