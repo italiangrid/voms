@@ -455,7 +455,7 @@ ERR_load_prxyerr_strings(
 #else
     char *                              randfile;
 #endif
-#if SSLEAY_VERSION_NUMBER >=  0x0090581fL
+#if SSLEAY_VERSION_NUMBER >=  0x0090581fL && !defined(OPENSSL_NO_EGD)
     char *                              egd_path;
 #endif
     char                                buffer[200];
@@ -2703,8 +2703,14 @@ proxy_get_filenames(
                       }
 
                     }
-                    else
-                      strcpy(default_user_cert, certname);
+                    else {
+                      default_user_cert = strndup(certname, strlen(certname));
+
+                      if (!default_user_cert) {
+                        PRXYerr(PRXYERR_F_INIT_CRED, PRXYERR_R_OUT_OF_MEMORY);
+                        goto err;
+                      }
+                    }
 
                     default_user_key = strndup(default_user_cert, strlen(default_user_cert));
 
