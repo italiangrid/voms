@@ -26,8 +26,6 @@
 #ifndef VOMS_API_H
 #define VOMS_API_H
 
-#include "config.h"
-
 #include <fstream>
 #include <string>
 #include <vector>
