@@ -205,8 +205,7 @@ extern struct contactdata **VOMS_FindByVO(struct vomsdata *vd, char *vo,
 
 
 extern void VOMS_DeleteContacts(struct contactdata **list); /*!< Frees a contactdata vector.
-							      \param list The vector to free.
-							      \return NONE */
+							      \param list The vector to free.*/
 
 extern struct vomsdata *VOMS_Init(char *voms, char *cert); /*!< Initializes a vomsdata structure for use by the other functions.
 						       N.B: This is the ONLY way to correctly initialize a vomsdata structure. It
