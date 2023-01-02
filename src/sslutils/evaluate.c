@@ -353,8 +353,8 @@ void PRIVATE read_pathrestriction(STACK_OF(X509) *chain, char *path,
     hash = gethash(cert, hashed);
 
     /* Determine file names */
-    strncpy(signing + 1, hash, 8);
-    strncpy(namespace + 1, hash, 8);
+    memcpy(signing + 1, hash, 8);
+    memcpy(namespace + 1, hash, 8);
 
     file = open_from_dir(path, signing);
     if (file) {
