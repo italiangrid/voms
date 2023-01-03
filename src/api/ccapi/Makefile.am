@@ -22,11 +22,12 @@ libvomsapi_la_CXXFLAGS = \
 
 libvomsapi_la_LDFLAGS = \
 	-rpath $(libdir) \
-  -version-info 1:0:0
+	-version-info 1:0:0
 
 libvomsapi_la_LIBADD = \
 	$(EXPAT_LIBS) \
 	$(OPENSSL_LIBS) \
+	-lpthread \
 	$(top_builddir)/src/replib/librep.la \
 	$(top_builddir)/src/common/libutilities_nog.la \
 	$(top_builddir)/src/common/libutilc_nog.la \
