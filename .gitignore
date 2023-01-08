@@ -13,6 +13,7 @@ Makefile.in
 Makefile
 /aux
 /m4/*
+!/m4/ax_pthread.m4
 !/m4/glite.m4
 !/m4/voms.m4
 !/m4/wsdl2h.m4
