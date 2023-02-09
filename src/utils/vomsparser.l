@@ -31,6 +31,7 @@
 
 #include "fakeparsertypes.h"
 #include "vomsparser.h"
+#include "lexparse.h"
 %}
 
 %x STR

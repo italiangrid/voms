@@ -486,6 +486,7 @@ char *yytext;
 
 #include "fakeparsertypes.h"
 #include "vomsparser.h"
+#include "lexparse.h"
 
 #line 491 "lex.yy.c"
 
