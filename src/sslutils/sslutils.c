@@ -767,6 +767,9 @@ proxy_genreq(
     if (RSA_generate_key_ex(rsa, rbits, rsa_exp, cb))
     {
       BN_free(rsa_exp);
+      rsa_exp = NULL;
+      BN_GENCB_free(cb);
+      cb = NULL;
     }
     else
     {
@@ -774,7 +777,11 @@ proxy_genreq(
         goto err;
     }
 
-    if (!EVP_PKEY_assign_RSA(pkey,rsa))
+    if (EVP_PKEY_assign_RSA(pkey,rsa))
+    {
+      rsa = NULL;
+    }
+    else
     {
         PRXYerr(PRXYERR_F_PROXY_GENREQ,PRXYERR_R_PROCESS_PROXY_KEY);
         goto err;
