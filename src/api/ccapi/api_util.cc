@@ -327,7 +327,12 @@ vomsdata::verifydata(AC *ac, UNUSED(const std::string& subject),
     issuer = check((void *)ac);
 
     if (!issuer) {
-      seterror(VERR_SIGN, "Cannot verify AC signature!");
+      std::string oldmessage = ErrorMessage();
+      if (oldmessage.empty()) {
+          seterror(VERR_SIGN, "Cannot verify AC signature!");
+      } else {
+          seterror(VERR_SIGN, "Cannot verify AC signature!  Underlying error: " + oldmessage);
+      }
       return false;
     }
   }
