@@ -1410,6 +1410,7 @@ static yyconst flex_int16_t yy_rule_linenum[15] =
 #include <stdlib.h>
 
 #include "parsertypes.h"
+#include "lexparse.h"
 #include "namespaces.h"
 #ifndef strndup
 extern char *strndup(const char*, size_t);
