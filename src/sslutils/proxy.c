@@ -366,13 +366,10 @@ struct VOMSProxy *VOMS_MakeProxy(struct VOMSProxyArguments *args, int *warning, 
       ex11 = X509V3_EXT_conf_nid(NULL, &ctx, NID_authority_key_identifier, "keyid");
     }
 
-    if (!ex11) {
-      PRXYerr(PRXYERR_F_PROXY_SIGN,PRXYERR_R_CLASS_ADD_EXT);
-      goto err;
+    if (ex11) {
+      if (!SET_EXT(ex11))
+        goto err;
     }
-          
-    if (!SET_EXT(ex11))
-      goto err;
   }
 
   /* class_add extension */
