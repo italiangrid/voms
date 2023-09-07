@@ -353,9 +353,10 @@ struct VOMSProxy *VOMS_MakeProxy(struct VOMSProxyArguments *args, int *warning, 
     }
   }
   
-  /* authority key identifier and subject key identifier extension */
+  /* authority key identifier and subject key identifier extension
+     (certificates only, not proxies) */
 
-  {
+  if (args->proxyversion == 0) {
     X509V3_CTX ctx;
     
     X509V3_set_ctx(&ctx, (args->selfsigned ? NULL : args->cert), NULL, req, NULL, 0);
