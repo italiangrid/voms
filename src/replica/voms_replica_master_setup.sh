@@ -223,7 +223,7 @@ fi
 fi
 
 
-echo "Send these informations to the administrator of the slave server:"
+echo "Send this information to the administrator of the slave server:"
 echo "Log File    : $master_log_file"
 echo "Log Position: $master_log_pos"
 echo "Account name: $mysql_replica_user"

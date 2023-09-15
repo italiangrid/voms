@@ -236,7 +236,7 @@ Fake::Fake(int argc, char ** argv) :   confile(conf_file_name),
     "    -proxyver <n>                  Version of proxy certificate.\n" \
     "    -rfc                           Create RFC-conforming proxies (synonim of --proxyver 4)\n"             
     "    -noregen                       Doesn't regenerate a new proxy for the connection.\n" \
-    "    -separate <file>               Saves the informations returned by the server on file <file>.\n" \
+    "    -separate <file>               Saves the information returned by the server on file <file>.\n" \
     "    -hostcert <file>               Fake host certificate.\n" \
     "    -hostkey <file>                Fake host private key.\n" \
     "    -fqan <string>                 String to include in the AC as the granted FQAN.\n" \

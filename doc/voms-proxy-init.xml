@@ -96,7 +96,7 @@ Location of new proxy cert</para>
 
 <para><option>-voms</option> <replaceable>voms[:command]</replaceable>
 Specifies the VOMS server to contact using the nickname <emphasis
-remap='I'>voms</emphasis>.  It also allows to send a specific command
+remap='I'>voms</emphasis>.  It also allows one to send a specific command
 to the server.  The default command is <emphasis
 remap='B'>:all</emphasis>, and it gets all group membership information.
 
@@ -171,7 +171,7 @@ This option targets the generated AC to a specific host.  This
   hosts.</para>
 
 <para><option>-timeout</option> <replaceable>seconds</replaceable>
-This option allows to specify the maximum number of seconds that
+This option allows one to specify the maximum number of seconds that
   voms-proxy-init will wait while trying to establish a connection
   with the server.  Its default value is -1 (unlimited).</para>
 
