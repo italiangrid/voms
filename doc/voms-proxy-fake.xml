@@ -194,7 +194,7 @@ of: <emphasis remap='I'>seconds</emphasis>, <emphasis remap='I'>hours:minutes</e
   have a CA=true bit in the Basic constraints Exception.</para>
 
 <para><option>-extension</option> <replaceable>oid[/criticality]value</replaceable></para>
-<para>This option allows to specified additional extensions to be put
+<para>This option allows one to specify additional extensions to be put
   in the created certificate.</para>
 <para><emphasis remap='I'>oid</emphasis> is the Object Identifier of
   the extensions.  Any OID may be used even if it is not already known
@@ -209,7 +209,7 @@ of: <emphasis remap='I'>seconds</emphasis>, <emphasis remap='I'>hours:minutes</e
   extensions. It is composed by two
   subfields, <emphasis remap='I'>type</emphasis>
   and <emphasis remap='I'>content</emphasis>. <emphasis remap='I'>type</emphasis>
-  is a single charater, and specifies how
+  is a single character, and specifies how
   the <emphasis remap='I'>content</emphasis> is interpreted.  ':'
   means that <emphasis remap='I'>content</emphasis> is a text string
   to be included as is. '~' means
@@ -219,7 +219,7 @@ of: <emphasis remap='I'>seconds</emphasis>, <emphasis remap='I'>hours:minutes</e
   which will contain the actual data.</para>  
 
 <para><option>-acextension</option> <replaceable>oid[/criticality]value</replaceable></para>
-<para>This option allows to specified additional extensions to be put
+<para>This option allows one to specify additional extensions to be put
   in the created attribute certificate.</para>
 <para><emphasis remap='I'>oid</emphasis> is the Object Identifier of
   the extensions.  Any OID may be used even if it is not already known
@@ -234,7 +234,7 @@ of: <emphasis remap='I'>seconds</emphasis>, <emphasis remap='I'>hours:minutes</e
   extensions. It is composed by two
   subfields, <emphasis remap='I'>type</emphasis>
   and <emphasis remap='I'>content</emphasis>. <emphasis remap='I'>type</emphasis>
-  is a single charater, and specifies how
+  is a single character, and specifies how
   the <emphasis remap='I'>content</emphasis> is interpreted.  ':'
   means that <emphasis remap='I'>content</emphasis> is a text string
   to be included as is. '~' means
@@ -249,7 +249,7 @@ of: <emphasis remap='I'>seconds</emphasis>, <emphasis remap='I'>hours:minutes</e
 <para><option>-voinfo</option> <replaceable>file</replaceable></para>
 
 <para>
-The file <emphasis remap='I'>file</emphasis> contains informations for
+The file <emphasis remap='I'>file</emphasis> contains information for
   additional ACs that should be included in the created proxy.  ACs
   specified via the -voinfo option shall be added before ACs specified
   via the command line options.</para>
