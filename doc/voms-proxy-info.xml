@@ -16,7 +16,7 @@
 
 <refnamediv id='name'>
 <refname>voms-proxy-info</refname>
-<refpurpose>prints informations about a proxy with VOMS extensions</refpurpose>
+<refpurpose>prints information about a proxy with VOMS extensions</refpurpose>
 </refnamediv>
 
 <refsynopsisdiv id='synopsis'>
@@ -56,7 +56,7 @@ The name of the file containing the proxy, in case it is in a
 non-standard place.</para>
 
 <para><option>-chain</option>
-Prints informations about the proxy's certificate chain.</para>
+Prints information about the proxy's certificate chain.</para>
 
 <para><option>-subject</option>
 Prints the DN of the proxy's subject.</para>

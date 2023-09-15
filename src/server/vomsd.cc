@@ -805,7 +805,7 @@ void VOMSServer::Run()
             return;
           }
 
-          LOGM(VARP, logh, LEV_INFO, T_PRE, "SSL handshake completed succesfully.");
+          LOGM(VARP, logh, LEV_INFO, T_PRE, "SSL handshake completed successfully.");
 
           std::string user    = sock.peer_subject;
           std::string userca  = sock.peer_ca;
@@ -874,7 +874,7 @@ bool VOMSServer::makeAC(vomsresult& vr, EVP_PKEY *key, X509 *issuer,
 
   if (!XML_Req_Decode(message, r)) {
     LOGM(VARP, logh, LEV_ERROR, T_PRE, "Unable to interpret command: %s",message.c_str());
-    vr.setError(ERR_NO_COMMAND, "Unable to intepret command: " + message);
+    vr.setError(ERR_NO_COMMAND, "Unable to interpret command: " + message);
     return false;
   }
 

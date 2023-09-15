@@ -29,7 +29,7 @@ Throughout this whole document, you will find sections marked thus:
 \begin{compatibility}
 Some information
 \end{compatibility}
-These section contain informations regarding both back and forward
+These sections contain information regarding both back and forward
 compatibility between different versions of the API.
 
 \begin{compatibility}
@@ -92,7 +92,7 @@ Attribute verifier.
 
 \section{The voms structure}
 The second one, \texttt{voms} is used to group together all the
-informations that can be gleaned from a single AC, and is defined as
+information that can be gleaned from a single AC, and is defined as
 follows:
 
 \begin{lstlisting}{}
@@ -195,7 +195,7 @@ be contacted on that server.
 
 \subsection{date1, date2}
 These are the dates of start and end of validity of the rest of the
-informations.  They are in a string representation readable to humans,
+information.  They are in a string representation readable to humans,
 but they may be easily converted back to their original format, with a
 little twist: dates coming from an AC are in GeneralizedTime format,
 while dates coming from the old version data are in UtcTime format.
@@ -266,7 +266,7 @@ specified in the Fully Qualified Attribute Name (FQAN) format.
 
 \section{vomsdata}
 The purpose of this object is to collect in a single place all
-informations present in a VOMS extension. It is defined so.
+information present in a VOMS extension. It is defined so.
 
 \begin{lstlisting}{}
 struct vomsdata {
@@ -375,7 +375,7 @@ what errors its execution may generate and on which conditions.
 \subsection{data}
 This field contains a vector of \texttt{voms} structures, in the exact
 same order as the corresponding ACs appeared in the proxy certificate,
-and containing the informations present in that AC.
+and containing the information present in that AC.
 
 \section{Methods}
 \subsection {voms}
@@ -624,7 +624,7 @@ This function retrieves a VOMS AC from a VOMS-enabled proxy
 certificate, executes the verifications requested by the
 SetVerificationType() function and interprets the data.
 \parameter{cert}{This is the X509 proxy certificate from which we want to
-retrieve the informations.}
+retrieve the information.}
 \parameter{chain}{This is the certificate chain associated to the proxy
 certificate.  This parameter is only significant if the value of the
 next parameter is \texttt{RECURSE\_CHAIN}.}

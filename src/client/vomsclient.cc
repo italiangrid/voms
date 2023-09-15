@@ -262,7 +262,7 @@ Client::Client(int argc, char ** argv) :
       "    -globus <version>              Globus version. (MajorMinor)\n" \
       "    -proxyver                      Version of proxy certificate.\n" \
       "    -noregen                       Use existing proxy certificate to connect to server and sign the new proxy.\n" \
-      "    -separate <file>               Saves the informations returned by the server on file <file>.\n" \
+      "    -separate <file>               Saves the information returned by the server on file <file>.\n" \
       "    -ignorewarn                    Ignore warnings.\n" \
       "    -failonwarn                    Treat warnings as errors.\n" \
       "    -list                          Show all available attributes.\n" \

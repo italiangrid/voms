@@ -215,7 +215,7 @@ int main(int argc, char* argv[]){
     exit(-1);
   }
 
-  printf("Certificate chain verified succesfully\n");
+  printf("Certificate chain verified successfully\n");
 
   return 0;
 }

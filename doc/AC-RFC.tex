@@ -9,8 +9,8 @@
 X.509 Attribute Certificates (ACs) \cite{rfc3281} are used to bind a
 set of attributes, like group membership, role, security clearance,
 etc\ldots\ with an AC holder.  Their well-defined, standardized format
-and easy extensibility make them a premium way to distribute those
-informations in large system, and in particular in environments where
+and easy extensibility make them a premium way to distribute that
+information in large system, and in particular in environments where
 authentication is done via X.509 Certificates \cite{rfc3280}.  This is
 the reason why ACs are the format chosen by the VOMS server
 \cite{voms} to encode authorization data.
@@ -52,7 +52,7 @@ simpler to have them all expressed together.
 \end{enumerate}
 
 For these reasons, a new format has been devised, as documented in
-\cite{fqan}.  However, here follows a copy of the relevant informations.
+\cite{fqan}.  However, here follows a copy of the relevant information.
 
 Group membership, Role holding and Capabilities may be expressed in a
 format that bounds them together in the following way:
@@ -175,7 +175,7 @@ certificate that the AC issuer will use to sign the AC. This in
 particular means that this subject MUST NOT be empty.
 
 \section{Attributes}
-The attributes field contains informations about the AC holder.  At
+The attributes field contains information about the AC holder.  At
 least one attribute MUST always be present. 
 
 Attributes types use the format defined in \cite{rfc3281}, repeated here
@@ -194,7 +194,7 @@ IetfAttrSyntax ::= SEQUENCE {
 
 The attributes Group and Role, defined in \cite{rfc3281} are not used by
 VOMS AC, and SHOULD NOT be present in conforming ACs.  Instead, it
-defines a new attribute, FQAN, which holds informations about both,
+defines a new attribute, FQAN, which holds information about both,
 and in fact also binds them together.
 
 \begin{verbatim}
