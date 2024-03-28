@@ -841,7 +841,12 @@ void VOMSServer::Run()
             sop->ssl = sock.ssl;
 
             // GSOAP will handle this
-            sop->fparse(sop);
+            // newer versions of gsoap don't call the http handlers (eg fget) in fparse
+            // fparse returns SOAP_STOP if any of the handlers were called instead of SOAP_OK (older versions)
+            // if the return value is SOAP_OK then no hander has been called (newer versions) and we call
+            // fget manually if it's a get request (SOAP_GET)
+            if(sop->fparse(sop) == SOAP_OK && sop->status == SOAP_GET)
+              sop->fget(sop);
 
             sock.Close();
           } else {
