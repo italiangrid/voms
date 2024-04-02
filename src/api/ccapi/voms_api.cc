@@ -247,20 +247,17 @@ bool vomsdata::InterpretOutput(const std::string &message, std::string& output)
 
     if (!a.ac.empty()) {
       output = a.ac;
-      if (a.errs.size() != 0) {
-        std::vector<errorp>::const_iterator end = a.errs.end();
-        for (std::vector<errorp>::const_iterator i = a.errs.begin();
-             i != end; ++i) {
-          serverrors += i->message;
-          if (i->num > ERROR_OFFSET)
-            result = false;
-          if (i->num == WARN_NO_FIRST_SELECT)
-            seterror(VERR_ORDER, "Cannot put requested attributes in the specified order.");
-        }
-      }
     }
     else if (!a.data.empty()) {
       output = a.data;
+    }
+    for (std::vector<errorp>::const_iterator i = a.errs.begin(), end = a.errs.end();
+         i != end; ++i) {
+      serverrors += i->message;
+      if (i->num > ERROR_OFFSET)
+        result = false;
+      if (i->num == WARN_NO_FIRST_SELECT)
+        seterror(VERR_ORDER, "Cannot put requested attributes in the specified order.");
     }
     if (!result && ver_type) {
       seterror(VERR_SERVERCODE, "The server returned an error.");
@@ -289,8 +286,14 @@ bool vomsdata::ContactRaw(std::string hostname, int port, std::string servsubjec
   /* Try REST connection first */
   bool ret = ContactRESTRaw(hostname, port, command, raw, version, timeout);
 
-  if (ret)
+  if (ret
+      || serverrors.find("User unknown to this VO") != std::string::npos
+      || serverrors.find("suspended") != std::string::npos
+      || serverrors.find("not active") != std::string::npos)
     return ret;
+
+  // reset the errors
+  serverrors.clear();
 
   std::vector<std::string>::const_iterator end = targets.end();
   std::vector<std::string>::const_iterator begin = targets.begin();
@@ -303,8 +306,12 @@ bool vomsdata::ContactRaw(std::string hostname, int port, std::string servsubjec
 
   comm = XML_Req_Encode(command, ordering, targs, duration);
 
-  if (!contact(hostname, port, servsubject, comm, buffer, subject, ca, timeout))
+  ret = contact(hostname, port, servsubject, comm, buffer, subject, ca, timeout);
+  // std::cerr << '\n' << comm << '\n' << buffer << '\n';
+
+  if (!ret) {
     return false;
+  }
 
   version = 1;
   return InterpretOutput(buffer, raw);
@@ -358,6 +365,8 @@ bool vomsdata::ContactRESTRaw(const std::string& hostname, int port, const std::
 
   std::string user, userca, output;
   bool res = contact(hostname, port, "", realCommand, output, user, userca, timeout);
+
+  // std::cerr << '\n' << realCommand << '\n' << output << '\n';
 
   bool ret = false;
 
