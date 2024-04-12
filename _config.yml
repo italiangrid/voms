@@ -18,33 +18,13 @@ voms:
     website: http://italiangrid.github.io/voms
 
 authors:
-  andrea:
-    display_name: Andrea Ceccanti
-    gravatar: f371f6284e5f3b10c555a24fd728a1ef
-    email: andrea.ceccanti@cnaf.infn.it
-    github: andreaceccanti
   francesco:
     display_name: Francesco Giacomini
     gravatar:
     email: francesco.giacomini@cnaf.infn.it
     github: giacomini
-  valerio:
-    display_name: Valerio Venturi
-    gravatar: 25170d7bd06dd4d753053e12888d1bb0
-    email: valerio.venturi@cnaf.infn.it
-    github: valerioventuri
-  daniele:
-    display_name: Daniele Andreotti
-    gravatar:
-    email: daniele.andreotti@cnaf.infn.it
-    github: dandreotti
   enrico:
     display_name: Enrico Vianello
     gravatar: 4f496230f3e42d606024e16c5f389611
     email: enrico.vianello@cnaf.infn.it
     github: enricovianello
-  gianni:
-    display_name: Gianni Dalla Torre
-    gravatar: 10794fc853d13fc21d00f589c1e28fc6
-    email: gianni.dallatorre@cnaf.infn.it
-    github: giannidallatorre
