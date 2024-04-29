@@ -75,13 +75,18 @@ AC_TARGET* build_ac_target(char* t){
         ASN1_IA5STRING_free(target_str);
         return NULL;
     }
+    GENERAL_NAME *name = GENERAL_NAME_new();
+    if (! name) {
+        AC_TARGET_free(target);
+        ASN1_IA5STRING_free(target_str);
+        return NULL;
+    }
 
     ASN1_STRING_set(target_str, t, strlen(t));
 
-    GENERAL_NAME *name = target->name;
-
     name->type = GEN_URI;
     name->d.ia5 = target_str;
+    target->name = name;
 
     return target;
 }
