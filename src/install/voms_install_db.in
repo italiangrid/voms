@@ -273,7 +273,7 @@ $ECHO $voms_password_query > $datapath/voms/$voms_vo/voms.pass
 
 uid=`/usr/bin/id -u`
 
-[ $uid = "0" ] && chown root.voms $datapath/voms/$voms_vo/voms.pass 
+[ $uid = "0" ] && chown root:voms $datapath/voms/$voms_vo/voms.pass
 chmod 640 $datapath/voms/$voms_vo/voms.pass
 
 if test -z $voms_vo ; then
