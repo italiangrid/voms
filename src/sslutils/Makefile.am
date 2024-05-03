@@ -24,11 +24,11 @@ signing_policy.$(OBJEXT): signing_policy.h
 if REGENERATE_PARSERS
 
 signing_policy.h signing_policy.c: signing_policy.y
-	$(YACC) -t -d -o signing_policy.c signing_policy.y
+	$(YACC) -t -d -o signing_policy.c $(srcdir)/signing_policy.y
 
 
 lex.signing.c: signing_policy.l signing_policy.h signing_policy.c
-	$(LEX) -b -f -d signing_policy.l
+	$(LEX) -b -f -d $(srcdir)/signing_policy.l
 endif
 
 namespaces.$(OBJEXT): namespaces.h
@@ -36,10 +36,10 @@ namespaces.$(OBJEXT): namespaces.h
 if REGENERATE_PARSERS
 
 namespaces.h namespaces.c: namespaces.y
-	$(YACC) -t -d -o namespaces.c namespaces.y
+	$(YACC) -t -d -o namespaces.c $(srcdir)/namespaces.y
 
 lex.namespaces.c: namespaces.l namespaces.h namespaces.c
-	$(LEX) -b -f -d namespaces.l
+	$(LEX) -b -f -d $(srcdir)/namespaces.l
 endif
 
 libssl_utils_nog_la_SOURCES= $(SOURCES)
