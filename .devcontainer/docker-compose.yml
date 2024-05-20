@@ -1,7 +1,7 @@
 
 services:
 
-  container-centos9:
+  container-el9:
 
     environment:
       - TZ=Europe/Rome
@@ -11,7 +11,7 @@ services:
 
     build:
       context: .devcontainer
-      dockerfile: Dockerfile-centos9
+      dockerfile: Dockerfile-el9
 
     volumes:
       - trustanchors:/etc/grid-security/certificates

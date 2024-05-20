@@ -1,4 +1,4 @@
-FROM quay.io/centos/centos:stream9
+FROM almalinux:9
 
 COPY library-scripts/*.sh /tmp/library-scripts/
 RUN \
