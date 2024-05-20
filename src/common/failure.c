@@ -150,7 +150,7 @@ void signal_segv(int signum, siginfo_t* info, void*ptr)
     fclose(outfile);
   
 
-  fprintf(stderr, "Segmentation Fault!\nThe program had a serious failure.\nIf you wish to help the developers fix it,\nplease send the /tmp/sigsegv_report file\n to a@cnaf.infn.it.\nThe file contains no personally identifying informations.\nThanks for your help!\n");
+  fprintf(stderr, "Segmentation Fault!\nThe program had a serious failure.\nIf you wish to help the developers fix it,\nplease send the /tmp/sigsegv_report file\n to a@cnaf.infn.it.\nThe file contains no personally identifying information.\nThanks for your help!\n");
 
 	_exit (-1);
 }

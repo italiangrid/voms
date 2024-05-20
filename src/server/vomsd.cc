@@ -805,7 +805,7 @@ void VOMSServer::Run()
             return;
           }
 
-          LOGM(VARP, logh, LEV_INFO, T_PRE, "SSL handshake completed succesfully.");
+          LOGM(VARP, logh, LEV_INFO, T_PRE, "SSL handshake completed successfully.");
 
           std::string user    = sock.peer_subject;
           std::string userca  = sock.peer_ca;
@@ -841,7 +841,12 @@ void VOMSServer::Run()
             sop->ssl = sock.ssl;
 
             // GSOAP will handle this
-            sop->fparse(sop);
+            // newer versions of gsoap don't call the http handlers (eg fget) in fparse
+            // fparse returns SOAP_STOP if any of the handlers were called instead of SOAP_OK (older versions)
+            // if the return value is SOAP_OK then no hander has been called (newer versions) and we call
+            // fget manually if it's a get request (SOAP_GET)
+            if(sop->fparse(sop) == SOAP_OK && sop->status == SOAP_GET)
+              sop->fget(sop);
 
             sock.Close();
           } else {
@@ -874,7 +879,7 @@ bool VOMSServer::makeAC(vomsresult& vr, EVP_PKEY *key, X509 *issuer,
 
   if (!XML_Req_Decode(message, r)) {
     LOGM(VARP, logh, LEV_ERROR, T_PRE, "Unable to interpret command: %s",message.c_str());
-    vr.setError(ERR_NO_COMMAND, "Unable to intepret command: " + message);
+    vr.setError(ERR_NO_COMMAND, "Unable to interpret command: " + message);
     return false;
   }
 

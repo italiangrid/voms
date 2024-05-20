@@ -16,7 +16,7 @@
 
 <refnamediv id='name'>
 <refname>voms-proxy-list</refname>
-<refpurpose>Shows a list of all availabel attributes from a specified server</refpurpose>
+<refpurpose>Shows a list of all available attributes from a specified server</refpurpose>
 </refnamediv>
 
 <refsynopsisdiv id='synopsis'>

@@ -50,7 +50,7 @@ proc mytest {} {
     -globus <version>              Globus version. \(MajorMinor\)
     -proxyver                      Version of proxy certificate.
     -noregen                       Use existing proxy certificate to connect to server and sign the new proxy.
-    -separate <file>               Saves the informations returned by the server on file <file>.
+    -separate <file>               Saves the information returned by the server on file <file>.
     -ignorewarn                    Ignore warnings.
     -failonwarn                    Treat warnings as errors.
     -list                          Show all available attributes.
