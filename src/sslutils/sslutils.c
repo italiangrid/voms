@@ -519,7 +519,7 @@ ERR_load_prxyerr_strings(
 
         randfile = RAND_file_name(buffer,200);
 
-        if (randfile)
+        if (randfile && access(randfile, "r") == 0)
         {
             RAND_load_file(randfile,1024L*1024L);
         }

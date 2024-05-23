@@ -73,6 +73,8 @@ extern int InitProxyCertInfoExtension(int);
 #include <fstream>
 #include <iostream>
 #include <map>
+#include <algorithm>
+#include <sstream>
 
 #include <voms_api.h>
 #include "data.h"
@@ -247,20 +249,17 @@ bool vomsdata::InterpretOutput(const std::string &message, std::string& output)
 
     if (!a.ac.empty()) {
       output = a.ac;
-      if (a.errs.size() != 0) {
-        std::vector<errorp>::const_iterator end = a.errs.end();
-        for (std::vector<errorp>::const_iterator i = a.errs.begin();
-             i != end; ++i) {
-          serverrors += i->message;
-          if (i->num > ERROR_OFFSET)
-            result = false;
-          if (i->num == WARN_NO_FIRST_SELECT)
-            seterror(VERR_ORDER, "Cannot put requested attributes in the specified order.");
-        }
-      }
     }
     else if (!a.data.empty()) {
       output = a.data;
+    }
+    for (std::vector<errorp>::const_iterator i = a.errs.begin(), end = a.errs.end();
+         i != end; ++i) {
+      serverrors += i->message;
+      if (i->num > ERROR_OFFSET)
+        result = false;
+      if (i->num == WARN_NO_FIRST_SELECT)
+        seterror(VERR_ORDER, "Cannot put requested attributes in the specified order.");
     }
     if (!result && ver_type) {
       seterror(VERR_SERVERCODE, "The server returned an error.");
@@ -289,8 +288,14 @@ bool vomsdata::ContactRaw(std::string hostname, int port, std::string servsubjec
   /* Try REST connection first */
   bool ret = ContactRESTRaw(hostname, port, command, raw, version, timeout);
 
-  if (ret)
+  if (ret
+      || serverrors.find("User unknown to this VO") != std::string::npos
+      || serverrors.find("suspended") != std::string::npos
+      || serverrors.find("not active") != std::string::npos)
     return ret;
+
+  // reset the errors
+  serverrors.clear();
 
   std::vector<std::string>::const_iterator end = targets.end();
   std::vector<std::string>::const_iterator begin = targets.begin();
@@ -303,8 +308,12 @@ bool vomsdata::ContactRaw(std::string hostname, int port, std::string servsubjec
 
   comm = XML_Req_Encode(command, ordering, targs, duration);
 
-  if (!contact(hostname, port, servsubject, comm, buffer, subject, ca, timeout))
+  ret = contact(hostname, port, servsubject, comm, buffer, subject, ca, timeout);
+  // std::cerr << '\n' << comm << '\n' << buffer << '\n';
+
+  if (!ret) {
     return false;
+  }
 
   version = 1;
   return InterpretOutput(buffer, raw);
@@ -324,12 +333,92 @@ static X509 *get_own_cert()
   return NULL;
 }
 
+static void change(std::string &name, const std::string& from, const std::string& to) 
+{
+  std::string::size_type pos = name.find(from);
+
+  while (pos != std::string::npos) {
+    name = name.substr(0, pos) + to + name.substr(pos+from.length());
+    pos = name.find(from, pos+1);
+  }
+}
+
+static std::vector<std::string> split(std::string const& source, char delim)
+{
+  std::vector<std::string> result;
+  std::istringstream is(source);
+  std::string token;
+
+  while (std::getline(is, token, delim)) {
+    if (!token.empty()) {
+      result.push_back(token);
+    }
+  }
+  return result;
+}
+
+static std::string join(std::vector<std::string> const& v, char delim)
+{
+  std::vector<std::string>::const_iterator it = v.begin();
+  std::vector<std::string>::const_iterator const end = v.end();
+
+  std::string result;
+
+  if (it != end) {
+    result += *it;
+    ++it;
+  }
+
+  for (; it != end; ++it)
+  {
+    result += delim;
+    result += *it;
+  }
+
+  return result;
+}
+
+static bool is_role(std::string const& s)
+{
+  return s.find("/Role=") != std::string::npos;
+}
+
+static std::string merge_order_and_fqans(std::string const& fqans, std::string const& ordering)
+{
+  std::vector<std::string> ordering_v = split(ordering, ',');
+  std::vector<std::string> fqans_v = split(fqans, ',');
+  std::vector<std::string> merged_v;
+
+  for (std::vector<std::string>::iterator it = ordering_v.begin(), end = ordering_v.end();
+       it != end; ++it)
+  {
+    std::vector<std::string>::iterator fqans_it = std::find(fqans_v.begin(), fqans_v.end(), *it);
+    if (fqans_it != fqans_v.end())
+    {
+      merged_v.push_back(*it);
+      fqans_v.erase(fqans_it);
+    } else if (!is_role(*it)) {
+      merged_v.push_back(*it);
+    }
+  }
+
+  merged_v.insert(merged_v.end(), fqans_v.begin(), fqans_v.end());
+
+  return join(merged_v, ',');
+}
 
 bool vomsdata::ContactRESTRaw(const std::string& hostname, int port, const std::string& command, std::string& raw, UNUSED(int version), int timeout)
 {
   std::string temp;
 
-  std::string realCommand = "GET /generate-ac?fqans="+ parse_commands(command);
+  std::string fqans = parse_commands(command);
+
+  if (fqans != "all" && !ordering.empty()) {
+    change(ordering, ":", "/Role=");
+    fqans = merge_order_and_fqans(fqans, ordering);
+  }
+
+  std::string realCommand = "GET /generate-ac?fqans=" + fqans;
 
   realCommand += "&lifetime="+ stringify(duration, temp);
 
@@ -358,6 +447,8 @@ bool vomsdata::ContactRESTRaw(const std::string& hostname, int port, const std::
 
   std::string user, userca, output;
   bool res = contact(hostname, port, "", realCommand, output, user, userca, timeout);
+
+  // std::cerr << '\n' << realCommand << '\n' << output << '\n';
 
   bool ret = false;
 
@@ -1044,17 +1135,6 @@ bool vomsdata::LoadCredentials(X509 *cert, EVP_PKEY *pkey, STACK_OF(X509) *chain
     return false;
   }
   return true;
-}
-
-
-static void change(std::string &name, const std::string& from, const std::string& to) 
-{
-  std::string::size_type pos = name.find(from);
-
-  while (pos != std::string::npos) {
-    name = name.substr(0, pos) + to + name.substr(pos+from.length());
-    pos = name.find(from, pos+1);
-  }
 }
 
 static std::string parse_commands(const std::string& commands)
