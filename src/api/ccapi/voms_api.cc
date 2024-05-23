@@ -73,6 +73,8 @@ extern int InitProxyCertInfoExtension(int);
 #include <fstream>
 #include <iostream>
 #include <map>
+#include <algorithm>
+#include <sstream>
 
 #include <voms_api.h>
 #include "data.h"
@@ -331,12 +333,89 @@ static X509 *get_own_cert()
   return NULL;
 }
 
+static void change(std::string &name, const std::string& from, const std::string& to) 
+{
+  std::string::size_type pos = name.find(from);
+
+  while (pos != std::string::npos) {
+    name = name.substr(0, pos) + to + name.substr(pos+from.length());
+    pos = name.find(from, pos+1);
+  }
+}
+
+static std::vector<std::string> split(std::string const& source, char delim)
+{
+  std::vector<std::string> result;
+  std::istringstream is(source);
+  std::string token;
+
+  while (std::getline(is, token, delim)) {
+    if (!token.empty()) {
+      result.push_back(token);
+    }
+  }
+  return result;
+}
+
+static std::string join(std::vector<std::string> const& v, char delim)
+{
+  std::string result;
+
+  if (!v.empty()) {
+    result = v.front();
+  }
+
+  for (std::vector<std::string>::const_iterator it = std::next(v.begin()), end = v.end();
+       it != end; ++it)
+  {
+    result += delim;
+    result += *it;
+  }
+
+  return result;
+}
+
+static bool is_role(std::string const& s)
+{
+  return s.find("/Role=") != std::string::npos;
+}
+
+static std::string merge_order_and_fqans(std::string const& fqans, std::string const& ordering)
+{
+  std::vector<std::string> ordering_v = split(ordering, ',');
+  std::vector<std::string> fqans_v = split(fqans, ',');
+  std::vector<std::string> merged_v;
+
+  for (std::vector<std::string>::iterator it = ordering_v.begin(), end = ordering_v.end();
+       it != end; ++it)
+  {
+    std::vector<std::string>::iterator fqans_it = std::find(fqans_v.begin(), fqans_v.end(), *it);
+    if (fqans_it != fqans_v.end())
+    {
+      merged_v.push_back(*it);
+      fqans_v.erase(fqans_it);
+    } else if (!is_role(*it)) {
+      merged_v.push_back(*it);
+    }
+  }
+
+  merged_v.insert(merged_v.end(), fqans_v.begin(), fqans_v.end());
+
+  return join(merged_v, ',');
+}
 
 bool vomsdata::ContactRESTRaw(const std::string& hostname, int port, const std::string& command, std::string& raw, UNUSED(int version), int timeout)
 {
   std::string temp;
 
-  std::string realCommand = "GET /generate-ac?fqans="+ parse_commands(command);
+  std::string fqans = parse_commands(command);
+
+  if (fqans != "all" && !ordering.empty()) {
+    change(ordering, ":", "/Role=");
+    fqans = merge_order_and_fqans(fqans, ordering);
+  }
+
+  std::string realCommand = "GET /generate-ac?fqans=" + fqans;
 
   realCommand += "&lifetime="+ stringify(duration, temp);
 
@@ -1053,17 +1132,6 @@ bool vomsdata::LoadCredentials(X509 *cert, EVP_PKEY *pkey, STACK_OF(X509) *chain
     return false;
   }
   return true;
-}
-
-
-static void change(std::string &name, const std::string& from, const std::string& to) 
-{
-  std::string::size_type pos = name.find(from);
-
-  while (pos != std::string::npos) {
-    name = name.substr(0, pos) + to + name.substr(pos+from.length());
-    pos = name.find(from, pos+1);
-  }
 }
 
 static std::string parse_commands(const std::string& commands)
