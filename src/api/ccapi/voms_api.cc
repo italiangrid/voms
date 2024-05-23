@@ -359,14 +359,17 @@ static std::vector<std::string> split(std::string const& source, char delim)
 
 static std::string join(std::vector<std::string> const& v, char delim)
 {
+  std::vector<std::string>::const_iterator it = v.begin();
+  std::vector<std::string>::const_iterator const end = v.end();
+
   std::string result;
 
-  if (!v.empty()) {
-    result = v.front();
+  if (it != end) {
+    result += *it;
+    ++it;
   }
 
-  for (std::vector<std::string>::const_iterator it = std::next(v.begin()), end = v.end();
-       it != end; ++it)
+  for (; it != end; ++it)
   {
     result += delim;
     result += *it;
