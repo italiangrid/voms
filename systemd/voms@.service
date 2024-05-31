@@ -3,7 +3,7 @@ Description=VOMS service for VO %i
 
 [Service]
 WorkingDirectory=/
-EnvironmentFile=/etc/sysconfig/voms
+EnvironmentFile=-/etc/sysconfig/voms
 User=voms
 Type=forking
 ExecStart=/usr/sbin/voms --conf /etc/voms/%i/voms.conf
