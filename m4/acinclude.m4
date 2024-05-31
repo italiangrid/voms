@@ -40,7 +40,7 @@ AC_DEFUN([AC_BUILD_PARTS],
       case "$withval" in
         yes) build_clients="yes" ;;
         no)  build_clients="no" ;;
-        *) AC_MSG_ERROR([bad value $withval for --with-client]) ;;
+        *) AC_MSG_ERROR([bad value $withval for --with-clients]) ;;
       esac
     ],
     [ build_clients="$build_all" ])

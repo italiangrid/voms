@@ -67,7 +67,6 @@ extern "C" {
 
 extern "C" 
 {
-  //#include "myproxycertinfo.h"
 #include "vomsproxy.h"
 }
 

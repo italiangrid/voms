@@ -15,7 +15,7 @@ SOURCES= scutils.c scutils.h sslutils.c proxycertinfo.c proxypolicy.c \
 
 EXTRA_DIST = 	namespaces.l namespaces.y namespaces.h \
 		signing_policy.y signing_policy.l signing_policy.h \
-		parsertypes.h
+		parsertypes.h lexparse.h
 
 evaluate.$(OBJEXT): signing_policy.h namespaces.h parsertypes.h evaluate.c
 
