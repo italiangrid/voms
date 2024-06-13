@@ -44,6 +44,7 @@ extern "C" {
 
 #include <string>
 #include <vector>
+#include <sstream>
 
 /*
  * Function:
@@ -144,71 +145,24 @@ stringify(int i, std::string &s)
 
 std::string OpenSSLError(bool debug) 
 {
-  unsigned long l;
-  char buf[256];
-#if SSLEAY_VERSION_NUMBER  >= 0x00904100L
-  const char *file;
-#else
-  char *file;
-#endif
-  char *dat;
+  std::ostringstream os;
+
+  char const *file;
   int line;
-
-  std::string outstring;
-  char *msgstring = NULL;
-  char *errstring = NULL;
-
-  /* WIN32 does not have the ERR_get_error_line_data */ 
-  /* exported, so simulate it till it is fixed */
-  /* in SSLeay-0.9.0 */
-  
-  while ( ERR_peek_error() != 0 ) {
-    
-    int i;
-    ERR_STATE *es;
-      
-    es = ERR_get_state();
-    i = (es->bottom+1)%ERR_NUM_ERRORS;
-
-    if (es->err_data[i] == NULL)
-      dat = strdup("");
-    else
-      dat = strdup(es->err_data[i]);
-
-
-    if (dat) {
-      int code = 0;
-
-      l = ERR_get_error_line(&file, &line);
-      code = ERR_GET_REASON(l);
-
-      switch (code) {
-      case SSL_R_SSLV3_ALERT_CERTIFICATE_EXPIRED:
-        outstring += "Either proxy or user certificate are expired.";
-        break;
-
-      default:
-        if (debug) {
-          std::string temp;
-          
-          outstring += std::string(ERR_error_string(l,buf)) + ":" +
-            file + ":" + stringify(line, temp) + dat + "\n";
-        }
-
-        msgstring = (char*)ERR_reason_error_string(l);
-        errstring = (char*)ERR_func_error_string(l);
-
-        if (msgstring)
-          outstring += std::string(msgstring) + std::string(dat ? dat : "") +
-            "\nFunction: " + std::string(errstring ? errstring : "") + "\n";
-        break;
-      }
-    }
-    
-    free(dat);
+  char const *data;
+  int flags;
+  unsigned long code = ERR_get_error_line_data(&file, &line, &data, &flags);
+  while (code)
+  {
+    std::size_t const buf_size = 256;
+    char buf[buf_size];
+    ERR_error_string_n(code, buf, buf_size);
+    os << buf << ':' << file << ':'
+       << line << ':' << (data && (flags & ERR_TXT_STRING) ? data : "") << '\n';
+    code = ERR_get_error_line_data(&file, &line, &data, &flags);
   }
 
-  return outstring;
+  return os.str();
 }
 
 static char *readfile(const char *file, int *size)
