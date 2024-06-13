@@ -1049,7 +1049,7 @@ bool Client::Test()
     Print(WARN) << std::endl << "ERROR: Your certificate expired "
                 << asctime(localtime(&time_after)) << std::endl;
     
-    return 2;
+    return true;
   } 
   
   if (hours && time_diff < length) {
@@ -1057,7 +1057,7 @@ bool Client::Test()
                 << asctime(localtime(&time_after))
                 << "which is within the requested lifetime of the proxy"
                 << std::endl;
-    return 1;
+    return false;
   }
   
   if (!quiet) {
@@ -1068,7 +1068,7 @@ bool Client::Test()
                 << asctime(localtime(&time_after_proxy)) << std::flush;
   }
 
-  return 0;
+  return false;
 }
 
 bool Client::AddToList(AC *ac) 
