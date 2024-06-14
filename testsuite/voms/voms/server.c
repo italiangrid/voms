@@ -164,11 +164,8 @@ int main(int argc, char *argv[])
         //      if (debug)
         fprintf(stdout, "%s:%s,%d,%s\n", ERR_error_string(l, buf),
                 file, line, dat);
-        //      error += std::string(ERR_reason_error_string(l)) + ":" + std::string(ERR_func_error_string(l)) + "\n";
       }
     }
-/*     fprintf(stdout, "%s\n", */
-/*             ERR_reason_error_string( ERR_get_error() )); */
     fprintf(stdout, "ERROR\n");
     exit(1);
   }
