@@ -157,8 +157,8 @@ std::string OpenSSLError(bool debug)
     std::size_t const buf_size = 256;
     char buf[buf_size];
     ERR_error_string_n(code, buf, buf_size);
-    os << buf << ':' << file << ':'
-       << line << ':' << (data && (flags & ERR_TXT_STRING) ? data : "") << '\n';
+    os << file << ':' << line << ':'
+       << buf << (data && (flags & ERR_TXT_STRING) ? data : "") << '\n';
     code = ERR_get_error_line_data(&file, &line, &data, &flags);
   }
 
