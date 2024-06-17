@@ -719,7 +719,8 @@ void GSISocketServer::SetErrorOpenSSL(const std::string &err)
 
   while( ERR_peek_error() ){
 
-    char error_msg_buf[512];
+    std::size_t const error_msg_buf_size = 512;
+    char error_msg_buf[error_msg_buf_size];
 
     const char *filename;
     int lineno;
@@ -729,7 +730,6 @@ void GSISocketServer::SetErrorOpenSSL(const std::string &err)
     long error_code = ERR_get_error_line_data(&filename, &lineno, &data, &flags);
 
     const char *lib = ERR_lib_error_string(error_code);
-    const char *func = ERR_func_error_string(error_code);
     const char *error_reason = ERR_reason_error_string(error_code);
 
     if (lib == NULL) {
@@ -741,11 +741,11 @@ void GSISocketServer::SetErrorOpenSSL(const std::string &err)
       }
     }
 
-    sprintf(error_msg_buf,
-        "%s %s [err:%lu,lib:%s,func:%s(file: %s+%d)]",
+    snprintf(error_msg_buf, error_msg_buf_size,
+        "%s %s [err:%lu,lib:%s,file:%s+%d]",
         (error_reason) ? error_reason : "",
-        (data) ? data : "",
-        error_code,lib,func,filename,lineno);
+        (data && (flags & ERR_TXT_STRING)) ? data : "",
+        error_code,lib,filename,lineno);
 
     openssl_errors.push_back(error_msg_buf);
   }
