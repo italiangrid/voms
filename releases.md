@@ -1,41 +1,31 @@
 ---
 layout: default
-title: VOMS releases
+title: VOMS Releases
 ---
-
-# VOMS releases
 
 {% include releases.liquid %}
 
-### Repository configuration
+## Repository configuration
 
-VOMS packages can be obtained from the UMD repository or from the VOMS product team package repository.
+For RedHat derivatives, VOMS packages can be obtained from [UMD][umd], [EPEL][epel] or [our own][voms-repo] repositories. We suggest taking them from EPEL.
 
-#### UMD repository
+Note that if you take the packages from our own repository you still probably need to enable the UMD and/or EPEL repositories to get some dependencies.
 
-You can find UMD repository configuration instructions [here][umd].
-Follow the [system administrator
-guide]({{site.baseurl}}/documentation/sysadmin-guide) for detailed VOMS
-installation instructions.
+Packages are available also for Debian.
 
-#### VOMS repository
+Many thanks to Mattias Ellert for maintaining EPEL and Debian packages.
 
-The [VOMS package repository][voms-repo] provides packages for CENTOS 6/7.
+## Source code
 
-Note that the VOMS PT repositories only provide the latest version of the certified VOMS packages.
-You still need to install UMD repositories (as detailed above) for installations to work as expected.
+The source code for all VOMS components is available on [Github](https://github.com) in the following repositories:
 
-### Source code
-
-The VOMS source is available on [Github](https://github.com) in the following repositories:
-
-- [VOMS clients](https://github.com/italiangrid/voms-clients)
-- [VOMS core](https://github.com/italiangrid/voms)
-- [VOMS Admin server](https://github.com/italiangrid/voms-admin-server)
-- [VOMS Admin client](https://github.com/italiangrid/voms-admin-client)
-- [VOMS C/C++ APIs](https://github.com/italiangrid/voms)
+- [VOMS Java Clients](https://github.com/italiangrid/voms-clients)
 - [VOMS Java APIs](https://github.com/italiangrid/voms-api-java)
-- [VOMS mysql plugin](https://github.com/italiangrid/voms-mysql-plugin)
+- [VOMS Core (Server, C/C++ APIs and Clients)](https://github.com/italiangrid/voms)
+- [VOMS MySQL Plugin](https://github.com/italiangrid/voms-mysql-plugin)
+- [VOMS Admin Server](https://github.com/italiangrid/voms-admin-server)
+- [VOMS Admin Client](https://github.com/italiangrid/voms-admin-client)
 
-[umd]: http://repository.egi.eu/category/umd_releases/distribution/umd-4/
+[umd]: https://repository.egi.eu/umd/index.html
+[epel]: https://repository.egi.eu/umd/index.html
 [voms-repo]: https://italiangrid.github.io/voms-repo/
