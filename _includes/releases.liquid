@@ -9,19 +9,25 @@
     </tr>
   </thead>
   <tbody>
-{% for c in site.data.versions.components %}
+  {% for c in site.data.versions.components %}
   <tr>
   <td> {{c[1].name }} </td>
   <td>
       <ul class="unstyled">
+        {% if c[1].current %}
         <li>
           <a href="{{ site.baseurl }}/release-notes/{{c[0]}}/{{c[1].current}}">{{ c[1].current}}</a>
         </li>
-    {% if c[1].previous != empty %}
-        {% for v in c[1].previous %}
-          <li class="collapse"><a href="{{ site.baseurl }}/release-notes/{{ c[0] }}/{{ v }}">{{ v }}</a></li>
-        {% endfor %}
-    {% endif %}
+        {% elsif c[1].notes %}
+          {{ c[1].notes}}
+        {% endif %}
+        {% if c[1].previous != empty %}
+          {% for v in c[1].previous %}
+        <li class="collapse">
+          <a href="{{ site.baseurl }}/release-notes/{{ c[0] }}/{{ v }}">{{ v }}</a>
+        </li>
+          {% endfor %}
+        {% endif %}
      </ul>
   </td>
   </tr>
