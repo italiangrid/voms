@@ -1,4 +1,13 @@
-gems:
+plugins:
+  - jekyll-coffeescript
+  - jekyll-default-layout
+  - jekyll-gist
+  - jekyll-github-metadata
+  - jekyll-optional-front-matter
+  - jekyll-paginate
+  - jekyll-readme-index
+  - jekyll-titles-from-headings
+  - jekyll-relative-links
   - jekyll-redirect-from
 
 exclude: [README.md,"run-jekyll.sh"]

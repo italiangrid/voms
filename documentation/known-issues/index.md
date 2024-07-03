@@ -1,10 +1,11 @@
 ---
 layout: default
-title: VOMS Known issues page
+title: Known issues
 ---
 
-# Known issues
+See the open issues on the [GitHub issue trackers][issue-trackers].
 
-### Latest VOMS release (available in VOMS and UMD repos)
+There are still some open issues on [our old tracker][voms-jira-open].
 
-See [VOMS Open issues on our tracker](https://issues.infn.it/jira/issues/?filter=12510).
+[issue-trackers]: /support.md#issue-trackers
+[voms-jira-open]: https://issues.infn.it/jira/issues/?filter=12510

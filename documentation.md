@@ -1,13 +1,10 @@
 ---
 layout: default
-title: VOMS Documentation
+title: Documentation
 ---
-
-# Documentation
 
 {% include docs.liquid %}
 
-# Known issues
+See also the [known issues][known-issues].
 
-See [VOMS Open issues on our
-tracker](https://issues.infn.it/jira/issues/?filter=12510).
+[known-issues]: /documentation/known-issues/index.md
