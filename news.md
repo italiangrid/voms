@@ -3,7 +3,6 @@ layout: default
 title: News
 ---
 
-# News
 {% for post in site.posts limit:30 %}
 <div class="row-fluid marketing news-row">
 	    <div class="span2">

@@ -8,9 +8,9 @@ title: VOMS Support Channels
 We provide support through the [GGUS](https://ggus.eu/) portal,
 operated by [EGI](http://www.egi.eu/).
 
-## Issue tracker
+## Issue trackers
 
-Developments and issues used to be tracked in the [INFN JIRA issue tracking service][VOMS-jira], but now they are tracked in the corresponding Github projects:
+Developments and issues used to be tracked in the [INFN JIRA issue tracking service][voms-jira], but now they are tracked in the corresponding GitHub projects:
 
 - [VOMS Java Clients](https://github.com/italiangrid/voms-clients/issues)
 - [VOMS Java APIs](https://github.com/italiangrid/voms-api-java/issues)
@@ -19,6 +19,6 @@ Developments and issues used to be tracked in the [INFN JIRA issue tracking serv
 - [VOMS Admin Server](https://github.com/italiangrid/voms-admin-server/issues)
 - [VOMS Admin Client](https://github.com/italiangrid/voms-admin-client/issues)
 
-Note that the VOMS-Admin Server and Client are not actively developed anymore and there is very minimal support for it until the end of 2024.
+Note that the VOMS-Admin Server and Client are not actively developed anymore and there is very minimal support for them until the end of 2024.
 
-[VOMS-jira]: https://issues.infn.it/jira/browse/VOMS
+[voms-jira]: https://issues.infn.it/jira/browse/VOMS
