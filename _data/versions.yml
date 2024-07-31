@@ -1,39 +1,55 @@
 components:
   voms-clients:
-      name: VOMS Java Clients
-      current: 3.3.2
-      previous: [3.0.7,3.0.6,3.0.5,3.0.4,3.0.3,3.0.2,2.0.12-2,2.0.12]
+    name: VOMS Java Clients
+    current: 3.3.3
+    previous: [3.3.2,3.0.7,3.0.6,3.0.5,3.0.4,3.0.3,3.0.2,2.0.12-2,2.0.12]
+    platforms: [CentOS7, RedHat8, RedHat9]
+    eol: false
   
   voms-api-java:
-      name: VOMS Java API
-      current: 3.3.2
-      previous: [3.3.0,3.0.6,3.0.5,3.0.4,3.0.2,3.0.1]
+    name: VOMS Java API
+    current: 3.3.3
+    previous: [3.3.2,3.3.0,3.0.6,3.0.5,3.0.4,3.0.2,3.0.1]
+    platforms: [CentOS7, RedHat8, RedHat9]
+    eol: false
 
   voms-core:
     name: VOMS Core (Server, C/C++ APIs and Clients)
     current: 2.1.0
+    platforms: [CentOS7, RedHat8, RedHat9]
+    eol: false
 
   voms-mysql-plugin:
-      name: VOMS MySQL Plugin
-      current: 3.1.7-2
-      previous: [3.1.7]
+    name: VOMS MySQL Plugin
+    current: 3.1.7-2
+    previous: [3.1.7]
+    platforms: [CentOS7, RedHat8, RedHat9]
+    eol: false
 
   voms-admin-server:
-      name: VOMS Admin Server
-      current: 3.8.1
-      previous: [3.8.0,3.7.0,3.6.0,3.5.2,3.5.1,3.5.0,3.4.2,3.4.1,3.4.0,3.3.3,3.3.2,3.3.1,3.3.0,3.2.0]
+    name: VOMS Admin Server
+    current: 3.9.0
+    previous: [3.8.1,3.8.0,3.7.0,3.6.0,3.5.2,3.5.1,3.5.0,3.4.2,3.4.1,3.4.0,3.3.3,3.3.2,3.3.1,3.3.0,3.2.0]
+    platforms: [CentOS7, RedHat8, RedHat9]
+    eol: true
 
   voms-admin-client:
-      name: VOMS Admin Client
-      current: 2.0.21
-      previous: [2.0.20,2.0.19]
+    name: VOMS Admin Client
+    current: 2.0.21
+    previous: [2.0.20,2.0.19]
+    platforms: [CentOS7]
+    eol: true
 
   voms-server:
-      name: VOMS Server
-      notes: See VOMS Core
-      previous: [2.0.16,2.0.15,2.0.14,2.0.13,2.0.12-2,2.0.12,2.0.11]
+    name: VOMS Server
+    notes: See VOMS Core
+    previous: [2.0.16,2.0.15,2.0.14,2.0.13,2.0.12-2,2.0.12,2.0.11]
+    platforms: [CentOS7]
+    eol: false
 
   voms-api-c:
-      name: VOMS C/C++ API
-      notes: See VOMS Core
-      previous: [2.0.16,2.0.15,2.0.14,2.0.13,2.0.12-2,2.0.12,2.0.11]
+    name: VOMS C/C++ API
+    notes: See VOMS Core
+    previous: [2.0.16,2.0.15,2.0.14,2.0.13,2.0.12-2,2.0.12,2.0.11]
+    platforms: [CentOS7]
+    eol: false

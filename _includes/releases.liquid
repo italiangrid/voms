@@ -2,17 +2,21 @@
   <thead>
     <tr>
       <th>Component</th>
-      <th>Releases
-          <button id="release-button" type="button" class="btn btn-mini pull-right"
-            data-toggle="collapse" data-target=".collapse">Show older releases</button>
+      <th>Releases</th>
+      <th>Platforms
+        <button id="release-button" type="button" class="btn btn-mini pull-right" data-toggle="collapse" data-target=".collapse">Show older releases</button>
       </th>
     </tr>
   </thead>
   <tbody>
   {% for c in site.data.versions.components %}
   <tr>
-  <td> {{c[1].name }} </td>
-  <td>
+    <td> {{c[1].name }} 
+      {% if c[1].eol %}
+      <span class="label label-error">End-Of-Life</span>
+      {% endif %}
+    </td>
+    <td>
       <ul class="unstyled">
         {% if c[1].current %}
         <li>
@@ -28,8 +32,21 @@
         </li>
           {% endfor %}
         {% endif %}
-     </ul>
-  </td>
+      </ul>
+    </td>
+    <td>
+      {% for p in c[1].platforms %}
+      {% if p == "CentOS7" %}
+      <span class="label label-info">CentOS7</span>
+      {% endif %}
+      {% if p == "RedHat8" %}
+      <span class="label label-warning">RedHat8</span>
+      {% endif %}
+      {% if p == "CentOS7" %}
+      <span class="label label-success">RedHat9</span>
+      {% endif %}
+      {% endfor %}
+    </td>
   </tr>
 {% endfor %}
   </tbody>

@@ -7,7 +7,7 @@ title: VOMS Releases
 
 ## Repository configuration
 
-For RedHat derivatives, VOMS packages can be obtained from [UMD][umd], [EPEL][epel] or (soon) our own repositories. We suggest taking them from EPEL.
+For RedHat derivatives, VOMS packages can be obtained from [UMD][umd], [EPEL][epel] or [our own][voms-repo] repositories. We suggest taking them from EPEL.
 
 Note that if you take the packages from our own repository you still probably need to enable the UMD and/or EPEL repositories to get some dependencies.
 
@@ -28,3 +28,4 @@ The source code for all VOMS components is available on [GitHub](https://github.
 
 [umd]: https://repository.egi.eu/umd/index.html
 [epel]: https://docs.fedoraproject.org/en-US/epel/
+[voms-repo]: https://italiangrid.github.io/voms-repo/
