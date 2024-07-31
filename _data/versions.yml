@@ -44,12 +44,12 @@ components:
     name: VOMS Server
     notes: See VOMS Core
     previous: [2.0.16,2.0.15,2.0.14,2.0.13,2.0.12-2,2.0.12,2.0.11]
-    platforms: [CentOS7]
+    platforms: [CentOS7, RedHat8, RedHat9]
     eol: false
 
   voms-api-c:
     name: VOMS C/C++ API
     notes: See VOMS Core
     previous: [2.0.16,2.0.15,2.0.14,2.0.13,2.0.12-2,2.0.12,2.0.11]
-    platforms: [CentOS7]
+    platforms: [CentOS7, RedHat8, RedHat9]
     eol: false
