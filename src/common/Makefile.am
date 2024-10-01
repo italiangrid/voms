@@ -1,4 +1,14 @@
 
+AM_CPPFLAGS = \
+	-I $(top_srcdir)/src/include \
+	-I $(top_srcdir)/src/sslutils \
+	$(EXPAT_CFLAGS) \
+	$(OPENSSL_CFLAGS)
+
+AM_LDFLAGS = \
+	$(EXPAT_LIBS) \
+	$(OPENSSL_LIBS)
+
 noinst_LTLIBRARIES = \
 	libutilities_nog.la \
 	libutilc_nog.la
@@ -12,23 +22,11 @@ libutilities_nog_la_SOURCES = \
 
 libutilities_nog_la_CFLAGS = \
 	-DNOGLOBUS \
+	$(NO_GLOBUS_FLAGS)
+
+libutilc_nog_la_CFLAGS = \
 	$(NO_GLOBUS_FLAGS) \
-	-I $(top_srcdir)/src/include
-
-AM_CPPFLAGS = \
-	-I $(top_srcdir)/src/include \
-	-I $(top_srcdir)/src/sslutils \
-	$(EXPAT_CFLAGS)
-
-AM_LDFLAGS = \
-	$(EXPAT_LIBS)
-
-libutilc_nog_la_CPPFLAGS = \
-	$(NO_GLOBUS_FLAGS) \
-	-DNOGLOBUS \
-	-I $(top_srcdir)/src/include \
-	-I $(top_srcdir)/src/sslutils \
-	$(EXPAT_CFLAGS) 
+	-DNOGLOBUS
 
 libutilc_nog_la_SOURCES = \
 	list.c \

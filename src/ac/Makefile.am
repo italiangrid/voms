@@ -1,3 +1,7 @@
+AM_CPPFLAGS= \
+	-I $(top_srcdir)/src/include \
+	-I $(top_srcdir)/src/sslutils \
+	$(OPENSSL_CFLAGS)
 
 noinst_LTLIBRARIES = \
   libattributes_nog.la
@@ -17,21 +21,13 @@ libattributes_nog_la_SOURCES = $(AC_C_SOURCES) $(AC_CC_SOURCES)
 
 libattributes_nog_la_CFLAGS = \
 	$(NO_GLOBUS_FLAGS) \
-	-DNOGLOBUS \
-	-I $(top_srcdir)/src/include \
-	-I $(top_builddir)/src/sslutils
+	-DNOGLOBUS
 
 libattributes_nog_la_CXXFLAGS = \
 	$(NO_GLOBUS_FLAGS) \
-	-DNOGLOBUS \
-	-I $(top_srcdir)/src/include \
-	-I $(top_builddir)/src/sslutils
+	-DNOGLOBUS
 
 libattributes_nog_la_LIBADD = \
 	$(OPENSSL_LIBS)
-
-AM_CPPFLAGS= \
-	-I $(top_srcdir)/src/include \
-	-I $(top_srcdir)/src/sslutils
 
 ###

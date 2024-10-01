@@ -40,13 +40,15 @@ voms_LDADD = \
 	$(GSOAP_SSL_PP_LIBS) \
 	$(OPENSSL_LIBS) \
 	$(EXPAT_LIBS) \
-	-ldl 
+	-ldl
 
-voms_CFLAGS = $(GSOAP_SSL_PP_CFLAGS) -DHAVE_OPENSSL_SSL_H
-
-AM_CPPFLAGS = \
+voms_CPPFLAGS = \
+	$(GSOAP_PP_CFLAGS) \
+	-DHAVE_OPENSSL_SSL_H \
 	-I$(top_srcdir)/src/include \
 	-I$(top_srcdir)/src/api/ccapi \
-	$(NO_GLOBUS_FLAGS)
+	$(NO_GLOBUS_FLAGS) \
+	$(OPENSSL_CFLAGS)
+
 
 endif
