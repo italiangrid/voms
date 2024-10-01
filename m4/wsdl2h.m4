@@ -20,10 +20,6 @@ AC_DEFUN([AC_WSDL2H],
         	[with_gsoap_wsdl2h="$withval"],
         	[with_gsoap_wsdl2h="/usr/bin/wsdl2h"])
 	
-	dnl SOAPCPP flags in addition to what is already set by gsoap
-	SOAPCPP2="/usr/bin/soapcpp2"
-	AC_SUBST(SOAPCPP2)
-	
 	dnl wsdl2h macros. we try to udnerstand which flags need to be used depending
 	dnl on wsdl2h version
 	AC_MSG_CHECKING([wsdl2h version])
@@ -65,4 +61,17 @@ AC_DEFUN([AC_WSDL2H],
 	AC_MSG_RESULT([yes. wsdl2h version $wsdl2h_version detected.])
 	AC_SUBST(WSDL2H)
 	AC_SUBST(WSDL2H_FLAGS)
+
+	WSDL2H_DIR=$(AS_DIRNAME([$WSDL2H]))
+	SOAPCPP2=$WSDL2H_DIR/soapcpp2
+
+	if ! test -e "$SOAPCPP2"; then
+		AC_MSG_ERROR("soapcpp2 executable: $SOAPCPP2 does not exist.")
+	fi
+
+	if ! test -x "$SOAPCPP2"; then
+		AC_MSG_ERROR("soapcpp2 executable: $SOAPCPP2 cannot be executed.")
+	fi
+	
+    AC_SUBST([SOAPCPP2])
 ])
