@@ -29,6 +29,13 @@
 #  define _POSIX_SOURCE 1
 #endif
 
+#ifndef NI_MAXHOST
+#  define NI_MAXHOST 1025
+#endif
+#ifndef NI_MAXSERV
+#  define NI_MAXSERV 32
+#endif
+
 #include <sys/types.h>
 #include <netdb.h>
 #include <sys/socket.h>
