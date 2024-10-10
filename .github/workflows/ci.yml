@@ -5,23 +5,6 @@ on:
   push:
 
 jobs:
-  
-  centos7:
-    runs-on: ubuntu-latest
-    container: centos:centos7
-    steps:
-      - uses: actions/checkout@v3
-
-      - name: Install packages
-        run: |
-          yum install -y epel-release
-          yum install -y make file automake libtool gcc-c++ openssl-devel gsoap-devel gsoap expat-devel bison
-
-      - name: Build
-        run: |
-          ./autogen.sh
-          ./configure
-          make
 
   el9:
     runs-on: ubuntu-latest
@@ -48,10 +31,27 @@ jobs:
       - name: Install packages
         run: |
           sudo apt update
-          sudo apt install make automake libtool pkg-config g++ libssl-dev libgsoap-dev gsoap libexpat-dev
+          sudo apt install -y make automake libtool pkg-config g++ libssl-dev libgsoap-dev gsoap libexpat-dev
 
       - name: Build
         run: |
           ./autogen.sh
           ./configure
           make
+
+  ubuntu2404:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install packages
+        run: |
+          sudo apt update
+          sudo apt install -y make automake libtool pkg-config g++ libssl-dev libgsoap-dev gsoap libexpat-dev
+
+      - name: Build
+        run: |
+          ./autogen.sh
+          ./configure
+          make
+

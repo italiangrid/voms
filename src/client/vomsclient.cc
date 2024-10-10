@@ -53,6 +53,7 @@ extern "C" {
 #include <sstream>
 #include <algorithm>
 #include <string>
+#include <random>
 
 #include "options.h"
 #include "vomsxml.h"
@@ -137,24 +138,6 @@ static void kpcallback(int p, UNUSED(int n), UNUSED(void* v))
 extern int proxy_verify_cert_chain(X509 * ucert, STACK_OF(X509) * cert_chain, proxy_verify_desc * pvd);
 extern void proxy_verify_ctx_init(proxy_verify_ctx_desc * pvxd);
 }
-
-
-class rand_wrapper 
-{
-
-public:
-  
-  rand_wrapper(unsigned int seed)
-  {
-    srand(seed);
-  }
-
-  UNUSED(ptrdiff_t operator() (ptrdiff_t max))
-  {
-    return static_cast<ptrdiff_t>(rand() % max);
-  }
-
-};
 
 Client::Client(int argc, char ** argv) :
                                          ignorewarn(false),
@@ -649,10 +632,8 @@ int Client::Run()
     /* find servers for that vo */
     std::vector<contactdata> servers;
     servers = v->FindByAlias(contact.nick());
-    rand_wrapper rd(time(0));
-    random_shuffle(servers.begin(), 
-                   servers.end(),
-                   rd);
+    std::default_random_engine rd{std::random_device{}()};
+    std::shuffle(servers.begin(), servers.end(), rd);
 
     std::string vo = (contact.vo().empty() ? servers[0].vo : contact.vo());
 

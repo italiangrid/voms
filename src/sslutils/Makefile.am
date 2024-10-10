@@ -45,10 +45,12 @@ endif
 libssl_utils_nog_la_SOURCES= $(SOURCES)
 
 libssl_utils_la_CFLAGS = \
-	-I $(top_srcdir)/src/include
+	-I $(top_srcdir)/src/include \
+	$(OPENSSL_CFLAGS)
 
 libssl_utils_nog_la_CFLAGS = \
 	$(NO_GLOBUS_FLAGS) \
-	-I $(top_srcdir)/src/include
+	-I $(top_srcdir)/src/include \
+	$(OPENSSL_CFLAGS)
 
 ###
