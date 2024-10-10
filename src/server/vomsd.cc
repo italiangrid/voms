@@ -51,7 +51,7 @@ extern "C" {
 static int reload = 0;
 
 void *logh = NULL;
-#include "myproxycertinfo.h"
+#include "proxycertinfo.h"
 }
 
 #include <sstream>
@@ -96,11 +96,15 @@ std::string vomsresult::makeRESTAnswer(int& code)
   std::string output = "<?xml version=\"1.0\" encoding=\"UTF-8\"?><voms>";
   code = SOAP_HTML;
 
-  if (ac != "A" && !ac.empty())
-    output += "<ac>"+Encode(ac, true)+"</ac>";
+  if (ac != "A" && !ac.empty()){
+    std::string encoded_ac = Encode(ac,true);
+    output += "<ac>"+encoded_ac+"</ac>";
+  }
 
-  if (!data.empty())
-    output += "<bitstr>"+Encode(data, true)+"</bitstr>";
+  if (!data.empty()){
+    std::string encoded_data = Encode(data,true);
+    output += "<bitstr>"+encoded_data+"</bitstr>";
+  }
 
   std::vector<errorp>::const_iterator end = errs.end();
   for (std::vector<errorp>::const_iterator i = errs.begin(); i != end; ++i) {
@@ -801,7 +805,7 @@ void VOMSServer::Run()
             return;
           }
 
-          LOGM(VARP, logh, LEV_INFO, T_PRE, "SSL handshake completed succesfully.");
+          LOGM(VARP, logh, LEV_INFO, T_PRE, "SSL handshake completed successfully.");
 
           std::string user    = sock.peer_subject;
           std::string userca  = sock.peer_ca;
@@ -837,7 +841,12 @@ void VOMSServer::Run()
             sop->ssl = sock.ssl;
 
             // GSOAP will handle this
-            sop->fparse(sop);
+            // newer versions of gsoap don't call the http handlers (eg fget) in fparse
+            // fparse returns SOAP_STOP if any of the handlers were called instead of SOAP_OK (older versions)
+            // if the return value is SOAP_OK then no hander has been called (newer versions) and we call
+            // fget manually if it's a get request (SOAP_GET)
+            if(sop->fparse(sop) == SOAP_OK && sop->status == SOAP_GET)
+              sop->fget(sop);
 
             sock.Close();
           } else {
@@ -870,7 +879,7 @@ bool VOMSServer::makeAC(vomsresult& vr, EVP_PKEY *key, X509 *issuer,
 
   if (!XML_Req_Decode(message, r)) {
     LOGM(VARP, logh, LEV_ERROR, T_PRE, "Unable to interpret command: %s",message.c_str());
-    vr.setError(ERR_NO_COMMAND, "Unable to intepret command: " + message);
+    vr.setError(ERR_NO_COMMAND, "Unable to interpret command: " + message);
     return false;
   }
 
@@ -1219,16 +1228,15 @@ bool VOMSServer::makeAC(vomsresult& vr, EVP_PKEY *key, X509 *issuer,
 
         /* Encode AC */
         if (!res) {
-          unsigned int len = i2d_AC(a, NULL);
+          unsigned char *buf = NULL;
 
-          unsigned char *tmp = (unsigned char *)OPENSSL_malloc(len);
-          unsigned char *ttmp = tmp;
+          int len = i2d_AC(a, &buf);
 
-          if (tmp) {
-            i2d_AC(a, &tmp);
-            codedac = std::string((char *)ttmp, len);
+          if (len > 0) {
+            codedac = std::string(reinterpret_cast<char*>(buf), len);
           }
-          free(ttmp);
+
+          OPENSSL_free(buf);
         }
         else
           vr.setError(ERR_NOT_MEMBER, get_error(res));
@@ -1448,7 +1456,7 @@ static bool determine_group_and_role(std::string command, char *comm, char **gro
     case 'B':
       *role = strchr(string, ':');
       if (*role) {
-        (*role) = '\0';
+        (**role) = '\0';
         (*role)++;
       }
       break;

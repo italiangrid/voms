@@ -31,6 +31,7 @@
 
 #include "parsertypes.h"
 #include "signing_policy.h"
+#include "lexparse.h"
 #ifndef strndup
 extern char *strndup(const char*, size_t);
 #endif

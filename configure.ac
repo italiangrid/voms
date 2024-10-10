@@ -1,4 +1,4 @@
-AC_INIT([VOMS], [2.0.16])
+AC_INIT([VOMS], [2.1.1])
 AC_PREREQ(2.57)
 AC_CONFIG_AUX_DIR([./aux])
 AM_INIT_AUTOMAKE
@@ -31,12 +31,9 @@ AC_PROG_YACC
 AC_PROG_LEX
 AC_COMPILER
 
-PKG_CHECK_MODULES([OPENSSL], [openssl])
+AX_PTHREAD
 
-PKG_CHECK_MODULES([GSOAP],[gsoap >= 2.7])
-PKG_CHECK_MODULES([GSOAP_PP],[gsoap++ >= 2.7])
-PKG_CHECK_MODULES([GSOAP_SSL],[gsoapssl >= 2.7])
-PKG_CHECK_MODULES([GSOAP_SSL_PP],[gsoapssl++ >= 2.7])
+PKG_CHECK_MODULES([OPENSSL], [openssl], [AC_DEFINE([OPENSSL_API_COMPAT], [10100], [Build against OpenSSL 1.1 API])])
 
 AC_CHECK_HEADER([expat.h], 
     [], 
@@ -51,7 +48,6 @@ AC_CHECK_LIB([expat],
 
 AC_SUBST(EXPAT_LIBS)
 
-AC_WSDL2H
 AC_ENABLE_DOCS
 
 # Checks for header files.
@@ -85,12 +81,8 @@ AC_CHECK_FUNCS([alarm atexit dup2 gethostbyaddr gethostname gethostbyname gethos
 AC_CHECK_DECLS(getopt_data)
 AC_REPLACE_FUNCS(getopt_long getopt_long_only daemon setenv memset)
 
-TEST_USE_BSD
-TEST_USE_POSIX
-
 # NEW_ISSUES
 
-AC_DEFINE(_SVID_SOURCE, 1, [Get SVID extensions])
 AC_VOMS_TIME_T_TIMEZONE
 AM_WITH_DMALLOC
 
@@ -100,6 +92,16 @@ AC_VOMS_STRNDUP
 
 AC_BUILD_API_ONLY
 AC_BUILD_PARTS
+
+# Check for gSOAP only when building server which is checked in BUILD_PARTS
+if test "x$build_server" = "xyes" ; then
+PKG_CHECK_MODULES([GSOAP],[gsoap >= 2.7])
+PKG_CHECK_MODULES([GSOAP_PP],[gsoap++ >= 2.7])
+PKG_CHECK_MODULES([GSOAP_SSL],[gsoapssl >= 2.7])
+PKG_CHECK_MODULES([GSOAP_SSL_PP],[gsoapssl++ >= 2.7])
+AC_WSDL2H
+fi
+
 GLITE_DOCBOOK_MAN
 
 AC_LINUX

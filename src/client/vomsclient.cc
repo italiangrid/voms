@@ -39,7 +39,8 @@ extern "C" {
 #include <sys/mman.h>
 #include <fcntl.h>
 #include <errno.h>
-
+#include <string.h>
+  
 #include "listfunc.h"
 #include "credentials.h"
 #include "replace.h"
@@ -66,7 +67,6 @@ extern "C" {
 
 extern "C" 
 {
-#include "myproxycertinfo.h"
 #include "vomsproxy.h"
 }
 
@@ -120,11 +120,11 @@ static int pwstdin_callback(char * buf, int num, UNUSED(int w))
   return i;	
 }
   
-static int kpcallback(int p, UNUSED(int n)) 
+static void kpcallback(int p, UNUSED(int n), UNUSED(void* v))
 {
   char c='B';
     
-  if (quiet) return 0;
+  if (quiet) return;
     
   if (p == 0) c='.';
   if (p == 1) c='+';
@@ -132,8 +132,6 @@ static int kpcallback(int p, UNUSED(int n))
   if (p == 3) c='\n';
   if (!debug) c = '.';
   fputc(c,stderr);
-
-  return 0;
 }
   
 extern int proxy_verify_cert_chain(X509 * ucert, STACK_OF(X509) * cert_chain, proxy_verify_desc * pvd);
@@ -263,7 +261,7 @@ Client::Client(int argc, char ** argv) :
       "    -globus <version>              Globus version. (MajorMinor)\n" \
       "    -proxyver                      Version of proxy certificate.\n" \
       "    -noregen                       Use existing proxy certificate to connect to server and sign the new proxy.\n" \
-      "    -separate <file>               Saves the informations returned by the server on file <file>.\n" \
+      "    -separate <file>               Saves the information returned by the server on file <file>.\n" \
       "    -ignorewarn                    Ignore warnings.\n" \
       "    -failonwarn                    Treat warnings as errors.\n" \
       "    -list                          Show all available attributes.\n" \
@@ -421,11 +419,6 @@ Client::Client(int argc, char ** argv) :
       dontverifyac = true;
   }
 
-  /* set globus version */
-
-  version = globus(version);
-  Print(DEBUG) << "Detected Globus version: " << version/10 << "." << version % 10 << std::endl;
-  
   /* set proxy version */
   if (rfc)
     proxyver = 4;
@@ -476,7 +469,7 @@ Client::Client(int argc, char ** argv) :
   /* controls that number of bits for the key is appropiate */
   
   if (bits == -1)
-    bits = 1024;
+    bits = 2048;
 
   if ((bits != 0) && (bits!=512) && (bits!=1024) && (bits!=2048) && (bits!=4096)) {
     Print(ERROR) << "Error: number of bits in key must be one of 512, 1024, 2048, 4096." << std::endl;
@@ -604,10 +597,12 @@ void Client::CleanAll()
   free(outfile);
   listfree((char **)aclist, (freefn)AC_free);
 
-  if (v)
-    delete v;
+  delete v;
 
   OBJ_cleanup();
+
+#warning if X509V3_EXT_cleanup is called valgrind moves some "still reachable" to "definitely lost"!
+  // X509V3_EXT_cleanup();
 }
 
 Client::~Client() 
@@ -872,7 +867,7 @@ bool Client::CreateProxy(std::string data, AC ** aclist, int version)
     args->limited       = limit_proxy;
 
     args->voID          = strdup(voID.c_str());
-    args->callback      = (int (*)())kpcallback;
+    args->callback      = kpcallback;
     int warn = 0;
     void *additional = NULL;
 
@@ -1054,7 +1049,7 @@ bool Client::Test()
     Print(WARN) << std::endl << "ERROR: Your certificate expired "
                 << asctime(localtime(&time_after)) << std::endl;
     
-    return 2;
+    return true;
   } 
   
   if (hours && time_diff < length) {
@@ -1062,7 +1057,7 @@ bool Client::Test()
                 << asctime(localtime(&time_after))
                 << "which is within the requested lifetime of the proxy"
                 << std::endl;
-    return 1;
+    return false;
   }
   
   if (!quiet) {
@@ -1073,7 +1068,7 @@ bool Client::Test()
                 << asctime(localtime(&time_after_proxy)) << std::flush;
   }
 
-  return 0;
+  return false;
 }
 
 bool Client::AddToList(AC *ac) 

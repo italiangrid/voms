@@ -30,7 +30,7 @@ proc mytest {} {
 issuer    : /C=IT/CN=001
 identity  : /C=IT/CN=001
 type      : proxy
-strength  : 1024 bits
+strength  : 2048 bits
 path      : /tmp/x509up_u\[0-9\]*
 timeleft  : \[0-9\]*:\[0-9\]*:\[0-9\]*
 included  : testo di prova"

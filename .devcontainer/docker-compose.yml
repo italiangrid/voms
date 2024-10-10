@@ -1,0 +1,52 @@
+
+services:
+
+  container-el9:
+
+    environment:
+      - TZ=Europe/Rome
+
+    depends_on:
+      - trust
+
+    build:
+      context: .devcontainer
+      dockerfile: Dockerfile-el9
+
+    volumes:
+      - trustanchors:/etc/grid-security/certificates
+      - .:/workspace
+
+    cap_add:
+      - SYS_PTRACE
+    security_opt:
+      - seccomp:unconfined
+
+    command: sleep infinity
+ 
+    init: true
+
+  container-centos7:
+
+    environment:
+      - TZ=Europe/Rome
+
+    depends_on:
+      - trust
+
+    build:
+      context: .devcontainer
+      dockerfile: Dockerfile-centos7
+
+    volumes:
+      - trustanchors:/etc/grid-security/certificates
+      - .:/workspace
+
+    cap_add:
+      - SYS_PTRACE
+    security_opt:
+      - seccomp:unconfined
+
+    command: sleep infinity
+ 
+    init: true

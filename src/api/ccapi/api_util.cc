@@ -23,10 +23,10 @@
  *
  *********************************************************************/
 
+#include "config.h"
 #include "api_util.h"
 
 extern "C" {
-#include "config.h"
 #include "replace.h"
 
 #include <sys/types.h>
@@ -37,7 +37,7 @@ extern "C" {
 #include <sys/wait.h>
 
 #include <signal.h>
-
+#include <assert.h>
 #include <stdio.h>
 #include <openssl/x509.h>
 #include <openssl/asn1.h>
@@ -45,6 +45,7 @@ extern "C" {
 #include <openssl/evp.h>
 #include "credentials.h"
 #include "sslutils.h"
+#include "newformat.h"
 }
 
 #include <string>
@@ -156,13 +157,17 @@ static bool findexts(X509 *cert , AC_SEQ **listnew, std::string &extra_data, std
 
   ext = get_ext(cert, "incfile");
   if (ext) {
-    extra_data = std::string((char *)(ext->value->data),ext->value->length);
+    ASN1_OCTET_STRING* value = X509_EXTENSION_get_data(ext);
+    assert(value && "X509_EXTENSION_get_data failed");
+    extra_data = std::string(reinterpret_cast<char*>(value->data), value->length);
     found = true;
   }
 
   ext = get_ext(cert, "vo");
   if (ext) {
-    workvo = std::string((char *)(ext->value->data),ext->value->length);
+    ASN1_OCTET_STRING* value = X509_EXTENSION_get_data(ext);
+    assert(value && "X509_EXTENSION_get_data failed");
+    workvo = std::string(reinterpret_cast<char*>(value->data), value->length);
   }
 
   return found;
@@ -327,7 +332,12 @@ vomsdata::verifydata(AC *ac, UNUSED(const std::string& subject),
     issuer = check((void *)ac);
 
     if (!issuer) {
-      seterror(VERR_SIGN, "Cannot verify AC signature!");
+      std::string oldmessage = ErrorMessage();
+      if (oldmessage.empty()) {
+          seterror(VERR_SIGN, "Cannot verify AC signature!");
+      } else {
+          seterror(VERR_SIGN, "Cannot verify AC signature!  Underlying error: " + oldmessage);
+      }
       return false;
     }
   }
@@ -737,7 +747,6 @@ vomsdata::check_cert(STACK_OF(X509) *stack)
     void (*oldsignal)(int) = signal(SIGPIPE,SIG_IGN);
 #endif
 
-    CRYPTO_malloc_init();
     if ((lookup = X509_STORE_add_lookup(ctx, X509_LOOKUP_file()))) {
       X509_LOOKUP_load_file(lookup, NULL, X509_FILETYPE_DEFAULT);
 

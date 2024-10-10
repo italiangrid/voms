@@ -298,7 +298,7 @@ std::string XML_Req_Encode(const std::string &command, const std::string &order,
 	
 }
 
-std::string Encode(std::string data, int base64)
+std::string Encode(const std::string &data, int base64)
 {
   int j = 0;
   char *tmp = NULL;
@@ -491,7 +491,7 @@ static void endans(void *userdata, const char *name)
     a->num = atoi(a->value.c_str());
   }
   else if ((!strcmp(name, "message")) && 
-           (a->depth == 3)) {
+           (a->depth == 3 || a->depth == 2)) {
     a->message = a->value;
   }
   else if (!strcmp(name, "warning")) {
@@ -501,10 +501,10 @@ static void endans(void *userdata, const char *name)
     a->a->errs.push_back(e);
   }
   else if ((!strcmp(name, "code")) && 
-           (a->depth == 3)) {
+           (a->depth == 2)) {
     const char *msg = a->value.c_str();
 
-    if (!strcmp(msg, "NoSuchUser"))
+    if (!strcmp(msg, "NoSuchUser") || atoi(msg) == ERR_NOT_MEMBER)
       a->num = ERR_NOT_MEMBER;
     else if (!strcmp(msg, "SuspendedUser"))
       a->num = ERR_SUSPENDED;

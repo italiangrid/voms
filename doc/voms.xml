@@ -99,7 +99,7 @@ meaning is the following.</para>
 
 <para><option>-globusid</option> <replaceable>id</replaceable></para>
 <para><option>-globuspwd</option> <replaceable>file</replaceable></para>
-<para>This options are supported for backwards compatibility only.
+<para>These options are supported for backwards compatibility only.
   They have no effect, and indeed do not get listed by the -help option.</para> 
 
 <para><option>-passfile</option> <replaceable>file</replaceable></para>
@@ -143,8 +143,8 @@ pseudo certificate. The default value is hostname:port</para>
 
 <para><option>-code</option> <replaceable>c</replaceable></para>
 <para><option>-globus</option> <replaceable>version</replaceable></para>
-<para>These option are obsolete and only present for backwards
-  compatibility with old installation.  Currently, their values are
+<para>These options are obsolete and only present for backwards
+  compatibility with old installations.  Currently, their values are
   ignored.  Do not specify them in new installations.</para> 
 
 <para><option>-logtype</option> <replaceable>type</replaceable></para>
@@ -187,7 +187,7 @@ overwrites the value of the <option>-logtype</option> option to 255.</para>
 not documented here are translated as the highest level possible, LEV_DEBUG</para>
 
 <para><option>-logformat</option> <replaceable>str</replaceable></para>
-<para>Sets the format used by the loggin system according toa printf-like
+<para>Sets the format used by the logging system according to a printf-like
 format string with the following directives format: <emphasis remap='I'>\%[size][char]</emphasis> where size, 
 if present, sets the maximum length of the field and <emphasis remap='i'>char</emphasis> selects the type
 of substitution done. Possible values are the following:</para>
@@ -289,7 +289,7 @@ better to put what whould be the argument of this string into the
 
 <para><option>-mysql-socket</option> <replaceable>socket</replaceable></para>
 <para>MySQL servers may be configured to allow access through a
-  unix-level socket.  This option allows to specify this method of
+  unix-level socket.  This option allows one to specify this method of
   contact.  However, it is almost always better to contact the server
   through the port.  This option is ignored for Oracle
   backends.</para>

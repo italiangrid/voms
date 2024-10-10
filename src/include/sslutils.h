@@ -328,7 +328,7 @@ struct proxy_verify_desc_struct {
     proxy_verify_ctx_desc *             pvxd;
     int                                 flags;
     X509_STORE_CTX *                    cert_store;
-    int                                 recursive_depth;
+    int                                 recursive_depth; /* unused */
     int                                 proxy_depth;
     int                                 cert_depth;
     int                                 limited_proxy;
@@ -423,7 +423,7 @@ proxy_genreq(
     EVP_PKEY **                         pkeyp,
     int                                 bits,
     const char *                        newdn,
-    int                                 (*callback)());
+    void                                (*callback)(int, int, void*));
 
 int
 proxy_sign(

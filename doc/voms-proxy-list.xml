@@ -16,7 +16,7 @@
 
 <refnamediv id='name'>
 <refname>voms-proxy-list</refname>
-<refpurpose>Shows a list of all availabel attributes from a specified server</refpurpose>
+<refpurpose>Shows a list of all available attributes from a specified server</refpurpose>
 </refnamediv>
 
 <refsynopsisdiv id='synopsis'>
@@ -99,7 +99,8 @@ and 755 if a directory is specified</para>
 should be used instead.</para>
 
 <para><option>-globus</option> <replaceable>version</replaceable>
-Underlying Globus version.</para>
+This option is obsolete and only present for backwards compatibility
+  with old installations.  Currently, its value is ignored.</para>
 
 <para><option>-noregen</option>
 Use existing proxy to contact the server and to sing the new proxy.</para>

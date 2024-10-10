@@ -31,17 +31,9 @@ extern "C" {
 #endif
 
 #define NOGLOBUS
-#ifndef GSSAPI_H_
-
-/*
- * Also check against _GSSAPI_H_ as that is what the Kerberos 5 code defines and
- * what header files on some systems look for.
- */
-
-#ifndef _GSSAPI_H
+#if !(defined(GSSAPI_H_) || defined(_GSSAPI_H) || defined(_GSSAPI_H_))
 typedef void * gss_cred_id_t;
 typedef void * gss_ctx_id_t;
-#endif
 #endif
 
 #include <openssl/x509.h>
@@ -213,8 +205,7 @@ extern struct contactdata **VOMS_FindByVO(struct vomsdata *vd, char *vo,
 
 
 extern void VOMS_DeleteContacts(struct contactdata **list); /*!< Frees a contactdata vector.
-							      \param list The vector to free.
-							      \return NONE */
+							      \param list The vector to free.*/
 
 extern struct vomsdata *VOMS_Init(char *voms, char *cert); /*!< Initializes a vomsdata structure for use by the other functions.
 						       N.B: This is the ONLY way to correctly initialize a vomsdata structure. It

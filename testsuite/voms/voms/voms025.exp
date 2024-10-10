@@ -23,7 +23,7 @@ proc mytest {} {
         set correct "=== Proxy Chain Information ===
 subject   : /C=IT/CN=001
 issuer    : /C=IT/O=INFN/CN=CAFromthisCN
-strength  : 1024 bits
+strength  : 2048 bits
 timeleft  : \[0-9\]*:\[0-9\]*:\[0-9\]*
 
 === Proxy Information ===
@@ -31,7 +31,7 @@ subject   : /C=IT/CN=001/CN=proxy
 issuer    : /C=IT/CN=001
 identity  : /C=IT/CN=001
 type      : proxy
-strength  : 1024 bits
+strength  : 2048 bits
 path      : /tmp/x509up_u\[0-9\]*
 timeleft  : \[0-9\]*:\[0-9\]*:\[0-9\]*"
 

@@ -198,7 +198,7 @@ getopts(int argc, char * const argv[], struct option *longopts)
 
   try {
     opts = new struct option[num+1];
-  } catch ( std::bad_alloc) {
+  } catch (std::bad_alloc &e) {
     return false;
   }
   

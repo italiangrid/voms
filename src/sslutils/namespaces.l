@@ -30,6 +30,7 @@
 #include <stdlib.h>
 
 #include "parsertypes.h"
+#include "lexparse.h"
 #include "namespaces.h"
 #ifndef strndup
 extern char *strndup(const char*, size_t);

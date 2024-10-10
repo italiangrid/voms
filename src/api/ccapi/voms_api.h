@@ -30,7 +30,10 @@
 #include <string>
 #include <vector>
 
+#ifndef NOGLOBUS
 #define NOGLOBUS
+#endif
+
 extern "C" {
 #ifndef GSSAPI_H_
 /*
@@ -211,6 +214,8 @@ struct vomsdata {
 
   public:
   verror_type error; /*!< Error code */
+
+  static void SkipSslInitialization();
 
   vomsdata(std::string voms_dir = "", 
 	   std::string cert_dir = ""); /*!< \param voms_dir The directory which contains the certificate 

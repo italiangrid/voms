@@ -212,7 +212,8 @@ void *FILEStreamerAdd(void *h)
  
 static int logfile_rotate(const char * name)
 {
-  char *pos, *dirname, *newname, *oldname, *basename;
+  char *pos, *dirname, *newname, *oldname;
+  char const* basename = NULL;
   DIR * dir = NULL;
   struct dirent * de = NULL;
   int result = 0;

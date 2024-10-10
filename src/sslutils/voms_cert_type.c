@@ -9,6 +9,7 @@
 
 #include <ctype.h>
 #include <stdio.h>
+#include <string.h>
 
 #define LIMITED_PROXY_OID               "1.3.6.1.4.1.3536.1.1.1.9"
 #define PROXYCERTINFO_OLD_OID           "1.3.6.1.4.1.3536.1.222"

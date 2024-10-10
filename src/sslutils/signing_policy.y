@@ -31,6 +31,7 @@
 #include <ctype.h>
 
 #include "parsertypes.h"
+#include "lexparse.h"
 #include "listfunc.h"
 
 char **parse_subjects(char *string);

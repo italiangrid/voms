@@ -78,7 +78,7 @@ extern FILE *yyin;
 
 extern "C" {
 
-#include "myproxycertinfo.h"
+#include "proxycertinfo.h"
 extern int writeac(const X509 *issuerc, const STACK_OF(X509) *certstack, const X509 *holder, 
 		   const EVP_PKEY *pkey, BIGNUM *s, char **c, 
 		   const char *t, char **attributes, AC **ac, const char *voname, 
@@ -89,7 +89,7 @@ extern int writeac(const X509 *issuerc, const STACK_OF(X509) *certstack, const X
 static int time_to_sec(std::string timestring);
 static long mystrtol(char *number, long int limit);
 static std::string hextostring(const std::string &data);
-static int parse_ga_value(char *ga, char **id, char **value, char **qual);
+static int parse_ga_value(char *ga, char **id, char **value, const char **qual);
 
 extern int AC_Init();
 
@@ -128,11 +128,11 @@ static int pwstdin_callback(char * buf, int num, UNUSED(int w))
   return i;
 }
   
-static int kpcallback(int p, int UNUSED(n)) 
+static void kpcallback(int p, int UNUSED(n), UNUSED(void* v))
 {
   char c='B';
     
-  if (quiet) return 0;
+  if (quiet) return;
     
   if (p == 0) c='.';
   if (p == 1) c='+';
@@ -140,8 +140,6 @@ static int kpcallback(int p, int UNUSED(n))
   if (p == 3) c='\n';
   if (!debug) c = '.';
   fputc(c,stderr);
-
-  return 0;
 }
   
 extern int proxy_verify_cert_chain(X509 * ucert, STACK_OF(X509) * cert_chain, proxy_verify_desc * pvd);
@@ -219,7 +217,7 @@ Fake::Fake(int argc, char ** argv) :   confile(conf_file_name),
     "    -pwstdin                       Allows passphrase from stdin\n" \
     "    -limited                       Creates a limited proxy\n" \
     "    -hours H                       Proxy is valid for H hours (default:12)\n" \
-    "    -bits                          Number of bits in key {512|1024|2048|4096} (default:1024)\n" \
+    "    -bits                          Number of bits in key {512|1024|2048|4096} (default:2048)\n" \
     "    -cert     <certfile>           Non-standard location of user certificate\n" \
     "    -key      <keyfile>            Non-standard location of user key\n" \
     "    -certdir  <certdir>            Non-standard location of trusted cert dir\n" \
@@ -238,7 +236,7 @@ Fake::Fake(int argc, char ** argv) :   confile(conf_file_name),
     "    -proxyver <n>                  Version of proxy certificate.\n" \
     "    -rfc                           Create RFC-conforming proxies (synonim of --proxyver 4)\n"             
     "    -noregen                       Doesn't regenerate a new proxy for the connection.\n" \
-    "    -separate <file>               Saves the informations returned by the server on file <file>.\n" \
+    "    -separate <file>               Saves the information returned by the server on file <file>.\n" \
     "    -hostcert <file>               Fake host certificate.\n" \
     "    -hostkey <file>                Fake host private key.\n" \
     "    -fqan <string>                 String to include in the AC as the granted FQAN.\n" \
@@ -398,7 +396,8 @@ Fake::Fake(int argc, char ** argv) :   confile(conf_file_name),
     int down = 0;
     for (unsigned int i = 0; i < galist.size(); i++) {
       char *temp = strdup(galist[i].c_str());
-      char *id, *value, *qual;
+      char *id, *value;
+      const char *qual;
       if (parse_ga_value(temp, &id, &value, &qual)) {
         std::string realga = std::string(qual) + "::" + id + "=" + value;
         voelem->gas[i] = (char*)strdup((realga.c_str()));
@@ -541,9 +540,9 @@ bool Fake::Run()
 
 }
 
-static int parse_ga_value(char *ga, char **id, char **value, char **qual)
+static int parse_ga_value(char *ga, char **id, char **value, const char **qual)
 {
-  static char *empty="";
+  static const char *empty="";
   char *eqpoint = strchr(ga, '=');
   char *qualpoint = strchr(ga, '(');
   char *qualend = strchr(ga, ')');
@@ -617,7 +616,7 @@ bool Fake::CreateProxy(std::string data, AC ** aclist, int version)
     args->minutes       = 0;
     args->limited       = limit_proxy;
     args->voID          = strdup(voID.c_str());
-    args->callback      = (int (*)())kpcallback;
+    args->callback      = kpcallback;
     args->pastproxy     = time_to_sec(pastproxy);
 
     if (!keyusage.empty())
@@ -943,16 +942,6 @@ bool Fake::VerifyOptions()
       exitError("Error: You must specify an host key!");
   }
 
-  /* set globus version */
-
-  version = globus(version);
-  if (version == 0) {
-    version = 22;
-    Print(DEBUG) << "Unable to discover Globus version: trying for 2.2" << std::endl;
-  }
-  else 
-    Print(DEBUG) << "Detected Globus version: " << version << std::endl;
-
   if (!selfsigned) {
     /* proxyversion is only significant if this is not a selfsigned certificate */
     if (rfc && proxyver != 0) 
@@ -966,16 +955,8 @@ bool Fake::VerifyOptions()
     if (proxyver!=2 && proxyver!=3 && proxyver!=4 && proxyver!=0)
       exitError("Error: proxyver must be 2 or 3 or 4");
     else if (proxyver==0) {
-      Print(DEBUG) << "Unspecified proxy version, settling on version: ";
-
-      if (version<30)
-        proxyver = 2;
-      else if (version<40)
-        proxyver = 3;
-      else
-        proxyver = 4;
-
-      Print(DEBUG) << proxyver << std::endl;
+      Print(DEBUG) << "Unspecified proxy version, settling on version 4 (RFC)" << std::endl;
+      proxyver = 4;
     }
 
     /* PCI extension option */ 
@@ -1021,7 +1002,7 @@ bool Fake::VerifyOptions()
   /* controls that number of bits for the key is appropiate */
 
   if (bits == -1)
-    bits = 1024;
+    bits = 2048;
 
   if ((bits!=512) && (bits!=1024) && 
       (bits!=2048) && (bits!=4096) && (bits != 0))

@@ -1,13 +1,22 @@
 '\" t
 .\"     Title: voms
 .\"    Author: [see the "Authors" section]
-.\" Generator: DocBook XSL Stylesheets v1.75.2 <http://docbook.sf.net/>
-.\"      Date: 12/14/2011
+.\" Generator: DocBook XSL Stylesheets vsnapshot <http://docbook.sf.net/>
+.\"      Date: 05/03/2021
 .\"    Manual: VOMS Server
 .\"    Source: VOMS Server
 .\"  Language: English
 .\"
-.TH "VOMS" "8" "12/14/2011" "VOMS Server" "VOMS Server"
+.TH "VOMS" "8" "05/03/2021" "VOMS Server" "VOMS Server"
+.\" -----------------------------------------------------------------
+.\" * Define some portability stuff
+.\" -----------------------------------------------------------------
+.\" ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+.\" http://bugs.debian.org/507673
+.\" http://lists.gnu.org/archive/html/groff/2009-02/msg00013.html
+.\" ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+.ie \n(.g .ds Aq \(aq
+.el       .ds Aq '
 .\" -----------------------------------------------------------------
 .\" * set default formatting
 .\" -----------------------------------------------------------------
@@ -64,13 +73,13 @@ Selects the file for logging\&. The default is /ver/log/voms\&.
 \fB\-globuspwd\fR
 \fIfile\fR
 .PP
-This options are supported for backwards compatibility only\&. They have no effect, and indeed do not get listed by the \-help option\&.
+These options are supported for backwards compatibility only\&. They have no effect, and indeed do not get listed by the \-help option\&.
 .PP
 \fB\-passfile\fR
 \fIfile\fR
 .PP
 Reads the password to access the DB from
-\fIfile\fR\&. The default is to read it from the console during server\'s startup\&.
+\fIfile\fR\&. The default is to read it from the console during server\*(Aqs startup\&.
 .PP
 \fB\-x509_cert_dir\fR
 \fIpath\fR
@@ -139,7 +148,7 @@ Prints information about the server and then exits\&.
 \fB\-globus\fR
 \fIversion\fR
 .PP
-These option are obsolete and only present for backwards compatibility with old installation\&. Currently, their values are ignored\&. Do not specify them in new installations\&.
+These options are obsolete and only present for backwards compatibility with old installations\&. Currently, their values are ignored\&. Do not specify them in new installations\&.
 .PP
 \fB\-logtype\fR
 \fItype\fR
@@ -248,7 +257,7 @@ Higher values include all messages printed by lower ones, and values not documen
 \fB\-logformat\fR
 \fIstr\fR
 .PP
-Sets the format used by the loggin system according toa printf\-like format string with the following directives format:
+Sets the format used by the logging system according to a printf\-like format string with the following directives format:
 \fI\e%[size][char]\fR
 where size, if present, sets the maximum length of the field and
 \fIchar\fR
@@ -262,7 +271,7 @@ selects the type of substitution done\&. Possible values are the following:
 .sp -1
 .IP \(bu 2.3
 .\}
-% \- Substitutes a plain \'%\'\&.
+% \- Substitutes a plain \*(Aq%\*(Aq\&.
 .RE
 .sp
 .RS 4
@@ -341,7 +350,7 @@ m \- Substitutes the message proper\&.
 .sp -1
 .IP \(bu 2.3
 .\}
-p \- Substitutes the process\' pid\&.
+p \- Substitutes the process\*(Aq pid\&.
 .RE
 .sp
 .RS 4
@@ -445,7 +454,7 @@ This option, if specified, forces voms to drop some of the checks done as the au
 \fB\-contactstring\fR
 \fIcontact\fR
 .PP
-This string specifies information on how to contact the DB server\&. Its exact meaning depends on the DB backend used\&. For MySQL it is the hostname of the MySQL server, and it defaults to \'localhost\'\&. For Oracle it is the contactstring of the DB\&. However, for oracle it is better to put what whould be the argument of this string into the \'tnsnames\&.ora\' file and ignore this option,
+This string specifies information on how to contact the DB server\&. Its exact meaning depends on the DB backend used\&. For MySQL it is the hostname of the MySQL server, and it defaults to \*(Aqlocalhost\*(Aq\&. For Oracle it is the contactstring of the DB\&. However, for oracle it is better to put what whould be the argument of this string into the \*(Aqtnsnames\&.ora\*(Aq file and ignore this option,
 .PP
 \fB\-mysql\-port \fR
 \fIport\fR
@@ -455,7 +464,7 @@ This option specified the port on which the MySQL server is listening if it is d
 \fB\-mysql\-socket\fR
 \fIsocket\fR
 .PP
-MySQL servers may be configured to allow access through a unix\-level socket\&. This option allows to specify this method of contact\&. However, it is almost always better to contact the server through the port\&. This option is ignored for Oracle backends\&.
+MySQL servers may be configured to allow access through a unix\-level socket\&. This option allows one to specify this method of contact\&. However, it is almost always better to contact the server through the port\&. This option is ignored for Oracle backends\&.
 .PP
 \fB\-shortfqans\fR
 .PP
@@ -493,10 +502,10 @@ voms\-proxy\-init(1), voms\-proxy\-info(1), voms\-proxy\-destroy(1)
 .SH "AUTHORS"
 .PP
 Vincenzo Ciaschini
-Vincenzo\&.Ciaschini@cnaf\&.infn\&.it\&.
+<Vincenzo\&.Ciaschini@cnaf\&.infn\&.it>\&.
 .PP
 Valerio Venturi
-Valerio\&.Venturi@cnaf\&.infn\&.it\&.
+<Valerio\&.Venturi@cnaf\&.infn\&.it>\&.
 .SH "COPYRIGHT"
 .PP
 Copyright (c) Members of the EGEE Collaboration\&. 2004\&. See the beneficiaries list for details on the copyright holders\&.

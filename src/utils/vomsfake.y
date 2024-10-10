@@ -19,6 +19,7 @@
 #include <string.h>
 
 #include "fakeparsertypes.h"
+#include "lexparse.h"
 
 #define MAX_SIZE 200
 

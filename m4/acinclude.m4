@@ -40,7 +40,7 @@ AC_DEFUN([AC_BUILD_PARTS],
       case "$withval" in
         yes) build_clients="yes" ;;
         no)  build_clients="no" ;;
-        *) AC_MSG_ERROR([bad value $withval for --with-client]) ;;
+        *) AC_MSG_ERROR([bad value $withval for --with-clients]) ;;
       esac
     ],
     [ build_clients="$build_all" ])
@@ -117,7 +117,7 @@ AC_DEFUN([AC_OPENSSL],
               [with_openssl_prefix=/usr])
 
   if test "x$with_openssl_prefix" = "x/usr" ; then
-    AC_CHECK_LIB(crypto, CRYPTO_num_locks, [found=yes], [found=no])
+    AC_CHECK_LIB(crypto, ERR_print_errors_fp, [found=yes], [found=no])
 
     if test "x$found" = "xyes" ; then
 	OPENSSL_LIBS="-lcrypto -lssl"
@@ -128,7 +128,7 @@ AC_DEFUN([AC_OPENSSL],
     LD_LIBRARY_PATH="$with_openssl_prefix/lib"
 
     AC_LANG_PUSH(C)
-    AC_CHECK_LIB(crypto, CRYPTO_num_locks, [found=yes], [found=no])
+    AC_CHECK_LIB(crypto, ERR_print_errors_fp, [found=yes], [found=no])
     AC_LANG_POP(C)  
     NO_GLOBUS_FLAGS="-I$with_openssl_prefix/include"
 
@@ -195,14 +195,25 @@ AC_DEFUN([AC_COMPILER],
       CXXFLAGS="-g -O0"
     fi
 
+    AC_ARG_WITH(profile,
+      [  --with-profile Compiles and links with collection of profile information activated],
+      [ac_with_profile="yes"],
+      [ac_with_profile="no"])
+    
+    if test "x$ac_with_profile" = "xyes" ; then
+      CFLAGS="$CFLAGS -pg"
+      CXXFLAGS="$CXXFLAGS -pg"
+      LDFLAGS="$LDFLAGS -pg"
+    fi
+
     AC_ARG_WITH(warnings,
       [  --with-warnings Compiles with maximum warnings],
       [ac_with_warnings="yes"],
       [ac_with_warnings="no"])
 
     if test "x$ac_with_warnings" = "xyes" ; then
-      CFLAGS="-g -O0 -Wall -ansi -W $CFLAGS"
-      CXXFLAGS="-g -O0 -Wall -ansi -W $CXXFLAGS"
+      CFLAGS="$CFLAGS -Wall -Wextra"
+      CXXFLAGS="$CXXFLAGS -Wall -Wextra"
     fi
 ])
 
@@ -424,95 +435,6 @@ AC_DEFUN([PUT_PRIVATES],
 #define PRIVATE
 #define PUBLIC
 #endif])])
-
-        
-AC_DEFUN([TEST_USE_BSD],
-[
-    AC_MSG_CHECKING([whether _BSD_SOURCE must be defined])
-
-    AC_LANG_PUSH(C)
-    
-    cat >conftest.c <<HERE
-#include <strings.h>
-char *f(void)
-{
-  return strdup("try");
-}
-int main(int argc, char **argv) {
-  (void)f();
-  return 0;
-}
-HERE
-
-    if ( ($CC -c -o conftest.o -Wall -ansi -pedantic-errors -Werror conftest.c >/dev/null 2>&1) ); then
-      AC_MSG_RESULT([no])
-else
-  cat >conftest.c <<HERE
-  #define _BSD_SOURCE
-  #include <strings.h>
-  char *f(void)
-  {
-    return strdup("try");
-  }
-  int main(int argc, char **argv) {
-    (void)f();
-    return 0;
-  }
-HERE
-  if ( ($CC -c -o conftest.o -Wall -ansi -pedantic-errors -Werror conftest.c >/dev/null 2>&1) ); then
-  AC_MSG_RESULT([Needs something else. Let's try and hope])
-  else
-  AC_MSG_RESULT([yes])
-  AC_DEFINE(_BSD_SOURCE, 1, [needed to get ansi functions definitions])
-  fi
-fi
-rm -rf conftest*
-AC_LANG_POP(C)
-])
-
-AC_DEFUN([TEST_USE_POSIX],
-[
-    AC_MSG_CHECKING([wether _POSIX_SOURCE must be defined])
-
-    AC_LANG_PUSH(C)
-
-cat >conftest.c <<HERE
-#include <stdio.h>
-int f(void)
-{
-  return fileno(stderr);
-}
-int main(int argc, char **argv) {
-  (void)f();
-  return 0;
-}
-HERE
-if ( ($CC -c -o conftest.o -Wall -ansi -pedantic-errors -Werror conftest.c >/dev/null 2>&1) ); then
-AC_MSG_RESULT([no])
-else
-  cat >conftest.c <<HERE
-  #define _POSIX_SOURCE
-  #include <strings.h>
-  int f(void)
-  {
-    return fileno(stderr);
-  }
-  int main(int argc, char **argv) {
-    (void)f();
-    return 0;
-  }
-HERE
-  if ( ($CC -c -o conftest.o -Wall -ansi -pedantic-errors -Werror conftest.c >/dev/null 2>&1) ); then
-  AC_MSG_RESULT([Needs something else. Let's try and hope])
-  else
-  AC_MSG_RESULT([yes])
-  AC_DEFINE(_POSIX_SOURCE, 1, [needed to get ansi functions definitions])
-  fi
-fi
-rm -rf conftest*
-AC_LANG_POP(C)
-
-])
 
 AC_DEFUN([AC_TESTSUITE],
 [

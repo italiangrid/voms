@@ -1,0 +1,16 @@
+volumes:
+  trustanchors:
+  cabundle:
+
+services:
+  trust:
+    image: indigoiam/egi-trustanchors:igi-test-ca
+
+    volumes:
+      - trustanchors:/tmp/certificates
+      - cabundle:/tmp/pki
+
+    environment:
+      FORCE_TRUST_ANCHORS_UPDATE: 1
+      TRUST_ANCHORS_TARGET: /tmp/certificates
+      CA_BUNDLE_TARGET: /tmp/pki

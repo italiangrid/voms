@@ -6,7 +6,7 @@ EXTRA_DIST = autogen.sh LICENSE
 APIDOC_DIR = $(top_builddir)/doc/apidoc
 USERDOC_DIR = $(top_builddir)/doc/userdoc
 
-APIDOC_FILES = $(top_srcdir)/AUTHORS $(top_srcdir)/INSTALL $(top_srcdir)/LICENSE $(top_srcdir)/README
+APIDOC_FILES = $(top_srcdir)/AUTHORS $(top_srcdir)/LICENSE $(top_srcdir)/README
 USERDOC_FILES = $(APIDOC_FILES)
 
 spec=spec/voms-all.spec
