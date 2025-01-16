@@ -482,7 +482,7 @@ int writeac(X509 *issuerc, STACK_OF(X509) *issuerstack, X509 *holder, EVP_PKEY *
     md = EVP_sha1();
   }
 
-  ASN1_sign((int (*)())i2d_AC_INFO, a->acinfo->alg, a->sig_alg, a->signature,
+  ASN1_sign((i2d_of_void *)i2d_AC_INFO, a->acinfo->alg, a->sig_alg, a->signature,
 	    (char *)a->acinfo, pkey, md);
 
   *ac = a;

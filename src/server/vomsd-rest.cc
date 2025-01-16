@@ -44,18 +44,18 @@ extern "C" {
 #include "fqan.h"
 #include "data.h"
 
-static int (*pw_cb)() = NULL;
+static pem_password_cb *pw_cb = NULL;
 static bool makeACSSL(vomsresult &vr, SSL *ssl, const std::string& command, const std::string &orderstring, const std::string& targets, int requested, VOMSServer *v);
 static int makeACREST(struct soap *soap, const std::string& command, const std::string& orderstring, const std::string& targets, int requested, int unknown);
 int http_get(soap *soap);
-static int pwstdin_callback(char * buf, int num, UNUSED(int w));
+static int pwstdin_callback(char * buf, int num, UNUSED(int w), UNUSED(void *u));
 static bool get_parameter(char **path, char **name, char **value);
 
 extern VOMSServer *selfpointer;
 extern void *logh;
 extern char *maingroup;
 
-static int pwstdin_callback(char * buf, int num, UNUSED(int w)) 
+static int pwstdin_callback(char * buf, int num, UNUSED(int w), UNUSED(void *u))
 {
   int i;
   
@@ -82,7 +82,7 @@ makeACSSL(vomsresult &vr, SSL *ssl, const std::string& command, const std::strin
   X509 *realholder = get_real_cert(holder, chain);
   X509 *issuer = NULL;
   EVP_PKEY *key = NULL;
-  pw_cb =(int (*)())(pwstdin_callback);
+  pw_cb = pwstdin_callback;
   char *hostcert = (char*)"/etc/grid-security/hostcert.pem";
   char *hostkey  = (char*)"/etc/grid-security/hostkey.pem";
 

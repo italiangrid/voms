@@ -354,7 +354,7 @@ int proxy_load_user_cert_and_key_pkcs12(const char *user_cert,
                                         X509 **cert,
                                         STACK_OF(X509) **stack,
                                         EVP_PKEY **pkey,
-                                        int (*pw_cb) ());
+                                        pem_password_cb *pw_cb);
 
 int
 proxy_get_filenames(
@@ -369,7 +369,7 @@ int
 proxy_load_user_cert(
     const char *                        user_cert,
     X509 **                             certificate,
-    int                                 (*pw_cb)(),
+    pem_password_cb *                   pw_cb,
     unsigned long *                     hSession);
 
 int
@@ -377,7 +377,7 @@ proxy_load_user_key(
     EVP_PKEY **                         private_key,
     X509 * ucert,
     const char *                        user_key,
-    int                                 (*pw_cb)(),
+    pem_password_cb *                   pw_cb,
     unsigned long *                     hSession);
 
 void
@@ -514,7 +514,7 @@ int PRIVATE determine_filenames(char **cacert, char **certdir, char **outfile,
                                 char **certfile, char **keyfile, int noregen);
 int load_credentials(const char *certname, const char *keyname,
                              X509 **cert, STACK_OF(X509) **stack, EVP_PKEY **key,
-                             int (*callback)());
+                             pem_password_cb *callback);
 int PRIVATE load_certificate_from_file(FILE *file, X509 **cert, 
                                        STACK_OF(X509) **stack);
 
