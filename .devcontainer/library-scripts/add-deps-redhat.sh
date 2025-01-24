@@ -22,6 +22,7 @@ package_list="\
   openssl-devel \
   gsoap-devel \
   bison \
+  flex \
   gcc-c++"
 
 if ! type git > /dev/null 2>&1; then
