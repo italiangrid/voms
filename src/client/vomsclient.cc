@@ -100,10 +100,10 @@ bool dontverifyac = false;
 
 extern "C" {
   
-static int (*pw_cb)() = NULL;
+static pem_password_cb *pw_cb = NULL;
 
 
-static int pwstdin_callback(char * buf, int num, UNUSED(int w)) 
+static int pwstdin_callback(char * buf, int num, UNUSED(int w), UNUSED(void *u))
 {
   int i;
   
@@ -472,7 +472,7 @@ Client::Client(int argc, char ** argv) :
   /* allow password from stdin */
   
   if (pwstdin)
-    pw_cb = (int (*)())(pwstdin_callback);
+    pw_cb = pwstdin_callback;
 
 
   /* file used */
