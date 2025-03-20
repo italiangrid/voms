@@ -402,20 +402,13 @@ test_proxy()
       }
       chain = load_chain_from_file(of);
 
-
       vomsdata d("","");
-      if (!dont_verify_ac) {
-          d.SetVerificationType((verify_type)(VERIFY_SIGN | VERIFY_KEY));
-          res = d.Retrieve(x, chain, RECURSE_CHAIN);
-      }
-      if (dont_verify_ac || !res || d.error == VERR_NOEXT) {
-        d.data.clear();
+      if (dont_verify_ac) {
         d.SetVerificationType((verify_type)(VERIFY_NONE));
-        res = d.Retrieve(x, chain, RECURSE_CHAIN);
-        if ( dont_verify_ac || d.error == VERR_NOEXT ) {
-            res = true;
-        }
+      } else {
+        d.SetVerificationType((verify_type)(VERIFY_SIGN | VERIFY_KEY));
       }
+      res = d.Retrieve(x, chain, RECURSE_CHAIN) || dont_verify_ac || d.error == VERR_NOEXT;
 
       if (!res) {
         std::cerr << "WARNING: Unable to verify signature! Server certificate possibly not installed.\n" 
