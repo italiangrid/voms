@@ -72,6 +72,7 @@ extern int AC_Init(void);
 
 #include <string>
 #include "voms_api.h"
+#include "normalize.h"
 
 #include <vector>
 #include <iostream>
@@ -569,7 +570,9 @@ static bool print(X509 *cert, STACK_OF(X509) *chain, vomsdata &vd)
       std::cout << "=== VO " << v->voname << " extension information ===\n";
       std::cout << "VO        : " << v->voname << "\n";
       std::cout << "subject   : " << v->user << "\n";
-      std::cout << "issuer    : " << v->server << "\n";
+      char* server = normalize(v->server.c_str());
+      std::cout << "issuer    : " << server << "\n";
+      free(server);
 
       std::vector<std::string>::const_iterator send = v->fqan.end();
       for (std::vector<std::string>::const_iterator s = v->fqan.begin(); s != send; ++s)
