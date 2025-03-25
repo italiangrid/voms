@@ -29,7 +29,7 @@
 
 #include "doio.h"
 
-static char *change(const char *str, char *from, char *to)
+static char *change(const char *str, const char *from, const char *to)
 {
   char *copy = strdup(str);
 
@@ -62,5 +62,7 @@ char *normalize(const char *str)
   free(tmp);
   tmp  = change(tmp2, "/E=", "/Email=");
   free(tmp2);
-  return tmp;
+  tmp2 = change(tmp, "\\/", "/");
+  free(tmp);
+  return tmp2;
 }
