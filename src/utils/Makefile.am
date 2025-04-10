@@ -5,6 +5,12 @@ bin_PROGRAMS = \
 	voms-proxy-fake \
 	voms-verify
 
+AM_CPPFLAGS = \
+	-I$(top_srcdir)/src/api/ccapi \
+	-I$(top_srcdir)/src/include \
+	-I$(top_srcdir)/src/sslutils \
+	$(NO_GLOBUS_FLAGS) \
+	$(OPENSSL_CFLAGS)
 
 voms_proxy_info_SOURCES = \
 	voms_proxy_info.cc
@@ -61,11 +67,5 @@ voms_proxy_fake_LDADD = \
 	$(top_builddir)/src/replib/librep.la \
 	$(top_builddir)/src/sslutils/libssl_utils_nog.la \
 	$(OPENSSL_LIBS)
-
-AM_CPPFLAGS = \
-	-I$(top_srcdir)/src/api/ccapi \
-	-I$(top_srcdir)/src/include \
-	-I$(top_srcdir)/src/sslutils \
-	$(NO_GLOBUS_FLAGS)
 
 endif

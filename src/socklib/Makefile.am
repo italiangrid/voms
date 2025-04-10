@@ -14,7 +14,8 @@ libsock_nog_la_SOURCES = Client.cpp Server.cpp ipv6sock.cc io.cc
 libsock_nog_la_CXXFLAGS = \
 	$(NO_GLOBUS_FLAGS) \
 	-I $(top_srcdir)/src/include \
-	-I $(top_srcdir)/src/sslutils
+	-I $(top_srcdir)/src/sslutils \
+	$(OPENSSL_CFLAGS)
 
 libsock_nog_la_LIBADD = \
 	-lcrypto -lssl

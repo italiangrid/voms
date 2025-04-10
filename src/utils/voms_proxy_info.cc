@@ -72,6 +72,7 @@ extern int AC_Init(void);
 
 #include <string>
 #include "voms_api.h"
+#include "normalize.h"
 
 #include <vector>
 #include <iostream>
@@ -405,31 +406,28 @@ test_proxy()
 
       vomsdata d("","");
       if (!dont_verify_ac) {
-          d.SetVerificationType((verify_type)(VERIFY_SIGN | VERIFY_KEY));
-          res = d.Retrieve(x, chain, RECURSE_CHAIN);
-      }
-      if (dont_verify_ac || !res || d.error == VERR_NOEXT) {
-        d.data.clear();
-        d.SetVerificationType((verify_type)(VERIFY_NONE));
+        d.SetVerificationType(static_cast<verify_type>(VERIFY_SIGN | VERIFY_KEY));
         res = d.Retrieve(x, chain, RECURSE_CHAIN);
-        if ( dont_verify_ac || d.error == VERR_NOEXT ) {
-            res = true;
+        // no VOMS extension is not an error
+        if (d.error == VERR_NOEXT) {
+          res = true;
+        }
+        if (!res) {
+          std::cerr << "\nWARNING: " << d.ErrorMessage() << "\n\n";
+        }
+      }
+      if (dont_verify_ac || !res) {
+        d.data.clear();
+        d.SetVerificationType(VERIFY_NONE);
+        d.Retrieve(x, chain, RECURSE_CHAIN);
+        if (dont_verify_ac || d.error == VERR_NOEXT) {
+          res = true;
         }
       }
 
-      if (!res) {
-        std::cerr << "WARNING: Unable to verify signature! Server certificate possibly not installed.\n" 
-                  << "Error: " << d.ErrorMessage() << std::endl;
-
-      }
-
-      bool print_res = print(x, chain, d);
-      if (print_res == false) {
-          res = false;
-      }
-    }
-    else {
-      std::cerr << std::endl << "Couldn't find a valid proxy." << std::endl << std::endl;
+      res = print(x, chain, d) && res;
+    } else {
+      std::cerr << "\nCouldn't find a valid proxy.\n\n";
       goto err;
     }
   }
@@ -569,7 +567,9 @@ static bool print(X509 *cert, STACK_OF(X509) *chain, vomsdata &vd)
       std::cout << "=== VO " << v->voname << " extension information ===\n";
       std::cout << "VO        : " << v->voname << "\n";
       std::cout << "subject   : " << v->user << "\n";
-      std::cout << "issuer    : " << v->server << "\n";
+      char* server = normalize(v->server.c_str());
+      std::cout << "issuer    : " << server << "\n";
+      free(server);
 
       std::vector<std::string>::const_iterator send = v->fqan.end();
       for (std::vector<std::string>::const_iterator s = v->fqan.begin(); s != send; ++s)

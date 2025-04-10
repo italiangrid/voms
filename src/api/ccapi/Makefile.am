@@ -19,7 +19,8 @@ libvomsapi_la_CXXFLAGS = \
 	$(PTHREAD_CFLAGS) \
 	$(NO_GLOBUS_FLAGS) \
 	-DNOGLOBUS \
-	-I$(top_srcdir)/src/include
+	-I$(top_srcdir)/src/include \
+	$(OPENSSL_CFLAGS)
 
 libvomsapi_la_LDFLAGS = \
 	-rpath $(libdir) \

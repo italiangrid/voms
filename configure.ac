@@ -1,4 +1,4 @@
-AC_INIT([VOMS], [2.1.1])
+AC_INIT([VOMS], [2.1.2])
 AC_PREREQ(2.57)
 AC_CONFIG_AUX_DIR([./aux])
 AM_INIT_AUTOMAKE
@@ -34,19 +34,7 @@ AC_COMPILER
 AX_PTHREAD
 
 PKG_CHECK_MODULES([OPENSSL], [openssl], [AC_DEFINE([OPENSSL_API_COMPAT], [10100], [Build against OpenSSL 1.1 API])])
-
-AC_CHECK_HEADER([expat.h], 
-    [], 
-    [AC_MSG_ERROR("Could not find expat.h. Please install the expat development package.")],
-    [])
-
-AC_CHECK_LIB([expat],
-    [XML_ParserCreate],
-    [EXPAT_LIBS=-lexpat],
-    [AC_MSG_ERROR("Error checking libexpat. Please install the expat development package.")]
-    )
-
-AC_SUBST(EXPAT_LIBS)
+PKG_CHECK_MODULES([EXPAT],[expat])
 
 AC_ENABLE_DOCS
 

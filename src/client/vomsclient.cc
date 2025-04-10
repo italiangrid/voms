@@ -53,6 +53,7 @@ extern "C" {
 #include <sstream>
 #include <algorithm>
 #include <string>
+#include <random>
 
 #include "options.h"
 #include "vomsxml.h"
@@ -99,10 +100,10 @@ bool dontverifyac = false;
 
 extern "C" {
   
-static int (*pw_cb)() = NULL;
+static pem_password_cb *pw_cb = NULL;
 
 
-static int pwstdin_callback(char * buf, int num, UNUSED(int w)) 
+static int pwstdin_callback(char * buf, int num, UNUSED(int w), UNUSED(void *u))
 {
   int i;
   
@@ -137,24 +138,6 @@ static void kpcallback(int p, UNUSED(int n), UNUSED(void* v))
 extern int proxy_verify_cert_chain(X509 * ucert, STACK_OF(X509) * cert_chain, proxy_verify_desc * pvd);
 extern void proxy_verify_ctx_init(proxy_verify_ctx_desc * pvxd);
 }
-
-
-class rand_wrapper 
-{
-
-public:
-  
-  rand_wrapper(unsigned int seed)
-  {
-    srand(seed);
-  }
-
-  UNUSED(ptrdiff_t operator() (ptrdiff_t max))
-  {
-    return static_cast<ptrdiff_t>(rand() % max);
-  }
-
-};
 
 Client::Client(int argc, char ** argv) :
                                          ignorewarn(false),
@@ -489,7 +472,7 @@ Client::Client(int argc, char ** argv) :
   /* allow password from stdin */
   
   if (pwstdin)
-    pw_cb = (int (*)())(pwstdin_callback);
+    pw_cb = pwstdin_callback;
 
 
   /* file used */
@@ -649,10 +632,8 @@ int Client::Run()
     /* find servers for that vo */
     std::vector<contactdata> servers;
     servers = v->FindByAlias(contact.nick());
-    rand_wrapper rd(time(0));
-    random_shuffle(servers.begin(), 
-                   servers.end(),
-                   rd);
+    std::default_random_engine rd{std::random_device{}()};
+    std::shuffle(servers.begin(), servers.end(), rd);
 
     std::string vo = (contact.vo().empty() ? servers[0].vo : contact.vo());
 
