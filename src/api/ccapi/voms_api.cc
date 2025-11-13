@@ -291,6 +291,7 @@ bool vomsdata::ContactRaw(std::string hostname, int port, std::string servsubjec
   if (ret
       || serverrors.find("User unknown to this VO") != std::string::npos
       || serverrors.find("suspended") != std::string::npos
+      || serverrors.find("needs to sign AUP") != std::string::npos
       || serverrors.find("not active") != std::string::npos)
     return ret;
 
