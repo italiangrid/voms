@@ -32,7 +32,7 @@ jobs:
       - name: Install packages
         run: |
           apt update
-          apt install -y make automake libtool pkg-config g++ libssl-dev libgsoap-dev gsoap libexpat-dev
+          DEBIAN_FRONTEND=noninteractive apt install -y make automake libtool pkg-config g++ libssl-dev libgsoap-dev gsoap libexpat-dev
 
       - name: Build
         run: |
