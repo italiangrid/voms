@@ -54,6 +54,8 @@ extern "C" {
 #include <algorithm>
 #include <string>
 #include <random>
+#include <iomanip>
+#include <cassert>
 
 #include "options.h"
 #include "vomsxml.h"
@@ -682,7 +684,7 @@ int Client::Run()
       }
       
       /* contact server */
-      Print(INFO) << "Contacting " << " " << beg->host << ":" << beg->port
+      Print(INFO) << "Contacting " << beg->host << ":" << beg->port
                   << " [" << beg->contact << "] \"" << beg->vo << "\"" << std::flush;
 
       int status = v->ContactRaw(beg->host, beg->port, beg->contact, command, buffer, version, timeout);
@@ -799,12 +801,7 @@ int Client::Run()
   else {
     setenv("X509_USER_PROXY", oldenv, 1);
   }
-  
-  /* assure user certificate is not expired or going to, else advise but still create proxy */
-  
-  if (Test())
-    return 1;
-  
+ 
   return Verify();
 
  err:
@@ -815,6 +812,28 @@ int Client::Run()
 
  err2:
   return 1;
+}
+
+namespace {
+
+// generate a string possibly in local time, with TZ indication
+std::string to_string(const ASN1_TIME *time)
+{
+  assert(time != nullptr);
+
+  tm tm_utc;
+  ASN1_TIME_to_tm(time, &tm_utc);
+  std::ostringstream os;
+#ifdef HAVE_TIMEGM
+  time_t t_utc = timegm(&tm_utc);
+  tm *tm_ptr = localtime(&t_utc);
+  os << std::put_time(tm_ptr, "%c %Z");
+#else
+  os << std::put_time(&tm_utc, "%c GMT");
+#endif
+  return os.str();
+}
+
 }
 
 bool Client::CreateProxy(std::string data, AC ** aclist, int version) 
@@ -867,10 +886,18 @@ bool Client::CreateProxy(std::string data, AC ** aclist, int version)
       if (ret == -1) 
         Print(ERROR) << "\nERROR: Cannot write proxy to: " << proxyfile << std::endl << std::flush;
     }
-    
 
-    if (ret != -1)
+    if (ret != -1) {
       Print(INFO) << " Done" << std::endl << std::flush;
+      // for the actual proxy containing the AC or for a plain Grid proxy
+      // print also the validity
+      if (aclist != nullptr || vomses.empty())
+      {
+        Print(INFO) << "\nCreated proxy in " << proxyfile
+                    << ".\n\nYour proxy is valid until "
+                    << to_string(X509_get0_notAfter(proxy->cert)) << '\n';
+      }
+    }
 
     VOMS_FreeProxy(proxy);
     free(args->proxyfilename);
@@ -1018,36 +1045,6 @@ int Client::Verify()
 
 bool Client::Test() 
 {
-  ASN1_UTCTIME * asn1_time = ASN1_UTCTIME_new();
-  X509_gmtime_adj(asn1_time, 0);
-  time_t time_now = ASN1_UTCTIME_mktime(asn1_time);
-  ASN1_UTCTIME_free(asn1_time);
-  time_t time_after = ASN1_UTCTIME_mktime(X509_get_notAfter(ucert));
-  time_t time_diff = time_after - time_now ;
-  int length  = hours*60*60 + minutes*60;
-
-  if (time_diff < 0) {
-    Print(WARN) << std::endl << "ERROR: Your certificate expired "
-                << asctime(localtime(&time_after)) << std::endl;
-    
-    return true;
-  } 
-  
-  if (hours && time_diff < length) {
-    Print(WARN) << std::endl << "Warning: your certificate and proxy will expire "
-                << asctime(localtime(&time_after))
-                << "which is within the requested lifetime of the proxy"
-                << std::endl;
-    return false;
-  }
-  
-  if (!quiet) {
-    time_t time_after_proxy;
-    time_after_proxy = time_now + length;
-    
-    Print(INFO) << "Your proxy is valid until "
-                << asctime(localtime(&time_after_proxy)) << std::flush;
-  }
 
   return false;
 }
@@ -1098,6 +1095,39 @@ bool Client::checkstats(char *file, int mode)
   return true;
 }
 
+static bool check_validity_dates(X509 const* cert, int& time_left, std::string& error)
+{
+  assert(cert != nullptr);
+
+  time_left = 0;
+  error.clear();
+
+  ASN1_TIME const* not_before = X509_get0_notBefore(cert);
+  ASN1_TIME const* not_after = X509_get0_notAfter(cert);
+  int start_cmp = X509_cmp_current_time(not_before);
+  int end_cmp = X509_cmp_current_time(not_after);
+
+  if (start_cmp == 0 || end_cmp == 0) {
+    error = "Cannot check validity of certificate dates";
+    return false;
+  }
+
+  if (start_cmp > 0) {
+    error = "Certificate is not yet valid; validity starts on " + to_string(not_before);
+    return false;
+  }
+
+  int days{0}, secs{0};
+  ASN1_TIME_diff(&days, &secs, nullptr, not_after);
+  time_left = days * 24 * 60 * 60 + secs;
+
+  if (end_cmp < 0) {
+    error = "Certificate has expired on " + to_string(not_after);
+    return false;
+  }
+
+  return true;
+}
 
 bool Client::pcdInit() 
 {
@@ -1109,26 +1139,30 @@ bool Client::pcdInit()
   OpenSSL_add_all_ciphers();
   PKCS12_PBE_add();
   
-  if (!determine_filenames(&cacertfile, &certdir, &outfile, &certfile, &keyfile, noregen ? 1 : 0))
-    goto err;
+  if (!determine_filenames(&cacertfile, &certdir, &outfile, &certfile, &keyfile, noregen ? 1 : 0)) {
+    Error();
+    return false;
+  }
 
   if (!certfile){
-    Print(ERROR) << "ERROR: Coudln't find valid credentials to generate a proxy." << std::endl;
-    goto err;
+    Print(ERROR) << "ERROR: Couldn't find valid credentials to generate a proxy." << std::endl;
+    Error();
+    return false;
   }
 
 
-  if (certfile == keyfile) 
+  if (certfile == keyfile) {
     keyfile = strdup(certfile);
+  }
 
   if (!noregen) {
-    if (certfile)
+    if (certfile) {
       setenv("X509_USER_CERT", certfile, 1);
-
-    if (keyfile)
+    }
+    if (keyfile) {
       setenv("X509_USER_KEY", keyfile, 1);
-  }
-  else {
+    }
+  } else {
     if (outfile) {
       setenv("X509_USER_CERT", outfile, 1);
       setenv("X509_USER_KEY", outfile, 1);
@@ -1139,8 +1173,10 @@ bool Client::pcdInit()
 
   if (!checkstats(certfile, S_IXUSR | S_IWGRP | S_IXGRP | S_IWOTH | S_IXOTH) ||
       !checkstats(keyfile, S_IXUSR | S_IRGRP | S_IWGRP | S_IXGRP | S_IRGRP |
-                  S_IWOTH | S_IXOTH))
-    exit(1);
+                  S_IWOTH | S_IXOTH)) {
+    Error();
+    return false;
+  }
   
   Print(DEBUG) << "Files being used:" << std::endl 
                << " CA certificate file: " << (cacertfile ? cacertfile : "none") << std::endl
@@ -1150,22 +1186,30 @@ bool Client::pcdInit()
                << " User key file: " << (keyfile ? keyfile : "none") << std::endl
                << "Output to " << outfile << std::endl;
 
-  if (!load_credentials(certfile, keyfile, &ucert, &cert_chain, &private_key, pw_cb))
-    goto err;
+  if (!load_credentials(certfile, keyfile, &ucert, &cert_chain, &private_key, pw_cb)) {
+    Error();
+    return false;
+  }
 
   if (!quiet) {
-    char * s = NULL;
-    s = X509_NAME_oneline(X509_get_subject_name(ucert),NULL,0);
+    char* s = X509_NAME_oneline(X509_get_subject_name(ucert),NULL,0);
     Print(INFO) << "Your identity: " << s << std::endl;
     OPENSSL_free(s);
   }
 
-  status = true;
-  
- err:
-  Error();
-  return status;
-  
+  int time_left;
+  std::string error;
+  if (!check_validity_dates(ucert, time_left, error)) {
+    Print(ERROR) << "\nERROR: " << error << "\n\n";
+    Error();
+    return false;
+  }
+
+  if (time_left < hours * 60 * 60 + minutes * 60) {
+    Print(WARN) << "\nWARNING: proxy lifetime limited to issuing credential lifetime\n";
+  }
+
+  return true;
 }
 
 void Client::Error() 
