@@ -56,6 +56,7 @@ extern "C" {
 #include <random>
 #include <iomanip>
 #include <cassert>
+#include <memory>
 
 #include "options.h"
 #include "vomsxml.h"
@@ -461,7 +462,7 @@ Client::Client(int argc, char ** argv) :
     exit(1);
   }
 
-  Print(DEBUG) << "Number of bits in key :" << bits << std::endl; 
+  Print(DEBUG) << "Number of bits in key: " << bits << std::endl; 
   
   /* parse valid options */
 
@@ -673,8 +674,6 @@ int Client::Run()
 
       /* create a temporary proxy to contact the server */  
       if (!noregen) {
-        Print(INFO) << "Creating temporary proxy " << std::flush;
-        Print(DEBUG) << "to " << proxyfile << " " << std::flush;
 
         int tmp = hours;
         hours = 1;
@@ -685,7 +684,7 @@ int Client::Run()
       
       /* contact server */
       Print(INFO) << "Contacting " << beg->host << ":" << beg->port
-                  << " [" << beg->contact << "] \"" << beg->vo << "\"" << std::flush;
+                  << " [" << beg->contact << "] \"" << beg->vo << "\"..." << std::flush;
 
       int status = v->ContactRaw(beg->host, beg->port, beg->contact, command, buffer, version, timeout);
 
@@ -733,7 +732,7 @@ int Client::Run()
         Print(INFO) << std::endl << "Trying next server for " << beg->nick << "." << std::endl;
       }
       else {
-        Print(ERROR) << std::endl << "None of the contacted servers for " << beg->vo << " were capable\nof returning a valid AC for the user." << std::endl;
+        Print(ERROR) << "\nNone of the contacted servers for " << beg->vo << " were capable of returning a valid AC for the user.\n";
         if (!noregen) 
           unlink(proxyfile.c_str());
         return 1;
@@ -780,19 +779,12 @@ int Client::Run()
   }
   
   /* create a proxy containing the data retrieved from VOMS servers */
-  
-  Print(INFO)  << "Creating proxy " << std::flush; 
-  Print(DEBUG) << "to " << proxyfile << " " << std::flush;
 
   if (CreateProxy(data, aclist, proxyver)) {
     goto err2;
   }
-  //  else  {
-    //    free(aclist);
-    //    aclist = NULL;
-  //  }
   
-  Print(INFO) << "\n" << std::flush;
+  Print(INFO) << '\n';
 
   /* unset environment */
   
@@ -816,7 +808,7 @@ int Client::Run()
 
 namespace {
 
-// generate a string possibly in local time, with TZ indication
+// generate a string preferably in local time, with TZ indication
 std::string to_string(const ASN1_TIME *time)
 {
   assert(time != nullptr);
@@ -838,8 +830,22 @@ std::string to_string(const ASN1_TIME *time)
 
 bool Client::CreateProxy(std::string data, AC ** aclist, int version) 
 {
-  struct VOMSProxyArguments *args = VOMS_MakeProxyArguments();
-  int ret = 0;
+  using ArgsPtr = std::unique_ptr<VOMSProxyArguments, void (*)(VOMSProxyArguments *)>;
+  ArgsPtr args{
+      VOMS_MakeProxyArguments(),
+      [](VOMSProxyArguments* args)
+      {
+        free(args->proxyfilename);
+        free(args->policyfile);
+        free(args->policylang);
+        free(args->voID);
+        free(args->filename);
+
+        VOMS_FreeProxyArguments(args);
+      }
+  };
+
+  int ret = -1;
 
   if (args) {
     args->proxyfilename = strdup(proxyfile.c_str());
@@ -867,13 +873,20 @@ bool Client::CreateProxy(std::string data, AC ** aclist, int version)
     args->limited       = limit_proxy;
 
     args->voID          = strdup(voID.c_str());
-    args->callback      = kpcallback;
     int warn = 0;
     void *additional = NULL;
 
-    struct VOMSProxy *proxy = VOMS_MakeProxy(args, &warn, &additional);
+    // we are creating a temporary proxy if there is no AC or
+    // if this is a plain Grid proxy (i.e. there was no -voms)
+    bool const temporary = aclist == nullptr && !vomses.empty();
+    Print(DEBUG) << "Creating" << (temporary ? " temporary " : " ")
+                 << "proxy in " << proxyfile << "... " << std::flush;
 
-    PrintProxyCreationError(warn, additional);
+    using ProxyPtr = std::unique_ptr<VOMSProxy, void(*)(VOMSProxy*)>;
+    ProxyPtr proxy{
+      VOMS_MakeProxy(args.get(), &warn, &additional),
+      [](VOMSProxy* p) { VOMS_FreeProxy(p); }
+    };
 
     if (proxy) {
       /* In case of success, OpenSSL routines have already automagically 
@@ -882,31 +895,25 @@ bool Client::CreateProxy(std::string data, AC ** aclist, int version)
         free(args->aclist);
         this->aclist = NULL;
       }
-      ret = VOMS_WriteProxy(proxyfile.c_str(), proxy);
-      if (ret == -1) 
-        Print(ERROR) << "\nERROR: Cannot write proxy to: " << proxyfile << std::endl << std::flush;
-    }
+      ret = VOMS_WriteProxy(proxyfile.c_str(), proxy.get());
+      if (ret == -1) {
+        Print(DEBUG) << "Failed\n";
+        PrintProxyCreationError(warn, additional);
+      } else {
+        Print(DEBUG) << "Done\n";
+        PrintProxyCreationError(warn, additional);
 
-    if (ret != -1) {
-      Print(INFO) << " Done" << std::endl << std::flush;
-      // for the actual proxy containing the AC or for a plain Grid proxy
-      // print also the validity
-      if (aclist != nullptr || vomses.empty())
-      {
-        Print(INFO) << "\nCreated proxy in " << proxyfile
-                    << ".\n\nYour proxy is valid until "
-                    << to_string(X509_get0_notAfter(proxy->cert)) << '\n';
+        if (!temporary)
+        {
+          Print(INFO) << "\nCreated proxy in " << proxyfile
+                      << ".\n\nYour proxy is valid until "
+                      << to_string(X509_get0_notAfter(proxy->cert)) << '\n';
+        }
       }
+    } else {
+      Print(DEBUG) << "Failed\n";
+      Print(ERROR) << OpenSSLError(true) << '\n';
     }
-
-    VOMS_FreeProxy(proxy);
-    free(args->proxyfilename);
-    free(args->policyfile);
-    free(args->policylang);
-    free(args->voID);
-    free(args->filename);
-
-    VOMS_FreeProxyArguments(args);
   }
 
   return ret == -1;
@@ -918,9 +925,9 @@ void Client::PrintProxyCreationError(int error, void *additional)
 
   if (msg) {
     if (PROXY_ERROR_IS_WARNING(error))
-      Print(DEBUG) << msg;
+      Print(DEBUG) << msg << '\n';
     else
-      Print(ERROR) << msg;
+      Print(ERROR) << msg << '\n';
     free(msg);
   }
 }
@@ -1180,11 +1187,10 @@ bool Client::pcdInit()
   
   Print(DEBUG) << "Files being used:" << std::endl 
                << " CA certificate file: " << (cacertfile ? cacertfile : "none") << std::endl
-               << " Trusted certificates directory : " << (certdir ? certdir : "none") << std::endl
-               << " Proxy certificate file : " << (outfile ? outfile : "none") << std::endl
+               << " Trusted certificates directory: " << (certdir ? certdir : "none") << std::endl
+               << " Proxy certificate file: " << (outfile ? outfile : "none") << std::endl
                << " User certificate file: " << (certfile ? certfile : "none") << std::endl
-               << " User key file: " << (keyfile ? keyfile : "none") << std::endl
-               << "Output to " << outfile << std::endl;
+               << " User key file: " << (keyfile ? keyfile : "none") << std::endl;
 
   if (!load_credentials(certfile, keyfile, &ucert, &cert_chain, &private_key, pw_cb)) {
     Error();
