@@ -1,12 +1,12 @@
-Name: voms
-Version: 2.1.2
-Release: 0%{?dist}
-Summary: The Virtual Organisation Membership Service C++ APIs
+Name:     voms
+Version:  2.1.3
+Release:  1%{?dist}
+Summary:  Virtual Organization Membership Service
 
-Group:          System Environment/Libraries
-License:        ASL 2.0
-URL: https://twiki.cnaf.infn.it/twiki/bin/view/VOMS
-Source: %{name}-%{version}.tar.gz
+Group:    System Environment/Libraries
+License:  Apache-2.0
+URL:      https://italiangrid.github.io/voms/
+Source:   %{name}-%{version}.tar.gz
 
 BuildRequires: libtool
 BuildRequires: expat-devel
@@ -22,8 +22,6 @@ Requires: expat
 Requires: openssl
 
 BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
-
-Packager: Andrea Ceccanti <andrea.ceccanti@cnaf.infn.it>
 
 %description
 The Virtual Organization Membership Service (VOMS) is an attribute authority
@@ -290,6 +288,10 @@ fi
 %{_mandir}/man8/voms.8*
 
 %changelog
+* Thu Nov 27 2025 Francesco Giacomini <francesco.giacomini@cnaf.infn.it> - 2.1.3-1
+- Update to version 2.1.3
+- Update general metadata
+
 * Thu Mar 27 2025 Francesco Giacomini <francesco.giacomini@cnaf.infn.it> - 2.1.2-0
 - Packaging for 2.1.0
 
