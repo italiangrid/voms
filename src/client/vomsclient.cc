@@ -899,6 +899,10 @@ bool Client::CreateProxy(std::string data, AC ** aclist, int version)
       if (ret == -1) {
         Print(DEBUG) << "Failed\n";
         PrintProxyCreationError(warn, additional);
+        if (!temporary)
+        {
+          Print(ERROR) << "\nERROR: Cannot write proxy to: " << proxyfile << '\n';
+        }
       } else {
         Print(DEBUG) << "Done\n";
         PrintProxyCreationError(warn, additional);
