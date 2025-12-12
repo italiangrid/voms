@@ -412,22 +412,15 @@ bool vomsdata::ContactRESTRaw(const std::string& hostname, int port, const std::
 
   // std::cerr << '\n' << realCommand << '\n' << output << '\n';
 
-  bool ret = false;
-
-  if (res) {
-    std::string::size_type pos = output.find("<?xml");
-
-    if (pos != std::string::npos)
-      ret = InterpretOutput(output.substr(pos), raw);
-
-    if (ret) 
-      if (!(output.substr(0,12) == "HTTP/1.1 200"))
-        return false;
-    
-    return ret;
+  if (!res) {
+    return false;
   }
 
-  return ret;
+  if (auto pos = output.find("<?xml"); pos != std::string::npos) {
+    return InterpretOutput(output.substr(pos), raw);
+  }
+
+  return false;
 }
 
 bool vomsdata::Contact(std::string hostname, int port, std::string servsubject, std::string command) {
