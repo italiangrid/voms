@@ -1,0 +1,126 @@
+# SPDX-FileCopyrightText: 2014 Istituto Nazionale di Fisica Nucleare
+#
+# SPDX-License-Identifier: Apache-2.0
+
+name: Build RPM
+on: push
+
+jobs:
+  build-rpm:
+    if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name != github.event.pull_request.base.repo.full_name
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [almalinux]
+        version: [8, 9, 10]
+    outputs:
+      repo: ${{ steps.info.outputs.repo }}
+      version: ${{ steps.info.outputs.version }}
+    runs-on: ubuntu-latest
+    container: '${{ matrix.os }}:${{ matrix.version }}'
+    steps:
+      - name: Install dependencies
+        run: |
+          dnf upgrade -y
+          dnf install -y epel-release
+          [[ "${{ matrix.version }}" = 8 ]] && dnf config-manager --set-enabled powertools
+          [[ "${{ matrix.version }}" = 9 ]] && dnf config-manager --set-enabled crb
+          [[ "${{ matrix.version }}" = 10 ]] && dnf install -y almalinux-release-devel
+          dnf install -y bison docbook-style-xsl doxygen expat-devel gcc-c++ git gsoap-devel libtool libxslt make openssl-devel pkgconfig pkgconfig rpm-sign rpmdevtools rpmlint
+      - name: Setup build tree
+        run: |
+          echo "%_topdir $(pwd)/rpmbuild" >> ~/.rpmmacros
+          rpmdev-setuptree
+      - uses: actions/checkout@v6
+        with:
+          path: 'rpmbuild/BUILD'
+          fetch-depth: 0
+      - name: Calculate version and repo
+        id: info
+        run: |
+          cd rpmbuild/BUILD
+          if [[ ${{ github.ref_type }} = 'tag' ]]; then
+            # In case is a tag, check if the tag matches v<x>.<y>.<z>(-[0-9A-Za-z-]+)?
+            if [[ ${GITHUB_REF_NAME} =~ ^v([0-9]+\.[0-9]+\.[0-9]+)(-[[:alnum:]-]+)?$ ]]; then
+              if [[ -z ${BASH_REMATCH[2]} ]]; then
+                REPO='stable'
+                VERSION="${BASH_REMATCH[1]}"
+              else
+                # If the tag includes a "-" is a beta, substitute the first "-" with "~" and any other ones with "_"
+                REPO='beta'
+                PRERELEASE=$(echo ${BASH_REMATCH[2]:1} | sed 's/-/_/g')
+                VERSION="${BASH_REMATCH[1]}~${PRERELEASE}"
+              fi
+            fi
+          else
+            # Use the output of "git describe" to create version dropping the leading "v" and substituting:
+            # - the last "-" with "."
+            # - the now last "-" with "^"
+            # - the first remaining "-" (if any) with "~"
+            # - all possible remaining "-" with "_"
+            VERSION=$(git describe --tags --long | sed 's/^v//' | sed -r 's/(.*)-/\1./' | sed -r 's/(.*)-/\1^/' | sed 's/-/~/' | sed 's/-/_/g')
+            if [[ ${GITHUB_REF_NAME} = ${{ github.event.repository.default_branch }} ]]; then
+              REPO='nightly'
+            fi
+          fi
+          echo "REPO=${REPO}" >> "${GITHUB_ENV}"
+          echo "repo=${REPO}" >> "${GITHUB_OUTPUT}"
+          echo "VERSION=${VERSION}" >> "${GITHUB_ENV}"
+          echo "version=${VERSION}" >> "${GITHUB_OUTPUT}"
+          echo "Version: ${VERSION}"
+          echo "Repo: ${REPO:-none}"
+      - name: Import GPG key
+        if: ${{ matrix.version != 8 }}
+        env:
+          MAVEN_GPG_KEY: ${{ secrets.MAVEN_GPG_KEY }}
+          MAVEN_GPG_PASSPHRASE: ${{ secrets.MAVEN_GPG_PASSPHRASE }}
+        run: |
+          echo "${MAVEN_GPG_KEY}" > private-key.asc
+          gpg --batch --import-options import-show --import private-key.asc
+          rm private-key.asc
+          gpg --export -a CNAFSD > RPM-GPG-KEY-pmanager
+          rpm --import RPM-GPG-KEY-pmanager
+          echo "%_gpg_name CNAFSD" >> ~/.rpmmacros
+          echo "%_gpg_sign_cmd_extra_args --pinentry-mode loopback --passphrase ${MAVEN_GPG_PASSPHRASE}" >> ~/.rpmmacros
+      - name: Build RPM
+        run: |
+          cp rpmbuild/BUILD/voms.spec rpmbuild/SPECS/voms.spec
+          rpmlint rpmbuild/SPECS/voms.spec
+          rpmbuild --define "base_version ${VERSION}" -ba rpmbuild/SPECS/voms.spec
+          if [[ "${{ matrix.version }}" = 8 ]]; then
+            echo "Skip signing on AlmaLinux 8 to avoid error: RPM-GPG-KEY-pmanager: key 1 import failed"
+            exit 0
+          fi
+          GPG_TTY="" rpm --addsign rpmbuild/RPMS/noarch/*.rpm
+      - uses: actions/upload-artifact@v5
+        with:
+          name: build-rpm-${{ matrix.os }}-${{ matrix.version }}
+          path: |
+            rpmbuild/RPMS/**/*.rpm
+      - name: Upload release to repo
+        if: env.REPO != ''
+        env:
+          NEXUS_PASSWORD: ${{ secrets.NEXUS_PASSWORD }}
+        run: |
+          for file in rpmbuild/RPMS/*/*.rpm; do
+            curl --fail --user "${{ vars.NEXUS_USERNAME }}:${NEXUS_PASSWORD}" --upload-file "${file}" https://repo.cloud.cnaf.infn.it/repository/voms-rpm-${REPO}/redhat${{ matrix.version }}/
+          done
+  create-release:
+    needs: build-rpm
+    runs-on: ubuntu-latest
+    env:
+      GH_TOKEN: ${{ github.token }}
+      VERSION: ${{ needs.build-rpm.outputs.version }}
+    if: needs.build-rpm.outputs.repo == 'stable'
+    steps:
+      - name: Check out repository code
+        uses: actions/checkout@v6
+      - uses: actions/download-artifact@v6
+      - name: Create release
+        run: |
+          # Get from the changelog file only the part related to the tagged release, in particular:
+          # - Delete lines up to the one beginning with "## <x>.<y>.<z>" (inclusive)
+          # - Delete lines from the next one beginning with "## " until the end of the file
+          # - Change all the "### " to "## " to use heading level 2 instead of level 3
+          sed -e "1,/^## ${VERSION}/d;/^## /,\$d;s/^### /## /g" CHANGELOG.md > RELEASE-CHANGELOG.md
+          gh release create v${VERSION} --title "VOMS Server, C/C++ APIs and Clients ${VERSION}" --notes-file RELEASE-CHANGELOG.md build-*/*

@@ -1,13 +1,17 @@
+# Remember to define the base_version macro
+%{!?base_version: %global base_version 0.0.0}
+
 Name:     voms
-Version:  2.1.3
+Version:  %{base_version}
 Release:  1%{?dist}
 Summary:  Virtual Organization Membership Service
 
 Group:    System Environment/Libraries
 License:  Apache-2.0
 URL:      https://italiangrid.github.io/voms/
-Source:   %{name}-%{version}.tar.gz
 
+BuildRequires: make
+BuildRequires: gcc-c++
 BuildRequires: libtool
 BuildRequires: expat-devel
 BuildRequires: pkgconfig
@@ -21,8 +25,6 @@ BuildRequires: bison
 Requires: expat
 Requires: openssl
 
-BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
-
 %description
 The Virtual Organization Membership Service (VOMS) is an attribute authority
 which serves as central repository for VO user authorization information,
@@ -35,11 +37,11 @@ This package provides libraries that applications using the VOMS functionality
 will bind to.
 
 %package devel
-Summary:	Virtual Organization Membership Service Development Files
-Group:		Development/Libraries
-Requires:	%{name}%{?_isa} = %{version}-%{release}
-Requires:	openssl-devel%{?_isa}
-Requires:	automake
+Summary: Virtual Organization Membership Service Development Files
+Group: Development/Libraries
+Requires: %{name}%{?_isa} = %{version}-%{release}
+Requires: openssl-devel%{?_isa}
+Requires: automake
 
 %description devel
 The Virtual Organization Membership Service (VOMS) is an attribute authority
@@ -52,21 +54,21 @@ authorization purposes.
 This package provides header files for programming with the VOMS libraries.
 
 %package doc
-Summary:	Virtual Organization Membership Service Documentation
-Group:		Documentation
+Summary: Virtual Organization Membership Service Documentation
+Group: Documentation
 %if %{?fedora}%{!?fedora:0} >= 10 || %{?rhel}%{!?rhel:0} >= 6
-BuildArch:	noarch
+BuildArch: noarch
 %endif
-Requires:	%{name} = %{version}-%{release}
+Requires: %{name} = %{version}-%{release}
 
 %description doc
 Documentation for the Virtual Organization Membership Service.
 
 %package clients
-Summary:	Virtual Organization Membership Service Clients
-Group:		Applications/Internet
+Summary: Virtual Organization Membership Service Clients
+Group: Applications/Internet
 
-Requires:	%{name}%{?_isa} = %{version}-%{release}
+Requires: %{name}%{?_isa} = %{version}-%{release}
 Conflicts: voms-clients3 <= 3.0.4
 
 Requires(post):         %{_sbindir}/update-alternatives
@@ -84,16 +86,16 @@ This package provides command line applications to access the VOMS
 services.
 
 %package server
-Summary:	Virtual Organization Membership Service Server
-Group:		Applications/Internet
-Requires:	%{name}%{?_isa} = %{version}-%{release}
-Requires:	gsoap
+Summary: Virtual Organization Membership Service Server
+Group: Applications/Internet
+Requires: %{name}%{?_isa} = %{version}-%{release}
+Requires: gsoap
 
-Requires(pre):		shadow-utils
-Requires(post):		chkconfig
-Requires(preun):	chkconfig
-Requires(preun):	initscripts
-Requires(postun):	initscripts
+Requires(pre): shadow-utils
+Requires(post): chkconfig
+Requires(preun): chkconfig
+Requires(preun): initscripts
+Requires(postun): initscripts
 
 %description server
 The Virtual Organization Membership Service (VOMS) is an attribute authority
@@ -106,7 +108,6 @@ authorization purposes.
 This package provides the VOMS service.
 
 %prep
-%setup -q
 
 # Fix bad permissions (which otherwise end up in the debuginfo package)
 find . '(' -name '*.h' -o -name '*.c' -o -name '*.cpp' -o \
@@ -137,12 +138,12 @@ install -m 644 -p LICENSE AUTHORS $RPM_BUILD_ROOT%{_docdir}/%{name}-%{version}
 ## C API documentation
 mkdir -p $RPM_BUILD_ROOT%{_docdir}/%{name}-%{version}/VOMS_C_API
 cp -pr  doc/apidoc/api/VOMS_C_API/html \
-	$RPM_BUILD_ROOT%{_docdir}/%{name}-%{version}/VOMS_C_API
+    $RPM_BUILD_ROOT%{_docdir}/%{name}-%{version}/VOMS_C_API
 rm -f $RPM_BUILD_ROOT%{_docdir}/%{name}-%{version}/VOMS_C_API/html/installdox
 
 mkdir -p $RPM_BUILD_ROOT%{_docdir}/%{name}-%{version}/VOMS_CC_API
 cp -pr  doc/apidoc/api/VOMS_CC_API/html \
-	$RPM_BUILD_ROOT%{_docdir}/%{name}-%{version}/VOMS_CC_API
+    $RPM_BUILD_ROOT%{_docdir}/%{name}-%{version}/VOMS_CC_API
 rm -f $RPM_BUILD_ROOT%{_docdir}/%{name}-%{version}/VOMS_CC_API/html/installdox
 
 for b in voms-proxy-init voms-proxy-info voms-proxy-destroy; do
@@ -155,10 +156,6 @@ for b in voms-proxy-init voms-proxy-info voms-proxy-destroy; do
   # Needed by alternatives. See http://fedoraproject.org/wiki/Packaging:Alternatives
   touch $RPM_BUILD_ROOT/%{_bindir}/${b}
 done
-
-%clean
-
-rm -rf $RPM_BUILD_ROOT
 
 %post -p /sbin/ldconfig
 %postun -p /sbin/ldconfig
@@ -288,41 +285,3 @@ fi
 %{_mandir}/man8/voms.8*
 
 %changelog
-* Thu Nov 27 2025 Francesco Giacomini <francesco.giacomini@cnaf.infn.it> - 2.1.3-1
-- Update to version 2.1.3
-- Update general metadata
-
-* Thu Mar 27 2025 Francesco Giacomini <francesco.giacomini@cnaf.infn.it> - 2.1.2-0
-- Packaging for 2.1.0
-
-* Tue Aug 23 2016 Andrea Ceccanti <andrea.ceccanti at cnaf.infn.it> - 2.1.0-0
-- Packaging for 2.1.0
-
-* Tue Aug 23 2016 Andrea Ceccanti <andrea.ceccanti at cnaf.infn.it> - 2.0.14-0
-- Packaging for 2.0.14
-
-* Mon Nov 9 2015 Andrea Ceccanti <andrea.ceccanti at cnaf.infn.it> - 2.0.13-0
-- Packaging for 2.0.13
-
-* Mon May 12 2014 Andrea Ceccanti <andrea.ceccanti at cnaf.infn.it> - 2.0.12-2
-- Added missing dependency on gsoap.
-
-* Mon May 12 2014 Andrea Ceccanti <andrea.ceccanti at cnaf.infn.it> - 2.0.12-1
-- New packaging of the clients. https://issues.infn.it/jira/browse/VOMS-495
-
-* Mon Aug 21 2013 Andrea Ceccanti <andrea.ceccanti at cnaf.infn.it> - 2.0.11-1
-- Fix for https://issues.infn.it/browse/VOMS-379
-
-* Tue Jan 8 2013 Andrea Ceccanti <andrea.ceccanti at cnaf.infn.it> - 2.0.10-1
-- Fix for https://issues.infn.it/browse/VOMS-196
-
-* Sat Oct 27 2012 Andrea Ceccanti <andrea.ceccanti at cnaf.infn.it> - 2.0.9-1
-- Fix for https://savannah.cern.ch/bugs/?91183
-- Fix for http://issues.cnaf.infn.it/browse/VOMS-128
-
-* Tue Apr 10 2012 Andrea Ceccanti <andrea.ceccanti at cnaf.infn.it> - 2.0.8-1
-- EMI 2 release.
-
-* Thu Dec 15 2011 Andrea Ceccanti <andrea.ceccanti at cnaf.infn.it> - 2.0.7-1
-- Restructured EMI build to leverage EPEL spec files by Mattias Ellert
-- Removed voms-java-apis from the main c-based source tree  
