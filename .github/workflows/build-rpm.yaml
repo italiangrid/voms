@@ -91,7 +91,9 @@ jobs:
             echo "Skip signing on AlmaLinux 8 to avoid error: RPM-GPG-KEY-pmanager: key 1 import failed"
             exit 0
           fi
-          GPG_TTY="" rpm --addsign rpmbuild/RPMS/noarch/*.rpm
+          for file in rpmbuild/RPMS/*/*.rpm; do
+            GPG_TTY="" rpm --addsign "${file}"
+          done
       - uses: actions/upload-artifact@v5
         with:
           name: build-rpm-${{ matrix.os }}-${{ matrix.version }}
@@ -123,4 +125,4 @@ jobs:
           # - Delete lines from the next one beginning with "## " until the end of the file
           # - Change all the "### " to "## " to use heading level 2 instead of level 3
           sed -e "1,/^## ${VERSION}/d;/^## /,\$d;s/^### /## /g" CHANGELOG.md > RELEASE-CHANGELOG.md
-          gh release create v${VERSION} --title "VOMS Server, C/C++ APIs and Clients ${VERSION}" --notes-file RELEASE-CHANGELOG.md build-*/*
+          gh release create v${VERSION} --verify-tag --draft --title "VOMS Server, C/C++ APIs and Clients ${VERSION}" --notes-file RELEASE-CHANGELOG.md build-*/*/*.rpm
