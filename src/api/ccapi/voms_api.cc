@@ -276,47 +276,9 @@ bool vomsdata::InterpretOutput(const std::string &message, std::string& output)
 
 bool vomsdata::ContactRaw(std::string hostname, int port, std::string servsubject, std::string command, std::string &raw, int& version, int timeout)
 {
-  std::string buffer;
-  std::string subject, ca;
-  std::string lifetime;
-
-  std::string comm;
-  std::string targs;
-
   version = 1;
 
-  /* Try REST connection first */
-  bool ret = ContactRESTRaw(hostname, port, command, raw, version, timeout);
-
-  if (ret
-      || serverrors.find("User unknown to this VO") != std::string::npos
-      || serverrors.find("suspended") != std::string::npos
-      || serverrors.find("not active") != std::string::npos)
-    return ret;
-
-  // reset the errors
-  serverrors.clear();
-
-  std::vector<std::string>::const_iterator end = targets.end();
-  std::vector<std::string>::const_iterator begin = targets.begin();
-  for (std::vector<std::string>::const_iterator i = begin; i != end; ++i) {
-    if (i == begin)
-      targs = *i;
-    else
-      targs += std::string(",") + *i;
-  }
-
-  comm = XML_Req_Encode(command, ordering, targs, duration);
-
-  ret = contact(hostname, port, servsubject, comm, buffer, subject, ca, timeout);
-  // std::cerr << '\n' << comm << '\n' << buffer << '\n';
-
-  if (!ret) {
-    return false;
-  }
-
-  version = 1;
-  return InterpretOutput(buffer, raw);
+  return ContactRESTRaw(hostname, port, command, raw, version, timeout);
 }
 
 static X509 *get_own_cert()
@@ -450,22 +412,15 @@ bool vomsdata::ContactRESTRaw(const std::string& hostname, int port, const std::
 
   // std::cerr << '\n' << realCommand << '\n' << output << '\n';
 
-  bool ret = false;
-
-  if (res) {
-    std::string::size_type pos = output.find("<?xml");
-
-    if (pos != std::string::npos)
-      ret = InterpretOutput(output.substr(pos), raw);
-
-    if (ret) 
-      if (!(output.substr(0,12) == "HTTP/1.1 200"))
-        return false;
-    
-    return ret;
+  if (!res) {
+    return false;
   }
 
-  return ret;
+  if (auto pos = output.find("<?xml"); pos != std::string::npos) {
+    return InterpretOutput(output.substr(pos), raw);
+  }
+
+  return false;
 }
 
 bool vomsdata::Contact(std::string hostname, int port, std::string servsubject, std::string command) {

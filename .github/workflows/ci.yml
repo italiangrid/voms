@@ -24,14 +24,15 @@ jobs:
           make
 
   ubuntu2004:
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-latest
+    container: ubuntu:20.04
     steps:
       - uses: actions/checkout@v4
 
       - name: Install packages
         run: |
-          sudo apt update
-          sudo apt install -y make automake libtool pkg-config g++ libssl-dev libgsoap-dev gsoap libexpat-dev
+          apt update
+          DEBIAN_FRONTEND=noninteractive apt install -y make automake libtool pkg-config g++ libssl-dev libgsoap-dev gsoap libexpat-dev
 
       - name: Build
         run: |
