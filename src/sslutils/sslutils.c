@@ -255,13 +255,13 @@ Returns :
 ********************************************************************/
 static int
 X509_NAME_cmp_no_set(
-    X509_NAME *                         a,
-    X509_NAME *                         b)
+    const X509_NAME *                         a,
+    const X509_NAME *                         b)
 {
     int                                 i;
     int                                 j;
-    X509_NAME_ENTRY *                   na;
-    X509_NAME_ENTRY *                   nb;
+    const X509_NAME_ENTRY *             na;
+    const X509_NAME_ENTRY *             nb;
 
     if (X509_NAME_entry_count(a) != X509_NAME_entry_count(b))
     {
@@ -272,8 +272,8 @@ X509_NAME_cmp_no_set(
     {
         na = X509_NAME_get_entry(a,i);
         nb = X509_NAME_get_entry(b,i);
-        ASN1_STRING* sa = X509_NAME_ENTRY_get_data(na);
-        ASN1_STRING* sb = X509_NAME_ENTRY_get_data(nb);
+        const ASN1_STRING* sa = X509_NAME_ENTRY_get_data(na);
+        const ASN1_STRING* sb = X509_NAME_ENTRY_get_data(nb);
         j = ASN1_STRING_length(sa) - ASN1_STRING_length(sb);
 
         if (j)
@@ -404,10 +404,12 @@ Returns:
 void PRIVATE
 ERR_set_continue_needed(void)
 {
+#if OPENSSL_VERSION_NUMBER < 0x40000000L
     ERR_STATE *es;
     es = ERR_get_state();
     es->err_data_flags[es->top] =
         es->err_data_flags[es->top] | ERR_DISPLAY_CONTINUE_NEEDED;
+#endif
 }
 
 
@@ -994,8 +996,8 @@ proxy_sign(
         PRXYerr(PRXYERR_F_PROXY_SIGN,PRXYERR_R_PROCESS_SIGN);
         if (proxyver >= 3) {
           free(newcn);
-	  free((void*)newserial);
-	}
+          free((void*)newserial);
+        }
         return 1;
       }
     }
@@ -1379,7 +1381,7 @@ proxy_construct_name(
     if(newcn)
     {
         if ((name_entry = X509_NAME_ENTRY_create_by_NID(NULL,
-							NID_commonName,
+                                                        NID_commonName,
                                                         V_ASN1_APP_CHOOSE,
                                                         (unsigned char *)newcn,
                                                         len)) == NULL)
@@ -1667,10 +1669,17 @@ int proxy_verify_name(X509* cert){
 }
 
 
+#if OPENSSL_VERSION_NUMBER < 0x40000000L
 int PRIVATE
 proxy_check_issued(UNUSED(X509_STORE_CTX *  ctx),
       X509 *                              x,
       X509 *                              issuer)
+#else
+int PRIVATE
+proxy_check_issued(UNUSED(X509_STORE_CTX *  ctx),
+      const X509 *                        x,
+      const X509 *                        issuer)
+#endif
 {
   int return_value;
   int return_code = 1;
@@ -3259,7 +3268,7 @@ time_t PRIVATE
 ASN1_UTCTIME_mktime(
     ASN1_UTCTIME *                      ctm)
 {
-  char     *str;
+  const char *str;
   time_t    offset;
   time_t    newtime;
   char      buff1[32];
@@ -3268,7 +3277,7 @@ ASN1_UTCTIME_mktime(
   struct tm tm;
   int       size = 0;
 
-  switch (ctm->type) {
+  switch (ASN1_STRING_type(ctm)) {
   case V_ASN1_UTCTIME:
     size=10;
     break;
@@ -3277,8 +3286,8 @@ ASN1_UTCTIME_mktime(
     break;
   }
   p = buff1;
-  i = ctm->length;
-  str = (char *)ctm->data;
+  i = ASN1_STRING_length(ctm);
+  str = (const char*) ASN1_STRING_get0_data(ctm);
   if ((i < 11) || (i > 17)) {
     return 0;
   }
@@ -3311,7 +3320,7 @@ ASN1_UTCTIME_mktime(
 
   tm.tm_isdst = 0;
   int index = 0;
-  if (ctm->type == V_ASN1_UTCTIME) {
+  if (ASN1_STRING_type(ctm) == V_ASN1_UTCTIME) {
     tm.tm_year  = (buff1[index++]-'0')*10;
     tm.tm_year += (buff1[index++]-'0');
   }
@@ -3765,7 +3774,7 @@ static X509_NAME *make_DN(const char *dnstring)
 static int check_critical_extensions(X509 *cert, int itsaproxy)
 {
   int i = 0;
-  ASN1_OBJECT *extension_obj;
+  const ASN1_OBJECT *extension_obj;
   int nid;
   X509_EXTENSION *ex;
 

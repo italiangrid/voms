@@ -76,6 +76,12 @@ extern "C" {
 #endif
 #endif
 
+#if OPENSSL_VERSION_NUMBER >= 0x40000000L
+#define CONST4 const
+#else
+#define CONST4
+#endif
+
 extern proxy_verify_desc *setup_initializers(char *cadir);
 extern void destroy_initializers(void *data);
 static bool dncompare(const char *mut, const char *fixed);
@@ -133,7 +139,7 @@ vomsdata::evaluate(AC_SEQ *acs, const std::string& subject,
 }
 
 
-static X509_EXTENSION *get_ext(X509 *cert, const char *name)
+static CONST4 X509_EXTENSION *get_ext(X509 *cert, const char *name)
 {
   int nid   = OBJ_txt2nid(name);
   int index = X509_get_ext_by_NID(cert, nid, -1);
@@ -146,7 +152,7 @@ static X509_EXTENSION *get_ext(X509 *cert, const char *name)
 
 static bool findexts(X509 *cert , AC_SEQ **listnew, std::string &extra_data, std::string &workvo)
 {
-  X509_EXTENSION *ext;
+  CONST4 X509_EXTENSION *ext;
   bool found = false;
 
   ext = get_ext(cert, "acseq");
@@ -157,17 +163,19 @@ static bool findexts(X509 *cert , AC_SEQ **listnew, std::string &extra_data, std
 
   ext = get_ext(cert, "incfile");
   if (ext) {
-    ASN1_OCTET_STRING* value = X509_EXTENSION_get_data(ext);
+    const ASN1_OCTET_STRING* value = X509_EXTENSION_get_data(ext);
     assert(value && "X509_EXTENSION_get_data failed");
-    extra_data = std::string(reinterpret_cast<char*>(value->data), value->length);
+    extra_data = std::string((const char*) ASN1_STRING_get0_data(value),
+                             ASN1_STRING_length(value));
     found = true;
   }
 
   ext = get_ext(cert, "vo");
   if (ext) {
-    ASN1_OCTET_STRING* value = X509_EXTENSION_get_data(ext);
+    const ASN1_OCTET_STRING* value = X509_EXTENSION_get_data(ext);
     assert(value && "X509_EXTENSION_get_data failed");
-    workvo = std::string(reinterpret_cast<char*>(value->data), value->length);
+    workvo = std::string((const char*) ASN1_STRING_get0_data(value),
+                         ASN1_STRING_length(value));
   }
 
   return found;
@@ -423,7 +431,8 @@ vomsdata::check(void *data)
     return NULL;
   }
   
-  std::string voname((const char *)name->d.ia5->data, 0, name->d.ia5->length);
+  std::string voname((const char*) ASN1_STRING_get0_data(name->d.ia5), 0,
+                     ASN1_STRING_length(name->d.ia5));
   std::string::size_type cpos = voname.find("://");
   std::string hostname;
 
@@ -760,7 +769,7 @@ vomsdata::check_cert(STACK_OF(X509) *stack)
         error = VERR_VERIFY;
         if (X509_STORE_CTX_init(csc, ctx, sk_X509_value(stack, 0), NULL)==0) {
           error = VERR_MEM;
-        } else	{
+        } else {
 
           X509_STORE_CTX_set_ex_data(csc, PVD_STORE_EX_DATA_IDX, pvd);
           /* X509_STORE_CTX_get0_param() only returns NULL if
@@ -813,7 +822,7 @@ vomsdata::check_cert(STACK_OF(X509) *stack)
 
 bool
 vomsdata::contact(const std::string &hostname, int port, UNUSED(const std::string &contact),
-	const std::string &command, std::string &buf, std::string &u, std::string &uc,
+                  const std::string &command, std::string &buf, std::string &u, std::string &uc,
                   int timeout)
 {
   GSISocketClient sock(hostname, port);

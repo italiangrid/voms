@@ -107,7 +107,6 @@ void *targets_s2i(UNUSED(struct v3_ext_method *method), UNUSED(struct v3_ext_ctx
   char *back = list;
   AC_TARGETS *a = AC_TARGETS_new();
 
-  int attlist;
   do {
     pos = strchr(list, ',');
 
@@ -129,7 +128,6 @@ void *targets_s2i(UNUSED(struct v3_ext_method *method), UNUSED(struct v3_ext_ctx
       g->d.ia5 = tmpr;
       targ->name = g;
       sk_AC_TARGET_push(a->targets, targ);
-      attlist++;
     }
     if (pos)
       list = ++pos;
@@ -210,7 +208,7 @@ void *authkey_s2i(UNUSED(struct v3_ext_method *method), UNUSED(struct v3_ext_ctx
   AUTHORITY_KEYID *keyid = AUTHORITY_KEYID_new();
 
   if (str && keyid) {
-    X509_PUBKEY* pk = X509_get_X509_PUBKEY(cert);
+    const X509_PUBKEY* pk = X509_get_X509_PUBKEY(cert);
     assert(pk != NULL && "X509_get_X509_PUBKEY failed");
     unsigned char const* data;
     int len;

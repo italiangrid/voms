@@ -205,9 +205,10 @@ int validate(X509 *cert, X509 *issuer, AC *ac, voms &v, verify_type valids, time
   }
 
   v.version    = 1;
-  v.siglen     = ac->signature->length;
-  v.signature  = std::string((char*)ac->signature->data, ac->signature->length);
-  bn               = ASN1_INTEGER_to_BN(ac->acinfo->serial, NULL);
+  v.siglen     = ASN1_STRING_length(ac->signature);
+  v.signature  = std::string((const char*) ASN1_STRING_get0_data(ac->signature),
+                             ASN1_STRING_length(ac->signature));
+  bn           = ASN1_INTEGER_to_BN(ac->acinfo->serial, NULL);
   char *bnstring = BN_bn2hex(bn);
   v.serial     = std::string(bnstring);
   OPENSSL_free(bnstring);
@@ -294,15 +295,17 @@ int validate(X509 *cert, X509 *issuer, AC *ac, voms &v, verify_type valids, time
       if (X509_NAME_cmp(name->d.dirn, X509_get_subject_name(issuer)))
         ERROR(AC_ERR_ISSUER_NAME);
 
-    if (ac->acinfo->serial->length>20)
+    if (ASN1_STRING_length(ac->acinfo->serial) > 20)
       ERROR(AC_ERR_SERIAL);
   }
 
   b = ac->acinfo->validity->notBefore;
   a = ac->acinfo->validity->notAfter;
 
-  v.date1 = std::string((char*)b->data, b->length);
-  v.date2 = std::string((char*)a->data, a->length);
+  v.date1 = std::string((const char*) ASN1_STRING_get0_data(b),
+                        ASN1_STRING_length(b));
+  v.date2 = std::string((const char*) ASN1_STRING_get0_data(a),
+                        ASN1_STRING_length(a));
 
   if (valids & VERIFY_DATE) {
     time_t ctime, dtime;
@@ -315,8 +318,8 @@ int validate(X509 *cert, X509 *issuer, AC *ac, voms &v, verify_type valids, time
     ctime += 300;
     dtime = ctime-600;
 
-    if ((a->type != V_ASN1_GENERALIZEDTIME) ||
-        (b->type != V_ASN1_GENERALIZEDTIME))
+    if ((ASN1_STRING_type(a) != V_ASN1_GENERALIZEDTIME) ||
+        (ASN1_STRING_type(b) != V_ASN1_GENERALIZEDTIME))
       ERROR(AC_ERR_DATES);
 
     if (((X509_cmp_time(b, &vertime) >= 0) &&
@@ -379,7 +382,8 @@ static int checkAttributes(STACK_OF(AC_ATTR) *atts, voms &v)
   /* put policyAuthority in voms struct */
   data = sk_GENERAL_NAME_value(capattr->names, 0);
   if (data->type == GEN_URI) {
-    v.voname = std::string((char*)data->d.ia5->data, data->d.ia5->length);
+    v.voname = std::string((const char*) ASN1_STRING_get0_data(data->d.ia5),
+                           ASN1_STRING_length(data->d.ia5));
     std::string::size_type point = v.voname.find("://");
 
     if (point != std::string::npos) {
@@ -398,10 +402,11 @@ static int checkAttributes(STACK_OF(AC_ATTR) *atts, voms &v)
   for (int i=0; i<sk_AC_IETFATTRVAL_num(values); i++) {
     capname = sk_AC_IETFATTRVAL_value(values, i);
 
-    if (!(capname->type == V_ASN1_OCTET_STRING))
+    if (!(ASN1_STRING_type(capname) == V_ASN1_OCTET_STRING))
       return AC_ERR_ATTRIB_FQAN;
 
-    std::string str  = std::string((char*)capname->data, capname->length);
+    std::string str = std::string((const char*) ASN1_STRING_get0_data(capname),
+                                  ASN1_STRING_length(capname));
     std::string::size_type top_group_size = top_group.size();
     std::string::size_type str_size = str.size();
 
@@ -556,14 +561,13 @@ static int checkExtensions(STACK_OF(X509_EXTENSION) *exts, X509 *iss, int valids
           if (key->keyid) {
             unsigned char hashed[SHA_DIGEST_LENGTH];
 
-            ASN1_BIT_STRING* pubkey = X509_get0_pubkey_bitstr(iss);
-            if (!SHA1(pubkey->data,
-                      pubkey->length,
-                      hashed))
+            const ASN1_BIT_STRING* pubkey = X509_get0_pubkey_bitstr(iss);
+            if (!SHA1(ASN1_STRING_get0_data(pubkey),
+                      ASN1_STRING_length(pubkey), hashed))
               ret = AC_ERR_EXT_KEY;
-          
-            if ((memcmp(key->keyid->data, hashed, 20) != 0) && 
-                (key->keyid->length == 20))
+
+            if ((memcmp(ASN1_STRING_get0_data(key->keyid), hashed, 20) != 0) &&
+                (ASN1_STRING_length(key->keyid) == 20))
               ret = AC_ERR_EXT_KEY;
           }
           else {
@@ -573,8 +577,8 @@ static int checkExtensions(STACK_OF(X509_EXTENSION) *exts, X509 *iss, int valids
             if (ASN1_INTEGER_cmp((key->serial),
                                 (X509_get0_serialNumber(iss))))
               ret = AC_ERR_EXT_KEY;
-	  
-            if (key->serial->type != GEN_DIRNAME)
+
+            if (ASN1_STRING_type(key->serial) != GEN_DIRNAME)
               ret = AC_ERR_EXT_KEY;
 
             if (X509_NAME_cmp(sk_GENERAL_NAME_value((key->issuer), 0)->d.dirn, 
@@ -632,15 +636,19 @@ static int interpret_attributes(AC_FULL_ATTRIBUTES *full_attr, realdata *rd)
       AC_ATTRIBUTE *at = sk_AC_ATTRIBUTE_value(atts, j);
 
       struct attribute a;
-      a.name      = std::string((char*)at->name->data,      at->name->length);
-      a.value     = std::string((char*)at->value->data,     at->value->length);
-      a.qualifier = std::string((char*)at->qualifier->data, at->qualifier->length);
+      a.name      = std::string((const char*) ASN1_STRING_get0_data(at->name),
+                                ASN1_STRING_length(at->name));
+      a.value     = std::string((const char*) ASN1_STRING_get0_data(at->value),
+                                ASN1_STRING_length(at->value));
+      a.qualifier = std::string((const char*) ASN1_STRING_get0_data(at->qualifier),
+                                ASN1_STRING_length(at->qualifier));
 
       al.attributes.push_back(a);
     }
 
     gn = sk_GENERAL_NAME_value(holder->grantor, 0);
-    al.grantor = std::string((char*)gn->d.ia5->data, gn->d.ia5->length);
+    al.grantor = std::string((const char*) ASN1_STRING_get0_data(gn->d.ia5),
+                             ASN1_STRING_length(gn->d.ia5));
 
     rd->attributes->push_back(al);
   }

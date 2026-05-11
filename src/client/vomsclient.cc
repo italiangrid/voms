@@ -123,21 +123,7 @@ static int pwstdin_callback(char * buf, int num, UNUSED(int w), UNUSED(void *u))
   }
   return i;	
 }
-  
-static void kpcallback(int p, UNUSED(int n), UNUSED(void* v))
-{
-  char c='B';
-    
-  if (quiet) return;
-    
-  if (p == 0) c='.';
-  if (p == 1) c='+';
-  if (p == 2) c='*';
-  if (p == 3) c='\n';
-  if (!debug) c = '.';
-  fputc(c,stderr);
-}
-  
+
 extern int proxy_verify_cert_chain(X509 * ucert, STACK_OF(X509) * cert_chain, proxy_verify_desc * pvd);
 extern void proxy_verify_ctx_init(proxy_verify_ctx_desc * pvxd);
 }
@@ -1142,8 +1128,6 @@ static bool check_validity_dates(X509 const* cert, int& time_left, std::string& 
 
 bool Client::pcdInit() 
 {
-  int status = false;
-
   ERR_load_prxyerr_strings(0);
   SSLeay_add_ssl_algorithms();
   ERR_load_crypto_strings();

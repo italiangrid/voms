@@ -368,7 +368,6 @@ GSISocketServer::AcceptGSIAuthentication()
   bool accept_timed_out = false;
   int expected = 0;
   BIO *bio = NULL;
-  BIO_METHOD* bio_method = NULL;
   char *cert_file, *user_cert, *user_key, *user_proxy;
   char *serial=NULL;
 
