@@ -77,6 +77,7 @@ extern int InitProxyCertInfoExtension(int);
 #include <sstream>
 
 #include <voms_api.h>
+#include "asn1_utils.h"
 #include "data.h"
 #include "vomsxml.h"
 
@@ -1021,8 +1022,7 @@ std::vector<std::string> voms::GetTargets()
         AC_TARGET *name = NULL;
         name = sk_AC_TARGET_value(target->targets, i);
         if (name->name->type == GEN_URI)
-          targets.push_back(std::string((const char*) ASN1_STRING_get0_data(name->name->d.ia5),
-                                        ASN1_STRING_length(name->name->d.ia5)));
+          targets.push_back(voms_internal::to_string(name->name->d.ia5));
       }
     }
     AC_TARGETS_free(target);

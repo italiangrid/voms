@@ -25,6 +25,7 @@
 
 #include "config.h"
 #include "api_util.h"
+#include "asn1_utils.h"
 
 extern "C" {
 #include "replace.h"
@@ -165,8 +166,7 @@ static bool findexts(X509 *cert , AC_SEQ **listnew, std::string &extra_data, std
   if (ext) {
     const ASN1_OCTET_STRING* value = X509_EXTENSION_get_data(ext);
     assert(value && "X509_EXTENSION_get_data failed");
-    extra_data = std::string((const char*) ASN1_STRING_get0_data(value),
-                             ASN1_STRING_length(value));
+    extra_data = voms_internal::to_string(value);
     found = true;
   }
 
@@ -174,8 +174,7 @@ static bool findexts(X509 *cert , AC_SEQ **listnew, std::string &extra_data, std
   if (ext) {
     const ASN1_OCTET_STRING* value = X509_EXTENSION_get_data(ext);
     assert(value && "X509_EXTENSION_get_data failed");
-    workvo = std::string((const char*) ASN1_STRING_get0_data(value),
-                         ASN1_STRING_length(value));
+    workvo = voms_internal::to_string(value);
   }
 
   return found;
@@ -431,8 +430,7 @@ vomsdata::check(void *data)
     return NULL;
   }
   
-  std::string voname((const char*) ASN1_STRING_get0_data(name->d.ia5), 0,
-                     ASN1_STRING_length(name->d.ia5));
+  std::string voname = voms_internal::to_string(name->d.ia5);
   std::string::size_type cpos = voname.find("://");
   std::string hostname;
 

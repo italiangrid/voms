@@ -54,7 +54,6 @@ extern "C" {
 #include <algorithm>
 #include <string>
 #include <random>
-#include <iomanip>
 #include <cassert>
 #include <memory>
 
@@ -67,6 +66,7 @@ extern "C" {
 #include "vomsclient.h"
 #include "fqan.h"
 #include "contact.hpp"
+#include "asn1_utils.h"
 
 
 extern "C" 
@@ -792,28 +792,6 @@ int Client::Run()
   return 1;
 }
 
-namespace {
-
-// generate a string preferably in local time, with TZ indication
-std::string to_string(const ASN1_TIME *time)
-{
-  assert(time != nullptr);
-
-  tm tm_utc;
-  ASN1_TIME_to_tm(time, &tm_utc);
-  std::ostringstream os;
-#ifdef HAVE_TIMEGM
-  time_t t_utc = timegm(&tm_utc);
-  tm *tm_ptr = localtime(&t_utc);
-  os << std::put_time(tm_ptr, "%c %Z");
-#else
-  os << std::put_time(&tm_utc, "%c GMT");
-#endif
-  return os.str();
-}
-
-}
-
 bool Client::CreateProxy(std::string data, AC ** aclist, int version) 
 {
   using ArgsPtr = std::unique_ptr<VOMSProxyArguments, void (*)(VOMSProxyArguments *)>;
@@ -897,7 +875,7 @@ bool Client::CreateProxy(std::string data, AC ** aclist, int version)
         {
           Print(INFO) << "\nCreated proxy in " << proxyfile
                       << ".\n\nYour proxy is valid until "
-                      << to_string(X509_get0_notAfter(proxy->cert)) << '\n';
+                      << voms_internal::to_string(X509_get0_notAfter(proxy->cert)) << '\n';
         }
       }
     } else {
@@ -1110,7 +1088,7 @@ static bool check_validity_dates(X509 const* cert, int& time_left, std::string& 
   }
 
   if (start_cmp > 0) {
-    error = "Certificate is not yet valid; validity starts on " + to_string(not_before);
+    error = "Certificate is not yet valid; validity starts on " + voms_internal::to_string(not_before);
     return false;
   }
 
@@ -1119,7 +1097,7 @@ static bool check_validity_dates(X509 const* cert, int& time_left, std::string& 
   time_left = days * 24 * 60 * 60 + secs;
 
   if (end_cmp < 0) {
-    error = "Certificate has expired on " + to_string(not_after);
+    error = "Certificate has expired on " + voms_internal::to_string(not_after);
     return false;
   }
 

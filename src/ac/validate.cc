@@ -64,6 +64,7 @@ extern "C" {
 
 #include "../api/ccapi/voms_api.h"
 #include "../api/ccapi/realdata.h"
+#include "asn1_utils.h"
 
 #include <string>
 
@@ -206,8 +207,7 @@ int validate(X509 *cert, X509 *issuer, AC *ac, voms &v, verify_type valids, time
 
   v.version    = 1;
   v.siglen     = ASN1_STRING_length(ac->signature);
-  v.signature  = std::string((const char*) ASN1_STRING_get0_data(ac->signature),
-                             ASN1_STRING_length(ac->signature));
+  v.signature  = voms_internal::to_string(ac->signature);
   bn           = ASN1_INTEGER_to_BN(ac->acinfo->serial, NULL);
   char *bnstring = BN_bn2hex(bn);
   v.serial     = std::string(bnstring);
@@ -302,10 +302,8 @@ int validate(X509 *cert, X509 *issuer, AC *ac, voms &v, verify_type valids, time
   b = ac->acinfo->validity->notBefore;
   a = ac->acinfo->validity->notAfter;
 
-  v.date1 = std::string((const char*) ASN1_STRING_get0_data(b),
-                        ASN1_STRING_length(b));
-  v.date2 = std::string((const char*) ASN1_STRING_get0_data(a),
-                        ASN1_STRING_length(a));
+  v.date1 = voms_internal::to_string(b);
+  v.date2 = voms_internal::to_string(a);
 
   if (valids & VERIFY_DATE) {
     time_t ctime, dtime;
@@ -382,8 +380,7 @@ static int checkAttributes(STACK_OF(AC_ATTR) *atts, voms &v)
   /* put policyAuthority in voms struct */
   data = sk_GENERAL_NAME_value(capattr->names, 0);
   if (data->type == GEN_URI) {
-    v.voname = std::string((const char*) ASN1_STRING_get0_data(data->d.ia5),
-                           ASN1_STRING_length(data->d.ia5));
+    v.voname = voms_internal::to_string(data->d.ia5);
     std::string::size_type point = v.voname.find("://");
 
     if (point != std::string::npos) {
@@ -405,8 +402,7 @@ static int checkAttributes(STACK_OF(AC_ATTR) *atts, voms &v)
     if (!(ASN1_STRING_type(capname) == V_ASN1_OCTET_STRING))
       return AC_ERR_ATTRIB_FQAN;
 
-    std::string str = std::string((const char*) ASN1_STRING_get0_data(capname),
-                                  ASN1_STRING_length(capname));
+    std::string str = voms_internal::to_string(capname);
     std::string::size_type top_group_size = top_group.size();
     std::string::size_type str_size = str.size();
 
@@ -636,19 +632,15 @@ static int interpret_attributes(AC_FULL_ATTRIBUTES *full_attr, realdata *rd)
       AC_ATTRIBUTE *at = sk_AC_ATTRIBUTE_value(atts, j);
 
       struct attribute a;
-      a.name      = std::string((const char*) ASN1_STRING_get0_data(at->name),
-                                ASN1_STRING_length(at->name));
-      a.value     = std::string((const char*) ASN1_STRING_get0_data(at->value),
-                                ASN1_STRING_length(at->value));
-      a.qualifier = std::string((const char*) ASN1_STRING_get0_data(at->qualifier),
-                                ASN1_STRING_length(at->qualifier));
+      a.name      = voms_internal::to_string(at->name);
+      a.value     = voms_internal::to_string(at->value);
+      a.qualifier = voms_internal::to_string(at->qualifier);
 
       al.attributes.push_back(a);
     }
 
     gn = sk_GENERAL_NAME_value(holder->grantor, 0);
-    al.grantor = std::string((const char*) ASN1_STRING_get0_data(gn->d.ia5),
-                             ASN1_STRING_length(gn->d.ia5));
+    al.grantor = voms_internal::to_string(gn->d.ia5);
 
     rd->attributes->push_back(al);
   }
