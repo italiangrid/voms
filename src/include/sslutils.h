@@ -400,11 +400,19 @@ int
 proxy_check_proxy_name(
     X509 *);
 
-int 
+#if OPENSSL_VERSION_NUMBER < 0x40000000L
+int
 proxy_check_issued(
     X509_STORE_CTX *                    ctx,
     X509 *                              x,
     X509 *                              issuer);
+#else
+int
+proxy_check_issued(
+    X509_STORE_CTX *                    ctx,
+    const X509 *                        x,
+    const X509 *                        issuer);
+#endif
 
 int
 proxy_verify_certchain(

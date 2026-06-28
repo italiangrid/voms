@@ -466,18 +466,8 @@ static STACK_OF(X509) *load_chain_from_file(char *certfile)
 static ASN1_TIME *
 convtime(std::string data)
 {
-  ASN1_TIME *t= ASN1_TIME_new();
-
-  t->data   = (unsigned char*)strdup(data.data());
-  t->length = data.size();
-  switch(t->length) {
-  case 10:
-    t->type = V_ASN1_UTCTIME;
-    break;
-  case 15:
-    t->type = V_ASN1_GENERALIZEDTIME;
-    break;
-  default:
+  ASN1_TIME *t = ASN1_TIME_new();
+  if (ASN1_TIME_set_string_X509(t, data.c_str()) == 0) {
     ASN1_TIME_free(t);
     return NULL;
   }
@@ -712,7 +702,7 @@ static bool print(X509 *cert, STACK_OF(X509) *chain, vomsdata &vd)
 
       if(res) {
         std::vector<voms>::const_iterator vend = vd.data.end();
-        for (std::vector<voms>::iterator v = vd.data.begin(); v != vd.data.end(); ++v) {
+        for (std::vector<voms>::iterator v = vd.data.begin(); v != vend; ++v) {
           if(v->voname == *i) {
             found = true;
             break;

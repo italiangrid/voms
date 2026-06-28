@@ -200,7 +200,8 @@ int writeac(X509 *issuerc, STACK_OF(X509) *issuerstack, X509 *holder, EVP_PKEY *
             STACK_OF(X509_EXTENSION) *extensions)
 {
   AC *a;
-  X509_NAME *name1, *name2, *subjdup, *issdup;
+  const X509_NAME *name1, *name2;
+  X509_NAME *subjdup, *issdup;
   GENERAL_NAME *dirn, *dirn2;
   ASN1_INTEGER  *serial, *holdserial, *version;
   ASN1_BIT_STRING *uid;

@@ -545,8 +545,6 @@ bool vomsdata::Retrieve(X509_EXTENSION *ext)
 
 bool vomsdata::Retrieve(AC *ac)
 {
-  verify_type v = ver_type;
-
   ver_type = (verify_type)((int) ver_type & (~VERIFY_ID));
 
   voms vv;
@@ -786,7 +784,6 @@ bool vomsdata::loadfile0(std::string filename, UNUSED(uid_t uid), UNUSED(gid_t g
   }
 
   /* Load the file */
-  int linenum = 1;
   bool ok = true;
   bool verok = true;
 
@@ -818,7 +815,6 @@ bool vomsdata::loadfile0(std::string filename, UNUSED(uid_t uid), UNUSED(gid_t g
         return false;
       }
     }
-    linenum++;
   }
   return true;
 }
@@ -1025,8 +1021,8 @@ std::vector<std::string> voms::GetTargets()
         AC_TARGET *name = NULL;
         name = sk_AC_TARGET_value(target->targets, i);
         if (name->name->type == GEN_URI)
-          targets.push_back(std::string((char*)(name->name->d.ia5->data), 
-                                        name->name->d.ia5->length));
+          targets.push_back(std::string((const char*) ASN1_STRING_get0_data(name->name->d.ia5),
+                                        ASN1_STRING_length(name->name->d.ia5)));
       }
     }
     AC_TARGETS_free(target);

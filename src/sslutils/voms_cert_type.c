@@ -11,13 +11,19 @@
 #include <stdio.h>
 #include <string.h>
 
+#if OPENSSL_VERSION_NUMBER >= 0x40000000L
+#define CONST4 const
+#else
+#define CONST4
+#endif
+
 #define LIMITED_PROXY_OID               "1.3.6.1.4.1.3536.1.1.1.9"
 #define PROXYCERTINFO_OLD_OID           "1.3.6.1.4.1.3536.1.222"
 #define NULL_STR "<null>"
 
 
 static voms_result_t 
-voms_validation_error_with_detail(int code, X509_NAME* subject,
+voms_validation_error_with_detail(int code, const X509_NAME* subject,
     const char* detail) { 
 
   char sub_buf[256];
@@ -46,17 +52,17 @@ voms_validation_error_with_detail(int code, X509_NAME* subject,
 }
 
 static voms_result_t 
-voms_validation_error(int code, X509_NAME* subject){
+voms_validation_error(int code, const X509_NAME* subject){
 
   return voms_validation_error_with_detail(code, subject, NULL);
 
 }
 
 static
-X509_NAME_ENTRY* 
-get_last_cn_entry_from_subject(X509_NAME* subject){
+const X509_NAME_ENTRY*
+get_last_cn_entry_from_subject(const X509_NAME* subject){
 
-  X509_NAME_ENTRY* ne = NULL;
+  const X509_NAME_ENTRY* ne = NULL;
 
   if (subject == NULL){
     return NULL;
@@ -113,17 +119,17 @@ voms_get_cert_type(X509* cert, voms_cert_type_t* cert_type){
   voms_result_t result = VOMS_SUCCESS;
 
   BASIC_CONSTRAINTS* bc_ext = NULL;
-  X509_EXTENSION* ext = NULL;
+  CONST4 X509_EXTENSION* ext = NULL;
   PROXY_CERT_INFO_EXTENSION *pci_ext = NULL;
   PROXY_POLICY *policy = NULL;
   ASN1_OBJECT *policy_lang = NULL;
 
-  X509_NAME *subject = NULL;	
+  const X509_NAME *subject = NULL;
   X509_NAME *expected_subject = NULL;
-  X509_NAME_ENTRY *ne = NULL;
+  const X509_NAME_ENTRY *ne = NULL;
   X509_NAME_ENTRY *new_ne = NULL;
 
-  ASN1_STRING *ne_data = NULL;
+  const ASN1_STRING *ne_data = NULL;
 
   int critical;
   int index = -1;
@@ -256,11 +262,13 @@ voms_get_cert_type(X509* cert, voms_cert_type_t* cert_type){
 
     ne_data = X509_NAME_ENTRY_get_data(ne);
 
-    if (ne_data->length == 5 && !memcmp(ne_data->data,"proxy",5))
+    if (ASN1_STRING_length(ne_data) == 5 &&
+        !memcmp(ASN1_STRING_get0_data(ne_data), "proxy", 5))
     {
       *cert_type = VOMS_CERT_TYPE_GSI_2_PROXY;
     }
-    else if (ne_data->length == 13 && !memcmp(ne_data->data,"limited proxy",13))
+    else if (ASN1_STRING_length(ne_data) == 13 &&
+             !memcmp(ASN1_STRING_get0_data(ne_data), "limited proxy", 13))
     {
       *cert_type = VOMS_CERT_TYPE_GSI_2_LIMITED_PROXY;
     }
@@ -292,8 +300,9 @@ voms_get_cert_type(X509* cert, voms_cert_type_t* cert_type){
 
     ne_data = X509_NAME_ENTRY_get_data(ne);
 
-    if ((new_ne = X509_NAME_ENTRY_create_by_NID( NULL, NID_commonName,
-	    ne_data->type, ne_data->data, -1)) == NULL){
+    if ((new_ne = X509_NAME_ENTRY_create_by_NID(NULL, NID_commonName,
+          ASN1_STRING_type(ne_data),
+          ASN1_STRING_get0_data(ne_data), -1)) == NULL){
 
       result = voms_validation_error(
 	  PRXYERR_R_ERROR_BUILDING_SUBJECT,

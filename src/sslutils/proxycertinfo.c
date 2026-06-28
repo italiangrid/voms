@@ -107,9 +107,10 @@ static int i2r_pci(X509V3_EXT_METHOD *method, PROXY_CERT_INFO_EXTENSION *pci,
     BIO_printf(out, "%*sPolicy Language: ", indent, "");
     i2a_ASN1_OBJECT(out, pci->proxyPolicy->policyLanguage);
     BIO_puts(out, "\n");
-    if (pci->proxyPolicy->policy && pci->proxyPolicy->policy->data)
+    if (pci->proxyPolicy->policy &&
+        ASN1_STRING_get0_data(pci->proxyPolicy->policy))
         BIO_printf(out, "%*sPolicy Text: %s\n", indent, "",
-                   pci->proxyPolicy->policy->data);
+                   ASN1_STRING_get0_data(pci->proxyPolicy->policy));
     return 1;
 }
 
@@ -138,15 +139,15 @@ ASN1_OBJECT * PROXY_POLICY_get_policy_language(
 
 unsigned char * PROXY_POLICY_get_policy(
     PROXY_POLICY *                       policy,
-    int *                               length)
+    int *                                length)
 {
-    if(policy->policy)
-    { 
-        (*length) = policy->policy->length;
-        if(*length > 0 && policy->policy->data)
+    if (policy->policy)
+    {
+        (*length) = ASN1_STRING_length(policy->policy);
+        if (*length > 0 && ASN1_STRING_get0_data(policy->policy))
         {
-            unsigned char *                 copy = malloc(*length);
-            memcpy(copy, policy->policy->data, *length);
+            unsigned char *copy = malloc(*length);
+            memcpy(copy, ASN1_STRING_get0_data(policy->policy), *length);
             return copy;
         }
     }
@@ -290,7 +291,7 @@ PROXY_CERT_INFO_EXTENSION_set_path_length(
 
     if (pl != -1) {
       if (pci->pcPathLengthConstraint == NULL) {
-	pci->pcPathLengthConstraint = ASN1_INTEGER_new();
+        pci->pcPathLengthConstraint = ASN1_INTEGER_new();
       }
       return ASN1_INTEGER_set(pci->pcPathLengthConstraint, pl);
     } else {
