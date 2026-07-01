@@ -7,7 +7,20 @@ their roles and other attributes in order to issue trusted attribute
 certificates and SAML assertions used in the Grid environment for authorization
 purposes.
 
-This repository hosts the VOMS server and C++ APIs.
+This repository hosts VOMS server, clients and C++ APIs.
+
+## Build matrix
+
+| Distribution | gcc version (C++ standard) | OpenSSL version |
+| ------------ | -------------------------- | --------------- |
+| Ubuntu 20.04 | 9.3 (C++14)                | 1.1.1f          |
+| Ubuntu 22.04 | 11.2 (C++17)               | 3.0.2           |
+| Ubuntu 24.04 | 13.2 (C++17)               | 3.0.13          |
+| Ubuntu 26.04 | 15.2 (C++20)               | 3.5.5           |
+| AlmaLinux  8 | 8.5 (C++14)                | 1.1.1k          |
+| AlmaLinux  9 | 11.5 (C++17)               | 3.5.5           |
+| AlmaLinux 10 | 14.3 (C++17)               | 3.5.5           |
+| Fedora 45    | 16.1 (C++20)               | 4.0.1           |
 
 ## Documentation
 

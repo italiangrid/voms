@@ -6,11 +6,62 @@ on:
 
 jobs:
 
+  el8:
+    runs-on: ubuntu-latest
+    container: almalinux:8
+    steps:
+      - uses: actions/checkout@v7
+
+      - name: Install packages
+        run: |
+          yum install -y epel-release
+          yum install -y make file automake libtool gcc-c++ openssl-devel gsoap-devel gsoap expat-devel bison
+
+      - name: Build
+        run: |
+          ./autogen.sh
+          ./configure
+          make
+
   el9:
     runs-on: ubuntu-latest
     container: almalinux:9
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
+
+      - name: Install packages
+        run: |
+          yum install -y epel-release
+          yum install -y make file automake libtool gcc-c++ openssl-devel gsoap-devel gsoap expat-devel bison
+
+      - name: Build
+        run: |
+          ./autogen.sh
+          ./configure
+          make
+
+  el10:
+    runs-on: ubuntu-latest
+    container: almalinux:10
+    steps:
+      - uses: actions/checkout@v7
+
+      - name: Install packages
+        run: |
+          yum install -y epel-release
+          yum install -y make file automake libtool gcc-c++ openssl-devel gsoap-devel gsoap expat-devel bison
+
+      - name: Build
+        run: |
+          ./autogen.sh
+          ./configure
+          make
+
+  fedora45:
+    runs-on: ubuntu-latest
+    container: fedora:45
+    steps:
+      - uses: actions/checkout@v7
 
       - name: Install packages
         run: |
@@ -27,7 +78,7 @@ jobs:
     runs-on: ubuntu-latest
     container: ubuntu:20.04
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
 
       - name: Install packages
         run: |
@@ -43,7 +94,7 @@ jobs:
   ubuntu2404:
     runs-on: ubuntu-24.04
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
 
       - name: Install packages
         run: |
@@ -56,3 +107,18 @@ jobs:
           ./configure
           make
 
+  ubuntu2604:
+    runs-on: ubuntu-26.04
+    steps:
+      - uses: actions/checkout@v7
+
+      - name: Install packages
+        run: |
+          sudo apt update
+          sudo apt install -y make automake libtool pkg-config g++ libssl-dev libgsoap-dev gsoap libexpat-dev
+
+      - name: Build
+        run: |
+          ./autogen.sh
+          ./configure
+          make
