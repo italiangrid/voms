@@ -19,6 +19,7 @@ Makefile
 !/m4/wsdl2h.m4
 !/m4/acinclude.m4
 !/m4/Makefile.am
+!/m4/m4_ax_cxx_compile_stdcxx.m4
 /libtool
 .libs
 .deps

@@ -1,5 +1,5 @@
-AC_INIT([VOMS], [2.1.3])
-AC_PREREQ(2.57)
+AC_INIT([VOMS],[2.1.3])
+AC_PREREQ([2.69])
 AC_CONFIG_AUX_DIR([./aux])
 AM_INIT_AUTOMAKE
 AC_CONFIG_SRCDIR([src/utils/voms_proxy_destroy.cc])
@@ -19,6 +19,7 @@ AC_SUBST(WORKDIR)
 
 # Checks for programs.
 AC_PROG_CXX
+AX_CXX_COMPILE_STDCXX(17)
 AC_PROG_AWK
 AC_PROG_CC
 AM_PROG_CC_C_O
@@ -26,7 +27,7 @@ AC_PROG_CPP
 AC_PROG_INSTALL
 AC_PROG_LN_S
 AC_PROG_MAKE_SET
-AC_PROG_LIBTOOL
+LT_INIT
 AC_PROG_YACC
 AC_PROG_LEX
 AC_COMPILER
@@ -40,7 +41,6 @@ AC_ENABLE_DOCS
 
 # Checks for header files.
 AC_HEADER_DIRENT
-AC_HEADER_STDC
 AC_HEADER_SYS_WAIT
 AC_CHECK_HEADERS([fcntl.h libintl.h limits.h memory.h netdb.h netinet/in.h stdlib.h string.h strings.h sys/socket.h sys/time.h syslog.h termios.h unistd.h malloc.h wchar.h])
 
@@ -53,7 +53,6 @@ AC_TYPE_OFF_T
 AC_TYPE_PID_T
 AC_TYPE_SIZE_T
 AC_CHECK_MEMBERS([struct stat.st_rdev])
-AC_HEADER_TIME
 AC_STRUCT_TM
 
 # Checks for library functions.
