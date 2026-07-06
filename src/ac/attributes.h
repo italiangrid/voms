@@ -39,14 +39,6 @@
 #include "acerrors.h"
 #include "acstack.h"
 
-#ifndef VOMS_MAYBECONST
-#if defined(D2I_OF)
-#define VOMS_MAYBECONST const
-#else
-#define VOMS_MAYBECONST
-#endif
-#endif
-
 typedef struct ACATTRIBUTE {
   ASN1_OCTET_STRING *name;
   ASN1_OCTET_STRING *value;

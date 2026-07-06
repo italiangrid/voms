@@ -69,20 +69,6 @@ extern "C" {
 #include "internal.h"
 #include "normalize.h"
 
-#ifndef VOMS_MAYBECONST
-#if defined(D2I_OF)
-#define VOMS_MAYBECONST const
-#else
-#define VOMS_MAYBECONST
-#endif
-#endif
-
-#if OPENSSL_VERSION_NUMBER >= 0x40000000L
-#define CONST4 const
-#else
-#define CONST4
-#endif
-
 extern proxy_verify_desc *setup_initializers(char *cadir);
 extern void destroy_initializers(void *data);
 static bool dncompare(const char *mut, const char *fixed);
@@ -139,24 +125,20 @@ vomsdata::evaluate(AC_SEQ *acs, const std::string& subject,
   return ok;
 }
 
-
-static CONST4 X509_EXTENSION *get_ext(X509 *cert, const char *name)
+static auto get_ext(X509 *cert, const char *name)
 {
   int nid   = OBJ_txt2nid(name);
   int index = X509_get_ext_by_NID(cert, nid, -1);
 
-  if (index >= 0)
-    return X509_get_ext(cert, index);
-  else
-    return NULL;
+  // it returns nullptr in case of invalid arguments
+  return X509_get_ext(cert, index);
 }
 
 static bool findexts(X509 *cert , AC_SEQ **listnew, std::string &extra_data, std::string &workvo)
 {
-  CONST4 X509_EXTENSION *ext;
   bool found = false;
 
-  ext = get_ext(cert, "acseq");
+  auto ext = get_ext(cert, "acseq");
   if (ext) {
     *listnew = (AC_SEQ *)X509V3_EXT_d2i(ext);
     found = true;
@@ -296,10 +278,10 @@ vomsdata::verifydata(std::string &message, UNUSED(std::string subject),
 
   error = VERR_FORMAT;
 
-  VOMS_MAYBECONST unsigned char *str  = (VOMS_MAYBECONST unsigned char *)(message.data());
-  VOMS_MAYBECONST unsigned char *orig = str;
+  unsigned char* const orig = reinterpret_cast<unsigned char*>(message.data());
+  unsigned char const* str  = orig;
 
-  AC   *tmp    = d2i_AC(NULL, &str, message.size());
+  AC* tmp = d2i_AC(NULL, &str, message.size());
 
   if (tmp) {
     size_t off = str - orig;

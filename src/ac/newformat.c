@@ -38,14 +38,6 @@
 #include "acerrors.h"
 #include "attributes.h"
 
-#ifndef VOMS_MAYBECONST
-#if defined(D2I_OF)
-#define VOMS_MAYBECONST const
-#else
-#define VOMS_MAYBECONST
-#endif
-#endif
-
 ASN1_SEQUENCE(AC_DIGEST) = {
   ASN1_SIMPLE(AC_DIGEST, type, ASN1_ENUMERATED),
   ASN1_OPT(AC_DIGEST, oid, ASN1_OBJECT),

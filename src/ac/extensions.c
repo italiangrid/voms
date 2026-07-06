@@ -42,14 +42,6 @@
 #include <string.h>
 #include <assert.h>
 
-#ifndef VOMS_MAYBECONST
-#if defined(D2I_OF)
-#define VOMS_MAYBECONST const
-#else
-#define VOMS_MAYBECONST
-#endif
-#endif
-
 static char *norep()
 {
   static char *buffer = 0;

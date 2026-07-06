@@ -35,14 +35,6 @@
 
 #include "acstack.h"
 
-#ifndef VOMS_MAYBECONST
-#if defined(D2I_OF)
-#define VOMS_MAYBECONST const
-#else
-#define VOMS_MAYBECONST
-#endif
-#endif
-
 typedef struct ACDIGEST {
   ASN1_ENUMERATED *type;
   ASN1_OBJECT     *oid;

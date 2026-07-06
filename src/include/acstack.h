@@ -30,15 +30,6 @@
 #include <openssl/safestack.h>
 #include <openssl/opensslv.h>
 
-#ifndef VOMS_MAYBECONST
-#if defined(D2I_OF)
-#define VOMS_MAYBECONST const
-#else
-#define VOMS_MAYBECONST
-/* typedef void *d2i_of_void(void *, unsigned char **); */
-#endif
-#endif
-
 #define DECL_STACK(type) DEFINE_STACK_OF(type)
 #define IMPL_STACK(type)
 

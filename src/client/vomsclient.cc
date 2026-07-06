@@ -76,14 +76,6 @@ extern "C"
 
 #include "init.h"
 
-#ifndef VOMS_MAYBECONST
-#if defined(D2I_OF)
-#define VOMS_MAYBECONST const
-#else
-#define VOMS_MAYBECONST
-#endif
-#endif
-
 static AC *getAC(const std::string& data);
 
 const std::string SUBPACKAGE      = "voms-proxy-init";
@@ -1189,21 +1181,9 @@ void Client::Error()
 
 static AC *getAC(const std::string& data)
 {
-  VOMS_MAYBECONST unsigned char *p;
-  char *pp;
-  AC *ac = NULL;
-  int len = data.size();
+  auto str = reinterpret_cast<unsigned char const*>(data.c_str());
 
-  pp = (char *)malloc(len);
-
-  if (pp) {
-    pp = (char *)memcpy(pp, data.data(), len);
-    p = (VOMS_MAYBECONST unsigned char*)pp;
-    ac = d2i_AC(NULL, (VOMS_MAYBECONST unsigned char **)&p, len);
-    free(pp);
-  }
-
-  return ac;
+  return d2i_AC(NULL, &str, data.size());
 }
 
 bool Client::LoadVomses()

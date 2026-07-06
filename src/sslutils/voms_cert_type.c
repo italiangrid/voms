@@ -11,12 +11,6 @@
 #include <stdio.h>
 #include <string.h>
 
-#if OPENSSL_VERSION_NUMBER >= 0x40000000L
-#define CONST4 const
-#else
-#define CONST4
-#endif
-
 #define LIMITED_PROXY_OID               "1.3.6.1.4.1.3536.1.1.1.9"
 #define PROXYCERTINFO_OLD_OID           "1.3.6.1.4.1.3536.1.222"
 #define NULL_STR "<null>"
@@ -119,7 +113,11 @@ voms_get_cert_type(X509* cert, voms_cert_type_t* cert_type){
   voms_result_t result = VOMS_SUCCESS;
 
   BASIC_CONSTRAINTS* bc_ext = NULL;
-  CONST4 X509_EXTENSION* ext = NULL;
+
+  // the following is a pointer, mutable or const dependeing on
+  // the openssl version
+  typedef typeof(X509_get_ext(NULL, 0)) X509Extension;
+  X509Extension ext = NULL;
   PROXY_CERT_INFO_EXTENSION *pci_ext = NULL;
   PROXY_POLICY *policy = NULL;
   ASN1_OBJECT *policy_lang = NULL;
