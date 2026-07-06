@@ -57,8 +57,6 @@ EXTERN_C_BEGIN
 #include <time.h>
 #include "openssl/crypto.h"
 
-#define OPENSSL_PEM_CB(A,B)  A, B
-
 #include "openssl/ssl.h"
 #include "openssl/err.h"
 #include "openssl/bio.h"

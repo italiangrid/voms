@@ -537,7 +537,7 @@ proxy_load_user_proxy(
 
     for (;;)
     {
-        x = PEM_read_bio_X509(in,NULL, OPENSSL_PEM_CB(NULL,NULL));
+        x = PEM_read_bio_X509(in, NULL, NULL, NULL);
         if (x == NULL)
         {
             if ((ERR_GET_REASON(ERR_peek_last_error()) ==
@@ -1341,7 +1341,7 @@ proxy_marshal_bp(
                                      NULL,
                                      NULL,
                                      0,
-                                     OPENSSL_PEM_CB(NULL,NULL)))
+                                     NULL, NULL))
     {
         return 2;
     }
@@ -2668,9 +2668,7 @@ proxy_load_user_cert(
         goto err;
       }
 
-      if (PEM_read_X509(fp,
-                        certificate,
-                        OPENSSL_PEM_CB(NULL,NULL)) == NULL) {
+      if (PEM_read_X509(fp, certificate, NULL, NULL) == NULL) {
         if (ERR_peek_error() == ERR_PACK(ERR_LIB_PEM,PEM_F_PEM_READ_BIO,PEM_R_NO_START_LINE)) {
           ERR_clear_error();
           PRXYerr(PRXYERR_F_INIT_CRED,PRXYERR_R_INVALID_CERT);
@@ -2783,9 +2781,7 @@ proxy_load_user_key(
         goto err;
       }
 
-      if (PEM_read_PrivateKey(fp,
-                              private_key,
-                              OPENSSL_PEM_CB(xpw_cb,NULL)) == NULL) {
+      if (PEM_read_PrivateKey(fp, private_key, xpw_cb, NULL) == NULL) {
         unsigned long error = ERR_peek_error();
         fclose(fp);
 
