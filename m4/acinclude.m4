@@ -365,51 +365,6 @@ AC_DEFUN([PUT_PRIVATES],
 
 AC_DEFUN([AC_TESTSUITE],
 [
-  AC_ARG_WITH(report-dir,
-    [  --with-report-dir    Set reportdir for testsuite],
-    [with_reportdir="$withval"],
-    [with_reportdir="$HOME/reports"])
-
-  AC_ARG_WITH(scratch-dir,
-    [  --with-scratch-dir   Set scratchdir for testsuite],
-    [with_scratchdir="$withval"],
-    [with_scratchdir="/tmp"])
-
-  AC_ARG_WITH(dbuser,
-    [  --with-dbuser        Set DB user for testsuite],
-    [with_dbuser="$withval"],
-    [with_dbuser="root"])
-
-  AC_ARG_WITH(dbpwd,
-    [  --with-dbpwd         Set DB password for testsuite],
-    [with_dbpwd="$withval"],
-    [with_dbpwd=""])
-
-  AC_ARG_WITH(mysqlconf,
-    [  --with-mysqlconf     Set DB password for testsuite],
-    [with_mysqlconf="$withval"],
-    [with_mysqlconf=""])
-
-  AC_ARG_ENABLE(oracle-tests,
-    [  --enable-oracle-tests  Do tests against Oracle DB],
-    [ case "$enableval" in
-      yes) enable_oracletests="yes" ;;
-      no)  enable_oracletests="no" ;;
-      *) AC_MSG_ERROR([bad value $(enableval) for --enable-oracle-tests]) ;;
-      esac
-    ],
-    [ enable_oracletests="no"])
-
-  AC_ARG_ENABLE(mysql-tests,
-    [  --enable-mysql-tests  Do tests against MySQL DB],
-    [ case "$enableval" in
-      yes) enable_mysqltests="yes" ;;
-      no)  enable_mysqltests="no" ;;
-      *) AC_MSG_ERROR([bad value $(enableval) for --enable-mysql-tests]) ;;
-      esac
-    ],
-    [ enable_mysqltests="yes"])
-
   AC_ARG_ENABLE(coverage,
     [  --enable-coverage Enable getting coverage info on the testsuite execution],
     [
@@ -426,11 +381,6 @@ AC_DEFUN([AC_TESTSUITE],
      CXXFLAGS="$CXXFLAGS -fprofile-arcs -ftest-coverage"
      LDFLAGS="$LDFLAGS -lgcov"
   fi
-
-  AC_ARG_WITH(cobertura,
-	      [  --with-cobertura=PFX    prefix where cobertura is placed (no default)],
-	      [with_cobertura_prefix="$withval"],
-	      [with_cobertura_prefix="no"])
 
   AC_ARG_WITH(valgrind,
         [  --with-valgrind=PFX     Also test memory leaks with valgrind],
@@ -454,17 +404,8 @@ AC_DEFUN([AC_TESTSUITE],
      AC_MSG_RESULT($with_valgrind.)
   fi
 
-  AM_CONDITIONAL(USE_COBERTURA, test ! x$with_cobertura_prefix = xno)
   AC_SUBST(with_valgrind)
-  AC_SUBST(with_reportdir)
-  AC_SUBST(with_scratchdir)
-  AC_SUBST(with_dbuser)
-  AC_SUBST(with_dbpwd)
-  AC_SUBST(with_mysqlconf)
-  AC_SUBST(enable_oracletests)
-  AC_SUBST(enable_mysqltests)
   AC_SUBST(enable_coverage)
-  AC_SUBST(with_cobertura_prefix)
 ])
 
 dnl This macro written by:

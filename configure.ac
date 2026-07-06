@@ -135,9 +135,7 @@ AC_CONFIG_FILES([Makefile
                  src/sslutils/Makefile
                  src/utils/Makefile
                  doc/Makefile
-                 m4/Makefile
-                 testsuite/Makefile
-                 testsuite/SuiteConfig])
+                 m4/Makefile])
                  
 AC_CONFIG_FILES([src/install/voms_install_db
                  src/install/voms.start
