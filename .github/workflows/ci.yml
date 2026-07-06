@@ -121,3 +121,21 @@ jobs:
           ./autogen.sh
           ./configure
           make
+
+  macos26:
+    runs-on: macos-26
+    steps:
+      - uses: actions/checkout@v7
+
+      - name: Install packages
+        run: |
+          brew install -y automake libtool gsoap openssl zlib
+
+      - name: Build
+        run: |
+          DYLD_LIBRARY_PATH=$(brew --prefix gsoap)/lib:$(brew --prefix openssl)/lib:$(brew --prefix zlib)/lib:$DYLD_LIBRARY_PATH
+          CPPFLAGS="-I$(brew --prefix openssl)/include"
+          LDFLAGS="-L$(brew --prefix openssl)/lib -lssl -lcrypto -lz"
+          ./autogen.sh
+          ./configure CPPFLAGS="$CPPFLAGS" LDFLAGS="$LDFLAGS" --with-gsoap-wsdl2h=$(brew --prefix gsoap)/bin/wsdl2h
+          make
