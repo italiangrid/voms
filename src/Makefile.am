@@ -1,7 +1,6 @@
 if BUILD_ALL
 SUBDIRS = \
 	include \
-	replib \
 	sslutils \
 	log \
 	common \
@@ -16,7 +15,6 @@ SUBDIRS = \
 else
 SUBDIRS = \
 	include \
-	replib \
 	sslutils \
 	log \
 	common \

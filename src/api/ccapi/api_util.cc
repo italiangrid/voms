@@ -28,7 +28,6 @@
 #include "asn1_utils.h"
 
 extern "C" {
-#include "replace.h"
 
 #include <sys/types.h>
 #include <netdb.h>

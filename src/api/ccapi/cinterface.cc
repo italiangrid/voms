@@ -23,7 +23,6 @@
  *
  *********************************************************************/
 #include "config.h"
-#include "replace.h"
 
 #include "voms_api.h"
 

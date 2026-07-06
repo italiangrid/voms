@@ -33,7 +33,6 @@ extern "C" {
 #endif
 
 #include "config.h"
-#include "replace.h"
 
 #include <unistd.h>
 #include <sys/types.h>

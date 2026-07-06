@@ -32,7 +32,6 @@ Description:
 #define _GNU_SOURCE
 
 #include "config.h"
-#include "replace.h"
 #include "proxycertinfo.h"
 #include "sslutils.h"
 #include "parsertypes.h"

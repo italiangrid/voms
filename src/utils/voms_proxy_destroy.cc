@@ -31,7 +31,6 @@
                              Include header files
 **********************************************************************/
 #include "config.h"
-#include "replace.h"
 
 #include <string>
 

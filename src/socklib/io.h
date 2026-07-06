@@ -29,7 +29,6 @@
 #include "config.h"
 
 extern "C" {
-#include "replace.h"
 #include <time.h>
 #include <openssl/ssl.h>
 }

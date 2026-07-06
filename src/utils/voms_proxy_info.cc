@@ -27,7 +27,6 @@
                              Include header files
 **********************************************************************/
 #include "config.h"
-#include "replace.h"
 
 extern "C" {
 #include <sys/types.h>

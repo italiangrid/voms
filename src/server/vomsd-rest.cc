@@ -25,7 +25,6 @@
 #include "config.h"
 
 extern "C" {
-#include "replace.h"
 #include <stdio.h>
 #include <ctype.h>
 #include <openssl/evp.h>

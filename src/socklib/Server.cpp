@@ -34,7 +34,6 @@
 
 /** The globus secure shell API definitions. */
 extern "C" {
-#include "replace.h"
 
 #include <sys/types.h>
 #include <unistd.h>

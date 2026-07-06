@@ -34,7 +34,6 @@ voms_LDADD = \
 	$(top_builddir)/src/common/libutilities_nog.la \
 	$(top_builddir)/src/ac/libattributes_nog.la \
 	$(top_builddir)/src/common/libutilc_nog.la \
-	$(top_builddir)/src/replib/librep.la \
 	$(top_builddir)/src/log/liblog.la \
 	$(top_builddir)/src/api/ccapi/libvomsapi.la \
 	$(GSOAP_SSL_PP_LIBS) \

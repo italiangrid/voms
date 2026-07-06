@@ -128,7 +128,6 @@ AC_CONFIG_FILES([Makefile
                  src/include/Makefile
                  src/install/Makefile
                  src/log/Makefile
-                 src/replib/Makefile
                  src/replica/Makefile
                  src/server/Makefile
                  src/socklib/Makefile

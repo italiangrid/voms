@@ -25,7 +25,6 @@
  *********************************************************************/
 
 #include "config.h"
-#include "replace.h"
 
 #include "options.h"
 #include "data.h"

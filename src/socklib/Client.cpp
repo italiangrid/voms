@@ -33,7 +33,6 @@
 #include "config.h"
 
 extern "C" {
-#include "replace.h"
 
 #include <errno.h>
 #include <sys/types.h>

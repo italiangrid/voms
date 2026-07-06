@@ -24,7 +24,6 @@
  *********************************************************************/
 extern "C" {
 #include "config.h"
-#include "replace.h"
 }
 
 #include <string>

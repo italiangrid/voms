@@ -25,8 +25,6 @@
 
 #include "config.h"
 
-#include "replace.h"
-
 #include "VOMSServer.h"
 #include "dbwrap.h"
 #include "sslutils.h"

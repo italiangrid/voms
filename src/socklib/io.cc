@@ -26,7 +26,6 @@
 #include "config.h"
 
 extern "C" {
-#include "replace.h"
 
 #include <stdio.h>
 #include <errno.h>

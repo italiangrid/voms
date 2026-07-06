@@ -24,7 +24,6 @@
  *********************************************************************/
 
 #include "config.h"
-#include "replace.h"
 
 #ifdef _GNU_SOURCE
 #undef _GNU_SOURCE
@@ -59,7 +58,6 @@ extern "C" {
 #include <string.h>
 #include <unistd.h>
 
-#include "replace.h"
 }
 
 #include "../api/ccapi/voms_api.h"

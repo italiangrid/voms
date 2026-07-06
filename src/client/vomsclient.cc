@@ -43,7 +43,6 @@ extern "C" {
   
 #include "listfunc.h"
 #include "credentials.h"
-#include "replace.h"
 #include "doio.h"
 
 #include <openssl/pkcs12.h>
