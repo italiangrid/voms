@@ -47,10 +47,6 @@ Description:
 #include "openssl/pem.h"
 #include "openssl/x509.h"
 
-#if SSLEAY_VERSION_NUMBER >= 0x0090581fL
-#include "openssl/x509v3.h"
-#endif
-
 #include "openssl/stack.h"
 
 typedef void *globus_gsi_callback_data_t;

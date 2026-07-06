@@ -1107,7 +1107,7 @@ static bool check_validity_dates(X509 const* cert, int& time_left, std::string& 
 bool Client::pcdInit() 
 {
   ERR_load_prxyerr_strings(0);
-  SSLeay_add_ssl_algorithms();
+  SSL_library_init();
   ERR_load_crypto_strings();
   OpenSSL_add_all_ciphers();
   PKCS12_PBE_add();

@@ -872,7 +872,7 @@ bool Fake::pcdInit() {
   int status = false;
 
   ERR_load_prxyerr_strings(0);
-  SSLeay_add_ssl_algorithms();
+  SSL_library_init();
   PKCS12_PBE_add();
   
   BIO * bio_err = NULL;

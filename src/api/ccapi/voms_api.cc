@@ -112,17 +112,6 @@ static bool ssl_is_initialized = false;
 
 static void initialize()
 {
-#if OPENSSL_VERSION_NUMBER < 0x10100000L
-  if (!ssl_is_initialized) {
-    // not strictly necessary, since initialize is called only once
-    ssl_is_initialized = true;
-
-    SSL_library_init();
-    OpenSSL_add_all_algorithms();
-    ERR_load_crypto_strings();
-    OpenSSL_add_all_ciphers();
-  }
-#endif
   AC_Init();
   InitProxyCertInfoExtension(1);
 }
@@ -587,11 +576,7 @@ bool vomsdata::Import(std::string buffer)
   char *buf = NULL;
 
   std::string subject, ca;
-#if OPENSSL_VERSION_NUMBER >= 0x00908000L
   const unsigned char *buftmp, *copy;
-#else
-  unsigned char *buftmp, *copy;
-#endif
 
   buffer = Decode(buffer);
 

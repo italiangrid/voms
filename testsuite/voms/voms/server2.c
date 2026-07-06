@@ -58,7 +58,7 @@ int main(int argc, char *argv[])
   // FIXME should this only be called once?
 
   OpenSSL_add_all_algorithms();
-  SSLeay_add_all_algorithms();
+  SSL_library_init();
   SSL_load_error_strings();
   ERR_load_crypto_strings();
   ERR_load_BIO_strings();
@@ -132,11 +132,7 @@ int main(int argc, char *argv[])
   if ( (error = SSL_accept( m_sslCon )) <= 0 ) {
     unsigned long l;
     char buf[256];
-#if SSLEAY_VERSION_NUMBER  >= 0x00904100L
     const char *file;
-#else
-    char *file;
-#endif
     char *dat;
     int line;
 

@@ -57,54 +57,7 @@ EXTERN_C_BEGIN
 #include <time.h>
 #include "openssl/crypto.h"
 
-
-
-#if SSLEAY_VERSION_NUMBER < 0x0090581fL
-#define RAND_add(a,b,c) RAND_seed(a,b)
-#define RAND_status() 1
-#endif
-
-#if SSLEAY_VERSION_NUMBER >= 0x00904100L
-/* Support both OpenSSL 0.9.4 and SSLeay 0.9.0 */
 #define OPENSSL_PEM_CB(A,B)  A, B
-#else
-#define RAND_add(a,b,c) RAND_seed(a,b)
-#define OPENSSL_PEM_CB(A,B)  A
-
-#define STACK_OF(A) STACK
-
-#define sk_X509_num  sk_num
-#define sk_X509_value  (X509 *)sk_value
-#define sk_X509_push(A, B) sk_push(A, (char *) B)
-#define sk_X509_insert(A,B,C)  sk_insert(A, (char *) B, C)
-#define sk_X509_delete  sk_delete
-#define sk_X509_new_null sk_new_null
-#define sk_X509_pop_free sk_pop_free
-
-#define sk_X509_NAME_ENTRY_num  sk_num
-#define sk_X509_NAME_ENTRY_value  (X509_NAME_ENTRY *)sk_value
-
-#define sk_SSL_CIPHER_num  sk_num
-#define sk_SSL_CIPHER_value  (SSL_CIPHER*)sk_value
-#define sk_SSL_CIPHER_insert(A,B,C)  sk_insert(A, (char *) B, C)
-#define sk_SSL_CIPHER_delete  sk_delete
-#define sk_SSL_CIPHER_push(A, B) sk_push(A, (char *) B)
-#define sk_SSL_CIPHER_shift(A) sk_shift(A)
-#define sk_SSL_CIPHER_dup(A) sk_dup(A)
-#define sk_SSL_CIPHER_unshift(A, B) sk_unshift(A, (char *) B)
-#define sk_SSL_CIPHER_pop(A) sk_pop(A)
-#define sk_SSL_CIPHER_delete_ptr(A, B) sk_delete_ptr(A, B)
-
-#define sk_X509_EXTENSION_num sk_num
-#define sk_X509_EXTENSION_value (X509_EXTENSION *)sk_value
-#define sk_X509_EXTENSION_push(A, B) sk_push(A, (char *) B)
-#define sk_X509_EXTENSION_new_null sk_new_null
-#define sk_X509_EXTENSION_pop_free sk_pop_free
-
-#define sk_X509_REVOKED_num sk_num
-#define sk_X509_REVOKED_value (X509_REVOKED*)sk_value
-
-#endif
 
 #include "openssl/ssl.h"
 #include "openssl/err.h"
@@ -164,25 +117,7 @@ EXTERN_C_BEGIN
 /* Location relative to ERR_LIB_USER where PRXYERR library will be stored */
 #define ERR_USER_LIB_PRXYERR_NUMBER     ERR_LIB_USER
 
-/*
- * Use the SSLeay error facility with the ERR_LIB_USER
- */
-
 #define PRXYerr(f,r) ERR_PUT_error(ERR_USER_LIB_PRXYERR_NUMBER,(f),(r),__FILE__,__LINE__)
-
-/* 
- * SSLeay 0.9.0 added the error_data feature. We may be running
- * with 0.8.1 which does not have it, if so, define a dummy
- * ERR_add_error_data and ERR_get_error_line_data
-        
-*/
-
-#if SSLEAY_VERSION_NUMBER < 0x0900
-void ERR_add_error_data( VAR_PLIST( int, num ) );
-
-unsigned long ERR_get_error_line_data(char **file,int *line,
-                                      char **data, int *flags);
-#endif
 
 void
 ERR_set_continue_needed(void);

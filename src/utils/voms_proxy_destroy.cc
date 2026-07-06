@@ -132,7 +132,7 @@ delete_proxy(void)
   char *of;
 
   ERR_load_prxyerr_strings(0);
-  SSLeay_add_ssl_algorithms();
+  SSL_library_init();
 
   /*
    * These 5 const_cast are allowed because proxy_get_filenames will

@@ -357,7 +357,7 @@ test_proxy()
   STACK_OF(X509) *chain = NULL;
 
   ERR_load_prxyerr_strings(0);
-  SSLeay_add_ssl_algorithms();
+  SSL_library_init();
 
   EVP_set_pw_prompt("Enter GRID pass phrase:");
 
@@ -719,11 +719,7 @@ static std::string getKeyUsage(X509 *cert)
 
   std::string keyusage;
 
-#if OPENSSL_VERSION_NUMBER >= 0x10000000L
   const X509V3_EXT_METHOD *method = X509V3_EXT_get_nid(NID_key_usage);
-#else
-  X509V3_EXT_METHOD *method = X509V3_EXT_get_nid(NID_key_usage);
-#endif
 
   if (method) {
     confs = NULL;

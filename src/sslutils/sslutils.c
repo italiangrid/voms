@@ -74,13 +74,7 @@ Description:
 
 #include "openssl/rsa.h"
 #include "openssl/rand.h"
-#if SSLEAY_VERSION_NUMBER >= 0x0090581fL
 #include "openssl/x509v3.h"
-#endif
-
-#ifndef X509_V_ERR_INVALID_PURPOSE
-#define X509_V_ERR_INVALID_PURPOSE X509_V_ERR_CERT_CHAIN_TOO_LONG
-#endif
 
 #include <assert.h>
 
@@ -290,59 +284,6 @@ X509_NAME_cmp_no_set(
     return(0);
 }
 
-#if SSLEAY_VERSION_NUMBER < 0x0900
-
-/**********************************************************************
-Function: ERR_add_error_data()
-
-Description:
-    Dummy routine only defined if running with SSLeay-0.8.x
-    this feature was introduced with SSLeay-0.9.0
-
-Parameters:
-
-Returns:
-**********************************************************************/
-void PRIVATE
-ERR_add_error_data( VAR_PLIST( int, num ))
-    VAR_ALIST
-{
-    VAR_BDEFN(args, int, num);
-}
-
-/**********************************************************************
-Function: ERR_get_error_line_data()
-
-Description:
-    Dummy routine only defined if running with SSLeay-0.8.x
-    this feature was introduced with SSLeay-0.9.0. We will
-    simulate it for 0.8.1
-
-Parameters:
-
-Returns:
-**********************************************************************/
-unsigned long PRIVATE
-ERR_get_error_line_data(
-    char **                             file,
-    int *                               line,
-    char **                             data,
-    int *                               flags)
-{
-    if (data)
-    {
-        *data = "";
-    }
-
-    if (flags)
-    {
-        *flags = 0;
-    }
-
-    return (ERR_get_error_line(file, line));
-}
-
-#endif
 
 /**********************************************************************
 Function: ERR_set_continue_needed()
@@ -412,12 +353,8 @@ ERR_load_prxyerr_strings(
     static int                          init = 1;
     struct stat                         stx;
     clock_t cputime;
-#if SSLEAY_VERSION_NUMBER  >= 0x00904100L
     const char *                        randfile;
-#else
-    char *                              randfile;
-#endif
-#if SSLEAY_VERSION_NUMBER >=  0x0090581fL && !defined(OPENSSL_NO_EGD)
+#if !defined(OPENSSL_NO_EGD)
     char *                              egd_path;
 #endif
     char                                buffer[200];
@@ -486,7 +423,7 @@ ERR_load_prxyerr_strings(
             RAND_load_file(randfile,1024L*1024L);
         }
 
-#if SSLEAY_VERSION_NUMBER >=  0x0090581fL && !defined(OPENSSL_NO_EGD)
+#if !defined(OPENSSL_NO_EGD)
         /*
          * Try to use the Entropy Garthering Deamon
          * See the OpenSSL crypto/rand/rand_egd.c
@@ -1534,7 +1471,7 @@ proxy_verify_ctx_release(
         pvxd->certdir = NULL;
     }
 }
-#if SSLEAY_VERSION_NUMBER >=  0x0090600fL
+
 /**********************************************************************
 Function: proxy_app_verify_callback()
 
@@ -1553,19 +1490,12 @@ int
 proxy_app_verify_callback(X509_STORE_CTX *ctx, UNUSED(void *empty))
 {
 
-#if OPENSSL_VERSION_NUMBER < 0x10100000L
-    ctx->check_issued = proxy_check_issued;
-#else
     X509_STORE_set_check_issued(X509_STORE_CTX_get0_store(ctx), proxy_check_issued);
-#endif
 
-#if defined(X509_V_FLAG_ALLOW_PROXY_CERTS)
     X509_STORE_CTX_set_flags(ctx, X509_V_FLAG_ALLOW_PROXY_CERTS);
-#endif
 
     return X509_verify_cert(ctx);
 }
-#endif
 
 /* Ifdef out all extra code not needed for k5cert
  * This includes the OLDGAA
@@ -2116,10 +2046,8 @@ proxy_verify_cert_chain(
     scert = ucert;
     cert_store = X509_STORE_new();
     X509_STORE_set_verify_cb(cert_store, proxy_verify_callback);
-#if SSLEAY_VERSION_NUMBER >=  0x0090600fL
     /* override the check_issued with our version */
     X509_STORE_set_check_issued(cert_store, proxy_check_issued);
-#endif
     if (cert_chain != NULL)
     {
         int i =0;
