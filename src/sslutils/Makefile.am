@@ -7,7 +7,7 @@ endif
 
 noinst_LTLIBRARIES = libssl_utils_nog.la
 
-SOURCES= scutils.c scutils.h sslutils.c proxycertinfo.c proxypolicy.c \
+SOURCES= sslutils.c proxycertinfo.c proxypolicy.c \
 	signing_policy.c lex.signing.c namespaces.c lex.namespaces.c \
 	evaluate.c proxy.c vomsproxy.h voms_cert_type.h  voms_cert_type.c \
 	ssl_compat.c

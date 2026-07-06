@@ -50,12 +50,8 @@ extern "C" {
 #include <fcntl.h>
 #include <errno.h>
 
-#ifdef USE_PKCS11
-#include "scutils.h"
-#endif
 #include "sslutils.h"
 }
-
 #include "data.h"
 #include "options.h"
 

@@ -95,10 +95,6 @@ Description:
 #define X509_V_ERR_INVALID_PURPOSE X509_V_ERR_CERT_CHAIN_TOO_LONG
 #endif
 
-#ifdef USE_PKCS11
-#include "scutils.h"
-#endif
-
 #include <assert.h>
 
 static int fix_add_entry_asn1_set_param = 0;
@@ -552,10 +548,6 @@ ERR_load_prxyerr_strings(
 #endif
 
         i++;
-#ifdef USE_PKCS11
-        i = ERR_load_scerr_strings(i);
-#endif
-
     }
     return i;
 }
@@ -2295,19 +2287,6 @@ Description:
     Then on input if there is a proxy, the user_cert and user_key are set to
     use the proxy.
 
-    Smart card support using PKCS#11 is controled by the USE_PKCS11 flag.
-
-    If the filename for the user key starts with SC: then it is assumed to be
-    of the form SC:card:label where card is the name of a smart card, and label
-    is the label of the key on the card. The card must be using Cryptoki
-    (PKCS#11) This code has been developed using the DataKey implementation
-    under Windows 95.
-
-    This will allow the cert to have the same form, with the same label as well
-    in the future.
-
-
-
 Parameters:
 
 Returns:
@@ -2783,8 +2762,7 @@ err:
 Function: proxy_load_user_cert()
 
 Description:
-    loads the users cert. May need a pw callback for Smartcard PIN.
-    May use a smartcard too.
+    loads the users cert.
 
 Parameters:
 
@@ -2880,51 +2858,6 @@ proxy_load_user_cert(
 
     if (!strncmp(user_cert,"SC:",3))
     {
-#ifdef USE_PKCS11
-        char * cp;
-        char * kp;
-        int rc;
-
-        cp = user_cert + 3;
-        kp = strchr(cp,':');
-        if (kp == NULL)
-        {
-            PRXYerr(PRXYERR_F_INIT_CRED,PRXYERR_R_PROBLEM_USER_NOCERT_FILE);
-            ERR_add_error_data(2, "\n        SmartCard reference=",
-                               user_cert);
-            status = PRXYERR_R_PROBLEM_USER_NOCERT_FILE;
-            goto err;
-        }
-
-        kp++; /* skip the : */
-
-        if (*hSession == 0)
-        {
-            rc = sc_init(hSession, cp, NULL, NULL, CKU_USER, 0);
-
-            if (rc)
-            {
-                PRXYerr(PRXYERR_F_INIT_CRED,PRXYERR_R_PROCESS_CERT);
-                ERR_add_error_data(
-                    1,
-                    "\n        Failed to open session to smartcard");
-                status = PRXYERR_R_PROCESS_CERT;
-                goto err;
-            }
-        }
-        rc = sc_get_cert_obj_by_label(*hSession,kp,
-                                      certificate);
-        if (rc)
-        {
-            PRXYerr(PRXYERR_F_INIT_CRED,PRXYERR_R_PROCESS_CERT);
-            ERR_add_error_data(
-                2,
-                "\n        Could not find certificate on smartcard, label=",
-                kp);
-            status = PRXYERR_R_PROCESS_CERT;
-            goto err;
-        }
-#else
         PRXYerr(PRXYERR_F_INIT_CRED,PRXYERR_R_PROCESS_CERT);
         ERR_add_error_data(
             1,
@@ -2937,7 +2870,6 @@ proxy_load_user_cert(
          * the random number generator on the card
          */
 
-#endif /* USE_PKCS11 */
     }
     else
     {
@@ -2981,7 +2913,6 @@ Function: proxy_load_user_key()
 Description:
     loads the users key. Assumes the cert has been loaded,
     and checks they match.
-    May use a smartcard too.
 
 Parameters:
 
@@ -3026,47 +2957,6 @@ proxy_load_user_key(
 
     if (!strncmp(user_key,"SC:",3))
     {
-#ifdef USE_PKCS11
-        char *cp;
-        char *kp;
-        int rc;
-
-        cp = user_key + 3;
-        kp = strchr(cp,':');
-        if (kp == NULL)
-        {
-            PRXYerr(PRXYERR_F_INIT_CRED,PRXYERR_R_PROBLEM_KEY_FILE);
-            ERR_add_error_data(2,"\n        SmartCard reference=",user_key);
-            status = PRXYERR_R_PROBLEM_KEY_FILE;
-            goto err;
-        }
-        kp++; /* skip the : */
-        if (*hSession == 0)
-        {
-            rc = sc_init(hSession, cp, NULL, NULL, CKU_USER, 0);
-            if (rc)
-            {
-                PRXYerr(PRXYERR_F_INIT_CRED,PRXYERR_R_PROCESS_KEY);
-                ERR_add_error_data(
-                    1,
-                    "\n        Failed to open session to smartcard");
-                status = PRXYERR_R_PROCESS_KEY;
-                goto err;
-            }
-        }
-        rc = sc_get_priv_key_obj_by_label(hSession,kp,
-                                          private_key);
-        if (rc)
-        {
-            PRXYerr(PRXYERR_F_INIT_CRED,PRXYERR_R_PROCESS_KEY);
-            ERR_add_error_data(
-                2,
-                "\n        Could not find key on smartcard, label=",
-                kp);
-            status = PRXYERR_R_PROCESS_KEY;
-            goto err;
-        }
-#else
         PRXYerr(PRXYERR_F_INIT_CRED,PRXYERR_R_PROCESS_KEY);
         ERR_add_error_data(
             1,
@@ -3079,7 +2969,6 @@ proxy_load_user_key(
          * the random number generator on the card
          */
 
-#endif /* USE_PKCS11 */
     }
     else
     {
@@ -3485,10 +3374,7 @@ int load_credentials(const char *certname, const char *keyname,
 
   unsigned long hSession = 0;
 
-  if (!strncmp(certname, "SC:", 3))
-    EVP_set_pw_prompt("Enter card pin:");
-  else
-    EVP_set_pw_prompt("Enter GRID pass phrase for this identity:");
+  EVP_set_pw_prompt("Enter GRID pass phrase for this identity:");
 
   if (strcmp(certname + strlen(certname) - 4, ".p12")) {
     if(proxy_load_user_cert(certname, cert, callback, &hSession))
@@ -3497,9 +3383,6 @@ int load_credentials(const char *certname, const char *keyname,
     EVP_set_pw_prompt("Enter GRID pass phrase:");
 
     if (keyname) {
-      if (!strncmp(keyname, "SC:", 3))
-        EVP_set_pw_prompt("Enter card pin:");
-
       if (proxy_load_user_key(key, *cert, keyname, callback, &hSession))
         goto err;
     }

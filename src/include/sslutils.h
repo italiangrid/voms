@@ -302,10 +302,6 @@ ERR_set_continue_needed(void);
 #define PRXYERR_R_ERROR_BUILDING_SUBJECT                 PRXYERR_R_BASE + 68
 
 
-
-/* NOTE: Don't go over 1500 here or will conflict with errors in scutils.h */
-
-
 /**********************************************************************
                                Type definitions
 **********************************************************************/

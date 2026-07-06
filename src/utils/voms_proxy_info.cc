@@ -56,9 +56,6 @@ extern "C" {
 #include "openssl/stack.h"
 #include "openssl/opensslv.h"
 
-#ifdef USE_PKCS11
-#include "scutils.h"
-#endif
 #include "sslutils.h"
 #include "newformat.h"
 #include "listfunc.h"
