@@ -97,10 +97,6 @@ static std::string getKeyUsage(X509 *cert);
 
 std::string program;
 
-#ifdef WIN32
-static int getuid() { return 0;}
-#endif
-
 static std::string file;
 
 static bool        progversion = false;
@@ -359,10 +355,6 @@ test_proxy()
   BIO  *in = NULL;
   X509 *x  = NULL;
   STACK_OF(X509) *chain = NULL;
-
-#ifdef WIN32
-  CRYPTO_malloc_init();
-#endif
 
   ERR_load_prxyerr_strings(0);
   SSLeay_add_ssl_algorithms();

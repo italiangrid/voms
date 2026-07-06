@@ -131,10 +131,6 @@ delete_proxy(void)
 {
   char *of;
 
-#ifdef WIN32
-  CRYPTO_malloc_init();
-#endif
-
   ERR_load_prxyerr_strings(0);
   SSLeay_add_ssl_algorithms();
 

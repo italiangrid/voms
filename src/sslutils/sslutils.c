@@ -46,28 +46,15 @@ Description:
 #endif
 
 #ifndef DEFAULT_SECURE_TMP_DIR
-#ifndef WIN32
 #define DEFAULT_SECURE_TMP_DIR "/tmp"
-#else
-#define DEFAULT_SECURE_TMP_DIR "c:\\tmp"
-#endif
 #endif
 
-#ifndef WIN32
 #define FILE_SEPERATOR "/"
-#else
-#define FILE_SEPERATOR "\\"
-#endif
 
-#ifdef WIN32
-#include "winglue.h"
-#include <io.h>
-#else
 #ifdef HAVE_UNISTD_H
 #include <unistd.h>
 #endif
 #include <dirent.h>
-#endif
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -302,29 +289,6 @@ X509_NAME_cmp_no_set(
     }
     return(0);
 }
-
-#ifdef WIN32
-/*********************************************************************
-Function: getuid, getpid
-
-Descriptions:
-        For Windows95, WIN32, we don't have these, so we will default
-    to using uid 0 and pid 0 Need to look at this better for NT.
-******************************************************************/
-static unsigned long
-getuid()
-{
-    return 0;
-}
-
-static int
-getpid()
-{
-    return 0;
-}
-
-#endif /* WIN32 */
-
 
 #if SSLEAY_VERSION_NUMBER < 0x0900
 
@@ -578,7 +542,6 @@ static int checkstat(const char* filename)
      */
     RAND_add((void*)&stx,sizeof(stx),2);
 
-#if !defined(WIN32) && !defined(TARGET_ARCH_CYGWIN)
     if (stx.st_uid != getuid())
     {
       return 2;
@@ -588,8 +551,6 @@ static int checkstat(const char* filename)
     {
         return 3;
     }
-
-#endif /* !WIN32 && !TARGET_ARCH_CYGWIN */
 
     if (stx.st_size == 0)
     {
@@ -2245,9 +2206,6 @@ Description:
     and key. If X509_USER_KEY is not defined, it will be assumed
     that the key is is the same file as the certificate.
 
-    If windows, look in the registry HKEY_CURRENT_USER for the
-    GSI_REGISTRY_DIR, then look for the x509_user_cert, etc.
-
     Then try $HOME/.globus/usercert.pem
     and $HOME/.globus/userkey.pem
         Unless it is being run as root, then look for
@@ -2314,20 +2272,6 @@ proxy_get_filenames(
     char *                              default_user_key = NULL;
     char *                              default_cert_dir = NULL;
     char *                              installed_cert_dir = NULL;
-#ifdef WIN32
-    HKEY                                hkDir = NULL;
-    char                                val_user_cert[512];
-    char                                val_user_key[512];
-    char                                val_user_proxy[512];
-    char                                val_cert_dir[512];
-    char                                val_cert_file[512];
-    LONG                                lval;
-    DWORD                               type;
-#endif
-
-#ifdef WIN32
-    RegOpenKey(HKEY_CURRENT_USER,GSI_REGISTRY_DIR,&hkDir);
-#endif
 
     /* setup some default values */
     if (p_cert_dir)
@@ -2340,17 +2284,6 @@ proxy_get_filenames(
     {
         cert_dir = (char *)getenv(X509_CERT_DIR);
     }
-#ifdef WIN32
-    if (!cert_dir)
-    {
-        lval = sizeof(val_cert_dir)-1;
-        if (hkDir && (RegQueryValueEx(hkDir,"x509_cert_dir",0,&type,
-                                      val_cert_dir,&lval) == ERROR_SUCCESS))
-        {
-            cert_dir = val_cert_dir;
-        }
-    }
-#endif
     if (p_cert_file)
     {
         cert_file = *p_cert_file;
@@ -2360,17 +2293,6 @@ proxy_get_filenames(
     {
         cert_file = (char *)getenv(X509_CERT_FILE);
     }
-#ifdef WIN32
-    if (!cert_file)
-    {
-        lval = sizeof(val_cert_file)-1;
-        if (hkDir && (RegQueryValueEx(hkDir,"x509_cert_file",0,&type,
-                                      val_cert_file,&lval) == ERROR_SUCCESS))
-        {
-            cert_file = val_cert_file;
-        }
-    }
-#endif
 
     if (cert_dir == NULL)
     {
@@ -2379,13 +2301,6 @@ proxy_get_filenames(
          * If ~/.globus/certificates exists, then use that
          */
         home = getenv("HOME");
-#ifndef WIN32
-        /* Under windows use c:\windows as default home */
-        if (!home)
-        {
-            home = "c:\\windows";
-        }
-#endif /* WIN32 */
 
         if (home)
         {
@@ -2404,7 +2319,6 @@ proxy_get_filenames(
                 cert_dir = default_cert_dir;
             }
         }
-
 
         /*
          * Now check for host based default directory
@@ -2510,17 +2424,6 @@ proxy_get_filenames(
     {
         user_proxy = (char *)getenv(X509_USER_PROXY);
     }
-#ifdef WIN32
-    if (!user_proxy)
-    {
-        lval = sizeof(val_user_proxy)-1;
-        if (hkDir && (RegQueryValueEx(hkDir,"x509_user_proxy",0,&type,
-                                      val_user_proxy,&lval) == ERROR_SUCCESS))
-        {
-            user_proxy = val_user_proxy;
-        }
-    }
-#endif
     if (!user_proxy && !getenv("X509_RUN_AS_SERVER"))
     {
         default_user_proxy = snprintf_wrap("%s%s%s%lu",
@@ -2535,10 +2438,8 @@ proxy_get_filenames(
             goto err;
         }
 
-#ifndef WIN32
         if ((!proxy_in || getuid() != 0)
             && checkstat(default_user_proxy) == 0)
-#endif
         {
             user_proxy = default_user_proxy;
         }
@@ -2565,21 +2466,6 @@ proxy_get_filenames(
             user_cert = (char *)getenv(X509_USER_CERT);
         }
 
-#ifdef WIN32
-        if (!user_cert)
-        {
-            lval = sizeof(val_user_cert)-1;
-            if (hkDir && (RegQueryValueEx(
-                              hkDir,
-                              "x509_user_cert",
-                              0,
-                              &type,
-                              val_user_cert,&lval) == ERROR_SUCCESS))
-            {
-                user_cert = val_user_cert;
-            }
-        }
-#endif
         if (user_cert)
         {
             if (p_user_key)
@@ -2590,21 +2476,6 @@ proxy_get_filenames(
             {
                 user_key = (char *)getenv(X509_USER_KEY);
             }
-#ifdef WIN32
-            if (!user_key)
-            {
-                lval = sizeof(val_user_key)-1;
-                if (hkDir && (RegQueryValueEx(
-                                  hkDir,
-                                  "x509_user_key",
-                                  0,
-                                  &type,
-                                  val_user_key,&lval) == ERROR_SUCCESS))
-                {
-                    user_key = val_user_key;
-                }
-            }
-#endif
             if (!user_key)
             {
                 user_key = user_cert;
@@ -2612,7 +2483,6 @@ proxy_get_filenames(
         }
         else
         {
-#ifndef WIN32
             if (getuid() == 0)
             {
                 if (checkstat(X509_DEFAULT_HOST_CERT) != 1)
@@ -2625,7 +2495,6 @@ proxy_get_filenames(
                 }
             }
             else
-#endif
             {
                 if (!home)
                 {
@@ -2633,12 +2502,8 @@ proxy_get_filenames(
                 }
                 if (!home)
                 {
-#ifndef WIN32
                     PRXYerr(PRXYERR_F_INIT_CRED,PRXYERR_R_NO_HOME);
                     goto err;
-#else
-                    home = "c:\\";
-#endif
                 }
 
                 default_user_cert = snprintf_wrap("%s%s%s",
@@ -2743,12 +2608,6 @@ err:
         *p_user_key = strdup(user_key);
       }
     }
-#ifdef WIN32
-    if (hkDir)
-    {
-        RegCloseKey(hkDir);
-    }
-#endif
 
     free(default_user_proxy);
     free(installed_cert_dir);
@@ -2937,12 +2796,6 @@ proxy_load_user_key(
       return 0;
 
     xpw_cb = pw_cb;
-#ifdef WIN32
-    if (!xpw_cb)
-    {
-        xpw_cb = read_passphrase_win32;
-    }
-#endif
 
     /* Check arguments */
     if (!user_key)

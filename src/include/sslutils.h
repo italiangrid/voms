@@ -129,18 +129,6 @@ EXTERN_C_BEGIN
 /* This is added after the CA name hash to make the policy filename */
 #define SIGNING_POLICY_FILE_EXTENSION   ".signing_policy"
 
-#ifdef WIN32
-#define GSI_REGISTRY_DIR "software\\Globus\\GSI"
-#define X509_DEFAULT_CERT_DIR   ".globus\\certificates"
-#define X509_DEFAULT_USER_CERT  ".globus\\usercert.pem"
-#define X509_DEFAULT_USER_CERT_P12  ".globus\\usercert.p12"
-#define X509_DEFAULT_USER_CERT_P12_GT  ".globus\\usercred.p12"
-#define X509_DEFAULT_USER_KEY   ".globus\\userkey.pem"
-#define X509_INSTALLED_CERT_DIR "share\\certificates"
-#define X509_INSTALLED_HOST_CERT_DIR "NEEDS_TO_BE_DETERMINED"
-#define X509_DEFAULT_HOST_CERT  "NEEDS_TO_BE_DETERMINED"
-#define X509_DEFAULT_HOST_KEY   "NEEDS_TO_BE_DETERMINED"
-#else
 #define X509_DEFAULT_CERT_DIR   ".globus/certificates"
 #define X509_DEFAULT_USER_CERT  ".globus/usercert.pem"
 #define X509_DEFAULT_USER_CERT_P12  ".globus/usercert.p12"
@@ -150,7 +138,6 @@ EXTERN_C_BEGIN
 #define X509_INSTALLED_HOST_CERT_DIR "/etc/grid-security/certificates"
 #define X509_DEFAULT_HOST_CERT  "/etc/grid-security/hostcert.pem"
 #define X509_DEFAULT_HOST_KEY   "/etc/grid-security/hostkey.pem"
-#endif
 
 /*
  * To allow the use of the proxy_verify_callback with 

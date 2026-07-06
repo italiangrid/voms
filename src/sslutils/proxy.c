@@ -107,14 +107,12 @@ int VOMS_WriteProxy(const char *filename, struct VOMSProxy *proxy)
     retry --;
   }
 
-#ifndef WIN32
   if (fd != -1) {
     if (fchmod(fd, S_IRUSR|S_IWUSR) < 0) {
       close(fd);
       return -1;
     }
   }
-#endif
 
   if (fd != -1) {
     if ((bp = BIO_new_fd(fd, BIO_NOCLOSE)) != NULL) {

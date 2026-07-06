@@ -140,10 +140,6 @@ int main(int argc, char *argv[])
     char *dat;
     int line;
 
-  /* WIN32 does not have the ERR_get_error_line_data */
-  /* exported, so simulate it till it is fixed */
-  /* in SSLeay-0.9.0 */
-
     while ( ERR_peek_error() != 0 ) {
 
       int i;
