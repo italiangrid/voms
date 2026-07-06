@@ -1,5 +1,5 @@
 ACLOCAL_AMFLAGS=-I m4
-SUBDIRS = src doc m4 testsuite
+SUBDIRS = src doc m4
 
 EXTRA_DIST = autogen.sh LICENSE
 
@@ -55,7 +55,6 @@ distclean-local:
 	rm -f configure aclocal.m4 $(distdir).tar.gz 
 	rm -f m4/libtool.m4 m4/ltoptions.m4 m4/ltsugar.m4 m4/ltversion.m4 m4/lt~obsolete.m4
 	rm -rf autom4te.cache aux src/autogen $(rpmbuild_dir) $(debbuild_dir)
-	rm -rf testsuite/dbg.log
 	find . -name Makefile.in -exec rm {} \;
 
 
