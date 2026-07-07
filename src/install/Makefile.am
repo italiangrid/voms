@@ -41,4 +41,8 @@ install-exec-hook: voms.start
 install-data-hook: sysconfig-voms
 	$(mkinstalldirs) $(DESTDIR)$(sysconfigdir)
 	$(INSTALL) -m 644 $(top_builddir)/src/install/sysconfig-voms $(DESTDIR)$(sysconfigdir)/voms
+
+uninstall-hook:
+	rm -f $(DESTDIR)$(initdir)/voms $(DESTDIR)$(sysconfigdir)/voms
+	rmdir $(DESTDIR)$(initdir) $(DESTDIR)$(sysconfigdir) 2>/dev/null || true
 endif

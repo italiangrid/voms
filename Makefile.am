@@ -25,6 +25,10 @@ apidoc-local: $(APIDOC_FILES)
 	  $(INSTALL_DATA) $${file} $(APIDOC_DIR); \
 	done
 
+uninstall-hook:
+	rm -f $(APIDOC_DIR)/AUTHORS $(APIDOC_DIR)/LICENSE $(APIDOC_DIR)/README
+	rmdir $(APIDOC_DIR) 2>/dev/null || true
+
 apidoc-recursive:
 	$(MAKE) apidoc -C api
 
