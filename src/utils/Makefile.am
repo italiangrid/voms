@@ -9,7 +9,6 @@ AM_CPPFLAGS = \
 	-I$(top_srcdir)/src/api/ccapi \
 	-I$(top_srcdir)/src/include \
 	-I$(top_srcdir)/src/sslutils \
-	$(NO_GLOBUS_FLAGS) \
 	$(OPENSSL_CFLAGS)
 
 voms_proxy_info_SOURCES = \
@@ -17,7 +16,7 @@ voms_proxy_info_SOURCES = \
 
 voms_proxy_info_LDADD = \
 	$(top_builddir)/src/api/ccapi/libvomsapi.la  \
-	$(top_builddir)/src/sslutils/libssl_utils_nog.la \
+	$(top_builddir)/src/sslutils/libssl_utils.la \
 	$(OPENSSL_LIBS) \
 	$(EXPAT_LIBS) 
 
@@ -26,7 +25,7 @@ voms_proxy_destroy_SOURCES = \
 
 voms_proxy_destroy_LDADD = \
 	$(top_builddir)/src/api/ccapi/libvomsapi.la  \
-	$(top_builddir)/src/sslutils/libssl_utils_nog.la \
+	$(top_builddir)/src/sslutils/libssl_utils.la \
 	$(OPENSSL_LIBS) \
 	$(EXPAT_LIBS) 
 
@@ -35,7 +34,7 @@ voms_verify_SOURCES = \
 
 voms_verify_LDADD = \
 	$(top_builddir)/src/api/ccapi/libvomsapi.la  \
-	$(top_builddir)/src/sslutils/libssl_utils_nog.la \
+	$(top_builddir)/src/sslutils/libssl_utils.la \
 	$(OPENSSL_LIBS) 
 
 voms_proxy_fake_SOURCES = \
@@ -61,7 +60,7 @@ endif
 
 voms_proxy_fake_LDADD = \
 	$(top_builddir)/src/api/ccapi/libvomsapi.la  \
-	$(top_builddir)/src/sslutils/libssl_utils_nog.la \
+	$(top_builddir)/src/sslutils/libssl_utils.la \
 	$(OPENSSL_LIBS)
 
 endif

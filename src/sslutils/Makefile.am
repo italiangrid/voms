@@ -5,7 +5,7 @@ include_HEADERS = \
 	vomsproxy.h
 endif
 
-noinst_LTLIBRARIES = libssl_utils_nog.la
+noinst_LTLIBRARIES = libssl_utils.la
 
 SOURCES= sslutils.c proxycertinfo.c proxypolicy.c \
 	signing_policy.c lex.signing.c namespaces.c lex.namespaces.c \
@@ -42,15 +42,8 @@ lex.namespaces.c: namespaces.l namespaces.h namespaces.c
 	$(LEX) -b -f -d $(srcdir)/namespaces.l
 endif
 
-libssl_utils_nog_la_SOURCES= $(SOURCES)
+libssl_utils_la_SOURCES= $(SOURCES)
 
 libssl_utils_la_CFLAGS = \
 	-I $(top_srcdir)/src/include \
 	$(OPENSSL_CFLAGS)
-
-libssl_utils_nog_la_CFLAGS = \
-	$(NO_GLOBUS_FLAGS) \
-	-I $(top_srcdir)/src/include \
-	$(OPENSSL_CFLAGS)
-
-###

@@ -23,14 +23,8 @@
  *
  *********************************************************************/
 
-#ifndef NOGLOBUS
-#define NOGLOBUS
-#endif
-
 extern "C" {
-#ifdef NOGLOBUS
 #include <pthread.h>
-#endif
 
 #include "config.h"
 
@@ -57,14 +51,8 @@ extern "C" {
 #include "sslutils.h"
 #include "gssapi_compat.h"
 
-#ifndef NOGLOBUS
-#ifdef HAVE_GLOBUS_MODULE_ACTIVATE
-#include <globus_module.h>
-#include <globus_openssl.h>
-#endif
-#else
 #include <openssl/crypto.h>
-#endif
+
 extern int InitProxyCertInfoExtension(int);
 }
 

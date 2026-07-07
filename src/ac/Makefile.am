@@ -4,7 +4,7 @@ AM_CPPFLAGS= \
 	$(OPENSSL_CFLAGS)
 
 noinst_LTLIBRARIES = \
-  libattributes_nog.la
+  libattributes.la
 
 AC_C_SOURCES = write.c extensions.c mystack.c error.c newformat.c init.c
 
@@ -17,17 +17,9 @@ EXTRA_DIST = \
 	extensions.h \
 	attributes.h
 
-libattributes_nog_la_SOURCES = $(AC_C_SOURCES) $(AC_CC_SOURCES)
+libattributes_la_SOURCES = $(AC_C_SOURCES) $(AC_CC_SOURCES)
 
-libattributes_nog_la_CFLAGS = \
-	$(NO_GLOBUS_FLAGS) \
-	-DNOGLOBUS
-
-libattributes_nog_la_CXXFLAGS = \
-	$(NO_GLOBUS_FLAGS) \
-	-DNOGLOBUS
-
-libattributes_nog_la_LIBADD = \
+libattributes_la_LIBADD = \
 	$(OPENSSL_LIBS)
 
 ###

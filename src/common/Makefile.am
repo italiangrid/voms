@@ -10,25 +10,17 @@ AM_LDFLAGS = \
 	$(OPENSSL_LIBS)
 
 noinst_LTLIBRARIES = \
-	libutilities_nog.la \
-	libutilc_nog.la
+	libutilities.la \
+	libutilc.la
 
-libutilities_nog_la_SOURCES = \
+libutilities_la_SOURCES = \
 	data.cc \
 	options.cc \
 	pass.cc \
 	fqan.cc \
 	xmlcc.cc
 
-libutilities_nog_la_CFLAGS = \
-	-DNOGLOBUS \
-	$(NO_GLOBUS_FLAGS)
-
-libutilc_nog_la_CFLAGS = \
-	$(NO_GLOBUS_FLAGS) \
-	-DNOGLOBUS
-
-libutilc_nog_la_SOURCES = \
+libutilc_la_SOURCES = \
 	list.c \
 	failure.c \
 	doio.c \

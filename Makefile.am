@@ -9,7 +9,7 @@ USERDOC_DIR = $(top_builddir)/doc/userdoc
 APIDOC_FILES = $(top_srcdir)/AUTHORS $(top_srcdir)/LICENSE $(top_srcdir)/README
 USERDOC_FILES = $(APIDOC_FILES)
 
-spec=spec/voms-all.spec
+spec=$(top_srcdir)/voms.spec
 deb_comp="libvomsapi1 voms-dev voms-clients voms-server"
 
 rpmbuild_dir=@WORKDIR@/rpmbuild
@@ -61,11 +61,10 @@ distclean-local:
 	rm -rf autom4te.cache aux src/autogen $(rpmbuild_dir) $(debbuild_dir)
 	find . -name Makefile.in -exec rm {} \;
 
-
 rpm: dist
 	mkdir -p $(rpmbuild_dir)/BUILD $(rpmbuild_dir)/RPMS $(rpmbuild_dir)/SOURCES $(rpmbuild_dir)/SPECS $(rpmbuild_dir)/SRPMS
-	cp $(distdir).tar.gz $(rpmbuild_dir)/SOURCES
-	rpmbuild --nodeps -v -ba $(spec) --define "_topdir $(rpmbuild_dir)"
+	tar -C $(rpmbuild_dir)/BUILD -xvzf $(distdir).tar.gz --strip-components 1
+	rpmbuild --nodeps -v -ba $(spec) --define "_topdir $(rpmbuild_dir)" --define "base_version 2.1.3"
 
 deb: dist
 	mkdir -p $(debbuild_dir)

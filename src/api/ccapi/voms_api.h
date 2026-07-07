@@ -30,10 +30,6 @@
 #include <string>
 #include <vector>
 
-#ifndef NOGLOBUS
-#define NOGLOBUS
-#endif
-
 extern "C" {
 #ifndef GSSAPI_H_
 /*
@@ -415,7 +411,6 @@ public:
   std::string ErrorMessage(void); /*!< Gets a textual description of the error.
             \return A string containg the error message. */
 
-#ifdef NOGLOBUS
   bool RetrieveFromCtx(gss_ctx_id_t context, recurse_type how); /*!< Gets VOMS information from the given globus context
              \param context The context from which to retrieve the certificate.
              \param how Recursion type
@@ -425,7 +420,6 @@ public:
              \param credential The credential from which to retrieve the certificate.
              \param how Recursion type
              \return failure (F) or success (T)*/
-#endif
 
   bool Retrieve(X509_EXTENSION *ext); /*!< Gets VOMS information from the given extension
              \param ext The extension to parse.

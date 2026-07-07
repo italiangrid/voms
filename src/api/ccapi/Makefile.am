@@ -17,8 +17,6 @@ libvomsapi_la_SOURCES = \
 
 libvomsapi_la_CXXFLAGS = \
 	$(PTHREAD_CFLAGS) \
-	$(NO_GLOBUS_FLAGS) \
-	-DNOGLOBUS \
 	-I$(top_srcdir)/src/include \
 	$(OPENSSL_CFLAGS)
 
@@ -30,12 +28,12 @@ libvomsapi_la_LIBADD = \
 	$(EXPAT_LIBS) \
 	$(OPENSSL_LIBS) \
 	$(PTHREAD_LIBS) \
-	$(top_builddir)/src/common/libutilities_nog.la \
-	$(top_builddir)/src/common/libutilc_nog.la \
-	$(top_builddir)/src/sslutils/libssl_utils_nog.la \
+	$(top_builddir)/src/common/libutilities.la \
+	$(top_builddir)/src/common/libutilc.la \
+	$(top_builddir)/src/sslutils/libssl_utils.la \
 	$(top_builddir)/src/log/liblog.la\
-	$(top_builddir)/src/socklib/libsock_nog.la \
-	$(top_builddir)/src/ac/libattributes_nog.la
+	$(top_builddir)/src/socklib/libsock.la \
+	$(top_builddir)/src/ac/libattributes.la
 
 
 
