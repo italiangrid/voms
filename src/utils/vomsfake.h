@@ -87,11 +87,6 @@ class Fake {
   std::string        targetlist;
   std::vector<std::string> fqans;
   
-#ifdef CLASS_ADD
-  void *             class_add_buf = NULL;
-  size_t             class_add_buf_len = 0;
-#endif
-  
   X509 *ucert;
   EVP_PKEY *upkey;
   STACK_OF(X509) *cert_chain;

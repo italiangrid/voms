@@ -398,22 +398,6 @@ struct VOMSProxy *VOMS_MakeProxy(struct VOMSProxyArguments *args, int *warning, 
     }
   }
 
-  /* class_add extension */
-
-#ifdef CLASS_ADD
-  
-  if (class_add_buf && class_add_buf_len > 0) {
-    if ((ex2 = proxy_extension_class_add_create((void *)args->class_add_buf, args->class_add_buf_len)) == NULL) {
-      PRXYerr(PRXYERR_F_PROXY_SIGN,PRXYERR_R_CLASS_ADD_EXT);
-      goto err;
-    }
-    
-    if (!SET_EXT(ex2))
-      goto err;
-  }
-
-#endif
-
   /* PCI extension */
   
   if (args->proxyversion>=3) {

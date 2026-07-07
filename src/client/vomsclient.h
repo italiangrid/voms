@@ -104,10 +104,6 @@ class Client {
   std::string              ordering;
   std::string              targetlist;
   std::vector<std::string> confiles;
-#ifdef CLASS_ADD
-  void *                   class_add_buf;
-  size_t                   class_add_buf_len;
-#endif
 
   //  proxy_cred_desc *        pcd;
   proxy_verify_desc        pvd;

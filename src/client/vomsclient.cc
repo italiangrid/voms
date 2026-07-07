@@ -141,10 +141,6 @@ Client::Client(int argc, char ** argv) :
                                          verify(false),
                                          noregen(false),
                                          version(0),
-#ifdef CLASS_ADD
-                                         class_add_buf(NULL),
-                                         class_add_buf_len(0),
-#endif 
                                          aclist(NULL),
                                          voID(""),
                                          listing(false),
@@ -278,9 +274,6 @@ Client::Client(int argc, char ** argv) :
       {"list",            0, (int *)&listing,     OPT_BOOL},
       {"rfc",             0, (int *)&rfc,         OPT_BOOL},
       {"old",             0, (int *)&old,         OPT_BOOL},
-#ifdef CLASS_ADD
-      {"classadd",        1, (int *)class_add_buf,OPT_STRING},
-#endif
       {"timeout",         1,        &timeout,     OPT_NUM},
       {"includeac",       1, (int *)&acfile,      OPT_STRING},
       {"dont-verify-ac",  0, (int *)&dontverifyac,OPT_BOOL},

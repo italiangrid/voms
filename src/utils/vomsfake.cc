@@ -175,10 +175,6 @@ Fake::Fake(int argc, char ** argv) :   confile(conf_file_name),
                                        vomslife(-1), proxyver(0),
                                        pathlength(1), verify(false), 
                                        noregen(false), version(0),
-#ifdef CLASS_ADD
-                                       class_add_buf(NULL),
-                                       class_add_buf_len(0),
-#endif					   
                                        ucert(NULL), upkey(NULL), cert_chain(NULL),
                                        aclist(NULL), voID(""),
                                        hostcert(""), hostkey(""),
@@ -320,9 +316,6 @@ Fake::Fake(int argc, char ** argv) :   confile(conf_file_name),
     {"acextension",     1, (int *)&acextensions,OPT_MULTI},
     {"selfsigned",      0, (int *)&selfsigned,  OPT_BOOL},
     {"ga",              1, (int *)&galist,      OPT_MULTI},
-#ifdef CLASS_ADD
-    {"classadd",        1, (int *)class_add_buf,OPT_STRING},
-#endif
     {0, 0, 0, 0}
   };
 

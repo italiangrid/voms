@@ -419,10 +419,6 @@ int
 proxy_get_base_name(
     X509_NAME *                         subject);
 
-X509_EXTENSION *
-proxy_extension_class_add_create(
-    void *                              buffer, 
-    size_t                              length);
 /*
  * SSLeay does not have a compare time function
  * So we add a convert to time_t function
