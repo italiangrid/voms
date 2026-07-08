@@ -9,6 +9,7 @@ Summary:  Virtual Organization Membership Service
 Group:    System Environment/Libraries
 License:  Apache-2.0
 URL:      https://italiangrid.github.io/voms/
+Source:   %{name}-%{version}.tar.gz
 
 BuildRequires: make
 BuildRequires: gcc-c++
@@ -108,7 +109,7 @@ authorization purposes.
 This package provides the VOMS service.
 
 %prep
-
+%setup -q
 # Fix bad permissions (which otherwise end up in the debuginfo package)
 find . '(' -name '*.h' -o -name '*.c' -o -name '*.cpp' -o \
         -name '*.cc' -o -name '*.java' ')' -exec chmod a-x {} ';'

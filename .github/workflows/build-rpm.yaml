@@ -11,21 +11,25 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [almalinux]
-        version: [8, 9, 10]
+        os: [almalinux:8, almalinux:9, almalinux:10, fedora:45]
     outputs:
       repo: ${{ steps.info.outputs.repo }}
       version: ${{ steps.info.outputs.version }}
     runs-on: ubuntu-latest
-    container: '${{ matrix.os }}:${{ matrix.version }}'
+    container: '${{ matrix.os }}'
     steps:
+      - name: Generate env variables
+        run: |
+          OS_FULL=${{ matrix.os }}
+          echo "OS_NAME=${OS_FULL%:*}" >> "${GITHUB_ENV}"
+          echo "OS_VERSION=${OS_FULL#*:}" >> "${GITHUB_ENV}"
       - name: Install dependencies
         run: |
           dnf upgrade -y
-          dnf install -y epel-release
-          [[ "${{ matrix.version }}" = 8 ]] && dnf config-manager --set-enabled powertools
-          [[ "${{ matrix.version }}" = 9 ]] && dnf config-manager --set-enabled crb
-          [[ "${{ matrix.version }}" = 10 ]] && dnf install -y almalinux-release-devel
+          [[ "${OS_NAME}" = 'almalinux' ]] && dnf install -y epel-release
+          [[ "${{ matrix.os }}" = 'almalinux:8' ]] && dnf config-manager --set-enabled powertools
+          [[ "${{ matrix.os }}" = 'almalinux:9' ]] && dnf config-manager --set-enabled crb
+          [[ "${{ matrix.os }}" = 'almalinux:10' ]] && dnf install -y almalinux-release-devel
           dnf install -y bison docbook-style-xsl doxygen expat-devel gcc-c++ git gsoap-devel libtool libxslt make openssl-devel pkgconfig pkgconfig rpm-sign rpmdevtools rpmlint
       - name: Setup build tree
         run: |
@@ -33,12 +37,12 @@ jobs:
           rpmdev-setuptree
       - uses: actions/checkout@v6
         with:
-          path: 'rpmbuild/BUILD'
+          path: 'repo'
           fetch-depth: 0
       - name: Calculate version and repo
         id: info
         run: |
-          cd rpmbuild/BUILD
+          cd repo
           if [[ ${{ github.ref_type }} = 'tag' ]]; then
             # In case is a tag, check if the tag matches v<x>.<y>.<z>(-[0-9A-Za-z-]+)?
             if [[ ${GITHUB_REF_NAME} =~ ^v([0-9]+\.[0-9]+\.[0-9]+)(-[[:alnum:]-]+)?$ ]]; then
@@ -69,8 +73,12 @@ jobs:
           echo "version=${VERSION}" >> "${GITHUB_OUTPUT}"
           echo "Version: ${VERSION}"
           echo "Repo: ${REPO:-none}"
+      - name: Create source tarball
+        run: |
+          mv repo voms-${VERSION}
+          tar -cvaf rpmbuild/SOURCES/voms-${VERSION}.tar.gz voms-${VERSION}
       - name: Import GPG key
-        if: ${{ matrix.version != 8 }}
+        if: ${{ matrix.os != 'almalinux:8' }}
         env:
           MAVEN_GPG_KEY: ${{ secrets.MAVEN_GPG_KEY }}
           MAVEN_GPG_PASSPHRASE: ${{ secrets.MAVEN_GPG_PASSPHRASE }}
@@ -84,10 +92,10 @@ jobs:
           echo "%_gpg_sign_cmd_extra_args --pinentry-mode loopback --passphrase ${MAVEN_GPG_PASSPHRASE}" >> ~/.rpmmacros
       - name: Build RPM
         run: |
-          cp rpmbuild/BUILD/voms.spec rpmbuild/SPECS/voms.spec
+          cp voms-${VERSION}/voms.spec rpmbuild/SPECS/voms.spec
           rpmlint rpmbuild/SPECS/voms.spec
           rpmbuild --define "base_version ${VERSION}" -ba rpmbuild/SPECS/voms.spec
-          if [[ "${{ matrix.version }}" = 8 ]]; then
+          if [[ "${{ matrix.os }}" = 'almalinux:8' ]]; then
             echo "Skip signing on AlmaLinux 8 to avoid error: RPM-GPG-KEY-pmanager: key 1 import failed"
             exit 0
           fi
@@ -96,7 +104,7 @@ jobs:
           done
       - uses: actions/upload-artifact@v5
         with:
-          name: build-rpm-${{ matrix.os }}-${{ matrix.version }}
+          name: build-rpm-${{ env.OS_NAME }}-${{ env.OS_VERSION }}
           path: |
             rpmbuild/RPMS/**/*.rpm
       - name: Upload release to repo
@@ -104,8 +112,13 @@ jobs:
         env:
           NEXUS_PASSWORD: ${{ secrets.NEXUS_PASSWORD }}
         run: |
+          if [ "${OS_NAME}" = 'almalinux' ]; then
+            OS_REPO="redhat"
+          else
+            OS_REPO="${OS_NAME}"
+          fi
           for file in rpmbuild/RPMS/*/*.rpm; do
-            curl --fail --user "${{ vars.NEXUS_USERNAME }}:${NEXUS_PASSWORD}" --upload-file "${file}" https://repo.cloud.cnaf.infn.it/repository/voms-rpm-${REPO}/redhat${{ matrix.version }}/
+            curl --fail --user "${{ vars.NEXUS_USERNAME }}:${NEXUS_PASSWORD}" --upload-file "${file}" https://repo.cloud.cnaf.infn.it/repository/voms-rpm-${REPO}/${OS_REPO}${OS_VERSION}/
           done
   create-release:
     needs: build-rpm
