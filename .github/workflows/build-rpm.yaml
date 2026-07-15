@@ -35,7 +35,7 @@ jobs:
         run: |
           echo "%_topdir $(pwd)/rpmbuild" >> ~/.rpmmacros
           rpmdev-setuptree
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
         with:
           path: 'repo'
           fetch-depth: 0
@@ -102,7 +102,7 @@ jobs:
           for file in rpmbuild/RPMS/*/*.rpm; do
             GPG_TTY="" rpm --addsign "${file}"
           done
-      - uses: actions/upload-artifact@v5
+      - uses: actions/upload-artifact@v7
         with:
           name: build-rpm-${{ env.OS_NAME }}-${{ env.OS_VERSION }}
           path: |
@@ -129,8 +129,8 @@ jobs:
     if: needs.build-rpm.outputs.repo == 'stable'
     steps:
       - name: Check out repository code
-        uses: actions/checkout@v6
-      - uses: actions/download-artifact@v6
+        uses: actions/checkout@v7
+      - uses: actions/download-artifact@v8
       - name: Create release
         run: |
           # Get from the changelog file only the part related to the tagged release, in particular:
