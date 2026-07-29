@@ -673,6 +673,8 @@ bool vomsdata::DefaultData(voms &d)
 
 bool vomsdata::loadfile(std::string filename, UNUSED(uid_t uid), UNUSED(gid_t gid))
 {
+  seterror(VERR_NONE, "");
+
   struct stat stats;
 
   struct vomsdata data;
