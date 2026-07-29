@@ -30,12 +30,6 @@ inline std::string to_string(ASN1_STRING const* value)
     return {};
   }
 
-  // special case a time. note that ASN1_TIME is a typedef for ASN1_STRING
-  auto type = ASN1_STRING_type(value);
-  if (type == V_ASN1_GENERALIZEDTIME || type == V_ASN1_UTCTIME) {
-    return asn1_time_to_string(value);
-  }
-
   return std::string{
     reinterpret_cast<char const*>(ASN1_STRING_get0_data(value)),
     static_cast<std::string::size_type>(ASN1_STRING_length(value))

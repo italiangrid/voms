@@ -857,7 +857,7 @@ bool Client::CreateProxy(std::string data, AC ** aclist, int version)
         {
           Print(INFO) << "\nCreated proxy in " << proxyfile
                       << ".\n\nYour proxy is valid until "
-                      << voms_internal::to_string(X509_get0_notAfter(proxy->cert)) << '\n';
+                      << voms_internal::asn1_time_to_string(X509_get0_notAfter(proxy->cert)) << '\n';
         }
       }
     } else {
@@ -1070,7 +1070,7 @@ static bool check_validity_dates(X509 const* cert, int& time_left, std::string& 
   }
 
   if (start_cmp > 0) {
-    error = "Certificate is not yet valid; validity starts on " + voms_internal::to_string(not_before);
+    error = "Certificate is not yet valid; validity starts on " + voms_internal::asn1_time_to_string(not_before);
     return false;
   }
 
@@ -1079,7 +1079,7 @@ static bool check_validity_dates(X509 const* cert, int& time_left, std::string& 
   time_left = days * 24 * 60 * 60 + secs;
 
   if (end_cmp < 0) {
-    error = "Certificate has expired on " + voms_internal::to_string(not_after);
+    error = "Certificate has expired on " + voms_internal::asn1_time_to_string(not_after);
     return false;
   }
 
