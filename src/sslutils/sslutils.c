@@ -2833,7 +2833,7 @@ proxy_load_user_key(
         if (ucertpkey != NULL
             && EVP_PKEY_base_id(ucertpkey) == EVP_PKEY_base_id(*private_key))
         {
-            RSA* public_rsa = EVP_PKEY_get0_RSA(ucertpkey);
+            RSA const* public_rsa = EVP_PKEY_get0_RSA(ucertpkey);
             if (public_rsa)
             {
               { /* add in key as random data too */
