@@ -22,5 +22,5 @@ voms_proxy_init_LDADD = \
 	$(EXPAT_LIBS)
 
 install-exec-hook:
-	-ln -s voms-proxy-init $(DESTDIR)$(bindir)/voms-proxy-list
+	-ln -sf voms-proxy-init $(DESTDIR)$(bindir)/voms-proxy-list
 endif
