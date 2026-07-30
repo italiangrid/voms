@@ -63,8 +63,8 @@ distclean-local:
 
 rpm: dist
 	mkdir -p $(rpmbuild_dir)/BUILD $(rpmbuild_dir)/RPMS $(rpmbuild_dir)/SOURCES $(rpmbuild_dir)/SPECS $(rpmbuild_dir)/SRPMS
-	tar -C $(rpmbuild_dir)/BUILD -xvzf $(distdir).tar.gz --strip-components 1
-	rpmbuild --nodeps -v -ba $(spec) --define "_topdir $(rpmbuild_dir)" --define "base_version 2.1.3"
+	cp $(distdir).tar.gz $(rpmbuild_dir)/SOURCES
+	rpmbuild --nodeps -v -ba $(spec) --define "_topdir $(rpmbuild_dir)"
 
 deb: dist
 	mkdir -p $(debbuild_dir)
