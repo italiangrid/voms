@@ -476,8 +476,7 @@ int writeac(X509 *issuerc, STACK_OF(X509) *issuerstack, X509 *holder, EVP_PKEY *
   EVP_MD const* md = EVP_get_digestbyobj(a->sig_alg->algorithm);
 
   if (md == NULL){
-    /* fall back to SHA1 */
-    md = EVP_sha1();
+    md = EVP_sha256();
   }
 
   ASN1_sign((i2d_of_void *)i2d_AC_INFO, a->acinfo->alg, a->sig_alg, a->signature,

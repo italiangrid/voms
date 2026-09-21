@@ -732,7 +732,7 @@ proxy_genreq(
 
     }
 
-    if (md == NULL) md = EVP_sha1();
+    if (md == NULL) md = EVP_sha256();
 
     if (!X509_REQ_sign(req,pkey,md))
     {
@@ -848,7 +848,7 @@ proxy_sign(
     EVP_MD const*                       sig_algo;
 
     sig_algo = EVP_get_digestbynid(X509_REQ_get_signature_nid(req));
-    if (sig_algo == NULL) sig_algo = EVP_sha1();
+    if (sig_algo == NULL) sig_algo = EVP_sha256();
 
     if(proxyver>=3) {
       unsigned sub_hash;
