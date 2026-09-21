@@ -2820,81 +2820,12 @@ proxy_load_user_key(
       fclose(fp);
     }
 
-    /*
-     * check that the private key matches the certificate
-     * Dont want a mixup of keys and certs
-     * Will only check rsa type for now.
-     */
-    if (ucert)
+    // check that certificate and private key match
+    if (ucert != NULL && X509_check_private_key(ucert, *private_key) != 1)
     {
-        ucertpkey = X509_get_pubkey(ucert);
-        int mismatch = 0;
-
-        if (ucertpkey != NULL
-            && EVP_PKEY_base_id(ucertpkey) == EVP_PKEY_base_id(*private_key))
-        {
-            RSA const* public_rsa = EVP_PKEY_get0_RSA(ucertpkey);
-            if (public_rsa)
-            {
-              { /* add in key as random data too */
-                BIGNUM const* p;
-                BIGNUM const* q;
-                RSA_get0_factors(public_rsa, &p, &q);
-                if(p != NULL)
-                {
-                  RAND_add(p, /* awful hack; d is the first field */
-                           BN_num_bytes(p),
-                           BN_num_bytes(p));
-                }
-                if (q != NULL)
-                {
-                  RAND_add(q, BN_num_bytes(q), BN_num_bytes(q));
-                }
-              }
-              {
-                BIGNUM const* public_n;
-                BIGNUM const* public_e;
-                RSA* private_rsa = EVP_PKEY_get0_RSA(*private_key);
-                RSA_get0_key(public_rsa, &public_n, &public_e, NULL);
-                if (public_n != NULL && private_rsa != NULL)
-                {
-                  BIGNUM const* private_n;
-                  BIGNUM const* private_e;
-                  RSA_get0_key(private_rsa, &private_n, &private_e, NULL);
-                  if (private_n != NULL && BN_num_bytes(private_n))
-                  {
-                      if (BN_cmp(public_n, private_n))
-                      {
-                          mismatch=1;
-                      }
-                  }
-                  else
-                  {
-                      int ret;
-                      BIGNUM* n = BN_dup(public_n);
-                      assert(n != NULL && "BN_dup failed");
-                      BIGNUM* e = BN_dup(public_e);
-                      assert(e != NULL && "BN_dup failed");
-                      ret = RSA_set0_key(private_rsa, n, e, NULL);
-                      assert(ret == 1 && "RSA_set0_key failed");
-                  }
-                }
-              }
-            }
-        }
-        else
-        {
-            mismatch=1;
-        }
-
-        EVP_PKEY_free(ucertpkey);
-
-        if (mismatch)
-        {
-            PRXYerr(PRXYERR_F_INIT_CRED,PRXYERR_R_KEY_CERT_MISMATCH);
-            status = PRXYERR_R_KEY_CERT_MISMATCH;
-            goto err;
-        }
+        PRXYerr(PRXYERR_F_INIT_CRED,PRXYERR_R_KEY_CERT_MISMATCH);
+        status = PRXYERR_R_KEY_CERT_MISMATCH;
+        goto err;
     }
 
     status = 0;
