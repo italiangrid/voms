@@ -6,13 +6,17 @@ SPDX-License-Identifier: Apache-2.0
 
 # Changelog
 
-## 2.1.4 (2026-07-31)
+## 2.1.4 (2026-10-07)
 
 ### What's changed
 
-* Support for OpenSSL 4
+* Add support for OpenSSL 4
+* Remove support for OpenSSL versions older than 1.1
+* Fallback to SHA-256 for signatures instead of SHA-1
+* Improve the check that certificate and private key match
 * Remove dead code for Windows, smart card support, DejaGnu testsuite, Globus, Class Add's and more
 * Build in C++17 mode
+* Improve const-correctness and fix related warnings
 * Add more platforms to CI builds
 * Some cleanup in build infrastructure
 
